@@ -3489,3 +3489,507 @@ ul.card-grid {
     bottom: 26%;
   }
 }
+
+/* ============================================================================================ *
+ * CABINET CONTROLS — the sweep that removes every remaining stock OS/web control.
+ *
+ * Everything below keeps the real element (a real <input type="checkbox">, a real
+ * <input type="range">, a real <details>/<summary>, a real <button>) so semantics, accessible
+ * names, roles and keyboard behaviour are untouched; only the paint changes. The vocabulary is
+ * design-v2's: solid bevels (--bevel-hi / --bevel-lo), solid press travel (--drop-N), cabinet
+ * grooves (--track) and metal domes (--metal-hi / --metal-lo). No blurred shadows, no images.
+ * ============================================================================================ */
+
+/* -- 1. Selection checkbox: a bronze coin slot that stamps a cookie mark ----------------------
+ * The native box is repainted with appearance:none rather than hidden, so it keeps its focus
+ * behaviour, its accessible name, and Space-to-toggle for free. Margin pads the 30px coin out
+ * to a 44px target without inflating the visible hardware. */
+.select-checkbox {
+  appearance: none;
+  -webkit-appearance: none;
+  flex: 0 0 auto;
+  width: 30px;
+  height: 30px;
+  margin: 7px;
+  padding: 0;
+  border-radius: var(--shape-full);
+  border: var(--border-thick) solid var(--cabinet-frame);
+  background: radial-gradient(circle at 50% 40%, var(--cabinet-frame), var(--track) 82%);
+  box-shadow:
+    inset 0 0 0 3px rgba(0, 0, 0, 0.35),
+    inset 0 5px 0 0 var(--bevel-lo),
+    0 var(--drop-1) 0 0 var(--cabinet-frame-dark);
+  cursor: pointer;
+  display: grid;
+  place-items: center;
+  position: relative;
+  transition:
+    transform calc(90ms * var(--motion-scale, 1)) ease,
+    box-shadow calc(90ms * var(--motion-scale, 1)) ease,
+    background calc(90ms * var(--motion-scale, 1)) ease;
+}
+
+/* The stamped cookie: a lit dome with three chips, drawn entirely from the token palette. */
+.select-checkbox::after {
+  content: '';
+  width: 16px;
+  height: 16px;
+  border-radius: var(--shape-full);
+  background: radial-gradient(circle at 40% 32%, var(--metal-hi), var(--metal-lo) 78%);
+  box-shadow:
+    0 0 0 2px var(--cabinet-frame-dark),
+    -4px -2px 0 0 var(--cabinet-frame-dark),
+    3px -3px 0 0 var(--cabinet-frame-dark),
+    1px 4px 0 0 var(--cabinet-frame-dark);
+  transform: scale(0);
+  transition: transform calc(120ms * var(--motion-scale, 1)) cubic-bezier(0.2, 1.4, 0.5, 1);
+}
+
+/* Selected = the coin has dropped: the base shortens and the face travels its full --drop-1. */
+.select-checkbox:checked {
+  background: radial-gradient(circle at 50% 38%, var(--spark), var(--spark-glow) 85%);
+  border-color: var(--cabinet-frame-dark);
+  transform: translateY(var(--drop-1));
+  box-shadow: inset 0 3px 0 0 rgba(0, 0, 0, 0.3);
+}
+
+.select-checkbox:checked::after {
+  transform: scale(1);
+}
+
+.select-checkbox:hover:not(:checked) {
+  background: radial-gradient(circle at 50% 40%, var(--cabinet-frame-dark), var(--spark-ring) 95%);
+}
+
+.select-checkbox:active {
+  transform: translateY(var(--drop-1));
+  box-shadow: inset 0 3px 0 0 rgba(0, 0, 0, 0.3);
+}
+
+.select-checkbox:focus-visible {
+  outline: var(--border-thick) solid var(--spark-ring);
+  outline-offset: 3px;
+}
+
+/* The regex-builder flag boxes are the same coin, one size down. */
+.regex-popover .flag-row label {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  min-height: 44px;
+  cursor: pointer;
+}
+
+.regex-popover .flag-row input[type='checkbox'] {
+  appearance: none;
+  -webkit-appearance: none;
+  width: 26px;
+  height: 26px;
+  margin: 0;
+  border-radius: var(--shape-full);
+  border: var(--border-thin) solid var(--cabinet-frame);
+  background: radial-gradient(circle at 50% 40%, var(--cabinet-frame), var(--track) 82%);
+  box-shadow:
+    inset 0 0 0 2px rgba(0, 0, 0, 0.35),
+    inset 0 4px 0 0 var(--bevel-lo),
+    0 3px 0 0 var(--cabinet-frame-dark);
+  cursor: pointer;
+  display: grid;
+  place-items: center;
+  transition:
+    transform calc(90ms * var(--motion-scale, 1)) ease,
+    box-shadow calc(90ms * var(--motion-scale, 1)) ease;
+}
+
+.regex-popover .flag-row input[type='checkbox']::after {
+  content: '';
+  width: 12px;
+  height: 12px;
+  border-radius: var(--shape-full);
+  background: radial-gradient(circle at 40% 32%, var(--metal-hi), var(--metal-lo) 78%);
+  box-shadow: 0 0 0 2px var(--cabinet-frame-dark);
+  transform: scale(0);
+  transition: transform calc(120ms * var(--motion-scale, 1)) ease;
+}
+
+.regex-popover .flag-row input[type='checkbox']:checked {
+  background: radial-gradient(circle at 50% 38%, var(--spark), var(--spark-glow) 85%);
+  transform: translateY(3px);
+  box-shadow: inset 0 2px 0 0 rgba(0, 0, 0, 0.3);
+}
+
+.regex-popover .flag-row input[type='checkbox']:checked::after {
+  transform: scale(1);
+}
+
+.regex-popover .flag-row input[type='checkbox']:focus-visible {
+  outline: var(--border-thick) solid var(--spark-ring);
+  outline-offset: 3px;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .select-checkbox,
+  .select-checkbox::after,
+  .regex-popover .flag-row input[type='checkbox'],
+  .regex-popover .flag-row input[type='checkbox']::after {
+    transition: none;
+  }
+}
+
+/* -- 2. Scrollbars: a cabinet groove with a domed metal thumb --------------------------------
+ * The default Chromium bar was the loudest remaining piece of stock chrome, in the shop rail,
+ * the dialogs and the upgrade strip. Non-WebKit engines get the standards-track two-colour
+ * form, which lands on the same palette. */
+/* NOTE: the standard `scrollbar-color` property is deliberately NOT set. Chromium honours it in
+   preference to the ::-webkit-scrollbar-* pseudo-elements, and the standard property can only
+   recolour the OS bar — it keeps the stepper arrows and the flat slab thumb, which is exactly
+   the stock look being removed here. Non-WebKit engines therefore keep their own bar; every
+   engine this app actually ships on is Chromium. */
+*::-webkit-scrollbar {
+  width: 18px;
+  height: 18px;
+}
+
+/* The routed channel is cut from the cabinet frame itself, so it stays clearly darker than
+   whatever panel surrounds it in both themes — --track alone was too close to the light panel. */
+*::-webkit-scrollbar-track {
+  background: var(--cabinet-frame);
+  border-radius: var(--shape-full);
+  border: var(--border-thin) solid var(--cabinet-frame-dark);
+  box-shadow: inset 0 0 0 3px rgba(0, 0, 0, 0.35);
+}
+
+*::-webkit-scrollbar-thumb {
+  background: linear-gradient(180deg, var(--metal-hi), var(--metal-lo));
+  border-radius: var(--shape-full);
+  border: var(--border-thin) solid var(--cabinet-frame-dark);
+  box-shadow:
+    inset 0 2px 0 0 var(--bevel-hi),
+    inset 0 -2px 0 0 rgba(0, 0, 0, 0.3);
+  min-height: 44px;
+}
+
+*::-webkit-scrollbar-thumb:hover {
+  background: linear-gradient(180deg, var(--spark), var(--spark-glow));
+}
+
+*::-webkit-scrollbar-thumb:active {
+  background: linear-gradient(180deg, var(--metal-lo), var(--cabinet-frame));
+}
+
+*::-webkit-scrollbar-thumb:horizontal {
+  min-height: 0;
+  min-width: 44px;
+}
+
+*::-webkit-scrollbar-corner {
+  background: var(--track);
+}
+
+/* No stepper arrows: those are unmistakably OS chrome. */
+*::-webkit-scrollbar-button {
+  display: none;
+  width: 0;
+  height: 0;
+}
+
+/* -- 3. Search field: a bezel-inset slot, and its gear becomes real hardware ------------------ */
+.search-field {
+  background: var(--panel-inset);
+  border-color: var(--cabinet-frame);
+  box-shadow:
+    inset 0 3px 0 0 var(--bevel-lo),
+    inset 0 -2px 0 0 var(--bevel-hi),
+    0 3px 0 0 var(--cabinet-frame-dark);
+}
+
+.search-field.regex-active {
+  border-color: var(--spark-ring);
+  box-shadow:
+    inset 0 3px 0 0 var(--bevel-lo),
+    0 3px 0 0 var(--spark-ring);
+}
+
+/* --on-surface-variant on --panel-inset clears AA; the browser default did not. */
+.search-field__input::placeholder {
+  color: var(--on-surface-variant);
+  opacity: 1;
+}
+
+.search-field__input:focus-visible {
+  outline: var(--border-thick) solid var(--spark-ring);
+  outline-offset: 1px;
+  border-radius: var(--shape-full);
+}
+
+.builder-toggle {
+  width: 44px;
+  height: 44px;
+  flex: 0 0 auto;
+  border: var(--border-thick) solid var(--cabinet-frame);
+  background: radial-gradient(circle at 40% 30%, var(--metal-hi), var(--metal-lo) 85%);
+  color: var(--cabinet-frame-dark);
+  font-family: var(--font-display);
+  font-weight: 900;
+  box-shadow:
+    inset 0 2px 0 0 var(--bevel-hi),
+    0 var(--drop-1) 0 0 var(--cabinet-frame-dark);
+  transition:
+    transform calc(90ms * var(--motion-scale, 1)) ease,
+    box-shadow calc(90ms * var(--motion-scale, 1)) ease;
+}
+
+.builder-toggle:active,
+.builder-toggle[aria-pressed='true'] {
+  transform: translateY(var(--drop-1));
+  box-shadow: inset 0 3px 0 0 rgba(0, 0, 0, 0.3);
+}
+
+.builder-toggle[aria-pressed='true'] {
+  background: radial-gradient(circle at 40% 30%, var(--spark), var(--spark-glow) 85%);
+  color: var(--cabinet-frame-dark);
+}
+
+.builder-toggle:focus-visible {
+  outline: var(--border-thick) solid var(--spark-ring);
+  outline-offset: 3px;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .builder-toggle {
+    transition: none;
+  }
+}
+
+/* The popover's own fields, mode segments and token keys, on the same idiom. */
+.regex-popover input[type='text'] {
+  background: var(--panel-inset);
+  border: var(--border-thin) solid var(--cabinet-frame);
+  border-radius: var(--shape-full);
+  min-height: 44px;
+  padding: 0 14px;
+  color: var(--on-surface);
+  box-shadow: inset 0 3px 0 0 var(--bevel-lo);
+}
+
+.regex-popover .mode-row {
+  background: var(--track);
+  border: var(--border-thick) solid var(--cabinet-frame);
+  border-radius: var(--shape-full);
+  padding: 3px;
+  box-shadow: inset 0 3px 0 0 var(--bevel-lo);
+}
+
+.regex-popover .mode-row button {
+  border: none;
+  background: transparent;
+  min-height: 40px;
+  border-radius: var(--shape-full);
+  color: var(--on-surface);
+}
+
+.regex-popover .mode-row button[aria-pressed='true'] {
+  background: radial-gradient(circle at 50% 20%, var(--metal-hi), var(--metal-lo) 92%);
+  color: var(--cabinet-frame-dark);
+  border: var(--border-thin) solid var(--cabinet-frame-dark);
+  box-shadow: inset 0 2px 0 0 var(--bevel-hi);
+}
+
+.regex-token-list button {
+  border: var(--border-thin) solid var(--cabinet-frame);
+  background: var(--surface-high);
+  color: var(--on-surface);
+  border-radius: 10px;
+  min-height: 36px;
+  box-shadow: 0 3px 0 0 var(--cabinet-frame-dark);
+}
+
+.regex-token-list button:active {
+  transform: translateY(3px);
+  box-shadow: none;
+}
+
+/* -- 4. The tool-progression toggle: a segmented cabinet switch with real travel --------------
+ * Still one <button aria-pressed>, so the role and the announced state are unchanged; the knob
+ * is a pseudo-element that slides across a routed slot. */
+.tools-hud__toggle {
+  position: relative;
+  display: inline-flex;
+  align-items: center;
+  padding: 0 18px 0 62px;
+  border-color: var(--cabinet-frame);
+  background: var(--track);
+  color: var(--on-surface);
+  font-family: var(--font-display);
+  font-weight: 900;
+  box-shadow:
+    inset 0 3px 0 0 var(--bevel-lo),
+    0 var(--drop-1) 0 0 var(--cabinet-frame-dark);
+}
+
+/* The routed slot the knob rides in. */
+.tools-hud__toggle::before {
+  content: '';
+  position: absolute;
+  left: 8px;
+  top: 50%;
+  transform: translateY(-50%);
+  width: 46px;
+  height: 24px;
+  border-radius: var(--shape-full);
+  background: var(--surface-highest);
+  border: 2px solid var(--cabinet-frame-dark);
+  box-shadow: inset 0 2px 0 0 var(--bevel-lo);
+}
+
+/* The knob itself. */
+.tools-hud__toggle::after {
+  content: '';
+  position: absolute;
+  left: 12px;
+  top: 50%;
+  width: 20px;
+  height: 20px;
+  border-radius: var(--shape-full);
+  background: radial-gradient(circle at 40% 30%, var(--metal-hi), var(--metal-lo) 85%);
+  border: 2px solid var(--cabinet-frame-dark);
+  transform: translateY(-50%);
+  transition: transform calc(140ms * var(--motion-scale, 1)) cubic-bezier(0.2, 1.2, 0.4, 1);
+}
+
+.tools-hud__toggle[aria-pressed='true'] {
+  background: var(--track);
+  border-color: var(--spark-ring);
+  color: var(--on-surface);
+}
+
+.tools-hud__toggle[aria-pressed='true']::before {
+  background: linear-gradient(180deg, var(--spark), var(--spark-glow));
+}
+
+.tools-hud__toggle[aria-pressed='true']::after {
+  transform: translate(26px, -50%);
+}
+
+.tools-hud__toggle:active {
+  transform: translateY(var(--drop-1));
+  box-shadow: inset 0 3px 0 0 rgba(0, 0, 0, 0.3);
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .tools-hud__toggle::after {
+    transition: none;
+  }
+}
+
+/* -- 5. Buy-quantity stepper: a routed track with a pressed-in coin segment ------------------- */
+.stepper {
+  background: var(--track);
+  border-color: var(--cabinet-frame);
+  box-shadow: inset 0 3px 0 0 var(--bevel-lo);
+}
+
+.stepper button {
+  color: var(--on-surface);
+  transition:
+    transform calc(90ms * var(--motion-scale, 1)) ease,
+    box-shadow calc(90ms * var(--motion-scale, 1)) ease;
+}
+
+.stepper button:hover:not([disabled]):not(.active) {
+  background: var(--surface-high);
+}
+
+/* The chosen quantity is a coin seated in its slot: rim, top-lit dome, sunk inner shadow. */
+.stepper button.active {
+  background: radial-gradient(circle at 50% 22%, var(--metal-hi), var(--metal-lo) 92%);
+  color: var(--cabinet-frame-dark);
+  border: var(--border-thin) solid var(--cabinet-frame-dark);
+  box-shadow:
+    inset 0 2px 0 0 var(--bevel-hi),
+    inset 0 -3px 0 0 rgba(0, 0, 0, 0.3);
+}
+
+.stepper button:focus-visible {
+  outline: var(--border-thick) solid var(--spark-ring);
+  outline-offset: 2px;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .stepper button {
+    transition: none;
+  }
+}
+
+/* -- 6. Range input: cabinet groove + domed thumb (the destructive gate's slider) ------------- */
+.gate__slider-wrap input[type='range'] {
+  appearance: none;
+  -webkit-appearance: none;
+  background: transparent;
+  height: 44px;
+  cursor: grab;
+}
+
+.gate__slider-wrap input[type='range']:active {
+  cursor: grabbing;
+}
+
+.gate__slider-wrap input[type='range']::-webkit-slider-runnable-track {
+  height: 18px;
+  border-radius: var(--shape-full);
+  background: var(--track);
+  border: var(--border-thick) solid var(--cabinet-frame);
+  box-shadow: inset 0 3px 0 0 var(--bevel-lo);
+}
+
+.gate__slider-wrap input[type='range']::-webkit-slider-thumb {
+  appearance: none;
+  -webkit-appearance: none;
+  width: 34px;
+  height: 34px;
+  margin-top: -11px;
+  border-radius: var(--shape-full);
+  background: radial-gradient(circle at 40% 30%, var(--metal-hi), var(--metal-lo) 85%);
+  border: var(--border-thick) solid var(--cabinet-frame-dark);
+  box-shadow: inset 0 3px 0 0 var(--bevel-hi);
+}
+
+.gate.tone-wipe .gate__slider-wrap input[type='range']::-webkit-slider-thumb {
+  background: radial-gradient(circle at 40% 30%, var(--spark), var(--spark-glow) 85%);
+}
+
+/* Its decorative echo becomes an XP bar rather than a flat grey rule. */
+.gate__anim-track {
+  height: 14px;
+  background: var(--track);
+  border: var(--border-thin) solid var(--cabinet-frame);
+  box-shadow: inset 0 2px 0 0 var(--bevel-lo);
+}
+
+.gate__anim-fill {
+  background: linear-gradient(180deg, var(--spark), var(--spark-glow));
+  box-shadow: inset 0 2px 0 0 var(--bevel-hi);
+}
+
+/* -- 7. <details> disclosures: the "more" affordance becomes a keycap that sinks when open ---- */
+.hud-strip__more {
+  border: var(--border-thin) solid var(--cabinet-frame);
+  background: var(--surface-high);
+  color: var(--on-surface);
+  box-shadow: 0 3px 0 0 var(--cabinet-frame-dark);
+  min-height: 28px;
+  display: inline-flex;
+  align-items: center;
+}
+
+.hud-strip[open] .hud-strip__more {
+  background: radial-gradient(circle at 50% 20%, var(--metal-hi), var(--metal-lo) 92%);
+  color: var(--cabinet-frame-dark);
+  transform: translateY(3px);
+  box-shadow: inset 0 2px 0 0 rgba(0, 0, 0, 0.28);
+}
+
+/* Belt-and-braces on the native marker across engines. */
+.hud-strip__summary::marker {
+  content: '';
+}

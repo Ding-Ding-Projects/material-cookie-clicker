@@ -65,7 +65,11 @@ expects. `npm run smoke` exists precisely to cover that seam — it reads
 
 ### The published baseline
 
-**Latest release is `v0.1.7`**, non-draft, target commit `37c967b`, carrying a
+**Latest release at the time of the 2026-08-16 rewrite is `v0.1.12`** (check
+`gh release view` rather than trusting this line — this file has gone stale on
+exactly this fact twice now). The last hand-audited release remains `v0.1.5`;
+everything after ships automatically through the same proven pipeline. An
+earlier baseline, `v0.1.7`, non-draft, target commit `37c967b`, carried a
 144,166,912-byte `MaterialCookieClicker-Setup.exe`, a full `.nupkg`, `RELEASES`
 and `release-changelog.json`.
 
@@ -80,30 +84,39 @@ An earlier version of this file named `v0.1.5` as "the release". That was true
 when written and is now stale by two — exactly the failure mode this file warns
 about.
 
-### Not verified — do not describe these as working
+### Newly verified in the 2026-08-16 pass
 
-- **The game itself has never been seen running.** The launch capture is the
-  empty shell; its body reads "The cookie-clicker game surface mounts here"
-  because at that commit it genuinely did.
-- **No game surface has been captured**: none of the six destinations, the tools
-  shop, settings, the command palette, the appearance editor, dark theme in the
-  application, narrow widths, or high display scales.
+- **The game has been seen running.** The single-surface game (HUD, cookie
+  hero, docked shop rail, upgrade ticket strip on one screen) plus the four
+  secondary tabs (Achievements, Tools, Statistics, Prestige) were launched from
+  the built `dist/` on an off-screen desktop and captured via PrintWindow:
+  `captures/app/surface-*.png`. The screens were driven by real background
+  clicks, not mocked.
+- The visual language is the game-first v2 design (`design/`, 78/78 AA pairs
+  computed), a deliberate escalation of the non-M3 decision. The core loop
+  lives on ONE surface by owner directive — never split shop/upgrades onto
+  separate pages again.
+- A real Pages site now lives in `site/` and deploys via the existing
+  `pages.yml`.
+
+### Still not verified — do not describe these as working
+
+- **Dark theme in the application has never been captured** (tokens exist and
+  are shared with light, but nobody has looked at it).
+- Narrow-width drawer behaviour was verified only by patching the breakpoint
+  in built CSS, not by resizing a real window.
 - **The completeness inventory and its negative regression guard do not exist.**
-  Until they do, "every canonical feature is present" is an assertion nobody can
-  check.
-- **App-logo customization is unimplemented** — the one canonical feature with
-  no reference implementation in any sibling project.
+- **App-logo customization, the file converter, and the local Ollama manager
+  are unimplemented in the app** — canonical features this repository has
+  never had; releases ship without them and say so.
 
 ## Work in flight at the end of this session
 
-Three lanes had subagents still working when the session closed. Their branches
-hold whatever had been committed; nothing was lost, and nothing is complete.
-
-| Branch | State |
-| --- | --- |
-| `lane/game-screens` | Cookie and Generators screens, store, provider, persistence, destructive gate, hold-to-click, narration, tool view model. **Upgrades, Achievements, Statistics, Prestige and Tools screens do not exist.** Never built, never run. |
-| `lane/purchasing` | Buy/sell modes, automation and the tool shop. Branch point only — no commits landed. |
-| `lane/docs-site` | Categorized documentation under `docs/`. Uncommitted at session end; preserved on its branch. |
+All lanes were completed and integrated into `main` in the 2026-08-16 pass:
+the seven screens exist, the shell mounts them, the core loop was restructured
+onto a single game surface, the v2 design bundle landed, and the Pages site
+was added. The old lane branches were recorded as merged and removed after
+ancestry proof.
 
 ## Layout
 

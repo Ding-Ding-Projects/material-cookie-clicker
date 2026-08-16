@@ -5,7 +5,7 @@ import { formatBigNum } from '../../shared/game/format-number.js';
 import { isEffectActive } from '../../shared/game/golden-cookie.js';
 import { computeMultipliers } from '../../shared/game/upgrades.js';
 import { computeDisclosure } from '../../shared/game/disclosure.js';
-import { GoldenCookieIcon } from '../assets/icons.js';
+import { HeroCookieArt } from '../assets/icons.js';
 import { COOKIE_SCREEN_COPY } from '../game/copy.js';
 import { useFastSnapshot, useGameDispatch, useStructureSnapshot } from '../game/GameProvider.js';
 import { createHoldToClickController } from '../game/hold-to-click.js';
@@ -117,12 +117,22 @@ export function CookieHero() {
             Pure CSS: a repeating conic gradient behind a ring mask. Under reduced motion it stays
             fully visible but stops rotating, exactly as the spec calls for. */}
         {goldenActive ? <span className="golden-rays" aria-hidden="true" /> : null}
-        {/* Oven embers drifting up behind the cookie. Decorative, and still under reduced motion. */}
+        {/* Oven embers drifting up behind the cookie. Decorative, and still under reduced motion.
+            Six motes now rather than three, in two depth bands: the three carrying
+            `--far` are smaller, dimmer, slightly blurred and drift slower, so the air in front
+            of the oven has depth instead of being one flat sheet of identical sparks. The blur
+            lives only on these decorative spans — never on the cookie, which animates. */}
         <span className="cookie-embers" aria-hidden="true">
+          <span className="cookie-embers__mote cookie-embers__mote--far" />
           <span className="cookie-embers__mote" />
+          <span className="cookie-embers__mote cookie-embers__mote--far" />
           <span className="cookie-embers__mote" />
+          <span className="cookie-embers__mote cookie-embers__mote--far" />
           <span className="cookie-embers__mote" />
         </span>
+        {/* Crumbs on the counter at the foot of the cookie. Still in every state — this is
+            scatter, not animation — and drawn as gradient dots, so it costs nothing. */}
+        <span className="cookie-crumbs" aria-hidden="true" />
         <button
           ref={buttonRef}
           type="button"
@@ -142,10 +152,13 @@ export function CookieHero() {
           onPointerLeave={() => controllerRef.current.stop()}
           onPointerCancel={() => controllerRef.current.stop()}
         >
-          {/* The ordinary cookie is already drawn by CSS (dough gradient plus chocolate chips),
-              so only the golden state needs art: the ray-burst cookie replaces the sparkle
-              character that used to be stuck on the dough. */}
-          {goldenActive ? <GoldenCookieIcon extraClass="cookie-btn__art" /> : null}
+          {/* The cookie itself is now a real drawing rather than a stack of CSS radial
+              gradients on the button face: an irregular baked silhouette with a browned rim,
+              cracks, speckle and chocolate chunks that have depth (see HeroCookieArt in
+              assets/icons.tsx). The button underneath keeps its arcade physics and stays the
+              solid base the cookie sits on; the drawing simply overhangs it. The golden state
+              is the same geometry, gilded — so it is unmistakably this cookie, gone gold. */}
+          <HeroCookieArt golden={goldenActive} extraClass="cookie-btn__art" />
         </button>
         {popups.map((popup) => (
           <span

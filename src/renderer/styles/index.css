@@ -1177,6 +1177,77 @@ body {
   --cookie-size: clamp(110px, 17vh, 190px);
 }
 
+/* --- the baked palette -----------------------------------------------------------------
+ * The hero cookie needs its OWN colour roles rather than borrowing --primary /
+ * --primary-container / --on-primary-container. Those roles legitimately invert between themes
+ * — in dark, --on-primary-container is a pale cream — and a chocolate chunk that goes pale in
+ * the dark theme is not a chocolate chunk. These tones are ordered as a real bake: pale dome,
+ * mid dough, browned edge, dark crust, then the chocolate. The dark twin is the same biscuit
+ * under ember light, not an inverted one. Decorative only: nothing here ever sits behind text,
+ * so the verified contrast table is untouched.
+ * -------------------------------------------------------------------------------------- */
+:root {
+  --cookie-centre: #e8bd7c;
+  --cookie-mid: #c98a41;
+  --cookie-edge: #96551b;
+  --cookie-crust: #5c300e;
+  --cookie-chip: #3a2109;
+  --cookie-chip-hi: #8a5729;
+  --cookie-crumb: #b8813f;
+  /* The colour of the light in the room. The cookie and the pool of oven glow under it both
+     read this, so the two can never disagree about what is lighting the scene. */
+  --cookie-lit: rgba(255, 240, 215, 0.6);
+  --oven-lamp: rgba(255, 197, 122, 0.55);
+
+  /* Gilding, for the golden state: real metal is a bright band with darker either side. */
+  --gold-centre: #ffeaa8;
+  --gold-mid: #f0bf49;
+  --gold-edge: #b8801a;
+  --gold-deep: #6f4a06;
+  --gold-hi: #fffbe8;
+}
+
+@media (prefers-color-scheme: dark) {
+  :root:not([data-theme='light']) {
+    /* Arcade night: a dim bakery lit by the oven's embers. The biscuit keeps its identity — the
+       browns stay browns — it is simply exposed several stops darker, and the light falling on
+       it is ember-orange rather than daylight. */
+    --cookie-centre: #c69456;
+    --cookie-mid: #9c6931;
+    --cookie-edge: #6e4317;
+    --cookie-crust: #3b2008;
+    --cookie-chip: #1c0f03;
+    --cookie-chip-hi: #6b4019;
+    --cookie-crumb: #7d5326;
+    --cookie-lit: rgba(255, 186, 112, 0.5);
+    --oven-lamp: rgba(255, 138, 0, 0.42);
+
+    --gold-centre: #ffd77a;
+    --gold-mid: #d9a22f;
+    --gold-edge: #8f5f10;
+    --gold-deep: #4a3004;
+    --gold-hi: #fff4cd;
+  }
+}
+
+:root[data-theme='dark'] {
+  --cookie-centre: #c69456;
+  --cookie-mid: #9c6931;
+  --cookie-edge: #6e4317;
+  --cookie-crust: #3b2008;
+  --cookie-chip: #1c0f03;
+  --cookie-chip-hi: #6b4019;
+  --cookie-crumb: #7d5326;
+  --cookie-lit: rgba(255, 186, 112, 0.5);
+  --oven-lamp: rgba(255, 138, 0, 0.42);
+
+  --gold-centre: #ffd77a;
+  --gold-mid: #d9a22f;
+  --gold-edge: #8f5f10;
+  --gold-deep: #4a3004;
+  --gold-hi: #fff4cd;
+}
+
 .cookie-cps {
   font-family: var(--font-display);
   font-size: 13px;
@@ -1203,14 +1274,27 @@ body {
   margin: 8px 0 14px;
 }
 
-/* The cookie sits in its own pool of oven light so it never floats on a plain panel. */
+/* The cookie sits in its own pool of oven light so it never floats on a plain panel.
+ *
+ * This now behaves like a light rather than like a coloured halo. Three things changed:
+ * the source is OFF-CENTRE, up and to the left, which is the same direction the cookie drawing
+ * is lit from; the falloff has real intermediate stops instead of one linear ramp to
+ * transparent, so brightness drops off with distance the way it actually does; and it is warm
+ * lamp colour (--oven-lamp) rather than a surface container tint, so in the dark theme it reads
+ * as embers in a dim bakery instead of a grey wash. Decorative, never behind text. */
 .cookie-target-wrap::before {
   content: '';
   position: absolute;
-  inset: -76px;
+  inset: -78px;
   border-radius: var(--shape-full);
-  background: radial-gradient(circle, var(--primary-container) 0%, transparent 70%);
-  opacity: 0.9;
+  background: radial-gradient(
+    circle at 38% 28%,
+    var(--oven-lamp) 0%,
+    color-mix(in srgb, var(--oven-lamp) 55%, transparent) 26%,
+    color-mix(in srgb, var(--oven-lamp) 22%, transparent) 48%,
+    transparent 72%
+  );
+  opacity: 0.95;
   pointer-events: none;
 }
 
@@ -1297,7 +1381,16 @@ body {
   position: absolute;
   inset: -34px;
   border-radius: var(--shape-full);
-  background: radial-gradient(circle, var(--spark-glow) 0%, transparent 70%);
+  /* The bloom gold this bright throws onto the air around it: hottest at the light's own
+     up-left source, falling off through the metal's mid tone rather than ramping straight to
+     transparent, which is what made the old single-stop version read as a flat orange disc. */
+  background: radial-gradient(
+    circle at 42% 34%,
+    color-mix(in srgb, var(--gold-centre) 78%, transparent) 0%,
+    color-mix(in srgb, var(--spark-glow) 62%, transparent) 30%,
+    color-mix(in srgb, var(--spark-glow) 24%, transparent) 52%,
+    transparent 76%
+  );
   animation: golden-pulse calc(1.6s * var(--motion-scale, 1)) ease-in-out infinite;
   pointer-events: none;
 }
@@ -3544,12 +3637,33 @@ ul.card-grid {
   margin-inline-end: 6px;
 }
 
-/* The hero cookie: the button zeroes its font-size to keep stock emoji off the dough, so the
-   drawing has to be sized in pixels rather than in ems. */
+/* The hero cookie: a real drawing on top of a real button base.
+ *
+ * The division of labour is deliberate. The <button> keeps every bit of the arcade press
+ * physics — the solid offset base, the travel on press, the hover rise, focus ring, hit area —
+ * but it stops pretending to BE the cookie: its face is repainted as the dark pedestal the
+ * cookie rests on, and its chip-gradient ::before is switched off, because the chips are now
+ * geometry inside the drawing. The drawing then OVERHANGS that pedestal slightly, so the
+ * irregular baked edge is the outline you see and the round base only ever shows as the lip of
+ * shadow underneath it. A cookie sitting on a button, rather than a button coloured like one. */
+.cookie-btn--art {
+  background: radial-gradient(circle at 40% 30%, var(--cookie-edge) 0%, var(--cookie-crust) 72%);
+  border-color: var(--cookie-crust);
+  overflow: visible;
+}
+
+/* The old CSS chocolate chips — eight identical dots on an even ring — were the loudest reason
+   the hero read as a button face. The drawing supersedes them entirely. */
+.cookie-btn--art::before {
+  content: none;
+}
+
 .cookie-btn--art .cookie-btn__art {
-  width: calc(var(--cookie-size, 208px) * 0.82);
-  height: calc(var(--cookie-size, 208px) * 0.82);
-  position: relative;
+  position: absolute;
+  /* the overhang: the baked silhouette sits proud of its base on every side */
+  inset: -10%;
+  width: auto;
+  height: auto;
   z-index: 2;
   pointer-events: none;
 }
@@ -3559,6 +3673,43 @@ ul.card-grid {
    shape (ray burst) and the accessible name still says which cookie this is. */
 .cookie-target-wrap.golden .cookie-btn--art::after {
   content: none;
+}
+
+/* The golden state's pedestal is struck metal rather than baked crust, so the base under the
+   gilded cookie matches what is sitting on it. (This has to be re-stated here: the plain
+   .cookie-btn--art face rule above is later in the file than the .golden .cookie-btn rule.) */
+.cookie-target-wrap.golden .cookie-btn--art {
+  background: radial-gradient(circle at 40% 30%, var(--gold-edge) 0%, var(--gold-deep) 74%);
+  border-color: var(--gold-deep);
+}
+
+/* --- crumbs on the counter ---------------------------------------------------------------
+ * A cookie this size has been sitting there. Gradient dots in two sizes and two tones, thinned
+ * out toward the edges so the scatter has a centre of gravity under the cookie rather than
+ * being wallpaper. Static in every state — this is scatter, not motion — so reduced motion has
+ * nothing to switch off. */
+.cookie-crumbs {
+  position: absolute;
+  left: -18%;
+  right: -18%;
+  bottom: -13%;
+  height: 26%;
+  pointer-events: none;
+  z-index: 0;
+  background-image: radial-gradient(circle at 18% 62%, var(--cookie-crust) 0 2.1px, transparent 2.6px),
+    radial-gradient(circle at 27% 34%, var(--cookie-crumb) 0 1.4px, transparent 1.9px),
+    radial-gradient(circle at 36% 78%, var(--cookie-crumb) 0 2.6px, transparent 3.1px),
+    radial-gradient(circle at 44% 48%, var(--cookie-crust) 0 1.2px, transparent 1.7px),
+    radial-gradient(circle at 53% 70%, var(--cookie-crumb) 0 1.8px, transparent 2.3px),
+    radial-gradient(circle at 61% 30%, var(--cookie-crust) 0 1.5px, transparent 2px),
+    radial-gradient(circle at 69% 66%, var(--cookie-crumb) 0 2.3px, transparent 2.8px),
+    radial-gradient(circle at 79% 44%, var(--cookie-crust) 0 1.3px, transparent 1.8px),
+    radial-gradient(circle at 88% 72%, var(--cookie-crumb) 0 1.7px, transparent 2.2px),
+    radial-gradient(circle at 8% 40%, var(--cookie-crumb) 0 1.1px, transparent 1.6px);
+  /* the scatter fades out at both ends instead of stopping on a hard rectangle edge */
+  mask: radial-gradient(ellipse 62% 100% at 50% 40%, black 0%, black 42%, transparent 88%);
+  -webkit-mask: radial-gradient(ellipse 62% 100% at 50% 40%, black 0%, black 42%, transparent 88%);
+  opacity: 0.75;
 }
 
 /* --- ambient bakery texture ------------------------------------------------------------ */
@@ -3618,48 +3769,97 @@ ul.card-grid {
   animation: cookie-ember-rise calc(5.5s * var(--motion-scale, 1)) ease-in-out infinite;
 }
 
+/* Depth. The far band is smaller, dimmer, out of focus and slower; the near band is sharp and
+   quicker. That difference is the whole trick — identical motes at identical speeds read as a
+   flat sheet of sparks no matter how many you add. The blur is on these decorative spans only:
+   nothing in the cookie's own press path carries a filter. */
+.cookie-embers__mote--far {
+  filter: blur(1.6px);
+  opacity: 0;
+  animation-duration: calc(8.5s * var(--motion-scale, 1));
+}
+
 .cookie-embers__mote:nth-child(1) {
-  left: 22%;
+  left: 16%;
+  width: 5px;
+  height: 5px;
   animation-delay: 0s;
+  --ember-peak: 0.42;
 }
 
 .cookie-embers__mote:nth-child(2) {
-  left: 52%;
-  width: 5px;
-  height: 5px;
-  animation-delay: calc(1.8s * var(--motion-scale, 1));
+  left: 31%;
+  width: 8px;
+  height: 8px;
+  animation-delay: calc(1.1s * var(--motion-scale, 1));
+  --ember-peak: 0.9;
 }
 
 .cookie-embers__mote:nth-child(3) {
-  left: 78%;
-  width: 9px;
-  height: 9px;
-  animation-delay: calc(3.4s * var(--motion-scale, 1));
+  left: 47%;
+  width: 6.5px;
+  height: 6.5px;
+  animation-delay: calc(2.4s * var(--motion-scale, 1));
+  --ember-peak: 0.34;
 }
 
+.cookie-embers__mote:nth-child(4) {
+  left: 61%;
+  width: 5px;
+  height: 5px;
+  animation-delay: calc(3.3s * var(--motion-scale, 1));
+  --ember-peak: 0.72;
+}
+
+.cookie-embers__mote:nth-child(5) {
+  left: 76%;
+  width: 7.5px;
+  height: 7.5px;
+  animation-delay: calc(4.6s * var(--motion-scale, 1));
+  --ember-peak: 0.3;
+}
+
+.cookie-embers__mote:nth-child(6) {
+  left: 88%;
+  width: 9px;
+  height: 9px;
+  animation-delay: calc(2.9s * var(--motion-scale, 1));
+  --ember-peak: 0.85;
+}
+
+/* Parallax, cheaply: a mote further from the eye travels a shorter distance across the frame in
+   the same time. --ember-rise is how far each band climbs, --ember-peak how bright it gets. */
 @keyframes cookie-ember-rise {
   0% {
     transform: translateY(0) scale(0.7);
     opacity: 0;
   }
   18% {
-    opacity: 0.85;
+    opacity: var(--ember-peak, 0.85);
   }
   70% {
-    opacity: 0.5;
+    opacity: calc(var(--ember-peak, 0.85) * 0.55);
   }
   100% {
-    transform: translateY(-150px) scale(1.15);
+    transform: translateY(var(--ember-rise, -150px)) scale(1.15);
     opacity: 0;
   }
 }
 
+.cookie-embers__mote--far {
+  --ember-rise: -92px;
+}
+
 @media (prefers-reduced-motion: reduce) {
-  /* Reduced motion keeps the embers as a still glow rather than removing the warmth. */
+  /* Reduced motion keeps the embers as a still glow rather than removing the warmth — and keeps
+     the depth too: the far band stays dimmer and softer, it simply stops climbing. */
   .cookie-embers__mote {
     animation: none;
-    opacity: 0.4;
+    opacity: calc(var(--ember-peak, 0.85) * 0.5);
     bottom: 26%;
+  }
+  .cookie-embers__mote--far {
+    bottom: 44%;
   }
 }
 
@@ -4291,15 +4491,33 @@ ul.card-grid {
 }
 
 /* --- Golden ray-burst (design/cookie-surface.html): the third golden layer, previously absent - */
+/* Light shafts, not spokes. A shaft of light is brightest at its source and thins out as it
+   travels, and shafts are not all the same width — so the conic gradient now carries wedges of
+   three different widths with soft rather than hard shoulders, and the mask fades them out
+   with distance from the cookie instead of trimming them to a hard ring. */
 .golden-rays {
   position: absolute;
-  inset: -34px;
+  inset: -46px;
   border-radius: var(--shape-full);
-  background: repeating-conic-gradient(from 0deg, var(--spark) 0deg 4deg, transparent 4deg 24deg);
-  opacity: 0.55;
-  mask: radial-gradient(circle, transparent 56%, black 58%, black 62%, transparent 64%);
-  -webkit-mask: radial-gradient(circle, transparent 56%, black 58%, black 62%, transparent 64%);
-  animation: spin-rays calc(6s * var(--motion-scale, 1)) linear infinite;
+  background: repeating-conic-gradient(
+    from 0deg,
+    transparent 0deg,
+    color-mix(in srgb, var(--gold-centre) 85%, transparent) 3deg,
+    color-mix(in srgb, var(--gold-centre) 85%, transparent) 5deg,
+    transparent 8deg,
+    transparent 17deg,
+    color-mix(in srgb, var(--gold-mid) 70%, transparent) 19deg,
+    transparent 21deg,
+    transparent 32deg,
+    color-mix(in srgb, var(--gold-centre) 60%, transparent) 34deg,
+    color-mix(in srgb, var(--gold-centre) 60%, transparent) 37deg,
+    transparent 40deg,
+    transparent 51deg
+  );
+  opacity: 0.6;
+  mask: radial-gradient(circle, transparent 44%, black 54%, rgba(0, 0, 0, 0.55) 74%, transparent 96%);
+  -webkit-mask: radial-gradient(circle, transparent 44%, black 54%, rgba(0, 0, 0, 0.55) 74%, transparent 96%);
+  animation: spin-rays calc(9s * var(--motion-scale, 1)) linear infinite;
   pointer-events: none;
   z-index: 0;
 }

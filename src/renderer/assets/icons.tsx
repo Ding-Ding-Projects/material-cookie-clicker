@@ -849,3 +849,232 @@ export function JerrycanGaugeIcon({ extraClass }: { extraClass?: string } = {}) 
     </Art>
   );
 }
+
+/* ==========================================================================================
+ * The hero cookie — a rendering-realism pass on the one object the whole game is about.
+ *
+ * This is deliberately NOT drawn on the shared 32-unit canvas: the hero renders two hundred
+ * pixels wide, so it can afford (and needs) an order of magnitude more geometry than a shelf
+ * icon. Everything the eye uses to decide "baked thing" rather than "brown button" is built
+ * here out of plain SVG:
+ *
+ *   - an IRREGULAR silhouette. A perfect circle is the single strongest tell that something is
+ *     a widget; the outline below is a sixteen-lobe wobble smoothed through its own midpoints.
+ *   - a BAKE gradient. Real biscuit is pale where the dough stayed thick and browned where the
+ *     edge went thin and hot, so the fill runs pale gold at an off-centre core out to a dark
+ *     crust ring, with a slightly inset paler plateau over it for the domed middle.
+ *   - CRACKS, each drawn twice: a dark fissure and a pale ridge shouldered up beside it toward
+ *     the light, so the split reads as having depth instead of as a pen line.
+ *   - CHUNKS, not dots. Every chocolate piece is the same irregular chunk path at a different
+ *     size and rotation, and each carries a contact shadow beneath it, a lit facet on its
+ *     upper-left and a darkened one opposite.
+ *
+ * The light direction is fixed at upper-left and is the SAME direction the oven glow behind
+ * the cookie comes from (.cookie-target-wrap::before in index.css) — a lit side that disagrees
+ * with the room is what makes CSS art look pasted on.
+ *
+ * The rules of this file still hold: no filters, no images, no external references, and every
+ * colour comes from a theme token, so the dark "arcade night" theme repaints this as ember-lit
+ * biscuit rather than inverting it into something inedible.
+ * ======================================================================================== */
+
+/** The baked silhouette. Generated as sixteen varying radii around a centre and smoothed
+ *  through their midpoints, rather than hand-nudged until it looked wobbly. */
+const COOKIE_EDGE_PATH =
+  'M40.8 3.3 Q50 1 57.9 6.3 Q65.9 11.7 75.6 13.2 Q85.4 14.6 87.5 24.1 Q89.7 33.5 93.4 41.8 Q97 50 97.3 59.9 ' +
+  'Q97.6 69.7 88.8 74.9 Q80.1 80.1 74.3 87.4 Q68.6 94.8 59.3 94.4 Q50 94 40.1 96 Q30.1 98 24.7 89.4 ' +
+  'Q19.2 80.8 13.1 74.3 Q7 67.8 8 58.9 Q9 50 6.2 40.3 Q3.3 30.7 10.9 24.6 Q18.5 18.5 25.1 12.1 Q31.6 5.7 40.8 3.3 Z';
+
+/** The domed middle, which browns less than the rim. Its own wobble, so it never traces the edge. */
+const COOKIE_DOME_PATH =
+  'M41.3 10.5 Q49 8.5 55.6 13.1 Q62.2 17.6 70.5 18.7 Q78.7 19.8 80.2 27.9 Q81.8 35.9 85.1 42.7 Q88.5 49.5 88.6 57.7 ' +
+  'Q88.7 66 81.2 70.1 Q73.7 74.2 69.1 80.6 Q64.5 86.9 56.7 86.5 Q49 86 40.7 87.8 Q32.4 89.7 27.9 82.3 ' +
+  'Q23.5 75 18.5 69.6 Q13.4 64.2 14.2 56.9 Q15 49.5 12.6 41.5 Q10.2 33.4 16.5 28.4 Q22.8 23.3 28.3 17.9 Q33.7 12.5 41.3 10.5 Z';
+
+/** One chocolate chunk, centred on its own origin so a transform can size and turn it. */
+const CHUNK_PATH =
+  'M-5.2 -2.4 Q-4.1 -4.7 -1.4 -4.4 Q1.7 -4.9 3.9 -3.1 Q5.5 -1.5 4.8 1 Q4.3 3.5 1.8 4.3 ' +
+  'Q-0.9 5.1 -3.3 3.9 Q-5.6 2.7 -5.2 -2.4 Z';
+
+interface CookieChunkSpec {
+  readonly x: number;
+  readonly y: number;
+  readonly s: number;
+  readonly r: number;
+}
+
+/** Nine chunks, no two the same size or angle — an even ring of identical dots was the other
+ *  half of why the old cookie read as a button face. */
+const COOKIE_CHUNKS: readonly CookieChunkSpec[] = [
+  { x: 33, y: 31, s: 1.3, r: -14 },
+  { x: 58, y: 24, s: 0.95, r: 24 },
+  { x: 73, y: 45, s: 1.4, r: -38 },
+  { x: 45, y: 48, s: 1.05, r: 9 },
+  { x: 24, y: 57, s: 0.9, r: 47 },
+  { x: 60, y: 69, s: 1.2, r: -25 },
+  { x: 37, y: 75, s: 0.85, r: 16 },
+  { x: 78, y: 64, s: 0.78, r: 61 },
+  { x: 47, y: 16, s: 0.68, r: -52 },
+];
+
+/** Baked speckle: flecks of toasted and under-toasted dough, so the surface is never flat.
+ *  Tuple is [x, y, radius, toasted]. */
+const COOKIE_SPECKS: readonly (readonly [number, number, number, boolean])[] = [
+  [27, 22, 2.4, true],
+  [67, 33, 1.8, false],
+  [52, 38, 2.1, true],
+  [38, 61, 1.6, false],
+  [70, 56, 2.6, true],
+  [30, 44, 1.4, false],
+  [55, 56, 1.9, true],
+  [66, 79, 2.2, false],
+  [43, 87, 1.5, true],
+  [21, 70, 1.7, false],
+  [86, 50, 2, true],
+  [50, 28, 1.3, false],
+];
+
+const COOKIE_CRACKS: readonly string[] = [
+  'M33 39 Q39 44 36.5 51 Q34.5 57 39 64',
+  'M58 34 Q63 40.5 60 47.5',
+  'M45 62 Q52.5 65 56 73',
+  'M72 28 Q75 33 72.5 38',
+];
+
+function CookieChunk({ chunk, chip, chipHi }: { chunk: CookieChunkSpec; chip: string; chipHi: string }) {
+  return (
+    <g transform={`translate(${chunk.x} ${chunk.y}) rotate(${chunk.r}) scale(${chunk.s})`}>
+      {/* the shadow the chunk casts into the dough it is sunk in — down and to the right,
+          because the light is up and to the left */}
+      <ellipse cx="0.9" cy="2.9" rx="4.9" ry="3.3" fill="rgba(0,0,0,0.3)" />
+      <path d={CHUNK_PATH} fill={chip} />
+      {/* the lit facet, and the facet turned away from the light */}
+      <path d="M-4.3 -2 Q-3.2 -3.8 -0.9 -3.6 Q1.4 -3.9 3 -2.7" fill="none" stroke={chipHi} strokeWidth="1.5" strokeLinecap="round" opacity="0.9" />
+      <path d="M4.2 0.4 Q3.6 3 1.3 3.9" fill="none" stroke="#000000" strokeWidth="1.3" strokeLinecap="round" opacity="0.5" />
+      <circle cx="-1.9" cy="-2.1" r="0.8" fill="rgba(255,255,255,0.5)" />
+    </g>
+  );
+}
+
+/**
+ * The hero cookie face. `golden` swaps the whole paint box for gilded metal over exactly the
+ * same geometry, so the golden moment is unmistakably the same object, gone gold.
+ */
+export function HeroCookieArt({ golden = false, extraClass }: { golden?: boolean; extraClass?: string } = {}) {
+  const centre = golden ? 'var(--gold-centre, #ffeaa8)' : 'var(--cookie-centre, #f0cd93)';
+  const mid = golden ? 'var(--gold-mid, #f2c14a)' : 'var(--cookie-mid, #d9a25c)';
+  const edge = golden ? 'var(--gold-edge, #b8801a)' : 'var(--cookie-edge, #a86426)';
+  const crust = golden ? 'var(--gold-deep, #7a5208)' : 'var(--cookie-crust, #6f3c14)';
+  const chip = golden ? 'var(--gold-deep, #7a5208)' : 'var(--cookie-chip, #3a2109)';
+  const chipHi = golden ? 'var(--gold-hi, #fffbe8)' : 'var(--cookie-chip-hi, #7c4c22)';
+  const lit = golden ? 'var(--gold-hi, #fffbe8)' : 'var(--cookie-lit, rgba(255, 240, 215, 0.55))';
+  const uid = golden ? 'gold' : 'bake';
+
+  return (
+    <svg
+      className={extraClass ? `hero-cookie ${extraClass}` : 'hero-cookie'}
+      viewBox="0 -1 100 102"
+      aria-hidden="true"
+      focusable="false"
+    >
+      <defs>
+        {/* The bake itself: pale where the dough stayed thick, browned out at the thin rim. The
+            core sits up-left of centre because that is where the light is. */}
+        <radialGradient id={`hc-${uid}-bake`} cx="38%" cy="31%" r="74%">
+          <stop offset="0%" stopColor={centre} />
+          <stop offset="38%" stopColor={centre} />
+          <stop offset="62%" stopColor={mid} />
+          <stop offset="88%" stopColor={edge} />
+          <stop offset="100%" stopColor={crust} />
+        </radialGradient>
+        {/* The dome: a pale wash that fades out well before the rim, so the middle sits proud of
+            the browned edge instead of being a second flat disc. */}
+        <radialGradient id={`hc-${uid}-dome`} cx="40%" cy="33%" r="64%">
+          <stop offset="0%" stopColor={centre} stopOpacity="0.85" />
+          <stop offset="55%" stopColor={centre} stopOpacity="0.32" />
+          <stop offset="100%" stopColor={centre} stopOpacity="0" />
+        </radialGradient>
+        {/* The light itself, falling off with distance from the upper-left source. */}
+        <radialGradient id={`hc-${uid}-light`} cx="30%" cy="22%" r="62%">
+          <stop offset="0%" stopColor={lit} stopOpacity={golden ? 0.8 : 0.34} />
+          <stop offset="45%" stopColor={lit} stopOpacity={0.1} />
+          <stop offset="100%" stopColor={lit} stopOpacity={0} />
+        </radialGradient>
+        {/* The shaded side, opposite the light. */}
+        <radialGradient id={`hc-${uid}-shade`} cx="74%" cy="82%" r="62%">
+          <stop offset="0%" stopColor="#000000" stopOpacity="0.34" />
+          <stop offset="55%" stopColor="#000000" stopOpacity="0.12" />
+          <stop offset="100%" stopColor="#000000" stopOpacity="0" />
+        </radialGradient>
+        {golden ? (
+          /* Gilding: a rolled-metal sheen band. Metal is not a ramp from light to dark, it is a
+             bright band with darker either side, which is what this reproduces. */
+          <linearGradient id="hc-gold-sheen" x1="6%" y1="0%" x2="94%" y2="100%">
+            <stop offset="0%" stopColor="#ffffff" stopOpacity="0" />
+            <stop offset="26%" stopColor="#ffffff" stopOpacity="0.08" />
+            <stop offset="40%" stopColor="#ffffff" stopOpacity="0.42" />
+            <stop offset="48%" stopColor="#ffffff" stopOpacity="0.16" />
+            <stop offset="63%" stopColor="#ffffff" stopOpacity="0.32" />
+            <stop offset="78%" stopColor="#000000" stopOpacity="0.12" />
+            <stop offset="100%" stopColor="#000000" stopOpacity="0.24" />
+          </linearGradient>
+        ) : null}
+        <clipPath id={`hc-${uid}-clip`}>
+          <path d={COOKIE_EDGE_PATH} />
+        </clipPath>
+      </defs>
+
+      {/* The thickness of the biscuit: the same silhouette, dropped and darkened, so the cookie
+          has a side rather than being a decal. */}
+      <path d={COOKIE_EDGE_PATH} fill={crust} transform="translate(0 2.4)" />
+      <path d={COOKIE_EDGE_PATH} fill={edge} transform="translate(0 1.2)" />
+      <path d={COOKIE_EDGE_PATH} fill={`url(#hc-${uid}-bake)`} />
+
+      <g clipPath={`url(#hc-${uid}-clip)`}>
+        <path d={COOKIE_DOME_PATH} fill={`url(#hc-${uid}-dome)`} />
+
+        {COOKIE_SPECKS.map(([x, y, r, toasted]) => (
+          <ellipse
+            key={`speck-${x}-${y}`}
+            cx={x}
+            cy={y}
+            rx={r}
+            ry={r * 0.72}
+            fill={toasted ? crust : centre}
+            opacity={toasted ? 0.16 : 0.3}
+          />
+        ))}
+
+        {COOKIE_CRACKS.map((d) => (
+          <g key={d}>
+            <path d={d} fill="none" stroke={centre} strokeWidth="2.4" strokeLinecap="round" opacity="0.22" transform="translate(-1.1 -1.1)" />
+            <path d={d} fill="none" stroke={crust} strokeWidth="1.6" strokeLinecap="round" opacity="0.26" />
+          </g>
+        ))}
+
+        {COOKIE_CHUNKS.map((chunk) => (
+          <CookieChunk key={`chunk-${chunk.x}-${chunk.y}`} chunk={chunk} chip={chip} chipHi={chipHi} />
+        ))}
+
+        {golden ? <path d={COOKIE_EDGE_PATH} fill="url(#hc-gold-sheen)" /> : null}
+
+        {/* the room's light, then the shaded side, laid over everything so the chunks are lit by
+            the same lamp as the dough they sit in */}
+        <path d={COOKIE_EDGE_PATH} fill={`url(#hc-${uid}-light)`} />
+        <path d={COOKIE_EDGE_PATH} fill={`url(#hc-${uid}-shade)`} />
+      </g>
+
+      {/* the browned rim, drawn last and only as a rim, plus the specular streak where the rim
+          turns into the light */}
+      <path d={COOKIE_EDGE_PATH} fill="none" stroke={crust} strokeWidth="2.2" opacity="0.5" />
+      <path
+        d="M18 30 Q24 19 36 13"
+        fill="none"
+        stroke={golden ? 'var(--gold-hi, #fffbe8)' : 'rgba(255, 255, 255, 0.55)'}
+        strokeWidth="2.6"
+        strokeLinecap="round"
+        opacity="0.26"
+      />
+    </svg>
+  );
+}

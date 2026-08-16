@@ -39,6 +39,24 @@
   --on-tertiary: #ffffff;
   --tertiary-container: #f8e287;
   --on-tertiary-container: #221b00;
+  --tertiary-shadow: #3a3000;
+
+  /* Arcade spark accent (design/tokens-color.html): decorative-only fills plus the one
+     AA-verified ring colour that is allowed near text. Reserved for celebratory moments —
+     an owned upgrade and an unlocked achievement — never ordinary chrome. */
+  --spark: #ffc72c;
+  --spark-glow: #ffe066;
+  --spark-ring: #d97300;
+
+  /* Chunky pressable depth (design/tokens-shape-elevation.html): a SOLID offset shadow in a
+     darker shade of the surface's own colour, not a blur. */
+  --primary-shadow: #4a2a0a;
+  --press-1: 0 3px 0 0 var(--outline);
+  --press-2: 0 4px 0 0 var(--primary-shadow);
+  --press-3: 0 5px 0 0 var(--outline);
+  --border-thick: 3px;
+  --border-chunky: 4px;
+  --font-display: 'Segoe UI Black', 'Arial Black', 'Segoe UI', var(--font-en);
 
   --shape-full: 999px;
   --shape-large: 16px;
@@ -86,6 +104,12 @@
     --on-tertiary: #383000;
     --tertiary-container: #514600;
     --on-tertiary-container: #f8e287;
+    --tertiary-shadow: #8f7a20;
+
+    --spark: #ffd666;
+    --spark-glow: #ffe8a3;
+    --spark-ring: #ffc24d;
+    --primary-shadow: #a66a2e;
   }
 }
 
@@ -113,6 +137,12 @@
   --on-tertiary: #383000;
   --tertiary-container: #514600;
   --on-tertiary-container: #f8e287;
+  --tertiary-shadow: #8f7a20;
+
+  --spark: #ffd666;
+  --spark-glow: #ffe8a3;
+  --spark-ring: #ffc24d;
+  --primary-shadow: #a66a2e;
 }
 
 * {
@@ -835,17 +865,37 @@ body {
 }
 
 .item-card {
-  border-radius: var(--shape-medium);
-  padding: 14px;
+  border-radius: var(--shape-large);
+  padding: 16px;
   background: var(--surface-high);
+  border: var(--border-thick) solid var(--outline);
   display: flex;
   flex-direction: column;
   gap: 8px;
-  min-height: 150px;
+  min-height: 160px;
+  transition: transform calc(140ms * var(--motion-scale, 1)) ease;
+}
+
+/* Pure delight: a live card tilts a couple of degrees on hover. Disabled outright under
+   reduced motion — a still card still reads correctly, so there is nothing to substitute. */
+.item-card.buyable:hover,
+.item-card.owned:hover {
+  transform: translateY(-3px) rotate(-0.6deg);
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .item-card {
+    transition: none;
+  }
+
+  .item-card.buyable:hover,
+  .item-card.owned:hover {
+    transform: none;
+  }
 }
 
 .item-card.locked {
-  opacity: 0.55;
+  opacity: 0.6;
 }
 
 .item-card.locked .item-card__icon {
@@ -854,9 +904,11 @@ body {
 
 .item-card.owned,
 .item-card.unlocked {
-  border: 2px solid var(--tertiary);
+  border: var(--border-chunky) solid var(--tertiary);
   background: var(--tertiary-container);
   color: var(--on-tertiary-container);
+  /* Spark-accented owned glow: the celebratory ring from design/upgrade-card.html. */
+  box-shadow: 0 0 0 4px var(--tertiary-container), 0 0 16px 2px var(--spark-ring);
 }
 
 .item-card__icon {
@@ -903,20 +955,50 @@ body {
 
 .item-card__buy {
   font: inherit;
-  font-weight: 700;
+  font-weight: 800;
   font-size: 13px;
-  min-height: 40px;
+  font-variant-numeric: tabular-nums;
+  min-height: 44px;
   border-radius: var(--shape-full);
   border: none;
   cursor: pointer;
   background: var(--primary);
   color: var(--on-primary);
+  box-shadow: var(--press-2);
+  transition:
+    transform calc(90ms * var(--motion-scale, 1)) ease,
+    box-shadow calc(90ms * var(--motion-scale, 1)) ease;
+}
+
+/* Compresses flat like a real arcade-cabinet button. */
+.item-card__buy:active:not([disabled]) {
+  transform: translateY(4px);
+  box-shadow: none;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .item-card__buy {
+    transition: none;
+  }
+
+  .item-card__buy:active:not([disabled]) {
+    transform: none;
+  }
 }
 
 .item-card__buy[disabled] {
   background: var(--surface-highest);
   color: var(--on-surface-variant);
+  box-shadow: none;
   cursor: not-allowed;
+}
+
+.item-card.owned .item-card__buy[disabled] {
+  background: var(--tertiary);
+  color: var(--on-tertiary);
+  box-shadow: 0 4px 0 0 var(--tertiary-shadow);
+  cursor: default;
+  opacity: 0.9;
 }
 
 .item-card__buy:focus-visible {
@@ -1020,43 +1102,97 @@ body {
   text-align: center;
 }
 
+/* Struck like a real minted medal: a chunky ring plus an inset bevel, not a flat circle. */
 .achievement-badge {
-  width: 60px;
-  height: 60px;
+  width: 72px;
+  height: 72px;
   border-radius: var(--shape-full);
   display: flex;
   align-items: center;
   justify-content: center;
-  font-size: 24px;
+  font-size: 30px;
+  border: var(--border-chunky) solid transparent;
 }
 
 .achievement-badge.locked {
   background: var(--surface-highest);
   color: var(--on-surface-variant);
+  border-color: var(--outline);
   filter: grayscale(1) brightness(0.85);
+  box-shadow:
+    inset 0 3px 0 0 rgba(255, 255, 255, 0.25),
+    inset 0 -4px 0 0 rgba(0, 0, 0, 0.15);
 }
 
 .achievement-badge.unlocked {
-  background: var(--tertiary-container);
-  color: var(--on-tertiary-container);
-  border: 3px solid var(--tertiary);
-  box-shadow: 0 0 10px 2px var(--tertiary-container);
+  background: radial-gradient(circle at 35% 30%, var(--spark-glow), var(--tertiary) 72%);
+  color: var(--on-tertiary);
+  border-color: var(--spark-ring);
+  box-shadow:
+    inset 0 3px 0 0 rgba(255, 255, 255, 0.45),
+    inset 0 -6px 0 0 var(--tertiary-shadow),
+    0 0 0 4px var(--tertiary-container),
+    0 0 16px 2px var(--spark-glow);
 }
 
 .achievement-badge:focus-visible {
-  outline: 3px solid var(--primary);
-  outline-offset: 3px;
+  outline: 4px solid var(--primary);
+  outline-offset: 4px;
 }
 
 .achievement-name {
-  font-size: 12px;
-  font-weight: 600;
+  font-size: 13px;
+  font-weight: 700;
 }
 
 .achievement-name-zh {
   font-family: var(--font-zh);
-  font-size: 11px;
+  font-size: 12px;
   color: var(--on-surface-variant);
+}
+
+/* Unlock toast (design/achievement-badge.html + design/narrator-toast.html): non-blocking,
+   corner-anchored, chunky offset shadow, spark-accent left stripe. Never modal. */
+.achievement-toast {
+  position: fixed;
+  bottom: 24px;
+  right: 24px;
+  max-width: 320px;
+  display: flex;
+  gap: 12px;
+  align-items: center;
+  padding: 14px 18px;
+  border-radius: var(--shape-large);
+  background: var(--surface-high);
+  color: var(--on-surface);
+  border: var(--border-thick) solid var(--outline);
+  border-left: 6px solid var(--spark-ring);
+  box-shadow: var(--press-3);
+}
+
+.achievement-toast__badge {
+  width: 44px;
+  height: 44px;
+  font-size: 20px;
+  flex-shrink: 0;
+}
+
+.achievement-toast__text {
+  font-size: 13px;
+}
+
+.achievement-toast__text strong {
+  display: block;
+  font-size: 14px;
+  font-family: var(--font-display);
+}
+
+.screen-summary {
+  font-family: var(--font-zh);
+  font-variant-numeric: tabular-nums;
+  font-size: 13px;
+  color: var(--on-surface-variant);
+  margin: 0;
 }
 
 /* ---------------------------------------------------------------------------------------- *

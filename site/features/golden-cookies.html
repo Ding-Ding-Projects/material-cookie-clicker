@@ -1,0 +1,80 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1" />
+<title>Golden-cookie events — Material Cookie Clicker</title>
+<meta name="description" content="A seeded, replayable random-event schedule: frenzy, click frenzy and windfall." />
+<link rel="stylesheet" href="../assets/site.css" />
+</head>
+<body>
+<a class="skip-link" href="#main">Skip to main content</a>
+<header class="site-head">
+  <div class="wrap">
+    <a class="brand" href="../index.html"><span aria-hidden="true">&#127850;</span> Material Cookie Clicker</a>
+    <nav class="site-nav" aria-label="Primary">
+      <ul>
+        <li><a href="../index.html">Home</a></li>
+        <li><a href="../features/index.html">Features</a></li>
+        <li><a href="../index.html#download">Download</a></li>
+      </ul>
+    </nav>
+  </div>
+</header>
+<main id="main" class="wrap">
+  <article>
+    <h1>Golden-cookie events</h1>
+    <p class="lede">A seeded, replayable random-event schedule: frenzy, click frenzy and windfall.</p>
+    <div class="inset" style="margin-bottom:18px">
+  <span class="label">Current state</span>
+  <p style="margin:0"><span class="tag tag--roadmap">Shipped engine, uncaptured surface</span> the scheduler ships with the game surface (<code>src/shared/game/golden-cookie.ts</code>), but no spawned golden cookie has been photographed.</p>
+</div>
+    <h2>From the running application</h2>
+    <div class="note note--roadmap">
+      <strong class="note-title">No capture of this one</strong>
+      <p>Nothing on this page is backed by a photograph of the running application. See the <a href="../index.html#captures">capture matrix</a> for the five surfaces that are.</p>
+    </div>
+    
+<h2>What it does</h2>
+<p>Every so often a golden cookie spawns as a temporary overlay on the main cookie surface. Click it before its window closes and you get one of three effects:</p>
+<div class="scroller">
+<table>
+  <caption>Default event configuration</caption>
+  <thead><tr><th scope="col">Effect</th><th scope="col">What it does</th><th scope="col">Default</th></tr></thead>
+  <tbody>
+    <tr><td>Frenzy</td><td>Multiplies all production</td><td>7&times; for 77 seconds</td></tr>
+    <tr><td>Click frenzy</td><td>Multiplies click value</td><td>3&times; for 13 seconds</td></tr>
+    <tr><td>Windfall</td><td>Instant cookie payout</td><td>15 minutes of current CPS</td></tr>
+  </tbody>
+</table>
+</div>
+<p>By default a golden cookie becomes eligible somewhere between 5 and 15 minutes after the last one, and stays clickable for 15 seconds before despawning unclicked.</p>
+
+<h2>Seeded, not random</h2>
+<p>The spawn schedule uses a small deterministic PRNG (splitmix32) with an explicit stream position that is saved and restored with the game. <code>Math.random()</code> is never called anywhere in this module. Given the same seed and stream index, the same sequence of spawns and effects replays exactly &mdash; which is what makes an event system unit-testable at all, and what stops a save/load cycle from re-rolling your luck.</p>
+
+<h2>How it is configured</h2>
+<p>Minimum and maximum delay, the clickable window, both multipliers, both durations and the windfall payout are all fields of one configuration object with a documented default set, not constants buried in the scheduler. The golden treatment uses the tertiary colour role exclusively, so the accent keeps meaning something and is never reused for ordinary chrome.</p>
+
+<h2>In the shipped build</h2>
+<p>The scheduler ships inside the running game, but with a five-to-fifteen-minute spawn window nobody has photographed a spawned golden cookie yet, so the overlay is the one gameplay surface on this site with no capture behind it. Treat the visual description above as the specification it is.</p>
+    <nav class="related plate" aria-labelledby="related-heading">
+      <h2 id="related-heading">Related articles</h2>
+      <ul>
+      <li><a href="cookie-clicking.html">Cookie clicking and the CPS loop</a></li>
+      <li><a href="statistics.html">Statistics</a></li>
+      <li><a href="achievements.html">Achievements</a></li>
+      <li><a href="upgrades.html">Upgrades</a></li>
+        <li><a href="index.html">All features &amp; search</a></li>
+      </ul>
+    </nav>
+  </article>
+</main>
+<footer class="site-foot">
+  <div class="wrap">
+    <p>Material Cookie Clicker is free, unsigned by permanent policy, and nobody ever pays anything to use it. This site is fully self-contained: no CDN, no remote font, no remote image, no analytics, no network request of any kind. Every graphic is either drawn in CSS or a screenshot of the application stored in this repository.</p>
+    <p><a href="https://github.com/Ding-Ding-Projects/material-cookie-clicker">Source code on GitHub</a> &middot; <a href="../features/index.html">All feature articles</a></p>
+  </div>
+</footer>
+</body>
+</html>

@@ -1,0 +1,92 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1" />
+<title>The 14-tier generator ladder — Material Cookie Clicker</title>
+<meta name="description" content="Cursor through Prism: fourteen generator tiers, a constant 1.15 cost curve, and the buy-quantity stepper." />
+<link rel="stylesheet" href="../assets/site.css" />
+</head>
+<body>
+<a class="skip-link" href="#main">Skip to main content</a>
+<header class="site-head">
+  <div class="wrap">
+    <a class="brand" href="../index.html"><span aria-hidden="true">&#127850;</span> Material Cookie Clicker</a>
+    <nav class="site-nav" aria-label="Primary">
+      <ul>
+        <li><a href="../index.html">Home</a></li>
+        <li><a href="../features/index.html">Features</a></li>
+        <li><a href="../index.html#download">Download</a></li>
+      </ul>
+    </nav>
+  </div>
+</header>
+<main id="main" class="wrap">
+  <article>
+    <h1>The 14-tier generator ladder</h1>
+    <p class="lede">Cursor through Prism: fourteen generator tiers, a constant 1.15 cost curve, and the buy-quantity stepper.</p>
+    <div class="inset" style="margin-bottom:18px">
+  <span class="label">Current state</span>
+  <p style="margin:0"><span class="tag">Shipped</span> the shop rail is in this release; 14 definitions in <code>src/shared/game/generators.ts</code>.</p>
+</div>
+    <h2>From the running application</h2>
+    <figure class="capture">
+  <img src="../assets/captures/surface-game.png" alt="The Material Cookie Clicker game window. Three HUD readouts across the top read COOKIES 4.06, PER SECOND 0 and PER CLICK 1.02, each labelled in English and Cantonese. Below on the left is the domed cookie button with "0 / sec" and "hold to click repeatedly" beneath it, and under that the UPGRADES strip reading 0 / 75 with ticket cards for Reinforced Finger, Sturdier Ovens and Double Click, Double Trouble, the last two padlocked. On the right is the docked SHOP rail with a generator search field and rows for Cursor and Grandma, each with an x1/x10/x100/Max stepper and a Buy button. A yellow achievement toast reading "Achievement unlocked: 1 Lifetime Cookies" sits over the lower right, partly covering the Grandma row. Five tabs run along the bottom: Game, Achievements, Tools, Statistics, Prestige." width="1557" height="1093" loading="lazy" />
+  <figcaption><strong>The single game surface.</strong> The core loop on one screen: clicking, the shop rail and the upgrade strip with no navigation between them. Captured from the built application running on an off-screen desktop, photographed with the Win32 PrintWindow API. Light theme.</figcaption>
+</figure>
+    <p><a href="../index.html#captures">See all five captures in the capture matrix</a>.</p>
+    
+<h2>What it does</h2>
+<p>Fourteen generator tiers bake cookies automatically once owned. Each tier's base cost and base output are roughly ten times the previous tier's, so the &ldquo;the next tier is finally worth it&rdquo; moment recurs at a predictable cadence for the whole run. Every tier carries an English name and a Hong Kong Cantonese name, and the Cantonese names lean into local jokes rather than literal translation.</p>
+<div class="scroller">
+<table>
+  <caption>The ladder, exactly as defined in source</caption>
+  <thead><tr><th scope="col">#</th><th scope="col">English</th><th scope="col">Cantonese</th><th scope="col">Base cost</th><th scope="col">Base CPS</th></tr></thead>
+  <tbody>
+    <tr><td>1</td><td>Cursor</td><td lang="zh-HK">掂手指</td><td>15</td><td>0.1</td></tr>
+    <tr><td>2</td><td>Grandma</td><td lang="zh-HK">包租婆</td><td>100</td><td>1</td></tr>
+    <tr><td>3</td><td>Cookie Farm</td><td lang="zh-HK">曲奇農場</td><td>1,100</td><td>8</td></tr>
+    <tr><td>4</td><td>Cookie Mine</td><td lang="zh-HK">曲奇礦場</td><td>12,000</td><td>47</td></tr>
+    <tr><td>5</td><td>Factory</td><td lang="zh-HK">餅乾工廠</td><td>130,000</td><td>260</td></tr>
+    <tr><td>6</td><td>Bank</td><td lang="zh-HK">大耳窿銀行</td><td>1,400,000</td><td>1,400</td></tr>
+    <tr><td>7</td><td>Temple</td><td lang="zh-HK">黃大仙廟</td><td>20,000,000</td><td>7,800</td></tr>
+    <tr><td>8</td><td>Wizard Tower</td><td lang="zh-HK">巫師塔</td><td>330,000,000</td><td>44,000</td></tr>
+    <tr><td>9</td><td>Shipment</td><td lang="zh-HK">貨櫃碼頭</td><td>5,100,000,000</td><td>260,000</td></tr>
+    <tr><td>10</td><td>Alchemy Lab</td><td lang="zh-HK">煉金實驗室</td><td>75,000,000,000</td><td>1,600,000</td></tr>
+    <tr><td>11</td><td>Portal</td><td lang="zh-HK">傳送門</td><td colspan="2">continues the same ~10&times; step</td></tr>
+    <tr><td>12</td><td>Time Machine</td><td lang="zh-HK">時光機</td><td colspan="2">continues the same ~10&times; step</td></tr>
+    <tr><td>13</td><td>Antimatter Condenser</td><td lang="zh-HK">反物質凝聚器</td><td colspan="2">continues the same ~10&times; step</td></tr>
+    <tr><td>14</td><td>Prism</td><td lang="zh-HK">稜鏡</td><td colspan="2">continues the same ~10&times; step</td></tr>
+  </tbody>
+</table>
+</div>
+<p>Every tier uses the same per-unit cost growth ratio of <strong>1.15</strong>, held constant across the whole ladder rather than tuned per tier, so the price of the next unit is a single predictable formula the player can reason about.</p>
+
+<h2>How it is configured</h2>
+<p>Cost, output and growth ratio are data in one file, not scattered through the purchase logic. A row's three presentation states are fixed by <code>design/building-row.html</code>: affordable, unaffordable (visible but disabled, never hidden), and locked (shown-and-locked, so you always know what is coming). The buy-quantity stepper offers &times;1, &times;10, &times;100 and Max as a segmented cabinet switch.</p>
+
+<h2>The rule about locks</h2>
+<p>Locking a later tier behind an earlier one's progress is a pacing decision for the game. It gates a purchase, and only a purchase. It is unrelated to the <a href="tools-tech-tree.html">Tools tech tree</a>, which never gates an application feature.</p>
+
+<h2>In the shipped build</h2>
+<p>The shop rail is docked beside the cookie on the same screen, with a search field, per-row x1/x10/x100/Max steppers and Buy buttons. Two caveats worth stating: an achievement toast can briefly overlay a shop row (it is doing exactly that in the capture above), and the narrow-width behaviour where the rail becomes a bottom-sheet drawer was verified by forcing the breakpoint, not by a real window resize.</p>
+    <nav class="related plate" aria-labelledby="related-heading">
+      <h2 id="related-heading">Related articles</h2>
+      <ul>
+      <li><a href="cookie-clicking.html">Cookie clicking and the CPS loop</a></li>
+      <li><a href="upgrades.html">Upgrades</a></li>
+      <li><a href="achievements.html">Achievements</a></li>
+      <li><a href="tools-tech-tree.html">The Tools tech tree</a></li>
+        <li><a href="index.html">All features &amp; search</a></li>
+      </ul>
+    </nav>
+  </article>
+</main>
+<footer class="site-foot">
+  <div class="wrap">
+    <p>Material Cookie Clicker is free, unsigned by permanent policy, and nobody ever pays anything to use it. This site is fully self-contained: no CDN, no remote font, no remote image, no analytics, no network request of any kind. Every graphic is either drawn in CSS or a screenshot of the application stored in this repository.</p>
+    <p><a href="https://github.com/Ding-Ding-Projects/material-cookie-clicker">Source code on GitHub</a> &middot; <a href="../features/index.html">All feature articles</a></p>
+  </div>
+</footer>
+</body>
+</html>

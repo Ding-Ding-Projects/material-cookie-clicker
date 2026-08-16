@@ -1,0 +1,76 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1" />
+<title>Achievements — Material Cookie Clicker</title>
+<meta name="description" content="One hundred achievements, generated from four milestone families, with a permanent unlock and a marquee toast." />
+<link rel="stylesheet" href="../assets/site.css" />
+</head>
+<body>
+<a class="skip-link" href="#main">Skip to main content</a>
+<header class="site-head">
+  <div class="wrap">
+    <a class="brand" href="../index.html"><span aria-hidden="true">&#127850;</span> Material Cookie Clicker</a>
+    <nav class="site-nav" aria-label="Primary">
+      <ul>
+        <li><a href="../index.html">Home</a></li>
+        <li><a href="../features/index.html">Features</a></li>
+        <li><a href="../index.html#download">Download</a></li>
+      </ul>
+    </nav>
+  </div>
+</header>
+<main id="main" class="wrap">
+  <article>
+    <h1>Achievements</h1>
+    <p class="lede">One hundred achievements, generated from four milestone families, with a permanent unlock and a marquee toast.</p>
+    <div class="inset" style="margin-bottom:18px">
+  <span class="label">Current state</span>
+  <p style="margin:0"><span class="tag">Shipped</span> the Achievements tab is in this release; 100 definitions in <code>src/shared/game/achievements.ts</code>.</p>
+</div>
+    <h2>From the running application</h2>
+    <figure class="capture">
+  <img src="../assets/captures/surface-achievements.png" alt="The Achievements tab. A marquee heading reads ACHIEVEMENTS with its Cantonese equivalent, above the line "2 / 100 unlocked" and a search field. Below is a grid of round badges: the first, "First Bite", is unlocked and drawn as a glowing gold-rimmed medal with a cookie on it; every other badge in view is a grey locked silhouette labelled "???" and "not unlocked" in Cantonese." width="1557" height="1093" loading="lazy" />
+  <figcaption><strong>Achievements.</strong> Locked silhouettes and one struck medal, out of the hundred defined achievements. Captured from the built application running on an off-screen desktop, photographed with the Win32 PrintWindow API. Light theme.</figcaption>
+</figure>
+    <p><a href="../index.html#captures">See all five captures in the capture matrix</a>.</p>
+    
+<h2>What it does</h2>
+<p>An achievement is a named milestone that unlocks permanently the first time its condition is met, and records the moment it was unlocked. There are <strong>100</strong> definitions, built from four families:</p>
+<ul>
+  <li><strong>84 ownership milestones</strong> &mdash; 1, 10, 25, 50, 100 and 200 owned, for each of the fourteen generators.</li>
+  <li><strong>7 lifetime-cookie milestones</strong> &mdash; from your first cookie up to a quadrillion.</li>
+  <li><strong>4 click milestones</strong> &mdash; 100, 1,000, 10,000 and 100,000 clicks.</li>
+  <li><strong>5 named and prestige milestones</strong>, including the ascension counts at 1, 5, 10 and 25.</li>
+</ul>
+<p>Every achievement has both an English and a Cantonese name. Conditions are evaluated against game state, which means a milestone crossed by passive production counts exactly like one crossed by clicking &mdash; achievements are not checked only at purchase time.</p>
+
+<h2>How it is configured</h2>
+<p>The milestone thresholds are arrays at the top of one file, and the definitions are generated from them, so the count moves with the data instead of being hand-maintained. <code>design/achievement-badge.html</code> fixes the presentation: a locked silhouette, an unlocked struck medal with a domed face and a rotating conic metal rim, and a distinct unlock toast that is corner-anchored, auto-dismissing, and never a blocking dialog.</p>
+
+<h2>The properties that matter</h2>
+<p>Unlocks are permanent and survive prestige. An unlocked achievement never silently re-locks. Because there is no leaderboard, no server and no payment anywhere in this product, an edited save file granting every badge is not a security problem and is not treated as one.</p>
+
+<h2>In the shipped build</h2>
+<p>The Achievements tab shows all one hundred badges with a live unlocked count and a search field, locked ones as grey silhouettes. The unlock toast works &mdash; and can briefly overlay a shop row on the game surface, which is a known rough edge rather than a hidden one.</p>
+    <nav class="related plate" aria-labelledby="related-heading">
+      <h2 id="related-heading">Related articles</h2>
+      <ul>
+      <li><a href="generator-ladder.html">The 14-tier generator ladder</a></li>
+      <li><a href="prestige.html">Prestige (ascend)</a></li>
+      <li><a href="statistics.html">Statistics</a></li>
+      <li><a href="tools-tech-tree.html">The Tools tech tree</a></li>
+        <li><a href="index.html">All features &amp; search</a></li>
+      </ul>
+    </nav>
+  </article>
+</main>
+<footer class="site-foot">
+  <div class="wrap">
+    <p>Material Cookie Clicker is free, unsigned by permanent policy, and nobody ever pays anything to use it. This site is fully self-contained: no CDN, no remote font, no remote image, no analytics, no network request of any kind. Every graphic is either drawn in CSS or a screenshot of the application stored in this repository.</p>
+    <p><a href="https://github.com/Ding-Ding-Projects/material-cookie-clicker">Source code on GitHub</a> &middot; <a href="../features/index.html">All feature articles</a></p>
+  </div>
+</footer>
+</body>
+</html>

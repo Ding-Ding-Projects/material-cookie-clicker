@@ -61,7 +61,7 @@ jobs:
           "tag=$tag" | Out-File -FilePath $env:GITHUB_OUTPUT -Encoding utf8 -Append
       - name: Bootstrap pinned GitHub CLI in the job-local tool cache
         shell: pwsh
-        run: ./scripts/bootstrap-gh-cli.ps1 -ToolsRoot (Join-Path $env:RUNNER_TEMP 'oak-kay-tools')
+        run: ./scripts/bootstrap-gh-cli.ps1 -ToolsRoot (Join-Path $env:RUNNER_TEMP 'material-cookie-clicker-tools')
       - name: Generate bounded in-app release manifest
         shell: pwsh
         env:
@@ -149,13 +149,13 @@ jobs:
           $releases = Get-ChildItem -Path $setup.DirectoryName -Filter 'RELEASES' | Select-Object -First 1
           $nupkg = Get-ChildItem -Path $setup.DirectoryName -Filter '*-full.nupkg' | Select-Object -First 1
           if (-not $releases -or -not $nupkg) { throw 'Squirrel did not produce RELEASES and a full .nupkg beside Setup.exe.' }
-          $expectedPackageName = "OakKay-$env:RELEASE_VERSION-full.nupkg"
+          $expectedPackageName = "MaterialCookieClicker-$env:RELEASE_VERSION-full.nupkg"
           if ($nupkg.Name -ne $expectedPackageName) { throw "Squirrel produced $($nupkg.Name), expected $expectedPackageName." }
           if (-not (Select-String -LiteralPath $releases.FullName -SimpleMatch $expectedPackageName -Quiet)) { throw "RELEASES does not advertise $expectedPackageName." }
           $signature = Get-AuthenticodeSignature -FilePath $setup.FullName
           if ($signature.Status -ne 'NotSigned') { throw "Code signing is prohibited, but Setup.exe reported $($signature.Status)." }
           New-Item -ItemType Directory -Path release-stage -Force | Out-Null
-          Copy-Item -LiteralPath $setup.FullName -Destination 'release-stage/OakKay-Setup.exe'
+          Copy-Item -LiteralPath $setup.FullName -Destination 'release-stage/MaterialCookieClicker-Setup.exe'
           Copy-Item -LiteralPath $releases.FullName -Destination 'release-stage/RELEASES'
           Copy-Item -LiteralPath $nupkg.FullName -Destination (Join-Path 'release-stage' $expectedPackageName)
           Copy-Item -LiteralPath 'release-changelog.pending.json' -Destination 'release-stage/release-changelog.pending.json'
@@ -190,7 +190,7 @@ jobs:
           path: release-stage
       - name: Bootstrap pinned GitHub CLI in the job-local tool cache
         shell: pwsh
-        run: ./scripts/bootstrap-gh-cli.ps1 -ToolsRoot (Join-Path $env:RUNNER_TEMP 'oak-kay-tools')
+        run: ./scripts/bootstrap-gh-cli.ps1 -ToolsRoot (Join-Path $env:RUNNER_TEMP 'material-cookie-clicker-tools')
       - name: Publish immutable assets and exact workflow timing
         shell: pwsh
         env:
@@ -199,12 +199,12 @@ jobs:
           RELEASE_VERSION: ${{ needs.windows-build.outputs.version }}
           WORKFLOW_STARTED: ${{ needs.prepare.outputs.started_at }}
         run: |
-          $setup = Resolve-Path 'release-stage/OakKay-Setup.exe'
+          $setup = Resolve-Path 'release-stage/MaterialCookieClicker-Setup.exe'
           $releases = Resolve-Path 'release-stage/RELEASES'
-          $nupkg = Resolve-Path "release-stage/OakKay-$env:RELEASE_VERSION-full.nupkg"
+          $nupkg = Resolve-Path "release-stage/MaterialCookieClicker-$env:RELEASE_VERSION-full.nupkg"
           $lineCount = Resolve-Path 'release-stage/line-count.md'
           $dish = Get-Content -LiteralPath 'release-stage/release-dish.json' -Raw | ConvertFrom-Json
-          $title = "Oak Kay $env:RELEASE_TAG"
+          $title = "Material Cookie Clicker $env:RELEASE_TAG"
           $initialNotes = @(
             'Publication timing is being finalized.'
             ''

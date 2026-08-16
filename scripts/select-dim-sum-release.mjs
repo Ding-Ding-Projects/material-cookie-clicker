@@ -8,7 +8,7 @@ export const CATALOG_URL = `https://raw.githubusercontent.com/${CATALOG_REPOSITO
 function requestHeaders(token) {
   return {
     Accept: 'application/vnd.github+json',
-    'User-Agent': 'oak-kay-release',
+    'User-Agent': 'material-cookie-clicker-release',
     'X-GitHub-Api-Version': '2022-11-28',
     ...(token ? { Authorization: `Bearer ${token}` } : {}),
   };

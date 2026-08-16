@@ -1,8 +1,25 @@
-import { readFile, stat, writeFile } from 'node:fs/promises';
+import { mkdir, readFile, stat, writeFile } from 'node:fs/promises';
 import path from 'node:path';
 import process from 'node:process';
 import { spawnSync } from 'node:child_process';
 import { pathToFileURL } from 'node:url';
+
+/**
+ * Write a generated file, creating its parent directory first.
+ *
+ * Node's writeFile does not create missing parents, so a generator pointed at a
+ * directory that does not exist yet fails with a bare ENOENT naming the file
+ * rather than the directory - which reads as "the generator is broken" instead
+ * of "nothing has created site/assets yet". That is exactly how this failed: the
+ * release job died on the site output while the lane that creates that directory
+ * was still being written. A generated file's directory is the generator's own
+ * business, and depending on someone else having made it first is a dependency
+ * nobody declared.
+ */
+async function writeGenerated(target, contents) {
+  await mkdir(path.dirname(target), { recursive: true });
+  await writeFile(target, contents, 'utf8');
+}
 
 export const CHANGELOG_SCHEMA_VERSION = 1;
 export const MAX_INVENTORY_BYTES = 2 * 1024 * 1024;
@@ -345,7 +362,7 @@ async function main() {
   if (reconcileInput) {
     if (!outputJson) throw new Error('--output-json is required when reconciling.');
     const manifest = reconcilePublishedManifest(await readBoundedJson(reconcileInput, 'Release manifest'), argument('--published-at'));
-    await writeFile(outputJson, `${JSON.stringify(manifest, null, 2)}\n`, 'utf8');
+    await writeGenerated(outputJson, `${JSON.stringify(manifest, null, 2)}\n`);
     return;
   }
   const inventoryFile = argument('--inventory');
@@ -366,9 +383,9 @@ async function main() {
   const manifest = fallback
     ? generateFallbackManifest({ repository, inventory, commitMetadata })
     : generateReleaseManifest({ repository, inventory, prospective, commitMetadata, dish });
-  await writeFile(outputTs, renderGeneratedModule(manifest), 'utf8');
-  await writeFile(outputJson, `${JSON.stringify(manifest, null, 2)}\n`, 'utf8');
-  if (outputSite) await writeFile(outputSite, renderGeneratedSiteModule(manifest), 'utf8');
+  await writeGenerated(outputTs, renderGeneratedModule(manifest));
+  await writeGenerated(outputJson, `${JSON.stringify(manifest, null, 2)}\n`);
+  if (outputSite) await writeGenerated(outputSite, renderGeneratedSiteModule(manifest));
 }
 
 if (process.argv[1] && import.meta.url === pathToFileURL(process.argv[1]).href) {

@@ -49,7 +49,7 @@
   <div class="note">
   <strong class="note-title">Where the project actually is</strong>
   <p>The game is playable. This release ships the single game surface &mdash; HUD readouts, the cookie hero, the docked shop rail and the upgrade ticket strip, all on one screen &mdash; plus the Achievements, Tools, Statistics and Prestige tabs. All 109 tests pass, the application builds, and every one of those five surfaces was photographed from the real running build. You can see the photographs <a href="index.html#captures">in the capture matrix</a>.</p>
-  <p>Three things are still honestly unverified, and they stay listed here until someone has actually seen them: <strong>no capture exists of the dark theme</strong> in the application; the <strong>narrow-width shop drawer</strong> was verified by forcing its breakpoint rather than by really resizing the window; and an <strong>unlock toast can briefly overlay shop rows</strong> &mdash; you can see it happening in the game-surface capture.</p>
+  <p>Two things are still honestly unverified, and they stay listed here until someone has actually seen them: the <strong>narrow-width shop drawer</strong> was verified by forcing its breakpoint rather than by really resizing the window; and an <strong>unlock toast can briefly overlay shop rows</strong> &mdash; you can see it happening in the game-surface capture.</p>
 </div>
   <ul class="stats">
     <li class="stat"><span class="v">14</span><span class="k">Generator tiers</span></li>
@@ -60,10 +60,11 @@
   <p>Those four numbers are counted from the definition lists in the source tree, not from a wish list, and all four are now on screen in the running application: the shop rail lists the generators, the ticket strip counts the upgrades, the Achievements tab counts the badges and the Tools tab counts the tools.</p>
 
   <h2 id="captures">Capture matrix</h2>
-  <p>Five surfaces, five photographs of the real thing. Every image below was <strong>captured from the built application</strong> &mdash; not a mock-up, not a design spec &mdash; running on an off-screen desktop, photographed with the Win32 <code>PrintWindow</code> API, in the <strong>light theme</strong>. The dark theme has not been captured anywhere, so this site makes no claim about how the application looks in it.</p>
+  <p>Five surfaces, five photographs of the real thing. Every image below was <strong>captured from the built application</strong> &mdash; not a mock-up, not a design spec &mdash; running on an off-screen desktop, photographed with the Win32 <code>PrintWindow</code> API, mostly in the <strong>light theme</strong>. The dark &ldquo;arcade night&rdquo; theme was captured for the game surface by setting <code>data-theme="dark"</code> on the built renderer&rsquo;s root element; that capture is below.</p>
   <div class="captures">
     <figure class="capture">
   <img src="assets/captures/surface-game.png" alt="The Material Cookie Clicker game window. Three HUD readouts across the top read COOKIES 4.06, PER SECOND 0 and PER CLICK 1.02, each labelled in English and Cantonese. Below on the left is the domed cookie button with "0 / sec" and "hold to click repeatedly" beneath it, and under that the UPGRADES strip reading 0 / 75 with ticket cards for Reinforced Finger, Sturdier Ovens and Double Click, Double Trouble, the last two padlocked. On the right is the docked SHOP rail with a generator search field and rows for Cursor and Grandma, each with an x1/x10/x100/Max stepper and a Buy button. A yellow achievement toast reading "Achievement unlocked: 1 Lifetime Cookies" sits over the lower right, partly covering the Grandma row. Five tabs run along the bottom: Game, Achievements, Tools, Statistics, Prestige." width="1557" height="1093" loading="lazy" />
+  <figure class="capture-figure"><img src="assets/captures/surface-game-dark.png" alt="The same game surface rendered in the dark arcade-night theme: the cookie glows warm orange on a deep brown cabinet, the three HUD readouts sit in dark recessed bezels, the shop rail and upgrade tickets use dark panels with light text, and a toast reads Tool unlocked: Colour Translator. Captured from the built application on an off-screen desktop via Win32 PrintWindow with data-theme dark set on the built renderer root." width="1557" height="1093" loading="lazy" /><figcaption>The same surface in the dark &ldquo;arcade night&rdquo; theme &middot; <span lang="zh-HK">同一個畫面，深色主題</span></figcaption></figure>
   <figcaption><strong>The single game surface.</strong> The core loop on one screen: clicking, the shop rail and the upgrade strip with no navigation between them. Captured from the built application running on an off-screen desktop, photographed with the Win32 PrintWindow API. Light theme.</figcaption>
 </figure>
     <figure class="capture">
@@ -85,7 +86,7 @@
   </div>
   <div class="note note--roadmap">
     <strong class="note-title">What these captures do not show</strong>
-    <p>No golden-cookie spawn (the spawn window is five to fifteen minutes and nobody has caught one on camera yet), no settings surface, no dark theme, and no genuinely narrow window &mdash; the bottom-sheet drawer behaviour was checked by forcing its breakpoint, not by resizing the real application. The prestige confirmation gate ships, but sits below the fold of the Prestige capture.</p>
+    <p>No golden-cookie spawn (the spawn window is five to fifteen minutes and nobody has caught one on camera yet), no settings surface, and no genuinely narrow window &mdash; the bottom-sheet drawer behaviour was checked by forcing its breakpoint, not by resizing the real application. The prestige confirmation gate ships, but sits below the fold of the Prestige capture.</p>
   </div>
 
   <h2 id="download">Download</h2>
@@ -100,7 +101,7 @@
     <div class="note">
       <strong class="note-title">What you get if you install it today</strong>
       <p>The game, playable: the single game surface with the cookie, the shop rail and the upgrade strip, plus the Achievements, Tools, Statistics and Prestige tabs &mdash; all bilingual, all offline. The <a href="#captures">capture matrix above</a> is what it actually looks like.</p>
-      <p>Not in this release: a settings surface (so the language-mode selector and the funny-level sliders are not reachable yet, and the application is always in bilingual mode), and any application dark theme anyone has verified.</p>
+      <p>Not in this release: a settings surface (so the language-mode selector and the funny-level sliders are not reachable yet, and the application is always in bilingual mode), the dark theme is verified for the game surface only.</p>
     </div>
   </div>
 

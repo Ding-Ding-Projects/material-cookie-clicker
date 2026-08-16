@@ -101,8 +101,9 @@ about.
 
 ### Still not verified — do not describe these as working
 
-- **Dark theme in the application has never been captured** (tokens exist and
-  are shared with light, but nobody has looked at it).
+- ~~Dark theme never captured~~ — captured later the same day
+  (`captures/app/surface-game-dark.png`, via `data-theme="dark"` on the built
+  renderer root) and it renders correctly.
 - Narrow-width drawer behaviour was verified only by patching the breakpoint
   in built CSS, not by resizing a real window.
 - **The completeness inventory and its negative regression guard do not exist.**

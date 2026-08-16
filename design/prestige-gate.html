@@ -1,0 +1,246 @@
+<!-- @dsCard group="Game Surfaces" -->
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1" />
+<title>Material Cookie Clicker · Prestige / Wipe Destructive Gate</title>
+<style>
+  :root {
+    --md-primary: #7A4A1D; --md-on-primary: #FFFFFF;
+    --md-tertiary: #5C4E00; --md-on-tertiary: #FFFFFF; --md-tertiary-container: #F8E287;
+    --md-error: #BA1A1A; --md-on-error: #FFFFFF; --md-error-container: #FFDAD6; --md-on-error-container: #410002;
+    --md-surface: #FFF8F3; --md-on-surface: #211A14;
+    --md-surface-variant: #F0E0D0; --md-on-surface-variant: #4F4539;
+    --md-outline: #7C6F64;
+    --md-surface-container: #FCEBDD;
+    --md-surface-container-high: #F7E5D6;
+    --font-en: -apple-system, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
+    --font-zh: "Segoe UI", "Microsoft JhengHei", var(--font-en);
+  }
+  [data-scheme="dark"] {
+    --md-primary: #FFB876; --md-on-primary: #4A2800;
+    --md-tertiary: #DBC66E; --md-on-tertiary: #383000; --md-tertiary-container: #514600;
+    --md-error: #FFB4AB; --md-on-error: #690005; --md-error-container: #93000A; --md-on-error-container: #FFDAD6;
+    --md-surface: #18120D; --md-on-surface: #EDE0D9;
+    --md-surface-variant: #4F4539; --md-on-surface-variant: #D3C4B4;
+    --md-outline: #9C8F83;
+    --md-surface-container: #251D17;
+    --md-surface-container-high: #302722;
+  }
+  * { box-sizing: border-box; }
+  body { margin: 0; font-family: var(--font-en); background: var(--md-surface); color: var(--md-on-surface); padding: 24px; }
+  h1 { font-size: 28px; margin: 0 0 4px; }
+  h2 { font-size: 18px; margin: 32px 0 8px; }
+  h3 { font-size: 15px; margin: 24px 0 8px; }
+  p.lede, p.caption { color: var(--md-on-surface-variant); max-width: 74ch; }
+  button.scheme-toggle {
+    font: inherit; font-weight: 600; padding: 10px 18px; min-height: 44px;
+    border-radius: 999px; border: 1px solid var(--md-outline);
+    background: var(--md-surface-container); color: var(--md-on-surface); cursor: pointer; margin: 16px 0 24px;
+  }
+  button.scheme-toggle:focus-visible { outline: 3px solid var(--md-primary); outline-offset: 2px; }
+
+  .gate {
+    border-radius: 16px;
+    padding: 24px;
+    max-width: 480px;
+    display: flex; flex-direction: column; gap: 16px;
+    box-shadow: 0 4px 4px rgba(0,0,0,0.30), 0 8px 12px 6px rgba(0,0,0,0.15);
+  }
+  .gate.prestige { background: var(--md-tertiary-container); color: var(--md-on-error-container); }
+  .gate.wipe { background: var(--md-error-container); color: var(--md-on-error-container); }
+  .gate h4 { margin: 0; font-size: 18px; }
+  .gate .impact { font-size: 14px; line-height: 1.5; }
+  .gate .impact strong { display: block; }
+
+  .keys { display: flex; gap: 16px; }
+  .key {
+    flex: 1;
+    display: flex; flex-direction: column; align-items: center; gap: 6px;
+    padding: 12px;
+    border-radius: 12px;
+    background: rgba(255,255,255,0.35);
+  }
+  [data-scheme="dark"] .key { background: rgba(0,0,0,0.25); }
+  .key button.toggle {
+    width: 64px; height: 36px; border-radius: 999px; border: 2px solid var(--md-outline);
+    background: var(--md-surface); position: relative; cursor: pointer;
+  }
+  .key button.toggle::after {
+    content: ""; position: absolute; top: 2px; left: 2px; width: 28px; height: 28px; border-radius: 999px;
+    background: var(--md-outline); transition: transform 150ms ease, background 150ms ease;
+  }
+  .key button.toggle[aria-pressed="true"] { border-color: var(--md-primary); }
+  .key button.toggle[aria-pressed="true"]::after { transform: translateX(28px); background: var(--md-primary); }
+  .key button.toggle:focus-visible { outline: 3px solid var(--md-primary); outline-offset: 3px; }
+  .key .key-label { font-size: 12px; font-weight: 700; text-align: center; }
+
+  .slider-wrap { display: flex; flex-direction: column; gap: 6px; }
+  input[type="range"] { width: 100%; height: 44px; accent-color: var(--md-primary); }
+  input[type="range"]:disabled { opacity: 0.45; }
+  input[type="range"]:focus-visible { outline: 3px solid var(--md-primary); outline-offset: 2px; }
+  .slider-hint { font-size: 12px; }
+
+  .anim-track { height: 10px; border-radius: 999px; background: rgba(0,0,0,0.15); overflow: hidden; }
+  .anim-fill { height: 100%; background: var(--md-primary); width: 0%; transition: width 120ms linear; }
+  .gate.wipe .anim-fill { background: var(--md-error); }
+
+  .completion { display: none; font-weight: 700; text-align: center; padding: 8px; border-radius: 8px; }
+  .completion.show { display: block; }
+  .gate.prestige .completion { background: var(--md-primary); color: var(--md-on-primary); }
+  .gate.wipe .completion { background: var(--md-error); color: var(--md-on-error); }
+
+  .exit-btn {
+    font: inherit; font-weight: 700; min-height: 44px; border-radius: 999px; border: 1px solid var(--md-outline);
+    background: transparent; cursor: pointer; align-self: center;
+  }
+  .exit-btn:focus-visible { outline: 3px solid var(--md-primary); outline-offset: 2px; }
+
+  .state-caption { font-size: 12px; opacity: 0.9; }
+</style>
+</head>
+<body data-scheme="light">
+  <h1>Prestige / wipe gate · 轉生／清空閘門 — super-confirmation</h1>
+  <p class="lede">
+    The destructive-action gate. Two independently operated key toggles, both required before the
+    confirmation slider unlocks; a dramatic non-blocking progress fill while dragging; a distinct
+    completion state; and an always-available Emergency exit. This page's gates are live and
+    interactive — drag the sliders yourself once both keys are on to see the disabled state
+    actually enforced.
+    <span style="font-family:var(--font-zh); display:block; margin-top:4px;">
+      危險動作嘅雙重確認閘門：兩條獨立嘅開關掣要一齊開先可以郁到確認滑桿，仲有隨時可以撳嘅緊急退出掣。
+    </span>
+  </p>
+  <button class="scheme-toggle" onclick="document.body.dataset.scheme = document.body.dataset.scheme === 'dark' ? 'light' : 'dark'">
+    🌗 Toggle light / dark · 切換淺色／深色
+  </button>
+
+  <h2>Variant 1 — Prestige (recoverable) · 轉生（可以再賺返）</h2>
+  <p class="caption">
+    Copy names exactly what resets and what carries forward. Prestige is a normal, expected,
+    repeatable action — not "as severe" as a wipe — so it uses the tertiary/primary palette
+    rather than error.
+  </p>
+  <div class="gate prestige" id="gatePrestige">
+    <h4>Prestige now? · 而家轉生？</h4>
+    <div class="impact">
+      <strong>This will reset · 呢個會清空:</strong>
+      All buildings, upgrades, and current cookie count back to zero.
+      所有建築物、升級同埋而家嘅曲奇數量會歸零。
+      <strong style="margin-top:8px;">This carries forward · 呢個會保留:</strong>
+      42 Golden Chips (permanent CPS bonus), all unlocked achievements.
+      42 粒金曲奇碎（永久產量加成）、全部已解鎖成就。
+    </div>
+    <div class="keys">
+      <div class="key">
+        <button class="toggle" data-gate="gatePrestige" data-key="1" aria-pressed="false" aria-label="Key 1 · 鎖匙一">Key 1 · 鎖匙一</button>
+        <span class="key-label">Confirm intent · 確認意向</span>
+      </div>
+      <div class="key">
+        <button class="toggle" data-gate="gatePrestige" data-key="2" aria-pressed="false" aria-label="Key 2 · 鎖匙二">Key 2 · 鎖匙二</button>
+        <span class="key-label">Confirm you read the impact · 確認睇咗影響</span>
+      </div>
+    </div>
+    <div class="slider-wrap">
+      <input type="range" min="0" max="100" value="0" disabled data-slider="gatePrestige" aria-label="Slide fully right to prestige · 拉到盡右邊確認轉生" />
+      <div class="anim-track"><div class="anim-fill" data-fill="gatePrestige"></div></div>
+      <span class="slider-hint" data-hint="gatePrestige">Both keys required before this slider unlocks · 要開晒兩條鎖匙先可以郁滑桿</span>
+    </div>
+    <div class="completion" data-completion="gatePrestige">✅ Prestiged! · 轉生完成！ Golden Chips awarded: +6 · 獲得金曲奇碎 +6</div>
+    <button class="exit-btn" data-reset="gatePrestige">🚪 Emergency exit · 緊急退出</button>
+  </div>
+
+  <h2>Variant 2 — Full wipe (severe) · 完全清空（嚴重）</h2>
+  <p class="caption">
+    Nothing carries forward from a full wipe, so the copy says exactly that and the gate uses
+    the error role throughout rather than tertiary/primary.
+  </p>
+  <div class="gate wipe" id="gateWipe">
+    <h4>Delete all save data? · 刪除全部存檔？</h4>
+    <div class="impact">
+      <strong>This will permanently delete · 呢個會永久刪除:</strong>
+      Every building, upgrade, achievement, Golden Chip, and prestige run. There is no undo and
+      no recovery route once this completes.
+      每一個建築物、升級、成就、金曲奇碎同轉生紀錄。完成之後無得反悔，無得復原。
+    </div>
+    <div class="keys">
+      <div class="key">
+        <button class="toggle" data-gate="gateWipe" data-key="1" aria-pressed="false" aria-label="Key 1 · 鎖匙一">Key 1 · 鎖匙一</button>
+        <span class="key-label">Confirm intent · 確認意向</span>
+      </div>
+      <div class="key">
+        <button class="toggle" data-gate="gateWipe" data-key="2" aria-pressed="false" aria-label="Key 2 · 鎖匙二">Key 2 · 鎖匙二</button>
+        <span class="key-label">Confirm you understand this is permanent · 確認明白呢個係永久性</span>
+      </div>
+    </div>
+    <div class="slider-wrap">
+      <input type="range" min="0" max="100" value="0" disabled data-slider="gateWipe" aria-label="Slide fully right to delete everything · 拉到盡右邊確認刪除全部" />
+      <div class="anim-track"><div class="anim-fill" data-fill="gateWipe"></div></div>
+      <span class="slider-hint" data-hint="gateWipe">Both keys required before this slider unlocks · 要開晒兩條鎖匙先可以郁滑桿</span>
+    </div>
+    <div class="completion" data-completion="gateWipe">🗑️ All save data deleted · 全部存檔已刪除</div>
+    <button class="exit-btn" data-reset="gateWipe">🚪 Emergency exit · 緊急退出</button>
+  </div>
+
+  <h2>Reference states (static) · 靜態狀態參考</h2>
+  <p class="caption">
+    Below are frozen screenshots-in-markup of every intermediate state for documentation, in
+    case the live demo above has already been interacted with.
+  </p>
+  <div style="display:grid; grid-template-columns: repeat(auto-fill, minmax(200px,1fr)); gap:12px; font-size:13px;">
+    <div class="caption"><strong>Untouched</strong>: both keys off, slider disabled at 0.</div>
+    <div class="caption"><strong>One key</strong>: one toggle on, slider still disabled.</div>
+    <div class="caption"><strong>Both keys</strong>: both toggles on, slider becomes enabled at 0.</div>
+    <div class="caption"><strong>Slider partial</strong>: dragged partway; progress fill animates but action has not fired.</div>
+    <div class="caption"><strong>Slider complete</strong>: reaches 100; completion banner replaces the slider row.</div>
+  </div>
+
+<script>
+  function wire(gateId) {
+    const keys = document.querySelectorAll(`button.toggle[data-gate="${gateId}"]`);
+    const slider = document.querySelector(`input[data-slider="${gateId}"]`);
+    const fill = document.querySelector(`div[data-fill="${gateId}"]`);
+    const hint = document.querySelector(`span[data-hint="${gateId}"]`);
+    const completion = document.querySelector(`div[data-completion="${gateId}"]`);
+    const resetBtn = document.querySelector(`button[data-reset="${gateId}"]`);
+
+    function bothOn() {
+      return Array.from(keys).every(k => k.getAttribute('aria-pressed') === 'true');
+    }
+    function updateSlider() {
+      const enabled = bothOn();
+      slider.disabled = !enabled;
+      hint.textContent = enabled
+        ? 'Drag fully right to confirm · 拉到盡右邊確認'
+        : 'Both keys required before this slider unlocks · 要開晒兩條鎖匙先可以郁滑桿';
+    }
+    keys.forEach(k => {
+      k.addEventListener('click', () => {
+        const pressed = k.getAttribute('aria-pressed') === 'true';
+        k.setAttribute('aria-pressed', String(!pressed));
+        updateSlider();
+      });
+    });
+    slider.addEventListener('input', () => {
+      fill.style.width = slider.value + '%';
+      if (Number(slider.value) >= 100) {
+        completion.classList.add('show');
+        slider.parentElement.style.display = 'none';
+      }
+    });
+    resetBtn.addEventListener('click', () => {
+      keys.forEach(k => k.setAttribute('aria-pressed', 'false'));
+      slider.value = 0;
+      fill.style.width = '0%';
+      completion.classList.remove('show');
+      slider.parentElement.style.display = '';
+      updateSlider();
+    });
+    updateSlider();
+  }
+  wire('gatePrestige');
+  wire('gateWipe');
+</script>
+</body>
+</html>

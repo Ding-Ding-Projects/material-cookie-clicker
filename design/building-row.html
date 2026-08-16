@@ -1,0 +1,172 @@
+<!-- @dsCard group="Game Surfaces" -->
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1" />
+<title>Material Cookie Clicker · Building Row · Generator List Item</title>
+<style>
+  :root {
+    --md-primary: #7A4A1D; --md-on-primary: #FFFFFF;
+    --md-primary-container: #FFDCB8; --md-on-primary-container: #3A2100;
+    --md-secondary: #6B4C3F; --md-on-secondary: #FFFFFF;
+    --md-secondary-container: #FFDBCB; --md-on-secondary-container: #2C160B;
+    --md-surface: #FFF8F3; --md-on-surface: #211A14;
+    --md-surface-variant: #F0E0D0; --md-on-surface-variant: #4F4539;
+    --md-outline: #7C6F64;
+    --md-surface-container: #FCEBDD;
+    --md-surface-container-high: #F7E5D6;
+    --font-en: -apple-system, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
+    --font-zh: "Segoe UI", "Microsoft JhengHei", var(--font-en);
+  }
+  [data-scheme="dark"] {
+    --md-primary: #FFB876; --md-on-primary: #4A2800;
+    --md-primary-container: #693C00; --md-on-primary-container: #FFDCB8;
+    --md-secondary: #E6BEAC; --md-on-secondary: #44291E;
+    --md-secondary-container: #5D3F32; --md-on-secondary-container: #FFDBCB;
+    --md-surface: #18120D; --md-on-surface: #EDE0D9;
+    --md-surface-variant: #4F4539; --md-on-surface-variant: #D3C4B4;
+    --md-outline: #9C8F83;
+    --md-surface-container: #251D17;
+    --md-surface-container-high: #302722;
+  }
+  * { box-sizing: border-box; }
+  body { margin: 0; font-family: var(--font-en); background: var(--md-surface); color: var(--md-on-surface); padding: 24px; }
+  h1 { font-size: 28px; margin: 0 0 4px; }
+  h2 { font-size: 18px; margin: 32px 0 8px; }
+  p.lede, p.caption { color: var(--md-on-surface-variant); max-width: 74ch; }
+  button.scheme-toggle {
+    font: inherit; font-weight: 600; padding: 10px 18px; min-height: 44px;
+    border-radius: 999px; border: 1px solid var(--md-outline);
+    background: var(--md-surface-container); color: var(--md-on-surface); cursor: pointer; margin: 16px 0 24px;
+  }
+  button.scheme-toggle:focus-visible { outline: 3px solid var(--md-primary); outline-offset: 2px; }
+
+  .row {
+    display: grid;
+    grid-template-columns: 48px 1fr auto auto;
+    gap: 16px;
+    align-items: center;
+    padding: 12px 16px;
+    border-radius: 12px;
+    background: var(--md-surface-container-high);
+    margin-bottom: 12px;
+    min-height: 64px;
+  }
+  .row .icon {
+    width: 44px; height: 44px; border-radius: 999px;
+    background: var(--md-primary-container); color: var(--md-on-primary-container);
+    display: flex; align-items: center; justify-content: center; font-size: 22px;
+  }
+  .row .names { display: flex; flex-direction: column; }
+  .row .name-en { font-weight: 600; font-size: 15px; }
+  .row .name-zh { font-family: var(--font-zh); font-size: 13px; color: var(--md-on-surface-variant); }
+  .row .meta { display: flex; gap: 16px; font-size: 13px; color: var(--md-on-surface-variant); margin-top: 2px; }
+  .row .owned-chip {
+    background: var(--md-secondary-container); color: var(--md-on-secondary-container);
+    border-radius: 999px; padding: 2px 10px; font-weight: 700; font-size: 12px;
+    justify-self: start;
+  }
+  .stepper {
+    display: flex; align-items: center; gap: 4px;
+    background: var(--md-surface); border: 1px solid var(--md-outline); border-radius: 999px; padding: 2px;
+  }
+  .stepper button {
+    font: inherit; font-weight: 700; font-size: 12px;
+    min-width: 44px; min-height: 36px;
+    border: none; border-radius: 999px;
+    background: transparent; color: var(--md-on-surface); cursor: pointer;
+  }
+  .stepper button.active { background: var(--md-primary); color: var(--md-on-primary); }
+  .stepper button:focus-visible { outline: 3px solid var(--md-primary); outline-offset: 2px; }
+  .buy-btn {
+    font: inherit; font-weight: 700; font-size: 14px;
+    min-height: 44px; padding: 0 20px;
+    border-radius: 999px; border: none; cursor: pointer;
+    background: var(--md-primary); color: var(--md-on-primary);
+  }
+  .buy-btn:focus-visible { outline: 3px solid var(--md-secondary); outline-offset: 2px; }
+  .buy-btn[disabled] { background: var(--md-surface-variant); color: var(--md-on-surface-variant); cursor: not-allowed; opacity: 0.7; }
+  .row.locked { opacity: 0.55; }
+  .row.locked .icon { filter: grayscale(1); }
+  .lock-icon { font-size: 20px; }
+</style>
+</head>
+<body data-scheme="light">
+  <h1>Building row · 建築物列 — generator list item</h1>
+  <p class="lede">
+    One row of the generator list (bakeries, farms, factories…). Icon, bilingual name, owned
+    count chip, per-unit cost, CPS contribution, and a buy-quantity stepper (×1 / ×10 / ×100 /
+    Max) plus the buy button itself. Rows are virtualised in the real list; each row keeps its
+    own keyboard-reachable stepper and buy control.
+    <span style="font-family:var(--font-zh); display:block; margin-top:4px;">
+      生產建築物清單入面嘅一列：圖示、雙語名稱、擁有數量、單價、每秒產量，仲有買 ×1／×10／×100／Max 嘅按鈕。
+    </span>
+  </p>
+  <button class="scheme-toggle" onclick="document.body.dataset.scheme = document.body.dataset.scheme === 'dark' ? 'light' : 'dark'">
+    🌗 Toggle light / dark · 切換淺色／深色
+  </button>
+
+  <h2>Affordable · 買得起</h2>
+  <p class="caption">The buy button is enabled and uses the primary role; the stepper's active quantity is highlighted.</p>
+  <div class="row">
+    <div class="icon">🏠</div>
+    <div class="names">
+      <span class="name-en">Grandma's Bakery</span>
+      <span class="name-zh">嫲嫲嘅麵包店</span>
+      <div class="meta">
+        <span>Owned: 12</span>
+        <span>+18.4 CPS each</span>
+      </div>
+    </div>
+    <div class="stepper" role="group" aria-label="Buy quantity · 購買數量">
+      <button>×1</button>
+      <button class="active" aria-pressed="true">×10</button>
+      <button>×100</button>
+      <button>Max</button>
+    </div>
+    <button class="buy-btn">Buy · 買 — 🍪 1,240</button>
+  </div>
+
+  <h2>Unaffordable · 買唔起</h2>
+  <p class="caption">The buy button is disabled (not hidden) with its exact cost still shown, so the player knows what they're saving toward.</p>
+  <div class="row">
+    <div class="icon">🏭</div>
+    <div class="names">
+      <span class="name-en">Cookie Factory</span>
+      <span class="name-zh">曲奇工廠</span>
+      <div class="meta">
+        <span>Owned: 3</span>
+        <span>+210 CPS each</span>
+      </div>
+    </div>
+    <div class="stepper" role="group" aria-label="Buy quantity · 購買數量">
+      <button class="active" aria-pressed="true">×1</button>
+      <button>×10</button>
+      <button>×100</button>
+      <button>Max</button>
+    </div>
+    <button class="buy-btn" disabled>Buy · 買 — 🍪 88,500</button>
+  </div>
+
+  <h2>Locked · 未解鎖</h2>
+  <p class="caption">Hidden requirement is disclosed in plain words rather than a bare padlock icon, per the guided-forms rule that a disabled control names its unmet condition.</p>
+  <div class="row locked">
+    <div class="icon">🚀</div>
+    <div class="names">
+      <span class="name-en">Cookie Rocket <span class="lock-icon">🔒</span></span>
+      <span class="name-zh">曲奇火箭</span>
+      <div class="meta">
+        <span>Unlocks at 500 Cookie Factories owned · 擁有 500 間曲奇工廠先解鎖</span>
+      </div>
+    </div>
+    <div class="stepper" role="group" aria-label="Buy quantity · 購買數量" aria-disabled="true">
+      <button disabled>×1</button>
+      <button disabled>×10</button>
+      <button disabled>×100</button>
+      <button disabled>Max</button>
+    </div>
+    <button class="buy-btn" disabled>Locked · 未解鎖</button>
+  </div>
+</body>
+</html>

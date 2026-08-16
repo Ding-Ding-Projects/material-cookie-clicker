@@ -1,0 +1,108 @@
+<!-- @dsCard group="Game Surfaces" -->
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1" />
+<title>Material Cookie Clicker · Upgrade Card</title>
+<style>
+  :root {
+    --md-primary: #7A4A1D; --md-on-primary: #FFFFFF;
+    --md-primary-container: #FFDCB8; --md-on-primary-container: #3A2100;
+    --md-tertiary: #5C4E00; --md-on-tertiary: #FFFFFF;
+    --md-tertiary-container: #F8E287; --md-on-tertiary-container: #221B00;
+    --md-surface: #FFF8F3; --md-on-surface: #211A14;
+    --md-surface-variant: #F0E0D0; --md-on-surface-variant: #4F4539;
+    --md-outline: #7C6F64;
+    --md-surface-container: #FCEBDD;
+    --md-surface-container-high: #F7E5D6;
+    --font-en: -apple-system, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
+    --font-zh: "Segoe UI", "Microsoft JhengHei", var(--font-en);
+  }
+  [data-scheme="dark"] {
+    --md-primary: #FFB876; --md-on-primary: #4A2800;
+    --md-primary-container: #693C00; --md-on-primary-container: #FFDCB8;
+    --md-tertiary: #DBC66E; --md-on-tertiary: #383000;
+    --md-tertiary-container: #514600; --md-on-tertiary-container: #F8E287;
+    --md-surface: #18120D; --md-on-surface: #EDE0D9;
+    --md-surface-variant: #4F4539; --md-on-surface-variant: #D3C4B4;
+    --md-outline: #9C8F83;
+    --md-surface-container: #251D17;
+    --md-surface-container-high: #302722;
+  }
+  * { box-sizing: border-box; }
+  body { margin: 0; font-family: var(--font-en); background: var(--md-surface); color: var(--md-on-surface); padding: 24px; }
+  h1 { font-size: 28px; margin: 0 0 4px; }
+  h2 { font-size: 18px; margin: 32px 0 8px; }
+  p.lede, p.caption { color: var(--md-on-surface-variant); max-width: 74ch; }
+  button.scheme-toggle {
+    font: inherit; font-weight: 600; padding: 10px 18px; min-height: 44px;
+    border-radius: 999px; border: 1px solid var(--md-outline);
+    background: var(--md-surface-container); color: var(--md-on-surface); cursor: pointer; margin: 16px 0 24px;
+  }
+  button.scheme-toggle:focus-visible { outline: 3px solid var(--md-primary); outline-offset: 2px; }
+  .grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(240px, 1fr)); gap: 20px; }
+  .card {
+    border-radius: 12px;
+    padding: 16px;
+    background: var(--md-surface-container-high);
+    display: flex; flex-direction: column; gap: 8px;
+    min-height: 160px;
+  }
+  .card .icon { font-size: 30px; }
+  .card .name-en { font-weight: 700; font-size: 15px; }
+  .card .name-zh { font-family: var(--font-zh); font-size: 13px; color: var(--md-on-surface-variant); }
+  .card .desc { font-size: 13px; color: var(--md-on-surface-variant); flex: 1; }
+  .card button.buy {
+    font: inherit; font-weight: 700; min-height: 44px; border-radius: 999px; border: none; cursor: pointer;
+    background: var(--md-primary); color: var(--md-on-primary);
+  }
+  .card button.buy:focus-visible { outline: 3px solid var(--md-tertiary); outline-offset: 2px; }
+  .card.locked { opacity: 0.5; }
+  .card.locked .icon { filter: grayscale(1); }
+  .card.owned { border: 2px solid var(--md-tertiary); background: var(--md-tertiary-container); }
+  .card.owned .name-en, .card.owned .desc, .card.owned .name-zh { color: var(--md-on-tertiary-container); }
+  .owned-ribbon {
+    align-self: flex-start;
+    background: var(--md-tertiary); color: var(--md-on-tertiary);
+    border-radius: 999px; padding: 2px 10px; font-size: 12px; font-weight: 700;
+  }
+</style>
+</head>
+<body data-scheme="light">
+  <h1>Upgrade card · 升級卡</h1>
+  <p class="lede">
+    A one-time purchase card (doubles a building's CPS, unlocks a click multiplier, etc).
+    Three states: locked (requirement not yet met), unlocked-and-buyable, and owned (permanent,
+    no re-purchase). <span style="font-family:var(--font-zh);">單次購買嘅升級卡，分三種狀態：未解鎖、可以買，同埋已經擁有。</span>
+  </p>
+  <button class="scheme-toggle" onclick="document.body.dataset.scheme = document.body.dataset.scheme === 'dark' ? 'light' : 'dark'">
+    🌗 Toggle light / dark · 切換淺色／深色
+  </button>
+
+  <div class="grid">
+    <div class="card locked">
+      <div class="icon">🔒</div>
+      <div class="name-en">Reinforced Rolling Pin</div>
+      <div class="name-zh">加固擀麵杖</div>
+      <div class="desc">Doubles Grandma's Bakery CPS. Requires 50 Grandma's Bakeries owned. · 令嫲嫲嘅麵包店產量加倍，需要擁有 50 間先解鎖。</div>
+      <button class="buy" disabled>Locked · 未解鎖 (12 / 50)</button>
+    </div>
+    <div class="card">
+      <div class="icon">🥄</div>
+      <div class="name-en">Golden Whisk</div>
+      <div class="name-zh">金打蛋器</div>
+      <div class="desc">+15% click power. · 每一擊力量增加 15%。</div>
+      <button class="buy">Buy · 買 — 🍪 5,000</button>
+    </div>
+    <div class="card owned">
+      <div class="owned-ribbon">Owned · 已擁有</div>
+      <div class="icon">🧈</div>
+      <div class="name-en">Butter Blessing</div>
+      <div class="name-zh">牛油祝福</div>
+      <div class="desc">Permanently +10% global CPS. · 永久令全局每秒產量增加 10%。</div>
+      <button class="buy" disabled>Already owned · 已經買咗</button>
+    </div>
+  </div>
+</body>
+</html>

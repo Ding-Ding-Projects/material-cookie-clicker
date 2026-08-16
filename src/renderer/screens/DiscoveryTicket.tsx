@@ -3,7 +3,7 @@ import { computeDisclosure } from '../../shared/game/disclosure.js';
 import { formatBigNum } from '../../shared/game/format-number.js';
 import { isUpgradeUnlocked, REVEAL_UPGRADE_DEFINITIONS, type UpgradeDefinition } from '../../shared/game/upgrades.js';
 import { UpgradeIcon } from '../assets/icons.js';
-import { DISCLOSURE_COPY, type Bilingual } from '../game/copy.js';
+import { showsEnglish, showsCantonese, bilingualText, DISCLOSURE_COPY, type Bilingual } from '../game/copy.js';
 import { useFastSnapshot, useGameDispatch, useStructureSnapshot } from '../game/GameProvider.js';
 import { upgradeTargetKey, usePurchaseFxTarget } from '../game/purchase-fx.js';
 
@@ -78,15 +78,15 @@ export function DiscoveryTicket() {
     return (
       <section
         className="panel discovery-ticket discovery-ticket--rumour"
-        aria-label={`${DISCLOSURE_COPY.discoveryLabel.en} · ${DISCLOSURE_COPY.discoveryLabel.yue}`}
+        aria-label={bilingualText(DISCLOSURE_COPY.discoveryLabel)}
       >
         <span className="discovery-ticket__glyph" aria-hidden="true">
           <UpgradeIcon family="locked" />
         </span>
-        <span className="discovery-ticket__name">{DISCLOSURE_COPY.discoveryMystery.en}</span>
-        <span className="discovery-ticket__name-zh">{DISCLOSURE_COPY.discoveryMystery.yue}</span>
+        {showsEnglish() ? <span className="discovery-ticket__name">{DISCLOSURE_COPY.discoveryMystery.en}</span> : null}
+        {showsCantonese() ? <span className="discovery-ticket__name-zh">{DISCLOSURE_COPY.discoveryMystery.yue}</span> : null}
         <span className="discovery-ticket__desc">
-          {DISCLOSURE_COPY.discoveryHint.en} · {DISCLOSURE_COPY.discoveryHint.yue}
+          {bilingualText(DISCLOSURE_COPY.discoveryHint)}
         </span>
         <span className="discovery-ticket__perf" aria-hidden="true" />
         <span
@@ -108,15 +108,15 @@ export function DiscoveryTicket() {
     <section
       ref={fxRef}
       className="panel discovery-ticket"
-      aria-label={`${DISCLOSURE_COPY.discoveryLabel.en} · ${DISCLOSURE_COPY.discoveryLabel.yue}`}
+      aria-label={bilingualText(DISCLOSURE_COPY.discoveryLabel)}
     >
       <span className="discovery-ticket__glyph" aria-hidden="true">
         <UpgradeIcon family="golden" />
       </span>
-      <span className="discovery-ticket__name">{next.nameEn}</span>
-      <span className="discovery-ticket__name-zh">{next.nameYue}</span>
+      {showsEnglish() ? <span className="discovery-ticket__name">{next.nameEn}</span> : null}
+      {showsCantonese() ? <span className="discovery-ticket__name-zh">{next.nameYue}</span> : null}
       <span className="discovery-ticket__desc">
-        {description.en} · {description.yue}
+        {bilingualText(description)}
       </span>
       <span className="discovery-ticket__perf" aria-hidden="true" />
       <button
@@ -125,7 +125,7 @@ export function DiscoveryTicket() {
         aria-label={`${DISCLOSURE_COPY.discoveryBuy.en} ${next.nameEn} — ${description.en} — ${priceText} · ${DISCLOSURE_COPY.discoveryBuy.yue}${next.nameYue} — ${description.yue} — ${priceText}`}
         onClick={() => dispatch({ type: 'buyUpgrade', upgradeId: next.id })}
       >
-        {DISCLOSURE_COPY.discoveryBuy.en} · {DISCLOSURE_COPY.discoveryBuy.yue} — {priceText}
+        {bilingualText(DISCLOSURE_COPY.discoveryBuy)} — {priceText}
       </button>
     </section>
   );

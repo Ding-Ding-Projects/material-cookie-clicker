@@ -70,6 +70,30 @@ follows the operating system's colour scheme and this desktop is light. The file
 was restored from a backup immediately afterwards. Nothing else in this set was
 patched, retouched or composed.
 
+### The settings set
+
+Four images from one session on the off-screen desktop `SettingsCapture`, each
+opened and looked at afterwards, taken from the built `dist/` launched by the
+real `electron` binary against a throwaway `--user-data-dir` so the save really
+was empty.
+
+| File | What it shows |
+| --- | --- |
+| `settings-fresh.png` | A brand-new profile with exactly one console button on the cabinet: the Settings gear. The four game emblems are all still unearned, which is the point — Settings is an application surface and is never gated by progress. |
+| `settings-dialog.png` | The Settings panel open as an anchored dialog over the dimmed game surface: the language-mode segmented switch with Bilingual pressed, and the top of the two funny-level cards under the "two separate controls" warning. |
+| `settings-sliders.png` | The two funny sliders in full, with the English one moved to 1 by keyboard while the Cantonese one stayed at 3 — the independence rule, demonstrated rather than asserted — plus the honest note that no copy varies by level yet. The focus ring on the English slider is real keyboard focus. |
+| `settings-yue.png` | The same window in Cantonese-only mode. The HUD label, the console button label, the panel heading and every line of the panel's own copy are Cantonese with no English beside them. |
+
+Not shown by this set: Settings opened from a progressed save (the game emblems
+beside the gear), and Settings reached from a tool card's "Open it now", which
+needs a run far enough along to have the Tools emblem. Both are gaps in
+evidence, not known breakage.
+
+Persistence across a restart was verified in the same session but not
+photographed as a pair: the application was closed through its own title-bar
+control and relaunched against the same profile, and came back up in
+Cantonese-only mode.
+
 ### Earlier lanes
 
 | File | What it shows | Commit |
@@ -139,8 +163,9 @@ never greyed out and never hidden behind the silhouette.
 
 ## Not captured yet
 
-- The tools shop, and the settings surfaces, command palette and appearance
-  editor — none of which exist in the application yet.
+- The command palette and the appearance editor — neither exists in the
+  application yet. The settings surface DOES exist now and is captured; see
+  the settings set below.
 - A golden-cookie spawn. The window is five to fifteen minutes wide and no
   capture run has sat still long enough to catch one.
 - Narrow widths and high display scales. Every image in the current set is one

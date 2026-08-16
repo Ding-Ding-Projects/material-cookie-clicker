@@ -8,7 +8,7 @@ import { generatorCps, getGeneratorDefinition } from '../../shared/game/generato
 import { prestigeMultiplierFor } from '../../shared/game/prestige.js';
 import { isToolBonusActive, TOOL_DEFINITIONS } from '../../shared/game/tools.js';
 import { computeMultipliers } from '../../shared/game/upgrades.js';
-import { STATS_SCREEN_COPY, TAB_COPY, type Bilingual } from '../game/copy.js';
+import { showsEnglish, showsCantonese, STATS_SCREEN_COPY, TAB_COPY, type Bilingual } from '../game/copy.js';
 import { useFastSnapshot, useStatsSnapshot, useStructureSnapshot } from '../game/GameProvider.js';
 
 /**
@@ -48,8 +48,8 @@ function trendSince(baseline: number, current: number): Trend | null {
 function StatTile({ label, value, trend }: { label: Bilingual; value: string; trend?: Trend | null }) {
   return (
     <div className="stat-tile">
-      <span className="stat-tile__label-en">{label.en}</span>
-      <span className="stat-tile__label-zh">{label.yue}</span>
+      {showsEnglish() ? <span className="stat-tile__label-en">{label.en}</span> : null}
+      {showsCantonese() ? <span className="stat-tile__label-zh">{label.yue}</span> : null}
       <span className="stat-tile__value">{value}</span>
       {trend ? (
         <span className={`stat-tile__trend ${trend.direction}`}>
@@ -110,8 +110,8 @@ export function StatisticsScreen() {
   return (
     <div className="screen">
       <h1>
-        {TAB_COPY.statistics.en}
-        <span className="screen-title-zh">{TAB_COPY.statistics.yue}</span>
+        {showsEnglish() ? TAB_COPY.statistics.en : null}
+        {showsCantonese() ? <span className="screen-title-zh">{TAB_COPY.statistics.yue}</span> : null}
       </h1>
 
       {/* aria-live="off": these figures change several times a second and must never be
@@ -157,7 +157,8 @@ export function StatisticsScreen() {
       </div>
 
       <h2 className="stat-section-heading">
-        Where your cookies come from<span className="screen-title-zh">你嘅曲奇由邊度嚟</span>
+        {showsEnglish() ? 'Where your cookies come from' : null}
+        {showsCantonese() ? <span className="screen-title-zh">你嘅曲奇由邊度嚟</span> : null}
       </h2>
       {contributions.length === 0 ? (
         <p className="stat-empty">
@@ -182,8 +183,8 @@ export function StatisticsScreen() {
             {contributions.map((row) => (
               <tr key={row.def.id}>
                 <th scope="row">
-                  {row.def.nameEn}
-                  <span className="contribution-table__name-zh">{row.def.nameYue}</span>
+                  {showsEnglish() ? row.def.nameEn : null}
+                  {showsCantonese() ? <span className="contribution-table__name-zh">{row.def.nameYue}</span> : null}
                 </th>
                 <td className="numeric">{row.count.toLocaleString('en-US')}</td>
                 <td className="numeric">{formatBigNum(row.cps, 'en')}</td>

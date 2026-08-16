@@ -3,8 +3,9 @@ import { useRef, useState } from 'react';
 import { formatBigNum } from '../../shared/game/format-number.js';
 import { ascensionValue, canPrestige, prestigeMultiplierFor } from '../../shared/game/prestige.js';
 import { getUpgradeDefinition } from '../../shared/game/upgrades.js';
+import { BilingualLines } from '../components/BilingualLines.js';
 import { DestructiveGate } from '../components/DestructiveGate.js';
-import { PRESTIGE_SCREEN_COPY, STATS_SCREEN_COPY, TAB_COPY, type Bilingual } from '../game/copy.js';
+import { showsEnglish, showsCantonese, bilingualText, PRESTIGE_SCREEN_COPY, STATS_SCREEN_COPY, TAB_COPY, type Bilingual } from '../game/copy.js';
 import {
   useFastSnapshot,
   useGameDispatch,
@@ -32,8 +33,8 @@ type OpenGate = 'none' | 'prestige' | 'wipe';
 function PrestigeStatTile({ label, value }: { label: Bilingual; value: string }) {
   return (
     <div className="stat-tile">
-      <span className="stat-tile__label-en">{label.en}</span>
-      <span className="stat-tile__label-zh">{label.yue}</span>
+      {showsEnglish() ? <span className="stat-tile__label-en">{label.en}</span> : null}
+      {showsCantonese() ? <span className="stat-tile__label-zh">{label.yue}</span> : null}
       <span className="stat-tile__value">{value}</span>
     </div>
   );
@@ -63,8 +64,8 @@ export function PrestigeScreen() {
   return (
     <div className="screen">
       <h1>
-        {TAB_COPY.prestige.en}
-        <span className="screen-title-zh">{TAB_COPY.prestige.yue}</span>
+        {showsEnglish() ? TAB_COPY.prestige.en : null}
+        {showsCantonese() ? <span className="screen-title-zh">{TAB_COPY.prestige.yue}</span> : null}
       </h1>
 
       <div className="stat-grid" aria-live="off">
@@ -81,21 +82,13 @@ export function PrestigeScreen() {
 
       <section className="projection-card">
         <h2>
-          {PRESTIGE_SCREEN_COPY.projectionTitle.en} · {PRESTIGE_SCREEN_COPY.projectionTitle.yue}
+          {bilingualText(PRESTIGE_SCREEN_COPY.projectionTitle)}
         </h2>
         <p>
           {eligible ? (
-            <>
-              {PRESTIGE_SCREEN_COPY.projectionBody(projectedPoints).en}
-              <br />
-              {PRESTIGE_SCREEN_COPY.projectionBody(projectedPoints).yue}
-            </>
+            <BilingualLines text={PRESTIGE_SCREEN_COPY.projectionBody(projectedPoints)} />
           ) : (
-            <>
-              {PRESTIGE_SCREEN_COPY.notYetEligible.en}
-              <br />
-              {PRESTIGE_SCREEN_COPY.notYetEligible.yue}
-            </>
+            <BilingualLines text={PRESTIGE_SCREEN_COPY.notYetEligible} />
           )}
         </p>
         <p className="projection-card__detail">
@@ -108,15 +101,13 @@ export function PrestigeScreen() {
 
       <section className="permanent-shop-card">
         <h2>
-          {PRESTIGE_SCREEN_COPY.permanentShopTitle.en} · {PRESTIGE_SCREEN_COPY.permanentShopTitle.yue}
+          {bilingualText(PRESTIGE_SCREEN_COPY.permanentShopTitle)}
         </h2>
         {permanentUnlockIds.length === 0 ? (
           <p className="empty-slot">
             <span className="empty-slot__key">Nothing yet · 未有</span>
             <span className="empty-slot__text">
-              {PRESTIGE_SCREEN_COPY.permanentShopEmpty.en}
-              <br />
-              {PRESTIGE_SCREEN_COPY.permanentShopEmpty.yue}
+              <BilingualLines text={PRESTIGE_SCREEN_COPY.permanentShopEmpty} />
             </span>
           </p>
         ) : (
@@ -125,7 +116,7 @@ export function PrestigeScreen() {
               const def = getUpgradeDefinition(id);
               return (
                 <li key={id}>
-                  {def.nameEn} · {def.nameYue}
+                  {bilingualText({ en: def.nameEn, yue: def.nameYue })}
                 </li>
               );
             })}
@@ -144,7 +135,7 @@ export function PrestigeScreen() {
             setOpenGate('prestige');
           }}
         >
-          {PRESTIGE_SCREEN_COPY.prestigeButton.en} · {PRESTIGE_SCREEN_COPY.prestigeButton.yue}
+          {bilingualText(PRESTIGE_SCREEN_COPY.prestigeButton)}
         </button>
         <button
           ref={wipeTriggerRef}
@@ -156,7 +147,7 @@ export function PrestigeScreen() {
             setOpenGate('wipe');
           }}
         >
-          {PRESTIGE_SCREEN_COPY.wipeButton.en} · {PRESTIGE_SCREEN_COPY.wipeButton.yue}
+          {bilingualText(PRESTIGE_SCREEN_COPY.wipeButton)}
         </button>
       </div>
 
@@ -168,13 +159,9 @@ export function PrestigeScreen() {
           impact={
             <>
               <strong>This will reset · 呢個會清空</strong>
-              {PRESTIGE_SCREEN_COPY.gatePrestigeResets.en}
-              <br />
-              {PRESTIGE_SCREEN_COPY.gatePrestigeResets.yue}
+              <BilingualLines text={PRESTIGE_SCREEN_COPY.gatePrestigeResets} />
               <strong>This carries forward · 呢個會保留</strong>
-              {PRESTIGE_SCREEN_COPY.gatePrestigeKeeps(ascensionPoints + projectedPoints).en}
-              <br />
-              {PRESTIGE_SCREEN_COPY.gatePrestigeKeeps(ascensionPoints + projectedPoints).yue}
+              <BilingualLines text={PRESTIGE_SCREEN_COPY.gatePrestigeKeeps(ascensionPoints + projectedPoints)} />
             </>
           }
           completion={completion}
@@ -199,9 +186,7 @@ export function PrestigeScreen() {
           impact={
             <>
               <strong>This will permanently delete · 呢個會永久刪除</strong>
-              {PRESTIGE_SCREEN_COPY.gateWipeBody.en}
-              <br />
-              {PRESTIGE_SCREEN_COPY.gateWipeBody.yue}
+              <BilingualLines text={PRESTIGE_SCREEN_COPY.gateWipeBody} />
             </>
           }
           completion={completion}

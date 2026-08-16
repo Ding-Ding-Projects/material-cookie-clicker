@@ -5546,3 +5546,225 @@ ul.card-grid {
     opacity: 0;
   }
 }
+
+/* ==========================================================================
+   SETTINGS PANEL (design/settings-funny-sliders.html)
+   Appended as new classes only: the Settings surface is entirely new chrome and
+   nothing above this line is restyled by it. Cabinet idiom throughout — chunky
+   borders, inset panels, solid press offsets, no hairlines and no blurred shadows.
+   ========================================================================== */
+
+.settings-screen {
+  display: flex;
+  flex-direction: column;
+  gap: 20px;
+}
+
+/* Where "Open it now" on a tool card lands, saying so plainly. */
+.settings-screen__from-tool {
+  margin: 0;
+  padding: 14px 16px;
+  border: var(--border-thick) solid var(--primary);
+  border-radius: var(--shape-md);
+  background: var(--primary-container);
+  color: var(--on-primary-container);
+  font-size: 13px;
+  line-height: 1.5;
+}
+
+.settings-block {
+  padding: 20px;
+  border: var(--border-fat) solid var(--outline);
+  border-radius: var(--shape-lg);
+  background: linear-gradient(180deg, var(--surface-high), var(--surface-highest));
+  box-shadow: var(--press-3), inset 0 4px 0 0 var(--bevel-hi);
+}
+
+/* The row the tool card pointed at. A border and a ring, never colour alone. */
+.settings-block[data-highlight='true'] {
+  border-color: var(--spark-ring);
+  outline: 3px solid var(--spark-ring);
+  outline-offset: 3px;
+}
+
+.settings-block__label {
+  margin: 0 0 12px;
+  font-family: var(--font-display, inherit);
+  font-size: 13px;
+  font-weight: 900;
+  letter-spacing: 0.18em;
+  text-transform: uppercase;
+  color: var(--on-surface);
+}
+
+.settings-caption {
+  margin: 12px 0 0;
+  font-size: 12px;
+  line-height: 1.55;
+  color: var(--on-surface-variant);
+}
+
+/* --- the segmented language-mode switch --- */
+.settings-modes {
+  display: flex;
+  gap: 6px;
+  padding: 6px;
+  border: var(--border-chunky) solid var(--outline);
+  border-radius: var(--shape-md);
+  background: var(--panel-inset);
+  box-shadow: inset 0 5px 0 -2px var(--bevel-lo);
+}
+
+.settings-modes__button {
+  flex: 1 1 0;
+  min-height: 48px;
+  padding: 8px 10px;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  gap: 2px;
+  font: inherit;
+  font-size: 13px;
+  font-weight: 800;
+  cursor: pointer;
+  color: var(--on-surface);
+  border: var(--border-thick) solid var(--outline);
+  border-radius: var(--shape-sm);
+  background: var(--surface);
+  box-shadow: 0 var(--drop-1) 0 0 var(--outline);
+  transition: transform 90ms ease, box-shadow 90ms ease;
+}
+
+.settings-modes__button:active {
+  transform: translateY(4px);
+  box-shadow: none;
+}
+
+/* The selected mode is marked by colour AND by its pressed-in depth, so it is still
+   identifiable without colour perception. */
+.settings-modes__button[aria-pressed='true'] {
+  color: var(--on-primary);
+  border-color: var(--primary-shadow);
+  background: linear-gradient(180deg, var(--primary), var(--primary-shadow));
+  box-shadow: inset 0 3px 0 0 rgba(255, 255, 255, 0.28);
+  transform: translateY(3px);
+}
+
+.settings-modes__button:focus-visible {
+  outline: 4px solid var(--spark-ring);
+  outline-offset: 3px;
+}
+
+.settings-modes__yue {
+  font-size: 12px;
+  opacity: 0.92;
+}
+
+/* --- notes: the independence warning and the honest scope caption --- */
+.settings-note {
+  margin: 0 0 14px;
+  padding: 13px 15px;
+  border-radius: var(--shape-md);
+  border: var(--border-thick) solid var(--outline);
+  font-size: 13px;
+  line-height: 1.55;
+}
+
+.settings-note--warning {
+  border-color: var(--primary);
+  background: var(--primary-container);
+  color: var(--on-primary-container);
+}
+
+.settings-note--honest {
+  margin: 16px 0 0;
+  background: var(--panel-inset);
+  color: var(--on-surface);
+  box-shadow: inset 0 4px 0 -2px var(--bevel-lo);
+}
+
+/* --- the two funny sliders. Two cards, side by side, never one control --- */
+.settings-sliders {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(240px, 1fr));
+  gap: 16px;
+}
+
+.settings-slider {
+  padding: 16px;
+  border: var(--border-chunky) solid var(--outline);
+  border-radius: var(--shape-md);
+  background: var(--panel-inset);
+  box-shadow: inset 0 5px 0 -2px var(--bevel-lo);
+}
+
+/* The two cards are deliberately distinguishable at a glance: a different accent edge each,
+   because the one thing this control must never look like is a single slider cut in half. */
+.settings-slider--en {
+  border-left: 8px solid var(--tier1);
+}
+
+.settings-slider--yue {
+  border-left: 8px solid var(--tier2);
+}
+
+.settings-slider__title {
+  margin: 0 0 4px;
+  font-size: 13px;
+  font-weight: 900;
+  letter-spacing: 0.06em;
+  color: var(--on-surface);
+}
+
+.settings-slider__scale,
+.settings-slider__value {
+  margin: 0;
+  font-size: 12px;
+  color: var(--on-surface-variant);
+}
+
+.settings-slider__scale {
+  margin-bottom: 10px;
+}
+
+.settings-slider__input {
+  width: 100%;
+  height: 44px;
+  accent-color: var(--primary);
+  cursor: pointer;
+}
+
+.settings-slider__input:focus-visible {
+  outline: 4px solid var(--spark-ring);
+  outline-offset: 3px;
+}
+
+.settings-slider__ticks {
+  display: flex;
+  justify-content: space-between;
+  margin-bottom: 8px;
+  font-size: 11px;
+  font-weight: 800;
+  font-variant-numeric: tabular-nums;
+  color: var(--on-surface-variant);
+}
+
+.settings-slider__ticks span[data-current='true'] {
+  color: var(--on-surface);
+  text-decoration: underline;
+  text-underline-offset: 3px;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .settings-modes__button {
+    transition: none;
+  }
+  .settings-modes__button:active {
+    transform: none;
+    box-shadow: inset 0 4px 0 0 var(--bevel-lo);
+  }
+  .settings-modes__button[aria-pressed='true'] {
+    transform: none;
+  }
+}

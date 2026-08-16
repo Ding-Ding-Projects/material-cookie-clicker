@@ -1,6 +1,7 @@
 import { useEffect, useRef, useState, type ReactNode } from 'react';
 
-import { PRESTIGE_SCREEN_COPY, type Bilingual } from '../game/copy.js';
+import { BilingualLines } from './BilingualLines.js';
+import { bilingualText, PRESTIGE_SCREEN_COPY, type Bilingual } from '../game/copy.js';
 import {
   INITIAL_GATE_STATE,
   isSliderEnabled,
@@ -97,7 +98,7 @@ export function DestructiveGate({
       }}
     >
       <h2 id={headingId}>
-        {title.en} · {title.yue}
+        {bilingualText(title)}
       </h2>
       <div className="gate__impact">{impact}</div>
 
@@ -121,7 +122,7 @@ export function DestructiveGate({
 
       {gate.completed && completion ? (
         <p className="gate__completion" role="status">
-          {completion.en} · {completion.yue}
+          {bilingualText(completion)}
         </p>
       ) : (
         <div className="gate__slider-wrap">
@@ -132,7 +133,7 @@ export function DestructiveGate({
             step={1}
             value={gate.sliderValue}
             disabled={!sliderEnabled}
-            aria-label={`${title.en} — ${hint.en} · ${hint.yue}`}
+            aria-label={`${title.en} — ${bilingualText(hint)}`}
             aria-describedby={`gate-hint-${tone}`}
             onChange={(event) => handleSlider(Number(event.target.value))}
           />
@@ -143,13 +144,13 @@ export function DestructiveGate({
             <div className="gate__anim-fill" style={{ width: `${gate.sliderValue}%` }} />
           </div>
           <span className="gate__slider-hint" id={`gate-hint-${tone}`}>
-            {hint.en} · {hint.yue}
+            {bilingualText(hint)}
           </span>
         </div>
       )}
 
       <button type="button" className="gate__exit-btn" onClick={exit}>
-        🚪 {PRESTIGE_SCREEN_COPY.emergencyExit.en} · {PRESTIGE_SCREEN_COPY.emergencyExit.yue}
+        🚪 {bilingualText(PRESTIGE_SCREEN_COPY.emergencyExit)}
       </button>
     </div>
   );
@@ -178,16 +179,14 @@ function GateKey({
         type="button"
         className="gate__key-toggle"
         aria-pressed={pressed}
-        aria-label={`${keyName} — ${label.en} · ${label.yue}`}
+        aria-label={`${keyName} — ${bilingualText(label)}`}
         disabled={disabled}
         onClick={onToggle}
       >
         {keyName}
       </button>
       <span className="gate__key-label" aria-hidden="true">
-        {label.en}
-        <br />
-        {label.yue}
+        <BilingualLines text={label} />
       </span>
     </div>
   );

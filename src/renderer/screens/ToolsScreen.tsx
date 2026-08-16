@@ -7,7 +7,7 @@ import { toolPrice } from '../../shared/game/tool-shop.js';
 import { TOOL_DEFINITIONS, type ToolDefinition, type ToolUnlockCondition } from '../../shared/game/tools.js';
 import { ToolIcon, ToolTierGem } from '../assets/icons.js';
 import { createSearchState, SearchWithRegexBuilder } from '../components/SearchWithRegexBuilder.js';
-import { LIST_COPY, TOOLS_SCREEN_COPY, type Bilingual } from '../game/copy.js';
+import { showsEnglish, showsCantonese, bilingualText, LIST_COPY, TOOLS_SCREEN_COPY, type Bilingual } from '../game/copy.js';
 import { useFastSnapshot, useGameDispatch, useStructureSnapshot } from '../game/GameProvider.js';
 import { matchesSearch } from '../game/local-regex-search.js';
 import { buildToolRowViewModel, type ToolRowViewModel } from '../game/tool-view-model.js';
@@ -89,10 +89,10 @@ function OpenItNowCallout({ def, onOpen }: { def: ToolDefinition; onOpen: OpenAp
   return (
     <div className="open-real-feature">
       <span className="open-real-feature__badge">
-        🔓 {TOOLS_SCREEN_COPY.alwaysAvailable.en} · {TOOLS_SCREEN_COPY.alwaysAvailable.yue}
+        🔓 {bilingualText(TOOLS_SCREEN_COPY.alwaysAvailable)}
       </span>
       <span className="open-real-feature__note">
-        {TOOLS_SCREEN_COPY.openItNowNote.en} · {TOOLS_SCREEN_COPY.openItNowNote.yue}
+        {bilingualText(TOOLS_SCREEN_COPY.openItNowNote)}
       </span>
       <button
         type="button"
@@ -100,7 +100,7 @@ function OpenItNowCallout({ def, onOpen }: { def: ToolDefinition; onOpen: OpenAp
         onClick={() => onOpen(def.id, def)}
         aria-label={`${TOOLS_SCREEN_COPY.openItNow.en} — ${def.nameEn} · ${TOOLS_SCREEN_COPY.openItNow.yue} — ${def.nameYue}`}
       >
-        {TOOLS_SCREEN_COPY.openItNow.en} · {TOOLS_SCREEN_COPY.openItNow.yue}
+        {bilingualText(TOOLS_SCREEN_COPY.openItNow)}
       </button>
     </div>
   );
@@ -139,15 +139,15 @@ const ToolNode = memo(function ToolNode({
       <span className="item-card__icon" aria-hidden="true">
         <ToolIcon id={def.id} tier={tier} hidden={hidden} />
       </span>
-      <span className="item-card__name-en">{hidden ? TOOLS_SCREEN_COPY.undiscoveredName.en : def.nameEn}</span>
-      <span className="item-card__name-zh">{hidden ? TOOLS_SCREEN_COPY.undiscoveredName.yue : def.nameYue}</span>
+      {showsEnglish() ? <span className="item-card__name-en">{hidden ? TOOLS_SCREEN_COPY.undiscoveredName.en : def.nameEn}</span> : null}
+      {showsCantonese() ? <span className="item-card__name-zh">{hidden ? TOOLS_SCREEN_COPY.undiscoveredName.yue : def.nameYue}</span> : null}
       <span className="tool-node__chip">
-        {chip.en} · {chip.yue}
+        {bilingualText(chip)}
       </span>
       <p className="item-card__desc">
         {hidden ? (
           <>
-            {TOOLS_SCREEN_COPY.undiscoveredBody.en} · {TOOLS_SCREEN_COPY.undiscoveredBody.yue}
+            {bilingualText(TOOLS_SCREEN_COPY.undiscoveredBody)}
           </>
         ) : (
           <>
@@ -157,13 +157,13 @@ const ToolNode = memo(function ToolNode({
       </p>
       {!hidden && (
         <span className="item-card__progress-line">
-          🎁 {vm.bonus.en} · {vm.bonus.yue}
+          🎁 {bilingualText(vm.bonus)}
         </span>
       )}
       {nodeState !== 'unlocked' && !hidden && (
         <>
           <span className="item-card__progress-line">
-            {vm.progress.en} · {vm.progress.yue}
+            {bilingualText(vm.progress)}
           </span>
           <div
             className="item-card__progress-track"
@@ -177,8 +177,8 @@ const ToolNode = memo(function ToolNode({
           </div>
           <button type="button" className="item-card__buy" disabled={!affordable} onClick={onBuy}>
             {affordable
-              ? `${TOOLS_SCREEN_COPY.unlockNow.en} · ${TOOLS_SCREEN_COPY.unlockNow.yue} — 🍪 ${priceText}`
-              : `${TOOLS_SCREEN_COPY.cannotAfford.en} · ${TOOLS_SCREEN_COPY.cannotAfford.yue} — 🍪 ${priceText}`}
+              ? `${bilingualText(TOOLS_SCREEN_COPY.unlockNow)} — 🍪 ${priceText}`
+              : `${bilingualText(TOOLS_SCREEN_COPY.cannotAfford)} — 🍪 ${priceText}`}
           </button>
         </>
       )}
@@ -229,8 +229,8 @@ export function ToolsScreen({ onOpenApplicationFeature }: ToolsScreenProps = {})
   return (
     <div className="screen">
       <h1>
-        {TOOLS_SCREEN_COPY.title.en}
-        <span className="screen-title-zh">{TOOLS_SCREEN_COPY.title.yue}</span>
+        {showsEnglish() ? TOOLS_SCREEN_COPY.title.en : null}
+        {showsCantonese() ? <span className="screen-title-zh">{TOOLS_SCREEN_COPY.title.yue}</span> : null}
       </h1>
       {/*
         The contract banner. It is compressed to one marquee line, NOT weakened: the full
@@ -243,16 +243,16 @@ export function ToolsScreen({ onOpenApplicationFeature }: ToolsScreenProps = {})
             🎮
           </span>
           <span className="hud-strip__headline">
-            {TOOLS_SCREEN_COPY.principleHeadline.en} · {TOOLS_SCREEN_COPY.principleHeadline.yue}
+            {bilingualText(TOOLS_SCREEN_COPY.principleHeadline)}
           </span>
           <span className="hud-strip__more">
             <span className="hud-strip__more-text">
-              {TOOLS_SCREEN_COPY.principleMore.en} · {TOOLS_SCREEN_COPY.principleMore.yue}
+              {bilingualText(TOOLS_SCREEN_COPY.principleMore)}
             </span>
           </span>
         </summary>
         <p className="hud-strip__body">
-          {TOOLS_SCREEN_COPY.principle.en} · {TOOLS_SCREEN_COPY.principle.yue}
+          {bilingualText(TOOLS_SCREEN_COPY.principle)}
         </p>
       </details>
 
@@ -267,7 +267,7 @@ export function ToolsScreen({ onOpenApplicationFeature }: ToolsScreenProps = {})
             {rows.length}
           </span>
           <span className="tools-hud__counter-label">
-            {TOOLS_SCREEN_COPY.toolsUnlockedLabel.en} · {TOOLS_SCREEN_COPY.toolsUnlockedLabel.yue}
+            {bilingualText(TOOLS_SCREEN_COPY.toolsUnlockedLabel)}
           </span>
         </span>
         <div
@@ -276,7 +276,7 @@ export function ToolsScreen({ onOpenApplicationFeature }: ToolsScreenProps = {})
           aria-valuemin={0}
           aria-valuemax={100}
           aria-valuenow={percent}
-          aria-label={`${TOOLS_SCREEN_COPY.toolsUnlockedLabel.en} · ${TOOLS_SCREEN_COPY.toolsUnlockedLabel.yue}`}
+          aria-label={bilingualText(TOOLS_SCREEN_COPY.toolsUnlockedLabel)}
         >
           <div className="tools-hud__fill" style={{ width: `${percent}%` }} />
         </div>
@@ -288,24 +288,24 @@ export function ToolsScreen({ onOpenApplicationFeature }: ToolsScreenProps = {})
             onClick={() => dispatch({ type: 'setToolProgression', enabled: !progressionOn })}
           >
             {progressionOn
-              ? `${TOOLS_SCREEN_COPY.progressionToggleOn.en} · ${TOOLS_SCREEN_COPY.progressionToggleOn.yue}`
-              : `${TOOLS_SCREEN_COPY.progressionToggleOff.en} · ${TOOLS_SCREEN_COPY.progressionToggleOff.yue}`}
+              ? `${bilingualText(TOOLS_SCREEN_COPY.progressionToggleOn)}`
+              : `${bilingualText(TOOLS_SCREEN_COPY.progressionToggleOff)}`}
           </button>
           <details className="hud-strip hud-strip--caption">
             <summary className="hud-strip__summary">
               <span className="hud-strip__headline">
-                {TOOLS_SCREEN_COPY.progressionCaption.en} · {TOOLS_SCREEN_COPY.progressionCaption.yue}
+                {bilingualText(TOOLS_SCREEN_COPY.progressionCaption)}
               </span>
               {/* In the tight HUD row the label is kept for screen readers and collapsed to the
                   chevron visually, so the row stays one line. */}
               <span className="hud-strip__more">
                 <span className="hud-strip__more-text">
-                  {TOOLS_SCREEN_COPY.progressionMore.en} · {TOOLS_SCREEN_COPY.progressionMore.yue}
+                  {bilingualText(TOOLS_SCREEN_COPY.progressionMore)}
                 </span>
               </span>
             </summary>
             <p className="hud-strip__body">
-              {TOOLS_SCREEN_COPY.progressionNote.en} · {TOOLS_SCREEN_COPY.progressionNote.yue}
+              {bilingualText(TOOLS_SCREEN_COPY.progressionNote)}
             </p>
           </details>
         </div>
@@ -321,7 +321,7 @@ export function ToolsScreen({ onOpenApplicationFeature }: ToolsScreenProps = {})
 
       {visible.length === 0 ? (
         <p>
-          {LIST_COPY.noResults.en} · {LIST_COPY.noResults.yue}
+          {bilingualText(LIST_COPY.noResults)}
         </p>
       ) : (
         ([1, 2, 3] as ToolTier[]).map((tier) => {
@@ -336,7 +336,7 @@ export function ToolsScreen({ onOpenApplicationFeature }: ToolsScreenProps = {})
                   <span className="tools-tier__gem" aria-hidden="true">
                     <ToolTierGem tier={tier} />
                   </span>
-                  {meta.label.en} · {meta.label.yue}
+                  {bilingualText(meta.label)}
                 </span>
               </h2>
               <p className="tools-tier__prereq">
@@ -345,7 +345,7 @@ export function ToolsScreen({ onOpenApplicationFeature }: ToolsScreenProps = {})
                     →
                   </span>
                 )}
-                {meta.prereq.en} · {meta.prereq.yue}
+                {bilingualText(meta.prereq)}
               </p>
               <ul className="card-grid">
                 {tierRows.map(({ vm, price }) => {

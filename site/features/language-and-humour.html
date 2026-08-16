@@ -27,7 +27,7 @@
     <p class="lede">English and Hong Kong Cantonese side by side, with two independent 1–5 humour sliders — one per language.</p>
     <div class="inset" style="margin-bottom:18px">
   <span class="label">Current state</span>
-  <p style="margin:0"><span class="tag">Partly shipped</span> every shipped surface is bilingual; the language selector and the two funny-level sliders are specified and not yet on screen.</p>
+  <p style="margin:0"><span class="tag">Partly shipped</span> every shipped surface is bilingual, and the Settings panel now ships with a working language-mode selector; the two funny-level sliders are on screen and stored, but no copy has per-level variants yet.</p>
 </div>
     <h2>From the running application</h2>
     <figure class="capture">
@@ -47,10 +47,20 @@
 <p><code>design/settings-funny-sliders.html</code> specifies a language-mode selector &mdash; English, Cantonese, or both at once &mdash; as a segmented cabinet switch, plus <strong>two independent 1&ndash;5 funny-level sliders, one per language</strong>. The two sliders are made visually and functionally distinct on purpose, so it is unmistakable that they are separate controls: setting English to 1 and Cantonese to 5 is a supported, sensible configuration, not a mistake to be helpfully &ldquo;synced&rdquo;.</p>
 
 <h2>How it is configured</h2>
-<p>Once the settings surface exists, the language mode and both humour levels are ordinary preferences stored locally with everything else. There is no telemetry, no language detection call, and no network request of any kind involved &mdash; the application works with the network unplugged, and so does this site.</p>
+<p>The Settings panel opens from its own gear emblem on the cabinet console. That emblem is not earned: every other console button appears only once the progress it describes exists, but Settings is an application surface rather than a reward, so it is on the cabinet from the first frame of a brand-new save &mdash; a player who cannot read English never has to play their way to the language switch.</p>
+<p>The language mode and both humour levels are ordinary preferences stored locally, in their own storage key, separate from the game save: wiping a run never resets the language you read the app in. There is no telemetry, no language-detection call, and no network request of any kind involved &mdash; the application works with the network unplugged, and so does this site.</p>
+<figure class="capture">
+  <img src="../assets/captures/settings-dialog.png" alt="The Settings panel open as an anchored dialog over a dimmed fresh game surface. Its header reads SETTINGS with the Cantonese heading beside it and a close button at the right. A LANGUAGE MODE section holds three segmented buttons, English, Cantonese and Bilingual, with Bilingual pressed and filled brown, above a caption saying the choice persists across restarts and applies to every surface. Below, a FUNNY LEVEL section opens with a highlighted warning that these are two separate controls, not one shared slider split in half, above the tops of two separate slider cards headed English funny level and Cantonese funny level." width="1557" height="1093" loading="lazy" />
+  <figcaption><strong>The Settings panel.</strong> The language-mode switch and the top of the two independent funny-level cards. Captured from the built application running on an off-screen Windows desktop, photographed with the Win32 PrintWindow API, from a completely fresh profile &mdash; the gear emblem beside the cookie counter is the only console button a new save has.</figcaption>
+</figure>
+<figure class="capture">
+  <img src="../assets/captures/settings-yue.png" alt="The same Settings panel after choosing Cantonese-only. The cookie counter behind now reads only its Cantonese label, the console button under the gear reads only Cantonese, the panel header, the language-mode heading, all three mode buttons, the caption and the funny-level headings are all in Cantonese with no English beside them, and the Cantonese mode button is the pressed one." width="1557" height="1093" loading="lazy" />
+  <figcaption><strong>Cantonese-only mode, applied everywhere.</strong> The same window a moment later: the setting reaches the HUD, the console button labels, the panel heading and every line of the panel's own copy, not just the screen you changed it on. Relaunching the application comes back up in this mode.</figcaption>
+</figure>
 
 <h2>In the shipped build</h2>
-<p>Every shipped surface is bilingual: each HUD readout, tab, generator row, upgrade ticket, badge, stat tile and callout carries its English and Cantonese text together, as the captures show. The language-mode selector and the two funny-level sliders are the part that is still specified rather than on screen &mdash; there is no settings surface in this release, so today the application is always in bilingual mode.</p>
+<p>The language mode is real and it works: choosing English, Cantonese or Bilingual re-renders the whole application through a single formatting function, so the HUD, the console labels, panel headings, buttons and captions all follow it at once. A handful of accessible names and a few hardcoded headings on the game screens still read as a bilingual pair regardless of the mode; those are named in the repository's handover notes rather than quietly left out.</p>
+<p>The two funny-level sliders are on screen, independent, and stored across restarts &mdash; and today they change nothing you can read. Every string in this build is written once per language, so there are no per-level variants for a level to select. The panel says exactly that in both languages, immediately under the sliders, rather than implying five voices that do not exist yet.</p>
     <nav class="related plate" aria-labelledby="related-heading">
       <h2 id="related-heading">Related articles</h2>
       <ul>

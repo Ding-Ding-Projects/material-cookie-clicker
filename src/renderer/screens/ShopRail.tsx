@@ -12,7 +12,7 @@ import { createSearchState, SearchWithRegexBuilder } from '../components/SearchW
 import { useSelection } from '../components/useSelection.js';
 import { matchesSearch } from '../game/local-regex-search.js';
 import { DieselDepot } from './DieselDepot.js';
-import { BULK_COPY, DISCLOSURE_COPY, GAME_SURFACE_COPY, LIST_COPY } from '../game/copy.js';
+import { showsEnglish, showsCantonese, bilingualText, BULK_COPY, DISCLOSURE_COPY, GAME_SURFACE_COPY, LIST_COPY } from '../game/copy.js';
 import { useFastSnapshot, useGameDispatch, useStructureSnapshot } from '../game/GameProvider.js';
 import { generatorTargetKey, usePurchaseFxTarget } from '../game/purchase-fx.js';
 
@@ -49,7 +49,7 @@ const GeneratorBuyButton = memo(function GeneratorBuyButton({
       disabled={!affordable || requestedQuantity <= 0}
       onClick={() => dispatch({ type: 'buyGeneratorBulk', generatorId: def.id, quantity })}
     >
-      {LIST_COPY.buy.en} · {LIST_COPY.buy.yue} — 🍪 {formatBigNum(finalCost, 'en')}
+      {bilingualText(LIST_COPY.buy)} — 🍪 {formatBigNum(finalCost, 'en')}
       {quantity === 'max' && requestedQuantity > 0 ? ` (×${requestedQuantity})` : ''}
     </button>
   );
@@ -70,7 +70,7 @@ function MysteryRow() {
       <div className="shop-row__names">
         <span className="shop-row__name">{DISCLOSURE_COPY.ladderMysteryName.en}</span>
         <span className="shop-row__sub">
-          {DISCLOSURE_COPY.ladderMysteryHint.en} · {DISCLOSURE_COPY.ladderMysteryHint.yue}
+          {bilingualText(DISCLOSURE_COPY.ladderMysteryHint)}
         </span>
       </div>
     </div>
@@ -110,8 +110,8 @@ const GeneratorRow = memo(function GeneratorRow({
         <GeneratorIcon id={def.id} />
       </div>
       <div className="shop-row__names">
-        <span className="shop-row__name">{def.nameEn}</span>
-        <span className="shop-row__name-zh">{def.nameYue}</span>
+        {showsEnglish() ? <span className="shop-row__name">{def.nameEn}</span> : null}
+        {showsCantonese() ? <span className="shop-row__name-zh">{def.nameYue}</span> : null}
         <span className="shop-row__sub">
           {`+${formatBigNum(generatorCps(def, 1), 'en')}/sec each · 每個 +${formatBigNum(generatorCps(def, 1), 'en')}`}
         </span>
@@ -199,13 +199,13 @@ export function ShopRail() {
           <span className="bulk-status__mark" aria-hidden="true">
             ✓
           </span>
-          {bought} {BULK_COPY.bulkBought.en} · {BULK_COPY.bulkBought.yue}
+          {bought} {bilingualText(BULK_COPY.bulkBought)}
         </span>
         <span className="bulk-status bulk-status--skipped">
           <span className="bulk-status__mark" aria-hidden="true">
             !
           </span>
-          {skipped} {BULK_COPY.bulkSkipped.en} · {BULK_COPY.bulkSkipped.yue}
+          {skipped} {bilingualText(BULK_COPY.bulkSkipped)}
         </span>
       </>,
     );
@@ -215,7 +215,7 @@ export function ShopRail() {
   return (
     <section
       className={`panel shop-rail${drawerOpen ? '' : ' collapsed'}`}
-      aria-label={`${GAME_SURFACE_COPY.shopDrawerLabel.en} · ${GAME_SURFACE_COPY.shopDrawerLabel.yue}`}
+      aria-label={bilingualText(GAME_SURFACE_COPY.shopDrawerLabel)}
     >
       <button
         type="button"
@@ -254,7 +254,7 @@ export function ShopRail() {
           actions={[
             {
               key: 'buy',
-              label: `${BULK_COPY.buySelected(selection.ids.size).en} · ${BULK_COPY.buySelected(selection.ids.size).yue}`,
+              label: `${bilingualText(BULK_COPY.buySelected(selection.ids.size))}`,
               onRun: () => void runBulkBuy(),
             },
           ]}

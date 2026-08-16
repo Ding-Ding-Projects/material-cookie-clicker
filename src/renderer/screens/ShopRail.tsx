@@ -9,7 +9,7 @@ import { BulkToolbar } from '../components/BulkToolbar.js';
 import { createSearchState, SearchWithRegexBuilder } from '../components/SearchWithRegexBuilder.js';
 import { useSelection } from '../components/useSelection.js';
 import { matchesSearch } from '../game/local-regex-search.js';
-import { BULK_COPY, LIST_COPY } from '../game/copy.js';
+import { BULK_COPY, GAME_SURFACE_COPY, LIST_COPY } from '../game/copy.js';
 import { useFastSnapshot, useGameDispatch, useStructureSnapshot } from '../game/GameProvider.js';
 
 /** The tiny leaf that actually depends on live cookies: cost text + the buy button's
@@ -58,6 +58,25 @@ const GeneratorBuyButton = memo(function GeneratorBuyButton({
   );
 });
 
+/** A slot in the shop rail needs to look like the machine it sells, not like fourteen identical
+ *  factories. The glyph is chosen per generator id; unknown ids fall back to the factory. */
+const GENERATOR_ICONS: Readonly<Record<string, string>> = {
+  cursor: '👆',
+  grandma: '👵',
+  farm: '🌾',
+  mine: '⛏️',
+  factory: '🏭',
+  bank: '🏦',
+  temple: '⛩️',
+  wizardTower: '🧙',
+  shipment: '🚀',
+  alchemyLab: '⚗️',
+  portal: '🌀',
+  timeMachine: '⏳',
+  antimatterCondenser: '⚛️',
+  prism: '🔮',
+};
+
 const GeneratorRow = memo(function GeneratorRow({
   def,
   owned,
@@ -77,7 +96,7 @@ const GeneratorRow = memo(function GeneratorRow({
 }) {
   const stepperLabelId = `stepper-label-${def.id}`;
   return (
-    <div className={`building-row${unlocked ? '' : ' locked'}${owned > 0 ? ' owned' : ''}`}>
+    <div className={`shop-row${unlocked ? '' : ' locked'}${owned > 0 ? ' owned' : ''}`}>
       <input
         type="checkbox"
         className="select-checkbox"
@@ -85,35 +104,41 @@ const GeneratorRow = memo(function GeneratorRow({
         onChange={onToggleSelect}
         aria-label={`Select ${def.nameEn} · 選取${def.nameYue}`}
       />
-      <div className="building-row__icon" aria-hidden="true">
-        🏭
+      <div className="shop-row__icon" aria-hidden="true">
+        {GENERATOR_ICONS[def.id] ?? '🏭'}
       </div>
-      <div className="building-row__names">
-        <span className="building-row__name-en">{def.nameEn}</span>
-        <span className="building-row__name-zh">{def.nameYue}</span>
-        <div className="building-row__meta">
-          {unlocked ? (
-            <>
-              <span className="owned-chip">
-                {LIST_COPY.owned.en} {owned} · {LIST_COPY.owned.yue} {owned}
-              </span>
-              <span>+{formatBigNum(generatorCps(def, 1), 'en')} CPS each · 每個 +{formatBigNum(generatorCps(def, 1), 'en')} 產量</span>
-            </>
-          ) : (
-            <span>Unlocks after buying its previous tier · 買咗上一層先會出現</span>
-          )}
-        </div>
+      <div className="shop-row__names">
+        <span className="shop-row__name">{def.nameEn}</span>
+        <span className="shop-row__name-zh">{def.nameYue}</span>
+        <span className="shop-row__sub">
+          {unlocked
+            ? `+${formatBigNum(generatorCps(def, 1), 'en')}/sec each · 每個 +${formatBigNum(generatorCps(def, 1), 'en')}`
+            : 'Buy the previous tier first · 買咗上一層先會出現'}
+        </span>
       </div>
+      <span className="shop-row__owned" aria-label={`${LIST_COPY.owned.en} ${owned} · ${LIST_COPY.owned.yue} ${owned}`}>
+        {owned}
+      </span>
       <span id={stepperLabelId} style={{ display: 'none' }}>
         Buy quantity for {def.nameEn} · {def.nameYue}購買數量
       </span>
-      <BuyStepper value={quantity} onChange={onQuantityChange} disabled={!unlocked} ariaLabelId={stepperLabelId} />
-      <GeneratorBuyButton def={def} owned={owned} quantity={quantity} unlocked={unlocked} />
+      <div className="shop-row__controls">
+        <BuyStepper value={quantity} onChange={onQuantityChange} disabled={!unlocked} ariaLabelId={stepperLabelId} />
+        <GeneratorBuyButton def={def} owned={owned} quantity={quantity} unlocked={unlocked} />
+      </div>
     </div>
   );
 });
 
-export function GeneratorsScreen() {
+/**
+ * The generator shop, docked to the cookie as a rail on the single game surface (never its own
+ * page). Buying here does not move the player away from the cookie: the rail scrolls inside
+ * itself, and below ~900px it becomes a bottom drawer on the same surface.
+ *
+ * The search field, multi-select and bulk-buy toolbar are carried over unchanged — they were
+ * working affordances of the old screen and none of them is part of a route.
+ */
+export function ShopRail() {
   const dispatch = useGameDispatch();
   const structure = useStructureSnapshot();
   const [search, setSearch] = useState(createSearchState());
@@ -161,10 +186,11 @@ export function GeneratorsScreen() {
   }
 
   return (
-    <div className="screen">
-      <h1>
-        Generators<span className="screen-title-zh">生產建築</span>
-      </h1>
+    <section className="panel shop-rail" aria-label={`${GAME_SURFACE_COPY.shopDrawerLabel.en} · ${GAME_SURFACE_COPY.shopDrawerLabel.yue}`}>
+      <h2 className="panel__title">
+        <span>{GAME_SURFACE_COPY.shopTitle.en}</span>
+        <span className="panel__title-zh">{GAME_SURFACE_COPY.shopTitle.yue}</span>
+      </h2>
       <SearchWithRegexBuilder
         idPrefix="generators-search"
         state={search}
@@ -195,7 +221,7 @@ export function GeneratorsScreen() {
           {LIST_COPY.noResults.en} · {LIST_COPY.noResults.yue}
         </p>
       ) : (
-        <div>
+        <div className="shop-rail__list">
           {visibleRows.map((row) => (
             <GeneratorRow
               key={row.def.id}
@@ -210,6 +236,6 @@ export function GeneratorsScreen() {
           ))}
         </div>
       )}
-    </div>
+    </section>
   );
 }

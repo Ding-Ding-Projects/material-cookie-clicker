@@ -11,7 +11,7 @@ import {
 } from '../../shared/game/upgrades.js';
 import type { GameState } from '../../shared/game/types.js';
 import { createSearchState, SearchWithRegexBuilder } from '../components/SearchWithRegexBuilder.js';
-import { LIST_COPY, type Bilingual } from '../game/copy.js';
+import { GAME_SURFACE_COPY, LIST_COPY, type Bilingual } from '../game/copy.js';
 import { useFastSnapshot, useGameDispatch, useStructureSnapshot } from '../game/GameProvider.js';
 import { matchesSearch } from '../game/local-regex-search.js';
 
@@ -94,46 +94,16 @@ function describeUnlock(condition: UnlockCondition, state: GameState): UnlockPro
 }
 
 /**
- * The only leaf that reads the fast (per-tick) slice: the cost line and the buy button's
- * enabled state. Keeping the subscription down here means a cookie tick re-renders one button
- * per card rather than the whole grid. The purchase itself goes through the single
- * `applyGameAction` seam via `dispatch` — this component never mutates state itself, and the
- * reducer independently re-checks affordability and the unlock condition.
+ * One perforated ticket in the strip under the cookie (design-v2/game-layout.html). The ticket
+ * IS the buy control — there is no separate card and no separate buy button, because an upgrade
+ * purchase on the game surface has to be a single reach from the cookie.
+ *
+ * This is also the only leaf that reads the fast (per-tick) slice, so a cookie tick re-renders
+ * one ticket's affordability rather than the whole strip. The purchase goes through the single
+ * `applyGameAction` seam via `dispatch`; the reducer independently re-checks affordability and
+ * the unlock condition.
  */
-const UpgradeBuyButton = memo(function UpgradeBuyButton({ def, state }: { def: UpgradeDefinition; state: CardState }) {
-  const dispatch = useGameDispatch();
-  const fast = useFastSnapshot();
-
-  if (state === 'owned') {
-    return (
-      <button type="button" className="item-card__buy" disabled>
-        {LIST_COPY.alreadyOwned.en} · {LIST_COPY.alreadyOwned.yue}
-      </button>
-    );
-  }
-
-  if (state === 'locked') {
-    return (
-      <button type="button" className="item-card__buy" disabled>
-        {LIST_COPY.locked.en} · {LIST_COPY.locked.yue} — 🍪 {formatBigNum(def.cost, 'en')}
-      </button>
-    );
-  }
-
-  const affordable = bnCompare(fast.cookies, def.cost) >= 0;
-  return (
-    <button
-      type="button"
-      className="item-card__buy"
-      disabled={!affordable}
-      onClick={() => dispatch({ type: 'buyUpgrade', upgradeId: def.id })}
-    >
-      {LIST_COPY.buy.en} · {LIST_COPY.buy.yue} — 🍪 {formatBigNum(def.cost, 'en')}
-    </button>
-  );
-});
-
-const UpgradeCard = memo(function UpgradeCard({
+const UpgradeTicket = memo(function UpgradeTicket({
   def,
   state,
   progress,
@@ -142,64 +112,68 @@ const UpgradeCard = memo(function UpgradeCard({
   state: CardState;
   progress: UnlockProgress | null;
 }) {
+  const dispatch = useGameDispatch();
+  const fast = useFastSnapshot();
+
   const effect = describeEffect(def);
   const stateLabel: Bilingual =
-    state === 'owned' ? LIST_COPY.owned : state === 'locked' ? LIST_COPY.locked : LIST_COPY.buy;
+    state === 'owned' ? LIST_COPY.alreadyOwned : state === 'locked' ? LIST_COPY.locked : LIST_COPY.buy;
+  const affordable = state === 'buyable' && bnCompare(fast.cookies, def.cost) >= 0;
+
+  // The cost line is never colour-only: it literally reads "Owned" or "Locked" when that is the
+  // state, so the three states are distinguishable without seeing the ticket's fill.
+  const costLine =
+    state === 'owned'
+      ? `${LIST_COPY.alreadyOwned.en} · ${LIST_COPY.alreadyOwned.yue}`
+      : state === 'locked'
+        ? `🔒 🍪 ${formatBigNum(def.cost, 'en')}`
+        : `🍪 ${formatBigNum(def.cost, 'en')}`;
 
   return (
-    <div
-      className={`item-card upgrade-card ${state}`}
-      role="group"
-      aria-label={`${def.nameEn} · ${def.nameYue} — ${stateLabel.en} · ${stateLabel.yue}`}
+    <button
+      type="button"
+      className={`mini-ticket ${state}`}
+      disabled={!affordable}
+      title={`${effect.en} · ${effect.yue}`}
+      aria-label={`${def.nameEn} · ${def.nameYue} — ${effect.en} · ${effect.yue} — ${stateLabel.en} · ${stateLabel.yue} — 🍪 ${formatBigNum(def.cost, 'en')}${
+        state === 'locked' && progress ? ` — ${progress.requirement.en} · ${progress.requirement.yue}` : ''
+      }`}
+      onClick={() => dispatch({ type: 'buyUpgrade', upgradeId: def.id })}
     >
-      {state === 'owned' ? (
-        <span className="item-card__badge">
-          {LIST_COPY.owned.en} · {LIST_COPY.owned.yue}
+      <span className="mini-ticket__glyph" aria-hidden="true">
+        {state === 'locked' ? '🔒' : iconFor(def)}
+      </span>
+      <span className="mini-ticket__name">{def.nameEn}</span>
+      <span className="mini-ticket__name-zh">{def.nameYue}</span>
+      {state === 'locked' && progress ? (
+        <span
+          className="mini-ticket__track"
+          role="progressbar"
+          aria-valuemin={0}
+          aria-valuemax={100}
+          aria-valuenow={Math.round(progress.fraction * 100)}
+          aria-label={`${progress.requirement.en} · ${progress.requirement.yue}`}
+        >
+          <span className="mini-ticket__fill" style={{ width: `${Math.round(progress.fraction * 100)}%` }} />
         </span>
       ) : null}
-      <div className="item-card__icon" aria-hidden="true">
-        {state === 'locked' ? '🔒' : iconFor(def)}
-      </div>
-      <div className="item-card__name-en">{def.nameEn}</div>
-      <div className="item-card__name-zh">{def.nameYue}</div>
-      <div className="item-card__desc">
-        {effect.en} · {effect.yue}
-        {state === 'locked' && progress ? (
-          <>
-            {' '}
-            {progress.requirement.en} · {progress.requirement.yue}
-          </>
-        ) : null}
-      </div>
-      {state === 'locked' && progress ? (
-        <>
-          <div className="item-card__progress-line">{progress.counter}</div>
-          <div
-            className="item-card__progress-track"
-            role="progressbar"
-            aria-valuemin={0}
-            aria-valuemax={100}
-            aria-valuenow={Math.round(progress.fraction * 100)}
-            aria-label={`${progress.requirement.en} · ${progress.requirement.yue}`}
-          >
-            <div className="item-card__progress-fill" style={{ width: `${Math.round(progress.fraction * 100)}%` }} />
-          </div>
-        </>
-      ) : null}
-      <UpgradeBuyButton def={def} state={state} />
-    </div>
+      <span className="mini-ticket__cost">{costLine}</span>
+    </button>
   );
 });
 
 /**
- * The Upgrades screen: every one-time upgrade in the shared domain, rendered in one of the three
- * states design/upgrade-card.html specifies (locked / unlocked-buyable / owned).
+ * The upgrade ticket strip: every one-time upgrade in the shared domain, in one of the three
+ * states design-v2/upgrade-card.html specifies (locked / unlocked-buyable / owned), laid out as a
+ * horizontally-scrolling strip directly under the cookie on the single game surface. Upgrades are
+ * never a page, and never move into the shop drawer — buying a generator and buying an upgrade
+ * are two different decisions.
  *
  * Nothing here asks whether an application feature is available, and nothing here is gated by
- * game progress except the in-game purchase itself: locking an upgrade card only affects that
- * upgrade's own bonus.
+ * game progress except the in-game purchase itself: locking a ticket only affects that upgrade's
+ * own bonus.
  */
-export function UpgradesScreen() {
+export function UpgradeStrip() {
   const structure = useStructureSnapshot();
   const [search, setSearch] = useState(createSearchState());
 
@@ -221,31 +195,38 @@ export function UpgradesScreen() {
   const visible = cards.filter((card) => matchesSearch(`${card.def.nameEn} ${card.def.nameYue}`, search));
 
   return (
-    <div className="screen">
-      <h1>
-        Upgrades<span className="screen-title-zh">升級</span>
-      </h1>
-      <p className="screen-summary">
-        {ownedIds.size} / {UPGRADE_DEFINITIONS.length} owned · 已擁有 {ownedIds.size} / {UPGRADE_DEFINITIONS.length}
-      </p>
-      <SearchWithRegexBuilder
-        idPrefix="upgrades-search"
-        state={search}
-        onChange={setSearch}
-        placeholder={LIST_COPY.searchPlaceholderUpgrades}
-        ariaLabel={LIST_COPY.searchPlaceholderUpgrades}
-      />
+    <section className="panel" aria-label={`${GAME_SURFACE_COPY.upgradeStripLabel.en} · ${GAME_SURFACE_COPY.upgradeStripLabel.yue}`}>
+      {/* The search sits IN the heading row rather than on its own line: on the game surface every
+          vertical pixel it would take is a pixel of ticket the player can no longer see. */}
+      <div className="panel__header">
+        <h2 className="panel__title">
+          <span>{GAME_SURFACE_COPY.upgradesTitle.en}</span>
+          <span className="panel__title-zh">{GAME_SURFACE_COPY.upgradesTitle.yue}</span>
+          <span className="panel__title-count">
+            {ownedIds.size} / {UPGRADE_DEFINITIONS.length}
+          </span>
+        </h2>
+        <div className="panel__header-search">
+          <SearchWithRegexBuilder
+            idPrefix="upgrades-search"
+            state={search}
+            onChange={setSearch}
+            placeholder={LIST_COPY.searchPlaceholderUpgrades}
+            ariaLabel={LIST_COPY.searchPlaceholderUpgrades}
+          />
+        </div>
+      </div>
       {visible.length === 0 ? (
         <p>
           {LIST_COPY.noResults.en} · {LIST_COPY.noResults.yue}
         </p>
       ) : (
-        <div className="card-grid">
+        <div className="upgrade-strip">
           {visible.map((card) => (
-            <UpgradeCard key={card.def.id} def={card.def} state={card.state} progress={card.progress} />
+            <UpgradeTicket key={card.def.id} def={card.def} state={card.state} progress={card.progress} />
           ))}
         </div>
       )}
-    </div>
+    </section>
   );
 }

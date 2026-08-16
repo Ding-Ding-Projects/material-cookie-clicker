@@ -33,6 +33,25 @@ export const TAB_COPY = {
   prestige: { en: "Prestige", yue: "轉生" },
 } as const satisfies Record<string, Bilingual>;
 
+/**
+ * The single game surface. Every string the cabinet chrome needs that is NOT a secondary
+ * destination: the pinned HUD readouts, the two panel headings, and the name of the game
+ * surface itself in the secondary dock.
+ */
+export const GAME_SURFACE_COPY = {
+  surfaceLabel: { en: "Game", yue: "遊戲" },
+  surfaceTitle: { en: "The bakery", yue: "餅店" },
+  hudCookies: { en: "Cookies", yue: "曲奇" },
+  hudPerSecond: { en: "Per second", yue: "每秒" },
+  hudPerClick: { en: "Per click", yue: "每擊" },
+  hudLabel: { en: "Live counters", yue: "即時數字" },
+  shopTitle: { en: "Shop", yue: "商店" },
+  upgradesTitle: { en: "Upgrades", yue: "升級" },
+  shopDrawerLabel: { en: "Generator shop", yue: "生產器商店" },
+  upgradeStripLabel: { en: "Upgrade tickets", yue: "升級票" },
+  secondaryLabel: { en: "Secondary surfaces", yue: "次要畫面" },
+} as const satisfies Record<string, Bilingual>;
+
 export const SHELL_COPY = {
   tabsLabel: { en: "Game sections", yue: "遊戲分頁" },
   dismiss: { en: "Dismiss", yue: "收起" },

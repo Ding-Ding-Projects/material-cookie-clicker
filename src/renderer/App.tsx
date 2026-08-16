@@ -1,29 +1,39 @@
 import { useCallback, useEffect, useRef, useState, type KeyboardEvent } from 'react';
 
-import { GameProvider, useMilestoneMessage, useOfflineNotice } from './game/GameProvider';
-import { SHELL_COPY, TAB_COPY, type Bilingual } from './game/copy';
+import { bnMulScalar } from '../shared/game/big-number.js';
+import { formatBigNum } from '../shared/game/format-number.js';
+import { isEffectActive } from '../shared/game/golden-cookie.js';
+import { computeMultipliers } from '../shared/game/upgrades.js';
+import {
+  GameProvider,
+  useFastSnapshot,
+  useMilestoneMessage,
+  useOfflineNotice,
+  useStructureSnapshot,
+} from './game/GameProvider';
+import { GAME_SURFACE_COPY, SHELL_COPY, TAB_COPY, type Bilingual } from './game/copy';
 import { AchievementsScreen } from './screens/AchievementsScreen';
-import { CookieScreen } from './screens/CookieScreen';
-import { GeneratorsScreen } from './screens/GeneratorsScreen';
+import { CookieHero } from './screens/CookieHero';
+import { ShopRail } from './screens/ShopRail';
 import { PrestigeScreen } from './screens/PrestigeScreen';
 import { StatisticsScreen } from './screens/StatisticsScreen';
 import { ToolsScreen, type OpenApplicationFeature } from './screens/ToolsScreen';
-import { UpgradesScreen } from './screens/UpgradesScreen';
+import { UpgradeStrip } from './screens/UpgradeStrip';
 
-/** Dock order of the seven destinations. TAB_COPY supplies both labels for each. */
-const TAB_IDS = [
-  'cookie',
-  'generators',
-  'upgrades',
-  'achievements',
-  'tools',
-  'statistics',
-  'prestige',
-] as const;
+/**
+ * The dock order. `game` is the single surface the core loop lives on — clicking the cookie,
+ * buying a generator and buying an upgrade all happen there with NO navigation between them.
+ * The other four are genuinely secondary surfaces a player visits deliberately and briefly, and
+ * they are the only reason a tab strip exists at all. Adding a core-loop control to one of them
+ * would be a spec violation (design-v2/game-layout.html).
+ */
+const TAB_IDS = ['game', 'achievements', 'tools', 'statistics', 'prestige'] as const;
 
 type TabId = (typeof TAB_IDS)[number];
 
-const ACTIVE_TAB_KEY = 'material-cookie-clicker:active-tab:v1';
+/** v2 because the destination set changed: the old cookie/generators/upgrades tabs no longer
+ *  exist, so a stored v1 choice must not resurrect a page that is now part of the game surface. */
+const ACTIVE_TAB_KEY = 'material-cookie-clicker:active-tab:v2';
 
 function isTabId(value: unknown): value is TabId {
   return typeof value === 'string' && (TAB_IDS as readonly string[]).includes(value);
@@ -36,11 +46,85 @@ function readStoredTab(): TabId {
   } catch {
     // Private-mode / disabled storage: the tab choice simply does not persist.
   }
-  return 'cookie';
+  return 'game';
 }
+
+/** Both labels for every dock button. The game surface has no TAB_COPY entry of its own because
+ *  it is not one of the "sections" that list named; it is the game. */
+const TAB_LABELS: Readonly<Record<TabId, Bilingual>> = {
+  game: GAME_SURFACE_COPY.surfaceLabel,
+  achievements: TAB_COPY.achievements,
+  tools: TAB_COPY.tools,
+  statistics: TAB_COPY.statistics,
+  prestige: TAB_COPY.prestige,
+};
 
 /** How long a shell announcement stays in the status region before it clears itself. */
 const SHELL_STATUS_MS = 6_000;
+
+/**
+ * The pinned HUD: cookies, cookies per second, cookies per click. Always visible, never scrolls
+ * away, and the ONLY place any of those three numbers is shown — the hero panel deliberately does
+ * not repeat the count. Everything here is `aria-live="off"`: the throttled milestone region is
+ * the single thing that ever announces, so a screen reader is not flooded by the tick.
+ */
+function Hud() {
+  const fast = useFastSnapshot();
+  const structure = useStructureSnapshot();
+
+  const clickValue = (() => {
+    const multipliers = computeMultipliers(structure);
+    let value = bnMulScalar(structure.baseClickValue, multipliers.clickMultiplier);
+    const effect = structure.goldenCookie.activeEffect;
+    if (effect?.kind === 'clickFrenzy' && effect.multiplier !== undefined && isEffectActive(effect, Date.now())) {
+      value = bnMulScalar(value, effect.multiplier);
+    }
+    return value;
+  })();
+
+  return (
+    <div className="hud" role="group" aria-label={`${GAME_SURFACE_COPY.hudLabel.en} · ${GAME_SURFACE_COPY.hudLabel.yue}`} aria-live="off">
+      <HudReadout label={GAME_SURFACE_COPY.hudCookies} value={fast.cookies} />
+      <HudReadout label={GAME_SURFACE_COPY.hudPerSecond} value={fast.cps} />
+      <HudReadout label={GAME_SURFACE_COPY.hudPerClick} value={clickValue} />
+    </div>
+  );
+}
+
+/** One recessed bezel in the HUD. Both labels always show; the Cantonese *number* only shows when
+ *  it actually reads differently from the English one (the two formatters agree on small values,
+ *  and printing "4.06" twice would look like a rendering bug rather than a translation). */
+function HudReadout({ label, value }: { label: Bilingual; value: Parameters<typeof formatBigNum>[0] }) {
+  const en = formatBigNum(value, 'en');
+  const yue = formatBigNum(value, 'yue');
+  return (
+    <div className="hud__readout">
+      <span className="hud__key">
+        {label.en} · {label.yue}
+      </span>
+      <span className="hud__value">{en}</span>
+      {yue === en ? null : <span className="hud__value-zh">{yue}</span>}
+    </div>
+  );
+}
+
+/**
+ * THE ONE SCREEN (design-v2/game-layout.html). Hero cookie plus the upgrade ticket strip in the
+ * left column, the generator shop docked as a rail on the right, everything on a single surface.
+ * Below ~900px the CSS turns the rail into a bottom drawer on this same surface — the cookie
+ * stays visible above it and no route changes.
+ */
+function GameSurface() {
+  return (
+    <div className="stage">
+      <div className="stage__hero-column">
+        <CookieHero />
+        <UpgradeStrip />
+      </div>
+      <ShopRail />
+    </div>
+  );
+}
 
 export function App() {
   const minimize = useCallback(() => window.materialCookieClicker?.window.minimize(), []);
@@ -121,7 +205,7 @@ function GameShell() {
 
   const onTabKeyDown = useCallback(
     (event: KeyboardEvent<HTMLButtonElement>, index: number) => {
-      // Vertical strip, so Up/Down move; Left/Right are accepted too because the dock edge is
+      // Horizontal dock, so Left/Right move; Up/Down are accepted too because the dock edge is
       // a layout choice and players reach for both. Home/End jump to the ends.
       let nextIndex: number | null = null;
       switch (event.key) {
@@ -150,49 +234,64 @@ function GameShell() {
 
   return (
     <main className="app-content" id="root-content">
-      <div className="tab-strip" role="tablist" aria-orientation="vertical" aria-label={SHELL_COPY.tabsLabel.en}>
-        {TAB_IDS.map((id, index) => {
-          const label = TAB_COPY[id];
-          const selected = id === activeTab;
-          return (
-            <button
-              key={id}
-              type="button"
-              role="tab"
-              id={`tab-${id}`}
-              className="tab-strip__button"
-              aria-selected={selected}
-              aria-controls={`panel-${id}`}
-              // Roving tabindex: exactly one tab is in the page tab order at a time, and the
-              // arrow keys move between the rest.
-              tabIndex={selected ? 0 : -1}
-              ref={(node) => {
-                tabRefs.current[id] = node;
-              }}
-              onClick={() => setActiveTab(id)}
-              onKeyDown={(event) => onTabKeyDown(event, index)}
-            >
-              <span>{label.en}</span>
-              <span className="tab-strip__label-zh">{label.yue}</span>
-            </button>
-          );
-        })}
-      </div>
+      {/* One cabinet. The HUD is pinned to its top, the body holds either the game surface or one
+          secondary surface, and the dock along the bottom is the only navigation in the app. */}
+      <div className="cabinet">
+        <Hud />
 
-      <div
-        className="tab-panel"
-        role="tabpanel"
-        id={`panel-${activeTab}`}
-        aria-labelledby={`tab-${activeTab}`}
-        tabIndex={0}
-      >
-        {activeTab === 'cookie' && <CookieScreen />}
-        {activeTab === 'generators' && <GeneratorsScreen />}
-        {activeTab === 'upgrades' && <UpgradesScreen />}
-        {activeTab === 'achievements' && <AchievementsScreen />}
-        {activeTab === 'tools' && <ToolsScreen onOpenApplicationFeature={openApplicationFeature} />}
-        {activeTab === 'statistics' && <StatisticsScreen />}
-        {activeTab === 'prestige' && <PrestigeScreen />}
+        <div
+          className="cabinet-body"
+          role="tabpanel"
+          id={`panel-${activeTab}`}
+          aria-labelledby={`tab-${activeTab}`}
+          tabIndex={0}
+        >
+          {activeTab === 'game' ? (
+            <GameSurface />
+          ) : (
+            <div className="tab-panel">
+              {activeTab === 'achievements' && <AchievementsScreen />}
+              {activeTab === 'tools' && <ToolsScreen onOpenApplicationFeature={openApplicationFeature} />}
+              {activeTab === 'statistics' && <StatisticsScreen />}
+              {activeTab === 'prestige' && <PrestigeScreen />}
+            </div>
+          )}
+        </div>
+
+        <div
+          className="cabinet-dock"
+          role="tablist"
+          aria-orientation="horizontal"
+          aria-label={`${SHELL_COPY.tabsLabel.en} · ${SHELL_COPY.tabsLabel.yue}`}
+        >
+          {TAB_IDS.map((id, index) => {
+            const label = TAB_LABELS[id];
+            const selected = id === activeTab;
+            return (
+              <button
+                key={id}
+                type="button"
+                role="tab"
+                id={`tab-${id}`}
+                className={`cabinet-dock__button${id === 'game' ? ' cabinet-dock__button--game' : ''}`}
+                aria-selected={selected}
+                aria-controls={`panel-${id}`}
+                // Roving tabindex: exactly one tab is in the page tab order at a time, and the
+                // arrow keys move between the rest.
+                tabIndex={selected ? 0 : -1}
+                ref={(node) => {
+                  tabRefs.current[id] = node;
+                }}
+                onClick={() => setActiveTab(id)}
+                onKeyDown={(event) => onTabKeyDown(event, index)}
+              >
+                {id === 'game' ? <span aria-hidden="true">🍪</span> : null}
+                <span>{label.en}</span>
+                <span className="cabinet-dock__label-zh">{label.yue}</span>
+              </button>
+            );
+          })}
+        </div>
       </div>
 
       {offlineNotice && (

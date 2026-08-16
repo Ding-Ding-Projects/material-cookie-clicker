@@ -17,12 +17,15 @@ interface Popup {
 let popupIdSeq = 0;
 
 /**
- * The primary click target. The live cookies counter and CPS readout are `aria-live="off"` —
- * deliberately silent on every click — and only the separate, throttled milestone status region
- * (rendered by App.tsx) ever announces to assistive technology. Holding the button repeats a
- * click at a fixed accessible rate through the exact same dispatch as a discrete click.
+ * The hero panel of the single game surface: the primary click target and nothing else.
+ *
+ * The headline cookie count is deliberately NOT repeated here — it lives once, in the pinned HUD
+ * that App.tsx renders above this panel, so a number means the same thing in one place. The CPS
+ * line is `aria-live="off"` — deliberately silent on every click — and only the separate,
+ * throttled milestone status region ever announces to assistive technology. Holding the button
+ * repeats a click at a fixed accessible rate through the exact same dispatch as a discrete click.
  */
-export function CookieScreen() {
+export function CookieHero() {
   const dispatch = useGameDispatch();
   const fast = useFastSnapshot();
   const structure = useStructureSnapshot();
@@ -62,23 +65,7 @@ export function CookieScreen() {
   }, [currentClickValue, goldenActive]);
 
   return (
-    <div className="screen cookie-screen">
-      <h1>
-        {COOKIE_SCREEN_COPY.clickTarget.en}
-        <span className="screen-title-zh">{COOKIE_SCREEN_COPY.clickTarget.yue}</span>
-      </h1>
-
-      <div aria-live="off">
-        <div className="cookie-counter">{formatBigNum(fast.cookies, 'en')}</div>
-        <div style={{ fontFamily: 'var(--font-zh)', fontSize: 13, color: 'var(--on-surface-variant)' }}>
-          {COOKIE_SCREEN_COPY.cookiesLabel.yue} {formatBigNum(fast.cookies, 'yue')}
-        </div>
-      </div>
-
-      <div className="cookie-cps" aria-live="off">
-        {COOKIE_SCREEN_COPY.cpsLabel.en} · {COOKIE_SCREEN_COPY.cpsLabel.yue}: {formatBigNum(fast.cps, 'en')}/s
-      </div>
-
+    <div className="panel cookie-hero">
       <div className={`cookie-target-wrap${goldenActive ? ' golden' : ''}${goldenActive ? ' golden-overlay-wrap' : ''}`}>
         <button
           ref={buttonRef}
@@ -103,7 +90,11 @@ export function CookieScreen() {
         ))}
       </div>
 
-      <p style={{ fontSize: 12, color: 'var(--on-surface-variant)', maxWidth: '32ch' }}>
+      <div className="cookie-cps" aria-live="off">
+        {formatBigNum(fast.cps, 'en')} / sec · {COOKIE_SCREEN_COPY.cpsLabel.yue} {formatBigNum(fast.cps, 'yue')}
+      </div>
+
+      <p className="cookie-hero__hint">
         {COOKIE_SCREEN_COPY.holdHint.en} · {COOKIE_SCREEN_COPY.holdHint.yue}
       </p>
     </div>

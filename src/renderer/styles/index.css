@@ -16,13 +16,18 @@
 :root {
   color-scheme: light;
 
-  --surface: #fff8f3;
-  --surface-low: #fcebdd;
-  --surface-high: #f7e5d6;
-  --surface-highest: #f0e0d0;
-  --on-surface: #211a14;
-  --on-surface-variant: #4f4539;
-  --outline: #7c6f64;
+  /* --- v2 "arcade cabinet" palette, light = bakery daytime. Hex values copied verbatim from
+         design-v2's tokens-color.html; the role names stay the ones this app already uses. --- */
+  --surface: #fff3e6;
+  --surface-lowest: #ffffff;
+  --surface-low: #fff0de;
+  --surface-container: #fbe8d2;
+  --surface-high: #f5dfc4;
+  --surface-highest: #eed5b4;
+  --on-surface: #1e1610;
+  --surface-variant: #f0dcc4;
+  --on-surface-variant: #4a3d2e;
+  --outline: #75634e;
   --outline-variant: #d8c7b6;
 
   --primary: #7a4a1d;
@@ -34,63 +39,86 @@
   --on-secondary: #ffffff;
   --secondary-container: #ffdbcb;
   --on-secondary-container: #2c160b;
+  --secondary-shadow: #35211a;
 
   --tertiary: #5c4e00;
   --on-tertiary: #ffffff;
   --tertiary-container: #f8e287;
   --on-tertiary-container: #221b00;
-  --tertiary-shadow: #3a3000;
+  --tertiary-shadow: #332900;
 
-  /* Arcade spark accent (design/tokens-color.html): decorative-only fills plus the one
-     AA-verified ring colour that is allowed near text. Reserved for celebratory moments —
-     an owned upgrade and an unlocked achievement — never ordinary chrome. */
-  --spark: #ffc72c;
-  --spark-glow: #ffe066;
-  --spark-ring: #d97300;
+  /* Arcade spark accent (design-v2/tokens-color.html): --spark and --spark-glow are DECORATIVE
+     ONLY (blurred glows, gradient fills) and never carry text; --spark-ring is the one spark
+     role allowed on text or a UI boundary, and v2 darkens it to #9c4b00 for AA in light. */
+  --spark: #ffc94d;
+  --spark-glow: #ff8a00;
+  --spark-ring: #9c4b00;
 
-  /* Chunky pressable depth (design/tokens-shape-elevation.html): a SOLID offset shadow in a
-     darker shade of the surface's own colour, not a blur. */
-  --primary-shadow: #4a2a0a;
-  /* Decorative shadow-only shades (never behind text), so the destructive gate presses with the
-     same physics as everything else. */
-  --error-shadow: #7a0000;
-  --press-1: 0 3px 0 0 var(--outline);
-  --press-2: 0 4px 0 0 var(--primary-shadow);
-  --press-3: 0 5px 0 0 var(--outline);
+  /* --- v2 cabinet chrome: the radial oven-glow stops, the recessed HUD face, the bevels and
+         the wooden cabinet body. None of these ever sit behind text except --panel-inset. --- */
+  --bg-core: #fff6ec;
+  --bg-mid: #faecda;
+  --bg-edge: #efdcc0;
+  --panel-inset: #fffbf4;
+  --bevel-hi: rgba(255, 255, 255, 0.85);
+  --bevel-lo: rgba(90, 58, 24, 0.28);
+  --metal-hi: #fff0c4;
+  --metal-lo: #b98a2e;
+  --cabinet-frame: #6a4522;
+  --cabinet-frame-dark: #43290f;
+  --track: #e4cdae;
+
+  /* Chunky pressable depth (design-v2/tokens-shape-elevation.html). --drop-N is the LENGTH a
+     control travels when pressed (also the height of its solid base); --press-N is the ready-made
+     box-shadow built from it. Solid offsets only — v2 uses no blurred drop shadow anywhere. */
+  --primary-shadow: #3c2107;
+  --error-shadow: #6e0000;
+  --drop-1: 4px;
+  --drop-2: 6px;
+  --drop-3: 8px;
+  --drop-4: 10px;
+  --press-0: none;
+  --press-1: 0 var(--drop-1) 0 0 var(--outline);
+  --press-2: 0 var(--drop-2) 0 0 var(--outline);
+  --press-3: 0 var(--drop-3) 0 0 var(--outline);
+  --press-4: 0 var(--drop-4) 0 0 var(--cabinet-frame-dark);
+  --border-thin: 2px;
   --border-thick: 3px;
   --border-chunky: 4px;
-  --font-display: 'Segoe UI Black', 'Arial Black', 'Segoe UI', var(--font-en);
+  --border-fat: 5px;
 
-
-  /* Jewel tool-tier ladder + arcade spark ring (design/tokens-color.html, design/tools-tree.html).
-     Tier 1 reuses the bakery bronze/primary family; tiers 2 and 3 are genuinely different hues
-     so the Tools tech tree visibly escalates rather than darkening one colour. */
-  --tier1: var(--primary);
-  --on-tier1: var(--on-primary);
-  --tier1-container: var(--primary-container);
-  --on-tier1-container: var(--on-primary-container);
-  --tier2: #256b3b;
+  /* Jewel tool-tier ladder (design-v2/tokens-color.html, design/tools-tree.html): bronze ->
+     emerald -> amethyst, so the Tools tech tree visibly escalates rather than darkening one hue. */
+  --tier1: #8a4e12;
+  --on-tier1: #ffffff;
+  --tier1-container: #ffdcba;
+  --on-tier1-container: #2e1600;
+  --tier2: #1f6337;
   --on-tier2: #ffffff;
   --tier2-container: #b8f0c4;
   --on-tier2-container: #04210d;
-  --tier3: #5b3b9c;
+  --tier3: #533593;
   --on-tier3: #ffffff;
   --tier3-container: #e6d9ff;
   --on-tier3-container: #20004d;
-  --spark-ring: #d97300;
 
-  /* Shape scale — bigger, more confident radii than M3's defaults
-     (design/tokens-shape-elevation.html). Nothing in this theme is a timid 8px web card. */
+  /* Shape scale — v2 goes fatter again (v1 was 8-34, v2 is 10-40). Both the v2 names and this
+     app's existing names are defined, pointing at the same steps. */
+  --shape-none: 0px;
+  --shape-xs: 10px;
+  --shape-sm: 16px;
+  --shape-md: 22px;
+  --shape-lg: 28px;
+  --shape-2xl: 40px;
   --shape-full: 999px;
   --shape-xl: 34px;
-  --shape-large: 26px;
-  --shape-medium: 18px;
-  --shape-small: 12px;
+  --shape-large: var(--shape-lg);
+  --shape-medium: var(--shape-md);
+  --shape-small: var(--shape-sm);
 
-  /* The cosy oven glow that sits behind the whole app (design/cookie-surface.html). Pure CSS,
-     no image asset, no network request. */
-  --oven-glow: radial-gradient(ellipse 1100px 620px at 50% -12%, var(--primary-container) 0%, transparent 62%),
-    radial-gradient(ellipse 700px 420px at 8% 108%, var(--secondary-container) 0%, transparent 66%);
+  /* The oven glow behind the whole cabinet: a radial gradient that is BRIGHT at its core and
+     falls off to the cabinet rim (design-v2/game-layout.html). Pure CSS, no image asset. */
+  --oven-glow: radial-gradient(ellipse 130% 95% at 50% -12%, var(--bg-core) 0%, var(--bg-mid) 42%, var(--bg-edge) 100%);
 
   --elevation-1: 0 1px 3px rgba(0, 0, 0, 0.3), 0 4px 8px 3px rgba(0, 0, 0, 0.15);
   --elevation-2: 0 2px 3px rgba(0, 0, 0, 0.3), 0 6px 10px 4px rgba(0, 0, 0, 0.15);
@@ -113,39 +141,64 @@
   --material-cookie-clicker-accent: var(--primary);
 }
 
+/* Dark = ARCADE NIGHT (design-v2/tokens-color.html). Not "the light theme with the lights off":
+   the cabinet is lit from inside, so the background glow gets BRIGHTER toward its centre while
+   the rim goes to near-black. Both ends of that gradient are contrast-verified upstream. */
 @media (prefers-color-scheme: dark) {
   :root:not([data-theme='light']) {
-    --surface: #18120d;
-    --surface-low: #251d17;
-    --surface-high: #302722;
-    --surface-highest: #3b3128;
-    --on-surface: #ede0d9;
-    --on-surface-variant: #d3c4b4;
-    --outline: #9c8f83;
+    color-scheme: dark;
+
+    --surface: #120c08;
+    --surface-lowest: #0a0603;
+    --surface-low: #1a120b;
+    --surface-container: #221810;
+    --surface-high: #2c2016;
+    --surface-highest: #382a1e;
+    --on-surface: #f2e4d6;
+    --surface-variant: #453a2e;
+    --on-surface-variant: #d8c8b4;
+    --outline: #a08d78;
     --outline-variant: #4f4539;
 
     --primary: #ffb876;
     --on-primary: #4a2800;
     --primary-container: #693c00;
     --on-primary-container: #ffdcb8;
+    --primary-shadow: #2a1600;
 
     --secondary: #e6beac;
     --on-secondary: #44291e;
     --secondary-container: #5d3f32;
     --on-secondary-container: #ffdbcb;
+    --secondary-shadow: #24140d;
 
     --tertiary: #dbc66e;
     --on-tertiary: #383000;
     --tertiary-container: #514600;
     --on-tertiary-container: #f8e287;
-    --tertiary-shadow: #8f7a20;
+    --tertiary-shadow: #201c00;
 
-    --spark: #ffd666;
-    --spark-glow: #ffe8a3;
+    --bg-core: #2a1a0a;
+    --bg-mid: #1a1008;
+    --bg-edge: #0a0705;
+    --panel-inset: #0b0704;
+    --bevel-hi: rgba(255, 214, 160, 0.3);
+    --bevel-lo: rgba(0, 0, 0, 0.72);
+    --metal-hi: #ffe7a8;
+    --metal-lo: #8a6318;
+    --cabinet-frame: #3a2410;
+    --cabinet-frame-dark: #150c05;
+    --track: #2e2419;
+
+    --spark: #ffd97a;
+    --spark-glow: #ffa326;
     --spark-ring: #ffc24d;
-    --primary-shadow: #a66a2e;
-    --error-shadow: #7a2a24;
+    --error-shadow: #4a0004;
 
+    --tier1: #f2b27a;
+    --on-tier1: #3a1e00;
+    --tier1-container: #5a3208;
+    --on-tier1-container: #ffdcba;
     --tier2: #8fe3a6;
     --on-tier2: #0c3018;
     --tier2-container: #1b4a28;
@@ -158,37 +211,59 @@
 }
 
 :root[data-theme='dark'] {
-  --surface: #18120d;
-  --surface-low: #251d17;
-  --surface-high: #302722;
-  --surface-highest: #3b3128;
-  --on-surface: #ede0d9;
-  --on-surface-variant: #d3c4b4;
-  --outline: #9c8f83;
+  color-scheme: dark;
+
+  --surface: #120c08;
+  --surface-lowest: #0a0603;
+  --surface-low: #1a120b;
+  --surface-container: #221810;
+  --surface-high: #2c2016;
+  --surface-highest: #382a1e;
+  --on-surface: #f2e4d6;
+  --surface-variant: #453a2e;
+  --on-surface-variant: #d8c8b4;
+  --outline: #a08d78;
   --outline-variant: #4f4539;
 
   --primary: #ffb876;
   --on-primary: #4a2800;
   --primary-container: #693c00;
   --on-primary-container: #ffdcb8;
+  --primary-shadow: #2a1600;
 
   --secondary: #e6beac;
   --on-secondary: #44291e;
   --secondary-container: #5d3f32;
   --on-secondary-container: #ffdbcb;
+  --secondary-shadow: #24140d;
 
   --tertiary: #dbc66e;
   --on-tertiary: #383000;
   --tertiary-container: #514600;
   --on-tertiary-container: #f8e287;
-  --tertiary-shadow: #8f7a20;
+  --tertiary-shadow: #201c00;
 
-  --spark: #ffd666;
-  --spark-glow: #ffe8a3;
+  --bg-core: #2a1a0a;
+  --bg-mid: #1a1008;
+  --bg-edge: #0a0705;
+  --panel-inset: #0b0704;
+  --bevel-hi: rgba(255, 214, 160, 0.3);
+  --bevel-lo: rgba(0, 0, 0, 0.72);
+  --metal-hi: #ffe7a8;
+  --metal-lo: #8a6318;
+  --cabinet-frame: #3a2410;
+  --cabinet-frame-dark: #150c05;
+  --track: #2e2419;
+
+  --spark: #ffd97a;
+  --spark-glow: #ffa326;
   --spark-ring: #ffc24d;
-  --primary-shadow: #a66a2e;
-  --error-shadow: #7a2a24;
+  --error-shadow: #4a0004;
 
+  --tier1: #f2b27a;
+  --on-tier1: #3a1e00;
+  --tier1-container: #5a3208;
+  --on-tier1-container: #ffdcba;
   --tier2: #8fe3a6;
   --on-tier2: #0c3018;
   --tier2-container: #1b4a28;
@@ -230,19 +305,24 @@ body {
   align-items: center;
   justify-content: space-between;
   height: 44px;
-  padding-inline-start: 16px;
-  background: var(--material-cookie-clicker-title-bar);
-  border-bottom: var(--border-chunky) solid var(--outline);
+  padding-inline-start: 18px;
+  background: linear-gradient(180deg, var(--cabinet-frame) 0%, var(--cabinet-frame-dark) 100%);
+  color: #fff;
+  border-bottom: var(--border-fat) solid var(--cabinet-frame-dark);
+  box-shadow: inset 0 3px 0 0 var(--bevel-hi);
   -webkit-app-region: drag;
   user-select: none;
 }
 
-/* The marquee across the top of the cabinet, not a browser chrome strip. */
+/* The marquee across the top of the cabinet, not a browser chrome strip: a bevelled plate with
+   letter-spaced all-caps display type (design-v2/tokens-type.html). */
 .title-bar__label {
   font-family: var(--font-display);
   font-weight: 900;
-  font-size: 15px;
-  letter-spacing: 0.4px;
+  font-size: 13px;
+  letter-spacing: 0.24em;
+  text-transform: uppercase;
+  color: #fff;
 }
 
 .title-bar__controls {
@@ -256,13 +336,18 @@ body {
   height: 100%;
   border: none;
   background: transparent;
-  color: var(--material-cookie-clicker-on-surface);
+  color: #fff;
   font-size: 14px;
   cursor: pointer;
 }
 
 .title-bar__button:hover {
-  background: rgba(0, 0, 0, 0.08);
+  background: rgba(255, 255, 255, 0.16);
+}
+
+.title-bar__button:focus-visible {
+  outline: 3px solid var(--spark-ring);
+  outline-offset: -3px;
 }
 
 .title-bar__button--close:hover {
@@ -273,124 +358,317 @@ body {
 .app-content {
   flex: 1;
   display: flex;
-  flex-direction: row;
-  align-items: stretch;
-  justify-content: flex-start;
+  flex-direction: column;
+  min-height: 0;
+  padding: 12px;
   overflow: hidden;
 }
 
 /* ---------------------------------------------------------------------------------------- *
- * Tab strip — left-docked (the app-wide default dock edge), built on surface-kernel's
- * tabs.ts ordering/activation reducer. Seven fixed destinations, so no overflow/pin/group UI
- * is wired here; those exist in the shared engine for a future surface with more tabs.
+ * THE CABINET — the one screen (design-v2/game-layout.html).
+ *
+ * The moment-to-moment loop — click the cookie, buy a generator, buy an upgrade — happens
+ * entirely inside `.cabinet-body` with NO navigation between those three things. The cookie is
+ * the hero, the generator shop is docked to it as a right rail, and the upgrades are a ticket
+ * strip on the same surface. The dock at the bottom is secondary chrome only.
  * ---------------------------------------------------------------------------------------- */
-/* The control column of an arcade cabinet: a recessed bezel holding a stack of real, chunky,
-   pressable buttons. Every tab carries its own solid offset shadow at rest, so the whole column
-   reads as hardware even before anything is hovered. */
-.tab-strip {
+.cabinet {
+  flex: 1;
+  min-height: 0;
   display: flex;
   flex-direction: column;
-  width: 216px;
-  flex-shrink: 0;
-  padding: 16px 12px 24px;
   gap: 12px;
-  background: var(--surface-low);
-  border-inline-end: var(--border-chunky) solid var(--outline);
-  box-shadow: inset -6px 0 0 0 rgba(0, 0, 0, 0.08);
-  overflow-y: auto;
+  padding: 14px;
+  border: var(--border-fat) solid var(--outline);
+  border-radius: var(--shape-2xl);
+  background: radial-gradient(ellipse 90% 70% at 30% 0%, var(--bg-core) 0%, var(--bg-mid) 55%, var(--bg-edge) 100%),
+    var(--bg-edge);
+  box-shadow: var(--press-4), inset 0 5px 0 0 var(--bevel-hi);
+  overflow: hidden;
 }
 
-.tab-strip__button {
-  font: inherit;
+/* --- the pinned HUD: live counters that never scroll away, in recessed bezels --- */
+.hud {
+  display: flex;
+  align-items: stretch;
+  gap: 12px;
+  flex-wrap: wrap;
+  flex-shrink: 0;
+}
+
+.hud__readout {
+  flex: 1 1 180px;
+  min-width: 150px;
+  border-radius: var(--shape-md);
+  padding: 8px 16px;
+  background: var(--panel-inset);
+  border: var(--border-chunky) solid var(--outline);
+  box-shadow: inset 0 5px 0 -2px var(--bevel-lo);
+}
+
+.hud__key {
   font-family: var(--font-display);
-  font-size: 14px;
+  font-size: 10px;
   font-weight: 900;
-  letter-spacing: 0.2px;
-  text-align: start;
+  letter-spacing: 0.24em;
+  text-transform: uppercase;
+  color: var(--on-surface-variant);
+  display: block;
+  margin-bottom: 2px;
+}
+
+.hud__value {
+  font-family: var(--font-display);
+  font-weight: 900;
+  font-variant-numeric: tabular-nums;
+  font-size: clamp(20px, 2.6vw, 34px);
+  line-height: 1.05;
+  letter-spacing: -0.02em;
+  color: var(--on-surface);
+  display: block;
+}
+
+.hud__value-zh {
+  font-family: var(--font-zh);
+  font-size: 11px;
+  font-weight: 700;
+  color: var(--on-surface-variant);
+  display: block;
+}
+
+/* --- the body of the cabinet: the game stage, or one secondary surface --- */
+.cabinet-body {
+  flex: 1;
+  min-height: 0;
   display: flex;
   flex-direction: column;
-  gap: 1px;
-  padding: 10px 14px;
-  min-height: 52px;
-  border-radius: var(--shape-medium);
-  background: var(--surface-high);
-  color: var(--on-surface);
-  cursor: pointer;
+  overflow: hidden;
+  border-radius: var(--shape-lg);
 }
 
-/* Chunky pressable: a solid offset shadow (never a blur) that the button compresses into on
-   press, per design/tokens-shape-elevation.html. */
-.tab-strip__button {
-  border: var(--border-thick) solid var(--outline);
-  box-shadow: 0 4px 0 0 var(--outline);
-  transition: transform 80ms ease, box-shadow 80ms ease, background 80ms ease;
-}
-
-.tab-strip__button:hover {
-  background: var(--surface-highest);
-  transform: translateY(-1px);
-  box-shadow: 0 5px 0 0 var(--outline);
-}
-
-/* The selected destination is visibly popped out of the bezel with a warm fill and its own
-   deeper shadow — never a tinted web sidebar row. */
-.tab-strip__button[aria-selected='true'] {
-  background: var(--primary-container);
-  color: var(--on-primary-container);
-  border-color: var(--primary);
-  box-shadow: 0 6px 0 0 var(--primary), 0 0 0 3px var(--primary-container);
-  transform: translateY(-3px);
-}
-
-.tab-strip__button:active,
-.tab-strip__button[aria-selected='true']:active {
-  transform: translateY(3px);
-  box-shadow: 0 0 0 0 transparent;
-}
-
-@media (prefers-reduced-motion: reduce) {
-  .tab-strip__button {
-    transition: none;
-  }
-
-  .tab-strip__button[aria-selected='true'],
-  .tab-strip__button:active {
-    transform: none;
-  }
-}
-
-.tab-strip__button:focus-visible {
-  outline: 3px solid var(--primary);
+.cabinet-body:focus-visible {
+  outline: 4px solid var(--spark-ring);
   outline-offset: 2px;
 }
 
-.tab-strip__label-zh {
+/* Hero column on the left, shop rail docked on the right. One surface, one scroll region. */
+.stage {
+  flex: 1;
+  min-height: 0;
+  display: grid;
+  grid-template-columns: minmax(0, 1fr) 360px;
+  gap: 12px;
+  align-items: stretch;
+  overflow: hidden;
+}
+
+/* The hero column does NOT scroll vertically: the cookie and the upgrade strip both have to be
+   on screen at once, so the strip absorbs the overflow horizontally instead. */
+.stage__hero-column {
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+  min-width: 0;
+  min-height: 0;
+  overflow: hidden;
+}
+
+/* The upgrades panel takes whatever height the cookie leaves and hands it to the strip. */
+.stage__hero-column > .panel:last-child {
+  flex: 1;
+  min-height: 0;
+  display: flex;
+  flex-direction: column;
+}
+
+.stage__hero-column > .panel:last-child .upgrade-strip {
+  flex: 1;
+  min-height: 0;
+  align-items: flex-start;
+  overflow-y: hidden;
+}
+
+/* --- the shared panel: a bevelled plate bolted to the cabinet --- */
+.panel {
+  border-radius: var(--shape-lg);
+  border: var(--border-fat) solid var(--outline);
+  background: linear-gradient(180deg, var(--surface-high), var(--surface-highest));
+  box-shadow: var(--press-2), inset 0 4px 0 0 var(--bevel-hi);
+  padding: 14px;
+  min-width: 0;
+}
+
+.panel__title {
+  font-family: var(--font-display);
+  font-size: 11px;
+  font-weight: 900;
+  letter-spacing: 0.24em;
+  text-transform: uppercase;
+  color: var(--on-surface-variant);
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  margin: 0 0 10px;
+}
+
+.panel__title::after {
+  content: '';
+  flex: 1;
+  border-top: var(--border-thick) solid var(--outline);
+  opacity: 0.5;
+}
+
+.panel__title-zh {
+  font-family: var(--font-zh);
+  letter-spacing: 0.12em;
+}
+
+/* A heading row that also carries a control (the upgrade strip's search). */
+.panel__header {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  flex-wrap: wrap;
+}
+
+.panel__header .panel__title {
+  flex: 1 1 200px;
+}
+
+.panel__header-search {
+  flex: 0 1 260px;
+  margin-bottom: 10px;
+}
+
+.panel__header-search .search-field-wrap {
+  max-width: none;
+}
+
+/* Sits AFTER the ::after rule in the flex row, so the count lands at the far end of the plate. */
+.panel__title-count {
+  order: 3;
+  font-variant-numeric: tabular-nums;
+  letter-spacing: 0.1em;
+}
+
+/* --- shop rail: internally scrolling, so the cookie never scrolls away --- */
+.shop-rail {
+  display: flex;
+  flex-direction: column;
+  min-height: 0;
+  overflow: hidden;
+}
+
+.shop-rail__list {
+  flex: 1;
+  min-height: 0;
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+  overflow-y: auto;
+  padding-right: 4px;
+}
+
+/* --- the ONLY navigation on the cabinet: the secondary-surface dock. Deliberately smaller and
+       quieter than anything in the game loop. --- */
+.cabinet-dock {
+  display: flex;
+  gap: 8px;
+  flex-wrap: wrap;
+  flex-shrink: 0;
+  align-items: center;
+}
+
+.cabinet-dock__button {
+  font: inherit;
+  font-family: var(--font-display);
+  font-size: 11px;
+  font-weight: 900;
+  letter-spacing: 0.14em;
+  text-transform: uppercase;
+  min-height: 44px;
+  padding: 0 14px;
+  border-radius: var(--shape-sm);
+  cursor: pointer;
+  background: var(--surface-high);
+  color: var(--on-surface);
+  border: var(--border-thick) solid var(--outline);
+  box-shadow: var(--press-1);
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  transition: transform 80ms ease, box-shadow 80ms ease, background 80ms ease;
+}
+
+.cabinet-dock__label-zh {
   font-family: var(--font-zh);
   font-size: 12px;
   font-weight: 700;
+  letter-spacing: 0.06em;
   opacity: 0.9;
 }
 
-/* The tabpanel is the scroll container's parent; the active `.screen` fills it. */
+/* The game surface is the home button: wider, warmer, and always first in reading order. */
+.cabinet-dock__button--game {
+  padding: 0 18px;
+  font-size: 12px;
+  background: var(--primary-container);
+  color: var(--on-primary-container);
+}
+
+.cabinet-dock__button[aria-selected='true'] {
+  background: var(--primary-container);
+  color: var(--on-primary-container);
+  border-color: var(--primary);
+  box-shadow: var(--press-1), inset 0 0 0 2px var(--primary);
+}
+
+.cabinet-dock__button:active {
+  transform: translateY(var(--drop-1));
+  box-shadow: none;
+}
+
+.cabinet-dock__button:focus-visible {
+  outline: 4px solid var(--spark-ring);
+  outline-offset: 3px;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .cabinet-dock__button {
+    transition: none;
+  }
+
+  .cabinet-dock__button:active {
+    transform: none;
+    box-shadow: inset 0 3px 0 0 var(--bevel-lo);
+  }
+}
+
+/* The secondary tabpanel fills the cabinet body; the active `.screen` scrolls inside it. */
 .tab-panel {
   flex: 1;
   display: flex;
   flex-direction: column;
   min-width: 0;
+  min-height: 0;
   overflow: hidden;
+  border-radius: var(--shape-lg);
+  border: var(--border-fat) solid var(--outline);
+  background: linear-gradient(180deg, var(--surface-high), var(--surface-highest));
+  box-shadow: var(--press-2), inset 0 4px 0 0 var(--bevel-hi);
 }
 
 .tab-panel:focus-visible {
-  outline: 3px solid var(--primary);
-  outline-offset: -3px;
+  outline: 4px solid var(--spark-ring);
+  outline-offset: -4px;
 }
 
 /* Shell-level announcements (e.g. an application feature with no window to open yet). Sits
    above the milestone region so the two never overlap. */
 .shell-status {
   position: fixed;
-  bottom: 68px;
-  left: 224px;
+  bottom: 168px;
+  right: 24px;
   max-width: 340px;
   background: var(--secondary-container);
   color: var(--on-secondary-container);
@@ -410,21 +688,29 @@ body {
 .screen {
   flex: 1;
   overflow-y: auto;
-  padding: 20px 24px 32px;
+  padding: 18px 22px 28px;
   display: flex;
   flex-direction: column;
   gap: 16px;
   min-width: 0;
+  min-height: 0;
 }
 
-/* Every screen title is set in the display face, big and black-weight — the game shouting its
-   own name, per design/tokens-type.html. */
+/* Every secondary surface's title is a marquee plate: bevelled, letter-spaced, all-caps display
+   type (design-v2/tokens-type.html). */
 .screen h1 {
   font-family: var(--font-display);
   font-weight: 900;
-  font-size: 32px;
-  line-height: 1.05;
+  font-size: clamp(20px, 3vw, 30px);
+  line-height: 1.04;
+  letter-spacing: 0.045em;
+  text-transform: uppercase;
   margin: 0 0 4px;
+  padding: 12px 18px;
+  border: var(--border-fat) solid var(--outline);
+  border-radius: var(--shape-lg);
+  background: linear-gradient(180deg, var(--surface-high) 0%, var(--surface-highest) 100%);
+  box-shadow: var(--press-3), inset 0 4px 0 0 var(--bevel-hi), inset 0 -4px 0 0 var(--bevel-lo);
 }
 
 .screen h1 .screen-title-zh {
@@ -478,10 +764,12 @@ body {
 /* ---------------------------------------------------------------------------------------- *
  * Milestone status region — throttled, one message at a time, never the plain click counter.
  * ---------------------------------------------------------------------------------------- */
+/* Anchored bottom-RIGHT, clear of the secondary dock along the bottom-left of the cabinet, so a
+   celebration never covers the only navigation in the app. */
 .milestone-region {
   position: fixed;
-  bottom: 20px;
-  left: 224px;
+  bottom: 92px;
+  right: 24px;
   max-width: 340px;
   background: var(--tertiary-container);
   color: var(--on-tertiary-container);
@@ -499,44 +787,49 @@ body {
 }
 
 /* ---------------------------------------------------------------------------------------- *
- * Cookie screen — the primary click target (design/cookie-surface.html).
+ * Hero panel — the cookie, the biggest single thing on the surface
+ * (design-v2/game-layout.html, design-v2/cookie-surface.html). The headline cookie count is NOT
+ * repeated here: it lives in the pinned HUD above, so a number means one thing in one place.
  * ---------------------------------------------------------------------------------------- */
-.cookie-screen {
+.cookie-hero {
+  display: flex;
+  flex-direction: column;
   align-items: center;
+  justify-content: center;
   text-align: center;
-  gap: 20px;
-  padding-top: 32px;
-}
+  gap: 6px;
+  padding: 10px 16px;
+  flex-shrink: 0;
 
-/* The headline number of the entire game. Display face, black weight, tabular figures so the
-   digits do not jitter as they tick. */
-.cookie-counter {
-  font-family: var(--font-display);
-  font-size: clamp(3rem, 8vw, 4.5rem);
-  font-weight: 900;
-  line-height: 1;
-  font-variant-numeric: tabular-nums;
-  letter-spacing: -1px;
-  text-shadow: 0 4px 0 var(--primary-container);
+  /* The cookie is sized against the window, not fixed: on a short window it gives height back to
+     the upgrade strip rather than pushing it off the surface. Both must be visible at once. */
+  --cookie-size: clamp(110px, 17vh, 190px);
 }
 
 .cookie-cps {
   font-family: var(--font-display);
-  font-size: 18px;
+  font-size: 13px;
+  font-weight: 900;
+  letter-spacing: 0.14em;
+  text-transform: uppercase;
   font-variant-numeric: tabular-nums;
   color: var(--on-surface-variant);
-  background: var(--surface-high);
-  border: var(--border-thick) solid var(--outline);
-  box-shadow: 0 3px 0 0 var(--outline);
-  border-radius: var(--shape-full);
-  padding: 8px 20px;
+}
+
+.cookie-hero__hint {
+  font-size: 11px;
+  font-family: var(--font-display);
+  letter-spacing: 0.1em;
+  text-transform: uppercase;
+  color: var(--on-surface-variant);
+  margin: 0;
 }
 
 .cookie-target-wrap {
   position: relative;
-  width: 232px;
-  height: 232px;
-  margin: 20px 0 28px;
+  width: var(--cookie-size, 208px);
+  height: var(--cookie-size, 208px);
+  margin: 8px 0 14px;
 }
 
 /* The cookie sits in its own pool of oven light so it never floats on a plain panel. */
@@ -552,14 +845,16 @@ body {
 
 .cookie-btn {
   position: relative;
-  width: 232px;
-  height: 232px;
+  width: var(--cookie-size, 208px);
+  height: var(--cookie-size, 208px);
   border-radius: var(--shape-full);
-  border: none;
+  border: var(--border-fat) solid var(--primary-shadow);
   cursor: pointer;
-  background: radial-gradient(circle at 35% 28%, var(--primary-container), var(--primary) 68%);
-  /* Chunky pressable depth: a SOLID offset shadow in baked brown, never a blur. */
-  box-shadow: 0 12px 0 0 var(--primary-shadow), inset 0 -16px 24px rgba(0, 0, 0, 0.22);
+  background: radial-gradient(circle at 34% 26%, var(--primary-container) 0%, var(--primary) 62%, var(--primary-shadow) 100%);
+  /* Chunky pressable depth: SOLID offsets only, never a blur — the dough sits on a baked-brown
+     base which in turn sits in the cabinet frame (design-v2/cookie-surface.html). */
+  box-shadow: 0 var(--drop-4) 0 0 var(--primary-shadow), 0 var(--drop-4) 0 5px var(--cabinet-frame-dark),
+    inset 0 10px 0 -4px rgba(255, 255, 255, 0.38), inset 0 -14px 18px rgba(0, 0, 0, 0.3);
   display: flex;
   align-items: center;
   justify-content: center;
@@ -592,29 +887,32 @@ body {
 
 /* Rises off the counter on hover, and compresses flat into it on press. */
 .cookie-btn:hover {
-  transform: translateY(-4px) scale(1.03);
-  box-shadow: 0 16px 0 0 var(--primary-shadow), inset 0 -16px 24px rgba(0, 0, 0, 0.22);
+  transform: translateY(-3px);
+  box-shadow: 0 14px 0 0 var(--primary-shadow), 0 14px 0 5px var(--cabinet-frame-dark),
+    inset 0 10px 0 -4px rgba(255, 255, 255, 0.38), inset 0 -14px 18px rgba(0, 0, 0, 0.3);
 }
 
 .cookie-btn:active {
-  transform: translateY(12px) scale(0.97);
-  box-shadow: 0 0 0 0 var(--primary-shadow), inset 0 -6px 12px rgba(0, 0, 0, 0.26);
+  transform: translateY(var(--drop-4)) scale(0.965);
+  box-shadow: 0 0 0 5px var(--cabinet-frame-dark), inset 0 8px 14px rgba(0, 0, 0, 0.45);
 }
 
 .cookie-btn:focus-visible {
-  outline: 4px solid var(--tertiary);
+  outline: 4px solid var(--spark-ring);
   outline-offset: 6px;
 }
 
 .cookie-target-wrap.golden .cookie-btn {
-  background: radial-gradient(circle at 35% 28%, var(--tertiary-container), var(--tertiary) 68%);
-  box-shadow: 0 12px 0 0 var(--tertiary-shadow), inset 0 -16px 24px rgba(0, 0, 0, 0.22);
+  background: radial-gradient(circle at 34% 26%, var(--tertiary-container) 0%, var(--tertiary) 62%, var(--tertiary-shadow) 100%);
+  border-color: var(--tertiary-shadow);
+  box-shadow: 0 var(--drop-4) 0 0 var(--tertiary-shadow), 0 var(--drop-4) 0 5px var(--cabinet-frame-dark),
+    inset 0 10px 0 -4px rgba(255, 255, 255, 0.38), inset 0 -14px 18px rgba(0, 0, 0, 0.3);
 }
 
 /* A golden cookie is unmistakable without relying on colour alone: it grows a sparkle mark of
    its own now that the button's own emoji text is hidden. */
 .cookie-target-wrap.golden .cookie-btn::after {
-  content: 'º8';
+  content: '\2728';
   font-size: 76px;
   line-height: 1;
   position: relative;
@@ -706,9 +1004,17 @@ body {
 }
 
 @media (prefers-reduced-motion: reduce) {
+  .cookie-btn {
+    transition: none;
+  }
   .cookie-btn:hover,
   .cookie-btn:active {
     transform: none;
+  }
+  /* Reduced-motion equivalent for the press: instead of travelling, the cookie switches
+     instantly to a recessed inset state, so the press is still unmistakably felt. */
+  .cookie-btn:active {
+    box-shadow: 0 0 0 5px var(--cabinet-frame-dark), inset 0 8px 14px rgba(0, 0, 0, 0.45);
   }
   .click-popup {
     animation: click-popup-static 400ms both;
@@ -722,6 +1028,293 @@ body {
   }
   100% {
     opacity: 0;
+  }
+}
+
+/* ---------------------------------------------------------------------------------------- *
+ * Upgrade ticket strip (design-v2/game-layout.html, design-v2/upgrade-card.html).
+ *
+ * Upgrades are bought from a horizontally-scrolling strip of perforated tickets sitting directly
+ * under the cookie — same surface, within thumb reach of the click target, never a page.
+ * ---------------------------------------------------------------------------------------- */
+.upgrade-strip {
+  display: flex;
+  gap: 14px;
+  overflow-x: auto;
+  padding: 4px 10px 12px;
+}
+
+.mini-ticket {
+  flex: 0 0 auto;
+  width: 154px;
+  min-height: 100px;
+  position: relative;
+  border-radius: var(--shape-sm);
+  padding: 10px;
+  overflow: hidden;
+  background: linear-gradient(180deg, var(--surface-low), var(--surface-highest));
+  border: var(--border-chunky) solid var(--outline);
+  box-shadow: var(--press-1), inset 0 3px 0 0 var(--bevel-hi);
+  cursor: pointer;
+  text-align: left;
+  color: var(--on-surface);
+  font: inherit;
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+  transition: transform 80ms ease, box-shadow 80ms ease;
+}
+
+/* The two punched holes that make a ticket a ticket. Decorative only. */
+.mini-ticket::before,
+.mini-ticket::after {
+  content: '';
+  position: absolute;
+  top: 62px;
+  width: 14px;
+  height: 14px;
+  border-radius: var(--shape-full);
+  background: var(--surface-high);
+  border: var(--border-thin) solid var(--outline);
+}
+
+.mini-ticket::before {
+  left: -9px;
+}
+
+.mini-ticket::after {
+  right: -9px;
+}
+
+.mini-ticket__glyph {
+  font-size: 22px;
+  line-height: 1;
+}
+
+.mini-ticket__name {
+  font-family: var(--font-display);
+  font-size: 12px;
+  font-weight: 900;
+  line-height: 1.15;
+  /* Two lines, then clipped: a ticket is a fixed-size stub, and a long name must not push its
+     cost line out of the strip. The full name is always in the button's accessible name. */
+  display: -webkit-box;
+  -webkit-line-clamp: 2;
+  -webkit-box-orient: vertical;
+  overflow: hidden;
+}
+
+.mini-ticket__name-zh {
+  font-family: var(--font-zh);
+  font-size: 11px;
+  font-weight: 700;
+  color: var(--on-surface-variant);
+  line-height: 1.15;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+.mini-ticket__cost {
+  margin-top: auto;
+  font-family: var(--font-display);
+  font-size: 11px;
+  white-space: nowrap;
+  font-variant-numeric: tabular-nums;
+  letter-spacing: 0.06em;
+  color: var(--on-surface-variant);
+}
+
+.mini-ticket:active:not([disabled]) {
+  transform: translateY(var(--drop-1));
+  box-shadow: none;
+}
+
+.mini-ticket:focus-visible {
+  outline: 4px solid var(--spark-ring);
+  outline-offset: 3px;
+}
+
+/* Owned tickets are stamped in the golden tertiary family with a metallic edge; locked ones go
+   flat and quiet. Neither state relies on colour alone — the cost line says which it is. */
+.mini-ticket.owned {
+  border-color: var(--metal-lo);
+  background: var(--tertiary-container);
+  color: var(--on-tertiary-container);
+  cursor: default;
+}
+
+.mini-ticket.owned .mini-ticket__cost,
+.mini-ticket.owned .mini-ticket__name-zh {
+  color: var(--on-tertiary-container);
+}
+
+.mini-ticket.locked {
+  opacity: 0.62;
+  cursor: not-allowed;
+  box-shadow: inset 0 3px 0 0 var(--bevel-lo);
+}
+
+.mini-ticket[disabled]:not(.locked):not(.owned) {
+  opacity: 0.72;
+  cursor: not-allowed;
+}
+
+.mini-ticket__track {
+  height: 6px;
+  border-radius: var(--shape-full);
+  background: var(--track);
+  overflow: hidden;
+}
+
+.mini-ticket__fill {
+  height: 100%;
+  background: var(--primary);
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .mini-ticket {
+    transition: none;
+  }
+
+  /* Reduced-motion equivalent: the ticket does not travel, it inverts its bevel instead. */
+  .mini-ticket:active:not([disabled]) {
+    transform: none;
+    box-shadow: inset 0 3px 0 0 var(--bevel-lo);
+  }
+}
+
+/* ---------------------------------------------------------------------------------------- *
+ * Shop rail rows (design-v2/game-layout.html, design-v2/building-row.html).
+ *
+ * One recessed slot per generator, docked beside the cookie. The whole rail scrolls inside
+ * itself so buying never moves the cookie.
+ * ---------------------------------------------------------------------------------------- */
+.shop-row {
+  display: grid;
+  grid-template-columns: auto 34px minmax(0, 1fr) auto;
+  gap: 6px 10px;
+  align-items: center;
+  border-radius: var(--shape-sm);
+  padding: 10px 12px;
+  background: var(--panel-inset);
+  color: var(--on-surface);
+  border: var(--border-thick) solid var(--outline);
+  box-shadow: inset 0 4px 0 -1px var(--bevel-lo);
+}
+
+/* Already producing: the slot warms up and gains the spark ring, so the generators actually
+   earning for you are obvious at a glance. */
+.shop-row.owned {
+  background: var(--primary-container);
+  color: var(--on-primary-container);
+  border-color: var(--spark-ring);
+}
+
+.shop-row.locked {
+  opacity: 0.58;
+}
+
+.shop-row__icon {
+  font-size: 24px;
+  line-height: 1;
+  text-align: center;
+}
+
+.shop-row__names {
+  display: flex;
+  flex-direction: column;
+  min-width: 0;
+}
+
+.shop-row__name {
+  font-family: var(--font-display);
+  font-size: 14px;
+  font-weight: 900;
+  line-height: 1.15;
+}
+
+.shop-row__name-zh {
+  font-family: var(--font-zh);
+  font-size: 12px;
+  font-weight: 700;
+  color: inherit;
+  opacity: 0.85;
+  line-height: 1.15;
+}
+
+.shop-row__sub {
+  font-size: 11px;
+  color: inherit;
+  opacity: 0.85;
+  font-variant-numeric: tabular-nums;
+}
+
+.shop-row__owned {
+  font-family: var(--font-display);
+  font-size: 22px;
+  font-weight: 900;
+  font-variant-numeric: tabular-nums;
+  min-width: 2ch;
+  text-align: right;
+}
+
+.shop-row__controls {
+  grid-column: 1 / -1;
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  flex-wrap: wrap;
+}
+
+.shop-row__controls .buy-btn {
+  flex: 1;
+  min-width: 140px;
+}
+
+/* ---------------------------------------------------------------------------------------- *
+ * NARROW WIDTH (design-v2/game-layout.html).
+ *
+ * Below ~900px the rail cannot sit beside the cookie, so it becomes a bottom drawer anchored to
+ * the SAME surface — not another page. The HUD stays pinned, the cookie stays visible and
+ * clickable above the drawer, and dismissing the drawer is not navigation.
+ * ---------------------------------------------------------------------------------------- */
+@media (max-width: 900px) {
+  /* One column, and the rail becomes the last item in a flex column: it sits ON the bottom edge
+     of the same surface with the cookie still on screen above it. No route change, no modal. */
+  .stage {
+    display: flex;
+    flex-direction: column;
+  }
+
+  .stage__hero-column {
+    flex: 1;
+    overflow-y: auto;
+  }
+
+  .shop-rail {
+    flex: 0 0 auto;
+    max-height: 46%;
+    border-bottom-left-radius: 0;
+    border-bottom-right-radius: 0;
+    border-bottom: none;
+    box-shadow: 0 -8px 0 0 var(--cabinet-frame-dark);
+  }
+
+  /* The drag handle that says "this is a drawer on this surface", not a route. */
+  .shop-rail::before {
+    content: '';
+    display: block;
+    width: 72px;
+    height: 8px;
+    border-radius: var(--shape-full);
+    background: var(--outline);
+    margin: 0 auto 10px;
+    flex-shrink: 0;
+  }
+
+  .cookie-hero {
+    --cookie-size: clamp(110px, 20vh, 168px);
   }
 }
 

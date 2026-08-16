@@ -4,6 +4,7 @@ import { bnMulScalar } from '../../shared/game/big-number.js';
 import { formatBigNum } from '../../shared/game/format-number.js';
 import { isEffectActive } from '../../shared/game/golden-cookie.js';
 import { computeMultipliers } from '../../shared/game/upgrades.js';
+import { GoldenCookieIcon } from '../assets/icons.js';
 import { COOKIE_SCREEN_COPY } from '../game/copy.js';
 import { useFastSnapshot, useGameDispatch, useStructureSnapshot } from '../game/GameProvider.js';
 import { createHoldToClickController } from '../game/hold-to-click.js';
@@ -67,10 +68,16 @@ export function CookieHero() {
   return (
     <div className="panel cookie-hero">
       <div className={`cookie-target-wrap${goldenActive ? ' golden' : ''}${goldenActive ? ' golden-overlay-wrap' : ''}`}>
+        {/* Oven embers drifting up behind the cookie. Decorative, and still under reduced motion. */}
+        <span className="cookie-embers" aria-hidden="true">
+          <span className="cookie-embers__mote" />
+          <span className="cookie-embers__mote" />
+          <span className="cookie-embers__mote" />
+        </span>
         <button
           ref={buttonRef}
           type="button"
-          className="cookie-btn"
+          className="cookie-btn cookie-btn--art"
           aria-label={goldenActive ? `${COOKIE_SCREEN_COPY.goldenAvailable.en} · ${COOKIE_SCREEN_COPY.goldenAvailable.yue}` : `${COOKIE_SCREEN_COPY.clickTarget.en} · ${COOKIE_SCREEN_COPY.clickTarget.yue}`}
           onClick={performClick}
           onPointerDown={(event) => {
@@ -81,7 +88,10 @@ export function CookieHero() {
           onPointerLeave={() => controllerRef.current.stop()}
           onPointerCancel={() => controllerRef.current.stop()}
         >
-          {goldenActive ? '✨' : '🍪'}
+          {/* The ordinary cookie is already drawn by CSS (dough gradient plus chocolate chips),
+              so only the golden state needs art: the ray-burst cookie replaces the sparkle
+              character that used to be stuck on the dough. */}
+          {goldenActive ? <GoldenCookieIcon extraClass="cookie-btn__art" /> : null}
         </button>
         {popups.map((popup) => (
           <span key={popup.id} className={`click-popup${popup.golden ? ' golden' : ''}`} aria-hidden="true">

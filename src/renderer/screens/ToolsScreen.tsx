@@ -5,6 +5,7 @@ import { formatBigNum } from '../../shared/game/format-number.js';
 import { GENERATOR_DEFINITIONS } from '../../shared/game/generators.js';
 import { toolPrice } from '../../shared/game/tool-shop.js';
 import { TOOL_DEFINITIONS, type ToolDefinition, type ToolUnlockCondition } from '../../shared/game/tools.js';
+import { ToolIcon, ToolTierGem } from '../assets/icons.js';
 import { createSearchState, SearchWithRegexBuilder } from '../components/SearchWithRegexBuilder.js';
 import { LIST_COPY, TOOLS_SCREEN_COPY, type Bilingual } from '../game/copy.js';
 import { useFastSnapshot, useGameDispatch, useStructureSnapshot } from '../game/GameProvider.js';
@@ -72,10 +73,10 @@ export function toolTier(condition: ToolUnlockCondition): ToolTier {
   }
 }
 
-const TIER_META: Record<ToolTier, { chip: string; label: Bilingual; prereq: Bilingual }> = {
-  1: { chip: '🥉', label: TOOLS_SCREEN_COPY.tier1, prereq: TOOLS_SCREEN_COPY.tier1Prereq },
-  2: { chip: '💚', label: TOOLS_SCREEN_COPY.tier2, prereq: TOOLS_SCREEN_COPY.tier2Prereq },
-  3: { chip: '💜', label: TOOLS_SCREEN_COPY.tier3, prereq: TOOLS_SCREEN_COPY.tier3Prereq },
+const TIER_META: Record<ToolTier, { label: Bilingual; prereq: Bilingual }> = {
+  1: { label: TOOLS_SCREEN_COPY.tier1, prereq: TOOLS_SCREEN_COPY.tier1Prereq },
+  2: { label: TOOLS_SCREEN_COPY.tier2, prereq: TOOLS_SCREEN_COPY.tier2Prereq },
+  3: { label: TOOLS_SCREEN_COPY.tier3, prereq: TOOLS_SCREEN_COPY.tier3Prereq },
 };
 
 type NodeState = 'undiscovered' | 'locked' | 'ready' | 'unlocked';
@@ -107,6 +108,7 @@ function OpenItNowCallout({ def, onOpen }: { def: ToolDefinition; onOpen: OpenAp
 
 const ToolNode = memo(function ToolNode({
   vm,
+  tier,
   nodeState,
   priceText,
   affordable,
@@ -114,6 +116,7 @@ const ToolNode = memo(function ToolNode({
   onOpen,
 }: {
   vm: ToolRowViewModel;
+  tier: ToolTier;
   nodeState: NodeState;
   priceText: string;
   affordable: boolean;
@@ -134,7 +137,7 @@ const ToolNode = memo(function ToolNode({
   return (
     <li className={`item-card tool-node ${nodeState}`}>
       <span className="item-card__icon" aria-hidden="true">
-        {hidden ? '❔' : '🛠️'}
+        <ToolIcon id={def.id} tier={tier} hidden={hidden} />
       </span>
       <span className="item-card__name-en">{hidden ? TOOLS_SCREEN_COPY.undiscoveredName.en : def.nameEn}</span>
       <span className="item-card__name-zh">{hidden ? TOOLS_SCREEN_COPY.undiscoveredName.yue : def.nameYue}</span>
@@ -330,7 +333,10 @@ export function ToolsScreen({ onOpenApplicationFeature }: ToolsScreenProps = {})
               <h2 className="tools-tier__heading" id={`tools-tier-${tier}`}>
                 Tier {tier}
                 <span className="tools-tier__chip">
-                  {meta.chip} {meta.label.en} · {meta.label.yue}
+                  <span className="tools-tier__gem" aria-hidden="true">
+                    <ToolTierGem tier={tier} />
+                  </span>
+                  {meta.label.en} · {meta.label.yue}
                 </span>
               </h2>
               <p className="tools-tier__prereq">
@@ -350,6 +356,7 @@ export function ToolsScreen({ onOpenApplicationFeature }: ToolsScreenProps = {})
                     <ToolNode
                       key={vm.id}
                       vm={vm}
+                      tier={tier}
                       nodeState={nodeState}
                       priceText={formatBigNum(price, 'en')}
                       affordable={affordable}

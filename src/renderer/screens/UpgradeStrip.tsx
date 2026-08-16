@@ -10,6 +10,7 @@ import {
   type UnlockCondition,
 } from '../../shared/game/upgrades.js';
 import type { GameState } from '../../shared/game/types.js';
+import { UpgradeIcon, type UpgradeFamily } from '../assets/icons.js';
 import { createSearchState, SearchWithRegexBuilder } from '../components/SearchWithRegexBuilder.js';
 import { GAME_SURFACE_COPY, LIST_COPY, type Bilingual } from '../game/copy.js';
 import { useFastSnapshot, useGameDispatch, useStructureSnapshot } from '../game/GameProvider.js';
@@ -18,16 +19,17 @@ import { matchesSearch } from '../game/local-regex-search.js';
 /** One of exactly three card states, mirroring design/upgrade-card.html. */
 type CardState = 'locked' | 'buyable' | 'owned';
 
-/** A card's glyph comes from what the upgrade actually does, so the icon is never decorative
- *  noise — click upgrades get a finger, per-generator upgrades a bakery, global ones butter. */
-function iconFor(def: UpgradeDefinition): string {
+/** A ticket's illustration comes from what the upgrade actually does, so the art is never
+ *  decorative noise — click upgrades get the sparking finger, per-generator upgrades the geared
+ *  cookie works, global ones the whole oven. */
+function familyFor(def: UpgradeDefinition): UpgradeFamily {
   switch (def.effect.kind) {
     case 'clickMultiplier':
-      return '👆';
+      return 'click';
     case 'generatorMultiplier':
-      return '🏭';
+      return 'generator';
     case 'globalCpsMultiplier':
-      return '🧈';
+      return 'global';
   }
 }
 
@@ -141,7 +143,7 @@ const UpgradeTicket = memo(function UpgradeTicket({
       onClick={() => dispatch({ type: 'buyUpgrade', upgradeId: def.id })}
     >
       <span className="mini-ticket__glyph" aria-hidden="true">
-        {state === 'locked' ? '🔒' : iconFor(def)}
+        <UpgradeIcon family={state === 'locked' ? 'locked' : familyFor(def)} />
       </span>
       <span className="mini-ticket__name">{def.nameEn}</span>
       <span className="mini-ticket__name-zh">{def.nameYue}</span>
@@ -221,7 +223,7 @@ export function UpgradeStrip() {
           {LIST_COPY.noResults.en} · {LIST_COPY.noResults.yue}
         </p>
       ) : (
-        <div className="upgrade-strip">
+        <div className="upgrade-strip upgrade-strip--crumbs">
           {visible.map((card) => (
             <UpgradeTicket key={card.def.id} def={card.def} state={card.state} progress={card.progress} />
           ))}

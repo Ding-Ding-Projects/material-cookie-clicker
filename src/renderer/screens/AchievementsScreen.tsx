@@ -6,6 +6,7 @@ import {
   type AchievementCondition,
   type AchievementDefinition,
 } from '../../shared/game/achievements.js';
+import { AchievementMedal, type MedalFamily } from '../assets/icons.js';
 import { createSearchState, SearchWithRegexBuilder } from '../components/SearchWithRegexBuilder.js';
 import { LIST_COPY, type Bilingual } from '../game/copy.js';
 import { useGameStoreInstance, useStructureSnapshot } from '../game/GameProvider.js';
@@ -25,16 +26,17 @@ const ACHIEVEMENTS_COPY = {
   dismissToast: { en: 'Dismiss', yue: '關閉' },
 } as const satisfies Record<string, Bilingual>;
 
-function iconFor(condition: AchievementCondition): string {
+/** Which struck medal face an achievement wears, taken from what it actually rewards. */
+function medalFor(condition: AchievementCondition): MedalFamily {
   switch (condition.kind) {
     case 'lifetimeCookies':
-      return '🍪';
+      return 'cookies';
     case 'totalClicks':
-      return '👆';
+      return 'clicks';
     case 'generatorOwned':
-      return '🏭';
+      return 'buildings';
     case 'prestigeCount':
-      return '⭐';
+      return 'prestige';
   }
 }
 
@@ -52,7 +54,7 @@ const AchievementCell = memo(function AchievementCell({
   return (
     <div className="achievement-cell">
       <div className={`achievement-badge ${unlocked ? 'unlocked' : 'locked'}`} role="img" aria-label={label} tabIndex={0}>
-        {unlocked ? iconFor(def.condition) : '❔'}
+        <AchievementMedal family={unlocked ? medalFor(def.condition) : 'locked'} />
       </div>
       <div className="achievement-name">{unlocked ? def.nameEn : ACHIEVEMENTS_COPY.lockedName.en}</div>
       <div className="achievement-name-zh">{unlocked ? def.nameYue : ACHIEVEMENTS_COPY.lockedName.yue}</div>
@@ -62,7 +64,7 @@ const AchievementCell = memo(function AchievementCell({
 
 interface ToastState {
   readonly key: number;
-  readonly icon: string;
+  readonly medal: MedalFamily;
   readonly message: Bilingual;
 }
 
@@ -94,7 +96,7 @@ export function AchievementsScreen() {
         if (event.kind !== 'achievement') continue;
         setToast({
           key: ++toastKeySeq,
-          icon: iconFor(getAchievementDefinition(event.id).condition),
+          medal: medalFor(getAchievementDefinition(event.id).condition),
           message: describeMilestone(event),
         });
       }
@@ -157,7 +159,9 @@ export function AchievementsScreen() {
           onFocusCapture={() => setToastPaused(true)}
           onBlurCapture={() => setToastPaused(false)}
         >
-          <div className="achievement-badge unlocked achievement-toast__badge">{toast.icon}</div>
+          <div className="achievement-badge unlocked achievement-toast__badge">
+            <AchievementMedal family={toast.medal} />
+          </div>
           <div className="achievement-toast__text">
             <strong>
               {ACHIEVEMENTS_COPY.unlockedToastTitle.en} · {ACHIEVEMENTS_COPY.unlockedToastTitle.yue}

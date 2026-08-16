@@ -27,9 +27,14 @@
     <p class="lede">English and Hong Kong Cantonese side by side, with two independent 1–5 humour sliders — one per language.</p>
     <div class="inset" style="margin-bottom:18px">
   <span class="label">Current state</span>
-  <p style="margin:0"><span class="tag">Game data: bilingual names and jokes are built into every definition; the language selector and the sliders are specified, not built</span></p>
-  <p style="margin:8px 0 0"><span class="tag tag--roadmap">Player-facing screen: roadmap, not built</span></p>
+  <p style="margin:0"><span class="tag">Partly shipped</span> every shipped surface is bilingual; the language selector and the two funny-level sliders are specified and not yet on screen.</p>
 </div>
+    <h2>From the running application</h2>
+    <figure class="capture">
+  <img src="../assets/captures/surface-game.png" alt="The Material Cookie Clicker game window. Three HUD readouts across the top read COOKIES 4.06, PER SECOND 0 and PER CLICK 1.02, each labelled in English and Cantonese. Below on the left is the domed cookie button with "0 / sec" and "hold to click repeatedly" beneath it, and under that the UPGRADES strip reading 0 / 75 with ticket cards for Reinforced Finger, Sturdier Ovens and Double Click, Double Trouble, the last two padlocked. On the right is the docked SHOP rail with a generator search field and rows for Cursor and Grandma, each with an x1/x10/x100/Max stepper and a Buy button. A yellow achievement toast reading "Achievement unlocked: 1 Lifetime Cookies" sits over the lower right, partly covering the Grandma row. Five tabs run along the bottom: Game, Achievements, Tools, Statistics, Prestige." width="1557" height="1093" loading="lazy" />
+  <figcaption><strong>The single game surface.</strong> The core loop on one screen: clicking, the shop rail and the upgrade strip with no navigation between them. Captured from the built application running on an off-screen desktop, photographed with the Win32 PrintWindow API. Light theme.</figcaption>
+</figure>
+    <p><a href="../index.html#captures">See all five captures in the capture matrix</a>.</p>
     
 <h2>What it does</h2>
 <p>Material Cookie Clicker is bilingual in English and Hong Kong Cantonese, and the Cantonese is not a translation pass bolted on afterwards. Every generator, upgrade, achievement and tool definition carries both names as first-class data, and the tool jokes are written twice rather than translated once &mdash; a Bank earns its loan-shark nickname, a Temple earns Wong Tai Sin's &ldquo;everything granted, nothing free&rdquo;.</p>
@@ -44,8 +49,8 @@
 <h2>How it is configured</h2>
 <p>Once the settings surface exists, the language mode and both humour levels are ordinary preferences stored locally with everything else. There is no telemetry, no language detection call, and no network request of any kind involved &mdash; the application works with the network unplugged, and so does this site.</p>
 
-<h2>Roadmap, not shipped</h2>
-<p>The selector and the sliders are a specification and a preferences module, not a screen you can open. What ships today is the bilingual data underneath them.</p>
+<h2>In the shipped build</h2>
+<p>Every shipped surface is bilingual: each HUD readout, tab, generator row, upgrade ticket, badge, stat tile and callout carries its English and Cantonese text together, as the captures show. The language-mode selector and the two funny-level sliders are the part that is still specified rather than on screen &mdash; there is no settings surface in this release, so today the application is always in bilingual mode.</p>
     <nav class="related plate" aria-labelledby="related-heading">
       <h2 id="related-heading">Related articles</h2>
       <ul>
@@ -60,7 +65,7 @@
 </main>
 <footer class="site-foot">
   <div class="wrap">
-    <p>Material Cookie Clicker is free, unsigned by permanent policy, and nobody ever pays anything to use it. This site is fully self-contained: no CDN, no remote font, no remote image, no analytics, no network request of any kind. Everything drawn here is drawn in CSS.</p>
+    <p>Material Cookie Clicker is free, unsigned by permanent policy, and nobody ever pays anything to use it. This site is fully self-contained: no CDN, no remote font, no remote image, no analytics, no network request of any kind. Every graphic is either drawn in CSS or a screenshot of the application stored in this repository.</p>
     <p><a href="https://github.com/Ding-Ding-Projects/material-cookie-clicker">Source code on GitHub</a> &middot; <a href="../features/index.html">All feature articles</a></p>
   </div>
 </footer>

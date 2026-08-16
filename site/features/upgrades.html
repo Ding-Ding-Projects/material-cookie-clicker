@@ -27,9 +27,14 @@
     <p class="lede">Seventy-five upgrades: five global ones plus five stacking tiers for each of the fourteen generators.</p>
     <div class="inset" style="margin-bottom:18px">
   <span class="label">Current state</span>
-  <p style="margin:0"><span class="tag">Rules engine: built (<code>src/shared/game/upgrades.ts</code>, 75 definitions)</span></p>
-  <p style="margin:8px 0 0"><span class="tag tag--roadmap">Player-facing screen: roadmap, not built</span></p>
+  <p style="margin:0"><span class="tag">Shipped</span> the upgrade ticket strip is in this release; 75 definitions in <code>src/shared/game/upgrades.ts</code>.</p>
 </div>
+    <h2>From the running application</h2>
+    <figure class="capture">
+  <img src="../assets/captures/surface-game.png" alt="The Material Cookie Clicker game window. Three HUD readouts across the top read COOKIES 4.06, PER SECOND 0 and PER CLICK 1.02, each labelled in English and Cantonese. Below on the left is the domed cookie button with "0 / sec" and "hold to click repeatedly" beneath it, and under that the UPGRADES strip reading 0 / 75 with ticket cards for Reinforced Finger, Sturdier Ovens and Double Click, Double Trouble, the last two padlocked. On the right is the docked SHOP rail with a generator search field and rows for Cursor and Grandma, each with an x1/x10/x100/Max stepper and a Buy button. A yellow achievement toast reading "Achievement unlocked: 1 Lifetime Cookies" sits over the lower right, partly covering the Grandma row. Five tabs run along the bottom: Game, Achievements, Tools, Statistics, Prestige." width="1557" height="1093" loading="lazy" />
+  <figcaption><strong>The single game surface.</strong> The core loop on one screen: clicking, the shop rail and the upgrade strip with no navigation between them. Captured from the built application running on an off-screen desktop, photographed with the Win32 PrintWindow API. Light theme.</figcaption>
+</figure>
+    <p><a href="../index.html#captures">See all five captures in the capture matrix</a>.</p>
     
 <h2>What it does</h2>
 <p>An upgrade is a one-time purchase that permanently multiplies something. There are <strong>75</strong> of them, and that number is not a target &mdash; it is what the definition list actually contains:</p>
@@ -43,8 +48,8 @@
 <p>The thresholds and the per-tier multiplier are named constants at the top of the file, and the seventy per-generator upgrades are generated from them rather than typed out, so a change to the ladder cannot leave a stale upgrade behind. Prices for the generated tiers derive from the generator's own base cost.</p>
 <p>Presentation is fixed by <code>design/upgrade-card.html</code>: upgrades are ticket-shaped purchases with notches punched out of both edges, a dashed perforation and a price stub, in locked, unlocked-buyable and owned states, with a metallic treatment once owned and a hover tilt that has a still equivalent under reduced motion.</p>
 
-<h2>Roadmap, not shipped</h2>
-<p>There is no upgrade strip on screen. The definitions, their effects, and the multiplier computation that combines them with tool and prestige bonuses are what exists today.</p>
+<h2>In the shipped build</h2>
+<p>The upgrade ticket strip sits on the same screen as the cookie and the shop, with its own search field and a live &ldquo;0 / 75&rdquo; counter, showing buyable tickets alongside padlocked ones. No dark-theme capture of it exists yet.</p>
     <nav class="related plate" aria-labelledby="related-heading">
       <h2 id="related-heading">Related articles</h2>
       <ul>
@@ -59,7 +64,7 @@
 </main>
 <footer class="site-foot">
   <div class="wrap">
-    <p>Material Cookie Clicker is free, unsigned by permanent policy, and nobody ever pays anything to use it. This site is fully self-contained: no CDN, no remote font, no remote image, no analytics, no network request of any kind. Everything drawn here is drawn in CSS.</p>
+    <p>Material Cookie Clicker is free, unsigned by permanent policy, and nobody ever pays anything to use it. This site is fully self-contained: no CDN, no remote font, no remote image, no analytics, no network request of any kind. Every graphic is either drawn in CSS or a screenshot of the application stored in this repository.</p>
     <p><a href="https://github.com/Ding-Ding-Projects/material-cookie-clicker">Source code on GitHub</a> &middot; <a href="../features/index.html">All feature articles</a></p>
   </div>
 </footer>

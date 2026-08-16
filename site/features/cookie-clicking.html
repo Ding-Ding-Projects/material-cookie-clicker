@@ -27,9 +27,14 @@
     <p class="lede">The primary click target, click multipliers, the cookies-per-second accumulator, and the offline-progress rules that make a closed window honest.</p>
     <div class="inset" style="margin-bottom:18px">
   <span class="label">Current state</span>
-  <p style="margin:0"><span class="tag">Rules engine: built and unit-tested (<code>src/shared/game/reducer.ts</code>, <code>cps.ts</code>, <code>offline-progress.ts</code>)</span></p>
-  <p style="margin:8px 0 0"><span class="tag tag--roadmap">Player-facing screen: roadmap, not built</span></p>
+  <p style="margin:0"><span class="tag">Shipped</span> the game surface is in this release; rules in <code>src/shared/game/reducer.ts</code>, <code>cps.ts</code>, <code>offline-progress.ts</code>.</p>
 </div>
+    <h2>From the running application</h2>
+    <figure class="capture">
+  <img src="../assets/captures/surface-game.png" alt="The Material Cookie Clicker game window. Three HUD readouts across the top read COOKIES 4.06, PER SECOND 0 and PER CLICK 1.02, each labelled in English and Cantonese. Below on the left is the domed cookie button with "0 / sec" and "hold to click repeatedly" beneath it, and under that the UPGRADES strip reading 0 / 75 with ticket cards for Reinforced Finger, Sturdier Ovens and Double Click, Double Trouble, the last two padlocked. On the right is the docked SHOP rail with a generator search field and rows for Cursor and Grandma, each with an x1/x10/x100/Max stepper and a Buy button. A yellow achievement toast reading "Achievement unlocked: 1 Lifetime Cookies" sits over the lower right, partly covering the Grandma row. Five tabs run along the bottom: Game, Achievements, Tools, Statistics, Prestige." width="1557" height="1093" loading="lazy" />
+  <figcaption><strong>The single game surface.</strong> The core loop on one screen: clicking, the shop rail and the upgrade strip with no navigation between them. Captured from the built application running on an off-screen desktop, photographed with the Win32 PrintWindow API. Light theme.</figcaption>
+</figure>
+    <p><a href="../index.html#captures">See all five captures in the capture matrix</a>.</p>
     
 <h2>What it does</h2>
 <p>Clicking the cookie adds a base click value of <strong>1</strong>, multiplied by every active click multiplier from upgrades, tools and prestige, to your cookie total and to your lifetime total. Each click also increments a total-click counter, which is itself an unlock condition for several achievements and tools.</p>
@@ -48,8 +53,8 @@
 <p>The offline cap and the offline CPS fraction are options passed in by the caller, not constants baked into the loop. A separate wrapper widens those options with any active offline bonuses from the Tools tech tree before computing, so the core function keeps no hidden dependency on tool state.</p>
 <p>The <code>design/cookie-surface.html</code> spec fixes the presentation the screen must honour once it exists: rest, hover, pressed, focus-visible, reduced-motion and disabled states on a 168px arcade-button cookie, a floating &ldquo;+N&rdquo; popup that respects reduced motion, and a disabled state that carries a reason a screen reader can announce rather than a silently dead button.</p>
 
-<h2>Roadmap, not shipped</h2>
-<p>There is no click surface in the application yet: no cookie button, no live counter, no &ldquo;+N&rdquo; popup. The rules those things will drive are what exists today.</p>
+<h2>In the shipped build</h2>
+<p>The cookie is on screen and clickable, with a hold-to-click-repeatedly mode, and the three HUD readouts above it (cookies, per second, per click) update live. What has not been photographed is the dark theme, and the narrow-width layout was checked by forcing its breakpoint rather than by really resizing the window.</p>
     <nav class="related plate" aria-labelledby="related-heading">
       <h2 id="related-heading">Related articles</h2>
       <ul>
@@ -64,7 +69,7 @@
 </main>
 <footer class="site-foot">
   <div class="wrap">
-    <p>Material Cookie Clicker is free, unsigned by permanent policy, and nobody ever pays anything to use it. This site is fully self-contained: no CDN, no remote font, no remote image, no analytics, no network request of any kind. Everything drawn here is drawn in CSS.</p>
+    <p>Material Cookie Clicker is free, unsigned by permanent policy, and nobody ever pays anything to use it. This site is fully self-contained: no CDN, no remote font, no remote image, no analytics, no network request of any kind. Every graphic is either drawn in CSS or a screenshot of the application stored in this repository.</p>
     <p><a href="https://github.com/Ding-Ding-Projects/material-cookie-clicker">Source code on GitHub</a> &middot; <a href="../features/index.html">All feature articles</a></p>
   </div>
 </footer>

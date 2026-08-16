@@ -587,6 +587,40 @@ pre code { border: none; background: none; padding: 0; }
 ul.plain { list-style: none; padding: 0; }
 ul.plain li { margin-bottom: 10px; }
 
+/* --- captures of the running application ---------------------------------- */
+.captures { display: grid; gap: 20px; }
+figure.capture {
+  margin: 0 0 20px;
+  border-radius: var(--shape-lg);
+  border: var(--border-fat) solid var(--md-outline);
+  background: linear-gradient(180deg, var(--md-surface-container-high), var(--md-surface-container-highest));
+  box-shadow: var(--press-2), inset 0 4px 0 0 var(--bevel-hi);
+  padding: 14px;
+}
+figure.capture img {
+  display: block;
+  width: 100%;
+  height: auto;
+  border-radius: var(--shape-sm);
+  border: var(--border-thick) solid var(--cabinet-frame-dark);
+  /* The captures are light-theme screenshots; they keep their own colours in
+     both schemes rather than being filtered into a fake dark version. */
+  background: var(--panel-inset);
+}
+figure.capture figcaption {
+  margin-top: 12px;
+  font-size: 14px;
+  line-height: 1.55;
+  color: var(--md-on-surface-variant);
+  max-width: 74ch;
+}
+figure.capture figcaption strong {
+  font-family: var(--font-display);
+  letter-spacing: 0.06em;
+  text-transform: uppercase;
+  color: var(--md-on-surface);
+}
+
 /* --- search --------------------------------------------------------------- */
 .search-field {
   display: block;

@@ -27,9 +27,13 @@
     <p class="lede">A seeded, replayable random-event schedule: frenzy, click frenzy and windfall.</p>
     <div class="inset" style="margin-bottom:18px">
   <span class="label">Current state</span>
-  <p style="margin:0"><span class="tag">Rules engine: built (<code>src/shared/game/golden-cookie.ts</code>)</span></p>
-  <p style="margin:8px 0 0"><span class="tag tag--roadmap">Player-facing screen: roadmap, not built</span></p>
+  <p style="margin:0"><span class="tag tag--roadmap">Shipped engine, uncaptured surface</span> the scheduler ships with the game surface (<code>src/shared/game/golden-cookie.ts</code>), but no spawned golden cookie has been photographed.</p>
 </div>
+    <h2>From the running application</h2>
+    <div class="note note--roadmap">
+      <strong class="note-title">No capture of this one</strong>
+      <p>Nothing on this page is backed by a photograph of the running application. See the <a href="../index.html#captures">capture matrix</a> for the five surfaces that are.</p>
+    </div>
     
 <h2>What it does</h2>
 <p>Every so often a golden cookie spawns as a temporary overlay on the main cookie surface. Click it before its window closes and you get one of three effects:</p>
@@ -52,8 +56,8 @@
 <h2>How it is configured</h2>
 <p>Minimum and maximum delay, the clickable window, both multipliers, both durations and the windfall payout are all fields of one configuration object with a documented default set, not constants buried in the scheduler. The golden treatment uses the tertiary colour role exclusively, so the accent keeps meaning something and is never reused for ordinary chrome.</p>
 
-<h2>Roadmap, not shipped</h2>
-<p>Nothing spawns on screen, because there is no screen. The scheduler, the effect selection and the effect state are what exists today.</p>
+<h2>In the shipped build</h2>
+<p>The scheduler ships inside the running game, but with a five-to-fifteen-minute spawn window nobody has photographed a spawned golden cookie yet, so the overlay is the one gameplay surface on this site with no capture behind it. Treat the visual description above as the specification it is.</p>
     <nav class="related plate" aria-labelledby="related-heading">
       <h2 id="related-heading">Related articles</h2>
       <ul>
@@ -68,7 +72,7 @@
 </main>
 <footer class="site-foot">
   <div class="wrap">
-    <p>Material Cookie Clicker is free, unsigned by permanent policy, and nobody ever pays anything to use it. This site is fully self-contained: no CDN, no remote font, no remote image, no analytics, no network request of any kind. Everything drawn here is drawn in CSS.</p>
+    <p>Material Cookie Clicker is free, unsigned by permanent policy, and nobody ever pays anything to use it. This site is fully self-contained: no CDN, no remote font, no remote image, no analytics, no network request of any kind. Every graphic is either drawn in CSS or a screenshot of the application stored in this repository.</p>
     <p><a href="https://github.com/Ding-Ding-Projects/material-cookie-clicker">Source code on GitHub</a> &middot; <a href="../features/index.html">All feature articles</a></p>
   </div>
 </footer>

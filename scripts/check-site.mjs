@@ -72,8 +72,12 @@ for (const page of pages) {
 
 /* ------------------------------------------------- external addresses & fetches */
 
+/** Text files get scanned; images are binary and are checked structurally instead. */
+const TEXT_EXTENSIONS = ['.html', '.css', '.js', '.mjs', '.md', '.json', '.svg', '.txt'];
+const isText = (f) => TEXT_EXTENSIONS.some((ext) => f.endsWith(ext));
+
 let externalCount = 0;
-for (const file of files) {
+for (const file of files.filter(isText)) {
   const text = readFileSync(file, 'utf8');
   for (const match of text.matchAll(/https?:\/\/[^\s"'`<>)]+/g)) {
     const url = match[0].replace(/[.,]$/, '');
@@ -139,6 +143,16 @@ for (const page of pages) {
   if (!/<main /.test(html)) problems.push(`${name}: no <main> landmark`);
   if (!/<h1/.test(html)) problems.push(`${name}: no <h1>`);
   if (!/skip-link/.test(html)) problems.push(`${name}: no skip link`);
+  // Local images only, each with real alt text and intrinsic dimensions.
+  for (const tag of html.match(/<img\b[^>]*>/g) || []) {
+    const alt = tag.match(/\salt="([^"]*)"/);
+    if (!alt) problems.push(`${name}: an <img> has no alt attribute`);
+    else if (alt[1].trim().length < 20) problems.push(`${name}: an <img> alt is too short to describe the capture: "${alt[1]}"`);
+    if (!/\swidth="\d+"/.test(tag) || !/\sheight="\d+"/.test(tag)) {
+      problems.push(`${name}: an <img> is missing width/height (it will shift the layout while loading)`);
+    }
+    if (/src="https?:/.test(tag)) problems.push(`${name}: an <img> loads a remote source`);
+  }
   const zh = (html.match(/lang="zh-HK"/g) || []).length;
   if (zh > 0) notes.push(`${name}: ${zh} Cantonese section(s) marked lang="zh-HK"`);
   // Any Han character outside a lang="zh-HK" element would be unmarked Cantonese.
@@ -152,7 +166,7 @@ for (const page of pages) {
 /* ------------------------------------------------------------------- reporting */
 
 console.log(`Pages checked:      ${pages.length}`);
-console.log(`Files checked:      ${files.length}`);
+console.log(`Files checked:      ${files.length} (${files.filter(isText).length} text, ${files.length - files.filter(isText).length} image)`);
 console.log(`Internal links:     ${linkCount}`);
 console.log(`External addresses: ${externalCount} (all must be the GitHub repo or release URL)`);
 for (const note of notes) console.log(`note: ${note}`);

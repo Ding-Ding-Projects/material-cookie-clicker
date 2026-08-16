@@ -27,9 +27,14 @@
     <p class="lede">A cube-root ascension curve, +1% production per point, behind a two-key destructive-action gate.</p>
     <div class="inset" style="margin-bottom:18px">
   <span class="label">Current state</span>
-  <p style="margin:0"><span class="tag">Rules engine: built and unit-tested (<code>src/shared/game/prestige.ts</code>)</span></p>
-  <p style="margin:8px 0 0"><span class="tag tag--roadmap">Player-facing screen: roadmap, not built</span></p>
+  <p style="margin:0"><span class="tag">Shipped</span> the Prestige tab is in this release; curve and reset in <code>src/shared/game/prestige.ts</code>.</p>
 </div>
+    <h2>From the running application</h2>
+    <figure class="capture">
+  <img src="../assets/captures/surface-prestige.png" alt="The Prestige tab. Four stat tiles read Ascension points 0, Production multiplier x1.00, Prestige runs 0, and Lifetime cookies this run 4.06. Below them an "Ascension projection" panel says, in English and Cantonese, that you are not eligible yet and must reach 1 trillion lifetime cookies, and that each ascension point is a permanent +1% to total production so ascending now would take you to x1.00." width="1557" height="1093" loading="lazy" />
+  <figcaption><strong>Prestige.</strong> The ascension projection before the trillion-cookie threshold is met. The two-key confirmation gate sits further down this surface. Captured from the built application running on an off-screen desktop, photographed with the Win32 PrintWindow API. Light theme.</figcaption>
+</figure>
+    <p><a href="../index.html#captures">See all five captures in the capture matrix</a>.</p>
     
 <h2>What it does</h2>
 <p>Ascending resets your cookies, your lifetime total and every owned generator, and converts your progress into permanent ascension points. Each point adds <strong>+1%</strong> to total production, and that formula lives in exactly one place, imported by the multiplier computation rather than restated.</p>
@@ -40,8 +45,8 @@
 <p>Because ascending is irreversible, it sits behind this project's destructive-action super-confirmation contract rather than a plain confirm dialog. <code>design/prestige-gate.html</code> specifies two independently operated key toggles, a confirmation slider that stays disabled until both keys are on, an animated but non-blocking progress fill, a distinct completion state, and an always-available emergency exit. It ships two variants: an ordinary prestige, and a full wipe rendered in the error role rather than the primary one.</p>
 <p>The gate's own behaviour is deliberately not configurable. Softening a destructive-action confirmation defeats the point of having one. It is also not a security boundary &mdash; it is a safeguard against an accidental irreversible action, which is a different thing and should not be merged with this project's toy-lock language elsewhere.</p>
 
-<h2>Roadmap, not shipped</h2>
-<p>There is no ascend button and no gate in the application. The ascension curve, the reset semantics and the multiplier are what exists today.</p>
+<h2>In the shipped build</h2>
+<p>The Prestige tab is in this release, showing ascension points, the production multiplier, prestige runs and the projection panel, which says plainly when you are not eligible yet. The two-key confirmation gate lives further down the same surface and is below the fold in the capture, so it ships but has not been photographed in its keyed, sliding or completed states.</p>
     <nav class="related plate" aria-labelledby="related-heading">
       <h2 id="related-heading">Related articles</h2>
       <ul>
@@ -56,7 +61,7 @@
 </main>
 <footer class="site-foot">
   <div class="wrap">
-    <p>Material Cookie Clicker is free, unsigned by permanent policy, and nobody ever pays anything to use it. This site is fully self-contained: no CDN, no remote font, no remote image, no analytics, no network request of any kind. Everything drawn here is drawn in CSS.</p>
+    <p>Material Cookie Clicker is free, unsigned by permanent policy, and nobody ever pays anything to use it. This site is fully self-contained: no CDN, no remote font, no remote image, no analytics, no network request of any kind. Every graphic is either drawn in CSS or a screenshot of the application stored in this repository.</p>
     <p><a href="https://github.com/Ding-Ding-Projects/material-cookie-clicker">Source code on GitHub</a> &middot; <a href="../features/index.html">All feature articles</a></p>
   </div>
 </footer>

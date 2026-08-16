@@ -46,9 +46,10 @@
   </div>
 
   <h2>Where the project actually is</h2>
-  <div class="note note--warn">
-  <strong class="note-title">Read this before you download</strong>
-  <p>The game rules engine is real, typed and unit-tested today. <strong>The playable screens are not built yet.</strong> The installer you can download right now opens an Electron window whose body still reads &ldquo;The cookie-clicker game surface mounts here&rdquo;. Everything on this site that describes a screen is marked as roadmap, because it is.</p>
+  <div class="note">
+  <strong class="note-title">Where the project actually is</strong>
+  <p>The game is playable. This release ships the single game surface &mdash; HUD readouts, the cookie hero, the docked shop rail and the upgrade ticket strip, all on one screen &mdash; plus the Achievements, Tools, Statistics and Prestige tabs. All 109 tests pass, the application builds, and every one of those five surfaces was photographed from the real running build. You can see the photographs <a href="index.html#captures">in the capture matrix</a>.</p>
+  <p>Three things are still honestly unverified, and they stay listed here until someone has actually seen them: <strong>no capture exists of the dark theme</strong> in the application; the <strong>narrow-width shop drawer</strong> was verified by forcing its breakpoint rather than by really resizing the window; and an <strong>unlock toast can briefly overlay shop rows</strong> &mdash; you can see it happening in the game-surface capture.</p>
 </div>
   <ul class="stats">
     <li class="stat"><span class="v">14</span><span class="k">Generator tiers</span></li>
@@ -56,7 +57,36 @@
     <li class="stat"><span class="v">100</span><span class="k">Achievements</span></li>
     <li class="stat"><span class="v">20</span><span class="k">Tools in the tree</span></li>
   </ul>
-  <p>Those four numbers are counted from the definition lists in the source tree, not from a wish list. What they describe is the rules engine: pure TypeScript, unit-tested, with one mutation seam. The screens that would let you touch any of it are still to come.</p>
+  <p>Those four numbers are counted from the definition lists in the source tree, not from a wish list, and all four are now on screen in the running application: the shop rail lists the generators, the ticket strip counts the upgrades, the Achievements tab counts the badges and the Tools tab counts the tools.</p>
+
+  <h2 id="captures">Capture matrix</h2>
+  <p>Five surfaces, five photographs of the real thing. Every image below was <strong>captured from the built application</strong> &mdash; not a mock-up, not a design spec &mdash; running on an off-screen desktop, photographed with the Win32 <code>PrintWindow</code> API, in the <strong>light theme</strong>. The dark theme has not been captured anywhere, so this site makes no claim about how the application looks in it.</p>
+  <div class="captures">
+    <figure class="capture">
+  <img src="assets/captures/surface-game.png" alt="The Material Cookie Clicker game window. Three HUD readouts across the top read COOKIES 4.06, PER SECOND 0 and PER CLICK 1.02, each labelled in English and Cantonese. Below on the left is the domed cookie button with "0 / sec" and "hold to click repeatedly" beneath it, and under that the UPGRADES strip reading 0 / 75 with ticket cards for Reinforced Finger, Sturdier Ovens and Double Click, Double Trouble, the last two padlocked. On the right is the docked SHOP rail with a generator search field and rows for Cursor and Grandma, each with an x1/x10/x100/Max stepper and a Buy button. A yellow achievement toast reading "Achievement unlocked: 1 Lifetime Cookies" sits over the lower right, partly covering the Grandma row. Five tabs run along the bottom: Game, Achievements, Tools, Statistics, Prestige." width="1557" height="1093" loading="lazy" />
+  <figcaption><strong>The single game surface.</strong> The core loop on one screen: clicking, the shop rail and the upgrade strip with no navigation between them. Captured from the built application running on an off-screen desktop, photographed with the Win32 PrintWindow API. Light theme.</figcaption>
+</figure>
+    <figure class="capture">
+  <img src="assets/captures/surface-achievements.png" alt="The Achievements tab. A marquee heading reads ACHIEVEMENTS with its Cantonese equivalent, above the line "2 / 100 unlocked" and a search field. Below is a grid of round badges: the first, "First Bite", is unlocked and drawn as a glowing gold-rimmed medal with a cookie on it; every other badge in view is a grey locked silhouette labelled "???" and "not unlocked" in Cantonese." width="1557" height="1093" loading="lazy" />
+  <figcaption><strong>Achievements.</strong> Locked silhouettes and one struck medal, out of the hundred defined achievements. Captured from the built application running on an off-screen desktop, photographed with the Win32 PrintWindow API. Light theme.</figcaption>
+</figure>
+    <figure class="capture">
+  <img src="assets/captures/surface-tools.png" alt="The Tools tech tree tab. A callout at the top states, in English and Cantonese, that unlocking a tool here only turns on its game bonus and its tech-tree display, and that the real application feature has always been available. Below, a progress panel reads "1 / 20 tools unlocked" with a progress bar and a "Tool progression: on" toggle. A second callout repeats that the toggle only changes the tech-tree display and the gameplay bonuses, never which real application features are reachable." width="1557" height="1093" loading="lazy" />
+  <figcaption><strong>Tools tech tree.</strong> The no-gating contract, stated on the surface itself rather than only in the code. Captured from the built application running on an off-screen desktop, photographed with the Win32 PrintWindow API. Light theme.</figcaption>
+</figure>
+    <figure class="capture">
+  <img src="assets/captures/surface-statistics.png" alt="The Statistics tab. Bilingual stat tiles, each a raised plate with a large tabular number, read: Total cookies baked 4.06, Lifetime cookies 4.06, Cookies per second 0, Click power 1.02 with a "no change this session" trend note, Total clicks 4, Ascension points 0, Prestige runs 0, and Achievements unlocked 2 / 100. Two further tiles, Tools unlocked and Clock anomalies caught, are partly scrolled out of view at the bottom." width="1557" height="1093" loading="lazy" />
+  <figcaption><strong>Statistics.</strong> Every counter the engine keeps, including the clock-anomaly count. Captured from the built application running on an off-screen desktop, photographed with the Win32 PrintWindow API. Light theme.</figcaption>
+</figure>
+    <figure class="capture">
+  <img src="assets/captures/surface-prestige.png" alt="The Prestige tab. Four stat tiles read Ascension points 0, Production multiplier x1.00, Prestige runs 0, and Lifetime cookies this run 4.06. Below them an "Ascension projection" panel says, in English and Cantonese, that you are not eligible yet and must reach 1 trillion lifetime cookies, and that each ascension point is a permanent +1% to total production so ascending now would take you to x1.00." width="1557" height="1093" loading="lazy" />
+  <figcaption><strong>Prestige.</strong> The ascension projection before the trillion-cookie threshold is met. The two-key confirmation gate sits further down this surface. Captured from the built application running on an off-screen desktop, photographed with the Win32 PrintWindow API. Light theme.</figcaption>
+</figure>
+  </div>
+  <div class="note note--roadmap">
+    <strong class="note-title">What these captures do not show</strong>
+    <p>No golden-cookie spawn (the spawn window is five to fifteen minutes and nobody has caught one on camera yet), no settings surface, no dark theme, and no genuinely narrow window &mdash; the bottom-sheet drawer behaviour was checked by forcing its breakpoint, not by resizing the real application. The prestige confirmation gate ships, but sits below the fold of the Prestige capture.</p>
+  </div>
 
   <h2 id="download">Download</h2>
   <div class="plate">
@@ -67,9 +97,10 @@
       <p>There is no code-signing certificate and there will not be one. Windows SmartScreen will therefore warn you when you run the installer, and you will have to choose &ldquo;More info&rdquo; and then &ldquo;Run anyway&rdquo; to continue. That warning is accurate: Windows genuinely cannot verify who published this, and no amount of reassurance on a web page changes that. If you are not comfortable with it, do not install it &mdash; <a href="https://github.com/Ding-Ding-Projects/material-cookie-clicker">the full source is on GitHub</a> and you can build it yourself.</p>
       <p>Nobody ever pays anything for this application, and it asks for no account, no key and no network access.</p>
     </div>
-    <div class="note note--roadmap">
+    <div class="note">
       <strong class="note-title">What you get if you install it today</strong>
-      <p>An Electron application window with a working frameless title bar and a placeholder body. The game surface is not wired in yet. Install it to watch the release pipeline work, not to play a cookie clicker.</p>
+      <p>The game, playable: the single game surface with the cookie, the shop rail and the upgrade strip, plus the Achievements, Tools, Statistics and Prestige tabs &mdash; all bilingual, all offline. The <a href="#captures">capture matrix above</a> is what it actually looks like.</p>
+      <p>Not in this release: a settings surface (so the language-mode selector and the funny-level sliders are not reachable yet, and the application is always in bilingual mode), and any application dark theme anyone has verified.</p>
     </div>
   </div>
 
@@ -127,12 +158,12 @@
   <h2>How this site is built</h2>
   <div class="plate">
     <p>This site follows the same design system as the game &mdash; the v2 &ldquo;arcade cabinet&rdquo; specs in <code>design/</code>: radial oven-glow backgrounds, marquee headings on bevelled plates, solid offset shadows with no blur anywhere, 2&ndash;7px borders, and the same colour tokens in light and dark. It is explicitly <em>not</em> Material Design 3; the role names (primary, surface, outline) are kept as vocabulary only.</p>
-    <p>It is also entirely self-contained. There is no CDN, no remote font, no remote image, no analytics and no network request of any kind: the cookie above is drawn with CSS gradients, the search index is baked into a local module, and the only external addresses anywhere in this site are the two GitHub links, which you have to click.</p>
+    <p>It is also entirely self-contained. There is no CDN, no remote font, no remote image, no analytics and no network request of any kind: the hero cookie is drawn with CSS gradients, the capture matrix loads PNG files committed alongside these pages, the search index is baked into a local module, and the only external addresses anywhere in this site are the two GitHub links, which you have to click.</p>
   </div>
 </main>
 <footer class="site-foot">
   <div class="wrap">
-    <p>Material Cookie Clicker is free, unsigned by permanent policy, and nobody ever pays anything to use it. This site is fully self-contained: no CDN, no remote font, no remote image, no analytics, no network request of any kind. Everything drawn here is drawn in CSS.</p>
+    <p>Material Cookie Clicker is free, unsigned by permanent policy, and nobody ever pays anything to use it. This site is fully self-contained: no CDN, no remote font, no remote image, no analytics, no network request of any kind. Every graphic is either drawn in CSS or a screenshot of the application stored in this repository.</p>
     <p><a href="https://github.com/Ding-Ding-Projects/material-cookie-clicker">Source code on GitHub</a> &middot; <a href="features/index.html">All feature articles</a></p>
   </div>
 </footer>

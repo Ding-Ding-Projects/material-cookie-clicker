@@ -1,9 +1,277 @@
+@import "@material-cookie-clicker/surface-kernel/tokens.css";
+
+/*
+ * Game palette + shape/type tokens, layered on top of the shared surface-kernel tokens
+ * imported above. This block (plus its dark-mode twin below) is the ONE place any hex colour,
+ * pixel radius, elevation shadow or font stack the game screens use is allowed to live —
+ * every component stylesheet reads these back through var(...) rather than repeating a literal
+ * value. `design/**` is being independently re-themed by another lane right now; because
+ * nothing in src/renderer/** reads colours from design/**, that re-theme cannot desync this
+ * app — and when its final palette lands here, this is the only block that needs to change.
+ *
+ * Role names reuse the kernel's own token names (--surface, --primary, ...) where the kernel
+ * already defines that role, and add the roles it does not yet define (--tertiary, --secondary,
+ * the shape/elevation/font scale) under the same naming convention.
+ */
 :root {
   color-scheme: light;
-  --material-cookie-clicker-surface: #fff8f1;
-  --material-cookie-clicker-title-bar: #f2dfc8;
-  --material-cookie-clicker-on-surface: #2c1a0e;
-  --material-cookie-clicker-accent: #a2532b;
+
+  /* --- v2 "arcade cabinet" palette, light = bakery daytime. Hex values copied verbatim from
+         design-v2's tokens-color.html; the role names stay the ones this app already uses. --- */
+  --surface: #fff3e6;
+  --surface-lowest: #ffffff;
+  --surface-low: #fff0de;
+  --surface-container: #fbe8d2;
+  --surface-high: #f5dfc4;
+  --surface-highest: #eed5b4;
+  --on-surface: #1e1610;
+  --surface-variant: #f0dcc4;
+  --on-surface-variant: #4a3d2e;
+  --outline: #75634e;
+  --outline-variant: #d8c7b6;
+
+  --primary: #7a4a1d;
+  --on-primary: #ffffff;
+  --primary-container: #ffdcb8;
+  --on-primary-container: #3a2100;
+
+  --secondary: #6b4c3f;
+  --on-secondary: #ffffff;
+  --secondary-container: #ffdbcb;
+  --on-secondary-container: #2c160b;
+  --secondary-shadow: #35211a;
+
+  --tertiary: #5c4e00;
+  --on-tertiary: #ffffff;
+  --tertiary-container: #f8e287;
+  --on-tertiary-container: #221b00;
+  --tertiary-shadow: #332900;
+
+  /* Arcade spark accent (design-v2/tokens-color.html): --spark and --spark-glow are DECORATIVE
+     ONLY (blurred glows, gradient fills) and never carry text; --spark-ring is the one spark
+     role allowed on text or a UI boundary, and v2 darkens it to #9c4b00 for AA in light. */
+  --spark: #ffc94d;
+  --spark-glow: #ff8a00;
+  --spark-ring: #9c4b00;
+
+  /* --- v2 cabinet chrome: the radial oven-glow stops, the recessed HUD face, the bevels and
+         the wooden cabinet body. None of these ever sit behind text except --panel-inset. --- */
+  --bg-core: #fff6ec;
+  --bg-mid: #faecda;
+  --bg-edge: #efdcc0;
+  --panel-inset: #fffbf4;
+  --bevel-hi: rgba(255, 255, 255, 0.85);
+  --bevel-lo: rgba(90, 58, 24, 0.28);
+  --metal-hi: #fff0c4;
+  --metal-lo: #b98a2e;
+  --cabinet-frame: #6a4522;
+  --cabinet-frame-dark: #43290f;
+  --track: #e4cdae;
+
+  /* Chunky pressable depth (design-v2/tokens-shape-elevation.html). --drop-N is the LENGTH a
+     control travels when pressed (also the height of its solid base); --press-N is the ready-made
+     box-shadow built from it. Solid offsets only — v2 uses no blurred drop shadow anywhere. */
+  --primary-shadow: #3c2107;
+  --error-shadow: #6e0000;
+  --drop-1: 4px;
+  --drop-2: 6px;
+  --drop-3: 8px;
+  --drop-4: 10px;
+  --press-0: none;
+  --press-1: 0 var(--drop-1) 0 0 var(--outline);
+  --press-2: 0 var(--drop-2) 0 0 var(--outline);
+  --press-3: 0 var(--drop-3) 0 0 var(--outline);
+  --press-4: 0 var(--drop-4) 0 0 var(--cabinet-frame-dark);
+  --border-thin: 2px;
+  --border-thick: 3px;
+  --border-chunky: 4px;
+  --border-fat: 5px;
+
+  /* Jewel tool-tier ladder (design-v2/tokens-color.html, design/tools-tree.html): bronze ->
+     emerald -> amethyst, so the Tools tech tree visibly escalates rather than darkening one hue. */
+  --tier1: #8a4e12;
+  --on-tier1: #ffffff;
+  --tier1-container: #ffdcba;
+  --on-tier1-container: #2e1600;
+  --tier2: #1f6337;
+  --on-tier2: #ffffff;
+  --tier2-container: #b8f0c4;
+  --on-tier2-container: #04210d;
+  --tier3: #533593;
+  --on-tier3: #ffffff;
+  --tier3-container: #e6d9ff;
+  --on-tier3-container: #20004d;
+
+  /* Shape scale — v2 goes fatter again (v1 was 8-34, v2 is 10-40). Both the v2 names and this
+     app's existing names are defined, pointing at the same steps. */
+  --shape-none: 0px;
+  --shape-xs: 10px;
+  --shape-sm: 16px;
+  --shape-md: 22px;
+  --shape-lg: 28px;
+  --shape-2xl: 40px;
+  --shape-full: 999px;
+  --shape-xl: 34px;
+  --shape-large: var(--shape-lg);
+  --shape-medium: var(--shape-md);
+  --shape-small: var(--shape-sm);
+
+  /* The oven glow behind the whole cabinet: a radial gradient that is BRIGHT at its core and
+     falls off to the cabinet rim (design-v2/game-layout.html). Pure CSS, no image asset. */
+  --oven-glow: radial-gradient(ellipse 130% 95% at 50% -12%, var(--bg-core) 0%, var(--bg-mid) 42%, var(--bg-edge) 100%);
+
+  --elevation-1: 0 1px 3px rgba(0, 0, 0, 0.3), 0 4px 8px 3px rgba(0, 0, 0, 0.15);
+  --elevation-2: 0 2px 3px rgba(0, 0, 0, 0.3), 0 6px 10px 4px rgba(0, 0, 0, 0.15);
+  --elevation-3: 0 4px 4px rgba(0, 0, 0, 0.3), 0 8px 12px 6px rgba(0, 0, 0, 0.15);
+
+  --font-en: -apple-system, 'Segoe UI', Roboto, Helvetica, Arial, sans-serif;
+  --font-zh: 'Segoe UI', 'Microsoft JhengHei', var(--font-en);
+  /* The display face is a system stack on purpose — this app makes no network request of any
+     kind, and no local font file is bundled. See design/README.md, "Why the display face is a
+     system stack, not a bundled font". If a font file is ever added, this is the one place to
+     point it. */
+  --font-display: 'Segoe UI Black', 'Arial Black', 'Segoe UI', var(--font-en);
+
+  /* The pre-existing scaffold's title-bar tokens, now sourced from the one shared token layer
+     above instead of their own hard-coded hex values, so the title bar follows the same
+     re-theme path as every other surface. */
+  --material-cookie-clicker-surface: var(--surface);
+  --material-cookie-clicker-title-bar: var(--surface-high);
+  --material-cookie-clicker-on-surface: var(--on-surface);
+  --material-cookie-clicker-accent: var(--primary);
+}
+
+/* Dark = ARCADE NIGHT (design-v2/tokens-color.html). Not "the light theme with the lights off":
+   the cabinet is lit from inside, so the background glow gets BRIGHTER toward its centre while
+   the rim goes to near-black. Both ends of that gradient are contrast-verified upstream. */
+@media (prefers-color-scheme: dark) {
+  :root:not([data-theme='light']) {
+    color-scheme: dark;
+
+    --surface: #120c08;
+    --surface-lowest: #0a0603;
+    --surface-low: #1a120b;
+    --surface-container: #221810;
+    --surface-high: #2c2016;
+    --surface-highest: #382a1e;
+    --on-surface: #f2e4d6;
+    --surface-variant: #453a2e;
+    --on-surface-variant: #d8c8b4;
+    --outline: #a08d78;
+    --outline-variant: #4f4539;
+
+    --primary: #ffb876;
+    --on-primary: #4a2800;
+    --primary-container: #693c00;
+    --on-primary-container: #ffdcb8;
+    --primary-shadow: #2a1600;
+
+    --secondary: #e6beac;
+    --on-secondary: #44291e;
+    --secondary-container: #5d3f32;
+    --on-secondary-container: #ffdbcb;
+    --secondary-shadow: #24140d;
+
+    --tertiary: #dbc66e;
+    --on-tertiary: #383000;
+    --tertiary-container: #514600;
+    --on-tertiary-container: #f8e287;
+    --tertiary-shadow: #201c00;
+
+    --bg-core: #2a1a0a;
+    --bg-mid: #1a1008;
+    --bg-edge: #0a0705;
+    --panel-inset: #0b0704;
+    --bevel-hi: rgba(255, 214, 160, 0.3);
+    --bevel-lo: rgba(0, 0, 0, 0.72);
+    --metal-hi: #ffe7a8;
+    --metal-lo: #8a6318;
+    --cabinet-frame: #3a2410;
+    --cabinet-frame-dark: #150c05;
+    --track: #2e2419;
+
+    --spark: #ffd97a;
+    --spark-glow: #ffa326;
+    --spark-ring: #ffc24d;
+    --error-shadow: #4a0004;
+
+    --tier1: #f2b27a;
+    --on-tier1: #3a1e00;
+    --tier1-container: #5a3208;
+    --on-tier1-container: #ffdcba;
+    --tier2: #8fe3a6;
+    --on-tier2: #0c3018;
+    --tier2-container: #1b4a28;
+    --on-tier2-container: #b8f0c4;
+    --tier3: #cfbcff;
+    --on-tier3: #2a0a5c;
+    --tier3-container: #3b2465;
+    --on-tier3-container: #e6d9ff;
+  }
+}
+
+:root[data-theme='dark'] {
+  color-scheme: dark;
+
+  --surface: #120c08;
+  --surface-lowest: #0a0603;
+  --surface-low: #1a120b;
+  --surface-container: #221810;
+  --surface-high: #2c2016;
+  --surface-highest: #382a1e;
+  --on-surface: #f2e4d6;
+  --surface-variant: #453a2e;
+  --on-surface-variant: #d8c8b4;
+  --outline: #a08d78;
+  --outline-variant: #4f4539;
+
+  --primary: #ffb876;
+  --on-primary: #4a2800;
+  --primary-container: #693c00;
+  --on-primary-container: #ffdcb8;
+  --primary-shadow: #2a1600;
+
+  --secondary: #e6beac;
+  --on-secondary: #44291e;
+  --secondary-container: #5d3f32;
+  --on-secondary-container: #ffdbcb;
+  --secondary-shadow: #24140d;
+
+  --tertiary: #dbc66e;
+  --on-tertiary: #383000;
+  --tertiary-container: #514600;
+  --on-tertiary-container: #f8e287;
+  --tertiary-shadow: #201c00;
+
+  --bg-core: #2a1a0a;
+  --bg-mid: #1a1008;
+  --bg-edge: #0a0705;
+  --panel-inset: #0b0704;
+  --bevel-hi: rgba(255, 214, 160, 0.3);
+  --bevel-lo: rgba(0, 0, 0, 0.72);
+  --metal-hi: #ffe7a8;
+  --metal-lo: #8a6318;
+  --cabinet-frame: #3a2410;
+  --cabinet-frame-dark: #150c05;
+  --track: #2e2419;
+
+  --spark: #ffd97a;
+  --spark-glow: #ffa326;
+  --spark-ring: #ffc24d;
+  --error-shadow: #4a0004;
+
+  --tier1: #f2b27a;
+  --on-tier1: #3a1e00;
+  --tier1-container: #5a3208;
+  --on-tier1-container: #ffdcba;
+  --tier2: #8fe3a6;
+  --on-tier2: #0c3018;
+  --tier2-container: #1b4a28;
+  --on-tier2-container: #b8f0c4;
+  --tier3: #cfbcff;
+  --on-tier3: #2a0a5c;
+  --tier3-container: #3b2465;
+  --on-tier3-container: #e6d9ff;
 }
 
 * {
@@ -18,8 +286,11 @@ body,
 }
 
 body {
-  font-family: 'Segoe UI', system-ui, sans-serif;
-  background: var(--material-cookie-clicker-surface);
+  font-family: var(--font-en);
+  /* Cosy bakery oven-glow ambiance behind the whole app — the single biggest reason the shell
+     stops reading as a flat web page. Fixed so it does not slide with scrolled content. */
+  background: var(--oven-glow), var(--material-cookie-clicker-surface);
+  background-attachment: fixed;
   color: var(--material-cookie-clicker-on-surface);
 }
 
@@ -33,16 +304,25 @@ body {
   display: flex;
   align-items: center;
   justify-content: space-between;
-  height: 40px;
-  padding-inline-start: 12px;
-  background: var(--material-cookie-clicker-title-bar);
+  height: 44px;
+  padding-inline-start: 18px;
+  background: linear-gradient(180deg, var(--cabinet-frame) 0%, var(--cabinet-frame-dark) 100%);
+  color: #fff;
+  border-bottom: var(--border-fat) solid var(--cabinet-frame-dark);
+  box-shadow: inset 0 3px 0 0 var(--bevel-hi);
   -webkit-app-region: drag;
   user-select: none;
 }
 
+/* The marquee across the top of the cabinet, not a browser chrome strip: a bevelled plate with
+   letter-spaced all-caps display type (design-v2/tokens-type.html). */
 .title-bar__label {
-  font-weight: 600;
-  font-size: 14px;
+  font-family: var(--font-display);
+  font-weight: 900;
+  font-size: 13px;
+  letter-spacing: 0.24em;
+  text-transform: uppercase;
+  color: #fff;
 }
 
 .title-bar__controls {
@@ -56,13 +336,18 @@ body {
   height: 100%;
   border: none;
   background: transparent;
-  color: var(--material-cookie-clicker-on-surface);
+  color: #fff;
   font-size: 14px;
   cursor: pointer;
 }
 
 .title-bar__button:hover {
-  background: rgba(0, 0, 0, 0.08);
+  background: rgba(255, 255, 255, 0.16);
+}
+
+.title-bar__button:focus-visible {
+  outline: 3px solid var(--spark-ring);
+  outline-offset: -3px;
 }
 
 .title-bar__button--close:hover {
@@ -74,8 +359,2488 @@ body {
   flex: 1;
   display: flex;
   flex-direction: column;
+  min-height: 0;
+  padding: 12px;
+  overflow: hidden;
+}
+
+/* ---------------------------------------------------------------------------------------- *
+ * THE CABINET — the one screen (design-v2/game-layout.html).
+ *
+ * The moment-to-moment loop — click the cookie, buy a generator, buy an upgrade — happens
+ * entirely inside `.cabinet-body` with NO navigation between those three things. The cookie is
+ * the hero, the generator shop is docked to it as a right rail, and the upgrades are a ticket
+ * strip on the same surface. The dock at the bottom is secondary chrome only.
+ * ---------------------------------------------------------------------------------------- */
+.cabinet {
+  flex: 1;
+  min-height: 0;
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+  padding: 14px;
+  border: var(--border-fat) solid var(--outline);
+  border-radius: var(--shape-2xl);
+  background: radial-gradient(ellipse 90% 70% at 30% 0%, var(--bg-core) 0%, var(--bg-mid) 55%, var(--bg-edge) 100%),
+    var(--bg-edge);
+  box-shadow: var(--press-4), inset 0 5px 0 0 var(--bevel-hi);
+  overflow: hidden;
+}
+
+/* --- the pinned HUD: live counters that never scroll away, in recessed bezels --- */
+.hud {
+  display: flex;
+  align-items: stretch;
+  gap: 12px;
+  flex-wrap: wrap;
+  flex-shrink: 0;
+}
+
+.hud__readout {
+  flex: 1 1 180px;
+  min-width: 150px;
+  border-radius: var(--shape-md);
+  padding: 8px 16px;
+  background: var(--panel-inset);
+  border: var(--border-chunky) solid var(--outline);
+  box-shadow: inset 0 5px 0 -2px var(--bevel-lo);
+}
+
+.hud__key {
+  font-family: var(--font-display);
+  font-size: 10px;
+  font-weight: 900;
+  letter-spacing: 0.24em;
+  text-transform: uppercase;
+  color: var(--on-surface-variant);
+  display: block;
+  margin-bottom: 2px;
+}
+
+.hud__value {
+  font-family: var(--font-display);
+  font-weight: 900;
+  font-variant-numeric: tabular-nums;
+  font-size: clamp(20px, 2.6vw, 34px);
+  line-height: 1.05;
+  letter-spacing: -0.02em;
+  color: var(--on-surface);
+  display: block;
+}
+
+.hud__value-zh {
+  font-family: var(--font-zh);
+  font-size: 11px;
+  font-weight: 700;
+  color: var(--on-surface-variant);
+  display: block;
+}
+
+/* --- the body of the cabinet: the game stage, or one secondary surface --- */
+.cabinet-body {
+  flex: 1;
+  min-height: 0;
+  display: flex;
+  flex-direction: column;
+  overflow: hidden;
+  border-radius: var(--shape-lg);
+}
+
+.cabinet-body:focus-visible {
+  outline: 4px solid var(--spark-ring);
+  outline-offset: 2px;
+}
+
+/* Hero column on the left, shop rail docked on the right. One surface, one scroll region. */
+.stage {
+  flex: 1;
+  min-height: 0;
+  display: grid;
+  grid-template-columns: minmax(0, 1fr) 360px;
+  gap: 12px;
+  align-items: stretch;
+  overflow: hidden;
+}
+
+/* The hero column does NOT scroll vertically: the cookie and the upgrade strip both have to be
+   on screen at once, so the strip absorbs the overflow horizontally instead. */
+.stage__hero-column {
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+  min-width: 0;
+  min-height: 0;
+  overflow: hidden;
+}
+
+/* The upgrades panel takes whatever height the cookie leaves and hands it to the strip. */
+.stage__hero-column > .panel:last-child {
+  flex: 1;
+  min-height: 0;
+  display: flex;
+  flex-direction: column;
+}
+
+.stage__hero-column > .panel:last-child .upgrade-strip {
+  flex: 1;
+  min-height: 0;
+  align-items: flex-start;
+  overflow-y: hidden;
+}
+
+/* --- the shared panel: a bevelled plate bolted to the cabinet --- */
+.panel {
+  border-radius: var(--shape-lg);
+  border: var(--border-fat) solid var(--outline);
+  background: linear-gradient(180deg, var(--surface-high), var(--surface-highest));
+  box-shadow: var(--press-2), inset 0 4px 0 0 var(--bevel-hi);
+  padding: 14px;
+  min-width: 0;
+}
+
+.panel__title {
+  font-family: var(--font-display);
+  font-size: 11px;
+  font-weight: 900;
+  letter-spacing: 0.24em;
+  text-transform: uppercase;
+  color: var(--on-surface-variant);
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  margin: 0 0 10px;
+}
+
+.panel__title::after {
+  content: '';
+  flex: 1;
+  border-top: var(--border-thick) solid var(--outline);
+  opacity: 0.5;
+}
+
+.panel__title-zh {
+  font-family: var(--font-zh);
+  letter-spacing: 0.12em;
+}
+
+/* A heading row that also carries a control (the upgrade strip's search). */
+.panel__header {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  flex-wrap: wrap;
+}
+
+.panel__header .panel__title {
+  flex: 1 1 200px;
+}
+
+.panel__header-search {
+  flex: 0 1 260px;
+  margin-bottom: 10px;
+}
+
+.panel__header-search .search-field-wrap {
+  max-width: none;
+}
+
+/* Sits AFTER the ::after rule in the flex row, so the count lands at the far end of the plate. */
+.panel__title-count {
+  order: 3;
+  font-variant-numeric: tabular-nums;
+  letter-spacing: 0.1em;
+}
+
+/* --- shop rail: internally scrolling, so the cookie never scrolls away --- */
+.shop-rail {
+  display: flex;
+  flex-direction: column;
+  min-height: 0;
+  overflow: hidden;
+}
+
+.shop-rail__list {
+  flex: 1;
+  min-height: 0;
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+  overflow-y: auto;
+  padding-right: 4px;
+}
+
+/* --- the ONLY navigation on the cabinet: the secondary-surface dock. Deliberately smaller and
+       quieter than anything in the game loop. --- */
+.cabinet-dock {
+  display: flex;
+  gap: 8px;
+  flex-wrap: wrap;
+  flex-shrink: 0;
+  align-items: center;
+}
+
+.cabinet-dock__button {
+  font: inherit;
+  font-family: var(--font-display);
+  font-size: 11px;
+  font-weight: 900;
+  letter-spacing: 0.14em;
+  text-transform: uppercase;
+  min-height: 44px;
+  padding: 0 14px;
+  border-radius: var(--shape-sm);
+  cursor: pointer;
+  background: var(--surface-high);
+  color: var(--on-surface);
+  border: var(--border-thick) solid var(--outline);
+  box-shadow: var(--press-1);
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  transition: transform 80ms ease, box-shadow 80ms ease, background 80ms ease;
+}
+
+.cabinet-dock__label-zh {
+  font-family: var(--font-zh);
+  font-size: 12px;
+  font-weight: 700;
+  letter-spacing: 0.06em;
+  opacity: 0.9;
+}
+
+/* The game surface is the home button: wider, warmer, and always first in reading order. */
+.cabinet-dock__button--game {
+  padding: 0 18px;
+  font-size: 12px;
+  background: var(--primary-container);
+  color: var(--on-primary-container);
+}
+
+.cabinet-dock__button[aria-selected='true'] {
+  background: var(--primary-container);
+  color: var(--on-primary-container);
+  border-color: var(--primary);
+  box-shadow: var(--press-1), inset 0 0 0 2px var(--primary);
+}
+
+.cabinet-dock__button:active {
+  transform: translateY(var(--drop-1));
+  box-shadow: none;
+}
+
+.cabinet-dock__button:focus-visible {
+  outline: 4px solid var(--spark-ring);
+  outline-offset: 3px;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .cabinet-dock__button {
+    transition: none;
+  }
+
+  .cabinet-dock__button:active {
+    transform: none;
+    box-shadow: inset 0 3px 0 0 var(--bevel-lo);
+  }
+}
+
+/* The secondary tabpanel fills the cabinet body; the active `.screen` scrolls inside it. */
+.tab-panel {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  min-width: 0;
+  min-height: 0;
+  overflow: hidden;
+  border-radius: var(--shape-lg);
+  border: var(--border-fat) solid var(--outline);
+  background: linear-gradient(180deg, var(--surface-high), var(--surface-highest));
+  box-shadow: var(--press-2), inset 0 4px 0 0 var(--bevel-hi);
+}
+
+.tab-panel:focus-visible {
+  outline: 4px solid var(--spark-ring);
+  outline-offset: -4px;
+}
+
+/* Shell-level announcements (e.g. an application feature with no window to open yet). Sits
+   above the milestone region so the two never overlap. */
+.shell-status {
+  position: fixed;
+  bottom: 168px;
+  right: 24px;
+  max-width: 340px;
+  background: var(--secondary-container);
+  color: var(--on-secondary-container);
+  border-radius: var(--shape-medium);
+  border: var(--border-thick) solid var(--secondary);
+  box-shadow: 0 5px 0 0 var(--secondary);
+  padding: 12px 16px;
+  font-size: 13px;
+  font-weight: 700;
+  z-index: 20;
+}
+
+.shell-status:empty {
+  display: none;
+}
+
+.screen {
+  flex: 1;
+  overflow-y: auto;
+  padding: 18px 22px 28px;
+  display: flex;
+  flex-direction: column;
+  gap: 16px;
+  min-width: 0;
+  min-height: 0;
+}
+
+/* Every secondary surface's title is a marquee plate: bevelled, letter-spaced, all-caps display
+   type (design-v2/tokens-type.html). */
+.screen h1 {
+  font-family: var(--font-display);
+  font-weight: 900;
+  font-size: clamp(20px, 3vw, 30px);
+  line-height: 1.04;
+  letter-spacing: 0.045em;
+  text-transform: uppercase;
+  margin: 0 0 4px;
+  padding: 12px 18px;
+  border: var(--border-fat) solid var(--outline);
+  border-radius: var(--shape-lg);
+  background: linear-gradient(180deg, var(--surface-high) 0%, var(--surface-highest) 100%);
+  box-shadow: var(--press-3), inset 0 4px 0 0 var(--bevel-hi), inset 0 -4px 0 0 var(--bevel-lo);
+}
+
+.screen h1 .screen-title-zh {
+  font-family: var(--font-zh);
+  font-weight: 700;
+  font-size: 18px;
+  color: var(--on-surface-variant);
+  margin-inline-start: 10px;
+}
+
+/* ---------------------------------------------------------------------------------------- *
+ * Offline-progress notice (non-blocking, corner-anchored, dismissible).
+ * ---------------------------------------------------------------------------------------- */
+.offline-banner {
+  position: fixed;
+  bottom: 20px;
+  right: 20px;
+  max-width: 360px;
+  background: var(--surface-highest);
+  color: var(--on-surface);
+  border-radius: var(--shape-medium);
+  border: var(--border-thick) solid var(--outline);
+  box-shadow: 0 5px 0 0 var(--outline);
+  padding: 12px 14px;
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+  font-size: 13px;
+  z-index: 20;
+}
+
+.offline-banner__dismiss {
+  align-self: flex-end;
+  font: inherit;
+  font-size: 12px;
+  font-weight: 700;
+  min-height: 32px;
+  padding: 0 12px;
+  border-radius: var(--shape-full);
+  border: 1px solid var(--outline);
+  background: transparent;
+  color: var(--on-surface);
+  cursor: pointer;
+}
+
+.offline-banner__dismiss:focus-visible {
+  outline: 3px solid var(--primary);
+  outline-offset: 2px;
+}
+
+/* ---------------------------------------------------------------------------------------- *
+ * Milestone status region — throttled, one message at a time, never the plain click counter.
+ * ---------------------------------------------------------------------------------------- */
+/* Anchored bottom-RIGHT, clear of the secondary dock along the bottom-left of the cabinet, so a
+   celebration never covers the only navigation in the app. */
+.milestone-region {
+  position: fixed;
+  bottom: 92px;
+  right: 24px;
+  max-width: 340px;
+  background: var(--tertiary-container);
+  color: var(--on-tertiary-container);
+  border-radius: var(--shape-medium);
+  border: var(--border-thick) solid var(--tertiary);
+  box-shadow: 0 5px 0 0 var(--tertiary);
+  padding: 12px 16px;
+  font-size: 13px;
+  font-weight: 700;
+  z-index: 20;
+}
+
+.milestone-region:empty {
+  display: none;
+}
+
+/* ---------------------------------------------------------------------------------------- *
+ * Hero panel — the cookie, the biggest single thing on the surface
+ * (design-v2/game-layout.html, design-v2/cookie-surface.html). The headline cookie count is NOT
+ * repeated here: it lives in the pinned HUD above, so a number means one thing in one place.
+ * ---------------------------------------------------------------------------------------- */
+.cookie-hero {
+  display: flex;
+  flex-direction: column;
   align-items: center;
   justify-content: center;
-  gap: 8px;
   text-align: center;
+  gap: 6px;
+  padding: 10px 16px;
+  flex-shrink: 0;
+
+  /* The cookie is sized against the window, not fixed: on a short window it gives height back to
+     the upgrade strip rather than pushing it off the surface. Both must be visible at once. */
+  --cookie-size: clamp(110px, 17vh, 190px);
+}
+
+.cookie-cps {
+  font-family: var(--font-display);
+  font-size: 13px;
+  font-weight: 900;
+  letter-spacing: 0.14em;
+  text-transform: uppercase;
+  font-variant-numeric: tabular-nums;
+  color: var(--on-surface-variant);
+}
+
+.cookie-hero__hint {
+  font-size: 11px;
+  font-family: var(--font-display);
+  letter-spacing: 0.1em;
+  text-transform: uppercase;
+  color: var(--on-surface-variant);
+  margin: 0;
+}
+
+.cookie-target-wrap {
+  position: relative;
+  width: var(--cookie-size, 208px);
+  height: var(--cookie-size, 208px);
+  margin: 8px 0 14px;
+}
+
+/* The cookie sits in its own pool of oven light so it never floats on a plain panel. */
+.cookie-target-wrap::before {
+  content: '';
+  position: absolute;
+  inset: -76px;
+  border-radius: var(--shape-full);
+  background: radial-gradient(circle, var(--primary-container) 0%, transparent 70%);
+  opacity: 0.9;
+  pointer-events: none;
+}
+
+.cookie-btn {
+  position: relative;
+  width: var(--cookie-size, 208px);
+  height: var(--cookie-size, 208px);
+  border-radius: var(--shape-full);
+  border: var(--border-fat) solid var(--primary-shadow);
+  cursor: pointer;
+  background: radial-gradient(circle at 34% 26%, var(--primary-container) 0%, var(--primary) 62%, var(--primary-shadow) 100%);
+  /* Chunky pressable depth: SOLID offsets only, never a blur — the dough sits on a baked-brown
+     base which in turn sits in the cabinet frame (design-v2/cookie-surface.html). */
+  box-shadow: 0 var(--drop-4) 0 0 var(--primary-shadow), 0 var(--drop-4) 0 5px var(--cabinet-frame-dark),
+    inset 0 10px 0 -4px rgba(255, 255, 255, 0.38), inset 0 -14px 18px rgba(0, 0, 0, 0.3);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  /* The cookie is drawn entirely in CSS — dough gradient plus chocolate chips. The button's
+     emoji text content is hidden so a stock colour glyph never sits on top of it like a
+     sticker; the accessible name lives on aria-label, which is unaffected. */
+  font-size: 0;
+  z-index: 1;
+  transition: transform calc(110ms * var(--motion-scale, 1)) ease,
+    box-shadow calc(110ms * var(--motion-scale, 1)) ease;
+}
+
+/* Chocolate-chip texture via layered radial-gradients — no image asset, fully offline. */
+.cookie-btn::before {
+  content: '';
+  position: absolute;
+  inset: 16px;
+  border-radius: var(--shape-full);
+  background-image: radial-gradient(circle at 25% 30%, var(--on-primary-container) 5%, transparent 6%),
+    radial-gradient(circle at 60% 18%, var(--on-primary-container) 5%, transparent 6%),
+    radial-gradient(circle at 78% 55%, var(--on-primary-container) 5%, transparent 6%),
+    radial-gradient(circle at 40% 66%, var(--on-primary-container) 5%, transparent 6%),
+    radial-gradient(circle at 18% 76%, var(--on-primary-container) 5%, transparent 6%),
+    radial-gradient(circle at 55% 45%, var(--on-primary-container) 5%, transparent 6%),
+    radial-gradient(circle at 70% 82%, var(--on-primary-container) 4%, transparent 5%),
+    radial-gradient(circle at 32% 12%, var(--on-primary-container) 4%, transparent 5%);
+  opacity: 0.6;
+  pointer-events: none;
+}
+
+/* Rises off the counter on hover, and compresses flat into it on press. */
+.cookie-btn:hover {
+  transform: translateY(-3px);
+  box-shadow: 0 14px 0 0 var(--primary-shadow), 0 14px 0 5px var(--cabinet-frame-dark),
+    inset 0 10px 0 -4px rgba(255, 255, 255, 0.38), inset 0 -14px 18px rgba(0, 0, 0, 0.3);
+}
+
+.cookie-btn:active {
+  transform: translateY(var(--drop-4)) scale(0.965);
+  box-shadow: 0 0 0 5px var(--cabinet-frame-dark), inset 0 8px 14px rgba(0, 0, 0, 0.45);
+}
+
+.cookie-btn:focus-visible {
+  outline: 4px solid var(--spark-ring);
+  outline-offset: 6px;
+}
+
+.cookie-target-wrap.golden .cookie-btn {
+  background: radial-gradient(circle at 34% 26%, var(--tertiary-container) 0%, var(--tertiary) 62%, var(--tertiary-shadow) 100%);
+  border-color: var(--tertiary-shadow);
+  box-shadow: 0 var(--drop-4) 0 0 var(--tertiary-shadow), 0 var(--drop-4) 0 5px var(--cabinet-frame-dark),
+    inset 0 10px 0 -4px rgba(255, 255, 255, 0.38), inset 0 -14px 18px rgba(0, 0, 0, 0.3);
+}
+
+/* A golden cookie is unmistakable without relying on colour alone: it grows a sparkle mark of
+   its own now that the button's own emoji text is hidden. */
+.cookie-target-wrap.golden .cookie-btn::after {
+  content: '\2728';
+  font-size: 76px;
+  line-height: 1;
+  position: relative;
+  z-index: 2;
+}
+
+/* Arcade sparkle burst (design/cookie-surface.html): a bright pulsing glow plus a chunky spark
+   ring. Decorative --spark tokens only — never near text. */
+.golden-overlay-wrap::before {
+  content: '';
+  position: absolute;
+  inset: -34px;
+  border-radius: var(--shape-full);
+  background: radial-gradient(circle, var(--spark-glow) 0%, transparent 70%);
+  animation: golden-pulse calc(1.6s * var(--motion-scale, 1)) ease-in-out infinite;
+  pointer-events: none;
+}
+
+.golden-overlay-wrap::after {
+  content: '';
+  position: absolute;
+  inset: -10px;
+  border-radius: var(--shape-full);
+  border: var(--border-chunky) solid var(--spark-ring);
+  box-shadow: 0 0 22px 6px var(--spark-glow);
+  pointer-events: none;
+}
+
+@keyframes golden-pulse {
+  0%,
+  100% {
+    opacity: 0.8;
+    transform: scale(1);
+  }
+  50% {
+    opacity: 1;
+    transform: scale(1.07);
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  /* Reduced-motion equivalent: the glow stays fully lit instead of pulsing, so the golden
+     moment is still unmistakable without any movement. */
+  .golden-overlay-wrap::before {
+    animation: none;
+    opacity: 1;
+  }
+}
+
+.click-popup {
+  position: absolute;
+  left: 50%;
+  top: -8px;
+  transform: translateX(-50%);
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  min-width: 68px;
+  padding: 8px 16px;
+  border-radius: var(--shape-full);
+  background: var(--primary);
+  color: var(--on-primary);
+  font-family: var(--font-display);
+  font-weight: 900;
+  font-size: 22px;
+  font-variant-numeric: tabular-nums;
+  box-shadow: 0 4px 0 0 var(--primary-shadow);
+  pointer-events: none;
+  z-index: 3;
+  animation: click-popup-float 700ms ease-out both;
+}
+
+.click-popup.golden {
+  background: var(--tertiary);
+  color: var(--on-tertiary);
+  box-shadow: 0 4px 0 0 var(--tertiary-shadow);
+  font-size: 26px;
+}
+
+@keyframes click-popup-float {
+  0% {
+    opacity: 1;
+    transform: translate(-50%, 0);
+  }
+  100% {
+    opacity: 0;
+    transform: translate(-50%, -36px);
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .cookie-btn {
+    transition: none;
+  }
+  .cookie-btn:hover,
+  .cookie-btn:active {
+    transform: none;
+  }
+  /* Reduced-motion equivalent for the press: instead of travelling, the cookie switches
+     instantly to a recessed inset state, so the press is still unmistakably felt. */
+  .cookie-btn:active {
+    box-shadow: 0 0 0 5px var(--cabinet-frame-dark), inset 0 8px 14px rgba(0, 0, 0, 0.45);
+  }
+  .click-popup {
+    animation: click-popup-static 400ms both;
+  }
+}
+
+@keyframes click-popup-static {
+  0%,
+  80% {
+    opacity: 1;
+  }
+  100% {
+    opacity: 0;
+  }
+}
+
+/* ---------------------------------------------------------------------------------------- *
+ * Upgrade ticket strip (design-v2/game-layout.html, design-v2/upgrade-card.html).
+ *
+ * Upgrades are bought from a horizontally-scrolling strip of perforated tickets sitting directly
+ * under the cookie — same surface, within thumb reach of the click target, never a page.
+ * ---------------------------------------------------------------------------------------- */
+.upgrade-strip {
+  display: flex;
+  gap: 14px;
+  overflow-x: auto;
+  padding: 4px 10px 12px;
+}
+
+.mini-ticket {
+  flex: 0 0 auto;
+  width: 154px;
+  min-height: 100px;
+  position: relative;
+  border-radius: var(--shape-sm);
+  padding: 10px;
+  overflow: hidden;
+  background: linear-gradient(180deg, var(--surface-low), var(--surface-highest));
+  border: var(--border-chunky) solid var(--outline);
+  box-shadow: var(--press-1), inset 0 3px 0 0 var(--bevel-hi);
+  cursor: pointer;
+  text-align: left;
+  color: var(--on-surface);
+  font: inherit;
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+  transition: transform 80ms ease, box-shadow 80ms ease;
+}
+
+/* The two punched holes that make a ticket a ticket. Decorative only. */
+.mini-ticket::before,
+.mini-ticket::after {
+  content: '';
+  position: absolute;
+  top: 62px;
+  width: 14px;
+  height: 14px;
+  border-radius: var(--shape-full);
+  background: var(--surface-high);
+  border: var(--border-thin) solid var(--outline);
+}
+
+.mini-ticket::before {
+  left: -9px;
+}
+
+.mini-ticket::after {
+  right: -9px;
+}
+
+.mini-ticket__glyph {
+  font-size: 22px;
+  line-height: 1;
+}
+
+.mini-ticket__name {
+  font-family: var(--font-display);
+  font-size: 12px;
+  font-weight: 900;
+  line-height: 1.15;
+  /* Two lines, then clipped: a ticket is a fixed-size stub, and a long name must not push its
+     cost line out of the strip. The full name is always in the button's accessible name. */
+  display: -webkit-box;
+  -webkit-line-clamp: 2;
+  -webkit-box-orient: vertical;
+  overflow: hidden;
+}
+
+.mini-ticket__name-zh {
+  font-family: var(--font-zh);
+  font-size: 11px;
+  font-weight: 700;
+  color: var(--on-surface-variant);
+  line-height: 1.15;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+.mini-ticket__cost {
+  margin-top: auto;
+  font-family: var(--font-display);
+  font-size: 11px;
+  white-space: nowrap;
+  font-variant-numeric: tabular-nums;
+  letter-spacing: 0.06em;
+  color: var(--on-surface-variant);
+}
+
+.mini-ticket:active:not([disabled]) {
+  transform: translateY(var(--drop-1));
+  box-shadow: none;
+}
+
+.mini-ticket:focus-visible {
+  outline: 4px solid var(--spark-ring);
+  outline-offset: 3px;
+}
+
+/* Owned tickets are stamped in the golden tertiary family with a metallic edge; locked ones go
+   flat and quiet. Neither state relies on colour alone — the cost line says which it is. */
+.mini-ticket.owned {
+  border-color: var(--metal-lo);
+  background: var(--tertiary-container);
+  color: var(--on-tertiary-container);
+  cursor: default;
+}
+
+.mini-ticket.owned .mini-ticket__cost,
+.mini-ticket.owned .mini-ticket__name-zh {
+  color: var(--on-tertiary-container);
+}
+
+.mini-ticket.locked {
+  opacity: 0.62;
+  cursor: not-allowed;
+  box-shadow: inset 0 3px 0 0 var(--bevel-lo);
+}
+
+.mini-ticket[disabled]:not(.locked):not(.owned) {
+  opacity: 0.72;
+  cursor: not-allowed;
+}
+
+.mini-ticket__track {
+  height: 6px;
+  border-radius: var(--shape-full);
+  background: var(--track);
+  overflow: hidden;
+}
+
+.mini-ticket__fill {
+  height: 100%;
+  background: var(--primary);
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .mini-ticket {
+    transition: none;
+  }
+
+  /* Reduced-motion equivalent: the ticket does not travel, it inverts its bevel instead. */
+  .mini-ticket:active:not([disabled]) {
+    transform: none;
+    box-shadow: inset 0 3px 0 0 var(--bevel-lo);
+  }
+}
+
+/* ---------------------------------------------------------------------------------------- *
+ * Shop rail rows (design-v2/game-layout.html, design-v2/building-row.html).
+ *
+ * One recessed slot per generator, docked beside the cookie. The whole rail scrolls inside
+ * itself so buying never moves the cookie.
+ * ---------------------------------------------------------------------------------------- */
+.shop-row {
+  display: grid;
+  grid-template-columns: auto 34px minmax(0, 1fr) auto;
+  gap: 6px 10px;
+  align-items: center;
+  border-radius: var(--shape-sm);
+  padding: 10px 12px;
+  background: var(--panel-inset);
+  color: var(--on-surface);
+  border: var(--border-thick) solid var(--outline);
+  box-shadow: inset 0 4px 0 -1px var(--bevel-lo);
+}
+
+/* Already producing: the slot warms up and gains the spark ring, so the generators actually
+   earning for you are obvious at a glance. */
+.shop-row.owned {
+  background: var(--primary-container);
+  color: var(--on-primary-container);
+  border-color: var(--spark-ring);
+}
+
+.shop-row.locked {
+  opacity: 0.58;
+}
+
+.shop-row__icon {
+  font-size: 24px;
+  line-height: 1;
+  text-align: center;
+}
+
+.shop-row__names {
+  display: flex;
+  flex-direction: column;
+  min-width: 0;
+}
+
+.shop-row__name {
+  font-family: var(--font-display);
+  font-size: 14px;
+  font-weight: 900;
+  line-height: 1.15;
+}
+
+.shop-row__name-zh {
+  font-family: var(--font-zh);
+  font-size: 12px;
+  font-weight: 700;
+  color: inherit;
+  opacity: 0.85;
+  line-height: 1.15;
+}
+
+.shop-row__sub {
+  font-size: 11px;
+  color: inherit;
+  opacity: 0.85;
+  font-variant-numeric: tabular-nums;
+}
+
+.shop-row__owned {
+  font-family: var(--font-display);
+  font-size: 22px;
+  font-weight: 900;
+  font-variant-numeric: tabular-nums;
+  min-width: 2ch;
+  text-align: right;
+}
+
+.shop-row__controls {
+  grid-column: 1 / -1;
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  flex-wrap: wrap;
+}
+
+.shop-row__controls .buy-btn {
+  flex: 1;
+  min-width: 140px;
+}
+
+/* ---------------------------------------------------------------------------------------- *
+ * NARROW WIDTH (design-v2/game-layout.html).
+ *
+ * Below ~900px the rail cannot sit beside the cookie, so it becomes a bottom drawer anchored to
+ * the SAME surface — not another page. The HUD stays pinned, the cookie stays visible and
+ * clickable above the drawer, and dismissing the drawer is not navigation.
+ * ---------------------------------------------------------------------------------------- */
+@media (max-width: 900px) {
+  /* One column, and the rail becomes the last item in a flex column: it sits ON the bottom edge
+     of the same surface with the cookie still on screen above it. No route change, no modal. */
+  .stage {
+    display: flex;
+    flex-direction: column;
+  }
+
+  .stage__hero-column {
+    flex: 1;
+    overflow-y: auto;
+  }
+
+  .shop-rail {
+    flex: 0 0 auto;
+    max-height: 46%;
+    border-bottom-left-radius: 0;
+    border-bottom-right-radius: 0;
+    border-bottom: none;
+    box-shadow: 0 -8px 0 0 var(--cabinet-frame-dark);
+  }
+
+  /* The drag handle that says "this is a drawer on this surface", not a route. */
+  .shop-rail::before {
+    content: '';
+    display: block;
+    width: 72px;
+    height: 8px;
+    border-radius: var(--shape-full);
+    background: var(--outline);
+    margin: 0 auto 10px;
+    flex-shrink: 0;
+  }
+
+  .cookie-hero {
+    --cookie-size: clamp(110px, 20vh, 168px);
+  }
+}
+
+/* ---------------------------------------------------------------------------------------- *
+ * Search field + anchored regex builder popover — shared by every list screen.
+ * ---------------------------------------------------------------------------------------- */
+.search-field-wrap {
+  position: relative;
+  max-width: 420px;
+}
+
+.search-field {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  border: var(--border-thick) solid var(--outline);
+  box-shadow: 0 3px 0 0 var(--outline);
+  border-radius: var(--shape-full);
+  background: var(--surface-high);
+  padding: 4px 6px 4px 16px;
+}
+
+.search-field.regex-active {
+  border-color: var(--primary);
+}
+
+.search-field__input {
+  flex: 1;
+  border: none;
+  background: transparent;
+  font: inherit;
+  font-size: 14px;
+  min-height: 40px;
+  color: var(--on-surface);
+  outline: none;
+}
+
+.builder-toggle {
+  width: 40px;
+  height: 40px;
+  border-radius: var(--shape-full);
+  border: none;
+  background: transparent;
+  color: var(--on-surface-variant);
+  cursor: pointer;
+  font-size: 15px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.builder-toggle[aria-pressed='true'] {
+  background: var(--primary-container);
+  color: var(--on-primary-container);
+}
+
+.builder-toggle:focus-visible,
+.search-field__input:focus-visible {
+  outline: 3px solid var(--primary);
+  outline-offset: 2px;
+}
+
+.regex-popover {
+  position: absolute;
+  top: calc(100% + 8px);
+  left: 0;
+  width: 340px;
+  max-width: calc(100vw - 48px);
+  background: var(--surface-highest);
+  color: var(--on-surface);
+  border-radius: var(--shape-large);
+  padding: 16px;
+  box-shadow: var(--elevation-2);
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+  border: 1px solid var(--outline);
+  z-index: 8;
+}
+
+.regex-popover label {
+  font-size: 12px;
+  font-weight: 600;
+  display: block;
+  margin-bottom: 4px;
+}
+
+.regex-popover input[type='text'] {
+  width: 100%;
+  min-height: 40px;
+  border-radius: var(--shape-small);
+  border: 1px solid var(--outline);
+  padding: 0 10px;
+  font: inherit;
+  font-size: 13px;
+  background: var(--surface);
+  color: var(--on-surface);
+}
+
+.regex-popover .mode-row {
+  display: flex;
+  gap: 8px;
+}
+
+.regex-popover .mode-row button {
+  flex: 1;
+  min-height: 36px;
+  border-radius: var(--shape-full);
+  border: 1px solid var(--outline);
+  background: var(--surface);
+  color: var(--on-surface);
+  cursor: pointer;
+  font: inherit;
+  font-size: 12px;
+}
+
+.regex-popover .mode-row button[aria-pressed='true'] {
+  background: var(--primary);
+  color: var(--on-primary);
+}
+
+.regex-popover .flag-row {
+  display: flex;
+  gap: 12px;
+  font-size: 12px;
+  flex-wrap: wrap;
+}
+
+.regex-popover .flag-row label {
+  display: flex;
+  align-items: center;
+  gap: 4px;
+  font-weight: 400;
+}
+
+.regex-token-list {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 6px;
+}
+
+.regex-token-list button {
+  font: inherit;
+  font-size: 11px;
+  min-height: 28px;
+  padding: 0 8px;
+  border-radius: var(--shape-full);
+  border: 1px solid var(--outline);
+  background: var(--surface);
+  color: var(--on-surface);
+  cursor: pointer;
+}
+
+.regex-token-list button:focus-visible,
+.regex-popover .mode-row button:focus-visible,
+.regex-popover input:focus-visible {
+  outline: 3px solid var(--primary);
+  outline-offset: 2px;
+}
+
+/* ---------------------------------------------------------------------------------------- *
+ * Bulk-action toolbar (design/bulk-toolbar.html).
+ * ---------------------------------------------------------------------------------------- */
+.bulk-toolbar {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  flex-wrap: wrap;
+  background: var(--surface-high);
+  border-radius: var(--shape-medium);
+  padding: 12px 18px;
+  border: var(--border-thick) solid var(--outline);
+  box-shadow: 0 4px 0 0 var(--outline);
+}
+
+.bulk-toolbar__count {
+  font-family: var(--font-display);
+  font-weight: 900;
+  font-size: 14px;
+  font-variant-numeric: tabular-nums;
+  background: var(--primary-container);
+  color: var(--on-primary-container);
+  border-radius: var(--shape-full);
+  padding: 4px 12px;
+}
+
+.bulk-toolbar button.action {
+  font: inherit;
+  font-size: 13px;
+  font-weight: 600;
+  min-height: 44px;
+  padding: 0 16px;
+  border-radius: var(--shape-full);
+  border: var(--border-thick) solid var(--outline);
+  background: var(--surface);
+  color: var(--on-surface);
+  box-shadow: 0 3px 0 0 var(--outline);
+  cursor: pointer;
+  transition: transform calc(90ms * var(--motion-scale, 1)) ease,
+    box-shadow calc(90ms * var(--motion-scale, 1)) ease;
+}
+
+.bulk-toolbar button.action:active:not([disabled]) {
+  transform: translateY(3px);
+  box-shadow: none;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .bulk-toolbar button.action {
+    transition: none;
+  }
+
+  .bulk-toolbar button.action:active:not([disabled]) {
+    transform: none;
+  }
+}
+
+.bulk-toolbar button.action:focus-visible {
+  outline: 3px solid var(--primary);
+  outline-offset: 2px;
+}
+
+.bulk-toolbar button.action[disabled] {
+  opacity: 0.55;
+  cursor: not-allowed;
+}
+
+.bulk-toolbar .spacer {
+  flex: 1;
+}
+
+.bulk-toolbar__result {
+  font-size: 13px;
+}
+
+/* ---------------------------------------------------------------------------------------- *
+ * Generator rows (design/building-row.html).
+ * ---------------------------------------------------------------------------------------- */
+/* Each generator is a physical slab on the counter: chunky outline, solid offset shadow, no
+   hairlines anywhere (design/building-row.html). */
+.building-row {
+  display: grid;
+  grid-template-columns: 44px 1fr auto auto auto;
+  gap: 16px;
+  align-items: center;
+  padding: 14px 18px;
+  border-radius: var(--shape-medium);
+  background: var(--surface-high);
+  border: var(--border-thick) solid var(--outline);
+  box-shadow: 0 4px 0 0 var(--outline);
+  min-height: 72px;
+}
+
+/* Already producing: a warm fill and a ring, so the generators actually earning for you pop out
+   of the list at a glance instead of reading as one uniform stack of rows. */
+.building-row.owned {
+  background: var(--primary-container);
+  color: var(--on-primary-container);
+  border-color: var(--primary);
+  box-shadow: 0 5px 0 0 var(--primary), 0 0 0 3px var(--primary-container);
+}
+
+.building-row.locked {
+  opacity: 0.6;
+  border-style: dashed;
+}
+
+.building-row__icon {
+  width: 48px;
+  height: 48px;
+  border-radius: var(--shape-full);
+  background: var(--primary-container);
+  color: var(--on-primary-container);
+  border: var(--border-thick) solid var(--primary);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 24px;
+}
+
+.building-row.locked .building-row__icon {
+  filter: grayscale(1);
+}
+
+.building-row__names {
+  display: flex;
+  flex-direction: column;
+  min-width: 0;
+}
+
+.building-row__name-en {
+  font-family: var(--font-display);
+  font-weight: 900;
+  font-size: 16px;
+}
+
+.building-row__name-zh {
+  font-family: var(--font-zh);
+  font-weight: 700;
+  font-size: 13px;
+  color: var(--on-surface-variant);
+}
+
+.building-row.owned .building-row__name-zh,
+.building-row.owned .building-row__meta {
+  color: inherit;
+}
+
+.building-row__meta {
+  display: flex;
+  gap: 16px;
+  font-size: 13px;
+  font-variant-numeric: tabular-nums;
+  color: var(--on-surface-variant);
+  margin-top: 2px;
+  flex-wrap: wrap;
+}
+
+.owned-chip {
+  background: var(--secondary);
+  color: var(--on-secondary);
+  border-radius: var(--shape-full);
+  padding: 4px 12px;
+  font-family: var(--font-display);
+  font-weight: 900;
+  font-size: 12px;
+  font-variant-numeric: tabular-nums;
+  justify-self: start;
+}
+
+.stepper {
+  display: flex;
+  align-items: center;
+  gap: 4px;
+  background: var(--surface);
+  border: var(--border-thick) solid var(--outline);
+  border-radius: var(--shape-full);
+  padding: 3px;
+}
+
+.stepper button {
+  font: inherit;
+  font-family: var(--font-display);
+  font-weight: 900;
+  font-size: 12px;
+  min-width: 44px;
+  min-height: 36px;
+  border: none;
+  border-radius: var(--shape-full);
+  background: transparent;
+  color: var(--on-surface);
+  cursor: pointer;
+}
+
+.stepper button[disabled] {
+  opacity: 0.5;
+  cursor: not-allowed;
+}
+
+.stepper button.active {
+  background: var(--primary);
+  color: var(--on-primary);
+  box-shadow: 0 2px 0 0 var(--primary-shadow);
+}
+
+.stepper button:focus-visible {
+  outline: 3px solid var(--primary);
+  outline-offset: 2px;
+}
+
+.buy-btn {
+  font: inherit;
+  font-family: var(--font-display);
+  font-weight: 900;
+  font-size: 14px;
+  font-variant-numeric: tabular-nums;
+  min-height: 44px;
+  padding: 0 22px;
+  border-radius: var(--shape-full);
+  border: none;
+  cursor: pointer;
+  background: var(--primary);
+  color: var(--on-primary);
+  box-shadow: 0 4px 0 0 var(--primary-shadow);
+  white-space: nowrap;
+  transition: transform calc(90ms * var(--motion-scale, 1)) ease,
+    box-shadow calc(90ms * var(--motion-scale, 1)) ease;
+}
+
+/* Compresses flat like a real arcade-cabinet button. */
+.buy-btn:active:not([disabled]) {
+  transform: translateY(4px);
+  box-shadow: none;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .buy-btn {
+    transition: none;
+  }
+
+  .buy-btn:active:not([disabled]) {
+    transform: none;
+  }
+}
+
+.buy-btn:focus-visible {
+  outline: 3px solid var(--secondary);
+  outline-offset: 2px;
+}
+
+.buy-btn[disabled] {
+  background: var(--surface-highest);
+  color: var(--on-surface-variant);
+  box-shadow: none;
+  cursor: not-allowed;
+  opacity: 0.85;
+}
+
+.select-checkbox {
+  width: 20px;
+  height: 20px;
+}
+
+/* ---------------------------------------------------------------------------------------- *
+ * Upgrade cards / tool cards (design/upgrade-card.html, design/tool-card.html).
+ * ---------------------------------------------------------------------------------------- */
+.card-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(250px, 1fr));
+  gap: 20px;
+}
+
+.item-card {
+  position: relative;
+  border-radius: var(--shape-large);
+  padding: 18px;
+  background: var(--surface-high);
+  border: var(--border-thick) solid var(--outline);
+  /* Solid offset shadow, never a blur: every card is a physical tile on the counter. */
+  box-shadow: 0 5px 0 0 var(--outline);
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+  min-height: 170px;
+  transition: transform calc(140ms * var(--motion-scale, 1)) ease;
+}
+
+/* Colour stripe across the top of every card — the single cue that turns a grid of panels into
+   a shelf of collectible tiles. Tool nodes override the colour per tier below. */
+.item-card::before {
+  content: '';
+  position: absolute;
+  top: -3px;
+  left: -3px;
+  right: -3px;
+  height: 10px;
+  border-radius: var(--shape-large) var(--shape-large) 0 0;
+  background: var(--card-accent, var(--primary));
+  pointer-events: none;
+}
+
+/* Pure delight: a live card tilts a couple of degrees on hover. Disabled outright under
+   reduced motion — a still card still reads correctly, so there is nothing to substitute. */
+.item-card.buyable:hover,
+.item-card.owned:hover {
+  transform: translateY(-3px) rotate(-0.6deg);
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .item-card {
+    transition: none;
+  }
+
+  .item-card.buyable:hover,
+  .item-card.owned:hover {
+    transform: none;
+  }
+}
+
+.item-card.locked {
+  opacity: 0.6;
+}
+
+.item-card.locked .item-card__icon {
+  filter: grayscale(1);
+}
+
+.item-card.owned,
+.item-card.unlocked {
+  --card-accent: var(--tertiary);
+  border: var(--border-chunky) solid var(--tertiary);
+  background: var(--tertiary-container);
+  color: var(--on-tertiary-container);
+  /* Spark-accented owned glow: the celebratory ring from design/upgrade-card.html. */
+  box-shadow: 0 5px 0 0 var(--tertiary), 0 0 0 4px var(--tertiary-container),
+    0 0 18px 3px var(--spark-ring);
+}
+
+/* Owned/unlocked cards carry the chunkier 4px border, so their stripe has to reach one pixel
+   further out to stay flush with it. */
+.item-card.owned::before,
+.item-card.unlocked::before {
+  top: -4px;
+  left: -4px;
+  right: -4px;
+}
+
+.item-card.locked {
+  --card-accent: var(--outline);
+}
+
+.item-card__icon {
+  font-size: 34px;
+  line-height: 1;
+  margin-top: 4px;
+}
+
+.item-card__name-en {
+  font-family: var(--font-display);
+  font-weight: 900;
+  font-size: 16px;
+}
+
+.item-card__name-zh {
+  font-family: var(--font-zh);
+  font-weight: 700;
+  font-size: 13px;
+  color: var(--on-surface-variant);
+}
+
+.item-card.owned .item-card__name-zh,
+.item-card.unlocked .item-card__name-zh {
+  color: inherit;
+  opacity: 0.85;
+}
+
+.item-card__desc {
+  font-size: 12px;
+  color: var(--on-surface-variant);
+  flex: 1;
+}
+
+.item-card.owned .item-card__desc,
+.item-card.unlocked .item-card__desc {
+  color: inherit;
+}
+
+.item-card__badge {
+  align-self: flex-start;
+  background: var(--tertiary);
+  color: var(--on-tertiary);
+  border-radius: var(--shape-full);
+  padding: 2px 10px;
+  font-size: 11px;
+  font-weight: 700;
+}
+
+.item-card__buy {
+  font: inherit;
+  font-family: var(--font-display);
+  font-weight: 900;
+  font-size: 14px;
+  font-variant-numeric: tabular-nums;
+  min-height: 44px;
+  border-radius: var(--shape-full);
+  border: none;
+  cursor: pointer;
+  background: var(--primary);
+  color: var(--on-primary);
+  box-shadow: var(--press-2);
+  transition:
+    transform calc(90ms * var(--motion-scale, 1)) ease,
+    box-shadow calc(90ms * var(--motion-scale, 1)) ease;
+}
+
+/* Compresses flat like a real arcade-cabinet button. */
+.item-card__buy:active:not([disabled]) {
+  transform: translateY(4px);
+  box-shadow: none;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .item-card__buy {
+    transition: none;
+  }
+
+  .item-card__buy:active:not([disabled]) {
+    transform: none;
+  }
+}
+
+.item-card__buy[disabled] {
+  background: var(--surface-highest);
+  color: var(--on-surface-variant);
+  box-shadow: none;
+  cursor: not-allowed;
+}
+
+.item-card.owned .item-card__buy[disabled] {
+  background: var(--tertiary);
+  color: var(--on-tertiary);
+  box-shadow: 0 4px 0 0 var(--tertiary-shadow);
+  cursor: default;
+  opacity: 0.9;
+}
+
+.item-card__buy:focus-visible {
+  outline: 3px solid var(--tertiary);
+  outline-offset: 2px;
+}
+
+.item-card__progress-line {
+  font-size: 11px;
+  color: var(--on-surface-variant);
+}
+
+.item-card.owned .item-card__progress-line,
+.item-card.unlocked .item-card__progress-line {
+  color: inherit;
+}
+
+.item-card__progress-track {
+  height: 6px;
+  border-radius: var(--shape-full);
+  background: var(--surface-highest);
+  overflow: hidden;
+}
+
+.item-card__progress-fill {
+  height: 100%;
+  background: var(--primary);
+}
+
+.item-card.undiscovered {
+  filter: grayscale(1);
+}
+
+/* The persistent, always-present "the real feature is not locked" affordance — present
+   identically in every tool-card state, including undiscovered. */
+.open-real-feature {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  border-top: var(--border-thick) solid var(--outline);
+  padding-top: 10px;
+  margin-top: auto;
+}
+
+.item-card.owned .open-real-feature,
+.item-card.unlocked .open-real-feature {
+  border-top-color: var(--on-tertiary-container);
+}
+
+.open-real-feature__note {
+  font-size: 10px;
+  color: var(--on-surface-variant);
+  flex: 1;
+  line-height: 1.4;
+}
+
+.item-card.owned .open-real-feature__note,
+.item-card.unlocked .open-real-feature__note {
+  color: inherit;
+}
+
+.open-real-feature__button {
+  font: inherit;
+  font-weight: 700;
+  font-size: 11px;
+  min-height: 34px;
+  padding: 0 10px;
+  border-radius: var(--shape-full);
+  border: 1px solid var(--primary);
+  background: transparent;
+  color: var(--primary);
+  cursor: pointer;
+  white-space: nowrap;
+}
+
+.item-card.owned .open-real-feature__button,
+.item-card.unlocked .open-real-feature__button {
+  border-color: var(--on-tertiary-container);
+  color: var(--on-tertiary-container);
+}
+
+.open-real-feature__button:focus-visible {
+  outline: 3px solid var(--primary);
+  outline-offset: 2px;
+}
+
+/* ---------------------------------------------------------------------------------------- *
+ * Achievement badges (design/achievement-badge.html).
+ * ---------------------------------------------------------------------------------------- */
+.achievement-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(140px, 1fr));
+  gap: 20px;
+}
+
+.achievement-cell {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 6px;
+  text-align: center;
+}
+
+/* Struck like a real minted medal: a chunky ring plus an inset bevel, not a flat circle. */
+.achievement-badge {
+  width: 92px;
+  height: 92px;
+  border-radius: var(--shape-full);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 40px;
+  border: var(--border-chunky) solid transparent;
+}
+
+.achievement-badge.locked {
+  background: var(--surface-highest);
+  color: var(--on-surface-variant);
+  border-color: var(--outline);
+  /* Struck-but-not-yet-earned, not switched off: a partial desaturation keeps the medal warm
+     and part of the bakery, rather than dropping a cold grey disc onto the counter. */
+  filter: grayscale(0.55) brightness(0.97);
+  box-shadow:
+    inset 0 3px 0 0 rgba(255, 255, 255, 0.25),
+    inset 0 -4px 0 0 rgba(0, 0, 0, 0.15);
+}
+
+.achievement-badge.unlocked {
+  background: radial-gradient(circle at 35% 30%, var(--spark-glow), var(--tertiary) 72%);
+  color: var(--on-tertiary);
+  border-color: var(--spark-ring);
+  box-shadow:
+    inset 0 3px 0 0 rgba(255, 255, 255, 0.45),
+    inset 0 -6px 0 0 var(--tertiary-shadow),
+    0 0 0 4px var(--tertiary-container),
+    0 0 16px 2px var(--spark-glow);
+}
+
+.achievement-badge:focus-visible {
+  outline: 4px solid var(--primary);
+  outline-offset: 4px;
+}
+
+.achievement-name {
+  font-family: var(--font-display);
+  font-size: 14px;
+  font-weight: 900;
+}
+
+.achievement-name-zh {
+  font-family: var(--font-zh);
+  font-weight: 700;
+  font-size: 12px;
+  color: var(--on-surface-variant);
+}
+
+/* Unlock toast (design/achievement-badge.html + design/narrator-toast.html): non-blocking,
+   corner-anchored, chunky offset shadow, spark-accent left stripe. Never modal. */
+.achievement-toast {
+  position: fixed;
+  bottom: 24px;
+  right: 24px;
+  max-width: 320px;
+  display: flex;
+  gap: 12px;
+  align-items: center;
+  padding: 14px 18px;
+  border-radius: var(--shape-large);
+  background: var(--surface-high);
+  color: var(--on-surface);
+  border: var(--border-thick) solid var(--outline);
+  border-left: 6px solid var(--spark-ring);
+  box-shadow: var(--press-3);
+}
+
+.achievement-toast__badge {
+  width: 44px;
+  height: 44px;
+  font-size: 20px;
+  flex-shrink: 0;
+}
+
+.achievement-toast__text {
+  font-size: 13px;
+}
+
+.achievement-toast__text strong {
+  display: block;
+  font-size: 14px;
+  font-family: var(--font-display);
+}
+
+.screen-summary {
+  font-family: var(--font-zh);
+  font-variant-numeric: tabular-nums;
+  font-size: 13px;
+  color: var(--on-surface-variant);
+  margin: 0;
+}
+
+/* ---------------------------------------------------------------------------------------- *
+ * Stat tiles (design/stat-tile.html).
+ * ---------------------------------------------------------------------------------------- */
+.stat-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(190px, 1fr));
+  gap: 18px;
+}
+
+.stat-tile {
+  position: relative;
+  border-radius: var(--shape-large);
+  padding: 18px;
+  background: var(--surface-high);
+  /* Chunky bordered chrome rather than a soft tonal card — see design/README.md on the
+     deliberate departure from M3 elevation. */
+  border: var(--border-thick) solid var(--outline);
+  box-shadow: 0 5px 0 0 var(--outline);
+  display: flex;
+  flex-direction: column;
+  gap: 3px;
+}
+
+/* Same accent stripe as the cards, so a stat board and an upgrade shelf read as one system. */
+.stat-tile::before {
+  content: '';
+  position: absolute;
+  top: -3px;
+  left: -3px;
+  right: -3px;
+  height: 8px;
+  border-radius: var(--shape-large) var(--shape-large) 0 0;
+  background: var(--tertiary);
+}
+
+.stat-tile__label-en {
+  font-size: 11px;
+  color: var(--on-surface-variant);
+  font-weight: 600;
+  text-transform: uppercase;
+  letter-spacing: 0.4px;
+}
+
+.stat-tile__label-zh {
+  font-family: var(--font-zh);
+  font-size: 11px;
+  color: var(--on-surface-variant);
+}
+
+.stat-tile__value {
+  font-family: var(--font-display);
+  font-size: 32px;
+  font-weight: 900;
+  /* Tabular figures so a column of tiles always aligns digit-for-digit while the numbers
+     tick — required by design/stat-tile.html for every repeatedly-read figure. */
+  font-variant-numeric: tabular-nums;
+  margin-top: 4px;
+}
+
+/*
+ * Trend indicators. Colour is NEVER the only signal: every trend also carries a glyph
+ * (▲ / ▼ / ■) and an explicit + / − sign, so the direction survives any colour-vision
+ * difference and any monochrome rendering.
+ */
+.stat-tile__trend {
+  font-size: 12px;
+  font-weight: 600;
+  font-variant-numeric: tabular-nums;
+  margin-top: 4px;
+}
+
+.stat-tile__trend.up {
+  color: var(--tertiary);
+}
+
+.stat-tile__trend.down {
+  color: var(--error);
+}
+
+.stat-tile__trend.flat {
+  color: var(--on-surface-variant);
+}
+
+.stat-section-heading {
+  font-family: var(--font-display);
+  font-weight: 900;
+  font-size: 22px;
+  margin: 28px 0 10px;
+}
+
+.stat-empty,
+.stat-footnote {
+  font-size: 13px;
+  color: var(--on-surface-variant);
+  max-width: 64ch;
+}
+
+.contribution-table {
+  border-collapse: collapse;
+  width: 100%;
+  max-width: 720px;
+  font-size: 13px;
+}
+
+.contribution-table__caption {
+  caption-side: bottom;
+  text-align: left;
+  padding-top: 8px;
+  font-size: 12px;
+  color: var(--on-surface-variant);
+}
+
+.contribution-table th,
+.contribution-table td {
+  text-align: left;
+  padding: 8px 10px;
+  border-bottom: 2px solid var(--outline-variant);
+}
+
+.contribution-table thead th {
+  font-size: 11px;
+  text-transform: uppercase;
+  letter-spacing: 0.4px;
+  color: var(--on-surface-variant);
+  border-bottom: 3px solid var(--outline);
+}
+
+.contribution-table tbody th {
+  font-weight: 700;
+}
+
+.contribution-table__name-zh {
+  display: block;
+  font-family: var(--font-zh);
+  font-weight: 400;
+  font-size: 12px;
+  color: var(--on-surface-variant);
+}
+
+.contribution-table td.numeric {
+  font-variant-numeric: tabular-nums;
+  white-space: nowrap;
+}
+
+.contribution-bar {
+  display: block;
+  height: 6px;
+  margin-top: 4px;
+  min-width: 80px;
+  border-radius: var(--shape-full);
+  background: var(--surface-highest);
+  overflow: hidden;
+}
+
+.contribution-bar__fill {
+  display: block;
+  height: 100%;
+  background: var(--primary);
+}
+
+/* ---------------------------------------------------------------------------------------- *
+ * Destructive gate (design/prestige-gate.html).
+ * ---------------------------------------------------------------------------------------- */
+/*
+ * Deliberately heavier chrome than anything else in the theme: a 4px border, a deep solid
+ * offset shadow and a large radius. This is the one moment the game wants to feel weighty
+ * and slow rather than quick, and it should not be mistakable for an ordinary settings card.
+ */
+.gate {
+  border-radius: 34px;
+  padding: 26px;
+  margin-top: 18px;
+  max-width: 480px;
+  display: flex;
+  flex-direction: column;
+  gap: 16px;
+  border: 4px solid var(--outline);
+}
+
+.gate.tone-prestige {
+  background: var(--tertiary-container);
+  color: var(--on-tertiary-container);
+  border-color: var(--tertiary);
+  box-shadow: 0 7px 0 0 var(--tertiary);
+}
+
+.gate.tone-wipe {
+  background: var(--error-container);
+  color: var(--on-error-container);
+  border-color: var(--error);
+  box-shadow: 0 7px 0 0 var(--error);
+}
+
+.gate h2 {
+  margin: 0;
+  font-family: var(--font-display);
+  font-weight: 900;
+  font-size: 24px;
+}
+
+.gate-triggers {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 12px;
+  margin-top: 20px;
+}
+
+.projection-card__detail {
+  font-size: 12px;
+  color: var(--on-surface-variant);
+  margin-bottom: 0;
+}
+
+.permanent-shop-card__list {
+  margin: 0;
+  padding-left: 20px;
+  font-size: 13px;
+}
+
+.gate__impact {
+  font-size: 13px;
+  line-height: 1.5;
+}
+
+.gate__impact strong {
+  display: block;
+  margin-top: 6px;
+}
+
+.gate__impact strong:first-child {
+  margin-top: 0;
+}
+
+.gate__keys {
+  display: flex;
+  gap: 14px;
+}
+
+.gate__key {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 6px;
+  padding: 10px;
+  border-radius: var(--shape-medium);
+  background: rgba(255, 255, 255, 0.35);
+}
+
+:root[data-theme='dark'] .gate__key {
+  background: rgba(0, 0, 0, 0.25);
+}
+
+@media (prefers-color-scheme: dark) {
+  :root:not([data-theme='light']) .gate__key {
+    background: rgba(0, 0, 0, 0.25);
+  }
+}
+
+/* 76x44: the toggle itself meets the 44px minimum target rather than relying on its
+   surrounding label to be hit. */
+.gate__key-toggle {
+  width: 76px;
+  height: 44px;
+  border-radius: var(--shape-full);
+  border: 4px solid var(--outline);
+  background: var(--surface);
+  position: relative;
+  cursor: pointer;
+  font-size: 0;
+}
+
+.gate__key-toggle[disabled] {
+  opacity: 0.55;
+  cursor: not-allowed;
+}
+
+.gate__key-toggle::after {
+  content: '';
+  position: absolute;
+  top: 3px;
+  left: 3px;
+  width: 30px;
+  height: 30px;
+  border-radius: var(--shape-full);
+  background: var(--outline);
+  transition: transform calc(150ms * var(--motion-scale, 1)) ease, background calc(150ms * var(--motion-scale, 1)) ease;
+}
+
+.gate__key-toggle[aria-pressed='true'] {
+  border-color: var(--primary);
+}
+
+.gate__key-toggle[aria-pressed='true']::after {
+  transform: translateX(30px);
+  background: var(--primary);
+}
+
+.gate__key-toggle:focus-visible {
+  outline: 3px solid var(--primary);
+  outline-offset: 3px;
+}
+
+.gate__key-label {
+  font-size: 11px;
+  font-weight: 700;
+  text-align: center;
+}
+
+.gate__slider-wrap {
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+}
+
+.gate__slider-wrap input[type='range'] {
+  width: 100%;
+  height: 40px;
+  accent-color: var(--primary);
+}
+
+.gate__slider-wrap input[type='range']:disabled {
+  opacity: 0.5;
+}
+
+.gate__slider-wrap input[type='range']:focus-visible {
+  outline: 3px solid var(--primary);
+  outline-offset: 2px;
+}
+
+.gate__slider-hint {
+  font-size: 11px;
+}
+
+.gate__anim-track {
+  height: 8px;
+  border-radius: var(--shape-full);
+  background: rgba(0, 0, 0, 0.15);
+  overflow: hidden;
+}
+
+.gate__anim-fill {
+  height: 100%;
+  background: var(--primary);
+  transition: width calc(120ms * var(--motion-scale, 1)) linear;
+}
+
+.gate.tone-wipe .gate__anim-fill {
+  background: var(--error);
+}
+
+/* The completion state is visually distinct from every intermediate state: a filled,
+   shadowed banner in the display face that replaces the slider row outright, so "done" can
+   never read as "still dragging". */
+.gate__completion {
+  margin: 0;
+  font-family: var(--font-display);
+  font-weight: 900;
+  font-size: 16px;
+  text-align: center;
+  padding: 12px;
+  border-radius: var(--shape-medium);
+}
+
+.gate.tone-prestige .gate__completion {
+  background: var(--primary);
+  color: var(--on-primary);
+}
+
+.gate.tone-wipe .gate__completion {
+  background: var(--error);
+  color: var(--on-error);
+}
+
+.gate__exit-btn {
+  font: inherit;
+  font-weight: 800;
+  min-height: 44px;
+  padding: 0 18px;
+  border-radius: var(--shape-full);
+  border: 3px solid var(--outline);
+  background: transparent;
+  cursor: pointer;
+  align-self: center;
+  color: inherit;
+}
+
+.gate__exit-btn:focus-visible {
+  outline: 3px solid var(--primary);
+  outline-offset: 2px;
+}
+
+.gate-trigger {
+  align-self: flex-start;
+  font: inherit;
+  font-family: var(--font-display);
+  font-weight: 900;
+  font-size: 14px;
+  min-height: 48px;
+  padding: 0 22px;
+  border-radius: var(--shape-full);
+  border: none;
+  cursor: pointer;
+  transition: transform calc(90ms * var(--motion-scale, 1)) ease,
+    box-shadow calc(90ms * var(--motion-scale, 1)) ease;
+}
+
+.gate-trigger:active:not([disabled]) {
+  transform: translateY(5px);
+  box-shadow: none;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .gate-trigger {
+    transition: none;
+  }
+
+  .gate-trigger:active:not([disabled]) {
+    transform: none;
+  }
+}
+
+.gate-trigger.tone-prestige {
+  background: var(--primary);
+  color: var(--on-primary);
+  box-shadow: 0 5px 0 0 var(--primary-shadow);
+}
+
+.gate-trigger.tone-wipe {
+  background: var(--error);
+  color: var(--on-error);
+  box-shadow: 0 5px 0 0 var(--error-shadow);
+}
+
+.gate-trigger[disabled] {
+  background: var(--surface-highest);
+  color: var(--on-surface-variant);
+  box-shadow: none;
+  cursor: not-allowed;
+}
+
+.gate-trigger:focus-visible {
+  outline: 3px solid var(--secondary);
+  outline-offset: 2px;
+}
+
+.projection-card,
+.permanent-shop-card {
+  border-radius: var(--shape-large);
+  padding: 18px;
+  background: var(--surface-high);
+  border: var(--border-thick) solid var(--outline);
+  box-shadow: 0 5px 0 0 var(--outline);
+  max-width: 520px;
+}
+
+.projection-card h2,
+.permanent-shop-card h2 {
+  margin: 0 0 6px;
+  font-family: var(--font-display);
+  font-weight: 900;
+  font-size: 18px;
+}
+
+/* ---------------------------------------------------------------------------------------- *
+ * Tools tech tree (design/tools-tree.html). Tier grouping, prerequisite arrows, the progress
+ * summary, and the per-tier jewel accent. Each .tools-tier block sets --tier-accent and its
+ * children inherit it through the cascade, so one declaration drives the chip, the node's top
+ * stripe, the mini progress fill and the unlocked-state glow.
+ * ---------------------------------------------------------------------------------------- */
+.tools-summary {
+  display: flex;
+  align-items: center;
+  gap: 20px;
+  flex-wrap: wrap;
+  background: var(--surface-high);
+  border: var(--border-thick) solid var(--outline);
+  box-shadow: 0 5px 0 0 var(--outline);
+  border-radius: var(--shape-large);
+  padding: 18px 22px;
+  margin-bottom: 16px;
+}
+
+.tools-summary__count {
+  font-family: var(--font-display);
+  font-size: 16px;
+  font-weight: 900;
+  font-variant-numeric: tabular-nums;
+}
+
+.tools-summary__track {
+  width: 190px;
+  height: 16px;
+  border-radius: var(--shape-full);
+  background: var(--surface-highest);
+  border: var(--border-thick) solid var(--outline);
+  overflow: hidden;
+}
+
+.tools-summary__fill {
+  height: 100%;
+  background: linear-gradient(90deg, var(--tier1), var(--tier2));
+}
+
+.tools-summary__toggle-wrap {
+  margin-left: auto;
+  display: flex;
+  align-items: center;
+  gap: 10px;
+}
+
+.tools-summary__toggle {
+  font: inherit;
+  font-weight: 700;
+  min-height: 44px;
+  padding: 0 16px;
+  border-radius: var(--shape-full);
+  border: 3px solid var(--outline);
+  background: var(--surface);
+  color: var(--on-surface);
+  cursor: pointer;
+}
+
+.tools-summary__toggle[aria-pressed='true'] {
+  border-color: var(--primary);
+  background: var(--primary-container);
+  color: var(--on-primary-container);
+}
+
+.tools-summary__toggle:focus-visible {
+  outline: 3px solid var(--primary);
+  outline-offset: 2px;
+}
+
+.tools-note {
+  background: var(--primary-container);
+  color: var(--on-primary-container);
+  border: 2px solid var(--primary);
+  border-radius: var(--shape-medium);
+  padding: 12px 16px;
+  font-size: 12px;
+  max-width: 74ch;
+  margin: 0 0 16px;
+}
+
+.tools-tier {
+  margin-bottom: 28px;
+}
+
+.tools-tier[data-tier='1'] {
+  --tier-accent: var(--tier1);
+  --on-tier-accent: var(--on-tier1);
+  --tier-accent-container: var(--tier1-container);
+  --on-tier-accent-container: var(--on-tier1-container);
+}
+
+.tools-tier[data-tier='2'] {
+  --tier-accent: var(--tier2);
+  --on-tier-accent: var(--on-tier2);
+  --tier-accent-container: var(--tier2-container);
+  --on-tier-accent-container: var(--on-tier2-container);
+}
+
+.tools-tier[data-tier='3'] {
+  --tier-accent: var(--tier3);
+  --on-tier-accent: var(--on-tier3);
+  --tier-accent-container: var(--tier3-container);
+  --on-tier-accent-container: var(--on-tier3-container);
+}
+
+.tools-tier__heading {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  flex-wrap: wrap;
+  margin: 0 0 4px;
+  font-family: var(--font-display);
+  font-weight: 900;
+  font-size: 22px;
+}
+
+.tools-tier__chip {
+  display: inline-flex;
+  align-items: center;
+  font-weight: 800;
+  font-size: 11px;
+  padding: 3px 10px;
+  border-radius: var(--shape-full);
+  background: var(--tier-accent);
+  color: var(--on-tier-accent);
+}
+
+.tools-tier__prereq {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  font-size: 12px;
+  color: var(--on-surface-variant);
+  margin: 0 0 10px;
+  max-width: 74ch;
+}
+
+.tools-tier__arrow {
+  font-size: 20px;
+  font-weight: 900;
+  color: var(--tier-accent);
+}
+
+/* The tier jewel drives the shared card top stripe, so a tool node escalates in colour up the
+   tree without needing its own border hack. */
+.tool-node {
+  --card-accent: var(--tier-accent);
+  border: var(--border-thick) solid var(--outline);
+  box-shadow: 0 5px 0 0 var(--outline);
+}
+
+.tool-node.undiscovered {
+  border-style: dashed;
+}
+
+/* A tool node always flies its tier colour, locked or not — the tier is what the stripe is
+   there to communicate, and it does not stop being true while the node is locked. */
+.tool-node.locked,
+.tool-node.undiscovered {
+  --card-accent: var(--tier-accent);
+}
+
+.tool-node.unlocked {
+  border: var(--border-chunky) solid var(--tier-accent);
+  background: var(--tier-accent-container);
+  color: var(--on-tier-accent-container);
+  box-shadow: 0 5px 0 0 var(--tier-accent), 0 0 0 4px var(--tier-accent-container),
+    0 0 18px 3px var(--spark-ring);
+}
+
+.tool-node.unlocked::before {
+  top: -4px;
+  left: -4px;
+  right: -4px;
+}
+
+.tool-node.ready {
+  box-shadow: 0 5px 0 0 var(--outline), 0 0 0 4px var(--tier-accent-container);
+}
+
+.tool-node .item-card__progress-fill {
+  background: var(--tier-accent);
+}
+
+.tool-node__chip {
+  align-self: flex-start;
+  border-radius: var(--shape-full);
+  padding: 2px 10px;
+  font-size: 11px;
+  font-weight: 800;
+  background: var(--surface-highest);
+  color: var(--on-surface-variant);
+}
+
+.tool-node.ready .tool-node__chip {
+  background: var(--tier-accent-container);
+  color: var(--on-tier-accent-container);
+}
+
+.tool-node.unlocked .tool-node__chip {
+  background: var(--tier-accent);
+  color: var(--on-tier-accent);
+}
+
+.tool-node.unlocked .item-card__name-zh,
+.tool-node.unlocked .item-card__desc,
+.tool-node.unlocked .item-card__progress-line {
+  color: inherit;
+}
+
+/* The "Open it now" callout is deliberately NOT part of the lock chrome: its own solid spark
+   ring, its own fill, its own badge, present and fully enabled in every node state including
+   undiscovered. Never grey it out, never hide it. */
+.tool-node .open-real-feature {
+  display: flex;
+  flex-direction: column;
+  align-items: flex-start;
+  gap: 8px;
+  border: 3px solid var(--spark-ring);
+  border-radius: var(--shape-medium);
+  background: var(--surface);
+  color: var(--on-surface);
+  padding: 10px 12px;
+  margin-top: auto;
+  filter: none;
+  opacity: 1;
+}
+
+.open-real-feature__badge {
+  font-size: 11px;
+  font-weight: 800;
+  text-transform: uppercase;
+  letter-spacing: 0.3px;
+  color: var(--spark-ring);
+}
+
+.tool-node .open-real-feature__button {
+  min-height: 40px;
+  border-width: 3px;
+  font-size: 12.5px;
+  background: var(--surface);
+}
+
+.tool-node.undiscovered {
+  filter: none;
+}
+
+.tool-node.undiscovered .item-card__icon,
+.tool-node.undiscovered .item-card__name-en,
+.tool-node.undiscovered .item-card__name-zh,
+.tool-node.undiscovered .item-card__desc {
+  filter: grayscale(1);
+  color: var(--on-surface-variant);
+}
+
+ul.card-grid {
+  list-style: none;
+  margin: 0;
+  padding: 0;
 }

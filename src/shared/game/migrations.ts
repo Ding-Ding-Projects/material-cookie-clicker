@@ -25,11 +25,19 @@ export class SaveVersionTooNewError extends Error {
 export type MigrationStep = (input: Record<string, unknown>) => Record<string, unknown>;
 
 /**
- * Ordered forward-only migrations, indexed by the version they migrate FROM.
- * Currently empty because SAVE_SCHEMA_VERSION is 1 and there is no version 0 save format
- * that predates this domain; add entries here (e.g. `1: migrateV1ToV2`) as the schema grows.
+ * Version 1 -> 2: adds `purchasedToolIds` (the Tools shop's early-buy record — see
+ * tool-shop.ts). No version-1 save could have bought a tool early, since the shop did not
+ * exist yet, so every migrated save starts with an empty list; the player's already-earned
+ * natural unlocks (tools.ts's unlock conditions) are untouched by this migration.
  */
-export const MIGRATIONS: Readonly<Record<number, MigrationStep>> = {};
+function migrateV1ToV2(input: Record<string, unknown>): Record<string, unknown> {
+  return { ...input, schemaVersion: 2, purchasedToolIds: [] };
+}
+
+/** Ordered forward-only migrations, indexed by the version they migrate FROM. */
+export const MIGRATIONS: Readonly<Record<number, MigrationStep>> = {
+  1: migrateV1ToV2,
+};
 
 export interface MigrationResult {
   readonly data: Record<string, unknown>;

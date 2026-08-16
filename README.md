@@ -72,25 +72,40 @@ site is published from `site/`.
 ## Captures
 
 Real screenshots of the built application, taken from the packaged `dist/`
-running on an off-screen desktop via Win32 PrintWindow. The dark theme was
-captured by setting `data-theme="dark"` on the built renderer's root element
-(the app otherwise follows the OS scheme). What they still do not show: a
-real-window narrow-width resize (the shop-drawer breakpoint was verified by
-patching built CSS) or a golden-cookie spawn.
+running maximised on an off-screen Windows desktop and photographed window by
+window via Win32 PrintWindow. Two of the nine start from a save written into the
+running application's own storage to skip the grind; every purchase in them was
+a real press of a real control. The dark-theme capture is the one thing that was
+altered: `data-theme="dark"` was set on the built renderer's root element in
+`dist/` and restored afterwards, because the application otherwise follows the
+operating system's colour scheme.
+
+What they still do not show: a real-window narrow-width resize — every capture
+here is one maximised window, so the shop-drawer breakpoint remains verified by
+forcing it rather than by resizing — a golden-cookie spawn, any settings surface
+(there is none), the prestige two-key confirmation gate (it ships, but sits below
+the fold of the Prestige capture), and the deep end of the generator ladder past
+Shipment, which no capture run has reached.
 
 <details>
-<summary>The five shipped surfaces</summary>
+<summary>The nine captures of the current build</summary>
 
-| Surface | Capture |
+| What it shows | Capture |
 | --- | --- |
-| The single game surface — HUD, cookie hero, docked shop rail, upgrade ticket strip | ![The game surface: HUD readouts showing cookies, per-second and per-click values above the cookie hero, with the shop rail docked right and the upgrade ticket strip below](captures/app/surface-game.png) |
-| The same game surface in the dark "arcade night" theme | ![The game surface in dark theme: the glowing cookie on a dark warm cabinet, HUD bezels, shop rail and upgrade tickets all rendered from the dark token set](captures/app/surface-game-dark.png) |
-| Achievements tab — unlocked medal beside locked silhouettes, 2 / 100 counter | ![The Achievements tab: the First Bite medal unlocked with a spark ring, rows of locked silhouette badges, and the 2 of 100 unlocked counter](captures/app/surface-achievements.png) |
-| Tools tech tree — 1 / 20 unlocked, the always-available contract banner | ![The Tools tab: the tech-tree summary showing 1 of 20 tools unlocked and the banner stating unlocking a tool never gates the real application feature](captures/app/surface-tools.png) |
-| Statistics tab — HUD-bezel stat tiles with tabular numerals | ![The Statistics tab: a grid of recessed stat tiles showing total cookies, lifetime cookies, cookies per second, click power and related counters](captures/app/surface-statistics.png) |
-| Prestige tab — ascension projection and the two-key destructive gate | ![The Prestige tab: ascension point and multiplier tiles with the ascension projection panel and the destructive action controls](captures/app/surface-prestige.png) |
+| A fresh save: progressive disclosure at its starting point, one cookie and one number | ![A fresh profile: a single COOKIES readout showing 0, the domed cookie button alone in an otherwise empty cabinet panel, and no shop rail, upgrade strip, console buttons or navigation of any kind](captures/app/fresh-start.png) |
+| The moment the shop is revealed, just after the Shop Sign upgrade is bought | ![Just after buying the Shop Sign: the COOKIES readout reads 2.22, the Achievements and Tools console emblems have appeared at the top right, and a SHOP rail has docked down the right with a Cursor row, its x1/x10/x100/Max stepper and a Buy button priced at 15 cookies above one padlocked mystery row](captures/app/shop-revealed.png) |
+| The full surface on a progressed save — HUD, cookie hero, upgrade strip, shop rail, Diesel Depot | ![The full game surface: HUD plates reading 3.926 billion cookies, 181.7 thousand per second and 2.04 per click, four console emblems at the top right, the cookie hero, an UPGRADES strip reading 6 of 79 with owned tickets, and a shop rail whose footer is the Diesel Depot](captures/app/game-progressed.png) |
+| The same surface in the dark "arcade night" theme | ![The same progressed surface in the dark theme: a near-black warm-brown cabinet, the cookie glowing pale gold, HUD plates in dark bezels, olive-gold upgrade tickets, and a dark shop rail with the Diesel Depot reading 36 litres and 76 vouchers minted](captures/app/game-dark.png) |
+| Achievements, open as an anchored dialog over the dimmed game | ![The Achievements panel anchored to its console emblem over a dimmed game surface, reading 15 of 100 unlocked above a grid where First Bite, 1 Cursor, 10 Cursors and 1 Grandma are struck gold medals and the rest are grey question-mark silhouettes](captures/app/dialog-achievements.png) |
+| The Tools tech tree, with the no-gating contract stated on the surface | ![The Tools panel anchored to its console emblem: a callout saying every real app feature is already open, a plate reading 9 of 20 tools unlocked with the Tool progression toggle on, and Tier 1 cards for an undiscovered tool and an unlocked Regex Builder, each ending in an ALWAYS AVAILABLE banner](captures/app/dialog-tools.png) |
+| Statistics — ten counters, including the clock-anomaly count | ![The Statistics panel anchored to its console emblem, showing ten tiles: total and lifetime cookies at 5.051 billion, 181.7 thousand cookies per second, click power 2.04, zero total clicks, zero ascension points, zero prestige runs, 15 of 100 achievements, 9 of 20 tools and zero clock anomalies](captures/app/dialog-statistics.png) |
+| Prestige — the ascension projection below the threshold | ![The Prestige panel anchored to its console emblem: tiles reading zero ascension points, a times 1.00 production multiplier, zero prestige runs and 5.054 billion lifetime cookies this run, above a projection panel saying you must reach 1 trillion lifetime cookies first](captures/app/dialog-prestige.png) |
+| The Diesel Depot mid-mint, one frame of the pump animation | ![The Diesel Depot caught mid-mint: a jerry can tipped up and pouring over the depot card, a hose and nozzle sweeping in behind it, a ghosted 14 rolling up under the litres figure, and a printed slip reading VOUCHER ed2d41c7 — the identifier the main process really wrote to the shared ledger](captures/app/diesel-mint.png) |
 
 </details>
+
+Older captures from earlier lanes are still on disk under `captures/`, and
+`captures/README.md` says what each of them was.
 
 ## License
 

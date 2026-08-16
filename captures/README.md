@@ -23,6 +23,55 @@ pixels.
 
 ## `app/` — the built application
 
+### The current set
+
+Nine images, all taken in one session from the same build, and all of them
+opened and looked at afterwards. This is the set the README table and the
+documentation site's capture matrix both point at; everything below it in this
+file is older evidence from earlier lanes, kept for the record.
+
+| File | What it shows |
+| --- | --- |
+| `fresh-start.png` | A genuinely fresh profile. One `COOKIES` plate reading 0, the cookie alone in an empty cabinet panel, and nothing else — no shop rail, no upgrade strip, no console emblems, no navigation. This is what progressive disclosure looks like at its starting point. |
+| `shop-revealed.png` | The same run after twelve real clicks on the cookie and one real press of the Shop Sign discovery ticket. The `SHOP` rail has docked, carrying a single Cursor row and one padlocked `???` rung; the Achievements and Tools console emblems arrived on their own progress. Still no upgrade strip. |
+| `game-progressed.png` | The full surface: three HUD plates, all four console emblems, the cookie hero with its per-second and hold-to-click lines, the `UPGRADES` strip at 6 / 79, the shop rail, and the Diesel Depot docked as the rail's footer. |
+| `game-dark.png` | The same surface in the dark "arcade night" theme. |
+| `dialog-achievements.png` `dialog-tools.png` `dialog-statistics.png` `dialog-prestige.png` | Each of the four anchored dialogs, open over the dimmed game surface and pointed at the console emblem that opened it: 15 / 100 achievements, 9 / 20 tools, ten stat tiles, and the ascension projection below the trillion-cookie threshold. |
+| `diesel-mint.png` | One frame of the Diesel Depot's mint animation: the can pouring, the nozzle sweeping in behind it, a ghosted `14` rolling up under the litres figure, and the printed slip carrying `ed2d41c7` — a voucher identifier that really is in `%APPDATA%\DingDingProjects\exchange\diesel-vouchers.json`. |
+
+**How this set was taken.** From the built `dist/`, launched by the real
+`electron` binary onto an off-screen Windows desktop named `CaptureRefresh`,
+with `--remote-debugging-port` so the run could be driven and a throwaway
+`--user-data-dir` so it started from an empty save. The window was maximised
+through the application's own title-bar API (2582x1550 device pixels at 144 DPI)
+and every image is a Win32 `PrintWindow` capture of that one window, resolved by
+title and class from the desktop's window list.
+
+`fresh-start.png` and `shop-revealed.png` are one unseeded run: the twelve clicks
+and the Shop Sign purchase were real presses of the real controls.
+
+The other seven come from a second run given a starting balance — a save in the
+application's own format carrying 5 billion cookies, the same lifetime figure and
+nothing else, written into the profile's `localStorage` over the running app's
+own devtools connection and then loaded normally. Everything visible past that
+balance was bought through the interface: the four reveal upgrades, two global
+upgrades, the generators down to Shipment, and every diesel mint. The
+achievements and the console emblems unlocked themselves off that lifetime total.
+
+Toasts queue, and a stale one lying across the shop rail would misrepresent the
+layout, so each capture waited until the milestone region was empty before the
+shutter. The dialog captures also wait several seconds after opening: a
+`PrintWindow` taken during the open animation comes back with a blank rectangle
+where the panel should be, and one such frame was discarded rather than shipped.
+
+**The one alteration.** `game-dark.png` needed `data-theme="dark"` added to the
+`<html>` element of `dist/renderer/index.html`, because the application otherwise
+follows the operating system's colour scheme and this desktop is light. The file
+was restored from a backup immediately afterwards. Nothing else in this set was
+patched, retouched or composed.
+
+### Earlier lanes
+
 | File | What it shows | Commit |
 | --- | --- | --- |
 | `launch-shell.png` | The application launched from the real build: window opens, product name correct, theme surface rendering, custom title bar rather than the operating system's default. | `37c967b` |
@@ -90,11 +139,16 @@ never greyed out and never hidden behind the silhouette.
 
 ## Not captured yet
 
-- The six game destinations and the tools shop, in the running application.
-- The settings surfaces, the command palette, and the appearance editor.
-- Dark theme in the built application. The design specs carry both schemes and
-  all 46 role pairs are contrast-verified, but the application itself has only
-  been photographed in light.
-- Narrow widths and high display scales.
+- The tools shop, and the settings surfaces, command palette and appearance
+  editor — none of which exist in the application yet.
+- A golden-cookie spawn. The window is five to fifteen minutes wide and no
+  capture run has sat still long enough to catch one.
+- Narrow widths and high display scales. Every image in the current set is one
+  maximised window on one desktop, so the shop rail's bottom-sheet drawer
+  breakpoint is still only verified by forcing it, never by a real resize.
+- The prestige two-key confirmation gate. It ships, and it sits below the fold
+  of `dialog-prestige.png`.
+- The generator ladder past Shipment. The seeded run never bought that deep, so
+  the last five tiers have never been on screen for a camera.
 
 These are gaps in evidence, not features known to be broken. Nobody has looked.

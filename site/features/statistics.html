@@ -31,10 +31,10 @@
 </div>
     <h2>From the running application</h2>
     <figure class="capture">
-  <img src="../assets/captures/surface-statistics.png" alt="The Statistics tab. Bilingual stat tiles, each a raised plate with a large tabular number, read: Total cookies baked 4.06, Lifetime cookies 4.06, Cookies per second 0, Click power 1.02 with a "no change this session" trend note, Total clicks 4, Ascension points 0, Prestige runs 0, and Achievements unlocked 2 / 100. Two further tiles, Tools unlocked and Clock anomalies caught, are partly scrolled out of view at the bottom." width="1557" height="1093" loading="lazy" />
-  <figcaption><strong>Statistics.</strong> Every counter the engine keeps, including the clock-anomaly count. Captured from the built application running on an off-screen desktop, photographed with the Win32 PrintWindow API. Light theme.</figcaption>
-</figure>
-    <p><a href="../index.html#captures">See all five captures in the capture matrix</a>.</p>
+      <img src="../assets/captures/dialog-statistics.png" alt="The Statistics panel open as an anchored dialog over the dimmed game surface, hanging from the STATISTICS console emblem. Ten stat tiles, each a plate with a bilingual label and a large tabular number, read: total cookies baked 5.051 billion, lifetime cookies 5.051 billion, cookies per second 181.7 thousand with a no change this session note, click power 2.04 with the same note, total clicks 0, ascension points 0, prestige runs 0, achievements unlocked 15 / 100, tools unlocked 9 / 20, and clock anomalies caught 0." width="2582" height="1550" loading="lazy" />
+      <figcaption><strong>Statistics.</strong> Every counter the engine keeps, including the clock-anomaly count. Captured from the built application running on an off-screen Windows desktop, photographed with the Win32 PrintWindow API, window maximised.</figcaption>
+    </figure>
+    <p><a href="../index.html#captures">See all nine captures in the capture matrix</a>.</p>
     
 <h2>What it does</h2>
 <p>The game state carries a small, deliberately short list of statistics, each maintained by the one mutation seam that owns all state changes:</p>
@@ -52,7 +52,7 @@
 <p>Nothing here is configurable; statistics are recorded, not tuned. Presentation is fixed by <code>design/stat-tile.html</code>: a raised outer plate with a recessed inner bezel the number sits down inside, a large tabular-numerals counter, a bilingual label, and an optional trend indicator that always pairs colour with a glyph rather than relying on colour alone.</p>
 
 <h2>In the shipped build</h2>
-<p>The Statistics tab is in this release. Two tiles &mdash; tools unlocked and clock anomalies caught &mdash; sit below the fold in the capture and need scrolling to reach, which is what the capture shows rather than something it hides.</p>
+<p>The Statistics panel is in this release. It opens as an anchored dialog from the Statistics console emblem rather than as a separate screen, and at the maximised window size of the capture all ten tiles &mdash; down to tools unlocked and clock anomalies caught &mdash; fit without scrolling.</p>
     <nav class="related plate" aria-labelledby="related-heading">
       <h2 id="related-heading">Related articles</h2>
       <ul>

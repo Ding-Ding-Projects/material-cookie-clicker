@@ -89,9 +89,13 @@ about.
 - **The game has been seen running.** The single-surface game (HUD, cookie
   hero, docked shop rail, upgrade ticket strip on one screen) plus the four
   secondary tabs (Achievements, Tools, Statistics, Prestige) were launched from
-  the built `dist/` on an off-screen desktop and captured via PrintWindow:
-  `captures/app/surface-*.png`. The screens were driven by real background
-  clicks, not mocked.
+  the built `dist/` on an off-screen desktop and captured via PrintWindow. The
+  current evidence set is the nine files listed under "The current set" in
+  `captures/README.md` — `fresh-start.png`, `shop-revealed.png`,
+  `game-progressed.png`, `game-dark.png`, the four `dialog-*.png` and
+  `diesel-mint.png`. It supersedes the older `surface-*.png`, which show a build
+  with bottom tabs and no progressive disclosure. Purchases were real presses of
+  the real controls, not mocked.
 - The visual language is the game-first v2 design (`design/`, 78/78 AA pairs
   computed), a deliberate escalation of the non-M3 decision. The core loop
   lives on ONE surface by owner directive — never split shop/upgrades onto
@@ -101,9 +105,8 @@ about.
 
 ### Still not verified — do not describe these as working
 
-- ~~Dark theme never captured~~ — captured later the same day
-  (`captures/app/surface-game-dark.png`, via `data-theme="dark"` on the built
-  renderer root) and it renders correctly.
+- ~~Dark theme never captured~~ — captured (`captures/app/game-dark.png`, via
+  `data-theme="dark"` on the built renderer root) and it renders correctly.
 - Narrow-width drawer behaviour was verified only by patching the breakpoint
   in built CSS, not by resizing a real window.
 - **The completeness inventory and its negative regression guard do not exist.**

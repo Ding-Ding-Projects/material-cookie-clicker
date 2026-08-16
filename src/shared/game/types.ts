@@ -12,6 +12,21 @@ export interface OwnedUpgrade {
   readonly purchasedAtTickCount: number;
 }
 
+/**
+ * A tool bought from the Tool Shop (see tool-shop.ts). This is intentionally NOT yet threaded
+ * through save-schema.ts/save-codec.ts/migrations.ts -- those files sit outside this lane's
+ * allowed paths, so a state round-tripped through decodeSave()/encodeSave() today loses
+ * `ownedTools` (schema strips unknown/missing fields; `saveDataToGameState`'s cast means it
+ * simply comes back `undefined`). Every reader of `GameState.ownedTools` in this domain treats
+ * `undefined` the same as `[]` defensively for exactly this reason. Persisting this field for
+ * real requires a coordinated SAVE_SCHEMA_VERSION bump + migration entry, tracked as a known,
+ * flagged follow-up rather than silently patched around here.
+ */
+export interface OwnedTool {
+  readonly id: string;
+  readonly purchasedAtTickCount: number;
+}
+
 export interface UnlockedAchievement {
   readonly id: string;
   readonly unlockedAtIso: string;
@@ -59,6 +74,14 @@ export interface GameState {
   readonly generators: readonly OwnedGenerator[];
   readonly upgrades: readonly OwnedUpgrade[];
   readonly achievements: readonly UnlockedAchievement[];
+
+  /**
+   * Tools bought from the Tool Shop -- see tool-shop.ts and OwnedTool's own doc comment above
+   * for the persistence caveat. Optional at the type level (rather than always-present-but-
+   * possibly-empty) precisely because a state decoded from an existing save predates this field
+   * and will genuinely be missing it at runtime; every reader treats `undefined` as `[]`.
+   */
+  readonly ownedTools?: readonly OwnedTool[];
 
   readonly prestige: PrestigeState;
   readonly goldenCookie: GoldenCookieState;

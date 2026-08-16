@@ -33,6 +33,21 @@ export const TAB_COPY = {
   prestige: { en: "Prestige", yue: "轉生" },
 } as const satisfies Record<string, Bilingual>;
 
+export const SHELL_COPY = {
+  tabsLabel: { en: "Game sections", yue: "遊戲分頁" },
+  dismiss: { en: "Dismiss", yue: "收起" },
+  /**
+   * Shown when the player taps "Open it now" on a tool card. The preload bridge exposes window
+   * chrome only, so there is no channel for opening an application feature yet; this states
+   * that plainly instead of pretending the click did nothing. It is NOT a gate — the tech tree
+   * never decides whether a real feature may be opened.
+   */
+  featureSurfaceMissing: (featureEn: string, featureYue: string): Bilingual => ({
+    en: `${featureEn} is not gated — but this build has no window to open it in yet, so nothing opened.`,
+    yue: `${featureYue} 冇被鎖住——不過呢個版本重未有可以開嘅視窗，所以冇嘢開到。`,
+  }),
+} as const satisfies Record<string, Bilingual | ((...args: any[]) => Bilingual)>;
+
 export const COOKIE_SCREEN_COPY = {
   clickTarget: { en: "Click the cookie", yue: "撳曲奇" },
   cookiesLabel: { en: "Cookies", yue: "曲奇" },

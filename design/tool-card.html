@@ -7,91 +7,116 @@
 <title>Material Cookie Clicker · Tool Card · Tools Tech Tree</title>
 <style>
   :root {
-    --md-primary: #7A4A1D; --md-on-primary: #FFFFFF; --md-primary-container: #FFDCB8; --md-on-primary-container: #3A2100;
+    --md-primary: #7A4A1D; --md-on-primary: #FFFFFF; --md-primary-shadow: #4A2A0A; --md-primary-container: #FFDCB8; --md-on-primary-container: #3A2100;
     --md-tertiary: #5C4E00; --md-on-tertiary: #FFFFFF; --md-tertiary-container: #F8E287; --md-on-tertiary-container: #221B00;
     --md-surface: #FFF8F3; --md-on-surface: #211A14;
     --md-surface-variant: #F0E0D0; --md-on-surface-variant: #4F4539;
     --md-outline: #7C6F64;
     --md-surface-container: #FCEBDD;
     --md-surface-container-high: #F7E5D6;
+    --spark-ring: #D97300;
     --font-en: -apple-system, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
     --font-zh: "Segoe UI", "Microsoft JhengHei", var(--font-en);
+    --font-display: "Segoe UI Black", "Arial Black", "Segoe UI", var(--font-en);
+    --shape-full: 999px; --shape-md: 18px; --shape-sm: 12px;
+    --border-thick: 3px; --border-chunky: 4px;
   }
   [data-scheme="dark"] {
-    --md-primary: #FFB876; --md-on-primary: #4A2800; --md-primary-container: #693C00; --md-on-primary-container: #FFDCB8;
+    --md-primary: #FFB876; --md-on-primary: #4A2800; --md-primary-shadow: #A66A2E; --md-primary-container: #693C00; --md-on-primary-container: #FFDCB8;
     --md-tertiary: #DBC66E; --md-on-tertiary: #383000; --md-tertiary-container: #514600; --md-on-tertiary-container: #F8E287;
     --md-surface: #18120D; --md-on-surface: #EDE0D9;
     --md-surface-variant: #4F4539; --md-on-surface-variant: #D3C4B4;
     --md-outline: #9C8F83;
     --md-surface-container: #251D17;
     --md-surface-container-high: #302722;
+    --spark-ring: #FFC24D;
   }
   * { box-sizing: border-box; }
   body { margin: 0; font-family: var(--font-en); background: var(--md-surface); color: var(--md-on-surface); padding: 24px; }
-  h1 { font-size: 28px; margin: 0 0 4px; }
+  h1 { font-family: var(--font-display); font-size: 30px; margin: 0 0 4px; }
   h2 { font-size: 18px; margin: 32px 0 8px; }
   p.lede, p.caption { color: var(--md-on-surface-variant); max-width: 74ch; }
   button.scheme-toggle {
-    font: inherit; font-weight: 600; padding: 10px 18px; min-height: 44px;
-    border-radius: 999px; border: 1px solid var(--md-outline);
+    font: inherit; font-weight: 700; padding: 10px 20px; min-height: 44px;
+    border-radius: var(--shape-full); border: var(--border-thick) solid var(--md-outline);
     background: var(--md-surface-container); color: var(--md-on-surface); cursor: pointer; margin: 16px 0 24px;
+    box-shadow: 0 3px 0 0 var(--md-outline); transition: transform 90ms ease, box-shadow 90ms ease;
   }
+  button.scheme-toggle:active { transform: translateY(3px); box-shadow: none; }
+  @media (prefers-reduced-motion: reduce) { button.scheme-toggle { transition: none; } button.scheme-toggle:active { transform: none; } }
   button.scheme-toggle:focus-visible { outline: 3px solid var(--md-primary); outline-offset: 2px; }
 
   .principle {
     background: var(--md-primary-container); color: var(--md-on-primary-container);
-    border-radius: 12px; padding: 14px 16px; font-size: 13px; margin: 12px 0 28px; max-width: 74ch;
+    border-radius: var(--shape-md); border: var(--border-thick) solid var(--md-primary);
+    padding: 16px 18px; font-size: 13px; margin: 12px 0 28px; max-width: 74ch;
   }
-  .principle strong { display: block; margin-bottom: 4px; }
+  .principle strong { display: block; margin-bottom: 4px; font-size: 14px; }
 
-  .grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(260px, 1fr)); gap: 20px; }
+  .grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(270px, 1fr)); gap: 22px; }
   .tool-card {
-    border-radius: 12px;
-    padding: 16px;
+    border-radius: var(--shape-md);
+    padding: 18px;
     background: var(--md-surface-container-high);
+    border: var(--border-thick) solid var(--md-outline);
     display: flex; flex-direction: column; gap: 10px;
-    min-height: 220px;
+    min-height: 240px;
   }
-  .tool-card .icon { font-size: 30px; }
-  .tool-card .name-en { font-weight: 700; font-size: 15px; }
+  .tool-card .icon { font-size: 32px; }
+  .tool-card .name-en { font-weight: 800; font-size: 15px; }
   .tool-card .name-zh { font-family: var(--font-zh); font-size: 13px; color: var(--md-on-surface-variant); }
   .tool-card .body { font-size: 13px; color: var(--md-on-surface-variant); flex: 1; }
-  .tool-card.undiscovered { filter: grayscale(1); }
+  .tool-card.undiscovered { filter: grayscale(1); border-style: dashed; }
   .tool-card.undiscovered .icon, .tool-card.undiscovered .name-en { color: var(--md-on-surface-variant); }
 
-  .progress-line { display: flex; align-items: center; gap: 8px; font-size: 12px; }
-  .progress-track { flex: 1; height: 8px; border-radius: 999px; background: var(--md-surface-variant); overflow: hidden; }
+  .progress-line { display: flex; align-items: center; gap: 8px; font-size: 12px; font-variant-numeric: tabular-nums; font-weight: 600; }
+  .progress-track { flex: 1; height: 10px; border-radius: var(--shape-full); background: var(--md-surface-variant); overflow: hidden; border: 1px solid var(--md-outline); }
   .progress-fill { height: 100%; background: var(--md-primary); }
 
   .cta-btn {
-    font: inherit; font-weight: 700; min-height: 44px; border-radius: 999px; border: none; cursor: pointer;
+    font: inherit; font-weight: 800; font-variant-numeric: tabular-nums; min-height: 44px; border-radius: var(--shape-full); border: none; cursor: pointer;
     background: var(--md-primary); color: var(--md-on-primary);
+    box-shadow: 0 4px 0 0 var(--md-primary-shadow); transition: transform 90ms ease, box-shadow 90ms ease;
   }
+  .cta-btn:active { transform: translateY(4px); box-shadow: none; }
+  @media (prefers-reduced-motion: reduce) { .cta-btn { transition: none; } .cta-btn:active { transform: none; } }
   .cta-btn:focus-visible { outline: 3px solid var(--md-tertiary); outline-offset: 2px; }
-  .cta-btn[disabled] { background: var(--md-surface-variant); color: var(--md-on-surface-variant); cursor: not-allowed; }
+  .cta-btn[disabled] { background: var(--md-surface-variant); color: var(--md-on-surface-variant); cursor: not-allowed; box-shadow: none; }
 
   .bonus-line {
     background: var(--md-tertiary-container); color: var(--md-on-tertiary-container);
-    border-radius: 8px; padding: 8px 10px; font-size: 13px; font-weight: 700;
+    border-radius: var(--shape-sm); border: var(--border-thin) solid var(--md-tertiary);
+    padding: 8px 12px; font-size: 13px; font-weight: 800;
   }
 
   /* The persistent, always-present "the real feature is not locked" affordance.
-     Present in every single state, including undiscovered, and never greyed out. */
+     Present in every single state, including undiscovered, and never greyed out.
+     Given its own contrasting, clearly-bordered callout box on purpose: a heavier lock
+     treatment above (dashed grey border, bigger padlock glyph) makes THIS block easy to read
+     as "part of the lock" if it isn't visually set apart, so it gets a distinct fill, a solid
+     (non-dashed) border, and its own small "always open" badge rather than blending into the
+     card chrome around it. */
   .open-real-feature {
-    display: flex; align-items: center; gap: 8px;
-    border-top: 1px solid var(--md-outline);
-    padding-top: 10px; margin-top: auto;
+    display: flex; flex-direction: column; gap: 8px;
+    border: var(--border-thick) solid var(--spark-ring);
+    border-radius: var(--shape-sm);
+    background: var(--md-surface);
+    padding: 10px 12px;
+    margin-top: auto;
   }
-  .open-real-feature .note { font-size: 11px; color: var(--md-on-surface-variant); flex: 1; line-height: 1.4; }
+  .open-real-feature .badge-row { display: flex; align-items: center; gap: 6px; font-size: 11px; font-weight: 800; color: var(--spark-ring); text-transform: uppercase; letter-spacing: 0.3px; }
+  .open-real-feature .note { font-size: 11.5px; color: var(--md-on-surface-variant); line-height: 1.45; }
   .open-real-feature button {
-    font: inherit; font-weight: 700; font-size: 12px; min-height: 36px; padding: 0 12px;
-    border-radius: 999px; border: 1px solid var(--md-primary); background: transparent; color: var(--md-primary);
-    cursor: pointer; white-space: nowrap;
+    font: inherit; font-weight: 800; font-size: 12.5px; min-height: 40px; padding: 0 14px;
+    border-radius: var(--shape-full); border: var(--border-thick) solid var(--md-primary); background: var(--md-surface); color: var(--md-primary);
+    cursor: pointer; white-space: nowrap; align-self: flex-start;
   }
   [data-scheme="dark"] .open-real-feature button { color: var(--md-primary); border-color: var(--md-primary); }
   .open-real-feature button:focus-visible { outline: 3px solid var(--md-primary); outline-offset: 2px; }
+  .tool-card.undiscovered .open-real-feature,
   .tool-card.undiscovered .open-real-feature button,
-  .tool-card.undiscovered .open-real-feature .note { filter: none; opacity: 1; }
+  .tool-card.undiscovered .open-real-feature .note,
+  .tool-card.undiscovered .open-real-feature .badge-row { filter: none; opacity: 1; }
 </style>
 </head>
 <body data-scheme="light">
@@ -106,12 +131,15 @@
   </p>
   <div class="principle">
     <strong>The unlock gates the game surfacing and the bonus only — never the real feature. · 解鎖淨係影響遊戲內顯示同加成，唔會鎖住真正嘅功能。</strong>
-    Every tool card, in every state, keeps an "Open it now" action that opens the real
-    application feature from settings/the command palette immediately — because that feature has
-    always been available to the player, regardless of tech-tree progress. This is why the action
-    is never greyed out, never hidden behind the silhouette, and appears identically on an
-    undiscovered card and a fully unlocked one. A player must never come away thinking the
-    Regex Builder or the Authenticator itself is "locked" — only its gameplay bonus is.
+    Every tool card, in every state, keeps an "Open it now" action in its own clearly bordered
+    callout box — that box is deliberately styled to stand apart from the lock/undiscovered chrome
+    above it, precisely because a chunkier padlock treatment could otherwise make the callout read
+    as part of the lock. It opens the real application feature from settings/the command palette
+    immediately — because that feature has always been available to the player, regardless of
+    tech-tree progress. This is why the action is never greyed out, never hidden behind the
+    silhouette, and appears identically on an undiscovered card and a fully unlocked one. A player
+    must never come away thinking the Regex Builder or the Authenticator itself is "locked" — only
+    its gameplay bonus is.
   </div>
   <button class="scheme-toggle" onclick="document.body.dataset.scheme = document.body.dataset.scheme === 'dark' ? 'light' : 'dark'">
     🌗 Toggle light / dark · 切換淺色／深色
@@ -131,7 +159,8 @@
         <br/>呢個工具仲未被發現，名、圖示同解鎖條件都未顯示。
       </div>
       <div class="open-real-feature">
-        <span class="note">This app feature is already available in Settings and the command palette. · 呢個應用程式功能喺設定同指令面板一直都用得到。</span>
+        <span class="badge-row">🔓 Always available · 一直用得</span>
+        <span class="note">This app feature is already available in Settings and the command palette — undiscovered only hides the game surfacing, never the feature itself. · 呢個應用程式功能喺設定同指令面板一直都用得到——未發現淨係隱藏遊戲內顯示，唔會隱藏功能本身。</span>
         <button>Open it now · 而家開啟</button>
       </div>
     </div>
@@ -148,6 +177,7 @@
       <div class="progress-track"><div class="progress-fill" style="width:28.4%;"></div></div>
       <button class="cta-btn" disabled>Locked · 未解鎖 (142 / 500)</button>
       <div class="open-real-feature">
+        <span class="badge-row">🔓 Always available · 一直用得</span>
         <span class="note">This app feature is already available in Settings and the command palette. · 呢個應用程式功能喺設定同指令面板一直都用得到。</span>
         <button>Open it now · 而家開啟</button>
       </div>
@@ -165,19 +195,21 @@
       <div class="progress-track"><div class="progress-fill" style="width:100%;"></div></div>
       <button class="cta-btn">Unlock now · 立即解鎖</button>
       <div class="open-real-feature">
+        <span class="badge-row">🔓 Always available · 一直用得</span>
         <span class="note">This app feature is already available in Settings and the command palette. · 呢個應用程式功能喺設定同指令面板一直都用得到。</span>
         <button>Open it now · 而家開啟</button>
       </div>
     </div>
 
     <!-- STATE 4: Unlocked -->
-    <div class="tool-card" style="border: 2px solid var(--md-tertiary); background: var(--md-tertiary-container);">
+    <div class="tool-card" style="border: var(--border-chunky) solid var(--md-tertiary); background: var(--md-tertiary-container); box-shadow: 0 0 0 3px var(--md-tertiary-container), 0 0 14px 1px var(--spark-ring);">
       <div class="icon">🎨</div>
       <div class="name-en" style="color: var(--md-on-tertiary-container);">Appearance Editor</div>
       <div class="name-zh" style="color: var(--md-on-tertiary-container);">外觀編輯器</div>
       <div class="body" style="color: var(--md-on-tertiary-container);">Unlocked at 1,000 total buildings owned.</div>
       <div class="bonus-line">🎁 Gameplay bonus: +8% global CPS · 遊戲加成：全局產量 +8%</div>
-      <div class="open-real-feature" style="border-top-color: var(--md-on-tertiary-container);">
+      <div class="open-real-feature" style="border-color: var(--md-on-tertiary-container);">
+        <span class="badge-row" style="color: var(--md-on-tertiary-container);">🔓 Always available · 一直用得</span>
         <span class="note" style="color: var(--md-on-tertiary-container);">
           Separate from the bonus above: this app feature has always been available in Settings
           and the command palette, whether or not this tool was unlocked. ·

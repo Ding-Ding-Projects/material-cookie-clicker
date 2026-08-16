@@ -1,6 +1,9 @@
-// Standalone WCAG contrast verifier for Material Cookie Clicker's M3 color tokens.
+// Standalone WCAG contrast verifier for Material Cookie Clicker's cosy-bakery-arcade color
+// tokens. The project deliberately does not conform to Material Design 3 (see design/README.md)
+// but keeps M3's primary/secondary/tertiary/surface role vocabulary as a naming convention, and
+// keeps computing real ratios rather than asserting them regardless of visual style.
 // Not shipped to the app; used only to derive/verify the swatch values
-// baked into design/tokens-color.html. Run: node scripts/contrast-check.mjs
+// baked into design/tokens-color.html. Run: node design/_verify/contrast-check.mjs
 
 function srgbToLin(c) {
   c /= 255;
@@ -35,6 +38,14 @@ const pairs = {
     ['on-error-container on error-container', '#410002', '#FFDAD6'],
     ['primary on surface (large/UI 3:1)', '#7A4A1D', '#FFF8F3'],
     ['tertiary on surface (large/UI 3:1)', '#5C4E00', '#FFF8F3'],
+    // Arcade spark accent (decorative glow/ring, never body text) and jewel tiers
+    ['spark-ring on surface (non-text min 3:1)', '#D97300', '#FFF8F3'],
+    ['on-tier2 on tier2', '#FFFFFF', '#256B3B'],
+    ['on-tier2-container on tier2-container', '#04210D', '#B8F0C4'],
+    ['tier2 on surface (large/UI 3:1)', '#256B3B', '#FFF8F3'],
+    ['on-tier3 on tier3', '#FFFFFF', '#5B3B9C'],
+    ['on-tier3-container on tier3-container', '#20004D', '#E6D9FF'],
+    ['tier3 on surface (large/UI 3:1)', '#5B3B9C', '#FFF8F3'],
   ],
   dark: [
     ['on-primary on primary', '#4A2800', '#FFB876'],
@@ -50,6 +61,14 @@ const pairs = {
     ['on-error-container on error-container', '#FFDAD6', '#93000A'],
     ['primary on surface (large/UI 3:1)', '#FFB876', '#18120D'],
     ['tertiary on surface (large/UI 3:1)', '#DBC66E', '#18120D'],
+    // Arcade spark accent (decorative glow/ring, never body text) and jewel tiers
+    ['spark-ring on surface (non-text min 3:1)', '#FFC24D', '#18120D'],
+    ['on-tier2 on tier2', '#0C3018', '#8FE3A6'],
+    ['on-tier2-container on tier2-container', '#B8F0C4', '#1B4A28'],
+    ['tier2 on surface (large/UI 3:1)', '#8FE3A6', '#18120D'],
+    ['on-tier3 on tier3', '#2A0A5C', '#CFBCFF'],
+    ['on-tier3-container on tier3-container', '#E6D9FF', '#3B2465'],
+    ['tier3 on surface (large/UI 3:1)', '#CFBCFF', '#18120D'],
   ],
 };
 

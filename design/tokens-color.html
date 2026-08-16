@@ -4,22 +4,29 @@
 <head>
 <meta charset="UTF-8" />
 <meta name="viewport" content="width=device-width, initial-scale=1" />
-<title>Material Cookie Clicker · Color Tokens · M3 Colour Roles</title>
+<title>Material Cookie Clicker · Color Tokens · Cosy Bakery Arcade</title>
 <style>
   :root {
-    /* ---- Material Cookie Clicker light scheme: baked-cookie brown/gold primary, golden-cookie tertiary ---- */
+    /* ---- Material Cookie Clicker light scheme: baked-cookie brown/gold primary, golden-cookie tertiary ----
+       Hex values are unchanged from the project's original Material 3 palette on purpose: they
+       were already a warm, appetising brown/gold and every pair below is real-world AA-verified.
+       What changed is everything AROUND these colours — shape, weight, shadow, texture, and two
+       new colour families (the arcade spark accent and the jewel tool-tier ladder) layered on top. */
     --md-primary: #7A4A1D;
     --md-on-primary: #FFFFFF;
     --md-primary-container: #FFDCB8;
     --md-on-primary-container: #3A2100;
+    --md-primary-shadow: #4A2A0A; /* solid "3D base" beneath a pressable primary button, not a blur */
     --md-secondary: #6B4C3F;
     --md-on-secondary: #FFFFFF;
     --md-secondary-container: #FFDBCB;
     --md-on-secondary-container: #2C160B;
+    --md-secondary-shadow: #401F14;
     --md-tertiary: #5C4E00;
     --md-on-tertiary: #FFFFFF;
     --md-tertiary-container: #F8E287;
     --md-on-tertiary-container: #221B00;
+    --md-tertiary-shadow: #3A3000;
     --md-surface: #FFF8F3;
     --md-on-surface: #211A14;
     --md-surface-variant: #F0E0D0;
@@ -29,12 +36,49 @@
     --md-on-error: #FFFFFF;
     --md-error-container: #FFDAD6;
     --md-on-error-container: #410002;
+    --md-error-shadow: #7A0000;
     --md-surface-container-lowest: #FFFFFF;
     --md-surface-container-low: #FFF1E6;
     --md-surface-container: #FCEBDD;
     --md-surface-container-high: #F7E5D6;
     --md-surface-container-highest: #F1DFCE;
     --md-shadow: #000000;
+
+    /* ---- Arcade spark accent — decorative only, NEVER used for body text ----
+       A single verified-safe ring/border tone (--spark-ring, 3:1 vs surface, used sparingly for
+       borders, focus-adjacent glows, and "new!" callouts) plus an unverified, purely-decorative
+       fill/glow tone (--spark) used only for gradients and blurred glow shapes that never carry
+       text of their own. This is the "saturated accent for golden-cookie moments" — separate
+       from the AA-verified tertiary role, which stays reserved for actual on-colour text. */
+    --spark: #FFC72C;
+    --spark-glow: #FFE066;
+    --spark-ring: #D97300;
+
+    /* ---- Jewel tool tiers — the late-game escalation ladder ----
+       Tier 1 reuses the primary bronze/brown above (the tech tree always opens on home ground).
+       Tier 2 is a verdant emerald; Tier 3 a deep amethyst. Each step is a genuinely different
+       jewel family, not a darker tint of the last one, so a glance at the tools-tree screen reads
+       as "I am getting somewhere" rather than "the same chip got slightly darker." */
+    --tier1: var(--md-primary); --on-tier1: var(--md-on-primary);
+    --tier1-container: var(--md-primary-container); --on-tier1-container: var(--md-on-primary-container);
+    --tier2: #256B3B; --on-tier2: #FFFFFF; --tier2-container: #B8F0C4; --on-tier2-container: #04210D;
+    --tier3: #5B3B9C; --on-tier3: #FFFFFF; --tier3-container: #E6D9FF; --on-tier3-container: #20004D;
+
+    /* ---- Shape — bigger, more confident radii; 1px hairlines read as productivity software ---- */
+    --shape-none: 0px;
+    --shape-xs: 8px;
+    --shape-sm: 12px;
+    --shape-md: 18px;
+    --shape-lg: 26px;
+    --shape-xl: 34px;
+    --shape-full: 999px;
+
+    /* ---- Border weight — chunky and confident ---- */
+    --border-thin: 2px;
+    --border-thick: 3px;
+    --border-chunky: 4px;
+
+    --font-display: "Segoe UI Black", "Arial Black", "Segoe UI", var(--font-en);
     --font-en: -apple-system, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
     --font-zh: "Segoe UI", "Microsoft JhengHei", "PMingLiU", var(--font-en);
   }
@@ -43,14 +87,17 @@
     --md-on-primary: #4A2800;
     --md-primary-container: #693C00;
     --md-on-primary-container: #FFDCB8;
+    --md-primary-shadow: #A66A2E;
     --md-secondary: #E6BEAC;
     --md-on-secondary: #44291E;
     --md-secondary-container: #5D3F32;
     --md-on-secondary-container: #FFDBCB;
+    --md-secondary-shadow: #8A5C48;
     --md-tertiary: #DBC66E;
     --md-on-tertiary: #383000;
     --md-tertiary-container: #514600;
     --md-on-tertiary-container: #F8E287;
+    --md-tertiary-shadow: #8F7A20;
     --md-surface: #18120D;
     --md-on-surface: #EDE0D9;
     --md-surface-variant: #4F4539;
@@ -60,11 +107,21 @@
     --md-on-error: #690005;
     --md-error-container: #93000A;
     --md-on-error-container: #FFDAD6;
+    --md-error-shadow: #7A2A24;
     --md-surface-container-lowest: #120D09;
     --md-surface-container-low: #211A14;
     --md-surface-container: #251D17;
     --md-surface-container-high: #302722;
     --md-surface-container-highest: #3B322C;
+
+    --spark: #FFD666;
+    --spark-glow: #FFE8A3;
+    --spark-ring: #FFC24D;
+
+    --tier1: var(--md-primary); --on-tier1: var(--md-on-primary);
+    --tier1-container: var(--md-primary-container); --on-tier1-container: var(--md-on-primary-container);
+    --tier2: #8FE3A6; --on-tier2: #0C3018; --tier2-container: #1B4A28; --on-tier2-container: #B8F0C4;
+    --tier3: #CFBCFF; --on-tier3: #2A0A5C; --tier3-container: #3B2465; --on-tier3-container: #E6D9FF;
   }
   * { box-sizing: border-box; }
   body {
@@ -74,53 +131,62 @@
     color: var(--md-on-surface);
     padding: 24px;
   }
-  h1 { font-size: 28px; margin: 0 0 4px; }
-  h2 { font-size: 20px; margin: 32px 0 12px; border-bottom: 1px solid var(--md-outline); padding-bottom: 8px; }
+  h1 { font-family: var(--font-display); font-size: 30px; margin: 0 0 4px; letter-spacing: 0.2px; }
+  h2 { font-size: 20px; margin: 32px 0 12px; border-bottom: var(--border-thin) solid var(--md-outline); padding-bottom: 8px; }
   p.lede { color: var(--md-on-surface-variant); max-width: 70ch; margin: 0 0 16px; }
   .toggle-row { display: flex; gap: 8px; align-items: center; margin: 16px 0 24px; }
   button.scheme-toggle {
     font: inherit;
-    font-weight: 600;
-    padding: 10px 18px;
+    font-weight: 700;
+    padding: 10px 20px;
     min-height: 44px;
-    border-radius: 100px;
-    border: 1px solid var(--md-outline);
+    border-radius: var(--shape-full);
+    border: var(--border-thick) solid var(--md-outline);
     background: var(--md-primary-container);
     color: var(--md-on-primary-container);
     cursor: pointer;
+    box-shadow: 0 3px 0 0 var(--md-outline);
   }
+  button.scheme-toggle:active { transform: translateY(3px); box-shadow: none; }
+  @media (prefers-reduced-motion: reduce) { button.scheme-toggle:active { transform: none; } }
   button.scheme-toggle:focus-visible {
     outline: 3px solid var(--md-primary);
     outline-offset: 2px;
   }
   .grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(240px, 1fr)); gap: 16px; }
   .swatch {
-    border-radius: 16px;
+    border-radius: var(--shape-md);
     padding: 16px;
     min-height: 120px;
     display: flex;
     flex-direction: column;
     justify-content: space-between;
-    border: 1px solid rgba(0,0,0,0.06);
+    border: var(--border-thin) solid rgba(0,0,0,0.12);
   }
   .swatch .role { font-weight: 700; font-size: 14px; }
-  .swatch .hex { font-family: "Cascadia Code", Consolas, monospace; font-size: 12px; opacity: 0.85; }
-  .swatch .ratio { font-size: 12px; margin-top: 8px; }
+  .swatch .hex { font-family: "Cascadia Code", Consolas, monospace; font-size: 12px; opacity: 0.85; font-variant-numeric: tabular-nums; }
+  .swatch .ratio { font-size: 12px; margin-top: 8px; font-variant-numeric: tabular-nums; }
   .pass { color: inherit; }
   .pass::before { content: "✅ AA "; }
   .caption { font-size: 13px; color: var(--md-on-surface-variant); margin-top: 4px; }
   .zh { display: block; font-family: var(--font-zh); }
+  .decorative-note {
+    background: var(--md-surface-container); border-radius: var(--shape-md);
+    border: var(--border-thin) dashed var(--md-outline);
+    padding: 10px 14px; font-size: 12px; margin-top: 8px; max-width: 74ch;
+  }
 </style>
 </head>
 <body data-scheme="light">
   <h1>Material Cookie Clicker design tokens · 設計標記 — Colour</h1>
   <p class="lede">
-    Full Material Design 3 colour role set for Material Cookie Clicker, themed as a warm baked-cookie
-    brown/gold primary with the golden-cookie accent reserved for <code>tertiary</code>.
-    Every role pair used for text has a real, computed WCAG contrast ratio shown on the
+    Warm baked-cookie brown/gold as the primary, a golden-cookie tertiary — the exact hex values
+    Material Cookie Clicker already had, kept because they were already appetising, not because the
+    project follows Material Design 3 anymore (it deliberately doesn't; see <code>README.md</code>).
+    Every role pair used for text still has a real, computed WCAG contrast ratio shown on the
     swatch — not asserted, calculated with the sRGB relative-luminance formula in
     <code>design/_verify/contrast-check.mjs</code> and re-verified before this file shipped.
-    <span class="zh">Material Cookie Clicker 嘅色彩標記，暖薯米色/金色做主色，金曲奇金色做強調色。每一對用嚟顯示文字嘅顏色都真係計過對比度，唔係靠估。</span>
+    <span class="zh">Material Cookie Clicker 嘅色彩標記，暖薯米色/金色做主色，金曲奇金色做強調色。呢個項目已經刻意唔跟返 Material Design 3 嘅規格，但每一對用嚟顯示文字嘅顏色都真係計過對比度，唔係靠估。</span>
   </p>
   <div class="toggle-row">
     <button class="scheme-toggle" onclick="document.body.dataset.scheme = document.body.dataset.scheme === 'dark' ? 'light' : 'dark'">
@@ -128,7 +194,7 @@
     </button>
   </div>
 
-  <h2>Primary · 主色</h2>
+  <h2>Primary · 主色 — baked cookie brown</h2>
   <p class="caption">Used for the cookie surface's default fill, the primary CTA, and the prestige-gate slider track fill when armed.</p>
   <div class="grid">
     <div class="swatch" style="background:var(--md-primary); color:var(--md-on-primary);">
@@ -150,10 +216,15 @@
       <span class="role">on-primary-container</span>
       <span class="hex" id="hexOnPrimaryContainer"></span>
     </div>
+    <div class="swatch" style="background:var(--md-primary-shadow); color:#FFFFFF;">
+      <span class="role">primary-shadow</span>
+      <span class="hex" id="hexPrimaryShadow"></span>
+      <span class="ratio">decorative "3D base" only — never used for text</span>
+    </div>
   </div>
 
   <h2>Secondary · 副色</h2>
-  <p class="caption">Used for building-row secondary chrome (owned count chip, stepper background).</p>
+  <p class="caption">Used for building-row secondary chrome (owned count chip, stepper background) and its own pressable-shadow base.</p>
   <div class="grid">
     <div class="swatch" style="background:var(--md-secondary); color:var(--md-on-secondary);">
       <span class="role">secondary</span>
@@ -164,6 +235,11 @@
       <span class="role">secondary-container</span>
       <span class="hex" id="hexSecondaryContainer"></span>
       <span class="ratio pass" id="ratioSecondaryContainer"></span>
+    </div>
+    <div class="swatch" style="background:var(--md-secondary-shadow); color:#FFFFFF;">
+      <span class="role">secondary-shadow</span>
+      <span class="hex" id="hexSecondaryShadow"></span>
+      <span class="ratio">decorative "3D base" only — never used for text</span>
     </div>
   </div>
 
@@ -180,9 +256,71 @@
       <span class="hex" id="hexTertiaryContainer"></span>
       <span class="ratio pass" id="ratioTertiaryContainer"></span>
     </div>
+    <div class="swatch" style="background:var(--md-tertiary-shadow); color:#FFFFFF;">
+      <span class="role">tertiary-shadow</span>
+      <span class="hex" id="hexTertiaryShadow"></span>
+      <span class="ratio">decorative "3D base" only — never used for text</span>
+    </div>
   </div>
 
-  <h2>Surface & tonal elevation steps · 表面色與明度階</h2>
+  <h2>Arcade spark accent · 火花強調色 — decorative only, never body text</h2>
+  <p class="caption">
+    The "saturated accent for golden-cookie moments": <code>--spark</code>/<code>--spark-glow</code>
+    are unverified decorative gradient/glow tones that never carry text of their own, and
+    <code>--spark-ring</code> is a real AA-checked 3:1 non-text tone safe for borders, rings, and
+    "new!" callouts against the surface. Keeping the arcade sparkle separate from the tertiary role
+    means tertiary's own AA-verified text pairs are never put at risk chasing extra saturation.
+  </p>
+  <div class="grid">
+    <div class="swatch" style="background:var(--spark); color:var(--md-on-surface);">
+      <span class="role">spark (decorative fill/glow)</span>
+      <span class="hex" id="hexSpark"></span>
+      <span class="ratio">not a text-bearing role — see decorative note below</span>
+    </div>
+    <div class="swatch" style="background:var(--md-surface); color:var(--spark-ring); border: var(--border-chunky) solid var(--spark-ring);">
+      <span class="role">spark-ring</span>
+      <span class="hex" id="hexSparkRing"></span>
+      <span class="ratio pass" id="ratioSparkRing"></span>
+    </div>
+  </div>
+  <div class="decorative-note">
+    <code>--spark</code> and <code>--spark-glow</code> are intentionally not contrast-checked: they
+    are used only as gradient stops inside blurred glow shapes (see <code>cookie-surface.html</code>'s
+    golden-cookie overlay) that never have text drawn directly on top of them. If a future surface
+    ever wants to put text on a spark fill, it must use <code>--md-on-surface</code> or
+    <code>--md-tertiary</code>-family text and get its own verified pair added here first.
+  </div>
+
+  <h2>Jewel tool tiers · 工具寶石層級 — the late-game ladder</h2>
+  <p class="caption">
+    Tier 1 reuses the primary bronze above. Tier 2 (emerald) and Tier 3 (amethyst) are genuinely
+    different jewel families rather than darker tints of the same hue, so the Tools tech tree
+    visibly escalates tier over tier. See <code>tools-tree.html</code> and <code>tool-card.html</code>.
+  </p>
+  <div class="grid">
+    <div class="swatch" style="background:var(--tier2); color:var(--on-tier2);">
+      <span class="role">tier2 (emerald)</span>
+      <span class="hex" id="hexTier2"></span>
+      <span class="ratio pass" id="ratioTier2"></span>
+    </div>
+    <div class="swatch" style="background:var(--tier2-container); color:var(--on-tier2-container);">
+      <span class="role">tier2-container</span>
+      <span class="hex" id="hexTier2Container"></span>
+      <span class="ratio pass" id="ratioTier2Container"></span>
+    </div>
+    <div class="swatch" style="background:var(--tier3); color:var(--on-tier3);">
+      <span class="role">tier3 (amethyst)</span>
+      <span class="hex" id="hexTier3"></span>
+      <span class="ratio pass" id="ratioTier3"></span>
+    </div>
+    <div class="swatch" style="background:var(--tier3-container); color:var(--on-tier3-container);">
+      <span class="role">tier3-container</span>
+      <span class="hex" id="hexTier3Container"></span>
+      <span class="ratio pass" id="ratioTier3Container"></span>
+    </div>
+  </div>
+
+  <h2>Surface &amp; tonal elevation steps · 表面色與明度階</h2>
   <p class="caption">The five surface-container tonal steps used to separate stacked cards (dialogs, popovers, toolbars) without relying on shadow alone. Text role verified against the base <code>surface</code>; the tonal steps differ from it by 2–6% luminance, which does not materially change the ratio.</p>
   <div class="grid">
     <div class="swatch" style="background:var(--md-surface-container-lowest); color:var(--md-on-surface); border-color:var(--md-outline);">
@@ -230,6 +368,11 @@
       <span class="hex" id="hexErrorContainer"></span>
       <span class="ratio pass" id="ratioErrorContainer"></span>
     </div>
+    <div class="swatch" style="background:var(--md-error-shadow); color:#FFFFFF;">
+      <span class="role">error-shadow</span>
+      <span class="hex" id="hexErrorShadow"></span>
+      <span class="ratio">decorative "3D base" only — never used for text</span>
+    </div>
   </div>
 
   <h2>Computed contrast ratios (live, in-page) · 即時計算對比度</h2>
@@ -266,6 +409,10 @@
       ['SurfaceVariant', '--md-surface-variant', '--md-on-surface-variant'],
       ['Error', '--md-error', '--md-on-error'],
       ['ErrorContainer', '--md-error-container', '--md-on-error-container'],
+      ['Tier2', '--tier2', '--on-tier2'],
+      ['Tier2Container', '--tier2-container', '--on-tier2-container'],
+      ['Tier3', '--tier3', '--on-tier3'],
+      ['Tier3Container', '--tier3-container', '--on-tier3-container'],
     ];
     const report = {};
     for (const [id, bgVar, fgVar] of pairs) {
@@ -277,14 +424,23 @@
       if (hexEl) hexEl.textContent = bg;
       if (ratioEl) ratioEl.textContent = 'ratio ' + r.toFixed(2) + ':1 (needs 4.5:1)';
     }
-    // outline is a non-text 3:1 UI-boundary role, checked against surface
-    const outlineHex = css('--md-outline');
-    const surfaceHex = css('--md-surface');
-    const outlineRatio = ratio(outlineHex, surfaceHex);
-    document.getElementById('hexOutline').textContent = outlineHex;
-    document.getElementById('ratioOutline').textContent = 'ratio ' + outlineRatio.toFixed(2) + ':1 (needs 3:1)';
+    // outline and spark-ring are non-text 3:1 UI-boundary roles, checked against surface
+    for (const [id, varName, min] of [['Outline', '--md-outline', 3], ['SparkRing', '--spark-ring', 3]]) {
+      const hex = css(varName);
+      const surfaceHex = css('--md-surface');
+      const r = ratio(hex, surfaceHex);
+      const hexEl = document.getElementById('hex' + id);
+      const ratioEl = document.getElementById('ratio' + id);
+      if (hexEl) hexEl.textContent = hex;
+      if (ratioEl) ratioEl.textContent = 'ratio ' + r.toFixed(2) + ':1 (needs ' + min + ':1)';
+    }
     document.getElementById('hexOnPrimary').textContent = css('--md-on-primary');
     document.getElementById('hexOnPrimaryContainer').textContent = css('--md-on-primary-container');
+    document.getElementById('hexPrimaryShadow').textContent = css('--md-primary-shadow');
+    document.getElementById('hexSecondaryShadow').textContent = css('--md-secondary-shadow');
+    document.getElementById('hexTertiaryShadow').textContent = css('--md-tertiary-shadow');
+    document.getElementById('hexErrorShadow').textContent = css('--md-error-shadow');
+    document.getElementById('hexSpark').textContent = css('--spark');
     window.__contrastReport = report;
   }
   render();

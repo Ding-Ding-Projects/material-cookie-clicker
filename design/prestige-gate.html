@@ -7,9 +7,9 @@
 <title>Material Cookie Clicker · Prestige / Wipe Destructive Gate</title>
 <style>
   :root {
-    --md-primary: #7A4A1D; --md-on-primary: #FFFFFF;
-    --md-tertiary: #5C4E00; --md-on-tertiary: #FFFFFF; --md-tertiary-container: #F8E287;
-    --md-error: #BA1A1A; --md-on-error: #FFFFFF; --md-error-container: #FFDAD6; --md-on-error-container: #410002;
+    --md-primary: #7A4A1D; --md-on-primary: #FFFFFF; --md-primary-shadow: #4A2A0A;
+    --md-tertiary: #5C4E00; --md-on-tertiary: #FFFFFF; --md-tertiary-container: #F8E287; --md-on-tertiary-container: #221B00; --md-tertiary-shadow: #3A3000;
+    --md-error: #BA1A1A; --md-on-error: #FFFFFF; --md-error-container: #FFDAD6; --md-on-error-container: #410002; --md-error-shadow: #7A0000;
     --md-surface: #FFF8F3; --md-on-surface: #211A14;
     --md-surface-variant: #F0E0D0; --md-on-surface-variant: #4F4539;
     --md-outline: #7C6F64;
@@ -17,11 +17,14 @@
     --md-surface-container-high: #F7E5D6;
     --font-en: -apple-system, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
     --font-zh: "Segoe UI", "Microsoft JhengHei", var(--font-en);
+    --font-display: "Segoe UI Black", "Arial Black", "Segoe UI", var(--font-en);
+    --shape-full: 999px; --shape-md: 18px; --shape-xl: 34px;
+    --border-thick: 3px; --border-chunky: 4px;
   }
   [data-scheme="dark"] {
-    --md-primary: #FFB876; --md-on-primary: #4A2800;
-    --md-tertiary: #DBC66E; --md-on-tertiary: #383000; --md-tertiary-container: #514600;
-    --md-error: #FFB4AB; --md-on-error: #690005; --md-error-container: #93000A; --md-on-error-container: #FFDAD6;
+    --md-primary: #FFB876; --md-on-primary: #4A2800; --md-primary-shadow: #A66A2E;
+    --md-tertiary: #DBC66E; --md-on-tertiary: #383000; --md-tertiary-container: #514600; --md-tertiary-shadow: #8F7A20;
+    --md-error: #FFB4AB; --md-on-error: #690005; --md-error-container: #93000A; --md-on-error-container: #FFDAD6; --md-error-shadow: #7A2A24;
     --md-surface: #18120D; --md-on-surface: #EDE0D9;
     --md-surface-variant: #4F4539; --md-on-surface-variant: #D3C4B4;
     --md-outline: #9C8F83;
@@ -30,27 +33,31 @@
   }
   * { box-sizing: border-box; }
   body { margin: 0; font-family: var(--font-en); background: var(--md-surface); color: var(--md-on-surface); padding: 24px; }
-  h1 { font-size: 28px; margin: 0 0 4px; }
+  h1 { font-family: var(--font-display); font-size: 30px; margin: 0 0 4px; }
   h2 { font-size: 18px; margin: 32px 0 8px; }
   h3 { font-size: 15px; margin: 24px 0 8px; }
   p.lede, p.caption { color: var(--md-on-surface-variant); max-width: 74ch; }
   button.scheme-toggle {
-    font: inherit; font-weight: 600; padding: 10px 18px; min-height: 44px;
-    border-radius: 999px; border: 1px solid var(--md-outline);
+    font: inherit; font-weight: 700; padding: 10px 20px; min-height: 44px;
+    border-radius: var(--shape-full); border: var(--border-thick) solid var(--md-outline);
     background: var(--md-surface-container); color: var(--md-on-surface); cursor: pointer; margin: 16px 0 24px;
+    box-shadow: 0 3px 0 0 var(--md-outline); transition: transform 90ms ease, box-shadow 90ms ease;
   }
+  button.scheme-toggle:active { transform: translateY(3px); box-shadow: none; }
+  @media (prefers-reduced-motion: reduce) { button.scheme-toggle { transition: none; } button.scheme-toggle:active { transform: none; } }
   button.scheme-toggle:focus-visible { outline: 3px solid var(--md-primary); outline-offset: 2px; }
 
   .gate {
-    border-radius: 16px;
-    padding: 24px;
+    border-radius: var(--shape-xl);
+    padding: 26px;
     max-width: 480px;
     display: flex; flex-direction: column; gap: 16px;
-    box-shadow: 0 4px 4px rgba(0,0,0,0.30), 0 8px 12px 6px rgba(0,0,0,0.15);
+    border: var(--border-chunky) solid var(--md-outline);
+    box-shadow: 0 7px 0 0 var(--md-outline);
   }
-  .gate.prestige { background: var(--md-tertiary-container); color: var(--md-on-error-container); }
-  .gate.wipe { background: var(--md-error-container); color: var(--md-on-error-container); }
-  .gate h4 { margin: 0; font-size: 18px; }
+  .gate.prestige { background: var(--md-tertiary-container); color: var(--md-on-tertiary-container); border-color: var(--md-tertiary); box-shadow: 0 7px 0 0 var(--md-tertiary-shadow); }
+  .gate.wipe { background: var(--md-error-container); color: var(--md-on-error-container); border-color: var(--md-error); box-shadow: 0 7px 0 0 var(--md-error-shadow); }
+  .gate h4 { margin: 0; font-family: var(--font-display); font-size: 20px; }
   .gate .impact { font-size: 14px; line-height: 1.5; }
   .gate .impact strong { display: block; }
 
@@ -59,20 +66,24 @@
     flex: 1;
     display: flex; flex-direction: column; align-items: center; gap: 6px;
     padding: 12px;
-    border-radius: 12px;
-    background: rgba(255,255,255,0.35);
+    border-radius: var(--shape-md);
+    border: var(--border-thin) solid rgba(0,0,0,0.15);
+    background: rgba(255,255,255,0.4);
   }
-  [data-scheme="dark"] .key { background: rgba(0,0,0,0.25); }
+  [data-scheme="dark"] .key { background: rgba(0,0,0,0.28); border-color: rgba(255,255,255,0.15); }
   .key button.toggle {
-    width: 64px; height: 36px; border-radius: 999px; border: 2px solid var(--md-outline);
+    width: 72px; height: 40px; border-radius: var(--shape-full); border: var(--border-chunky) solid var(--md-outline);
     background: var(--md-surface); position: relative; cursor: pointer;
+    box-shadow: inset 0 2px 0 0 rgba(0,0,0,0.08);
   }
   .key button.toggle::after {
-    content: ""; position: absolute; top: 2px; left: 2px; width: 28px; height: 28px; border-radius: 999px;
+    content: ""; position: absolute; top: 3px; left: 3px; width: 30px; height: 30px; border-radius: var(--shape-full);
     background: var(--md-outline); transition: transform 150ms ease, background 150ms ease;
+    box-shadow: 0 2px 0 0 rgba(0,0,0,0.25);
   }
+  @media (prefers-reduced-motion: reduce) { .key button.toggle::after { transition: none; } }
   .key button.toggle[aria-pressed="true"] { border-color: var(--md-primary); }
-  .key button.toggle[aria-pressed="true"]::after { transform: translateX(28px); background: var(--md-primary); }
+  .key button.toggle[aria-pressed="true"]::after { transform: translateX(30px); background: var(--md-primary); }
   .key button.toggle:focus-visible { outline: 3px solid var(--md-primary); outline-offset: 3px; }
   .key .key-label { font-size: 12px; font-weight: 700; text-align: center; }
 
@@ -80,19 +91,20 @@
   input[type="range"] { width: 100%; height: 44px; accent-color: var(--md-primary); }
   input[type="range"]:disabled { opacity: 0.45; }
   input[type="range"]:focus-visible { outline: 3px solid var(--md-primary); outline-offset: 2px; }
-  .slider-hint { font-size: 12px; }
+  .slider-hint { font-size: 12px; font-weight: 600; }
 
-  .anim-track { height: 10px; border-radius: 999px; background: rgba(0,0,0,0.15); overflow: hidden; }
+  .anim-track { height: 14px; border-radius: var(--shape-full); background: rgba(0,0,0,0.18); overflow: hidden; border: var(--border-thin) solid rgba(0,0,0,0.2); }
   .anim-fill { height: 100%; background: var(--md-primary); width: 0%; transition: width 120ms linear; }
+  @media (prefers-reduced-motion: reduce) { .anim-fill { transition: none; } }
   .gate.wipe .anim-fill { background: var(--md-error); }
 
-  .completion { display: none; font-weight: 700; text-align: center; padding: 8px; border-radius: 8px; }
+  .completion { display: none; font-family: var(--font-display); font-weight: 900; text-align: center; padding: 12px; border-radius: var(--shape-md); font-size: 16px; }
   .completion.show { display: block; }
-  .gate.prestige .completion { background: var(--md-primary); color: var(--md-on-primary); }
-  .gate.wipe .completion { background: var(--md-error); color: var(--md-on-error); }
+  .gate.prestige .completion { background: var(--md-primary); color: var(--md-on-primary); box-shadow: 0 3px 0 0 var(--md-primary-shadow); }
+  .gate.wipe .completion { background: var(--md-error); color: var(--md-on-error); box-shadow: 0 3px 0 0 var(--md-error-shadow); }
 
   .exit-btn {
-    font: inherit; font-weight: 700; min-height: 44px; border-radius: 999px; border: 1px solid var(--md-outline);
+    font: inherit; font-weight: 800; min-height: 44px; padding: 0 18px; border-radius: var(--shape-full); border: var(--border-thick) solid var(--md-outline);
     background: transparent; cursor: pointer; align-self: center;
   }
   .exit-btn:focus-visible { outline: 3px solid var(--md-primary); outline-offset: 2px; }
@@ -105,9 +117,10 @@
   <p class="lede">
     The destructive-action gate. Two independently operated key toggles, both required before the
     confirmation slider unlocks; a dramatic non-blocking progress fill while dragging; a distinct
-    completion state; and an always-available Emergency exit. This page's gates are live and
-    interactive — drag the sliders yourself once both keys are on to see the disabled state
-    actually enforced.
+    completion state; and an always-available Emergency exit. Rendered chunkier than a settings
+    dialog on purpose — this is the one moment the game wants to feel weighty and deliberate rather
+    than quick. This page's gates are live and interactive — drag the sliders yourself once both
+    keys are on to see the disabled state actually enforced.
     <span style="font-family:var(--font-zh); display:block; margin-top:4px;">
       危險動作嘅雙重確認閘門：兩條獨立嘅開關掣要一齊開先可以郁到確認滑桿，仲有隨時可以撳嘅緊急退出掣。
     </span>

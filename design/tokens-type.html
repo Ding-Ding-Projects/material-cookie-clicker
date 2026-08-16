@@ -4,7 +4,7 @@
 <head>
 <meta charset="UTF-8" />
 <meta name="viewport" content="width=device-width, initial-scale=1" />
-<title>Material Cookie Clicker · Type Tokens · M3 Type Scale (EN + 中文)</title>
+<title>Material Cookie Clicker · Type Tokens · Display Face + Tabular Figures (EN + 中文)</title>
 <style>
   :root {
     --md-primary: #7A4A1D; --md-on-primary: #FFFFFF;
@@ -14,6 +14,13 @@
     --md-surface-container: #FCEBDD;
     --font-en: -apple-system, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
     --font-zh: "Segoe UI", "Microsoft JhengHei", "PMingLiU", "MingLiU", var(--font-en);
+    /* Display face for headings and big numbers: a bold, blocky SYSTEM stack, not a remote
+       webfont. "Segoe UI Black" ships with every supported Windows release (this project's
+       active delivery scope); "Arial Black" is the cross-platform fallback with the same
+       chunky, cartoon-poster character. No local font file is bundled because a system stack
+       already delivers the "confident, characterful" heading face this theme wants without
+       adding a network dependency — see design/README.md for the explicit reasoning. */
+    --font-display: "Segoe UI Black", "Arial Black", "Segoe UI", var(--font-en);
   }
   [data-scheme="dark"] {
     --md-primary: #FFB876; --md-on-primary: #4A2800;
@@ -24,13 +31,17 @@
   }
   * { box-sizing: border-box; }
   body { margin: 0; font-family: var(--font-en); background: var(--md-surface); color: var(--md-on-surface); padding: 24px; }
-  h1 { font-size: 28px; margin: 0 0 4px; }
+  h1 { font-family: var(--font-display); font-size: 30px; margin: 0 0 4px; }
+  h2 { font-size: 20px; margin: 32px 0 12px; border-bottom: 2px solid var(--md-outline); padding-bottom: 8px; }
   p.lede { color: var(--md-on-surface-variant); max-width: 74ch; }
   button.scheme-toggle {
-    font: inherit; font-weight: 600; padding: 10px 18px; min-height: 44px;
-    border-radius: 100px; border: 1px solid var(--md-outline);
+    font: inherit; font-weight: 700; padding: 10px 20px; min-height: 44px;
+    border-radius: 999px; border: 3px solid var(--md-outline);
     background: var(--md-surface-container); color: var(--md-on-surface); cursor: pointer; margin: 16px 0 24px;
+    box-shadow: 0 3px 0 0 var(--md-outline);
   }
+  button.scheme-toggle:active { transform: translateY(3px); box-shadow: none; }
+  @media (prefers-reduced-motion: reduce) { button.scheme-toggle:active { transform: none; } }
   button.scheme-toggle:focus-visible { outline: 3px solid var(--md-primary); outline-offset: 2px; }
   .row { border-bottom: 1px solid var(--md-outline); padding: 20px 0; display: grid; grid-template-columns: 220px 1fr; gap: 16px; align-items: baseline; }
   .row .meta { font-size: 13px; color: var(--md-on-surface-variant); font-family: "Cascadia Code", Consolas, monospace; }
@@ -38,34 +49,79 @@
   .sample-zh { font-family: var(--font-zh); margin-top: 6px; }
   .caption { font-size: 13px; color: var(--md-on-surface-variant); margin-top: 6px; max-width: 60ch; }
   .fallback-note {
-    background: var(--md-surface-container); border-radius: 12px; padding: 16px; margin-top: 32px;
-    font-size: 14px;
+    background: var(--md-surface-container); border-radius: 18px; padding: 16px; margin-top: 16px;
+    font-size: 14px; border: 2px solid var(--md-outline);
   }
-  code { font-family: "Cascadia Code", Consolas, monospace; background: var(--md-surface-container); padding: 2px 6px; border-radius: 4px; }
+  code { font-family: "Cascadia Code", Consolas, monospace; background: var(--md-surface-container); padding: 2px 6px; border-radius: 6px; }
+  .display-demo { display: flex; flex-direction: column; gap: 10px; margin-top: 16px; }
+  .display-demo .headline { font-family: var(--font-display); font-size: 42px; line-height: 1.05; }
+  .display-demo .headline-zh { font-family: var(--font-zh); font-weight: 700; font-size: 30px; }
+  .tabular-demo { display: grid; grid-template-columns: repeat(auto-fill, minmax(160px, 1fr)); gap: 12px; margin-top: 12px; }
+  .tabular-demo .num-card {
+    background: var(--md-surface-container); border-radius: 12px; border: 2px solid var(--md-outline);
+    padding: 12px; font-size: 20px; font-weight: 700; font-variant-numeric: tabular-nums;
+  }
+  .tabular-demo .num-card .label { display: block; font-size: 11px; font-weight: 600; color: var(--md-on-surface-variant); margin-bottom: 4px; font-variant-numeric: normal; }
 </style>
 </head>
 <body data-scheme="light">
   <h1>Material Cookie Clicker design tokens · 設計標記 — Type</h1>
   <p class="lede">
-    Full M3 type scale (display / headline / title / body / label, each large / medium / small),
-    every row shown against an English sample AND a Traditional Chinese (Hong Kong) sample so the
-    CJK line-height and tracking difference is visible rather than assumed.
+    Two type families doing two different jobs: a bold, blocky <strong>display face</strong> for
+    headings and big milestone numbers (character, confidence, arcade-poster energy), and a
+    highly legible <strong>body face</strong> for every reading-heavy surface and every factual
+    figure, always with tabular numerals so digits align in a column. Full M3-derived type scale
+    below (display / headline / title / body / label, each large/medium/small), every row shown
+    against English AND Traditional Chinese (Hong Kong) so the CJK line-height difference is
+    visible rather than assumed.
     <span style="font-family:var(--font-zh); display:block; margin-top:4px;">
-      完整嘅 M3 字級，英文同繁體中文（香港）並排顯示，等你睇得出兩者行高唔一樣，唔使靠估。
+      兩種字體各有分工：粗體、有性格嘅標題字用喺標題同大數字度，清楚易讀嘅內文字就用喺所有講緊嘅內容同數字度，數字一律用等寬對齊。
     </span>
   </p>
   <button class="scheme-toggle" onclick="document.body.dataset.scheme = document.body.dataset.scheme === 'dark' ? 'light' : 'dark'">
     🌗 Toggle light / dark · 切換淺色／深色
   </button>
 
+  <h2>Display face · 標題字型 — character, without a network request</h2>
+  <p class="caption">
+    <code>--font-display</code> stacks <code>"Segoe UI Black"</code> (bundled with every supported
+    Windows release, this project's active delivery scope) then <code>"Arial Black"</code>
+    (near-universal cross-platform fallback with the same chunky letterform weight) before
+    dropping to the ordinary body stack. No <code>.woff</code>/<code>.ttf</code> is bundled and no
+    remote font service is used — a bold system face already gives headings the "confident,
+    arcade-poster" character this theme wants, and adding a network dependency for one heading
+    face was judged not worth breaking the fully-self-contained, offline requirement.
+  </p>
+  <div class="display-demo">
+    <div class="headline">Material Cookie Clicker</div>
+    <div class="headline-zh">橡奇曲奇</div>
+    <div class="headline" style="font-size:28px;">4.82Qa cookies baked</div>
+  </div>
+
+  <h2>Tabular figures · 數字對齊</h2>
+  <p class="caption">
+    Every place a number appears repeatedly in a fixed-width context — stat tiles, building costs,
+    CPS deltas, tool-tree progress fractions — sets <code>font-variant-numeric: tabular-nums</code>
+    so digits occupy equal width and align in a column instead of jittering as the value updates.
+    This applies in the body face; no separate monospace font is needed.
+  </p>
+  <div class="tabular-demo">
+    <div class="num-card"><span class="label">CPS</span>18,420</div>
+    <div class="num-card"><span class="label">CPS (updated)</span>118,420</div>
+    <div class="num-card"><span class="label">Click power</span>312</div>
+    <div class="num-card"><span class="label">Cost</span>🍪 88,500</div>
+  </div>
+
   <div class="fallback-note">
-    <strong>CJK-safe fallback stack · 中文字型後備堆疊：</strong>
+    <strong>Body/CJK-safe fallback stack · 內文／中文字型後備堆疊：</strong>
     <code>"Segoe UI", "Microsoft JhengHei", "PMingLiU", "MingLiU", -apple-system, "Segoe UI", Roboto, Helvetica, Arial, sans-serif</code>
     <p class="caption" style="margin-top:8px;">
       Microsoft JhengHei is the Traditional-Chinese-native face bundled with every supported
       Windows release, so Cantonese copy renders in a purpose-built CJK face rather than a Latin
       font's fallback glyphs. Segoe UI leads for Latin text so English stays crisp; JhengHei only
-      engages for CJK code points thanks to normal font-fallback substitution.
+      engages for CJK code points thanks to normal font-fallback substitution. The display face
+      above is Latin/heading-only — Cantonese headings still render in the bold weight of this
+      body/CJK stack, since "Segoe UI Black" has no CJK glyph coverage to fall back on safely.
     </p>
   </div>
 
@@ -73,21 +129,21 @@
 
 <script>
   const scale = [
-    ['display-large', '57px', '64px', '-0.25px', 400],
-    ['display-medium', '45px', '52px', '0px', 400],
-    ['display-small', '36px', '44px', '0px', 400],
-    ['headline-large', '32px', '40px', '0px', 400],
-    ['headline-medium', '28px', '36px', '0px', 400],
-    ['headline-small', '24px', '32px', '0px', 400],
-    ['title-large', '22px', '28px', '0px', 500],
-    ['title-medium', '16px', '24px', '0.15px', 500],
-    ['title-small', '14px', '20px', '0.1px', 500],
-    ['body-large', '16px', '24px', '0.5px', 400],
-    ['body-medium', '14px', '20px', '0.25px', 400],
-    ['body-small', '12px', '16px', '0.4px', 400],
-    ['label-large', '14px', '20px', '0.1px', 500],
-    ['label-medium', '12px', '16px', '0.5px', 500],
-    ['label-small', '11px', '16px', '0.5px', 500],
+    ['display-large', '57px', '64px', '-0.25px', 900, true],
+    ['display-medium', '45px', '52px', '0px', 900, true],
+    ['display-small', '36px', '44px', '0px', 700, true],
+    ['headline-large', '32px', '40px', '0px', 700, true],
+    ['headline-medium', '28px', '36px', '0px', 700, true],
+    ['headline-small', '24px', '32px', '0px', 700, false],
+    ['title-large', '22px', '28px', '0px', 700, false],
+    ['title-medium', '16px', '24px', '0.15px', 600, false],
+    ['title-small', '14px', '20px', '0.1px', 600, false],
+    ['body-large', '16px', '24px', '0.5px', 400, false],
+    ['body-medium', '14px', '20px', '0.25px', 400, false],
+    ['body-small', '12px', '16px', '0.4px', 400, false],
+    ['label-large', '14px', '20px', '0.1px', 700, false],
+    ['label-medium', '12px', '16px', '0.5px', 700, false],
+    ['label-small', '11px', '16px', '0.5px', 700, false],
   ];
   const enSamples = {
     'display': 'Material Cookie Clicker',
@@ -104,29 +160,31 @@
     'label': '買 ×10',
   };
   const container = document.getElementById('scale');
-  for (const [name, size, lineHeight, tracking, weight] of scale) {
+  for (const [name, size, lineHeight, tracking, weight, useDisplay] of scale) {
     const bucket = name.split('-')[0];
     const row = document.createElement('div');
     row.className = 'row';
+    const fontVar = useDisplay ? 'var(--font-display)' : 'var(--font-en)';
     row.innerHTML = `
       <div class="meta">
         <div><strong>${name}</strong></div>
         <div>${size} / ${lineHeight}</div>
-        <div>tracking ${tracking}, weight ${weight}</div>
+        <div>tracking ${tracking}, weight ${weight}${useDisplay ? ', display face' : ''}</div>
       </div>
       <div>
-        <div class="sample-en" style="font-size:${size}; line-height:${lineHeight}; letter-spacing:${tracking}; font-weight:${weight};">
+        <div class="sample-en" style="font-family:${fontVar}; font-size:${size}; line-height:${lineHeight}; letter-spacing:${tracking}; font-weight:${weight};">
           ${enSamples[bucket]}
         </div>
-        <div class="sample-zh" style="font-size:${size}; line-height:${lineHeight}; letter-spacing:${tracking}; font-weight:${weight};">
+        <div class="sample-zh" style="font-size:${size}; line-height:${lineHeight}; letter-spacing:${tracking}; font-weight:${Math.min(weight, 700)};">
           ${zhSamples[bucket]}
         </div>
         <div class="caption">
-          English sample uses ${size} tracked at ${tracking}; the Traditional Chinese sample
-          uses the same numeric size but visually needs less negative tracking to read
-          comfortably at small sizes, since CJK glyphs are full-width and do not kern the way
-          Latin letterforms do — the fallback stack above intentionally applies the same
-          tracking value to both, and this row is where you can see whether that still holds.
+          English sample uses ${size} tracked at ${tracking}${useDisplay ? ' in the display face' : ' in the body face'};
+          the Traditional Chinese sample uses the same numeric size in the body/CJK stack (capped
+          at weight 700, since the display face has no CJK glyphs) and visually needs less negative
+          tracking to read comfortably at small sizes, since CJK glyphs are full-width and do not
+          kern the way Latin letterforms do — the fallback stack above intentionally applies the
+          same tracking value to both, and this row is where you can see whether that still holds.
         </div>
       </div>`;
     container.appendChild(row);

@@ -7,7 +7,7 @@
 <title>Material Cookie Clicker · Building Row · Generator List Item</title>
 <style>
   :root {
-    --md-primary: #7A4A1D; --md-on-primary: #FFFFFF;
+    --md-primary: #7A4A1D; --md-on-primary: #FFFFFF; --md-primary-shadow: #4A2A0A;
     --md-primary-container: #FFDCB8; --md-on-primary-container: #3A2100;
     --md-secondary: #6B4C3F; --md-on-secondary: #FFFFFF;
     --md-secondary-container: #FFDBCB; --md-on-secondary-container: #2C160B;
@@ -18,9 +18,12 @@
     --md-surface-container-high: #F7E5D6;
     --font-en: -apple-system, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
     --font-zh: "Segoe UI", "Microsoft JhengHei", var(--font-en);
+    --font-display: "Segoe UI Black", "Arial Black", "Segoe UI", var(--font-en);
+    --shape-full: 999px; --shape-md: 18px; --shape-sm: 12px;
+    --border-thick: 3px; --border-chunky: 4px;
   }
   [data-scheme="dark"] {
-    --md-primary: #FFB876; --md-on-primary: #4A2800;
+    --md-primary: #FFB876; --md-on-primary: #4A2800; --md-primary-shadow: #A66A2E;
     --md-primary-container: #693C00; --md-on-primary-container: #FFDCB8;
     --md-secondary: #E6BEAC; --md-on-secondary: #44291E;
     --md-secondary-container: #5D3F32; --md-on-secondary-container: #FFDBCB;
@@ -32,63 +35,72 @@
   }
   * { box-sizing: border-box; }
   body { margin: 0; font-family: var(--font-en); background: var(--md-surface); color: var(--md-on-surface); padding: 24px; }
-  h1 { font-size: 28px; margin: 0 0 4px; }
+  h1 { font-family: var(--font-display); font-size: 30px; margin: 0 0 4px; }
   h2 { font-size: 18px; margin: 32px 0 8px; }
   p.lede, p.caption { color: var(--md-on-surface-variant); max-width: 74ch; }
   button.scheme-toggle {
-    font: inherit; font-weight: 600; padding: 10px 18px; min-height: 44px;
-    border-radius: 999px; border: 1px solid var(--md-outline);
+    font: inherit; font-weight: 700; padding: 10px 20px; min-height: 44px;
+    border-radius: var(--shape-full); border: var(--border-thick) solid var(--md-outline);
     background: var(--md-surface-container); color: var(--md-on-surface); cursor: pointer; margin: 16px 0 24px;
+    box-shadow: 0 3px 0 0 var(--md-outline); transition: transform 90ms ease, box-shadow 90ms ease;
   }
+  button.scheme-toggle:active { transform: translateY(3px); box-shadow: none; }
+  @media (prefers-reduced-motion: reduce) { button.scheme-toggle { transition: none; } button.scheme-toggle:active { transform: none; } }
   button.scheme-toggle:focus-visible { outline: 3px solid var(--md-primary); outline-offset: 2px; }
 
   .row {
     display: grid;
-    grid-template-columns: 48px 1fr auto auto;
+    grid-template-columns: 52px 1fr auto auto;
     gap: 16px;
     align-items: center;
-    padding: 12px 16px;
-    border-radius: 12px;
+    padding: 14px 18px;
+    border-radius: var(--shape-md);
     background: var(--md-surface-container-high);
-    margin-bottom: 12px;
-    min-height: 64px;
+    border: var(--border-thick) solid var(--md-outline);
+    margin-bottom: 14px;
+    min-height: 68px;
   }
   .row .icon {
-    width: 44px; height: 44px; border-radius: 999px;
+    width: 48px; height: 48px; border-radius: var(--shape-full);
     background: var(--md-primary-container); color: var(--md-on-primary-container);
-    display: flex; align-items: center; justify-content: center; font-size: 22px;
+    display: flex; align-items: center; justify-content: center; font-size: 24px;
+    border: var(--border-thick) solid var(--md-primary);
   }
   .row .names { display: flex; flex-direction: column; }
-  .row .name-en { font-weight: 600; font-size: 15px; }
+  .row .name-en { font-weight: 700; font-size: 15px; }
   .row .name-zh { font-family: var(--font-zh); font-size: 13px; color: var(--md-on-surface-variant); }
-  .row .meta { display: flex; gap: 16px; font-size: 13px; color: var(--md-on-surface-variant); margin-top: 2px; }
+  .row .meta { display: flex; gap: 16px; font-size: 13px; color: var(--md-on-surface-variant); margin-top: 2px; font-variant-numeric: tabular-nums; }
   .row .owned-chip {
-    background: var(--md-secondary-container); color: var(--md-on-secondary-container);
-    border-radius: 999px; padding: 2px 10px; font-weight: 700; font-size: 12px;
-    justify-self: start;
+    background: var(--md-secondary); color: var(--md-on-secondary);
+    border-radius: var(--shape-full); padding: 3px 12px; font-weight: 700; font-size: 12px;
+    justify-self: start; font-variant-numeric: tabular-nums;
   }
   .stepper {
     display: flex; align-items: center; gap: 4px;
-    background: var(--md-surface); border: 1px solid var(--md-outline); border-radius: 999px; padding: 2px;
+    background: var(--md-surface); border: var(--border-thick) solid var(--md-outline); border-radius: var(--shape-full); padding: 3px;
   }
   .stepper button {
-    font: inherit; font-weight: 700; font-size: 12px;
+    font: inherit; font-weight: 800; font-size: 12px;
     min-width: 44px; min-height: 36px;
-    border: none; border-radius: 999px;
+    border: none; border-radius: var(--shape-full);
     background: transparent; color: var(--md-on-surface); cursor: pointer;
   }
-  .stepper button.active { background: var(--md-primary); color: var(--md-on-primary); }
+  .stepper button.active { background: var(--md-primary); color: var(--md-on-primary); box-shadow: 0 2px 0 0 var(--md-primary-shadow); }
   .stepper button:focus-visible { outline: 3px solid var(--md-primary); outline-offset: 2px; }
   .buy-btn {
-    font: inherit; font-weight: 700; font-size: 14px;
-    min-height: 44px; padding: 0 20px;
-    border-radius: 999px; border: none; cursor: pointer;
+    font: inherit; font-weight: 800; font-size: 14px; font-variant-numeric: tabular-nums;
+    min-height: 44px; padding: 0 22px;
+    border-radius: var(--shape-full); border: none; cursor: pointer;
     background: var(--md-primary); color: var(--md-on-primary);
+    box-shadow: 0 4px 0 0 var(--md-primary-shadow);
+    transition: transform 90ms ease, box-shadow 90ms ease;
   }
+  .buy-btn:active { transform: translateY(4px); box-shadow: none; }
+  @media (prefers-reduced-motion: reduce) { .buy-btn { transition: none; } .buy-btn:active { transform: none; } }
   .buy-btn:focus-visible { outline: 3px solid var(--md-secondary); outline-offset: 2px; }
-  .buy-btn[disabled] { background: var(--md-surface-variant); color: var(--md-on-surface-variant); cursor: not-allowed; opacity: 0.7; }
-  .row.locked { opacity: 0.55; }
-  .row.locked .icon { filter: grayscale(1); }
+  .buy-btn[disabled] { background: var(--md-surface-variant); color: var(--md-on-surface-variant); cursor: not-allowed; box-shadow: none; }
+  .row.locked { opacity: 0.6; }
+  .row.locked .icon { filter: grayscale(1); border-color: var(--md-outline); }
   .lock-icon { font-size: 20px; }
 </style>
 </head>
@@ -97,7 +109,8 @@
   <p class="lede">
     One row of the generator list (bakeries, farms, factories…). Icon, bilingual name, owned
     count chip, per-unit cost, CPS contribution, and a buy-quantity stepper (×1 / ×10 / ×100 /
-    Max) plus the buy button itself. Rows are virtualised in the real list; each row keeps its
+    Max) plus the buy button itself. Every figure is set with tabular numerals so a rapid string of
+    purchases never jitters the column. Rows are virtualised in the real list; each row keeps its
     own keyboard-reachable stepper and buy control.
     <span style="font-family:var(--font-zh); display:block; margin-top:4px;">
       生產建築物清單入面嘅一列：圖示、雙語名稱、擁有數量、單價、每秒產量，仲有買 ×1／×10／×100／Max 嘅按鈕。
@@ -108,7 +121,7 @@
   </button>
 
   <h2>Affordable · 買得起</h2>
-  <p class="caption">The buy button is enabled and uses the primary role; the stepper's active quantity is highlighted.</p>
+  <p class="caption">The buy button is enabled and uses the primary role with its own pressable shadow; the stepper's active quantity is highlighted.</p>
   <div class="row">
     <div class="icon">🏠</div>
     <div class="names">

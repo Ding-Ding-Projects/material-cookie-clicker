@@ -1,0 +1,89 @@
+{
+  "name": "material-cookie-clicker",
+  "version": "0.1.0",
+  "private": false,
+  "description": "Material Cookie Clicker, a Material Design 3 cookie-clicker game for Windows.",
+  "author": "Ding Ding Projects",
+  "license": "Apache-2.0",
+  "homepage": "https://ding-ding-projects.github.io/material-cookie-clicker/",
+  "main": "dist/main/main.js",
+  "type": "module",
+  "workspaces": [
+    "packages/*"
+  ],
+  "scripts": {
+    "build": "npm run build:renderer && npm run build:main && npm run build:preload",
+    "build:renderer": "vite build",
+    "build:main": "tsc -p tsconfig.main.json",
+    "build:preload": "esbuild src/preload/index.ts --bundle --platform=node --format=cjs --external:electron --outfile=dist/preload/index.cjs",
+    "check": "tsc -p tsconfig.renderer.json --noEmit && tsc -p tsconfig.main.json --noEmit && vitest run tests && npm run typecheck --workspaces --if-present && npm run test --workspaces --if-present",
+    "count:lines": "node scripts/count-lines.mjs",
+    "dev": "npm run build && electron .",
+    "start": "npm run build && electron .",
+    "test": "vitest run tests",
+    "dist": "npm run build && electron-builder --win squirrel --publish never",
+    "prestart": "node scripts/ensure-electron-binary.mjs",
+    "pretest": "node scripts/ensure-electron-binary.mjs"
+  },
+  "dependencies": {
+    "electron-squirrel-startup": "^1.0.1",
+    "react": "^19.2.8",
+    "react-dom": "^19.2.8",
+    "zod": "^4.4.3"
+  },
+  "devDependencies": {
+    "@types/node": "^26.1.2",
+    "@types/react": "^19.2.18",
+    "@types/react-dom": "^19.2.4",
+    "@vitejs/plugin-react": "^5.2.0",
+    "electron": "^43.3.0",
+    "electron-builder": "^26.15.3",
+    "electron-builder-squirrel-windows": "^26.15.3",
+    "esbuild": "^0.28.1",
+    "typescript": "^5.9.3",
+    "vite": "^7.3.6",
+    "vitest": "^4.1.10"
+  },
+  "build": {
+    "appId": "org.dingdingprojects.materialcookieclicker",
+    "productName": "Material Cookie Clicker",
+    "asar": true,
+    "directories": {
+      "output": "release"
+    },
+    "files": [
+      "dist/**/*",
+      "assets/**/*",
+      "package.json"
+    ],
+    "icon": "assets/material-cookie-clicker.ico",
+    "win": {
+      "icon": "assets/material-cookie-clicker.ico",
+      "target": [
+        {
+          "target": "squirrel",
+          "arch": [
+            "x64"
+          ]
+        }
+      ],
+      "forceCodeSigning": false,
+      "signExecutable": false
+    },
+    "squirrelWindows": {
+      "name": "MaterialCookieClicker",
+      "artifactName": "MaterialCookieClicker-Setup.${ext}",
+      "iconUrl": "https://raw.githubusercontent.com/Ding-Ding-Projects/material-cookie-clicker/main/assets/material-cookie-clicker.ico",
+      "msi": false
+    },
+    "publish": {
+      "provider": "generic",
+      "url": "https://github.com/Ding-Ding-Projects/material-cookie-clicker/releases/latest/download/"
+    }
+  },
+  "allowScripts": {
+    "electron@43.4.0": true,
+    "electron-winstaller@5.4.0": true,
+    "esbuild@0.28.2": true
+  }
+}

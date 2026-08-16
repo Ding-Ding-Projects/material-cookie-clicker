@@ -1,0 +1,81 @@
+:root {
+  color-scheme: light;
+  --material-cookie-clicker-surface: #fff8f1;
+  --material-cookie-clicker-title-bar: #f2dfc8;
+  --material-cookie-clicker-on-surface: #2c1a0e;
+  --material-cookie-clicker-accent: #a2532b;
+}
+
+* {
+  box-sizing: border-box;
+}
+
+html,
+body,
+#root {
+  height: 100%;
+  margin: 0;
+}
+
+body {
+  font-family: 'Segoe UI', system-ui, sans-serif;
+  background: var(--material-cookie-clicker-surface);
+  color: var(--material-cookie-clicker-on-surface);
+}
+
+.app-shell {
+  display: flex;
+  flex-direction: column;
+  height: 100vh;
+}
+
+.title-bar {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  height: 40px;
+  padding-inline-start: 12px;
+  background: var(--material-cookie-clicker-title-bar);
+  -webkit-app-region: drag;
+  user-select: none;
+}
+
+.title-bar__label {
+  font-weight: 600;
+  font-size: 14px;
+}
+
+.title-bar__controls {
+  display: flex;
+  height: 100%;
+  -webkit-app-region: no-drag;
+}
+
+.title-bar__button {
+  width: 46px;
+  height: 100%;
+  border: none;
+  background: transparent;
+  color: var(--material-cookie-clicker-on-surface);
+  font-size: 14px;
+  cursor: pointer;
+}
+
+.title-bar__button:hover {
+  background: rgba(0, 0, 0, 0.08);
+}
+
+.title-bar__button--close:hover {
+  background: #c0392b;
+  color: #fff;
+}
+
+.app-content {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  gap: 8px;
+  text-align: center;
+}

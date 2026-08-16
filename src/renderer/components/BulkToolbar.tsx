@@ -1,6 +1,7 @@
 import type { ReactNode } from 'react';
 
-import { BULK_COPY } from '../game/copy.js';
+import {
+  bilingualText, BULK_COPY } from '../game/copy.js';
 
 export interface BulkAction {
   readonly key: string;
@@ -38,9 +39,9 @@ export function BulkToolbar({
   const countCopy = BULK_COPY.selectedCount(selectedCount);
 
   return (
-    <div className="bulk-toolbar" role="region" aria-label={`${countCopy.en} · ${countCopy.yue}`}>
+    <div className="bulk-toolbar" role="region" aria-label={bilingualText(countCopy)}>
       <span className="bulk-toolbar__count">
-        {countCopy.en} · {countCopy.yue}
+        {bilingualText(countCopy)}
       </span>
       {resultText ? (
         <>
@@ -60,17 +61,17 @@ export function BulkToolbar({
               disabled={busy}
               onClick={action.onRun}
             >
-              {busy ? `${BULK_COPY.inFlight.en} · ${BULK_COPY.inFlight.yue}` : action.label}
+              {busy ? `${bilingualText(BULK_COPY.inFlight)}` : action.label}
             </button>
           ))}
           <div className="spacer" />
           {matchingCount > selectedCount && (
             <button type="button" className="action" disabled={busy} onClick={onSelectAllMatching}>
-              {BULK_COPY.selectAllMatching.en} · {BULK_COPY.selectAllMatching.yue}
+              {bilingualText(BULK_COPY.selectAllMatching)}
             </button>
           )}
           <button type="button" className="action" disabled={busy} onClick={onClearSelection}>
-            {BULK_COPY.clearSelection.en} · {BULK_COPY.clearSelection.yue}
+            {bilingualText(BULK_COPY.clearSelection)}
           </button>
         </>
       )}

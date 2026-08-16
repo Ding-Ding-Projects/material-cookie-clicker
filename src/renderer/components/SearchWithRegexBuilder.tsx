@@ -51,8 +51,8 @@ export function SearchWithRegexBuilder({ idPrefix, state, onChange, placeholder,
           id={inputId}
           className="search-field__input"
           type="text"
-          placeholder={`${placeholder.en} · ${placeholder.yue}`}
-          aria-label={state.regex ? `${ariaLabel.en}, regex mode active · ${ariaLabel.yue}，規則運算式模式已啟用` : `${ariaLabel.en} · ${ariaLabel.yue}`}
+          placeholder={bilingualText(placeholder)}
+          aria-label={state.regex ? `${ariaLabel.en}, regex mode active · ${ariaLabel.yue}，規則運算式模式已啟用` : `${bilingualText(ariaLabel)}`}
           value={state.regex ? state.pattern : state.query}
           onChange={(event) =>
             onChange(state.regex ? { ...state, pattern: event.target.value } : { ...state, query: event.target.value })
@@ -97,7 +97,7 @@ export function SearchWithRegexBuilder({ idPrefix, state, onChange, placeholder,
                   checked={state.flags.includes(flag)}
                   onChange={() => onChange({ ...state, flags: toggleFlag(state.flags, flag) })}
                 />
-                {label.en} · {label.yue}
+                {bilingualText(label)}
               </label>
             ))}
           </div>

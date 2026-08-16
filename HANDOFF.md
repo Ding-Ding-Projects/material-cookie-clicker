@@ -49,7 +49,7 @@ X yet", that is this contract being eroded.
 
 | Thing | Evidence |
 | --- | --- |
-| Project test suite | **10 files, 109 tests, all passing** (`npx vitest run tests`) |
+| Project test suite | **14 files, 196 tests, all passing** (`npx vitest run tests`) |
 | `packages/surface-kernel` | **89 tests passing** (`npm test` in that package) |
 | `packages/local-ollama` | **37 tests passing** — previously unverifiable, now green once the workspace was wired |
 | Smoke test | **7/7** (`npm run smoke`) |
@@ -113,6 +113,46 @@ about.
 - **App-logo customization, the file converter, and the local Ollama manager
   are unimplemented in the app** — canonical features this repository has
   never had; releases ship without them and say so.
+
+### Settings, language mode and the funny levels
+
+There IS a settings surface now: a fifth console emblem (a gear), visible from
+the first frame of a brand-new save because Settings is an application surface
+and progressive disclosure does not apply to it — asserted in
+`tests/game/settings.test.ts`, which also fails if a `settings` key ever appears
+in the disclosure record.
+
+What is real:
+
+- **Language mode (English / Cantonese / Bilingual) works.** One formatting
+  function, `formatBilingual` in `src/renderer/game/copy.ts`, decides what a
+  bilingual pair renders as; `bilingualText` — which nearly every label already
+  went through — delegates to it against a module-level active mode that `App`
+  sets during render. Photographed end to end in
+  `captures/app/settings-yue.png`.
+- **Settings are persisted separately from the game save**
+  (`src/renderer/game/app-settings.ts`, key
+  `material-cookie-clicker:settings:v1`), so a save wipe never resets the
+  language somebody reads the app in. Verified by relaunching the built app
+  against the same profile and finding it still in Cantonese-only mode.
+- **"Open it now" on a tool card now opens Settings** and highlights the
+  closest row, instead of announcing that no surface exists. It still consults
+  nothing: `openFeatureRequest` in `console-panels.ts` does not take the game
+  state.
+
+What is stored but not yet visible:
+
+- **The two funny levels change nothing on screen.** They are independent, they
+  persist, and no string in this build has per-level variants, so there is
+  nothing for a level to select. The panel says so in both languages under the
+  sliders. Do not "wire them up" with a text transform — write the variants.
+
+Known remainder in the language migration: a small number of accessible names
+and a few hardcoded headings (parts of `ShopRail`, `DiscoveryTicket`,
+`UpgradeStrip` aria-labels, the `DestructiveGate` section headings) still
+compose both languages into one string regardless of the mode. They were left
+rather than half-converted; each is a plain `${x.en} · ${x.yue}` template that
+`bilingualText` can absorb.
 
 ## Work in flight at the end of this session
 

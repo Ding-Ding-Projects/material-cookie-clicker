@@ -138,6 +138,38 @@ export function AscensionEmblem({ className }: EmblemProps) {
   );
 }
 
+/** SETTINGS — a machined gear with a bevelled rim, eight teeth and a hub, with a slider bar
+ *  laid across its lower half: the panel is a machine control, and the two funny sliders are the
+ *  thing inside it. Drawn in the same idiom as the other four (inline gradient, --spark-ring
+ *  outline) so the fifth button reads as part of the same console rather than a bolted-on
+ *  afterthought. Unlike the other four this one is on the cabinet from the very first frame:
+ *  Settings is an application surface, not a game unlock. */
+export function GearEmblem({ className }: EmblemProps) {
+  // Eight teeth, generated rather than hand-listed so they stay exactly evenly spaced.
+  const teeth = Array.from({ length: 8 }, (_, index) => index * 45);
+  return (
+    <svg {...frame(className)}>
+      <defs>
+        <radialGradient id="mcc-gear-face" cx="0.36" cy="0.3" r="0.85">
+          <stop offset="0" stopColor="var(--metal-hi)" />
+          <stop offset="0.55" stopColor="var(--surface-highest)" />
+          <stop offset="1" stopColor="var(--metal-lo)" />
+        </radialGradient>
+      </defs>
+      <g stroke="var(--spark-ring)" strokeWidth="1.2" strokeLinejoin="round" fill="url(#mcc-gear-face)">
+        {teeth.map((angle) => (
+          <rect key={angle} x="13.6" y="0.9" width="4.8" height="7.4" rx="1.4" transform={`rotate(${angle} 16 16)`} />
+        ))}
+      </g>
+      <circle cx="16" cy="16" r="10.2" fill="url(#mcc-gear-face)" stroke="var(--spark-ring)" strokeWidth="2" />
+      <circle cx="16" cy="16" r="4.1" fill="var(--surface-lowest)" stroke="var(--spark-ring)" strokeWidth="1.5" />
+      <path d="M8.8 21.6h14.4" stroke="var(--tier2)" strokeWidth="2.4" strokeLinecap="round" opacity="0.9" />
+      <circle cx="19.6" cy="21.6" r="2.6" fill="var(--tier2)" stroke="var(--spark-ring)" strokeWidth="1" />
+      <path d="M9.4 10.6a8.6 8.6 0 0 1 4.4-3.2" fill="none" stroke="#fff" strokeWidth="1.6" strokeLinecap="round" opacity="0.55" />
+    </svg>
+  );
+}
+
 /** Decorative rivets/brackets for the panel header plate — chrome, never content. */
 export function PanelCorner({ className }: EmblemProps) {
   return (
@@ -153,4 +185,5 @@ export const CONSOLE_EMBLEMS = {
   tools: GemWrenchEmblem,
   statistics: GaugeEmblem,
   prestige: AscensionEmblem,
+  settings: GearEmblem,
 } as const;

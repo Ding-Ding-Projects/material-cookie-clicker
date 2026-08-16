@@ -44,6 +44,17 @@ have to farm cookies to get a regex builder, and this project's completeness
 rules forbid satisfying a feature contract by hiding the feature — so the
 separation is enforced in code and covered by a test, not left as an intention.
 
+## Language and settings
+
+The application ships a Settings panel, reachable from its gear emblem on the
+cabinet console from the very first frame of a new save — it is an application
+surface, not something the game unlocks. It holds a language-mode selector
+(English, Cantonese, or both at once), which really does re-render every
+surface in the app, and two independent 1–5 funny-level sliders, one per
+language. The levels persist; the writing does not vary by level yet, because
+every string in this build is written once per language, and the panel says so
+plainly instead of implying otherwise.
+
 ## Install
 
 No release exists yet. A download button will appear here, and on the
@@ -82,10 +93,12 @@ operating system's colour scheme.
 
 What they still do not show: a real-window narrow-width resize — every capture
 here is one maximised window, so the shop-drawer breakpoint remains verified by
-forcing it rather than by resizing — a golden-cookie spawn, any settings surface
-(there is none), the prestige two-key confirmation gate (it ships, but sits below
-the fold of the Prestige capture), and the deep end of the generator ladder past
-Shipment, which no capture run has reached.
+forcing it rather than by resizing — a golden-cookie spawn, the prestige two-key
+confirmation gate (it ships, but sits below the fold of the Prestige capture),
+and the deep end of the generator ladder past Shipment, which no capture run has
+reached. The Settings panel IS photographed now — the console emblem on a fresh
+save, the panel itself, and the same window in Cantonese-only mode — but only
+from a fresh profile, and never as reached from a tool card's "Open it now".
 
 <details>
 <summary>The nine captures of the current build</summary>

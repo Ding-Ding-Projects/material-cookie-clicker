@@ -3,7 +3,7 @@ import { costOfLitres, DIESEL_LEDGER_DISPLAY_PATH } from '../../shared/game/dies
 import { computeDisclosure } from '../../shared/game/disclosure.js';
 import { formatBigNum } from '../../shared/game/format-number.js';
 import { DieselCanisterIcon } from '../assets/icons.js';
-import { DIESEL_COPY } from '../game/copy.js';
+import { showsEnglish, showsCantonese, bilingualText, DIESEL_COPY } from '../game/copy.js';
 import { useDieselExchange, useFastSnapshot, useGameDispatch, useStructureSnapshot } from '../game/GameProvider.js';
 import { DIESEL_TARGET_KEY, usePurchaseFxTarget } from '../game/purchase-fx.js';
 
@@ -51,7 +51,7 @@ export function DieselDepot() {
   const consumedText =
     exchange.summary && exchange.summary.consumedCount > 0
       ? String(exchange.summary.consumedCount)
-      : `${DIESEL_COPY.consumedNone.en} · ${DIESEL_COPY.consumedNone.yue}`;
+      : `${bilingualText(DIESEL_COPY.consumedNone)}`;
 
   const ledgerPath = exchange.ledgerPath ?? DIESEL_LEDGER_DISPLAY_PATH;
 
@@ -59,32 +59,32 @@ export function DieselDepot() {
     <section
       ref={fxRef}
       className="diesel-depot"
-      aria-label={`${DIESEL_COPY.title.en} · ${DIESEL_COPY.title.yue}`}
+      aria-label={bilingualText(DIESEL_COPY.title)}
     >
       <header className="diesel-depot__head">
         <span className="diesel-depot__icon" aria-hidden="true">
           <DieselCanisterIcon />
         </span>
         <span className="diesel-depot__names">
-          <span className="diesel-depot__name">{DIESEL_COPY.title.en}</span>
-          <span className="diesel-depot__name-zh">{DIESEL_COPY.title.yue}</span>
+          {showsEnglish() ? <span className="diesel-depot__name">{DIESEL_COPY.title.en}</span> : null}
+          {showsCantonese() ? <span className="diesel-depot__name-zh">{DIESEL_COPY.title.yue}</span> : null}
         </span>
       </header>
 
       <p className="diesel-depot__sub">
-        {DIESEL_COPY.subtitle.en} · {DIESEL_COPY.subtitle.yue}
+        {bilingualText(DIESEL_COPY.subtitle)}
       </p>
 
       <dl className="diesel-depot__figures">
         <div className="diesel-depot__figure">
           <dt>
-            {DIESEL_COPY.litresLabel.en} · {DIESEL_COPY.litresLabel.yue}
+            {bilingualText(DIESEL_COPY.litresLabel)}
           </dt>
           <dd className="diesel-depot__count">{depot.litresMinted} L</dd>
         </div>
         <div className="diesel-depot__figure">
           <dt>
-            {DIESEL_COPY.vouchersLabel.en} · {DIESEL_COPY.vouchersLabel.yue}
+            {bilingualText(DIESEL_COPY.vouchersLabel)}
           </dt>
           <dd className="diesel-depot__count">{exchange.summary?.voucherCount ?? depot.vouchersMinted}</dd>
         </div>
@@ -92,7 +92,7 @@ export function DieselDepot() {
 
       <p className="diesel-depot__consumed">
         <span className="diesel-depot__consumed-label">
-          {DIESEL_COPY.consumedLabel.en} · {DIESEL_COPY.consumedLabel.yue}:
+          {bilingualText(DIESEL_COPY.consumedLabel)}:
         </span>{' '}
         <span className="diesel-depot__consumed-value">{consumedText}</span>
       </p>
@@ -101,32 +101,32 @@ export function DieselDepot() {
         type="button"
         className="diesel-depot__mint"
         disabled={!affordable}
-        aria-label={`${mintLabel.en} · ${mintLabel.yue}`}
+        aria-label={bilingualText(mintLabel)}
         onClick={() => dispatch({ type: 'mintDiesel', litres: MINT_LITRES })}
       >
-        {mintLabel.en} · {mintLabel.yue}
+        {bilingualText(mintLabel)}
       </button>
 
       {!affordable ? (
         <p className="diesel-depot__note">
-          {DIESEL_COPY.cannotAfford.en} · {DIESEL_COPY.cannotAfford.yue}
+          {bilingualText(DIESEL_COPY.cannotAfford)}
         </p>
       ) : null}
 
       {exchange.error ? (
         <p className="diesel-depot__note diesel-depot__note--problem" role="status">
-          {exchange.error.en} · {exchange.error.yue}
+          {bilingualText(exchange.error)}
         </p>
       ) : null}
 
       {!exchange.bridgeAvailable ? (
         <p className="diesel-depot__note diesel-depot__note--problem">
-          {DIESEL_COPY.noBridge.en} · {DIESEL_COPY.noBridge.yue}
+          {bilingualText(DIESEL_COPY.noBridge)}
         </p>
       ) : null}
 
       <p className="diesel-depot__note">
-        {DIESEL_COPY.handoffNote.en} · {DIESEL_COPY.handoffNote.yue}
+        {bilingualText(DIESEL_COPY.handoffNote)}
       </p>
       <p className="diesel-depot__path">{DIESEL_COPY.ledgerAt(ledgerPath).en}</p>
     </section>

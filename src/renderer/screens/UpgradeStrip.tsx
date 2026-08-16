@@ -13,7 +13,7 @@ import {
 import type { GameState } from '../../shared/game/types.js';
 import { UpgradeIcon, type UpgradeFamily } from '../assets/icons.js';
 import { createSearchState, SearchWithRegexBuilder } from '../components/SearchWithRegexBuilder.js';
-import { DISCLOSURE_COPY, GAME_SURFACE_COPY, LIST_COPY, type Bilingual } from '../game/copy.js';
+import { showsEnglish, showsCantonese, bilingualText, DISCLOSURE_COPY, GAME_SURFACE_COPY, LIST_COPY, type Bilingual } from '../game/copy.js';
 import { useFastSnapshot, useGameDispatch, useStructureSnapshot } from '../game/GameProvider.js';
 import { upgradeTargetKey, usePurchaseFxTarget } from '../game/purchase-fx.js';
 import { matchesSearch } from '../game/local-regex-search.js';
@@ -157,7 +157,7 @@ const UpgradeTicket = memo(function UpgradeTicket({
   // state, so the three states are distinguishable without seeing the ticket's fill.
   const costLine =
     state === 'owned'
-      ? `${LIST_COPY.alreadyOwned.en} · ${LIST_COPY.alreadyOwned.yue}`
+      ? `${bilingualText(LIST_COPY.alreadyOwned)}`
       : state === 'locked'
         ? `🔒 🍪 ${formatBigNum(def.cost, 'en')}`
         : `🍪 ${formatBigNum(def.cost, 'en')}`;
@@ -168,17 +168,17 @@ const UpgradeTicket = memo(function UpgradeTicket({
       type="button"
       className={`mini-ticket ${state}`}
       disabled={!affordable}
-      title={`${effect.en} · ${effect.yue}`}
-      aria-label={`${def.nameEn} · ${def.nameYue} — ${effect.en} · ${effect.yue} — ${stateLabel.en} · ${stateLabel.yue} — 🍪 ${formatBigNum(def.cost, 'en')}${
-        state === 'locked' && progress ? ` — ${progress.requirement.en} · ${progress.requirement.yue}` : ''
+      title={bilingualText(effect)}
+      aria-label={`${def.nameEn} · ${def.nameYue} — ${bilingualText(effect)} — ${bilingualText(stateLabel)} — 🍪 ${formatBigNum(def.cost, 'en')}${
+        state === 'locked' && progress ? ` — ${bilingualText(progress.requirement)}` : ''
       }`}
       onClick={() => dispatch({ type: 'buyUpgrade', upgradeId: def.id })}
     >
       <span className="mini-ticket__glyph" aria-hidden="true">
         <UpgradeIcon family={state === 'locked' ? 'locked' : familyFor(def)} />
       </span>
-      <span className="mini-ticket__name">{def.nameEn}</span>
-      <span className="mini-ticket__name-zh">{def.nameYue}</span>
+      {showsEnglish() ? <span className="mini-ticket__name">{def.nameEn}</span> : null}
+      {showsCantonese() ? <span className="mini-ticket__name-zh">{def.nameYue}</span> : null}
       {state === 'locked' && progress ? (
         <span
           className="mini-ticket__track"
@@ -186,7 +186,7 @@ const UpgradeTicket = memo(function UpgradeTicket({
           aria-valuemin={0}
           aria-valuemax={100}
           aria-valuenow={Math.round(progress.fraction * 100)}
-          aria-label={`${progress.requirement.en} · ${progress.requirement.yue}`}
+          aria-label={bilingualText(progress.requirement)}
         >
           <span className="mini-ticket__fill" style={{ width: `${Math.round(progress.fraction * 100)}%` }} />
         </span>
@@ -229,7 +229,7 @@ export function UpgradeStrip() {
   const visible = cards.filter((card) => matchesSearch(`${card.def.nameEn} ${card.def.nameYue}`, search));
 
   return (
-    <section className="panel" aria-label={`${GAME_SURFACE_COPY.upgradeStripLabel.en} · ${GAME_SURFACE_COPY.upgradeStripLabel.yue}`}>
+    <section className="panel" aria-label={bilingualText(GAME_SURFACE_COPY.upgradeStripLabel)}>
       {/* The search sits IN the heading row rather than on its own line: on the game surface every
           vertical pixel it would take is a pixel of ticket the player can no longer see. */}
       <div className="panel__header">
@@ -252,7 +252,7 @@ export function UpgradeStrip() {
       </div>
       {visible.length === 0 ? (
         <p>
-          {LIST_COPY.noResults.en} · {LIST_COPY.noResults.yue}
+          {bilingualText(LIST_COPY.noResults)}
         </p>
       ) : (
         <div className="upgrade-strip upgrade-strip--crumbs">

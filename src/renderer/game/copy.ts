@@ -9,18 +9,67 @@
  *
  * Every string is an `{ en, yue }` pair. Numbers/costs/rates are interpolated as plain values
  * and never themselves translated or altered — only the surrounding prose differs by language.
- * A funny-level slider / language-mode toggle would normally select which of these renders
- * (see the shared instructions' language-mode contract); no such settings surface exists yet in
- * this lane's scope, so every screen renders both languages together (bilingual-by-default),
- * matching the design mockups' own "English · 中文" presentation.
+ *
+ * WHICH LANGUAGES RENDER is now a real setting (Settings panel → language mode, stored in
+ * app-settings.ts). `formatBilingual` is the ONE place that decides, and `bilingualText` — which
+ * every screen already funnels its labels through — delegates to it against the currently
+ * active mode. That is why a screen does not have to know the setting exists to obey it.
  */
+import type { LanguageMode } from "./app-settings.js";
+
 export interface Bilingual {
   readonly en: string;
   readonly yue: string;
 }
 
-export function bilingualText({ en, yue }: Bilingual): string {
-  return `${en} · ${yue}`;
+/** The separator between the two languages when both are shown. */
+export const BILINGUAL_SEPARATOR = " · ";
+
+/**
+ * THE formatting function for bilingual copy.
+ *
+ * Pure, and exported for tests: given a pair and a mode it returns exactly what should appear on
+ * screen. 'en' and 'yue' each render one language; 'both' renders the paired "English · 中文"
+ * presentation the design mockups use and the only behaviour this app had before settings existed.
+ */
+export function formatBilingual(text: Bilingual, mode: LanguageMode): string {
+  if (mode === "en") return text.en;
+  if (mode === "yue") return text.yue;
+  return `${text.en}${BILINGUAL_SEPARATOR}${text.yue}`;
+}
+
+/**
+ * The mode every un-parameterised call renders against.
+ *
+ * A module-level value rather than a React context because roughly a hundred existing call
+ * sites format a label as a plain string (aria-labels, titles, placeholders) where a hook cannot
+ * reach. The shell sets it from the settings state during render, ABOVE every consumer, and any
+ * change to the setting re-renders the whole tree from `App`, so no consumer can read a stale
+ * mode. Nothing else in the app is allowed to write it.
+ */
+let activeLanguageMode: LanguageMode = "both";
+
+export function setActiveLanguageMode(mode: LanguageMode): void {
+  activeLanguageMode = mode;
+}
+
+export function getActiveLanguageMode(): LanguageMode {
+  return activeLanguageMode;
+}
+
+/** True when English text should be rendered at all, for the paired-span layouts that keep the
+ *  two languages in separate elements instead of one formatted string. */
+export function showsEnglish(mode: LanguageMode = activeLanguageMode): boolean {
+  return mode !== "yue";
+}
+
+/** True when Cantonese text should be rendered at all. */
+export function showsCantonese(mode: LanguageMode = activeLanguageMode): boolean {
+  return mode !== "en";
+}
+
+export function bilingualText(text: Bilingual): string {
+  return formatBilingual(text, activeLanguageMode);
 }
 
 export const TAB_COPY = {
@@ -81,16 +130,9 @@ export const CONSOLE_COPY = {
 export const SHELL_COPY = {
   tabsLabel: { en: "Game sections", yue: "遊戲分頁" },
   dismiss: { en: "Dismiss", yue: "收起" },
-  /**
-   * Shown when the player taps "Open it now" on a tool card. The preload bridge exposes window
-   * chrome only, so there is no channel for opening an application feature yet; this states
-   * that plainly instead of pretending the click did nothing. It is NOT a gate — the tech tree
-   * never decides whether a real feature may be opened.
-   */
-  featureSurfaceMissing: (featureEn: string, featureYue: string): Bilingual => ({
-    en: `${featureEn} is not gated — but this build has no window to open it in yet, so nothing opened.`,
-    yue: `${featureYue} 冇被鎖住——不過呢個版本重未有可以開嘅視窗，所以冇嘢開到。`,
-  }),
+  /* "Open it now" on a tool card used to answer here, with a line saying no surface existed to
+     open. There is one now — the Settings panel — so the shell announces SETTINGS_COPY.
+     featureOpened instead and that honest placeholder has been deleted rather than left behind. */
 } as const satisfies Record<string, Bilingual | ((...args: any[]) => Bilingual)>;
 
 export const COOKIE_SCREEN_COPY = {
@@ -371,4 +413,72 @@ export const OFFLINE_COPY = {
     yue: `舊存檔讀唔到（${detail.yue}）。原檔保留咗喺新存檔隔籬，冇整走過任何嘢。`,
   }),
   saveCorruptUnknown: { en: "unknown error", yue: "不明錯誤" },
+} as const satisfies Record<string, Bilingual | ((...args: any[]) => Bilingual)>;
+
+/**
+ * The Settings panel (design/settings-funny-sliders.html).
+ *
+ * Settings is an APPLICATION surface, not a game unlock, so none of this copy is gated by
+ * progress and none of it talks about earning anything.
+ */
+export const SETTINGS_COPY = {
+  title: { en: "Settings", yue: "設定" },
+  languageLabel: { en: "Language mode", yue: "語言模式" },
+  languageCaption: {
+    en: "Persists across restarts. Applies to every surface in the app, including this settings panel itself.",
+    yue: "重開都會記住。應用喺 app 入面每一個畫面，包括呢個設定面板本身。",
+  },
+  modeEn: { en: "English", yue: "英文" },
+  modeYue: { en: "Cantonese", yue: "粵語" },
+  modeBoth: { en: "Bilingual", yue: "雙語" },
+  funnyHeading: { en: "Funny level", yue: "搞笑程度" },
+  independenceNote: {
+    en: "Two separate controls, not one shared slider split in half. Moving the English slider never touches the Cantonese one, and the other way round.",
+    yue: "呢兩條係獨立嘅掣，唔係一條掣拆開兩半。郁英文嗰條唔會影響廣東話嗰條，反之亦然。",
+  },
+  funnyEnTitle: { en: "English funny level", yue: "英文搞笑程度" },
+  funnyYueTitle: { en: "Cantonese funny level", yue: "廣東話搞笑程度" },
+  funnyEnScale: { en: "1 = fully serious, 5 = maximum playfulness", yue: "1 = 完全正經，5 = 最搞笑" },
+  funnyYueScale: { en: "1 = fully serious, 5 = maximum playfulness", yue: "1 = 完全正經，5 = 最搞笑" },
+  funnyLevelValue: (level: number): Bilingual => ({
+    en: `Current level: ${level} of 5`,
+    yue: `而家程度：${level} / 5`,
+  }),
+  funnyEnSliderLabel: (level: number): Bilingual => ({
+    en: `English funny level, currently ${level} of 5`,
+    yue: `英文搞笑程度，而家 ${level} / 5`,
+  }),
+  funnyYueSliderLabel: (level: number): Bilingual => ({
+    en: `Cantonese funny level, currently ${level} of 5`,
+    yue: `廣東話搞笑程度，而家 ${level} / 5`,
+  }),
+  /**
+   * The honest caption. Every string in this build is written once per language, so a level is
+   * stored and honoured wherever a variant exists — which is nowhere yet. Saying so is the whole
+   * point: the alternative is a slider that pretends.
+   */
+  funnyScopeNote: {
+    en: "Your levels are saved and stay saved. The written copy in this build has one voice per language so far, so nothing on screen reads differently yet — higher levels arrive as the copy grows, and this note goes with them.",
+    yue: "你揀嘅程度會儲起，唔會唔見。呢個版本嘅文字每種語言暫時淨係得一把聲，所以畫面暫時未會唔同——寫多啲版本之後啲程度先至有分別，到時呢句就會刪走。",
+  },
+  factsNote: {
+    en: "Facts stay exact at every level — what was bought, the exact numbers. Only the voice would change.",
+    yue: "無論邊個程度，數字同事實都一樣準——買咗咩、幾多，全部照舊。淨係語氣會變。",
+  },
+  openSettings: { en: "Open Settings panel", yue: "打開設定面板" },
+  featureOpened: (featureEn: string, featureYue: string): Bilingual => ({
+    en: `${featureEn} is not gated — the Settings panel is open, with the closest matching row highlighted.`,
+    yue: `${featureYue} 冇被鎖住——設定面板已經打開咗，最相關嗰行標示咗。`,
+  }),
+  /**
+   * Shown at the top of Settings when it was opened by a tool card's "Open it now".
+   *
+   * Honest about what actually happened: Settings is the application surface this build has, so
+   * every tool's "Open it now" lands here on the row it touches most closely, rather than on a
+   * dedicated screen that does not exist. The tech tree never gated any of it.
+   */
+  openedFromTool: (featureEn: string, featureYue: string): Bilingual => ({
+    en: `Opened from the Tools tech tree: ${featureEn}. Settings is the application surface this build ships, so you land on the row closest to it — highlighted below. The tree never gated any of this; it only decides whether the card is on screen.`,
+    yue: `由工具科技樹打開：${featureYue}。呢個版本嘅應用程式介面就係設定面板，所以會帶你去最相關嗰行（下面標示咗）。科技樹從來冇鎖過任何功能，佢淨係決定張卡出唔出現。`,
+  }),
 } as const satisfies Record<string, Bilingual | ((...args: any[]) => Bilingual)>;

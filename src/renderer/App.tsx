@@ -4,7 +4,14 @@ import { bnMulScalar } from '../shared/game/big-number.js';
 import { formatBigNum } from '../shared/game/format-number.js';
 import { isEffectActive } from '../shared/game/golden-cookie.js';
 import { computeMultipliers } from '../shared/game/upgrades.js';
-import { computeDisclosure } from '../shared/game/disclosure.js';
+import { computeDisclosure, type ConsoleSurfaceId } from '../shared/game/disclosure.js';
+import {
+  consolePanelIds,
+  openFeatureRequest,
+  SETTINGS_PANEL_ID,
+  type PanelId,
+  type SettingsRowId,
+} from './game/console-panels.js';
 import {
   GameProvider,
   useFastSnapshot,
@@ -18,11 +25,24 @@ import {
   bilingualText,
   CONSOLE_COPY,
   GAME_SURFACE_COPY,
+  SETTINGS_COPY,
+  setActiveLanguageMode,
   SHELL_COPY,
+  showsCantonese,
+  showsEnglish,
   TAB_COPY,
   TITLE_BAR_COPY,
   type Bilingual,
 } from './game/copy';
+import {
+  DEFAULT_APP_SETTINGS,
+  resolveAppSettingsStore,
+  type AppSettings,
+  type FunnyLevel,
+  type LanguageMode,
+} from './game/app-settings';
+import { AppSettingsProvider, type AppSettingsContextValue } from './game/AppSettingsContext';
+import { SettingsScreen } from './screens/SettingsScreen';
 import { AchievementsScreen, AchievementUnlockToast } from './screens/AchievementsScreen';
 import { CookieHero } from './screens/CookieHero';
 import { DiscoveryTicket } from './screens/DiscoveryTicket';
@@ -41,15 +61,20 @@ import { UpgradeStrip } from './screens/UpgradeStrip';
  * of these would still be a spec violation — those three live on the game surface only
  * (design/game-layout.html).
  */
-const SURFACE_IDS = ['achievements', 'tools', 'statistics', 'prestige'] as const;
+/**
+ * The panel ids, the console order, and where a tool card's "Open it now" lands all live in
+ * game/console-panels.ts so they can be asserted directly by tests without rendering anything.
+ * SETTINGS is in that list unconditionally: it is an application surface, not a game unlock, so
+ * progressive disclosure does not apply to it (tests/settings.test.ts asserts exactly that).
+ */
+type SurfaceId = ConsoleSurfaceId;
 
-type SurfaceId = (typeof SURFACE_IDS)[number];
-
-const SURFACE_LABELS: Readonly<Record<SurfaceId, Bilingual>> = {
+const SURFACE_LABELS: Readonly<Record<PanelId, Bilingual>> = {
   achievements: TAB_COPY.achievements,
   tools: TAB_COPY.tools,
   statistics: TAB_COPY.statistics,
   prestige: TAB_COPY.prestige,
+  settings: SETTINGS_COPY.title,
 };
 
 
@@ -86,7 +111,7 @@ function Hud() {
   const disclosure = computeDisclosure(structure);
 
   return (
-    <div className="hud" role="group" aria-label={`${GAME_SURFACE_COPY.hudLabel.en} · ${GAME_SURFACE_COPY.hudLabel.yue}`} aria-live="off">
+    <div className="hud" role="group" aria-label={bilingualText(GAME_SURFACE_COPY.hudLabel)} aria-live="off">
       <HudReadout label={GAME_SURFACE_COPY.hudCookies} value={fast.cookies} fxKey={HUD_COOKIES_TARGET_KEY} />
       {disclosure.perSecondReadout ? <HudReadout label={GAME_SURFACE_COPY.hudPerSecond} value={fast.cps} /> : null}
       {disclosure.perClickReadout ? <HudReadout label={GAME_SURFACE_COPY.hudPerClick} value={clickValue} /> : null}
@@ -114,10 +139,15 @@ function HudReadout({
   return (
     <div className="hud__readout" ref={fxKey ? fxRef : undefined}>
       <span className="hud__key">
-        {label.en} · {label.yue}
+        {bilingualText(label)}
       </span>
-      <span className="hud__value">{en}</span>
-      {yue === en ? null : <span className="hud__value-zh">{yue}</span>}
+      {/* Language mode reaches the NUMBERS too: Cantonese-only shows the Cantonese formatting of
+          the value on its own rather than beside an English one. The two formatters agree on
+          small values, so in bilingual mode the second line still only appears when it actually
+          reads differently — printing "4.06" twice looks like a rendering bug, not a
+          translation. */}
+      {showsEnglish() || yue === en ? <span className="hud__value">{en}</span> : null}
+      {showsCantonese() && yue !== en ? <span className="hud__value-zh">{yue}</span> : null}
     </div>
   );
 }
@@ -150,39 +180,38 @@ function GameSurface() {
 
 /** The drawn emblem for one surface. Decorative in every position it appears — the button and
  *  the panel header both carry their own accessible name. */
-function ConsoleEmblem({ id }: { id: SurfaceId }) {
+function ConsoleEmblem({ id }: { id: PanelId }) {
   const Drawing = CONSOLE_EMBLEMS[id];
   return <Drawing />;
 }
 
 /**
- * The console cluster bolted to the cabinet frame. Four arcade buttons, each with its own
- * emblem and a small label. They are plain buttons — deliberately NOT a tablist — because
- * pressing one opens a panel over the game rather than navigating anywhere.
+ * The console cluster bolted to the cabinet frame. Arcade buttons, each with its own emblem and
+ * a small label. They are plain buttons — deliberately NOT a tablist — because pressing one
+ * opens a panel over the game rather than navigating anywhere.
  */
 function CabinetConsole({
   openId,
   onOpen,
   buttonRefs,
 }: {
-  openId: SurfaceId | null;
-  onOpen: (id: SurfaceId, button: HTMLButtonElement) => void;
-  buttonRefs: React.MutableRefObject<Partial<Record<SurfaceId, HTMLButtonElement | null>>>;
+  openId: PanelId | null;
+  onOpen: (id: PanelId, button: HTMLButtonElement) => void;
+  buttonRefs: React.MutableRefObject<Partial<Record<PanelId, HTMLButtonElement | null>>>;
 }) {
-  // Each emblem is earned by the progress its panel is about: a first achievement, a first
+  // Each GAME emblem is earned by the progress its panel is about: a first achievement, a first
   // discovered tool, a first generator, a first sight of the prestige horizon. Hiding a button
   // hides a GAME panel and nothing else — the Tools tech tree's contract that every real
   // application feature stays reachable is untouched, and its "Open it now" control behaves
   // identically the moment the panel is open (see tools.ts#gatesApplicationFeature).
   const structure = useStructureSnapshot();
   const disclosure = computeDisclosure(structure);
-  const visibleIds = SURFACE_IDS.filter((id) => disclosure.consoles[id]);
-  // An empty group with an accessible name is a label pointing at nothing; render no console
-  // at all until the first emblem is earned.
-  if (visibleIds.length === 0) return null;
+  // Settings is last in the row and FIRST in time: consolePanelIds appends it unconditionally,
+  // so the console is never empty and a fresh save always has somewhere to change its language.
+  const visibleIds = consolePanelIds(disclosure);
 
   return (
-    <div className="console" role="group" aria-label={`${CONSOLE_COPY.consoleLabel.en} · ${CONSOLE_COPY.consoleLabel.yue}`}>
+    <div className="console" role="group" aria-label={bilingualText(CONSOLE_COPY.consoleLabel)}>
       {visibleIds.map((id) => {
         const label = SURFACE_LABELS[id];
         const open = id === openId;
@@ -194,7 +223,7 @@ function CabinetConsole({
             id={`console-${id}`}
             aria-haspopup="dialog"
             aria-expanded={open}
-            aria-label={`${CONSOLE_COPY.open(label.en, label.yue).en} · ${CONSOLE_COPY.open(label.en, label.yue).yue}`}
+            aria-label={bilingualText(CONSOLE_COPY.open(label.en, label.yue))}
             data-open={open ? 'true' : undefined}
             ref={(node) => {
               buttonRefs.current[id] = node;
@@ -202,12 +231,16 @@ function CabinetConsole({
             onClick={(event) => onOpen(id, event.currentTarget)}
           >
             <ConsoleEmblem id={id} />
-            <span className="console__label console__label--legible" aria-hidden="true">
-              {label.en}
-            </span>
-            <span className="console__label-zh console__label-zh--legible" aria-hidden="true">
-              {label.yue}
-            </span>
+            {showsEnglish() ? (
+              <span className="console__label console__label--legible" aria-hidden="true">
+                {label.en}
+              </span>
+            ) : null}
+            {showsCantonese() ? (
+              <span className="console__label-zh console__label-zh--legible" aria-hidden="true">
+                {label.yue}
+              </span>
+            ) : null}
           </button>
         );
       })}
@@ -234,7 +267,7 @@ function AnchoredPanel({
   onClose,
   children,
 }: {
-  surfaceId: SurfaceId;
+  surfaceId: PanelId;
   label: Bilingual;
   anchor: Anchor;
   onClose: () => void;
@@ -319,14 +352,14 @@ function AnchoredPanel({
             <ConsoleEmblem id={surfaceId} />
           </span>
           <h2 className="anchored-panel__title" id={titleId}>
-            <span>{label.en}</span>
-            <span className="anchored-panel__title-zh">{label.yue}</span>
+            {showsEnglish() ? <span>{label.en}</span> : null}
+            {showsCantonese() ? <span className="anchored-panel__title-zh">{label.yue}</span> : null}
           </h2>
           <button
             type="button"
             className="anchored-panel__close"
             ref={closeRef}
-            aria-label={`${CONSOLE_COPY.close.en} · ${CONSOLE_COPY.close.yue}`}
+            aria-label={bilingualText(CONSOLE_COPY.close)}
             onClick={onClose}
           >
             <span aria-hidden="true">&#x2715;</span>
@@ -343,8 +376,52 @@ export function App() {
   const toggleMaximize = useCallback(() => window.materialCookieClicker?.window.toggleMaximize(), []);
   const close = useCallback(() => window.materialCookieClicker?.window.close(), []);
 
+  // The settings STORE is resolved once and kept in a ref: it is a backend, not state, and
+  // re-resolving it on every render would re-read localStorage for nothing.
+  const settingsStoreRef = useRef<ReturnType<typeof resolveAppSettingsStore> | null>(null);
+  if (!settingsStoreRef.current) settingsStoreRef.current = resolveAppSettingsStore();
+  const settingsStore = settingsStoreRef.current;
+
+  // Loaded synchronously from the initialiser, so the very first paint is already in the
+  // player's chosen language — a bilingual flash before switching to Cantonese would be a bug
+  // visible on every single launch.
+  const [settings, setSettings] = useState<AppSettings>(() => {
+    try {
+      return settingsStore.load();
+    } catch {
+      return DEFAULT_APP_SETTINGS;
+    }
+  });
+
+  // The one write to copy.ts's module-level mode, done during render of the topmost component so
+  // every child below — including the ~100 label sites that format labels as plain strings —
+  // renders against the current mode. Any change to `settings` re-renders this whole tree.
+  setActiveLanguageMode(settings.languageMode);
+
+  const commit = useCallback(
+    (next: AppSettings) => {
+      setSettings(next);
+      settingsStore.save(next);
+    },
+    [settingsStore],
+  );
+
+  const settingsContext: AppSettingsContextValue = {
+    settings,
+    setLanguageMode: useCallback(
+      (languageMode: LanguageMode) => commit({ ...settings, languageMode }),
+      [commit, settings],
+    ),
+    // One language per call, by construction: there is no code path that can move both levels.
+    setFunnyLevel: useCallback(
+      (language: 'en' | 'yue', level: FunnyLevel) =>
+        commit(language === 'en' ? { ...settings, funnyLevelEn: level } : { ...settings, funnyLevelYue: level }),
+      [commit, settings],
+    ),
+  };
+
   return (
-    <div className="app-shell">
+    <div className="app-shell" data-language-mode={settings.languageMode}>
       <header className="title-bar" role="banner">
         <span className="title-bar__label">Material Cookie Clicker</span>
         <div className="title-bar__controls" role="group" aria-label={bilingualText(TITLE_BAR_COPY.controlsLabel)}>
@@ -371,9 +448,11 @@ export function App() {
       </header>
       {/* One GameProvider for the whole shell: every screen reads the same store, so switching
           tabs never restarts the tick loop or reloads the save. */}
-      <GameProvider>
-        <GameShell />
-      </GameProvider>
+      <AppSettingsProvider value={settingsContext}>
+        <GameProvider>
+          <GameShell />
+        </GameProvider>
+      </AppSettingsProvider>
     </div>
   );
 }
@@ -381,18 +460,27 @@ export function App() {
 function GameShell() {
   // Which panel is open, if any, and where it grows from. Nothing about this is persisted: the
   // game surface is always the base state, so a reload never reopens a panel over it.
-  const [openSurface, setOpenSurface] = useState<SurfaceId | null>(null);
+  const [openSurface, setOpenSurface] = useState<PanelId | null>(null);
   const [anchor, setAnchor] = useState<Anchor>({ x: 0, y: 0 });
   const [shellStatus, setShellStatus] = useState<Bilingual | null>(null);
+  // Set only when Settings was opened by a tool card's "Open it now", so the panel can say where
+  // the player came from and light up the row that request was closest to. Cleared on close.
+  const [settingsEntry, setSettingsEntry] = useState<{
+    row: SettingsRowId;
+    nameEn: string;
+    nameYue: string;
+  } | null>(null);
   const statusTimerRef = useRef<ReturnType<typeof setTimeout> | null>(null);
-  const buttonRefs = useRef<Partial<Record<SurfaceId, HTMLButtonElement | null>>>({});
+  const buttonRefs = useRef<Partial<Record<PanelId, HTMLButtonElement | null>>>({});
   const { notice: offlineNotice, dismiss: dismissOfflineNotice } = useOfflineNotice();
   const milestoneMessage = useMilestoneMessage();
 
-  const openPanel = useCallback((id: SurfaceId, button: HTMLButtonElement) => {
+  const openPanel = useCallback((id: PanelId, button: HTMLButtonElement) => {
     const rect = button.getBoundingClientRect();
     setAnchor({ x: rect.left + rect.width / 2, y: rect.bottom });
     setOpenSurface(id);
+    // Pressing the Settings emblem directly is not an arrival from the tech tree.
+    setSettingsEntry(null);
   }, []);
 
   // Closing always hands focus back to the button that opened the panel, so the keyboard never
@@ -402,6 +490,7 @@ function GameShell() {
       if (current) buttonRefs.current[current]?.focus();
       return null;
     });
+    setSettingsEntry(null);
   }, []);
 
   useEffect(() => {
@@ -417,15 +506,26 @@ function GameShell() {
   }, []);
 
   /**
-   * "Open it now" on a tool card. The preload bridge (src/preload/index.ts) exposes window
-   * chrome only — minimize/maximize/close — and has no channel for opening an application
-   * feature, so rather than inventing an IPC contract this lane does not own, the click is
-   * answered honestly in the status region. Nothing here consults the tech tree: the handler
-   * runs identically for every tool in every unlock state.
+   * "Open it now" on a tool card. This now has a real destination: the Settings panel, which is
+   * the application surface this build ships. The click swaps the open panel from Tools to
+   * Settings, anchored to the Settings emblem, with the row the request is closest to
+   * highlighted and a note at the top saying where the player came from.
+   *
+   * Nothing here consults the tech tree. The handler runs identically for every tool in every
+   * unlock state — an undiscovered card's button lands in exactly the same place as an unlocked
+   * one's (see tools.ts#gatesApplicationFeature).
    */
   const openApplicationFeature = useCallback<OpenApplicationFeature>(
-    (_toolId, def) => {
-      announce(SHELL_COPY.featureSurfaceMissing(def.nameEn, def.nameYue));
+    (toolId, def) => {
+      const request = openFeatureRequest(toolId);
+      setSettingsEntry({ row: request.row, nameEn: def.nameEn, nameYue: def.nameYue });
+      const button = buttonRefs.current[request.panel];
+      if (button) {
+        const rect = button.getBoundingClientRect();
+        setAnchor({ x: rect.left + rect.width / 2, y: rect.bottom });
+      }
+      setOpenSurface(request.panel);
+      announce(SETTINGS_COPY.featureOpened(def.nameEn, def.nameYue));
     },
     [announce],
   );
@@ -457,6 +557,12 @@ function GameShell() {
           {openSurface === 'tools' && <ToolsScreen onOpenApplicationFeature={openApplicationFeature} />}
           {openSurface === 'statistics' && <StatisticsScreen />}
           {openSurface === 'prestige' && <PrestigeScreen />}
+          {openSurface === 'settings' && (
+            <SettingsScreen
+              highlightRow={settingsEntry?.row ?? null}
+              openedFrom={settingsEntry ? { nameEn: settingsEntry.nameEn, nameYue: settingsEntry.nameYue } : null}
+            />
+          )}
         </AnchoredPanel>
       )}
 
@@ -465,7 +571,7 @@ function GameShell() {
           <span>{offlineNotice.en}</span>
           <span>{offlineNotice.yue}</span>
           <button type="button" className="offline-banner__dismiss offline-banner__dismiss--target" onClick={dismissOfflineNotice}>
-            {SHELL_COPY.dismiss.en} · {SHELL_COPY.dismiss.yue}
+            {bilingualText(SHELL_COPY.dismiss)}
           </button>
         </div>
       )}
@@ -477,7 +583,7 @@ function GameShell() {
       <AchievementUnlockToast />
 
       <div className="milestone-region" role="status" aria-live="polite">
-        {milestoneMessage ? `${milestoneMessage.en} · ${milestoneMessage.yue}` : ''}
+        {milestoneMessage ? `${bilingualText(milestoneMessage)}` : ''}
       </div>
 
       {/* The one purchase-feedback overlay for the whole game. It renders nothing until a
@@ -485,7 +591,7 @@ function GameShell() {
       <PurchaseFxLayer />
 
       <div className="shell-status" role="status" aria-live="polite">
-        {shellStatus ? `${shellStatus.en} · ${shellStatus.yue}` : ''}
+        {shellStatus ? `${bilingualText(shellStatus)}` : ''}
       </div>
     </main>
   );

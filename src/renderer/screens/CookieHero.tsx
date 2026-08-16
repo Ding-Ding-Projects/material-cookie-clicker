@@ -6,7 +6,7 @@ import { isEffectActive } from '../../shared/game/golden-cookie.js';
 import { computeMultipliers } from '../../shared/game/upgrades.js';
 import { computeDisclosure } from '../../shared/game/disclosure.js';
 import { HeroCookieArt } from '../assets/icons.js';
-import { COOKIE_SCREEN_COPY } from '../game/copy.js';
+import { showsEnglish, showsCantonese, bilingualText, COOKIE_SCREEN_COPY } from '../game/copy.js';
 import { useFastSnapshot, useGameDispatch, useStructureSnapshot } from '../game/GameProvider.js';
 import { createHoldToClickController } from '../game/hold-to-click.js';
 
@@ -137,7 +137,7 @@ export function CookieHero() {
           ref={buttonRef}
           type="button"
           className="cookie-btn cookie-btn--art cookie-btn--lift"
-          aria-label={goldenActive ? `${COOKIE_SCREEN_COPY.goldenAvailable.en} · ${COOKIE_SCREEN_COPY.goldenAvailable.yue}` : `${COOKIE_SCREEN_COPY.clickTarget.en} · ${COOKIE_SCREEN_COPY.clickTarget.yue}`}
+          aria-label={goldenActive ? `${bilingualText(COOKIE_SCREEN_COPY.goldenAvailable)}` : `${bilingualText(COOKIE_SCREEN_COPY.clickTarget)}`}
           onClick={(event) => {
             // A keyboard-activated click reports 0,0 detail; only a real pointer has a position.
             if (event.detail > 0) recordPoint(event.clientX, event.clientY);
@@ -174,13 +174,15 @@ export function CookieHero() {
 
       {disclosure.perSecondReadout ? (
         <div className="cookie-cps" aria-live="off">
-          {formatBigNum(fast.cps, 'en')} / sec · {COOKIE_SCREEN_COPY.cpsLabel.yue} {formatBigNum(fast.cps, 'yue')}
+          {showsEnglish() ? `${formatBigNum(fast.cps, 'en')} / sec` : null}
+          {showsEnglish() && showsCantonese() ? ' · ' : null}
+          {showsCantonese() ? `${COOKIE_SCREEN_COPY.cpsLabel.yue} ${formatBigNum(fast.cps, 'yue')}` : null}
         </div>
       ) : null}
 
       {holdEnabled ? (
         <p className="cookie-hero__hint">
-          {COOKIE_SCREEN_COPY.holdHint.en} · {COOKIE_SCREEN_COPY.holdHint.yue}
+          {bilingualText(COOKIE_SCREEN_COPY.holdHint)}
         </p>
       ) : null}
     </div>

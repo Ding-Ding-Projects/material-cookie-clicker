@@ -1,4 +1,4 @@
-import { bilingualText, LIST_COPY } from '../game/copy.js';
+import { showsEnglish, showsCantonese, bilingualText, LIST_COPY } from '../game/copy.js';
 
 export type BuyQuantity = 1 | 10 | 100 | 'max';
 
@@ -32,10 +32,12 @@ export function BuyStepper({ value, onChange, disabled = false, ariaLabelId }: B
         >
           {option === 'max' ? (
             <>
-              <span>{LIST_COPY.buyMax.en}</span>
-              <span className="stepper__max-zh" aria-hidden="true">
-                {LIST_COPY.buyMax.yue}
-              </span>
+              {showsEnglish() ? <span>{LIST_COPY.buyMax.en}</span> : null}
+              {showsCantonese() ? (
+                <span className="stepper__max-zh" aria-hidden="true">
+                  {LIST_COPY.buyMax.yue}
+                </span>
+              ) : null}
             </>
           ) : (
             `×${option}`

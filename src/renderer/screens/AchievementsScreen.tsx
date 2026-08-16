@@ -8,7 +8,7 @@ import {
 } from '../../shared/game/achievements.js';
 import { AchievementMedal, type MedalFamily } from '../assets/icons.js';
 import { createSearchState, SearchWithRegexBuilder } from '../components/SearchWithRegexBuilder.js';
-import { ACHIEVEMENTS_COPY, bilingualText, LIST_COPY, type Bilingual } from '../game/copy.js';
+import { TAB_COPY, showsEnglish, showsCantonese, ACHIEVEMENTS_COPY, bilingualText, LIST_COPY, type Bilingual } from '../game/copy.js';
 import { useGameStoreInstance, useStructureSnapshot } from '../game/GameProvider.js';
 import { matchesSearch } from '../game/local-regex-search.js';
 import { detectMilestones, describeMilestone } from '../game/narration.js';
@@ -52,8 +52,12 @@ const AchievementCell = memo(function AchievementCell({
       <div className={`achievement-badge ${unlocked ? 'unlocked achievement-badge--minted' : 'locked'}`} role="img" aria-label={label}>
         <AchievementMedal family={unlocked ? medalFor(def.condition) : 'locked'} />
       </div>
-      <div className="achievement-name">{unlocked ? def.nameEn : ACHIEVEMENTS_COPY.lockedName.en}</div>
-      <div className="achievement-name-zh">{unlocked ? def.nameYue : ACHIEVEMENTS_COPY.lockedName.yue}</div>
+      {showsEnglish() ? (
+        <div className="achievement-name">{unlocked ? def.nameEn : ACHIEVEMENTS_COPY.lockedName.en}</div>
+      ) : null}
+      {showsCantonese() ? (
+        <div className="achievement-name-zh">{unlocked ? def.nameYue : ACHIEVEMENTS_COPY.lockedName.yue}</div>
+      ) : null}
     </div>
   );
 });
@@ -152,7 +156,8 @@ export function AchievementsScreen() {
   return (
     <div className="screen">
       <h1>
-        Achievements<span className="screen-title-zh">成就</span>
+        {showsEnglish() ? TAB_COPY.achievements.en : null}
+        {showsCantonese() ? <span className="screen-title-zh">{TAB_COPY.achievements.yue}</span> : null}
       </h1>
       <p className="screen-summary">
         {unlockedIds.size} / {ACHIEVEMENT_DEFINITIONS.length} unlocked · 已解鎖 {unlockedIds.size} /{' '}
@@ -167,7 +172,7 @@ export function AchievementsScreen() {
       />
       {visible.length === 0 ? (
         <p>
-          {LIST_COPY.noResults.en} · {LIST_COPY.noResults.yue}
+          {bilingualText(LIST_COPY.noResults)}
         </p>
       ) : (
         <div className="achievement-grid">

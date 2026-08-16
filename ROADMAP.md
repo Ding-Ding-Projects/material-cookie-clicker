@@ -36,7 +36,7 @@ well is a sales page.
 
 - **App-logo customization.** The one canonical feature with no reference
   implementation in any sibling project, so it is genuinely from scratch.
-- **Completeness inventory and its negative regression Shek Q.** The
+- **Completeness inventory and its negative regression guard.** The
   hand-written per-surface list that must fail closed when any canonical feature
   is missing. Until this exists, "every feature is present" is an assertion
   nobody can check — and a guard that only validates the features it can already

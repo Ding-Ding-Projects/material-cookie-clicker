@@ -34,6 +34,7 @@ interface GameContextValue {
   readonly offlineNotice: Bilingual | null;
   readonly dismissOfflineNotice: () => void;
   readonly milestoneMessage: Bilingual | null;
+  readonly wipe: () => Promise<void>;
 }
 
 const GameContext = createContext<GameContextValue | null>(null);
@@ -175,6 +176,15 @@ export function GameProvider({ children }: { children: ReactNode }) {
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [ready]);
 
+  // Full wipe (prestige-gate's "wipe" tone, see PrestigeScreen.tsx): deletes the on-disk save
+  // through the resolved persistence backend, THEN replaces the live in-memory state with a
+  // brand-new game — deleting the save file alone would leave the running session untouched
+  // until the next restart, which is not what "delete all save data" promises the player.
+  async function wipe(): Promise<void> {
+    await persistenceRef.current.wipe();
+    store.replaceState(createInitialGameState(new Date().toISOString()));
+  }
+
   const value: GameContextValue = {
     store,
     dispatch,
@@ -182,6 +192,7 @@ export function GameProvider({ children }: { children: ReactNode }) {
     offlineNotice,
     dismissOfflineNotice: () => setOfflineNotice(null),
     milestoneMessage,
+    wipe,
   };
 
   return <GameContext.Provider value={value}>{children}</GameContext.Provider>;
@@ -208,6 +219,11 @@ export function useOfflineNotice(): { notice: Bilingual | null; dismiss: () => v
 
 export function useMilestoneMessage(): Bilingual | null {
   return useGameContext().milestoneMessage;
+}
+
+/** Deletes the on-disk save AND replaces the live session with a fresh game — see wipe() above. */
+export function useGameWipe(): () => Promise<void> {
+  return useGameContext().wipe;
 }
 
 /** Fast slice: cookies / lifetimeCookies / derived CPS — updates on every click and tick. */

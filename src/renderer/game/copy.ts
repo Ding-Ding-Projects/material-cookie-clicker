@@ -88,7 +88,44 @@ export const TOOLS_SCREEN_COPY = {
     en: "Tool progression: off (previewing every tool as unlocked)",
     yue: "工具進度：熄咗（預覽晒全部工具當已解鎖）",
   },
+  shopPriceLabel: { en: "Price", yue: "價錢" },
+  buyEarly: { en: "Buy early", yue: "提前解鎖" },
+  openedRegexBuilder: {
+    en: "Opened — this screen's own search field already has the real regex builder, right above.",
+    yue: "已開啟——呢個畫面自己嘅搜尋欄上面就係真正嘅正則表達式產生器。",
+  },
+  openedGeneric: {
+    en: "This build of Material Cookie Clicker has not wired this feature into its own screen yet — but as the note above says, it was never gated by this tool card either way.",
+    yue: "呢個版本嘅曲奇餅乾點擊器仲未將呢個功能接返自己嘅畫面——不過好似上面講，呢張工具卡從來都冇鎖住呢個功能。",
+  },
 } as const satisfies Record<string, Bilingual>;
+
+export const ACHIEVEMENTS_SCREEN_COPY = {
+  unlockedSummary: (unlocked: number, total: number): Bilingual => ({
+    en: `${unlocked} of ${total} achievements unlocked`,
+    yue: `已解鎖 ${unlocked} / ${total} 個成就`,
+  }),
+  unlockedAt: (dateText: string): Bilingual => ({
+    en: `Unlocked ${dateText}`,
+    yue: `${dateText} 解鎖`,
+  }),
+  requireLifetimeCookies: (target: string): Bilingual => ({
+    en: `Reach ${target} lifetime cookies`,
+    yue: `一生累積曲奇達到 ${target}`,
+  }),
+  requireClicks: (target: string): Bilingual => ({
+    en: `Click ${target} times`,
+    yue: `撳 ${target} 下`,
+  }),
+  requireGeneratorOwned: (count: number, nameEn: string, nameYue: string): Bilingual => ({
+    en: `Own ${count} × ${nameEn}`,
+    yue: `擁有 ${count} 個${nameYue}`,
+  }),
+  requirePrestige: (target: number): Bilingual => ({
+    en: `Prestige ${target} time${target === 1 ? "" : "s"}`,
+    yue: `轉生 ${target} 次`,
+  }),
+} as const satisfies Record<string, Bilingual | ((...args: any[]) => Bilingual)>;
 
 export const STATS_SCREEN_COPY = {
   totalCookiesBaked: { en: "Total Cookies Baked", yue: "總共烤咗嘅曲奇" },
@@ -137,6 +174,8 @@ export const PRESTIGE_SCREEN_COPY = {
   key2WipeLabel: { en: "Confirm you understand this is permanent", yue: "確認明白呢個係永久性" },
   sliderHintDisabled: { en: "Both keys required before this slider unlocks", yue: "要開晒兩條鎖匙先可以郁滑桿" },
   sliderHintEnabled: { en: "Drag fully right to confirm", yue: "拉到盡右邊確認" },
+  sliderAriaPrestige: { en: "Slide fully right to prestige", yue: "拉到盡右邊確認轉生" },
+  sliderAriaWipe: { en: "Slide fully right to delete everything", yue: "拉到盡右邊確認刪除全部" },
   emergencyExit: { en: "Emergency exit", yue: "緊急退出" },
   prestigeCompleted: (points: number): Bilingual => ({
     en: `Prestiged! Ascension points awarded: +${points}`,

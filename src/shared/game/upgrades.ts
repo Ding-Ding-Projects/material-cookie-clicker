@@ -1,8 +1,8 @@
-import { bnCompare, bnFromNumber, bnMulScalar, type BigNum } from "./big-number";
-import { GENERATOR_DEFINITIONS } from "./generators";
-import { prestigeMultiplierFor } from "./prestige";
-import { isToolBonusActive, TOOL_DEFINITIONS } from "./tools";
-import type { GameState } from "./types";
+import { bnCompare, bnFromNumber, bnMulScalar, type BigNum } from "./big-number.js";
+import { GENERATOR_DEFINITIONS } from "./generators.js";
+import { prestigeMultiplierFor } from "./prestige.js";
+import { isToolBonusActive, TOOL_DEFINITIONS } from "./tools.js";
+import type { GameState } from "./types.js";
 
 export type UpgradeEffect =
   | { readonly kind: "clickMultiplier"; readonly multiplier: number }

@@ -1,5 +1,5 @@
-import { bnCompare, bnFromNumber, bnToNumber, type BigNum } from "./big-number";
-import type { GameState, PrestigeState } from "./types";
+import { bnCompare, bnFromNumber, bnToNumber, type BigNum } from "./big-number.js";
+import type { GameState, PrestigeState } from "./types.js";
 
 /** +1% total production per ascension point. This is the single source of truth for the
  * prestige bonus formula — upgrades.ts#computeMultipliers imports it rather than redefining it. */

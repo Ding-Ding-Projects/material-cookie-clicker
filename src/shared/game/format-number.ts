@@ -1,4 +1,4 @@
-import { bnToNumber, type BigNum } from "./big-number";
+import { bnToNumber, type BigNum } from "./big-number.js";
 
 export type FormatLocale = "en" | "yue";
 export type FormatStyle = "short" | "scientific";

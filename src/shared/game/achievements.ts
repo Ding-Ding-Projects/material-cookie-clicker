@@ -1,6 +1,6 @@
-import { bnCompare, bnFromNumber, type BigNum } from "./big-number";
-import { GENERATOR_DEFINITIONS } from "./generators";
-import type { GameState } from "./types";
+import { bnCompare, bnFromNumber, type BigNum } from "./big-number.js";
+import { GENERATOR_DEFINITIONS } from "./generators.js";
+import type { GameState } from "./types.js";
 
 export type AchievementCondition =
   | { readonly kind: "lifetimeCookies"; readonly atLeast: BigNum }

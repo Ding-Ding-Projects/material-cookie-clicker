@@ -1,7 +1,7 @@
-import { bnAdd, bnFromNumber, bnMulScalar, type BigNum } from "./big-number";
-import { generatorCps, getGeneratorDefinition } from "./generators";
-import { computeMultipliers } from "./upgrades";
-import type { GameState } from "./types";
+import { bnAdd, bnFromNumber, bnMulScalar, type BigNum } from "./big-number.js";
+import { generatorCps, getGeneratorDefinition } from "./generators.js";
+import { computeMultipliers } from "./upgrades.js";
+import type { GameState } from "./types.js";
 
 /** Total cookies-per-second for the given state, derived purely from owned generators + upgrades. */
 export function totalCps(state: GameState): BigNum {

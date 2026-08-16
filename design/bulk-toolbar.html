@@ -7,8 +7,8 @@
 <title>Material Cookie Clicker · Bulk Action Toolbar</title>
 <style>
   :root {
-    --md-primary: #7A4A1D; --md-on-primary: #FFFFFF; --md-primary-container: #FFDCB8; --md-on-primary-container: #3A2100;
-    --md-error: #BA1A1A; --md-on-error: #FFFFFF;
+    --md-primary: #7A4A1D; --md-on-primary: #FFFFFF; --md-primary-shadow: #4A2A0A; --md-primary-container: #FFDCB8; --md-on-primary-container: #3A2100;
+    --md-error: #BA1A1A; --md-on-error: #FFFFFF; --md-error-shadow: #7A0000;
     --md-surface: #FFF8F3; --md-on-surface: #211A14;
     --md-surface-variant: #F0E0D0; --md-on-surface-variant: #4F4539;
     --md-outline: #7C6F64;
@@ -16,10 +16,13 @@
     --md-surface-container-high: #F7E5D6;
     --font-en: -apple-system, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
     --font-zh: "Segoe UI", "Microsoft JhengHei", var(--font-en);
+    --font-display: "Segoe UI Black", "Arial Black", "Segoe UI", var(--font-en);
+    --shape-full: 999px; --shape-md: 18px;
+    --border-thick: 3px;
   }
   [data-scheme="dark"] {
-    --md-primary: #FFB876; --md-on-primary: #4A2800; --md-primary-container: #693C00; --md-on-primary-container: #FFDCB8;
-    --md-error: #FFB4AB; --md-on-error: #690005;
+    --md-primary: #FFB876; --md-on-primary: #4A2800; --md-primary-shadow: #A66A2E; --md-primary-container: #693C00; --md-on-primary-container: #FFDCB8;
+    --md-error: #FFB4AB; --md-on-error: #690005; --md-error-shadow: #7A2A24;
     --md-surface: #18120D; --md-on-surface: #EDE0D9;
     --md-surface-variant: #4F4539; --md-on-surface-variant: #D3C4B4;
     --md-outline: #9C8F83;
@@ -28,39 +31,47 @@
   }
   * { box-sizing: border-box; }
   body { margin: 0; font-family: var(--font-en); background: var(--md-surface); color: var(--md-on-surface); padding: 24px; }
-  h1 { font-size: 28px; margin: 0 0 4px; }
+  h1 { font-family: var(--font-display); font-size: 30px; margin: 0 0 4px; }
   h2 { font-size: 18px; margin: 32px 0 8px; }
   p.lede, p.caption { color: var(--md-on-surface-variant); max-width: 74ch; }
   button.scheme-toggle {
-    font: inherit; font-weight: 600; padding: 10px 18px; min-height: 44px;
-    border-radius: 999px; border: 1px solid var(--md-outline);
+    font: inherit; font-weight: 700; padding: 10px 20px; min-height: 44px;
+    border-radius: var(--shape-full); border: var(--border-thick) solid var(--md-outline);
     background: var(--md-surface-container); color: var(--md-on-surface); cursor: pointer; margin: 16px 0 24px;
+    box-shadow: 0 3px 0 0 var(--md-outline); transition: transform 90ms ease, box-shadow 90ms ease;
   }
+  button.scheme-toggle:active { transform: translateY(3px); box-shadow: none; }
+  @media (prefers-reduced-motion: reduce) { button.scheme-toggle { transition: none; } button.scheme-toggle:active { transform: none; } }
   button.scheme-toggle:focus-visible { outline: 3px solid var(--md-primary); outline-offset: 2px; }
 
   .toolbar {
     display: flex; align-items: center; gap: 12px; flex-wrap: wrap;
     background: var(--md-surface-container-high);
-    border-radius: 12px; padding: 10px 16px;
-    box-shadow: 0 1px 3px rgba(0,0,0,0.30), 0 4px 8px 3px rgba(0,0,0,0.15);
-    margin-bottom: 16px;
+    border-radius: var(--shape-md);
+    border: var(--border-thick) solid var(--md-outline);
+    padding: 12px 18px;
+    box-shadow: 0 5px 0 0 var(--md-outline);
+    margin-bottom: 18px;
   }
   .toolbar .count {
-    font-weight: 700; font-size: 14px;
+    font-weight: 800; font-size: 14px; font-variant-numeric: tabular-nums;
     background: var(--md-primary-container); color: var(--md-on-primary-container);
-    border-radius: 999px; padding: 4px 12px;
+    border-radius: var(--shape-full); padding: 5px 14px;
   }
   .toolbar button.action {
-    font: inherit; font-size: 13px; font-weight: 600; min-height: 40px; padding: 0 14px;
-    border-radius: 999px; border: 1px solid var(--md-outline); background: var(--md-surface); color: var(--md-on-surface);
-    cursor: pointer;
+    font: inherit; font-size: 13px; font-weight: 700; min-height: 42px; padding: 0 16px; font-variant-numeric: tabular-nums;
+    border-radius: var(--shape-full); border: var(--border-thick) solid var(--md-outline); background: var(--md-surface); color: var(--md-on-surface);
+    cursor: pointer; box-shadow: 0 3px 0 0 var(--md-outline); transition: transform 90ms ease, box-shadow 90ms ease;
   }
+  .toolbar button.action:active { transform: translateY(3px); box-shadow: none; }
+  @media (prefers-reduced-motion: reduce) { .toolbar button.action { transition: none; } .toolbar button.action:active { transform: none; } }
   .toolbar button.action:focus-visible { outline: 3px solid var(--md-primary); outline-offset: 2px; }
-  .toolbar button.action.destructive { border-color: var(--md-error); color: var(--md-error); }
-  .toolbar button.action[disabled] { opacity: 0.5; cursor: not-allowed; }
+  .toolbar button.action.destructive { border-color: var(--md-error); color: var(--md-error); box-shadow: 0 3px 0 0 var(--md-error); }
+  .toolbar button.action.destructive:active { box-shadow: none; }
+  .toolbar button.action[disabled] { opacity: 0.5; cursor: not-allowed; box-shadow: none; }
   .toolbar .spacer { flex: 1; }
-  .progress-line { display: flex; align-items: center; gap: 8px; font-size: 12px; color: var(--md-on-surface-variant); }
-  .progress-track { width: 120px; height: 6px; border-radius: 999px; background: var(--md-surface-variant); overflow: hidden; }
+  .progress-line { display: flex; align-items: center; gap: 8px; font-size: 12px; color: var(--md-on-surface-variant); font-variant-numeric: tabular-nums; font-weight: 600; }
+  .progress-track { width: 130px; height: 8px; border-radius: var(--shape-full); background: var(--md-surface-variant); overflow: hidden; border: 1px solid var(--md-outline); }
   .progress-fill { height: 100%; width: 62%; background: var(--md-primary); }
 </style>
 </head>

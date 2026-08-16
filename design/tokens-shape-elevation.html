@@ -4,10 +4,12 @@
 <head>
 <meta charset="UTF-8" />
 <meta name="viewport" content="width=device-width, initial-scale=1" />
-<title>Material Cookie Clicker · Shape &amp; Elevation Tokens</title>
+<title>Material Cookie Clicker · Shape &amp; Depth Tokens · Cosy Bakery Arcade</title>
 <style>
   :root {
-    --md-primary: #7A4A1D; --md-on-primary: #FFFFFF;
+    --md-primary: #7A4A1D; --md-on-primary: #FFFFFF; --md-primary-shadow: #4A2A0A;
+    --md-tertiary: #5C4E00; --md-on-tertiary: #FFFFFF; --md-tertiary-shadow: #3A3000;
+    --md-error: #BA1A1A; --md-on-error: #FFFFFF; --md-error-shadow: #7A0000;
     --md-surface: #FFF8F3; --md-on-surface: #211A14;
     --md-surface-variant: #F0E0D0; --md-on-surface-variant: #4F4539;
     --md-outline: #7C6F64;
@@ -15,70 +17,97 @@
     --md-surface-container-high: #F7E5D6;
     --font-en: -apple-system, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
     --font-zh: "Segoe UI", "Microsoft JhengHei", var(--font-en);
-    /* Shape scale */
+    --font-display: "Segoe UI Black", "Arial Black", "Segoe UI", var(--font-en);
+    /* Shape scale — bigger, more confident radii than M3's defaults */
     --shape-none: 0px;
-    --shape-extra-small: 4px;
-    --shape-small: 8px;
-    --shape-medium: 12px;
-    --shape-large: 16px;
-    --shape-extra-large: 28px;
+    --shape-xs: 8px;
+    --shape-sm: 12px;
+    --shape-md: 18px;
+    --shape-lg: 26px;
+    --shape-xl: 34px;
     --shape-full: 999px;
-    /* Elevation shadow recipes (M3 approximations, light key + ambient) */
-    --elev-0: none;
-    --elev-1: 0px 1px 2px rgba(0,0,0,0.30), 0px 1px 3px 1px rgba(0,0,0,0.15);
-    --elev-2: 0px 1px 2px rgba(0,0,0,0.30), 0px 2px 6px 2px rgba(0,0,0,0.15);
-    --elev-3: 0px 1px 3px rgba(0,0,0,0.30), 0px 4px 8px 3px rgba(0,0,0,0.15);
-    --elev-4: 0px 2px 3px rgba(0,0,0,0.30), 0px 6px 10px 4px rgba(0,0,0,0.15);
-    --elev-5: 0px 4px 4px rgba(0,0,0,0.30), 0px 8px 12px 6px rgba(0,0,0,0.15);
+    /* Border weight — thick and confident, never a 1px hairline */
+    --border-thin: 2px;
+    --border-thick: 3px;
+    --border-chunky: 4px;
+    /* "Pressable" chunky depth — a SOLID offset shadow (the surface's own darker shade), not a
+       blurred M3 elevation. It compresses flat on :active, like a real arcade-cabinet button. */
+    --press-1: 3px;
+    --press-2: 5px;
+    --press-3: 7px;
   }
   [data-scheme="dark"] {
-    --md-primary: #FFB876; --md-on-primary: #4A2800;
+    --md-primary: #FFB876; --md-on-primary: #4A2800; --md-primary-shadow: #A66A2E;
+    --md-tertiary: #DBC66E; --md-on-tertiary: #383000; --md-tertiary-shadow: #8F7A20;
+    --md-error: #FFB4AB; --md-on-error: #690005; --md-error-shadow: #7A2A24;
     --md-surface: #18120D; --md-on-surface: #EDE0D9;
     --md-surface-variant: #4F4539; --md-on-surface-variant: #D3C4B4;
     --md-outline: #9C8F83;
     --md-surface-container: #251D17;
     --md-surface-container-high: #302722;
-    --elev-1: 0px 1px 2px rgba(0,0,0,0.60), 0px 1px 3px 1px rgba(0,0,0,0.40);
-    --elev-2: 0px 1px 2px rgba(0,0,0,0.60), 0px 2px 6px 2px rgba(0,0,0,0.40);
-    --elev-3: 0px 1px 3px rgba(0,0,0,0.60), 0px 4px 8px 3px rgba(0,0,0,0.40);
-    --elev-4: 0px 2px 3px rgba(0,0,0,0.60), 0px 6px 10px 4px rgba(0,0,0,0.40);
-    --elev-5: 0px 4px 4px rgba(0,0,0,0.60), 0px 8px 12px 6px rgba(0,0,0,0.40);
   }
   * { box-sizing: border-box; }
   body { margin: 0; font-family: var(--font-en); background: var(--md-surface); color: var(--md-on-surface); padding: 24px; }
-  h1 { font-size: 28px; margin: 0 0 4px; }
-  h2 { font-size: 20px; margin: 32px 0 12px; border-bottom: 1px solid var(--md-outline); padding-bottom: 8px; }
+  h1 { font-family: var(--font-display); font-size: 30px; margin: 0 0 4px; }
+  h2 { font-size: 20px; margin: 32px 0 12px; border-bottom: var(--border-thin) solid var(--md-outline); padding-bottom: 8px; }
   p.lede, p.caption { color: var(--md-on-surface-variant); max-width: 74ch; }
   button.scheme-toggle {
-    font: inherit; font-weight: 600; padding: 10px 18px; min-height: 44px;
-    border-radius: var(--shape-full); border: 1px solid var(--md-outline);
+    font: inherit; font-weight: 700; padding: 10px 20px; min-height: 44px;
+    border-radius: var(--shape-full); border: var(--border-thick) solid var(--md-outline);
     background: var(--md-surface-container); color: var(--md-on-surface); cursor: pointer; margin: 16px 0 24px;
+    box-shadow: 0 3px 0 0 var(--md-outline);
   }
+  button.scheme-toggle:active { transform: translateY(3px); box-shadow: none; }
+  @media (prefers-reduced-motion: reduce) { button.scheme-toggle:active { transform: none; } }
   button.scheme-toggle:focus-visible { outline: 3px solid var(--md-primary); outline-offset: 2px; }
   .grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(200px, 1fr)); gap: 24px; }
   .card {
     background: var(--md-surface-container-high);
     padding: 20px;
     display: flex; flex-direction: column; gap: 8px;
-    border: 1px solid var(--md-outline);
+    border: var(--border-thick) solid var(--md-outline);
   }
   .card .label { font-weight: 700; font-size: 14px; }
   .card .value { font-family: "Cascadia Code", Consolas, monospace; font-size: 12px; color: var(--md-on-surface-variant); }
-  .elev-card {
+
+  /* --- Pressable depth demo cards: solid offset shadow, compresses flat on :active --- */
+  .press-card {
     background: var(--md-surface-container-high);
-    border-radius: 16px;
+    border-radius: var(--shape-lg);
     padding: 24px;
     display: flex; flex-direction: column; gap: 8px;
     border: none;
+    cursor: pointer;
+    font: inherit;
+    text-align: left;
+    color: var(--md-on-surface);
+    transition: transform 90ms ease, box-shadow 90ms ease;
+  }
+  .press-card:focus-visible { outline: 3px solid var(--md-primary); outline-offset: 3px; }
+  @media (prefers-reduced-motion: reduce) { .press-card { transition: none; } }
+  .press-0 { box-shadow: none; }
+  .press-1 { box-shadow: 0 var(--press-1) 0 0 var(--md-primary-shadow); }
+  .press-1:active { transform: translateY(var(--press-1)); box-shadow: 0 0 0 0 var(--md-primary-shadow); }
+  .press-2 { box-shadow: 0 var(--press-2) 0 0 var(--md-primary-shadow); }
+  .press-2:active { transform: translateY(var(--press-2)); box-shadow: 0 0 0 0 var(--md-primary-shadow); }
+  .press-3 { box-shadow: 0 var(--press-3) 0 0 var(--md-tertiary-shadow); }
+  .press-3:active { transform: translateY(var(--press-3)); box-shadow: 0 0 0 0 var(--md-tertiary-shadow); }
+  .press-4 { box-shadow: 0 var(--press-3) 0 0 var(--md-error-shadow); }
+  .press-4:active { transform: translateY(var(--press-3)); box-shadow: 0 0 0 0 var(--md-error-shadow); }
+  @media (prefers-reduced-motion: reduce) {
+    .press-1:active, .press-2:active, .press-3:active, .press-4:active { transform: none; }
   }
 </style>
 </head>
 <body data-scheme="light">
-  <h1>Material Cookie Clicker design tokens · 設計標記 — Shape &amp; Elevation</h1>
+  <h1>Material Cookie Clicker design tokens · 設計標記 — Shape &amp; Depth</h1>
   <p class="lede">
-    Corner radii and elevation levels, each rendered on a real card so the shadow can be
-    judged directly rather than read as a number.
-    <span style="font-family:var(--font-zh); display:block;">形狀圓角同明度層級，每一個都畫喺真卡片上面，等你親眼睇到個陰影，唔使靠估。</span>
+    Corner radii and a chunky, pressable-depth shadow system, each rendered on a real card so the
+    weight can be judged directly rather than read as a number. This project deliberately does not
+    use Material 3's soft blurred "tonal elevation" — depth here is a solid offset shadow in the
+    surface's own darker shade that visibly compresses flat when you press it, like a real arcade
+    button. Try clicking the cards below.
+    <span style="font-family:var(--font-zh); display:block;">形狀圓角同「可以撳落去」嘅厚度效果，每一個都畫喺真卡片上面，撳落去仲會郁，唔使靠估。</span>
   </p>
   <button class="scheme-toggle" onclick="document.body.dataset.scheme = document.body.dataset.scheme === 'dark' ? 'light' : 'dark'">
     🌗 Toggle light / dark · 切換淺色／深色
@@ -87,33 +116,35 @@
   <h2>Shape scale · 形狀階</h2>
   <p class="caption">
     Used across the app: <code>full</code> for the cookie surface and pill buttons,
-    <code>large</code> for dialogs and the prestige gate, <code>medium</code> for building
-    rows and upgrade cards, <code>small</code>/<code>extra-small</code> for chips and badges.
+    <code>xl</code>/<code>lg</code> for dialogs and the prestige gate, <code>md</code> for building
+    rows, upgrade cards and tool cards, <code>sm</code>/<code>xs</code> for chips and badges.
+    Every radius is bigger than this project's original Material 3 scale — timid 4px corners read
+    as productivity software, not a bakery.
   </p>
   <div class="grid">
     <div class="card" style="border-radius: var(--shape-none);">
       <div class="label">none — 0px</div>
       <div class="value">--shape-none</div>
     </div>
-    <div class="card" style="border-radius: var(--shape-extra-small);">
-      <div class="label">extra-small — 4px</div>
-      <div class="value">--shape-extra-small</div>
+    <div class="card" style="border-radius: var(--shape-xs);">
+      <div class="label">xs — 8px</div>
+      <div class="value">--shape-xs (chips, badges)</div>
     </div>
-    <div class="card" style="border-radius: var(--shape-small);">
-      <div class="label">small — 8px</div>
-      <div class="value">--shape-small</div>
+    <div class="card" style="border-radius: var(--shape-sm);">
+      <div class="label">sm — 12px</div>
+      <div class="value">--shape-sm</div>
     </div>
-    <div class="card" style="border-radius: var(--shape-medium);">
-      <div class="label">medium — 12px</div>
-      <div class="value">--shape-medium (building row, upgrade card)</div>
+    <div class="card" style="border-radius: var(--shape-md);">
+      <div class="label">md — 18px</div>
+      <div class="value">--shape-md (building row, upgrade card, tool card)</div>
     </div>
-    <div class="card" style="border-radius: var(--shape-large);">
-      <div class="label">large — 16px</div>
-      <div class="value">--shape-large (dialogs, prestige gate)</div>
+    <div class="card" style="border-radius: var(--shape-lg);">
+      <div class="label">lg — 26px</div>
+      <div class="value">--shape-lg (dialogs)</div>
     </div>
-    <div class="card" style="border-radius: var(--shape-extra-large);">
-      <div class="label">extra-large — 28px</div>
-      <div class="value">--shape-extra-large</div>
+    <div class="card" style="border-radius: var(--shape-xl);">
+      <div class="label">xl — 34px</div>
+      <div class="value">--shape-xl (prestige gate)</div>
     </div>
     <div class="card" style="border-radius: var(--shape-full); align-items: center; justify-content: center; aspect-ratio: 1;">
       <div class="label">full — 999px</div>
@@ -121,38 +152,62 @@
     </div>
   </div>
 
-  <h2>Elevation levels · 明度層級</h2>
-  <p class="caption">
-    M3 uses tonal elevation (a lighter/darker surface tint) plus a shadow; this spec shows
-    the shadow component so the depth is judgeable against the page background at each level.
-    Level 0 is flush with the page; level 5 is reserved for the prestige-gate dialog, the
-    highest-priority surface in the app.
-  </p>
+  <h2>Border weight · 邊框粗度</h2>
+  <p class="caption">Three weights, all thicker than a 1px hairline: <code>thin</code> for internal dividers, <code>thick</code> for a card's own outline, <code>chunky</code> for a callout that must not be missed (the golden-cookie ring, the "Open it now" affordance on a locked tool).</p>
   <div class="grid">
-    <div class="elev-card" style="box-shadow: var(--elev-0);">
-      <div class="label">Level 0</div>
-      <div class="value">--elev-0 (flush, e.g. building-row at rest)</div>
-    </div>
-    <div class="elev-card" style="box-shadow: var(--elev-1);">
-      <div class="label">Level 1</div>
-      <div class="value">--elev-1 (cards, stat tiles)</div>
-    </div>
-    <div class="elev-card" style="box-shadow: var(--elev-2);">
-      <div class="label">Level 2</div>
-      <div class="value">--elev-2 (hover state)</div>
-    </div>
-    <div class="elev-card" style="box-shadow: var(--elev-3);">
-      <div class="label">Level 3</div>
-      <div class="value">--elev-3 (toasts, bulk toolbar)</div>
-    </div>
-    <div class="elev-card" style="box-shadow: var(--elev-4);">
-      <div class="label">Level 4</div>
-      <div class="value">--elev-4 (anchored regex-builder popover)</div>
-    </div>
-    <div class="elev-card" style="box-shadow: var(--elev-5);">
-      <div class="label">Level 5</div>
-      <div class="value">--elev-5 (prestige/wipe destructive gate)</div>
-    </div>
+    <div class="card" style="border-width: var(--border-thin);"><div class="label">thin — 2px</div><div class="value">--border-thin</div></div>
+    <div class="card" style="border-width: var(--border-thick);"><div class="label">thick — 3px</div><div class="value">--border-thick</div></div>
+    <div class="card" style="border-width: var(--border-chunky);"><div class="label">chunky — 4px</div><div class="value">--border-chunky</div></div>
   </div>
+
+  <h2>Pressable depth · 可撳厚度 — click these</h2>
+  <p class="caption">
+    Depth is a solid offset shadow in a darker shade of the element's own colour (<code>--md-primary-shadow</code>,
+    <code>--md-tertiary-shadow</code>, <code>--md-error-shadow</code> — see <code>tokens-color.html</code>),
+    not a blur. On <code>:active</code> the element translates down by the shadow's own offset and the
+    shadow disappears, so it visibly compresses into the surface. Under
+    <code>prefers-reduced-motion: reduce</code> the translate is removed but the shadow still snaps to
+    flat instantly (an un-animated state change, not motion), so the press is still legible without
+    any movement — try the toggle below.
+  </p>
+  <label style="display:flex; align-items:center; gap:8px; font-size:13px; margin-bottom:16px;">
+    <input type="checkbox" id="rmToggle" onchange="document.body.classList.toggle('force-reduced-motion', this.checked)" />
+    Preview reduced-motion behaviour on this page · 喺呢版預覽減少動態嘅效果
+  </label>
+  <div class="grid">
+    <button class="press-card press-0" type="button">
+      <div class="label">Level 0 · flush</div>
+      <div class="value">--press-0 (flush, e.g. building-row at rest)</div>
+    </button>
+    <button class="press-card press-1" type="button">
+      <div class="label">Level 1 · 3px</div>
+      <div class="value">--press-1 (stat tiles, list rows)</div>
+    </button>
+    <button class="press-card press-2" type="button">
+      <div class="label">Level 2 · 5px</div>
+      <div class="value">--press-2 (buy buttons, toolbars, toasts)</div>
+    </button>
+    <button class="press-card press-3" type="button">
+      <div class="label">Level 3 · 7px, tertiary base</div>
+      <div class="value">--press-3 (the cookie itself, golden-cookie moments)</div>
+    </button>
+    <button class="press-card press-4" type="button">
+      <div class="label">Level 3 · 7px, error base</div>
+      <div class="value">--press-3 (prestige/wipe destructive gate)</div>
+    </button>
+  </div>
+<script>
+  document.getElementById('rmToggle').addEventListener('change', function () {
+    const style = document.getElementById('force-rm-style');
+    if (this.checked) {
+      const s = document.createElement('style');
+      s.id = 'force-rm-style';
+      s.textContent = '.press-1:active,.press-2:active,.press-3:active,.press-4:active,button.scheme-toggle:active{transform:none !important;}';
+      document.head.appendChild(s);
+    } else if (style) {
+      style.remove();
+    }
+  });
+</script>
 </body>
 </html>

@@ -13,8 +13,12 @@
     --md-surface-variant: #F0E0D0; --md-on-surface-variant: #4F4539;
     --md-outline: #7C6F64;
     --md-surface-container-high: #F7E5D6;
+    --spark-ring: #D97300;
     --font-en: -apple-system, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
     --font-zh: "Segoe UI", "Microsoft JhengHei", var(--font-en);
+    --font-display: "Segoe UI Black", "Arial Black", "Segoe UI", var(--font-en);
+    --shape-full: 999px; --shape-md: 18px;
+    --border-thick: 3px;
   }
   [data-scheme="dark"] {
     --md-primary: #FFB876; --md-on-primary: #4A2800;
@@ -23,36 +27,42 @@
     --md-surface-variant: #4F4539; --md-on-surface-variant: #D3C4B4;
     --md-outline: #9C8F83;
     --md-surface-container-high: #302722;
+    --spark-ring: #FFC24D;
   }
   * { box-sizing: border-box; }
   body { margin: 0; font-family: var(--font-en); background: var(--md-surface); color: var(--md-on-surface); padding: 24px; min-height: 100vh; position: relative; }
-  h1 { font-size: 28px; margin: 0 0 4px; }
+  h1 { font-family: var(--font-display); font-size: 30px; margin: 0 0 4px; }
   h2 { font-size: 18px; margin: 32px 0 8px; }
   p.lede, p.caption { color: var(--md-on-surface-variant); max-width: 74ch; }
   button.scheme-toggle {
-    font: inherit; font-weight: 600; padding: 10px 18px; min-height: 44px;
-    border-radius: 999px; border: 1px solid var(--md-outline);
+    font: inherit; font-weight: 700; padding: 10px 20px; min-height: 44px;
+    border-radius: var(--shape-full); border: var(--border-thick) solid var(--md-outline);
     background: var(--md-surface-container-high); color: var(--md-on-surface); cursor: pointer; margin: 16px 0 24px;
+    box-shadow: 0 3px 0 0 var(--md-outline); transition: transform 90ms ease, box-shadow 90ms ease;
   }
+  button.scheme-toggle:active { transform: translateY(3px); box-shadow: none; }
+  @media (prefers-reduced-motion: reduce) { button.scheme-toggle { transition: none; } button.scheme-toggle:active { transform: none; } }
   button.scheme-toggle:focus-visible { outline: 3px solid var(--md-primary); outline-offset: 2px; }
 
-  .toast-demo { position: relative; height: 160px; border: 1px dashed var(--md-outline); border-radius: 12px; margin-bottom: 8px; }
+  .toast-demo { position: relative; height: 170px; border: var(--border-thick) dashed var(--md-outline); border-radius: var(--shape-md); margin-bottom: 8px; }
   .toast {
-    position: absolute; bottom: 16px; right: 16px; max-width: 320px;
+    position: absolute; bottom: 18px; right: 18px; max-width: 320px;
     background: var(--md-surface-container-high); color: var(--md-on-surface);
-    border-radius: 12px; padding: 12px 14px;
-    box-shadow: 0 1px 3px rgba(0,0,0,0.30), 0 4px 8px 3px rgba(0,0,0,0.15);
-    display: flex; gap: 10px; align-items: flex-start;
+    border-radius: var(--shape-md); padding: 14px 16px;
+    border: var(--border-thick) solid var(--md-outline);
+    box-shadow: 0 5px 0 0 var(--md-outline);
+    display: flex; gap: 12px; align-items: flex-start;
   }
-  .toast .glyph { font-size: 20px; flex-shrink: 0; }
+  .toast .glyph { font-size: 22px; flex-shrink: 0; }
   .toast .body { font-size: 13px; }
-  .toast .body strong { display: block; font-size: 14px; margin-bottom: 2px; }
+  .toast .body strong { display: block; font-size: 14px; margin-bottom: 2px; font-family: var(--font-display); font-weight: 800; }
   .toast .dismiss {
     margin-left: auto; background: none; border: none; cursor: pointer; font-size: 14px;
-    min-width: 32px; min-height: 32px; color: var(--md-on-surface-variant); border-radius: 999px;
+    min-width: 34px; min-height: 34px; color: var(--md-on-surface-variant); border-radius: var(--shape-full);
   }
   .toast .dismiss:focus-visible { outline: 3px solid var(--md-primary); outline-offset: 2px; }
-  .toast.persist { border-left: 4px solid var(--md-primary); }
+  .toast.persist { border-left: 6px solid var(--md-primary); }
+  .toast.golden { border-left: 6px solid var(--spark-ring); box-shadow: 0 5px 0 0 var(--md-outline), 0 0 14px 1px var(--spark-ring); }
 </style>
 </head>
 <body data-scheme="light">
@@ -62,7 +72,9 @@
     golden cookie missed, offline earnings collected). Always bottom-right in this spec; the
     app's own notification settings may move it to bottom-left. Two lifecycle variants: an
     auto-dismissing informational toast, and a persist-until-dismissed variant for anything the
-    player should actively acknowledge (e.g. a large offline-earnings summary).
+    player should actively acknowledge (e.g. a large offline-earnings summary). Rendered with the
+    same chunky offset shadow and thick border as every other card in the theme, plus a coloured
+    left accent stripe that names which kind of moment it is.
     <span style="font-family:var(--font-zh); display:block; margin-top:4px;">
       非阻擋式、貼喺角落嘅提示，達成里程碑先出現。分自動消失同要用戶主動關閉兩種。
     </span>
@@ -72,9 +84,9 @@
   </button>
 
   <h2>Auto-dismiss variant · 自動消失版本</h2>
-  <p class="caption">Fires on a golden-cookie click; fades out on its own after ~5s. Hovering or focusing pauses the timer.</p>
+  <p class="caption">Fires on a golden-cookie click; fades out on its own after ~5s. Hovering or focusing pauses the timer. The spark-accent left border marks it as a golden-cookie moment specifically.</p>
   <div class="toast-demo">
-    <div class="toast">
+    <div class="toast golden">
       <span class="glyph">✨</span>
       <div class="body">
         <strong>Golden cookie clicked! · 撳中金曲奇！</strong>

@@ -9,6 +9,8 @@ import {
   type GoldenCookieConfig,
   DEFAULT_GOLDEN_COOKIE_CONFIG,
 } from "./golden-cookie.js";
+import { costOfLitres } from "./diesel-exchange.js";
+import { computeDisclosure } from "./disclosure.js";
 import { costOfBulk, costOfNext, getGeneratorDefinition, maxAffordable } from "./generators.js";
 import { computeOfflineProgressWithTools, type OfflineProgressOptions } from "./offline-progress.js";
 import { canPrestige, performPrestige } from "./prestige.js";
@@ -29,6 +31,15 @@ export type GameAction =
   | { readonly type: "buyGeneratorBulk"; readonly generatorId: string; readonly quantity: number | "max" }
   | { readonly type: "buyUpgrade"; readonly upgradeId: string }
   | { readonly type: "buyTool"; readonly toolId: string }
+  /**
+   * Buys `litres` of diesel for WinForge with cookies (diesel-exchange.ts). The reducer does
+   * the whole GAME half of that purchase — check the depot is revealed, check the price, deduct
+   * the cookies, record the litres — and nothing else. Writing the actual voucher to the shared
+   * ledger file is a side effect of this action having been dispatched, performed by
+   * GameProvider through the main-process bridge, exactly as autosave is. The domain never
+   * touches a file system, so a mint is as replayable and testable as a click.
+   */
+  | { readonly type: "mintDiesel"; readonly litres: number }
   | { readonly type: "setToolProgression"; readonly enabled: boolean }
   | { readonly type: "tick"; readonly elapsedMs: number }
   | { readonly type: "collectGoldenCookie" }
@@ -153,6 +164,33 @@ function handleBuyTool(state: GameState, ctx: ReducerCtx, toolId: string): GameS
   return withAchievements(nextState, nowIso(ctx));
 }
 
+/**
+ * Refuses silently, in the same shape as every other purchase here, when the depot has not been
+ * revealed, when the quantity is not a positive whole number of litres, or when the cookies are
+ * not there. A refusal returns the state unchanged, which is also what tells the provider's
+ * observer that no voucher should be written.
+ */
+function handleMintDiesel(state: GameState, ctx: ReducerCtx, litresRequested: number): GameState {
+  if (!computeDisclosure(state).dieselDepot) return state;
+  const litres = Math.floor(litresRequested);
+  if (!Number.isFinite(litres) || litres <= 0) return state;
+
+  const cost = costOfLitres(state.dieselDepot.litresMinted, litres);
+  if (bnCompare(state.cookies, cost) < 0) return state;
+
+  const nextState: GameState = {
+    ...state,
+    cookies: bnClampNonNegative(bnSub(state.cookies, cost)),
+    dieselDepot: {
+      litresMinted: state.dieselDepot.litresMinted + litres,
+      vouchersMinted: state.dieselDepot.vouchersMinted + 1,
+      cookiesSpent: bnAdd(state.dieselDepot.cookiesSpent, cost),
+    },
+  };
+
+  return withAchievements(nextState, nowIso(ctx));
+}
+
 function handleSetToolProgression(state: GameState, enabled: boolean): GameState {
   if (state.toolProgressionEnabled === enabled) return state;
   return { ...state, toolProgressionEnabled: enabled };
@@ -236,6 +274,8 @@ export function applyGameAction(state: GameState, action: GameAction, ctx: Reduc
       return handleBuyUpgrade(state, ctx, action.upgradeId);
     case "buyTool":
       return handleBuyTool(state, ctx, action.toolId);
+    case "mintDiesel":
+      return handleMintDiesel(state, ctx, action.litres);
     case "setToolProgression":
       return handleSetToolProgression(state, action.enabled);
     case "tick":
@@ -255,7 +295,7 @@ export { costOfNext };
 export function createInitialGameState(nowIsoString: string): GameState {
   const zero = bnFromNumber(0);
   return {
-    schemaVersion: 3,
+    schemaVersion: 4,
     cookies: zero,
     lifetimeCookies: zero,
     baseClickValue: bnFromNumber(1),
@@ -265,6 +305,7 @@ export function createInitialGameState(nowIsoString: string): GameState {
     prestige: { ascensionPoints: 0, totalPrestigeCount: 0, permanentUnlockIds: [] },
     goldenCookie: { isSpawned: false, rngStreamIndex: 0, nextEligibleAtEpochMs: 0 },
     stats: { totalClicks: 0, totalCookiesBaked: zero, clockAnomalyCount: 0 },
+    dieselDepot: { litresMinted: 0, vouchersMinted: 0, cookiesSpent: zero },
     toolProgressionEnabled: true,
     purchasedToolIds: [],
     lastTickAtIso: nowIsoString,

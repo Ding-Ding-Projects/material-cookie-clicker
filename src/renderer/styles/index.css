@@ -4586,3 +4586,186 @@ ul.card-grid {
   flex: 1;
   min-height: 0;
 }
+
+/* ---------------------------------------------------------------------------------------- *
+ * THE DIESEL DEPOT (src/renderer/screens/DieselDepot.tsx).
+ *
+ * A fuel counter in the shop rail's footer, below the generator ladder and outside its search.
+ * It is a card, not a row: the rail's grid would misalign it and, worse, would make it read as
+ * one more thing on the ladder when it is a purchase of a completely different kind — cookies
+ * leaving this application for a file another application reads.
+ *
+ * Appended at the end of the sheet, in the established order of this file, so nothing above is
+ * touched. Colours come from the same tokens the rest of the cabinet uses, so light and dark
+ * both repaint automatically.
+ * ---------------------------------------------------------------------------------------- */
+.diesel-depot {
+  margin-top: 16px;
+  padding: 14px 16px 16px;
+  border-radius: var(--shape-lg, 16px);
+  border: 2px solid var(--outline-variant);
+  /* Sits ON the rail rather than in it: the inset panel colour plus the same solid bevel every
+     other raised object in the cabinet wears, never a blurred drop shadow. */
+  background: var(--panel-inset);
+  box-shadow: inset 0 2px 0 0 var(--bevel-hi), 0 3px 0 0 var(--bevel-lo);
+}
+
+.diesel-depot__head {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+}
+
+.diesel-depot__icon {
+  display: inline-flex;
+  font-size: 30px;
+  line-height: 1;
+}
+
+.diesel-depot__names {
+  display: flex;
+  flex-direction: column;
+  min-width: 0;
+}
+
+.diesel-depot__name {
+  font-family: var(--font-display);
+  font-weight: 900;
+  font-size: 15px;
+  color: var(--on-surface);
+}
+
+.diesel-depot__name-zh {
+  font-size: 12px;
+  color: var(--on-surface-variant);
+}
+
+.diesel-depot__sub {
+  margin: 8px 0 0;
+  font-size: 12px;
+  line-height: 1.45;
+  color: var(--on-surface-variant);
+}
+
+/* Two figures side by side. Both are counts the player watches change, so both are tabular:
+   the litres number must not shuffle its own width as it climbs from 9 to 10. */
+.diesel-depot__figures {
+  display: flex;
+  gap: 18px;
+  margin: 12px 0 0;
+}
+
+.diesel-depot__figure {
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+  min-width: 0;
+}
+
+.diesel-depot__figure dt {
+  font-size: 11px;
+  color: var(--on-surface-variant);
+}
+
+.diesel-depot__count {
+  margin: 0;
+  font-family: var(--font-display);
+  font-weight: 900;
+  font-size: 20px;
+  font-variant-numeric: tabular-nums;
+  color: var(--on-surface);
+}
+
+/* The honest line. Kept at body weight and body colour — it is a statement of fact, not a
+   warning, and dressing it as an alert would overstate a perfectly ordinary "not yet". */
+.diesel-depot__consumed {
+  margin: 10px 0 0;
+  font-size: 12px;
+  line-height: 1.45;
+  color: var(--on-surface-variant);
+}
+
+.diesel-depot__consumed-label {
+  font-weight: 700;
+}
+
+.diesel-depot__consumed-value {
+  font-variant-numeric: tabular-nums;
+}
+
+/* The same coin-press idiom as .buy-btn: a solid offset base that the press flattens. */
+.diesel-depot__mint {
+  margin-top: 12px;
+  width: 100%;
+  font: inherit;
+  font-family: var(--font-display);
+  font-weight: 900;
+  font-size: 13px;
+  font-variant-numeric: tabular-nums;
+  min-height: 44px;
+  padding: 0 18px;
+  border: none;
+  border-radius: var(--shape-full);
+  cursor: pointer;
+  background: var(--tertiary);
+  color: var(--on-tertiary);
+  box-shadow: 0 4px 0 0 var(--tertiary-shadow);
+  transition: transform calc(90ms * var(--motion-scale, 1)) ease,
+    box-shadow calc(90ms * var(--motion-scale, 1)) ease;
+}
+
+.diesel-depot__mint:active:not([disabled]) {
+  transform: translateY(4px);
+  box-shadow: none;
+}
+
+.diesel-depot__mint:focus-visible {
+  outline: 3px solid var(--secondary);
+  outline-offset: 2px;
+}
+
+.diesel-depot__mint[disabled] {
+  background: var(--surface-highest);
+  color: var(--on-surface-variant);
+  box-shadow: none;
+  cursor: not-allowed;
+  opacity: 0.85;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .diesel-depot__mint {
+    transition: none;
+  }
+
+  /* No travel: the button inverts its base instead of moving, the substitution every other
+     pressable in this cabinet makes under reduced motion. */
+  .diesel-depot__mint:active:not([disabled]) {
+    transform: none;
+    box-shadow: inset 0 3px 0 0 var(--bevel-lo);
+  }
+}
+
+.diesel-depot__note {
+  margin: 10px 0 0;
+  font-size: 11px;
+  line-height: 1.45;
+  color: var(--on-surface-variant);
+}
+
+/* A problem carries a colour AND a left rule, so it is never distinguished by colour alone. */
+.diesel-depot__note--problem {
+  padding-left: 8px;
+  border-left: 3px solid var(--error, #a13208);
+  color: var(--on-surface);
+}
+
+/* The ledger path. Monospaced because it is a file path the player may want to type out, and
+   allowed to break anywhere because it is long and must never widen the rail. */
+.diesel-depot__path {
+  margin: 8px 0 0;
+  font-family: var(--font-mono, ui-monospace, "Cascadia Mono", Consolas, monospace);
+  font-size: 10px;
+  line-height: 1.4;
+  color: var(--on-surface-variant);
+  overflow-wrap: anywhere;
+}

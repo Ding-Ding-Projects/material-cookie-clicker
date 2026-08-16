@@ -11,6 +11,7 @@ import { BulkToolbar } from '../components/BulkToolbar.js';
 import { createSearchState, SearchWithRegexBuilder } from '../components/SearchWithRegexBuilder.js';
 import { useSelection } from '../components/useSelection.js';
 import { matchesSearch } from '../game/local-regex-search.js';
+import { DieselDepot } from './DieselDepot.js';
 import { BULK_COPY, DISCLOSURE_COPY, GAME_SURFACE_COPY, LIST_COPY } from '../game/copy.js';
 import { useFastSnapshot, useGameDispatch, useStructureSnapshot } from '../game/GameProvider.js';
 
@@ -276,6 +277,10 @@ export function ShopRail() {
             {showMysteryRow ? <MysteryRow /> : null}
           </div>
         )}
+        {/* The rail's footer. The depot is not a generator tier, so it sits below the ladder and
+            outside the search field's reach rather than pretending to be a row. It renders
+            nothing at all until the Fuel Contract reveal is bought. */}
+        <DieselDepot />
       </div>
     </section>
   );

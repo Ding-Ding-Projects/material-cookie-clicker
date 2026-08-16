@@ -9,10 +9,11 @@ import {
 } from 'react';
 
 import { bnSub, bnToNumber } from '../../shared/game/big-number.js';
+import { cookiesSpentString, summarizeLedger, type LedgerSummary } from '../../shared/game/diesel-exchange.js';
 import { formatBigNum } from '../../shared/game/format-number.js';
 import { createInitialGameState, type GameAction, type ReducerCtx } from '../../shared/game/reducer.js';
 import type { GameState } from '../../shared/game/types.js';
-import { OFFLINE_COPY, type Bilingual } from './copy.js';
+import { DIESEL_COPY, OFFLINE_COPY, type Bilingual } from './copy.js';
 import { describeMilestone, detectMilestones } from './narration.js';
 import { OFFLINE_PROGRESS_OPTIONS, resolvePersistence, type GamePersistence } from './persistence.js';
 import { createSessionRng } from './rng.js';
@@ -26,6 +27,24 @@ const AUTOSAVE_DEBOUNCE_MS = 1_500;
 /** How long a milestone announcement stays before the next one may replace it, matching
  *  narrator-toast.html's "~6s auto-dismiss" spec. */
 const MILESTONE_DISPLAY_MS = 6_000;
+
+/**
+ * What the Diesel Depot card is allowed to say, and no more.
+ *
+ * `summary` is read back from the ledger FILE, so `consumedCount` reports what WinForge has
+ * actually marked — which, until the WinForge side exists, is zero and is shown as "none yet".
+ * `bridgeAvailable` is false when the game is running somewhere without the preload bridge (a
+ * browser tab, a test harness); the card then says plainly that nothing was written, rather
+ * than pretending a mint reached a file.
+ */
+export interface DieselExchangeStatus {
+  readonly bridgeAvailable: boolean;
+  readonly summary: LedgerSummary | null;
+  readonly ledgerPath: string | null;
+  /** Set when the last mint could not be written. Never cleared by a later failure's absence. */
+  readonly error: Bilingual | null;
+  readonly refresh: () => void;
+}
 
 interface GameContextValue {
   readonly store: GameStore;
@@ -42,6 +61,7 @@ interface GameContextValue {
    * itself on the next launch.
    */
   readonly wipeAllSaveData: () => Promise<void>;
+  readonly diesel: DieselExchangeStatus;
 }
 
 const GameContext = createContext<GameContextValue | null>(null);
@@ -61,8 +81,31 @@ export function GameProvider({ children }: { children: ReactNode }) {
   const milestoneQueueRef = useRef<Bilingual[]>([]);
   const milestoneTimerRef = useRef<ReturnType<typeof setTimeout> | null>(null);
   const autosaveTimerRef = useRef<ReturnType<typeof setTimeout> | null>(null);
+  const [dieselSummary, setDieselSummary] = useState<LedgerSummary | null>(null);
+  const [dieselPath, setDieselPath] = useState<string | null>(null);
+  const [dieselError, setDieselError] = useState<Bilingual | null>(null);
 
   const nowCtx = (): ReducerCtx => ({ now: () => Date.now(), rng: rngRef.current });
+
+  const dieselBridge = typeof window !== 'undefined' ? window.materialCookieClicker?.diesel : undefined;
+
+  /** Reads the shared ledger back and reports what is actually in it. */
+  function refreshDieselLedger(): void {
+    if (!dieselBridge) return;
+    void dieselBridge
+      .read()
+      .then((response) => {
+        if (response.ok) {
+          setDieselSummary(summarizeLedger(response.ledger));
+          setDieselPath(response.filePath);
+        } else {
+          setDieselError(DIESEL_COPY.ledgerUnreadable(response.reason));
+        }
+      })
+      .catch((error: unknown) => {
+        setDieselError(DIESEL_COPY.ledgerUnreadable(error instanceof Error ? error.message : String(error)));
+      });
+  }
 
   const dispatch = (action: GameAction): GameState => store.dispatch(action, nowCtx());
 
@@ -110,6 +153,50 @@ export function GameProvider({ children }: { children: ReactNode }) {
     return () => {
       cancelled = true;
     };
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, []);
+
+  // THE MINT SIDE EFFECT.
+  //
+  // The reducer already did the whole game half of a diesel purchase — checked the reveal,
+  // checked the price, deducted the cookies, recorded the litres — and it did it purely. What
+  // it cannot do is write a file. This observer is the seam where that happens, and it is the
+  // SAME seam autosave uses: subscribe to dispatches, look at what actually changed, and ask
+  // the main process to do the I/O. A mint the reducer refused changes nothing, so this sees
+  // no litres and writes no voucher.
+  useEffect(() => {
+    const unsubscribe = store.onDispatch((previous, next, action) => {
+      if (action.type !== 'mintDiesel') return;
+      const litres = next.dieselDepot.litresMinted - previous.dieselDepot.litresMinted;
+      if (litres <= 0) return;
+      if (!dieselBridge) {
+        setDieselError(DIESEL_COPY.noBridge);
+        return;
+      }
+      const cookiesSpent = cookiesSpentString(bnSub(previous.cookies, next.cookies));
+      void dieselBridge
+        .mint({ litres, cookiesSpent })
+        .then((response) => {
+          if (response.ok) {
+            setDieselPath(response.filePath);
+            setDieselError(null);
+            refreshDieselLedger();
+          } else {
+            setDieselError(DIESEL_COPY.mintFailed(response.reason));
+          }
+        })
+        .catch((error: unknown) => {
+          setDieselError(DIESEL_COPY.mintFailed(error instanceof Error ? error.message : String(error)));
+        });
+    });
+    return unsubscribe;
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, []);
+
+  // One read at startup, so the card opens with what the ledger really holds — including any
+  // vouchers a previous run left behind, and anything WinForge has since marked consumed.
+  useEffect(() => {
+    refreshDieselLedger();
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
 
@@ -196,6 +283,13 @@ export function GameProvider({ children }: { children: ReactNode }) {
       await persistenceRef.current.wipe();
       store.replaceState(createInitialGameState(new Date().toISOString()));
     },
+    diesel: {
+      bridgeAvailable: Boolean(dieselBridge),
+      summary: dieselSummary,
+      ledgerPath: dieselPath,
+      error: dieselError,
+      refresh: refreshDieselLedger,
+    },
   };
 
   return <GameContext.Provider value={value}>{children}</GameContext.Provider>;
@@ -222,6 +316,11 @@ export function useOfflineNotice(): { notice: Bilingual | null; dismiss: () => v
 
 export function useWipeAllSaveData(): () => Promise<void> {
   return useGameContext().wipeAllSaveData;
+}
+
+/** The Diesel Depot card's view of the exchange. */
+export function useDieselExchange(): DieselExchangeStatus {
+  return useGameContext().diesel;
 }
 
 export function useMilestoneMessage(): Bilingual | null {

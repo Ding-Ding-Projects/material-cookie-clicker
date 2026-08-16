@@ -59,10 +59,27 @@ function migrateV2ToV3(input: Record<string, unknown>): Record<string, unknown> 
   return { ...input, schemaVersion: 3, upgrades: [...existing, ...additions] };
 }
 
+/**
+ * Version 3 -> 4: adds `dieselDepot`, the Diesel Depot's lifetime totals (diesel-exchange.ts).
+ *
+ * Nothing is granted here, unlike the previous step. A version-3 save was written by a build
+ * with no depot in it, so it minted no diesel, spent no cookies on diesel, and cannot have lost
+ * a surface it never had — zeroes are simply the honest record. The Fuel Contract reveal
+ * upgrade is likewise NOT handed out: an older player buys it like everyone else.
+ */
+function migrateV3ToV4(input: Record<string, unknown>): Record<string, unknown> {
+  return {
+    ...input,
+    schemaVersion: 4,
+    dieselDepot: { litresMinted: 0, vouchersMinted: 0, cookiesSpent: { mantissa: 0, exponent: 0 } },
+  };
+}
+
 /** Ordered forward-only migrations, indexed by the version they migrate FROM. */
 export const MIGRATIONS: Readonly<Record<number, MigrationStep>> = {
   1: migrateV1ToV2,
   2: migrateV2ToV3,
+  3: migrateV3ToV4,
 };
 
 export interface MigrationResult {

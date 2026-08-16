@@ -47,6 +47,21 @@ export interface GameStats {
   readonly clockAnomalyCount: number;
 }
 
+/**
+ * The Diesel Depot's running totals (diesel-exchange.ts). These are the GAME's memory of what
+ * the player bought — the vouchers themselves live in a file outside this application, written
+ * by the main process, and are never mirrored into save state. `vouchersMinted` therefore
+ * counts what this save asked for; it deliberately does NOT claim anything about what WinForge
+ * has since consumed, which only the ledger file itself can answer.
+ */
+export interface DieselDepotState {
+  /** Lifetime litres minted. Also the position on the price curve — see costOfLitres. */
+  readonly litresMinted: number;
+  readonly vouchersMinted: number;
+  /** Lifetime cookies paid into the depot. */
+  readonly cookiesSpent: BigNum;
+}
+
 export interface GameState {
   readonly schemaVersion: number;
 
@@ -63,6 +78,7 @@ export interface GameState {
   readonly prestige: PrestigeState;
   readonly goldenCookie: GoldenCookieState;
   readonly stats: GameStats;
+  readonly dieselDepot: DieselDepotState;
 
   /**
    * Player-facing switch for the Tools tech tree's progression gate (see tools.ts). When

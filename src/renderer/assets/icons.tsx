@@ -764,3 +764,35 @@ export function ToolIcon({ id, tier, hidden }: { id: string; tier: 1 | 2 | 3; hi
   const Drawing = TOOL_ART[id];
   return Drawing ? <Drawing /> : <ToolTierGem tier={tier} />;
 }
+
+/**
+ * The diesel canister for the Diesel Depot (see src/shared/game/diesel-exchange.ts): a jerrycan
+ * seen three-quarters on, with the X-brace pressed into its face, a screw cap, a carry handle
+ * and a spark on the shoulder so it sits in the same arcade-bakery light as everything else.
+ * Drawn, like every mark in this file — never the 🛢 emoji, which would render as somebody
+ * else's artwork at somebody else's colour.
+ */
+export function DieselCanisterIcon({ extraClass }: { extraClass?: string } = {}) {
+  return (
+    <Art extraClass={extraClass}>
+      {/* the solid offset base every v2 object stands on, rather than a blurred shadow */}
+      <path d="M7.5 12.5h17v15a1.6 1.6 0 0 1-1.6 1.6H9.1a1.6 1.6 0 0 1-1.6-1.6z" fill={CRUST_DARK} stroke="none" />
+      <path
+        d="M7.5 10.5h17v15a1.6 1.6 0 0 1-1.6 1.6H9.1a1.6 1.6 0 0 1-1.6-1.6z"
+        fill={EMERALD}
+        stroke={INK}
+        strokeWidth={1.6}
+      />
+      {/* the pressed X-brace that says "jerrycan" and nothing else */}
+      <path d="M10.6 13.8 21.4 23.8M21.4 13.8 10.6 23.8" stroke={EMERALD_LIGHT} strokeWidth={1.5} />
+      {/* carry handle across the shoulder */}
+      <path d="M11.4 10.4V8.4h9.2v2" fill="none" stroke={INK} strokeWidth={1.6} />
+      {/* screw cap and its spout */}
+      <rect x="18.4" y="6.2" width="4.6" height="3" rx="1.1" fill={METAL_LO} stroke={INK} strokeWidth={1.4} />
+      <path d="M20.7 6.2V4.6" stroke={INK} strokeWidth={1.4} />
+      {/* bevel highlight on top, and one spark, exactly as the rest of the set wears them */}
+      <path d="M9.4 12.6a1 1 0 0 1 1-1h4" stroke={METAL_HI} strokeWidth={1.4} />
+      <path d="M24.8 15.6l1 2.2 2.2 1-2.2 1-1 2.2-1-2.2-2.2-1 2.2-1z" fill={GOLD} stroke={GOLD_RING} strokeWidth={1} />
+    </Art>
+  );
+}

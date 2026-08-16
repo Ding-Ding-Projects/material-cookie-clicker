@@ -67,6 +67,7 @@ const REVEAL_EFFECT_COPY: Readonly<Record<RevealSurface, Bilingual>> = {
   shop: DISCLOSURE_COPY.revealShop,
   upgradeStrip: DISCLOSURE_COPY.revealUpgradeStrip,
   holdToClick: DISCLOSURE_COPY.revealHoldToClick,
+  dieselDepot: DISCLOSURE_COPY.revealDieselDepot,
 };
 
 interface UnlockProgress {

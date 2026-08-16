@@ -55,6 +55,12 @@ export interface Disclosure {
   readonly upgradeStrip: boolean;
   /** Press-and-hold repeat clicking, and only then its hint line. Bought with Steady Hand. */
   readonly holdToClick: boolean;
+  /**
+   * The Diesel Depot card in the shop rail's footer. Bought with Fuel Contract, and — unlike
+   * the three surfaces above it — NOT granted to an ascended player for free, because the depot
+   * did not exist before this version and nobody can lose a surface they never had.
+   */
+  readonly dieselDepot: boolean;
   /** The per-second HUD readout and the hero's CPS line. Reached with the first generator. */
   readonly perSecondReadout: boolean;
   /** The per-click HUD readout. Reached with Steady Hand, which is when a click gains nuance. */
@@ -112,6 +118,11 @@ export function computeDisclosure(state: GameState): Disclosure {
     shop,
     upgradeStrip,
     holdToClick,
+    // Bought outright, every time, for everyone: no "or ascended", no "or you already have
+    // progress that implies it". The depot is new, so there is no older save whose surface this
+    // could take away, and inventing a free grant would put a cookie-spending panel in front of
+    // a player who never chose it.
+    dieselDepot: ownsUpgrade(state, "reveal_fuel_contract"),
     perSecondReadout: generatorsOwned > 0 || ascended,
     perClickReadout: holdToClick,
     consoles: {

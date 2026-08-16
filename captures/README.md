@@ -26,6 +26,18 @@ pixels.
 | File | What it shows | Commit |
 | --- | --- | --- |
 | `launch-shell.png` | The application launched from the real build: window opens, product name correct, theme surface rendering, custom title bar rather than the operating system's default. | `37c967b` |
+| `diesel-depot.png` | The Diesel Depot in the shop rail's footer, one litre after minting: litres and vouchers both at 1, the price already risen to 1.15 thousand for the next litre, and the consumption line reading "none yet — WinForge has not read the ledger". The voucher this press wrote was checked on disk at `%APPDATA%\DingDingProjects\exchange\diesel-vouchers.json`. | this commit |
+
+**How the diesel capture was set up.** It ran from the built `dist/` on an
+off-screen desktop with a fresh, throwaway user-data directory, so the run
+started from a genuinely empty save. Reaching a Diesel Depot purchase by hand
+means about 1,600 clicks, which is not a thing to automate into a screenshot, so
+the run was given a starting balance of 5,000 cookies: a save in the
+application's own format, written into the profile's `localStorage` (where this
+build persists) through the running app's own devtools connection, then loaded
+by the app normally. Nothing else was seeded — the Shop Sign, the Upgrade
+Catalogue and the Fuel Contract were all bought by clicking their real tickets,
+and the mint was a real press of the real button.
 
 **This is the shell, not the game.** The body reads "The cookie-clicker game
 surface mounts here" because at that commit it genuinely did — the screens lane

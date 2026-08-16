@@ -50,15 +50,16 @@ describe("disclosure: a fresh save shows nothing but the cookie", () => {
       shop: false,
       upgradeStrip: false,
       holdToClick: false,
+      dieselDepot: false,
       perSecondReadout: false,
       perClickReadout: false,
       consoles: { achievements: false, tools: false, statistics: false, prestige: false },
     });
   });
 
-  it("owns none of the three reveal upgrades", () => {
+  it("owns none of the four reveal upgrades", () => {
     expect(freshState().upgrades).toEqual([]);
-    expect(REVEAL_UPGRADE_DEFINITIONS).toHaveLength(3);
+    expect(REVEAL_UPGRADE_DEFINITIONS).toHaveLength(4);
   });
 
   it("still lets the player click the cookie — clicking is never gated", () => {
@@ -309,15 +310,20 @@ describe("disclosure: save compatibility", () => {
     };
   }
 
-  it("migrates a version-2 save to the current version and grants all three reveals", () => {
+  it("migrates a version-2 save to the current version and grants the three original reveals", () => {
     const decoded = decodeSave(v2Save());
     expect(decoded.ok).toBe(true);
     if (!decoded.ok) return;
 
     expect(decoded.state.schemaVersion).toBe(SAVE_SCHEMA_VERSION);
-    for (const def of REVEAL_UPGRADE_DEFINITIONS) {
-      expect(decoded.state.upgrades.some((u) => u.id === def.id)).toBe(true);
+    // The three surfaces a version-2 save could already see. The fourth reveal, Fuel Contract,
+    // is deliberately NOT granted: the Diesel Depot did not exist in that build, so nobody is
+    // losing anything by being asked to buy it.
+    for (const id of ["reveal_shop_sign", "reveal_upgrade_catalogue", "reveal_steady_hand"]) {
+      expect(decoded.state.upgrades.some((u) => u.id === id)).toBe(true);
     }
+    expect(decoded.state.upgrades.some((u) => u.id === "reveal_fuel_contract")).toBe(false);
+    expect(computeDisclosure(decoded.state).dieselDepot).toBe(false);
     // The upgrade it actually bought is untouched.
     expect(decoded.state.upgrades.some((u) => u.id === "reinforced_finger" && u.purchasedAtTickCount === 12)).toBe(true);
   });
@@ -374,7 +380,11 @@ describe("disclosure: save compatibility", () => {
   });
 
   it("a save written by this build round-trips at the current version", () => {
-    const decoded = decodeSave({ ...v2Save(), schemaVersion: SAVE_SCHEMA_VERSION });
+    const decoded = decodeSave({
+      ...v2Save(),
+      schemaVersion: SAVE_SCHEMA_VERSION,
+      dieselDepot: { litresMinted: 0, vouchersMinted: 0, cookiesSpent: { mantissa: 0, exponent: 0 } },
+    });
     expect(decoded.ok).toBe(true);
     if (!decoded.ok) return;
     // Already current: no migration ran, so nothing was granted.
@@ -389,8 +399,8 @@ describe("disclosure: the reveal upgrades are ordinary upgrades", () => {
     }
   });
 
-  it("form a ladder of three whose costs rise 10 / 50 / 100", () => {
-    expect(REVEAL_UPGRADE_DEFINITIONS.map((d) => bnToNumber(d.cost))).toEqual([10, 50, 100]);
+  it("form a ladder whose costs rise 10 / 50 / 100 / 500", () => {
+    expect(REVEAL_UPGRADE_DEFINITIONS.map((d) => bnToNumber(d.cost))).toEqual([10, 50, 100, 500]);
   });
 
   it("declare no multiplier at all", () => {

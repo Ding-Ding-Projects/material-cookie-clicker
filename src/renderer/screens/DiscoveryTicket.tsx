@@ -17,6 +17,7 @@ const REVEAL_DESCRIPTIONS: Readonly<Record<string, Bilingual>> = {
   reveal_shop_sign: DISCLOSURE_COPY.revealShop,
   reveal_upgrade_catalogue: DISCLOSURE_COPY.revealUpgradeStrip,
   reveal_steady_hand: DISCLOSURE_COPY.revealHoldToClick,
+  reveal_fuel_contract: DISCLOSURE_COPY.revealDieselDepot,
 };
 
 /**

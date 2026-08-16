@@ -27,7 +27,7 @@
     <p class="lede">Seventy-five upgrades: five global ones plus five stacking tiers for each of the fourteen generators.</p>
     <div class="inset" style="margin-bottom:18px">
   <span class="label">Current state</span>
-  <p style="margin:0"><span class="tag">Shipped</span> the upgrade ticket strip is in this release; 78 definitions in <code>src/shared/game/upgrades.ts</code>.</p>
+  <p style="margin:0"><span class="tag">Shipped</span> the upgrade ticket strip is in this release; 79 definitions in <code>src/shared/game/upgrades.ts</code>.</p>
 </div>
     <h2>From the running application</h2>
     <figure class="capture">
@@ -37,9 +37,9 @@
     <p><a href="../index.html#captures">See all five captures in the capture matrix</a>.</p>
     
 <h2>What it does</h2>
-<p>An upgrade is a one-time purchase that permanently multiplies something. There are <strong>78</strong> of them, and that number is not a target &mdash; it is what the definition list actually contains:</p>
+<p>An upgrade is a one-time purchase that permanently multiplies something. There are <strong>79</strong> of them, and that number is not a target &mdash; it is what the definition list actually contains:</p>
 <ul>
-  <li><strong>3 reveal upgrades</strong> &mdash; Shop Sign (10 cookies), Upgrade Catalogue (50) and Steady Hand (100). These multiply nothing at all. A fresh save is the cookie and its counter alone, and each of these buys back one piece of the game&rsquo;s own surface: the shop rail, this very ticket strip, and press-and-hold clicking. Before the strip exists there is nowhere to buy them from, so the next one appears as a single discovery ticket beside the cookie once its price is within reach.</li>
+  <li><strong>4 reveal upgrades</strong> &mdash; Shop Sign (10 cookies), Upgrade Catalogue (50), Steady Hand (100) and Fuel Contract (500). These multiply nothing at all. A fresh save is the cookie and its counter alone, and each of these buys back one piece of the game&rsquo;s own surface: the shop rail, this very ticket strip, press-and-hold clicking, and the Diesel Depot in the shop rail&rsquo;s footer. Before the strip exists there is nowhere to buy them from, so the next one appears as a single discovery ticket beside the cookie once its price is within reach.</li>
   <li><strong>5 global upgrades</strong>, unlocked by lifetime-cookie thresholds. Reinforced Finger doubles click power for 100 cookies; Sturdier Ovens adds 10% to all production; Double Click, Double Trouble doubles click power again; Industrial-Grade Yeast adds 25% to all production; Thousand-Finger Technique triples click power.</li>
   <li><strong>70 per-generator upgrades</strong> &mdash; five tiers for each of the fourteen generators, unlocking at 1, 5, 25, 50 and 100 owned. Each tier doubles that generator's own output, so all five stacked reach a 32&times; multiplier on that tier at 100 owned.</li>
 </ul>
@@ -50,7 +50,7 @@
 <p>Presentation is fixed by <code>design/upgrade-card.html</code>: upgrades are ticket-shaped purchases with notches punched out of both edges, a dashed perforation and a price stub, in locked, unlocked-buyable and owned states, with a metallic treatment once owned and a hover tilt that has a still equivalent under reduced motion.</p>
 
 <h2>In the shipped build</h2>
-<p>The upgrade ticket strip sits on the same screen as the cookie and the shop, with its own search field and a live &ldquo;owned / 78&rdquo; counter, showing buyable tickets alongside padlocked ones. The strip is not on screen at the start of a run: it arrives with the Upgrade Catalogue, and a save made before progressive disclosure existed is granted all three reveals on load so it never loses a surface it always had. No dark-theme capture of it exists yet.</p>
+<p>The upgrade ticket strip sits on the same screen as the cookie and the shop, with its own search field and a live &ldquo;owned / 79&rdquo; counter, showing buyable tickets alongside padlocked ones. The strip is not on screen at the start of a run: it arrives with the Upgrade Catalogue, and a save made before progressive disclosure existed is granted the three original reveals on load so it never loses a surface it always had; the Fuel Contract is not granted, because the Diesel Depot is new and no older save can have lost it. No dark-theme capture of it exists yet.</p>
     <nav class="related plate" aria-labelledby="related-heading">
       <h2 id="related-heading">Related articles</h2>
       <ul>

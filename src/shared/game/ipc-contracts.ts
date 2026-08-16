@@ -1,3 +1,4 @@
+import type { DieselVoucher, DieselVoucherLedger } from "./diesel-exchange.js";
 import type { SaveDataLatest } from "./save-schema.js";
 
 /**
@@ -41,4 +42,40 @@ export interface GameIpcApi {
   load(): Promise<GameLoadResponse>;
   save(save: SaveDataLatest): Promise<GameSaveResponse>;
   wipe(): Promise<GameWipeResponse>;
+}
+
+/**
+ * THE DIESEL EXCHANGE CHANNELS.
+ *
+ * Unlike the game-save channels above, these two ARE wired end to end in this build:
+ * `src/main/main.ts` registers them against `DieselLedgerService`, `src/preload/index.ts`
+ * exposes them as `window.materialCookieClicker.diesel`, and `GameProvider` calls `mint` as a
+ * side effect of the `mintDiesel` reducer action. The renderer holds no file-system access of
+ * its own — it asks, the main process writes.
+ */
+export const DIESEL_IPC_CHANNELS = {
+  mint: "diesel:mint",
+  read: "diesel:read",
+} as const;
+
+/** What the renderer sends to mint a voucher. The timestamp is NOT here on purpose: the main
+ *  process stamps `mintedAt` from its own clock. */
+export interface DieselMintRequest {
+  readonly litres: number;
+  /** Cookies paid, already rendered as the ledger's decimal string (see cookiesSpentString). */
+  readonly cookiesSpent: string;
+}
+
+export type DieselMintResponse =
+  | { readonly ok: true; readonly voucher: DieselVoucher; readonly filePath: string }
+  | { readonly ok: false; readonly reason: string };
+
+export type DieselReadResponse =
+  | { readonly ok: true; readonly ledger: DieselVoucherLedger; readonly filePath: string }
+  | { readonly ok: false; readonly reason: string };
+
+/** The shape the preload bridge exposes to the renderer for the exchange. */
+export interface DieselIpcApi {
+  mint(request: DieselMintRequest): Promise<DieselMintResponse>;
+  read(): Promise<DieselReadResponse>;
 }

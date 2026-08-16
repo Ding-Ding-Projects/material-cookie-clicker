@@ -3,6 +3,14 @@ import { fileURLToPath } from 'node:url';
 import { app, BrowserWindow, ipcMain } from 'electron';
 import squirrelStartup from 'electron-squirrel-startup';
 
+import { DieselLedgerService } from './diesel-ledger-service.js';
+import {
+  DIESEL_IPC_CHANNELS,
+  type DieselMintRequest,
+  type DieselMintResponse,
+  type DieselReadResponse,
+} from '../shared/game/ipc-contracts.js';
+
 const PRODUCT_NAME = 'Material Cookie Clicker';
 const PRODUCT_APP_ID = 'org.dingdingprojects.materialcookieclicker';
 
@@ -82,6 +90,27 @@ void app.whenReady().then(() => {
     if (mainWindow?.isMaximized()) mainWindow.unmaximize(); else mainWindow?.maximize();
   });
   ipcMain.on('window:close', () => mainWindow?.close());
+
+  // The diesel voucher exchange with WinForge. `app.getPath('appData')` is the OS roaming
+  // application-data directory (%APPDATA% on Windows); the service puts the shared ledger at
+  // <appData>/DingDingProjects/exchange/diesel-vouchers.json, which is the location both
+  // applications agreed on in docs/winforge-diesel-exchange.md. Resolving it HERE, once, is
+  // what keeps the path out of the renderer entirely.
+  const dieselLedger = new DieselLedgerService(app.getPath('appData'));
+
+  ipcMain.handle(DIESEL_IPC_CHANNELS.mint, async (_event, request: DieselMintRequest): Promise<DieselMintResponse> => {
+    const litres = Number((request as DieselMintRequest | undefined)?.litres);
+    const cookiesSpent = String((request as DieselMintRequest | undefined)?.cookiesSpent ?? '');
+    const result = await dieselLedger.mint(litres, cookiesSpent);
+    if (!result.ok) return result;
+    return { ok: true, voucher: result.voucher, filePath: dieselLedger.filePath };
+  });
+
+  ipcMain.handle(DIESEL_IPC_CHANNELS.read, async (): Promise<DieselReadResponse> => {
+    const result = await dieselLedger.read();
+    if (!result.ok) return result;
+    return { ok: true, ledger: result.ledger, filePath: dieselLedger.filePath };
+  });
 
   app.on('activate', () => {
     if (BrowserWindow.getAllWindows().length === 0) {

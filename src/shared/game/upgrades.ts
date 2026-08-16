@@ -22,7 +22,7 @@ export type UpgradeEffect =
   | { readonly kind: "reveal"; readonly surface: RevealSurface };
 
 /** The game-surface pieces a reveal upgrade can turn on. Mirrored in disclosure.ts. */
-export type RevealSurface = "shop" | "upgradeStrip" | "holdToClick";
+export type RevealSurface = "shop" | "upgradeStrip" | "holdToClick" | "dieselDepot";
 
 export type UnlockCondition =
   | { readonly kind: "generatorOwned"; readonly generatorId: string; readonly atLeast: number }
@@ -97,6 +97,21 @@ export const REVEAL_UPGRADE_DEFINITIONS: readonly UpgradeDefinition[] = [
     cost: bnFromNumber(100),
     effect: { kind: "reveal", surface: "holdToClick" },
     unlockCondition: { kind: "upgradeOwned", upgradeId: "reveal_upgrade_catalogue" },
+  },
+  /**
+   * The fourth reveal, and the odd one out: it turns on the Diesel Depot in the shop rail's
+   * footer, where cookies buy litres of diesel for WinForge's emergency generators (see
+   * diesel-exchange.ts). It hangs off the Shop Sign because the depot lives inside the shop
+   * rail — with no rail on screen there would be no footer to put it in — and it is dearer than
+   * the first three because it opens a spending surface rather than a viewing one.
+   */
+  {
+    id: "reveal_fuel_contract",
+    nameEn: "Fuel Contract",
+    nameYue: "燃油合約",
+    cost: bnFromNumber(500),
+    effect: { kind: "reveal", surface: "dieselDepot" },
+    unlockCondition: { kind: "upgradeOwned", upgradeId: "reveal_shop_sign" },
   },
 ];
 

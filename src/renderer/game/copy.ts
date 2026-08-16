@@ -126,6 +126,10 @@ export const DISCLOSURE_COPY = {
     en: "Steady enough to hold the cookie down and keep clicking.",
     yue: "手夠穩，可以撳住曲奇連續撳落去。",
   },
+  revealDieselDepot: {
+    en: "A fuel counter at the back of the shop, selling diesel to WinForge.",
+    yue: "商店後面開個油站，賣柴油畀 WinForge。",
+  },
   ladderMysteryName: { en: "???", yue: "???" },
   ladderMysteryHint: {
     en: "Buy the tier above to find out what this is.",
@@ -294,6 +298,55 @@ export const PRESTIGE_SCREEN_COPY = {
   wipeCompleted: { en: "All save data deleted.", yue: "全部存檔已刪除。" },
   prestigeButton: { en: "Prestige…", yue: "轉生…" },
   wipeButton: { en: "Delete all save data…", yue: "刪除全部存檔…" },
+} as const satisfies Record<string, Bilingual | ((...args: any[]) => Bilingual)>;
+
+/**
+ * The Diesel Depot (src/shared/game/diesel-exchange.ts). Every line here is written to be true
+ * whether or not WinForge has ever run: the game says what it minted, says where it put it, and
+ * says — without hedging — that consuming a voucher happens in the other application and has
+ * not happened yet as far as this one can see.
+ */
+export const DIESEL_COPY = {
+  title: { en: "Diesel Depot", yue: "柴油補給站" },
+  subtitle: {
+    en: "Cookies into diesel for WinForge's emergency generators.",
+    yue: "用曲奇換 WinForge 應急發電機嘅柴油。",
+  },
+  litresLabel: { en: "Litres minted", yue: "已開出公升" },
+  vouchersLabel: { en: "Vouchers minted", yue: "已開出憑證" },
+  consumedLabel: { en: "Consumed by WinForge", yue: "WinForge 已用" },
+  /** The honest answer while the WinForge reader does not exist. Not a zero dressed as a fact. */
+  consumedNone: {
+    en: "none yet — WinForge has not read the ledger",
+    yue: "重未有——WinForge 重未讀過本帳",
+  },
+  mintButton: (litres: number, price: string): Bilingual => ({
+    en: `Mint ${litres} L — 🍪 ${price}`,
+    yue: `開 ${litres} 公升憑證 — 🍪 ${price}`,
+  }),
+  cannotAfford: { en: "Not enough cookies for a litre yet.", yue: "重未夠曲奇買一公升。" },
+  ledgerAt: (path: string): Bilingual => ({
+    en: `Ledger: ${path}`,
+    yue: `帳簿：${path}`,
+  }),
+  /** Shown where there is no main process to write through — a browser tab, a test harness. */
+  noBridge: {
+    en: "No desktop bridge in this build, so nothing was written to the shared ledger.",
+    yue: "呢個版本冇桌面橋接，所以冇寫任何嘢入去共用帳簿。",
+  },
+  mintFailed: (reason: string): Bilingual => ({
+    en: `The voucher could not be written (${reason}). The cookies were still spent.`,
+    yue: `寫唔到憑證（${reason}）。啲曲奇已經扣咗。`,
+  }),
+  ledgerUnreadable: (reason: string): Bilingual => ({
+    en: `The shared ledger could not be read (${reason}). Nothing was changed.`,
+    yue: `讀唔到共用帳簿（${reason}）。冇改動過任何嘢。`,
+  }),
+  /** The card's standing note. WinForge reads this file; this game only ever writes to it. */
+  handoffNote: {
+    en: "Vouchers are minted here and consumed in WinForge, which reads the same file. This game never marks one used.",
+    yue: "憑證喺呢度開出，喺 WinForge 度使用，兩邊讀同一個檔。呢隻遊戲永遠唔會自己話用咗。",
+  },
 } as const satisfies Record<string, Bilingual | ((...args: any[]) => Bilingual)>;
 
 export const NARRATOR_COPY = {

@@ -4,7 +4,7 @@ import { z } from "zod";
  * Current on-disk save schema version. Bump this whenever `SaveDataLatest`'s shape changes,
  * and add a forward-only migration entry in migrations.ts keyed by the *previous* version.
  */
-export const SAVE_SCHEMA_VERSION = 3;
+export const SAVE_SCHEMA_VERSION = 4;
 
 const BigNumSchema = z.object({
   mantissa: z.number(),
@@ -97,9 +97,28 @@ export const SaveDataV3Schema = SaveDataV2Schema.omit({ schemaVersion: true }).e
 
 export type SaveDataV3 = z.infer<typeof SaveDataV3Schema>;
 
+/**
+ * Schema for save-format version 4. Adds `dieselDepot` — the Diesel Depot's lifetime totals
+ * (see diesel-exchange.ts): litres minted, vouchers minted, and cookies spent. The vouchers
+ * themselves are NOT stored here; they live in the shared ledger file outside this application,
+ * and duplicating them into the save would create a second, divergent record of a thing this
+ * application does not own. `migrations.ts#migrateV3ToV4` supplies zeroes for an older save,
+ * which is the truth: it never minted anything.
+ */
+export const SaveDataV4Schema = SaveDataV3Schema.omit({ schemaVersion: true }).extend({
+  schemaVersion: z.literal(4),
+  dieselDepot: z.object({
+    litresMinted: z.number().int().nonnegative(),
+    vouchersMinted: z.number().int().nonnegative(),
+    cookiesSpent: BigNumSchema,
+  }),
+});
+
+export type SaveDataV4 = z.infer<typeof SaveDataV4Schema>;
+
 /** The schema alias that always points at the current (latest) version's shape. */
-export const SaveDataLatestSchema = SaveDataV3Schema;
-export type SaveDataLatest = SaveDataV3;
+export const SaveDataLatestSchema = SaveDataV4Schema;
+export type SaveDataLatest = SaveDataV4;
 
 /** Minimal shape used only to read `schemaVersion` off of otherwise-unvalidated input. */
 export const SaveVersionProbeSchema = z.object({

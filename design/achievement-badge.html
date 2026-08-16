@@ -1,0 +1,113 @@
+<!-- @dsCard group="Game Surfaces" -->
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1" />
+<title>Material Cookie Clicker · Achievement Badge</title>
+<style>
+  :root {
+    --md-primary: #7A4A1D; --md-on-primary: #FFFFFF;
+    --md-tertiary: #5C4E00; --md-on-tertiary: #FFFFFF;
+    --md-tertiary-container: #F8E287; --md-on-tertiary-container: #221B00;
+    --md-surface: #FFF8F3; --md-on-surface: #211A14;
+    --md-surface-variant: #F0E0D0; --md-on-surface-variant: #4F4539;
+    --md-outline: #7C6F64;
+    --md-surface-container: #FCEBDD;
+    --md-surface-container-high: #F7E5D6;
+    --font-en: -apple-system, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
+    --font-zh: "Segoe UI", "Microsoft JhengHei", var(--font-en);
+  }
+  [data-scheme="dark"] {
+    --md-primary: #FFB876; --md-on-primary: #4A2800;
+    --md-tertiary: #DBC66E; --md-on-tertiary: #383000;
+    --md-tertiary-container: #514600; --md-on-tertiary-container: #F8E287;
+    --md-surface: #18120D; --md-on-surface: #EDE0D9;
+    --md-surface-variant: #4F4539; --md-on-surface-variant: #D3C4B4;
+    --md-outline: #9C8F83;
+    --md-surface-container: #251D17;
+    --md-surface-container-high: #302722;
+  }
+  * { box-sizing: border-box; }
+  body { margin: 0; font-family: var(--font-en); background: var(--md-surface); color: var(--md-on-surface); padding: 24px; }
+  h1 { font-size: 28px; margin: 0 0 4px; }
+  h2 { font-size: 18px; margin: 32px 0 8px; }
+  p.lede, p.caption { color: var(--md-on-surface-variant); max-width: 74ch; }
+  button.scheme-toggle {
+    font: inherit; font-weight: 600; padding: 10px 18px; min-height: 44px;
+    border-radius: 999px; border: 1px solid var(--md-outline);
+    background: var(--md-surface-container); color: var(--md-on-surface); cursor: pointer; margin: 16px 0 24px;
+  }
+  button.scheme-toggle:focus-visible { outline: 3px solid var(--md-primary); outline-offset: 2px; }
+  .row { display: flex; gap: 24px; flex-wrap: wrap; align-items: flex-start; }
+  .cell { display: flex; flex-direction: column; align-items: center; gap: 8px; width: 140px; }
+  .badge {
+    width: 72px; height: 72px; border-radius: 999px;
+    display: flex; align-items: center; justify-content: center; font-size: 30px;
+  }
+  .badge.locked {
+    background: var(--md-surface-variant); color: var(--md-on-surface-variant);
+    filter: grayscale(1) brightness(0.75);
+  }
+  .badge.unlocked {
+    background: var(--md-tertiary-container); color: var(--md-on-tertiary-container);
+    border: 3px solid var(--md-tertiary);
+    box-shadow: 0 0 12px 2px var(--md-tertiary-container);
+  }
+  .badge:focus-visible { outline: 3px solid var(--md-primary); outline-offset: 3px; }
+  .badge-name { font-size: 13px; font-weight: 600; text-align: center; }
+  .badge-name-zh { font-family: var(--font-zh); font-size: 12px; color: var(--md-on-surface-variant); text-align: center; }
+
+  .toast {
+    position: fixed; bottom: 24px; right: 24px;
+    background: var(--md-surface-container-high); color: var(--md-on-surface);
+    border-radius: 12px; padding: 12px 16px; display: flex; gap: 12px; align-items: center;
+    box-shadow: 0 4px 12px rgba(0,0,0,0.3); max-width: 320px;
+  }
+  .toast .badge { width: 40px; height: 40px; font-size: 18px; flex-shrink: 0; }
+  .toast-text { font-size: 13px; }
+  .toast-text strong { display: block; font-size: 14px; }
+</style>
+</head>
+<body data-scheme="light">
+  <h1>Achievement badge · 成就徽章</h1>
+  <p class="lede">
+    Locked badges render as a greyscale silhouette so a player knows an achievement exists
+    without spoiling its name or icon; unlocked badges show the full-colour icon in the
+    tertiary role with a glow, matching the golden-cookie visual language.
+    <span style="font-family:var(--font-zh); display:block;">未解鎖嘅徽章淨係顯示灰色剪影，解鎖之後先顯示全色圖示同金光效果。</span>
+  </p>
+  <button class="scheme-toggle" onclick="document.body.dataset.scheme = document.body.dataset.scheme === 'dark' ? 'light' : 'dark'">
+    🌗 Toggle light / dark · 切換淺色／深色
+  </button>
+
+  <h2>Locked vs unlocked · 未解鎖 / 已解鎖</h2>
+  <div class="row">
+    <div class="cell">
+      <div class="badge locked" role="img" aria-label="Locked achievement · 未解鎖成就" tabindex="0">❔</div>
+      <div class="badge-name">???</div>
+      <div class="badge-name-zh">未解鎖</div>
+    </div>
+    <div class="cell">
+      <div class="badge unlocked" role="img" aria-label="Achievement unlocked: Hundred Bakeries · 成就已解鎖：百間麵包店" tabindex="0">💯</div>
+      <div class="badge-name">Hundred Bakeries</div>
+      <div class="badge-name-zh">百間麵包店</div>
+    </div>
+  </div>
+
+  <h2>Unlock toast · 解鎖提示</h2>
+  <p class="caption">
+    A non-blocking, corner-anchored toast fires the moment an achievement unlocks. Auto-dismisses
+    after ~6s; hovering or focusing it pauses the timer. Never modal, never interrupts a click.
+  </p>
+  <div class="row" style="position: relative; height: 140px; width: 100%;">
+    <div class="toast" style="position: absolute; bottom: 0; right: 0;">
+      <div class="badge unlocked">💯</div>
+      <div class="toast-text">
+        <strong>Achievement unlocked · 成就解鎖</strong>
+        Hundred Bakeries · 百間麵包店
+      </div>
+    </div>
+  </div>
+</body>
+</html>

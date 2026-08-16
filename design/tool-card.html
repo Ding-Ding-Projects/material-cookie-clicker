@@ -1,0 +1,192 @@
+<!-- @dsCard group="Game Surfaces" -->
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1" />
+<title>Material Cookie Clicker · Tool Card · Tools Tech Tree</title>
+<style>
+  :root {
+    --md-primary: #7A4A1D; --md-on-primary: #FFFFFF; --md-primary-container: #FFDCB8; --md-on-primary-container: #3A2100;
+    --md-tertiary: #5C4E00; --md-on-tertiary: #FFFFFF; --md-tertiary-container: #F8E287; --md-on-tertiary-container: #221B00;
+    --md-surface: #FFF8F3; --md-on-surface: #211A14;
+    --md-surface-variant: #F0E0D0; --md-on-surface-variant: #4F4539;
+    --md-outline: #7C6F64;
+    --md-surface-container: #FCEBDD;
+    --md-surface-container-high: #F7E5D6;
+    --font-en: -apple-system, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
+    --font-zh: "Segoe UI", "Microsoft JhengHei", var(--font-en);
+  }
+  [data-scheme="dark"] {
+    --md-primary: #FFB876; --md-on-primary: #4A2800; --md-primary-container: #693C00; --md-on-primary-container: #FFDCB8;
+    --md-tertiary: #DBC66E; --md-on-tertiary: #383000; --md-tertiary-container: #514600; --md-on-tertiary-container: #F8E287;
+    --md-surface: #18120D; --md-on-surface: #EDE0D9;
+    --md-surface-variant: #4F4539; --md-on-surface-variant: #D3C4B4;
+    --md-outline: #9C8F83;
+    --md-surface-container: #251D17;
+    --md-surface-container-high: #302722;
+  }
+  * { box-sizing: border-box; }
+  body { margin: 0; font-family: var(--font-en); background: var(--md-surface); color: var(--md-on-surface); padding: 24px; }
+  h1 { font-size: 28px; margin: 0 0 4px; }
+  h2 { font-size: 18px; margin: 32px 0 8px; }
+  p.lede, p.caption { color: var(--md-on-surface-variant); max-width: 74ch; }
+  button.scheme-toggle {
+    font: inherit; font-weight: 600; padding: 10px 18px; min-height: 44px;
+    border-radius: 999px; border: 1px solid var(--md-outline);
+    background: var(--md-surface-container); color: var(--md-on-surface); cursor: pointer; margin: 16px 0 24px;
+  }
+  button.scheme-toggle:focus-visible { outline: 3px solid var(--md-primary); outline-offset: 2px; }
+
+  .principle {
+    background: var(--md-primary-container); color: var(--md-on-primary-container);
+    border-radius: 12px; padding: 14px 16px; font-size: 13px; margin: 12px 0 28px; max-width: 74ch;
+  }
+  .principle strong { display: block; margin-bottom: 4px; }
+
+  .grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(260px, 1fr)); gap: 20px; }
+  .tool-card {
+    border-radius: 12px;
+    padding: 16px;
+    background: var(--md-surface-container-high);
+    display: flex; flex-direction: column; gap: 10px;
+    min-height: 220px;
+  }
+  .tool-card .icon { font-size: 30px; }
+  .tool-card .name-en { font-weight: 700; font-size: 15px; }
+  .tool-card .name-zh { font-family: var(--font-zh); font-size: 13px; color: var(--md-on-surface-variant); }
+  .tool-card .body { font-size: 13px; color: var(--md-on-surface-variant); flex: 1; }
+  .tool-card.undiscovered { filter: grayscale(1); }
+  .tool-card.undiscovered .icon, .tool-card.undiscovered .name-en { color: var(--md-on-surface-variant); }
+
+  .progress-line { display: flex; align-items: center; gap: 8px; font-size: 12px; }
+  .progress-track { flex: 1; height: 8px; border-radius: 999px; background: var(--md-surface-variant); overflow: hidden; }
+  .progress-fill { height: 100%; background: var(--md-primary); }
+
+  .cta-btn {
+    font: inherit; font-weight: 700; min-height: 44px; border-radius: 999px; border: none; cursor: pointer;
+    background: var(--md-primary); color: var(--md-on-primary);
+  }
+  .cta-btn:focus-visible { outline: 3px solid var(--md-tertiary); outline-offset: 2px; }
+  .cta-btn[disabled] { background: var(--md-surface-variant); color: var(--md-on-surface-variant); cursor: not-allowed; }
+
+  .bonus-line {
+    background: var(--md-tertiary-container); color: var(--md-on-tertiary-container);
+    border-radius: 8px; padding: 8px 10px; font-size: 13px; font-weight: 700;
+  }
+
+  /* The persistent, always-present "the real feature is not locked" affordance.
+     Present in every single state, including undiscovered, and never greyed out. */
+  .open-real-feature {
+    display: flex; align-items: center; gap: 8px;
+    border-top: 1px solid var(--md-outline);
+    padding-top: 10px; margin-top: auto;
+  }
+  .open-real-feature .note { font-size: 11px; color: var(--md-on-surface-variant); flex: 1; line-height: 1.4; }
+  .open-real-feature button {
+    font: inherit; font-weight: 700; font-size: 12px; min-height: 36px; padding: 0 12px;
+    border-radius: 999px; border: 1px solid var(--md-primary); background: transparent; color: var(--md-primary);
+    cursor: pointer; white-space: nowrap;
+  }
+  [data-scheme="dark"] .open-real-feature button { color: var(--md-primary); border-color: var(--md-primary); }
+  .open-real-feature button:focus-visible { outline: 3px solid var(--md-primary); outline-offset: 2px; }
+  .tool-card.undiscovered .open-real-feature button,
+  .tool-card.undiscovered .open-real-feature .note { filter: none; opacity: 1; }
+</style>
+</head>
+<body data-scheme="light">
+  <h1>Tool card · 工具卡 — Tools tech tree</h1>
+  <p class="lede">
+    Every canonical application feature (command palette, regex builder, authenticator, file
+    converter, local model manager, appearance editor, and so on) doubles as an in-game "tool"
+    the player discovers and unlocks through play, granting a gameplay bonus on unlock.
+    <span style="font-family:var(--font-zh); display:block; margin-top:4px;">
+      應用程式自己嘅正式功能（指令面板、正則表達式產生器、驗證器、檔案轉換器等）喺遊戲入面變成玩家可以解鎖嘅「工具」，解鎖之後有遊戲加成。
+    </span>
+  </p>
+  <div class="principle">
+    <strong>The unlock gates the game surfacing and the bonus only — never the real feature. · 解鎖淨係影響遊戲內顯示同加成，唔會鎖住真正嘅功能。</strong>
+    Every tool card, in every state, keeps an "Open it now" action that opens the real
+    application feature from settings/the command palette immediately — because that feature has
+    always been available to the player, regardless of tech-tree progress. This is why the action
+    is never greyed out, never hidden behind the silhouette, and appears identically on an
+    undiscovered card and a fully unlocked one. A player must never come away thinking the
+    Regex Builder or the Authenticator itself is "locked" — only its gameplay bonus is.
+  </div>
+  <button class="scheme-toggle" onclick="document.body.dataset.scheme = document.body.dataset.scheme === 'dark' ? 'light' : 'dark'">
+    🌗 Toggle light / dark · 切換淺色／深色
+  </button>
+
+  <h2>Four states · 四種狀態</h2>
+  <div class="grid">
+
+    <!-- STATE 1: Undiscovered -->
+    <div class="tool-card undiscovered">
+      <div class="icon">❔</div>
+      <div class="name-en">??? Tool</div>
+      <div class="name-zh">未發現嘅工具</div>
+      <div class="body">
+        This tool hasn't been discovered yet. Its name, icon, and unlock condition stay hidden
+        so discovery is a real moment rather than a spoiled checklist item.
+        <br/>呢個工具仲未被發現，名、圖示同解鎖條件都未顯示。
+      </div>
+      <div class="open-real-feature">
+        <span class="note">This app feature is already available in Settings and the command palette. · 呢個應用程式功能喺設定同指令面板一直都用得到。</span>
+        <button>Open it now · 而家開啟</button>
+      </div>
+    </div>
+
+    <!-- STATE 2: Discovered but locked -->
+    <div class="tool-card">
+      <div class="icon">🔍</div>
+      <div class="name-en">Regex Builder</div>
+      <div class="name-zh">正則表達式產生器</div>
+      <div class="body">Unlocks a "×Max" auto-buy shortcut across every building row.</div>
+      <div class="progress-line">
+        <span>142 / 500 Grandmas · 142／500 間嫲嫲屋</span>
+      </div>
+      <div class="progress-track"><div class="progress-fill" style="width:28.4%;"></div></div>
+      <button class="cta-btn" disabled>Locked · 未解鎖 (142 / 500)</button>
+      <div class="open-real-feature">
+        <span class="note">This app feature is already available in Settings and the command palette. · 呢個應用程式功能喺設定同指令面板一直都用得到。</span>
+        <button>Open it now · 而家開啟</button>
+      </div>
+    </div>
+
+    <!-- STATE 3: Unlockable now -->
+    <div class="tool-card">
+      <div class="icon">🔐</div>
+      <div class="name-en">Authenticator</div>
+      <div class="name-zh">驗證器</div>
+      <div class="body">Grants a permanent +5% offline-earnings rate once claimed.</div>
+      <div class="progress-line">
+        <span>500 / 500 Grandmas — ready! · 500／500 間嫲嫲屋 — 就緒！</span>
+      </div>
+      <div class="progress-track"><div class="progress-fill" style="width:100%;"></div></div>
+      <button class="cta-btn">Unlock now · 立即解鎖</button>
+      <div class="open-real-feature">
+        <span class="note">This app feature is already available in Settings and the command palette. · 呢個應用程式功能喺設定同指令面板一直都用得到。</span>
+        <button>Open it now · 而家開啟</button>
+      </div>
+    </div>
+
+    <!-- STATE 4: Unlocked -->
+    <div class="tool-card" style="border: 2px solid var(--md-tertiary); background: var(--md-tertiary-container);">
+      <div class="icon">🎨</div>
+      <div class="name-en" style="color: var(--md-on-tertiary-container);">Appearance Editor</div>
+      <div class="name-zh" style="color: var(--md-on-tertiary-container);">外觀編輯器</div>
+      <div class="body" style="color: var(--md-on-tertiary-container);">Unlocked at 1,000 total buildings owned.</div>
+      <div class="bonus-line">🎁 Gameplay bonus: +8% global CPS · 遊戲加成：全局產量 +8%</div>
+      <div class="open-real-feature" style="border-top-color: var(--md-on-tertiary-container);">
+        <span class="note" style="color: var(--md-on-tertiary-container);">
+          Separate from the bonus above: this app feature has always been available in Settings
+          and the command palette, whether or not this tool was unlocked. ·
+          同上面嘅加成係兩回事：呢個應用程式功能一直都喺設定同指令面板用得到，唔理呢個工具有冇解鎖。
+        </span>
+        <button>Open it now · 而家開啟</button>
+      </div>
+    </div>
+
+  </div>
+</body>
+</html>

@@ -1,0 +1,100 @@
+<!-- @dsCard group="Feedback" -->
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1" />
+<title>Material Cookie Clicker · Milestone Toast</title>
+<style>
+  :root {
+    --md-primary: #7A4A1D; --md-on-primary: #FFFFFF;
+    --md-tertiary: #5C4E00; --md-on-tertiary: #FFFFFF; --md-tertiary-container: #F8E287; --md-on-tertiary-container: #221B00;
+    --md-surface: #FFF8F3; --md-on-surface: #211A14;
+    --md-surface-variant: #F0E0D0; --md-on-surface-variant: #4F4539;
+    --md-outline: #7C6F64;
+    --md-surface-container-high: #F7E5D6;
+    --font-en: -apple-system, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
+    --font-zh: "Segoe UI", "Microsoft JhengHei", var(--font-en);
+  }
+  [data-scheme="dark"] {
+    --md-primary: #FFB876; --md-on-primary: #4A2800;
+    --md-tertiary: #DBC66E; --md-on-tertiary: #383000; --md-tertiary-container: #514600; --md-on-tertiary-container: #F8E287;
+    --md-surface: #18120D; --md-on-surface: #EDE0D9;
+    --md-surface-variant: #4F4539; --md-on-surface-variant: #D3C4B4;
+    --md-outline: #9C8F83;
+    --md-surface-container-high: #302722;
+  }
+  * { box-sizing: border-box; }
+  body { margin: 0; font-family: var(--font-en); background: var(--md-surface); color: var(--md-on-surface); padding: 24px; min-height: 100vh; position: relative; }
+  h1 { font-size: 28px; margin: 0 0 4px; }
+  h2 { font-size: 18px; margin: 32px 0 8px; }
+  p.lede, p.caption { color: var(--md-on-surface-variant); max-width: 74ch; }
+  button.scheme-toggle {
+    font: inherit; font-weight: 600; padding: 10px 18px; min-height: 44px;
+    border-radius: 999px; border: 1px solid var(--md-outline);
+    background: var(--md-surface-container-high); color: var(--md-on-surface); cursor: pointer; margin: 16px 0 24px;
+  }
+  button.scheme-toggle:focus-visible { outline: 3px solid var(--md-primary); outline-offset: 2px; }
+
+  .toast-demo { position: relative; height: 160px; border: 1px dashed var(--md-outline); border-radius: 12px; margin-bottom: 8px; }
+  .toast {
+    position: absolute; bottom: 16px; right: 16px; max-width: 320px;
+    background: var(--md-surface-container-high); color: var(--md-on-surface);
+    border-radius: 12px; padding: 12px 14px;
+    box-shadow: 0 1px 3px rgba(0,0,0,0.30), 0 4px 8px 3px rgba(0,0,0,0.15);
+    display: flex; gap: 10px; align-items: flex-start;
+  }
+  .toast .glyph { font-size: 20px; flex-shrink: 0; }
+  .toast .body { font-size: 13px; }
+  .toast .body strong { display: block; font-size: 14px; margin-bottom: 2px; }
+  .toast .dismiss {
+    margin-left: auto; background: none; border: none; cursor: pointer; font-size: 14px;
+    min-width: 32px; min-height: 32px; color: var(--md-on-surface-variant); border-radius: 999px;
+  }
+  .toast .dismiss:focus-visible { outline: 3px solid var(--md-primary); outline-offset: 2px; }
+  .toast.persist { border-left: 4px solid var(--md-primary); }
+</style>
+</head>
+<body data-scheme="light">
+  <h1>Milestone toast · 里程碑提示</h1>
+  <p class="lede">
+    A non-blocking, corner-anchored notification for game milestones (achievement unlocked,
+    golden cookie missed, offline earnings collected). Always bottom-right in this spec; the
+    app's own notification settings may move it to bottom-left. Two lifecycle variants: an
+    auto-dismissing informational toast, and a persist-until-dismissed variant for anything the
+    player should actively acknowledge (e.g. a large offline-earnings summary).
+    <span style="font-family:var(--font-zh); display:block; margin-top:4px;">
+      非阻擋式、貼喺角落嘅提示，達成里程碑先出現。分自動消失同要用戶主動關閉兩種。
+    </span>
+  </p>
+  <button class="scheme-toggle" onclick="document.body.dataset.scheme = document.body.dataset.scheme === 'dark' ? 'light' : 'dark'">
+    🌗 Toggle light / dark · 切換淺色／深色
+  </button>
+
+  <h2>Auto-dismiss variant · 自動消失版本</h2>
+  <p class="caption">Fires on a golden-cookie click; fades out on its own after ~5s. Hovering or focusing pauses the timer.</p>
+  <div class="toast-demo">
+    <div class="toast">
+      <span class="glyph">✨</span>
+      <div class="body">
+        <strong>Golden cookie clicked! · 撳中金曲奇！</strong>
+        +1,337 cookies, frenzy active for 60s · 獲得 1,337 個曲奇，狂熱效果 60 秒
+      </div>
+    </div>
+  </div>
+
+  <h2>Persist-until-dismissed variant · 需手動關閉版本</h2>
+  <p class="caption">Used for the offline-earnings summary shown on app launch. Stays until the player dismisses it or opens the full breakdown; never blocks input to the rest of the app.</p>
+  <div class="toast-demo">
+    <div class="toast persist">
+      <span class="glyph">🌙</span>
+      <div class="body">
+        <strong>Welcome back · 歡迎返嚟</strong>
+        While you were away you earned 2.4M cookies over 6h 12m.
+        你離開嘅時候賺咗 240 萬個曲奇，總共 6 小時 12 分鐘。
+      </div>
+      <button class="dismiss" aria-label="Dismiss · 關閉">✕</button>
+    </div>
+  </div>
+</body>
+</html>

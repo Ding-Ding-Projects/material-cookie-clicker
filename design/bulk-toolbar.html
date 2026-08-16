@@ -1,0 +1,116 @@
+<!-- @dsCard group="List Controls" -->
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1" />
+<title>Material Cookie Clicker · Bulk Action Toolbar</title>
+<style>
+  :root {
+    --md-primary: #7A4A1D; --md-on-primary: #FFFFFF; --md-primary-container: #FFDCB8; --md-on-primary-container: #3A2100;
+    --md-error: #BA1A1A; --md-on-error: #FFFFFF;
+    --md-surface: #FFF8F3; --md-on-surface: #211A14;
+    --md-surface-variant: #F0E0D0; --md-on-surface-variant: #4F4539;
+    --md-outline: #7C6F64;
+    --md-surface-container: #FCEBDD;
+    --md-surface-container-high: #F7E5D6;
+    --font-en: -apple-system, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
+    --font-zh: "Segoe UI", "Microsoft JhengHei", var(--font-en);
+  }
+  [data-scheme="dark"] {
+    --md-primary: #FFB876; --md-on-primary: #4A2800; --md-primary-container: #693C00; --md-on-primary-container: #FFDCB8;
+    --md-error: #FFB4AB; --md-on-error: #690005;
+    --md-surface: #18120D; --md-on-surface: #EDE0D9;
+    --md-surface-variant: #4F4539; --md-on-surface-variant: #D3C4B4;
+    --md-outline: #9C8F83;
+    --md-surface-container: #251D17;
+    --md-surface-container-high: #302722;
+  }
+  * { box-sizing: border-box; }
+  body { margin: 0; font-family: var(--font-en); background: var(--md-surface); color: var(--md-on-surface); padding: 24px; }
+  h1 { font-size: 28px; margin: 0 0 4px; }
+  h2 { font-size: 18px; margin: 32px 0 8px; }
+  p.lede, p.caption { color: var(--md-on-surface-variant); max-width: 74ch; }
+  button.scheme-toggle {
+    font: inherit; font-weight: 600; padding: 10px 18px; min-height: 44px;
+    border-radius: 999px; border: 1px solid var(--md-outline);
+    background: var(--md-surface-container); color: var(--md-on-surface); cursor: pointer; margin: 16px 0 24px;
+  }
+  button.scheme-toggle:focus-visible { outline: 3px solid var(--md-primary); outline-offset: 2px; }
+
+  .toolbar {
+    display: flex; align-items: center; gap: 12px; flex-wrap: wrap;
+    background: var(--md-surface-container-high);
+    border-radius: 12px; padding: 10px 16px;
+    box-shadow: 0 1px 3px rgba(0,0,0,0.30), 0 4px 8px 3px rgba(0,0,0,0.15);
+    margin-bottom: 16px;
+  }
+  .toolbar .count {
+    font-weight: 700; font-size: 14px;
+    background: var(--md-primary-container); color: var(--md-on-primary-container);
+    border-radius: 999px; padding: 4px 12px;
+  }
+  .toolbar button.action {
+    font: inherit; font-size: 13px; font-weight: 600; min-height: 40px; padding: 0 14px;
+    border-radius: 999px; border: 1px solid var(--md-outline); background: var(--md-surface); color: var(--md-on-surface);
+    cursor: pointer;
+  }
+  .toolbar button.action:focus-visible { outline: 3px solid var(--md-primary); outline-offset: 2px; }
+  .toolbar button.action.destructive { border-color: var(--md-error); color: var(--md-error); }
+  .toolbar button.action[disabled] { opacity: 0.5; cursor: not-allowed; }
+  .toolbar .spacer { flex: 1; }
+  .progress-line { display: flex; align-items: center; gap: 8px; font-size: 12px; color: var(--md-on-surface-variant); }
+  .progress-track { width: 120px; height: 6px; border-radius: 999px; background: var(--md-surface-variant); overflow: hidden; }
+  .progress-fill { height: 100%; width: 62%; background: var(--md-primary); }
+</style>
+</head>
+<body data-scheme="light">
+  <h1>Bulk action toolbar · 批量操作列</h1>
+  <p class="lede">
+    Appears above any multi-select list (achievements, saved building presets, notification
+    history) once at least one item is selected. The count is baked into every action label
+    rather than shown once at the edge, so a keyboard or screen-reader user reading a single
+    button still knows exactly how many items it affects.
+    <span style="font-family:var(--font-zh); display:block; margin-top:4px;">
+      多選清單上面嘅批量操作列，每個按鈕標籤入面都寫住影響幾多項，唔使用戶自己數。
+    </span>
+  </p>
+  <button class="scheme-toggle" onclick="document.body.dataset.scheme = document.body.dataset.scheme === 'dark' ? 'light' : 'dark'">
+    🌗 Toggle light / dark · 切換淺色／深色
+  </button>
+
+  <h2>At rest, items selected · 靜止，已選擇項目</h2>
+  <div class="toolbar">
+    <span class="count">7 selected · 已選 7 項</span>
+    <button class="action">Export 7 · 匯出 7 項</button>
+    <button class="action">Mark 7 as read · 標記 7 項為已讀</button>
+    <button class="action destructive">Delete 7 · 刪除 7 項</button>
+    <div class="spacer"></div>
+    <button class="action">Select all matching · 選取全部符合項</button>
+    <button class="action">Clear selection · 清除選擇</button>
+  </div>
+
+  <h2>In-flight · 執行緊</h2>
+  <p class="caption">Every action is disabled while one is running, and progress reports honest counts rather than a spinner alone.</p>
+  <div class="toolbar">
+    <span class="count">7 selected · 已選 7 項</span>
+    <button class="action" disabled>Export 7 · 匯出 7 項</button>
+    <button class="action" disabled>Mark 7 as read · 標記 7 項為已讀</button>
+    <button class="action destructive" disabled>Deleting… · 刪除緊…</button>
+    <div class="spacer"></div>
+    <div class="progress-line">
+      <span>4 / 7 done · 完成 4／7</span>
+      <div class="progress-track"><div class="progress-fill"></div></div>
+    </div>
+  </div>
+
+  <h2>Honest partial result · 誠實嘅部分結果</h2>
+  <p class="caption">A completed bulk action reports what actually happened, including any skipped items, rather than a blanket success.</p>
+  <div class="toolbar">
+    <span class="count">7 selected · 已選 7 項</span>
+    <span style="font-size:13px;">✅ 6 deleted, ⚠️ 1 skipped (locked achievement) · 刪咗 6 項，跳過 1 項（成就已鎖定）</span>
+    <div class="spacer"></div>
+    <button class="action">Dismiss · 知道喇</button>
+  </div>
+</body>
+</html>

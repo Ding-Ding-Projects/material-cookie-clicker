@@ -1,0 +1,318 @@
+<!-- @dsCard group="Game Surfaces" -->
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1" />
+<title>Material Cookie Clicker · Tools Tech Tree Overview</title>
+<style>
+  :root {
+    --md-primary: #7A4A1D; --md-on-primary: #FFFFFF; --md-primary-container: #FFDCB8; --md-on-primary-container: #3A2100;
+    --md-tertiary: #5C4E00; --md-on-tertiary: #FFFFFF; --md-tertiary-container: #F8E287; --md-on-tertiary-container: #221B00;
+    --md-surface: #FFF8F3; --md-on-surface: #211A14;
+    --md-surface-variant: #F0E0D0; --md-on-surface-variant: #4F4539;
+    --md-outline: #7C6F64;
+    --md-surface-container: #FCEBDD;
+    --md-surface-container-high: #F7E5D6;
+    --font-en: -apple-system, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
+    --font-zh: "Segoe UI", "Microsoft JhengHei", var(--font-en);
+  }
+  [data-scheme="dark"] {
+    --md-primary: #FFB876; --md-on-primary: #4A2800; --md-primary-container: #693C00; --md-on-primary-container: #FFDCB8;
+    --md-tertiary: #DBC66E; --md-on-tertiary: #383000; --md-tertiary-container: #514600; --md-on-tertiary-container: #F8E287;
+    --md-surface: #18120D; --md-on-surface: #EDE0D9;
+    --md-surface-variant: #4F4539; --md-on-surface-variant: #D3C4B4;
+    --md-outline: #9C8F83;
+    --md-surface-container: #251D17;
+    --md-surface-container-high: #302722;
+  }
+  * { box-sizing: border-box; }
+  body { margin: 0; font-family: var(--font-en); background: var(--md-surface); color: var(--md-on-surface); padding: 24px; }
+  h1 { font-size: 28px; margin: 0 0 4px; }
+  h2 { font-size: 18px; margin: 32px 0 8px; }
+  p.lede, p.caption { color: var(--md-on-surface-variant); max-width: 74ch; }
+  button.scheme-toggle {
+    font: inherit; font-weight: 600; padding: 10px 18px; min-height: 44px;
+    border-radius: 999px; border: 1px solid var(--md-outline);
+    background: var(--md-surface-container); color: var(--md-on-surface); cursor: pointer; margin: 16px 0 24px;
+  }
+  button.scheme-toggle:focus-visible { outline: 3px solid var(--md-primary); outline-offset: 2px; }
+
+  /* --- Summary + progression toggle --- */
+  .summary-bar {
+    display: flex; align-items: center; gap: 20px; flex-wrap: wrap;
+    background: var(--md-surface-container-high); border-radius: 12px; padding: 14px 18px; margin-bottom: 20px;
+  }
+  .summary-count { font-weight: 700; font-size: 15px; }
+  .summary-track { width: 180px; height: 8px; border-radius: 999px; background: var(--md-surface-variant); overflow: hidden; }
+  .summary-fill { height: 100%; background: var(--md-primary); width: 41%; }
+  .progression-toggle-wrap { margin-left: auto; display: flex; align-items: center; gap: 8px; }
+  .progression-toggle {
+    width: 52px; height: 30px; border-radius: 999px; border: 2px solid var(--md-outline); background: var(--md-surface);
+    position: relative; cursor: pointer;
+  }
+  .progression-toggle::after {
+    content: ""; position: absolute; top: 2px; left: 2px; width: 22px; height: 22px; border-radius: 999px;
+    background: var(--md-outline); transition: transform 150ms ease;
+  }
+  .progression-toggle[aria-pressed="true"] { border-color: var(--md-primary); }
+  .progression-toggle[aria-pressed="true"]::after { transform: translateX(22px); background: var(--md-primary); }
+  .progression-toggle:focus-visible { outline: 3px solid var(--md-primary); outline-offset: 2px; }
+  .progression-label { font-size: 13px; font-weight: 600; }
+
+  .toggle-note {
+    background: var(--md-primary-container); color: var(--md-on-primary-container);
+    border-radius: 10px; padding: 10px 14px; font-size: 12px; margin-bottom: 20px; max-width: 74ch;
+  }
+
+  /* --- Search --- */
+  .search-field-wrap { position: relative; max-width: 420px; margin-bottom: 28px; }
+  .search-field {
+    display: flex; align-items: center; gap: 8px;
+    border: 1px solid var(--md-outline); border-radius: 999px;
+    background: var(--md-surface-container-high);
+    padding: 4px 6px 4px 16px;
+  }
+  .search-field input {
+    flex: 1; border: none; background: transparent; font: inherit; font-size: 14px;
+    min-height: 40px; color: var(--md-on-surface); outline: none;
+  }
+  .builder-toggle {
+    width: 40px; height: 40px; border-radius: 999px; border: none; background: transparent;
+    color: var(--md-on-surface-variant); cursor: pointer; font-size: 16px;
+    display: flex; align-items: center; justify-content: center;
+  }
+  .builder-toggle:focus-visible, .search-field input:focus-visible { outline: 3px solid var(--md-primary); outline-offset: 2px; }
+  .popover {
+    position: absolute; top: calc(100% + 8px); left: 0; width: 340px;
+    background: var(--md-surface-container-high); color: var(--md-on-surface);
+    border-radius: 16px; padding: 16px;
+    box-shadow: 0 2px 3px rgba(0,0,0,0.30), 0 6px 10px 4px rgba(0,0,0,0.15);
+    display: none; flex-direction: column; gap: 10px;
+    border: 1px solid var(--md-outline);
+    z-index: 5;
+  }
+  .popover.open { display: flex; }
+  .popover label { font-size: 12px; font-weight: 600; display: block; margin-bottom: 4px; }
+  .popover input[type="text"] {
+    width: 100%; min-height: 40px; border-radius: 8px; border: 1px solid var(--md-outline);
+    padding: 0 10px; font: inherit; font-size: 13px; background: var(--md-surface); color: var(--md-on-surface);
+  }
+
+  /* --- Tiers --- */
+  .tier { margin-bottom: 32px; }
+  .tier-heading { display: flex; align-items: center; gap: 10px; margin-bottom: 4px; }
+  .tier-heading h3 { margin: 0; font-size: 16px; }
+  .tier-heading .tier-zh { font-family: var(--font-zh); font-size: 13px; color: var(--md-on-surface-variant); }
+  .tier-row { display: flex; gap: 16px; flex-wrap: wrap; align-items: stretch; }
+  .prereq-arrow { align-self: center; font-size: 20px; color: var(--md-on-surface-variant); }
+
+  .node {
+    width: 200px; border-radius: 12px; padding: 12px; background: var(--md-surface-container-high);
+    display: flex; flex-direction: column; gap: 6px; font-size: 12px;
+  }
+  .node .icon { font-size: 22px; }
+  .node .name-en { font-weight: 700; font-size: 13px; }
+  .node .name-zh { font-family: var(--font-zh); color: var(--md-on-surface-variant); }
+  .node .state-chip {
+    align-self: flex-start; border-radius: 999px; padding: 2px 8px; font-size: 10px; font-weight: 700;
+  }
+  .node.state-undiscovered { filter: grayscale(1); }
+  .node.state-undiscovered .state-chip { background: var(--md-surface-variant); color: var(--md-on-surface-variant); }
+  .node.state-locked .state-chip { background: var(--md-surface-variant); color: var(--md-on-surface-variant); }
+  .node.state-ready .state-chip { background: var(--md-primary-container); color: var(--md-on-primary-container); }
+  .node.state-unlocked { border: 2px solid var(--md-tertiary); background: var(--md-tertiary-container); }
+  .node.state-unlocked .name-en, .node.state-unlocked .name-zh { color: var(--md-on-tertiary-container); }
+  .node.state-unlocked .state-chip { background: var(--md-tertiary); color: var(--md-on-tertiary); }
+  .node .mini-progress { height: 5px; border-radius: 999px; background: var(--md-surface-variant); overflow: hidden; }
+  .node .mini-progress-fill { height: 100%; background: var(--md-primary); }
+  .node .open-link {
+    margin-top: auto; padding-top: 6px; border-top: 1px solid var(--md-outline);
+    font-size: 10px; display: flex; justify-content: space-between; align-items: center; gap: 4px;
+  }
+  .node .open-link button {
+    font: inherit; font-size: 10px; font-weight: 700; min-height: 28px; padding: 0 8px;
+    border-radius: 999px; border: 1px solid var(--md-primary); background: transparent; color: var(--md-primary); cursor: pointer;
+  }
+  .node .open-link button:focus-visible { outline: 3px solid var(--md-primary); outline-offset: 2px; }
+</style>
+</head>
+<body data-scheme="light">
+  <h1>Tools tech tree · 工具科技樹 — overview</h1>
+  <p class="lede">
+    The tech-tree overview screen: tools grouped by tier with prerequisite relationships shown as
+    arrows between nodes, a progress summary, its own search field with the anchored regex
+    builder, and every mixed node state at a glance.
+    <span style="font-family:var(--font-zh); display:block; margin-top:4px;">
+      工具科技樹總覽：按層級分組，用箭頭顯示前置條件，有進度摘要同自己嘅搜尋欄。
+    </span>
+  </p>
+  <button class="scheme-toggle" onclick="document.body.dataset.scheme = document.body.dataset.scheme === 'dark' ? 'light' : 'dark'">
+    🌗 Toggle light / dark · 切換淺色／深色
+  </button>
+
+  <div class="summary-bar">
+    <span class="summary-count">7 / 17 tools unlocked · 17 個工具入面已解鎖 7 個</span>
+    <div class="summary-track"><div class="summary-fill"></div></div>
+    <div class="progression-toggle-wrap">
+      <span class="progression-label">Tool progression · 工具進度</span>
+      <button class="progression-toggle" id="progressionToggle" aria-pressed="true" aria-label="Tool progression, currently on · 工具進度，而家開緊" onclick="toggleProgression(this)">​</button>
+    </div>
+  </div>
+  <div class="toggle-note" id="toggleNote">
+    🎮 This toggle only changes the game's tech tree display and its gameplay bonuses. Turning it
+    off shows every tool as unlocked in this screen so you can preview all bonuses at once — it
+    never changes what real application features are available; every one of them has always been
+    reachable from Settings and the command palette regardless of this switch.
+    <span style="font-family:var(--font-zh); display:block; margin-top:4px;">
+      呢個掣淨係改變遊戲科技樹嘅顯示同遊戲加成，唔會改變真正應用程式功能嘅可用性——嗰啲功能一直都可以喺設定同指令面板用到。
+    </span>
+  </div>
+
+  <div class="search-field-wrap">
+    <div class="search-field">
+      <span aria-hidden="true">🔍</span>
+      <input type="text" placeholder="Search tools… · 搜尋工具…" aria-label="Search tools tech tree · 搜尋工具科技樹" />
+      <button class="builder-toggle" aria-pressed="false" aria-label="Open regex builder · 開啟規則運算式產生器" onclick="document.getElementById('treePop').classList.toggle('open'); this.setAttribute('aria-pressed', document.getElementById('treePop').classList.contains('open'));">⚙</button>
+    </div>
+    <div class="popover" id="treePop">
+      <div>
+        <label for="treePattern">Pattern · 規則</label>
+        <input type="text" id="treePattern" placeholder="e.g. ^auth" />
+      </div>
+      <p class="caption" style="margin:0;">Same anchored builder as every other search field in the app; plain text is the default mode. See <code>search-regex-builder.html</code> for the full spec.</p>
+    </div>
+  </div>
+
+  <div class="tier">
+    <div class="tier-heading">
+      <h3>Tier 1 · 第一層</h3>
+      <span class="tier-zh">Early game · 遊戲初期</span>
+    </div>
+    <div class="tier-row">
+      <div class="node state-unlocked">
+        <div class="icon">🔍</div>
+        <div class="name-en">Regex Builder</div>
+        <div class="name-zh">正則表達式產生器</div>
+        <span class="state-chip">Unlocked · 已解鎖</span>
+        <div class="open-link">
+          <span>Bonus: ×Max auto-buy</span>
+          <button>Open now</button>
+        </div>
+      </div>
+      <div class="node state-unlocked">
+        <div class="icon">🎨</div>
+        <div class="name-en">Appearance Editor</div>
+        <div class="name-zh">外觀編輯器</div>
+        <span class="state-chip">Unlocked · 已解鎖</span>
+        <div class="open-link">
+          <span>Bonus: +8% CPS</span>
+          <button>Open now</button>
+        </div>
+      </div>
+      <div class="node state-ready">
+        <div class="icon">🔐</div>
+        <div class="name-en">Authenticator</div>
+        <div class="name-zh">驗證器</div>
+        <span class="state-chip">Ready to unlock · 可以解鎖</span>
+        <div class="mini-progress"><div class="mini-progress-fill" style="width:100%;"></div></div>
+        <div class="open-link">
+          <span>Always open</span>
+          <button>Open now</button>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <div class="tier">
+    <div class="tier-heading">
+      <h3>Tier 2 · 第二層</h3>
+      <span class="tier-zh">Requires 2 Tier 1 tools unlocked · 需要解鎖 2 個第一層工具</span>
+    </div>
+    <div class="tier-row">
+      <span class="prereq-arrow" aria-hidden="true">→</span>
+      <div class="node state-locked">
+        <div class="icon">📋</div>
+        <div class="name-en">Command Palette</div>
+        <div class="name-zh">指令面板</div>
+        <span class="state-chip">Locked · 未解鎖</span>
+        <div>142 / 500 Grandmas · 142／500 間嫲嫲屋</div>
+        <div class="mini-progress"><div class="mini-progress-fill" style="width:28.4%;"></div></div>
+        <div class="open-link">
+          <span>Always open</span>
+          <button>Open now</button>
+        </div>
+      </div>
+      <div class="node state-locked">
+        <div class="icon">📁</div>
+        <div class="name-en">File Converter</div>
+        <div class="name-zh">檔案轉換器</div>
+        <span class="state-chip">Locked · 未解鎖</span>
+        <div>3 / 10 upgrades owned · 3／10 個升級</div>
+        <div class="mini-progress"><div class="mini-progress-fill" style="width:30%;"></div></div>
+        <div class="open-link">
+          <span>Always open</span>
+          <button>Open now</button>
+        </div>
+      </div>
+      <div class="node state-undiscovered">
+        <div class="icon">❔</div>
+        <div class="name-en">??? Tool</div>
+        <div class="name-zh">未發現嘅工具</div>
+        <span class="state-chip">Undiscovered · 未發現</span>
+        <div class="open-link">
+          <span>Always open</span>
+          <button>Open now</button>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <div class="tier">
+    <div class="tier-heading">
+      <h3>Tier 3 · 第三層</h3>
+      <span class="tier-zh">Requires first prestige run · 需要完成第一次轉生</span>
+    </div>
+    <div class="tier-row">
+      <span class="prereq-arrow" aria-hidden="true">→</span>
+      <div class="node state-undiscovered">
+        <div class="icon">❔</div>
+        <div class="name-en">??? Tool</div>
+        <div class="name-zh">未發現嘅工具</div>
+        <span class="state-chip">Undiscovered · 未發現</span>
+        <div class="open-link">
+          <span>Always open</span>
+          <button>Open now</button>
+        </div>
+      </div>
+      <div class="node state-undiscovered">
+        <div class="icon">❔</div>
+        <div class="name-en">??? Tool</div>
+        <div class="name-zh">未發現嘅工具</div>
+        <span class="state-chip">Undiscovered · 未發現</span>
+        <div class="open-link">
+          <span>Always open</span>
+          <button>Open now</button>
+        </div>
+      </div>
+    </div>
+  </div>
+
+<script>
+  function toggleProgression(btn) {
+    const on = btn.getAttribute('aria-pressed') === 'true';
+    btn.setAttribute('aria-pressed', String(!on));
+    btn.setAttribute('aria-label', !on ? 'Tool progression, currently on · 工具進度，而家開緊' : 'Tool progression, currently off — every tool previewed as unlocked · 工具進度，而家熄咗——全部工具當已解鎖顯示');
+    document.querySelectorAll('.node').forEach(n => {
+      if (!on) {
+        // turning progression OFF: preview every node as unlocked (visual only)
+        n.dataset.prevClass = n.className;
+        n.className = 'node state-unlocked';
+      } else if (n.dataset.prevClass) {
+        n.className = n.dataset.prevClass;
+      }
+    });
+  }
+</script>
+</body>
+</html>

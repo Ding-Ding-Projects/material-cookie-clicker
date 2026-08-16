@@ -1,0 +1,90 @@
+<!-- @dsCard group="Game Surfaces" -->
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1" />
+<title>Material Cookie Clicker · Stat Tile</title>
+<style>
+  :root {
+    --md-primary: #7A4A1D; --md-on-primary: #FFFFFF;
+    --md-tertiary: #5C4E00;
+    --md-error: #BA1A1A;
+    --md-surface: #FFF8F3; --md-on-surface: #211A14;
+    --md-surface-variant: #F0E0D0; --md-on-surface-variant: #4F4539;
+    --md-outline: #7C6F64;
+    --md-surface-container-high: #F7E5D6;
+    --font-en: -apple-system, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
+    --font-zh: "Segoe UI", "Microsoft JhengHei", var(--font-en);
+  }
+  [data-scheme="dark"] {
+    --md-primary: #FFB876; --md-on-primary: #4A2800;
+    --md-tertiary: #DBC66E;
+    --md-error: #FFB4AB;
+    --md-surface: #18120D; --md-on-surface: #EDE0D9;
+    --md-surface-variant: #4F4539; --md-on-surface-variant: #D3C4B4;
+    --md-outline: #9C8F83;
+    --md-surface-container-high: #302722;
+  }
+  * { box-sizing: border-box; }
+  body { margin: 0; font-family: var(--font-en); background: var(--md-surface); color: var(--md-on-surface); padding: 24px; }
+  h1 { font-size: 28px; margin: 0 0 4px; }
+  p.lede, p.caption { color: var(--md-on-surface-variant); max-width: 74ch; }
+  button.scheme-toggle {
+    font: inherit; font-weight: 600; padding: 10px 18px; min-height: 44px;
+    border-radius: 999px; border: 1px solid var(--md-outline);
+    background: var(--md-surface-container-high); color: var(--md-on-surface); cursor: pointer; margin: 16px 0 24px;
+  }
+  button.scheme-toggle:focus-visible { outline: 3px solid var(--md-primary); outline-offset: 2px; }
+  .grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(180px, 1fr)); gap: 16px; }
+  .tile {
+    border-radius: 12px; padding: 16px;
+    background: var(--md-surface-container-high);
+    display: flex; flex-direction: column; gap: 4px;
+  }
+  .tile .label-en { font-size: 12px; color: var(--md-on-surface-variant); font-weight: 600; text-transform: uppercase; letter-spacing: 0.4px; }
+  .tile .label-zh { font-family: var(--font-zh); font-size: 12px; color: var(--md-on-surface-variant); }
+  .tile .value { font-size: 26px; font-weight: 700; }
+  .tile .trend { font-size: 12px; display: flex; align-items: center; gap: 4px; margin-top: 4px; }
+  .trend.up { color: var(--md-tertiary); }
+  .trend.down { color: var(--md-error); }
+</style>
+</head>
+<body data-scheme="light">
+  <h1>Stat tile · 統計方塊</h1>
+  <p class="lede">
+    A single cell in the statistics grid: value, bilingual label, and an optional trend
+    indicator. Trend colour is never the only signal — the arrow glyph and sign carry the
+    meaning too, so colour-blind players are not relying on hue alone.
+    <span style="font-family:var(--font-zh); display:block;">統計方格入面嘅單一格：數值、雙語標籤，仲有可選嘅趨勢指標。</span>
+  </p>
+  <button class="scheme-toggle" onclick="document.body.dataset.scheme = document.body.dataset.scheme === 'dark' ? 'light' : 'dark'">
+    🌗 Toggle light / dark · 切換淺色／深色
+  </button>
+
+  <div class="grid">
+    <div class="tile">
+      <span class="label-en">Total Cookies Baked</span>
+      <span class="label-zh">總共烤咗嘅曲奇</span>
+      <span class="value">4.82Qa</span>
+    </div>
+    <div class="tile">
+      <span class="label-en">Cookies Per Second</span>
+      <span class="label-zh">每秒曲奇產量</span>
+      <span class="value">18,420</span>
+      <span class="trend up">▲ +6.2% this session · 呢節升咗 6.2%</span>
+    </div>
+    <div class="tile">
+      <span class="label-en">Click Power</span>
+      <span class="label-zh">每擊力量</span>
+      <span class="value">312</span>
+      <span class="trend down">▼ −3.1% since last prestige · 由上次轉生跌咗 3.1%</span>
+    </div>
+    <div class="tile">
+      <span class="label-en">Prestige Runs</span>
+      <span class="label-zh">轉生次數</span>
+      <span class="value">7</span>
+    </div>
+  </div>
+</body>
+</html>

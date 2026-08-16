@@ -1,0 +1,148 @@
+<!-- @dsCard group="List Controls" -->
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1" />
+<title>Material Cookie Clicker · Search Field with Anchored Regex Builder</title>
+<style>
+  :root {
+    --md-primary: #7A4A1D; --md-on-primary: #FFFFFF; --md-primary-container: #FFDCB8; --md-on-primary-container: #3A2100;
+    --md-surface: #FFF8F3; --md-on-surface: #211A14;
+    --md-surface-variant: #F0E0D0; --md-on-surface-variant: #4F4539;
+    --md-outline: #7C6F64;
+    --md-surface-container: #FCEBDD;
+    --md-surface-container-high: #F7E5D6;
+    --font-en: -apple-system, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
+    --font-zh: "Segoe UI", "Microsoft JhengHei", var(--font-en);
+  }
+  [data-scheme="dark"] {
+    --md-primary: #FFB876; --md-on-primary: #4A2800; --md-primary-container: #693C00; --md-on-primary-container: #FFDCB8;
+    --md-surface: #18120D; --md-on-surface: #EDE0D9;
+    --md-surface-variant: #4F4539; --md-on-surface-variant: #D3C4B4;
+    --md-outline: #9C8F83;
+    --md-surface-container: #251D17;
+    --md-surface-container-high: #302722;
+  }
+  * { box-sizing: border-box; }
+  body { margin: 0; font-family: var(--font-en); background: var(--md-surface); color: var(--md-on-surface); padding: 24px; }
+  h1 { font-size: 28px; margin: 0 0 4px; }
+  h2 { font-size: 18px; margin: 32px 0 8px; }
+  p.lede, p.caption { color: var(--md-on-surface-variant); max-width: 74ch; }
+  button.scheme-toggle {
+    font: inherit; font-weight: 600; padding: 10px 18px; min-height: 44px;
+    border-radius: 999px; border: 1px solid var(--md-outline);
+    background: var(--md-surface-container); color: var(--md-on-surface); cursor: pointer; margin: 16px 0 24px;
+  }
+  button.scheme-toggle:focus-visible { outline: 3px solid var(--md-primary); outline-offset: 2px; }
+
+  .search-field-wrap { position: relative; max-width: 420px; margin-bottom: 40px; }
+  .search-field {
+    display: flex; align-items: center; gap: 8px;
+    border: 1px solid var(--md-outline); border-radius: 999px;
+    background: var(--md-surface-container-high);
+    padding: 4px 6px 4px 16px;
+  }
+  .search-field input {
+    flex: 1; border: none; background: transparent; font: inherit; font-size: 14px;
+    min-height: 40px; color: var(--md-on-surface); outline: none;
+  }
+  .search-field input::placeholder { color: var(--md-on-surface-variant); }
+  .builder-toggle {
+    width: 40px; height: 40px; border-radius: 999px; border: none; background: transparent;
+    color: var(--md-on-surface-variant); cursor: pointer; font-size: 16px;
+    display: flex; align-items: center; justify-content: center;
+  }
+  .builder-toggle:focus-visible, .search-field input:focus-visible { outline: 3px solid var(--md-primary); outline-offset: 2px; }
+  .builder-toggle[aria-pressed="true"] { background: var(--md-primary-container); color: var(--md-on-primary-container); }
+
+  .popover {
+    position: absolute; top: calc(100% + 8px); left: 0; width: 380px;
+    background: var(--md-surface-container-high); color: var(--md-on-surface);
+    border-radius: 16px; padding: 16px;
+    box-shadow: 0 2px 3px rgba(0,0,0,0.30), 0 6px 10px 4px rgba(0,0,0,0.15);
+    display: none; flex-direction: column; gap: 10px;
+    border: 1px solid var(--md-outline);
+  }
+  .popover.open { display: flex; }
+  .popover h3 { margin: 0; font-size: 14px; }
+  .popover label { font-size: 12px; font-weight: 600; display: block; margin-bottom: 4px; }
+  .popover input[type="text"] {
+    width: 100%; min-height: 40px; border-radius: 8px; border: 1px solid var(--md-outline);
+    padding: 0 10px; font: inherit; font-size: 13px; background: var(--md-surface); color: var(--md-on-surface);
+  }
+  .flag-row { display: flex; gap: 12px; font-size: 12px; }
+  .flag-row label { display: flex; align-items: center; gap: 4px; font-weight: 400; }
+  .match-preview {
+    font-family: "Cascadia Code", Consolas, monospace; font-size: 12px;
+    background: var(--md-surface); border-radius: 8px; padding: 8px; border: 1px solid var(--md-outline);
+  }
+  mark { background: var(--md-primary-container); color: var(--md-on-primary-container); border-radius: 3px; }
+  .mode-row { display: flex; gap: 8px; font-size: 12px; }
+  .mode-row button {
+    flex: 1; min-height: 36px; border-radius: 999px; border: 1px solid var(--md-outline);
+    background: var(--md-surface); color: var(--md-on-surface); cursor: pointer; font: inherit; font-size: 12px;
+  }
+  .mode-row button[aria-pressed="true"] { background: var(--md-primary); color: var(--md-on-primary); }
+</style>
+</head>
+<body data-scheme="light">
+  <h1>Search field · 搜尋欄 — anchored regex builder</h1>
+  <p class="lede">
+    Every list search in Material Cookie Clicker (achievements, building list, notification history) uses this
+    exact field. The regex builder affordance opens a popover anchored directly beside the
+    field it belongs to — never a detached dialog — and plain-text stays the default mode.
+    <span style="font-family:var(--font-zh); display:block; margin-top:4px;">
+      規則運算式產生器一定貼喺自己嘅搜尋欄旁邊彈出，唔會開一個獨立對話框；預設用純文字搜尋。
+    </span>
+  </p>
+  <button class="scheme-toggle" onclick="document.body.dataset.scheme = document.body.dataset.scheme === 'dark' ? 'light' : 'dark'">
+    🌗 Toggle light / dark · 切換淺色／深色
+  </button>
+
+  <h2>Plain-text mode (default) · 純文字模式（預設）</h2>
+  <p class="caption">Click the ⚙ icon to open the anchored builder popover.</p>
+  <div class="search-field-wrap">
+    <div class="search-field">
+      <span aria-hidden="true">🔍</span>
+      <input type="text" placeholder="Search achievements… · 搜尋成就…" value="bakery" aria-label="Search achievements · 搜尋成就" />
+      <button class="builder-toggle" id="builderToggle" aria-pressed="false" aria-label="Open regex builder · 開啟規則運算式產生器" onclick="document.getElementById('pop').classList.toggle('open'); this.setAttribute('aria-pressed', document.getElementById('pop').classList.contains('open'));">⚙</button>
+    </div>
+    <div class="popover open" id="pop">
+      <h3>Regex builder · 規則運算式產生器</h3>
+      <div class="mode-row" role="group" aria-label="Search mode · 搜尋模式">
+        <button aria-pressed="true">Plain text · 純文字</button>
+        <button aria-pressed="false">Regex · 規則運算式</button>
+      </div>
+      <div>
+        <label for="patternInput">Pattern · 規則</label>
+        <input type="text" id="patternInput" value="bak(ery|eries)" />
+      </div>
+      <div class="flag-row">
+        <label><input type="checkbox" checked /> Ignore case · 忽略大小寫</label>
+        <label><input type="checkbox" /> Multiline · 多行</label>
+        <label><input type="checkbox" /> Unicode · Unicode</label>
+      </div>
+      <div>
+        <label>Live matches against sample list · 即時對照樣本清單</label>
+        <div class="match-preview">
+          Grandma's <mark>Bakery</mark><br/>
+          Cookie Farm<br/>
+          Rolling <mark>Bakeries</mark> Guild
+        </div>
+      </div>
+      <p class="caption" style="margin:0;">2 of 3 rows match · 3 項入面有 2 項符合。Evaluated locally, bounded, never transmitted.</p>
+    </div>
+  </div>
+
+  <h2>Regex mode enabled · 已開啟規則運算式模式</h2>
+  <p class="caption">The search field itself shows an active-regex indicator so the mode is visible even with the popover closed.</p>
+  <div class="search-field-wrap">
+    <div class="search-field" style="border-color: var(--md-primary);">
+      <span aria-hidden="true">🔍</span>
+      <input type="text" placeholder="Search…" value="bak(ery|eries)" aria-label="Search achievements, regex mode active · 搜尋成就，規則運算式模式已啟用" />
+      <button class="builder-toggle" aria-pressed="true" aria-label="Regex builder open, regex mode active · 規則運算式產生器已開啟">.*</button>
+    </div>
+  </div>
+</body>
+</html>

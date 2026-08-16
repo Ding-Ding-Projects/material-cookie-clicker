@@ -7,64 +7,86 @@
 <title>Material Cookie Clicker · Achievement Badge</title>
 <style>
   :root {
-    --md-primary: #7A4A1D; --md-on-primary: #FFFFFF;
-    --md-tertiary: #5C4E00; --md-on-tertiary: #FFFFFF;
+    --md-primary: #7A4A1D; --md-on-primary: #FFFFFF; --md-primary-shadow: #4A2A0A;
+    --md-tertiary: #5C4E00; --md-on-tertiary: #FFFFFF; --md-tertiary-shadow: #3A3000;
     --md-tertiary-container: #F8E287; --md-on-tertiary-container: #221B00;
     --md-surface: #FFF8F3; --md-on-surface: #211A14;
     --md-surface-variant: #F0E0D0; --md-on-surface-variant: #4F4539;
     --md-outline: #7C6F64;
     --md-surface-container: #FCEBDD;
     --md-surface-container-high: #F7E5D6;
+    --spark: #FFC72C; --spark-glow: #FFE066; --spark-ring: #D97300;
     --font-en: -apple-system, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
     --font-zh: "Segoe UI", "Microsoft JhengHei", var(--font-en);
+    --font-display: "Segoe UI Black", "Arial Black", "Segoe UI", var(--font-en);
+    --shape-full: 999px; --shape-md: 18px;
+    --border-thick: 3px; --border-chunky: 4px;
   }
   [data-scheme="dark"] {
-    --md-primary: #FFB876; --md-on-primary: #4A2800;
-    --md-tertiary: #DBC66E; --md-on-tertiary: #383000;
+    --md-primary: #FFB876; --md-on-primary: #4A2800; --md-primary-shadow: #A66A2E;
+    --md-tertiary: #DBC66E; --md-on-tertiary: #383000; --md-tertiary-shadow: #8F7A20;
     --md-tertiary-container: #514600; --md-on-tertiary-container: #F8E287;
     --md-surface: #18120D; --md-on-surface: #EDE0D9;
     --md-surface-variant: #4F4539; --md-on-surface-variant: #D3C4B4;
     --md-outline: #9C8F83;
     --md-surface-container: #251D17;
     --md-surface-container-high: #302722;
+    --spark: #FFD666; --spark-glow: #FFE8A3; --spark-ring: #FFC24D;
   }
   * { box-sizing: border-box; }
   body { margin: 0; font-family: var(--font-en); background: var(--md-surface); color: var(--md-on-surface); padding: 24px; }
-  h1 { font-size: 28px; margin: 0 0 4px; }
+  h1 { font-family: var(--font-display); font-size: 30px; margin: 0 0 4px; }
   h2 { font-size: 18px; margin: 32px 0 8px; }
   p.lede, p.caption { color: var(--md-on-surface-variant); max-width: 74ch; }
   button.scheme-toggle {
-    font: inherit; font-weight: 600; padding: 10px 18px; min-height: 44px;
-    border-radius: 999px; border: 1px solid var(--md-outline);
+    font: inherit; font-weight: 700; padding: 10px 20px; min-height: 44px;
+    border-radius: var(--shape-full); border: var(--border-thick) solid var(--md-outline);
     background: var(--md-surface-container); color: var(--md-on-surface); cursor: pointer; margin: 16px 0 24px;
+    box-shadow: 0 3px 0 0 var(--md-outline); transition: transform 90ms ease, box-shadow 90ms ease;
   }
+  button.scheme-toggle:active { transform: translateY(3px); box-shadow: none; }
+  @media (prefers-reduced-motion: reduce) { button.scheme-toggle { transition: none; } button.scheme-toggle:active { transform: none; } }
   button.scheme-toggle:focus-visible { outline: 3px solid var(--md-primary); outline-offset: 2px; }
   .row { display: flex; gap: 24px; flex-wrap: wrap; align-items: flex-start; }
-  .cell { display: flex; flex-direction: column; align-items: center; gap: 8px; width: 140px; }
+  .cell { display: flex; flex-direction: column; align-items: center; gap: 8px; width: 150px; }
+
+  /* Medal-style badge: a chunky outer ring plus an inset highlight bevel so it reads as a real
+     minted medal rather than a flat coloured circle. */
   .badge {
-    width: 72px; height: 72px; border-radius: 999px;
-    display: flex; align-items: center; justify-content: center; font-size: 30px;
+    width: 80px; height: 80px; border-radius: var(--shape-full);
+    display: flex; align-items: center; justify-content: center; font-size: 32px;
+    border: var(--border-chunky) solid transparent;
   }
   .badge.locked {
     background: var(--md-surface-variant); color: var(--md-on-surface-variant);
-    filter: grayscale(1) brightness(0.75);
+    border-color: var(--md-outline);
+    filter: grayscale(1) brightness(0.8);
+    box-shadow: inset 0 3px 0 0 rgba(255,255,255,0.25), inset 0 -4px 0 0 rgba(0,0,0,0.15);
   }
   .badge.unlocked {
-    background: var(--md-tertiary-container); color: var(--md-on-tertiary-container);
-    border: 3px solid var(--md-tertiary);
-    box-shadow: 0 0 12px 2px var(--md-tertiary-container);
+    background: radial-gradient(circle at 35% 30%, var(--spark-glow), var(--md-tertiary) 72%);
+    color: var(--md-on-tertiary);
+    border-color: var(--spark-ring);
+    box-shadow:
+      inset 0 3px 0 0 rgba(255,255,255,0.45),
+      inset 0 -6px 0 0 var(--md-tertiary-shadow),
+      0 0 0 4px var(--md-tertiary-container),
+      0 0 16px 2px var(--spark-glow);
   }
-  .badge:focus-visible { outline: 3px solid var(--md-primary); outline-offset: 3px; }
-  .badge-name { font-size: 13px; font-weight: 600; text-align: center; }
+  .badge:focus-visible { outline: 4px solid var(--md-primary); outline-offset: 4px; }
+  .badge-name { font-size: 13px; font-weight: 700; text-align: center; }
   .badge-name-zh { font-family: var(--font-zh); font-size: 12px; color: var(--md-on-surface-variant); text-align: center; }
 
   .toast {
     position: fixed; bottom: 24px; right: 24px;
     background: var(--md-surface-container-high); color: var(--md-on-surface);
-    border-radius: 12px; padding: 12px 16px; display: flex; gap: 12px; align-items: center;
-    box-shadow: 0 4px 12px rgba(0,0,0,0.3); max-width: 320px;
+    border-radius: var(--shape-md); padding: 14px 18px; display: flex; gap: 12px; align-items: center;
+    border: var(--border-thick) solid var(--md-outline);
+    border-left: 6px solid var(--spark-ring);
+    box-shadow: 0 5px 0 0 var(--md-outline);
+    max-width: 320px;
   }
-  .toast .badge { width: 40px; height: 40px; font-size: 18px; flex-shrink: 0; }
+  .toast .badge { width: 44px; height: 44px; font-size: 20px; flex-shrink: 0; }
   .toast-text { font-size: 13px; }
   .toast-text strong { display: block; font-size: 14px; }
 </style>
@@ -72,10 +94,11 @@
 <body data-scheme="light">
   <h1>Achievement badge · 成就徽章</h1>
   <p class="lede">
-    Locked badges render as a greyscale silhouette so a player knows an achievement exists
-    without spoiling its name or icon; unlocked badges show the full-colour icon in the
-    tertiary role with a glow, matching the golden-cookie visual language.
-    <span style="font-family:var(--font-zh); display:block;">未解鎖嘅徽章淨係顯示灰色剪影，解鎖之後先顯示全色圖示同金光效果。</span>
+    Locked badges render as a greyscale silhouette with a dulled bevel so a player knows an
+    achievement exists without spoiling its name or icon; unlocked badges are struck like a real
+    minted medal — a bright radial fill, a chunky ring in the arcade spark accent, and a bevelled
+    highlight — matching the golden-cookie visual language.
+    <span style="font-family:var(--font-zh); display:block;">未解鎖嘅徽章淨係顯示灰色剪影，解鎖之後先顯示好似真獎牌咁嘅金色圖示同光環效果。</span>
   </p>
   <button class="scheme-toggle" onclick="document.body.dataset.scheme = document.body.dataset.scheme === 'dark' ? 'light' : 'dark'">
     🌗 Toggle light / dark · 切換淺色／深色
@@ -97,8 +120,10 @@
 
   <h2>Unlock toast · 解鎖提示</h2>
   <p class="caption">
-    A non-blocking, corner-anchored toast fires the moment an achievement unlocks. Auto-dismisses
-    after ~6s; hovering or focusing it pauses the timer. Never modal, never interrupts a click.
+    A non-blocking, corner-anchored toast fires the moment an achievement unlocks, with a chunky
+    offset shadow and a spark-accent left border so it reads as a celebratory pop-up rather than a
+    routine system message. Auto-dismisses after ~6s; hovering or focusing it pauses the timer.
+    Never modal, never interrupts a click.
   </p>
   <div class="row" style="position: relative; height: 140px; width: 100%;">
     <div class="toast" style="position: absolute; bottom: 0; right: 0;">

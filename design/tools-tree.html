@@ -14,8 +14,14 @@
     --md-outline: #7C6F64;
     --md-surface-container: #FCEBDD;
     --md-surface-container-high: #F7E5D6;
+    --tier1: var(--md-primary); --on-tier1: var(--md-on-primary); --tier1-container: var(--md-primary-container); --on-tier1-container: var(--md-on-primary-container);
+    --tier2: #256B3B; --on-tier2: #FFFFFF; --tier2-container: #B8F0C4; --on-tier2-container: #04210D;
+    --tier3: #5B3B9C; --on-tier3: #FFFFFF; --tier3-container: #E6D9FF; --on-tier3-container: #20004D;
     --font-en: -apple-system, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
     --font-zh: "Segoe UI", "Microsoft JhengHei", var(--font-en);
+    --font-display: "Segoe UI Black", "Arial Black", "Segoe UI", var(--font-en);
+    --shape-full: 999px; --shape-md: 18px; --shape-sm: 12px; --shape-lg: 26px;
+    --border-thick: 3px; --border-chunky: 4px;
   }
   [data-scheme="dark"] {
     --md-primary: #FFB876; --md-on-primary: #4A2800; --md-primary-container: #693C00; --md-on-primary-container: #FFDCB8;
@@ -25,51 +31,61 @@
     --md-outline: #9C8F83;
     --md-surface-container: #251D17;
     --md-surface-container-high: #302722;
+    --tier1: var(--md-primary); --on-tier1: var(--md-on-primary); --tier1-container: var(--md-primary-container); --on-tier1-container: var(--md-on-primary-container);
+    --tier2: #8FE3A6; --on-tier2: #0C3018; --tier2-container: #1B4A28; --on-tier2-container: #B8F0C4;
+    --tier3: #CFBCFF; --on-tier3: #2A0A5C; --tier3-container: #3B2465; --on-tier3-container: #E6D9FF;
   }
   * { box-sizing: border-box; }
   body { margin: 0; font-family: var(--font-en); background: var(--md-surface); color: var(--md-on-surface); padding: 24px; }
-  h1 { font-size: 28px; margin: 0 0 4px; }
+  h1 { font-family: var(--font-display); font-size: 30px; margin: 0 0 4px; }
   h2 { font-size: 18px; margin: 32px 0 8px; }
   p.lede, p.caption { color: var(--md-on-surface-variant); max-width: 74ch; }
   button.scheme-toggle {
-    font: inherit; font-weight: 600; padding: 10px 18px; min-height: 44px;
-    border-radius: 999px; border: 1px solid var(--md-outline);
+    font: inherit; font-weight: 700; padding: 10px 20px; min-height: 44px;
+    border-radius: var(--shape-full); border: var(--border-thick) solid var(--md-outline);
     background: var(--md-surface-container); color: var(--md-on-surface); cursor: pointer; margin: 16px 0 24px;
+    box-shadow: 0 3px 0 0 var(--md-outline); transition: transform 90ms ease, box-shadow 90ms ease;
   }
+  button.scheme-toggle:active { transform: translateY(3px); box-shadow: none; }
+  @media (prefers-reduced-motion: reduce) { button.scheme-toggle { transition: none; } button.scheme-toggle:active { transform: none; } }
   button.scheme-toggle:focus-visible { outline: 3px solid var(--md-primary); outline-offset: 2px; }
 
   /* --- Summary + progression toggle --- */
   .summary-bar {
     display: flex; align-items: center; gap: 20px; flex-wrap: wrap;
-    background: var(--md-surface-container-high); border-radius: 12px; padding: 14px 18px; margin-bottom: 20px;
+    background: var(--md-surface-container-high); border-radius: var(--shape-md);
+    border: var(--border-thick) solid var(--md-outline);
+    padding: 16px 20px; margin-bottom: 22px;
   }
-  .summary-count { font-weight: 700; font-size: 15px; }
-  .summary-track { width: 180px; height: 8px; border-radius: 999px; background: var(--md-surface-variant); overflow: hidden; }
-  .summary-fill { height: 100%; background: var(--md-primary); width: 41%; }
+  .summary-count { font-family: var(--font-display); font-weight: 900; font-size: 16px; font-variant-numeric: tabular-nums; }
+  .summary-track { width: 190px; height: 12px; border-radius: var(--shape-full); background: var(--md-surface-variant); overflow: hidden; border: 1px solid var(--md-outline); }
+  .summary-fill { height: 100%; background: linear-gradient(90deg, var(--tier1), var(--tier2)); width: 41%; }
   .progression-toggle-wrap { margin-left: auto; display: flex; align-items: center; gap: 8px; }
   .progression-toggle {
-    width: 52px; height: 30px; border-radius: 999px; border: 2px solid var(--md-outline); background: var(--md-surface);
+    width: 56px; height: 32px; border-radius: var(--shape-full); border: var(--border-chunky) solid var(--md-outline); background: var(--md-surface);
     position: relative; cursor: pointer;
   }
   .progression-toggle::after {
-    content: ""; position: absolute; top: 2px; left: 2px; width: 22px; height: 22px; border-radius: 999px;
+    content: ""; position: absolute; top: 2px; left: 2px; width: 22px; height: 22px; border-radius: var(--shape-full);
     background: var(--md-outline); transition: transform 150ms ease;
   }
+  @media (prefers-reduced-motion: reduce) { .progression-toggle::after { transition: none; } }
   .progression-toggle[aria-pressed="true"] { border-color: var(--md-primary); }
-  .progression-toggle[aria-pressed="true"]::after { transform: translateX(22px); background: var(--md-primary); }
+  .progression-toggle[aria-pressed="true"]::after { transform: translateX(24px); background: var(--md-primary); }
   .progression-toggle:focus-visible { outline: 3px solid var(--md-primary); outline-offset: 2px; }
-  .progression-label { font-size: 13px; font-weight: 600; }
+  .progression-label { font-size: 13px; font-weight: 700; }
 
   .toggle-note {
     background: var(--md-primary-container); color: var(--md-on-primary-container);
-    border-radius: 10px; padding: 10px 14px; font-size: 12px; margin-bottom: 20px; max-width: 74ch;
+    border-radius: var(--shape-sm); border: var(--border-thin) solid var(--md-primary);
+    padding: 12px 16px; font-size: 12px; margin-bottom: 22px; max-width: 74ch;
   }
 
   /* --- Search --- */
-  .search-field-wrap { position: relative; max-width: 420px; margin-bottom: 28px; }
+  .search-field-wrap { position: relative; max-width: 420px; margin-bottom: 30px; }
   .search-field {
     display: flex; align-items: center; gap: 8px;
-    border: 1px solid var(--md-outline); border-radius: 999px;
+    border: var(--border-thick) solid var(--md-outline); border-radius: var(--shape-full);
     background: var(--md-surface-container-high);
     padding: 4px 6px 4px 16px;
   }
@@ -78,61 +94,76 @@
     min-height: 40px; color: var(--md-on-surface); outline: none;
   }
   .builder-toggle {
-    width: 40px; height: 40px; border-radius: 999px; border: none; background: transparent;
+    width: 42px; height: 42px; border-radius: var(--shape-full); border: none; background: transparent;
     color: var(--md-on-surface-variant); cursor: pointer; font-size: 16px;
     display: flex; align-items: center; justify-content: center;
   }
   .builder-toggle:focus-visible, .search-field input:focus-visible { outline: 3px solid var(--md-primary); outline-offset: 2px; }
   .popover {
-    position: absolute; top: calc(100% + 8px); left: 0; width: 340px;
+    position: absolute; top: calc(100% + 10px); left: 0; width: 340px;
     background: var(--md-surface-container-high); color: var(--md-on-surface);
-    border-radius: 16px; padding: 16px;
-    box-shadow: 0 2px 3px rgba(0,0,0,0.30), 0 6px 10px 4px rgba(0,0,0,0.15);
+    border-radius: var(--shape-lg); padding: 18px;
+    border: var(--border-chunky) solid var(--md-outline);
+    box-shadow: 0 6px 0 0 var(--md-outline);
     display: none; flex-direction: column; gap: 10px;
-    border: 1px solid var(--md-outline);
     z-index: 5;
   }
   .popover.open { display: flex; }
-  .popover label { font-size: 12px; font-weight: 600; display: block; margin-bottom: 4px; }
+  .popover label { font-size: 12px; font-weight: 700; display: block; margin-bottom: 4px; }
   .popover input[type="text"] {
-    width: 100%; min-height: 40px; border-radius: 8px; border: 1px solid var(--md-outline);
+    width: 100%; min-height: 40px; border-radius: var(--shape-sm); border: var(--border-thin) solid var(--md-outline);
     padding: 0 10px; font: inherit; font-size: 13px; background: var(--md-surface); color: var(--md-on-surface);
   }
 
   /* --- Tiers --- */
-  .tier { margin-bottom: 32px; }
-  .tier-heading { display: flex; align-items: center; gap: 10px; margin-bottom: 4px; }
-  .tier-heading h3 { margin: 0; font-size: 16px; }
+  .tier { margin-bottom: 36px; }
+  .tier-heading { display: flex; align-items: center; gap: 10px; margin-bottom: 6px; }
+  .tier-heading h3 { margin: 0; font-family: var(--font-display); font-size: 17px; }
+  .tier-chip {
+    display: inline-flex; align-items: center; font-weight: 800; font-size: 11px;
+    padding: 3px 10px; border-radius: var(--shape-full);
+    background: var(--tier-accent); color: var(--on-tier-accent);
+  }
   .tier-heading .tier-zh { font-family: var(--font-zh); font-size: 13px; color: var(--md-on-surface-variant); }
   .tier-row { display: flex; gap: 16px; flex-wrap: wrap; align-items: stretch; }
-  .prereq-arrow { align-self: center; font-size: 20px; color: var(--md-on-surface-variant); }
+  .prereq-arrow { align-self: center; font-size: 22px; color: var(--md-on-surface-variant); font-weight: 900; }
+
+  /* Every .tier block sets its own jewel-tone custom properties; .node children inherit them via
+     the cascade, so one tier accent drives the chip, the node top-stripe, and the ready-state glow. */
+  .tier[data-tier="1"] { --tier-accent: var(--tier1); --on-tier-accent: var(--on-tier1); --tier-accent-container: var(--tier1-container); --on-tier-accent-container: var(--on-tier1-container); }
+  .tier[data-tier="2"] { --tier-accent: var(--tier2); --on-tier-accent: var(--on-tier2); --tier-accent-container: var(--tier2-container); --on-tier-accent-container: var(--on-tier2-container); }
+  .tier[data-tier="3"] { --tier-accent: var(--tier3); --on-tier-accent: var(--on-tier3); --tier-accent-container: var(--tier3-container); --on-tier-accent-container: var(--on-tier3-container); }
 
   .node {
-    width: 200px; border-radius: 12px; padding: 12px; background: var(--md-surface-container-high);
+    width: 210px; border-radius: var(--shape-md); padding: 14px; background: var(--md-surface-container-high);
+    border: var(--border-thick) solid var(--md-outline);
+    border-top: 7px solid var(--tier-accent);
     display: flex; flex-direction: column; gap: 6px; font-size: 12px;
   }
-  .node .icon { font-size: 22px; }
-  .node .name-en { font-weight: 700; font-size: 13px; }
+  .node .icon { font-size: 24px; }
+  .node .name-en { font-weight: 800; font-size: 13px; }
   .node .name-zh { font-family: var(--font-zh); color: var(--md-on-surface-variant); }
   .node .state-chip {
-    align-self: flex-start; border-radius: 999px; padding: 2px 8px; font-size: 10px; font-weight: 700;
+    align-self: flex-start; border-radius: var(--shape-full); padding: 2px 9px; font-size: 10px; font-weight: 800;
   }
-  .node.state-undiscovered { filter: grayscale(1); }
+  .node.state-undiscovered { filter: grayscale(1); border-style: dashed; }
   .node.state-undiscovered .state-chip { background: var(--md-surface-variant); color: var(--md-on-surface-variant); }
   .node.state-locked .state-chip { background: var(--md-surface-variant); color: var(--md-on-surface-variant); }
-  .node.state-ready .state-chip { background: var(--md-primary-container); color: var(--md-on-primary-container); }
-  .node.state-unlocked { border: 2px solid var(--md-tertiary); background: var(--md-tertiary-container); }
-  .node.state-unlocked .name-en, .node.state-unlocked .name-zh { color: var(--md-on-tertiary-container); }
-  .node.state-unlocked .state-chip { background: var(--md-tertiary); color: var(--md-on-tertiary); }
-  .node .mini-progress { height: 5px; border-radius: 999px; background: var(--md-surface-variant); overflow: hidden; }
-  .node .mini-progress-fill { height: 100%; background: var(--md-primary); }
+  .node.state-ready { box-shadow: 0 0 0 3px var(--tier-accent-container); }
+  .node.state-ready .state-chip { background: var(--tier-accent-container); color: var(--on-tier-accent-container); }
+  .node.state-unlocked { border: var(--border-chunky) solid var(--tier-accent); background: var(--tier-accent-container); box-shadow: 0 0 14px 1px var(--tier-accent); }
+  .node.state-unlocked .name-en, .node.state-unlocked .name-zh { color: var(--on-tier-accent-container); }
+  .node.state-unlocked .state-chip { background: var(--tier-accent); color: var(--on-tier-accent); }
+  .node .mini-progress { height: 6px; border-radius: var(--shape-full); background: var(--md-surface-variant); overflow: hidden; }
+  .node .mini-progress-fill { height: 100%; background: var(--tier-accent); }
+  .node div:not(.icon):not(.state-chip) { font-variant-numeric: tabular-nums; }
   .node .open-link {
-    margin-top: auto; padding-top: 6px; border-top: 1px solid var(--md-outline);
+    margin-top: auto; padding-top: 7px; border-top: var(--border-thin) solid var(--md-outline);
     font-size: 10px; display: flex; justify-content: space-between; align-items: center; gap: 4px;
   }
   .node .open-link button {
-    font: inherit; font-size: 10px; font-weight: 700; min-height: 28px; padding: 0 8px;
-    border-radius: 999px; border: 1px solid var(--md-primary); background: transparent; color: var(--md-primary); cursor: pointer;
+    font: inherit; font-size: 10px; font-weight: 800; min-height: 30px; padding: 0 9px;
+    border-radius: var(--shape-full); border: var(--border-thin) solid var(--md-primary); background: var(--md-surface); color: var(--md-primary); cursor: pointer;
   }
   .node .open-link button:focus-visible { outline: 3px solid var(--md-primary); outline-offset: 2px; }
 </style>
@@ -142,9 +173,11 @@
   <p class="lede">
     The tech-tree overview screen: tools grouped by tier with prerequisite relationships shown as
     arrows between nodes, a progress summary, its own search field with the anchored regex
-    builder, and every mixed node state at a glance.
+    builder, and every mixed node state at a glance. Each tier is struck in a genuinely different
+    jewel tone — bronze, then emerald, then amethyst — so the ladder visibly escalates as you
+    scroll down rather than reading as one colour getting slightly darker.
     <span style="font-family:var(--font-zh); display:block; margin-top:4px;">
-      工具科技樹總覽：按層級分組，用箭頭顯示前置條件，有進度摘要同自己嘅搜尋欄。
+      工具科技樹總覽：按層級分組，用箭頭顯示前置條件，有進度摘要同自己嘅搜尋欄。每層用唔同嘅寶石色，一眼睇得出愈嚟愈高級。
     </span>
   </p>
   <button class="scheme-toggle" onclick="document.body.dataset.scheme = document.body.dataset.scheme === 'dark' ? 'light' : 'dark'">
@@ -184,9 +217,10 @@
     </div>
   </div>
 
-  <div class="tier">
+  <div class="tier" data-tier="1">
     <div class="tier-heading">
-      <h3>Tier 1 · 第一層</h3>
+      <h3>Tier 1</h3>
+      <span class="tier-chip">🥉 Bronze · 青銅</span>
       <span class="tier-zh">Early game · 遊戲初期</span>
     </div>
     <div class="tier-row">
@@ -224,9 +258,10 @@
     </div>
   </div>
 
-  <div class="tier">
+  <div class="tier" data-tier="2">
     <div class="tier-heading">
-      <h3>Tier 2 · 第二層</h3>
+      <h3>Tier 2</h3>
+      <span class="tier-chip">💚 Emerald · 翡翠</span>
       <span class="tier-zh">Requires 2 Tier 1 tools unlocked · 需要解鎖 2 個第一層工具</span>
     </div>
     <div class="tier-row">
@@ -268,9 +303,10 @@
     </div>
   </div>
 
-  <div class="tier">
+  <div class="tier" data-tier="3">
     <div class="tier-heading">
-      <h3>Tier 3 · 第三層</h3>
+      <h3>Tier 3</h3>
+      <span class="tier-chip">💜 Amethyst · 紫水晶</span>
       <span class="tier-zh">Requires first prestige run · 需要完成第一次轉生</span>
     </div>
     <div class="tier-row">

@@ -7,109 +7,167 @@
 <title>Material Cookie Clicker · Cookie Surface · Primary Click Target</title>
 <style>
   :root {
-    --md-primary: #7A4A1D; --md-on-primary: #FFFFFF;
+    --md-primary: #7A4A1D; --md-on-primary: #FFFFFF; --md-primary-shadow: #4A2A0A;
     --md-primary-container: #FFDCB8; --md-on-primary-container: #3A2100;
-    --md-tertiary: #5C4E00; --md-on-tertiary: #FFFFFF;
+    --md-tertiary: #5C4E00; --md-on-tertiary: #FFFFFF; --md-tertiary-shadow: #3A3000;
     --md-tertiary-container: #F8E287; --md-on-tertiary-container: #221B00;
     --md-surface: #FFF8F3; --md-on-surface: #211A14;
     --md-surface-variant: #F0E0D0; --md-on-surface-variant: #4F4539;
     --md-outline: #7C6F64;
-    --md-surface-container: #FCEBDD;
+    --md-surface-container: #FCEBDD; --md-surface-container-low: #FFF1E6;
+    --spark: #FFC72C; --spark-glow: #FFE066; --spark-ring: #D97300;
     --font-en: -apple-system, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
     --font-zh: "Segoe UI", "Microsoft JhengHei", var(--font-en);
+    --font-display: "Segoe UI Black", "Arial Black", "Segoe UI", var(--font-en);
+    --shape-full: 999px; --shape-md: 18px; --shape-lg: 26px;
+    --border-thick: 3px; --border-chunky: 4px;
+    --press-3: 7px;
   }
   [data-scheme="dark"] {
-    --md-primary: #FFB876; --md-on-primary: #4A2800;
+    --md-primary: #FFB876; --md-on-primary: #4A2800; --md-primary-shadow: #A66A2E;
     --md-primary-container: #693C00; --md-on-primary-container: #FFDCB8;
-    --md-tertiary: #DBC66E; --md-on-tertiary: #383000;
+    --md-tertiary: #DBC66E; --md-on-tertiary: #383000; --md-tertiary-shadow: #8F7A20;
     --md-tertiary-container: #514600; --md-on-tertiary-container: #F8E287;
     --md-surface: #18120D; --md-on-surface: #EDE0D9;
     --md-surface-variant: #4F4539; --md-on-surface-variant: #D3C4B4;
     --md-outline: #9C8F83;
-    --md-surface-container: #251D17;
+    --md-surface-container: #251D17; --md-surface-container-low: #211A14;
+    --spark: #FFD666; --spark-glow: #FFE8A3; --spark-ring: #FFC24D;
   }
   * { box-sizing: border-box; }
-  body { margin: 0; font-family: var(--font-en); background: var(--md-surface); color: var(--md-on-surface); padding: 24px; }
-  h1 { font-size: 28px; margin: 0 0 4px; }
+  body {
+    margin: 0; font-family: var(--font-en); color: var(--md-on-surface); padding: 24px;
+    /* Cosy oven-glow ambiance: a very soft radial warmth behind the whole page, never behind text
+       blocks, self-contained CSS — no image asset. */
+    background:
+      radial-gradient(ellipse 900px 500px at 50% -10%, var(--md-primary-container) 0%, transparent 60%),
+      var(--md-surface);
+    background-attachment: fixed;
+  }
+  [data-scheme="dark"] body {
+    background:
+      radial-gradient(ellipse 900px 500px at 50% -10%, var(--md-primary-shadow) 0%, transparent 60%),
+      var(--md-surface);
+    background-attachment: fixed;
+  }
+  h1 { font-family: var(--font-display); font-size: 30px; margin: 0 0 4px; }
   h2 { font-size: 18px; margin: 32px 0 8px; }
   p.lede, p.caption { color: var(--md-on-surface-variant); max-width: 74ch; }
   button.scheme-toggle {
-    font: inherit; font-weight: 600; padding: 10px 18px; min-height: 44px;
-    border-radius: 999px; border: 1px solid var(--md-outline);
+    font: inherit; font-weight: 700; padding: 10px 20px; min-height: 44px;
+    border-radius: var(--shape-full); border: var(--border-thick) solid var(--md-outline);
     background: var(--md-surface-container); color: var(--md-on-surface); cursor: pointer; margin: 16px 0 24px;
+    box-shadow: 0 3px 0 0 var(--md-outline); transition: transform 90ms ease, box-shadow 90ms ease;
   }
+  button.scheme-toggle:active { transform: translateY(3px); box-shadow: none; }
   button.scheme-toggle:focus-visible { outline: 3px solid var(--md-primary); outline-offset: 2px; }
   .grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(220px, 1fr)); gap: 24px; }
   .cell { display: flex; flex-direction: column; align-items: center; gap: 10px; }
   .state-label { font-weight: 700; font-size: 14px; }
 
-  /* --- The real cookie button, minimum 88x88 target --- */
+  /* --- The real cookie button, minimum 88x88 target ---
+     Chunky pressable depth: a SOLID offset shadow (--md-primary-shadow, a darker baked-brown, not
+     a blur) sits under the cookie. On :active the button drops down by the shadow's own offset and
+     the shadow disappears, so it visibly compresses into the counter like an arcade-cabinet button. */
   .cookie-btn {
     position: relative;
-    width: 96px; height: 96px;
-    border-radius: 999px;
+    width: 104px; height: 104px;
+    border-radius: var(--shape-full);
     border: none;
     cursor: pointer;
-    background: radial-gradient(circle at 35% 30%, var(--md-primary-container), var(--md-primary) 70%);
-    box-shadow: 0 4px 10px rgba(0,0,0,0.25), inset 0 -6px 10px rgba(0,0,0,0.18);
+    background: radial-gradient(circle at 35% 28%, var(--md-primary-container), var(--md-primary) 68%);
+    box-shadow: 0 var(--press-3) 0 0 var(--md-primary-shadow), inset 0 -8px 12px rgba(0,0,0,0.20);
     display: flex; align-items: center; justify-content: center;
-    font-size: 34px;
-    transition: transform 120ms ease;
+    font-size: 38px;
+    transition: transform 110ms ease, box-shadow 110ms ease;
   }
   .cookie-btn::before {
-    /* chocolate-chip texture via layered radial-gradients — no image assets */
+    /* chocolate-chip texture via layered radial-gradients — no image assets, bigger + bolder chips */
     content: "";
-    position: absolute; inset: 6px;
-    border-radius: 999px;
+    position: absolute; inset: 8px;
+    border-radius: var(--shape-full);
     background-image:
-      radial-gradient(circle at 25% 30%, var(--md-on-primary-container) 4%, transparent 5%),
-      radial-gradient(circle at 60% 20%, var(--md-on-primary-container) 4%, transparent 5%),
-      radial-gradient(circle at 75% 55%, var(--md-on-primary-container) 4%, transparent 5%),
-      radial-gradient(circle at 40% 65%, var(--md-on-primary-container) 4%, transparent 5%),
-      radial-gradient(circle at 20% 75%, var(--md-on-primary-container) 4%, transparent 5%);
-    opacity: 0.55;
+      radial-gradient(circle at 25% 30%, var(--md-on-primary-container) 5%, transparent 6%),
+      radial-gradient(circle at 60% 18%, var(--md-on-primary-container) 5%, transparent 6%),
+      radial-gradient(circle at 78% 55%, var(--md-on-primary-container) 5%, transparent 6%),
+      radial-gradient(circle at 40% 66%, var(--md-on-primary-container) 5%, transparent 6%),
+      radial-gradient(circle at 18% 76%, var(--md-on-primary-container) 5%, transparent 6%),
+      radial-gradient(circle at 55% 45%, var(--md-on-primary-container) 5%, transparent 6%);
+    opacity: 0.6;
   }
-  .cookie-btn:hover { transform: scale(1.04); }
-  .cookie-btn:active { transform: scale(0.94); }
-  .cookie-btn:focus-visible { outline: 3px solid var(--md-tertiary); outline-offset: 4px; }
+  .cookie-btn:hover { transform: translateY(-3px) scale(1.04); box-shadow: 0 calc(var(--press-3) + 3px) 0 0 var(--md-primary-shadow), inset 0 -8px 12px rgba(0,0,0,0.20); }
+  .cookie-btn:active {
+    transform: translateY(var(--press-3)) scale(0.96);
+    box-shadow: 0 0 0 0 var(--md-primary-shadow), inset 0 -3px 6px rgba(0,0,0,0.22);
+  }
+  .cookie-btn:focus-visible { outline: 4px solid var(--md-tertiary); outline-offset: 5px; }
   .cookie-btn[disabled] { opacity: 0.5; cursor: default; }
 
+  @media (prefers-reduced-motion: reduce) {
+    .cookie-btn { transition: none; }
+    .cookie-btn:hover, .cookie-btn:active { transform: none; }
+  }
+  /* Demo-only class to preview the reduced-motion equivalent regardless of the real OS setting */
+  .reduced-motion .cookie-btn { transition: none; }
   .reduced-motion .cookie-btn:hover,
   .reduced-motion .cookie-btn:active { transform: none; }
 
   .popup {
     position: relative;
     display: inline-flex; align-items: center; justify-content: center;
-    min-width: 64px; padding: 8px 14px; border-radius: 999px;
+    min-width: 68px; padding: 8px 16px; border-radius: var(--shape-full);
     background: var(--md-primary); color: var(--md-on-primary);
-    font-weight: 700; font-size: 18px;
+    font-family: var(--font-display); font-weight: 900; font-size: 20px;
+    font-variant-numeric: tabular-nums;
+    box-shadow: 0 3px 0 0 var(--md-primary-shadow);
   }
 
-  .golden-overlay-wrap { position: relative; width: 96px; height: 96px; }
+  .golden-overlay-wrap { position: relative; width: 104px; height: 104px; }
+  /* Arcade sparkle burst: a bright radial glow plus a chunky ring in --spark-ring, replacing the
+     original muted tertiary-container haze. Uses the decorative --spark tokens, never text. */
   .golden-overlay {
-    position: absolute; inset: -8px;
-    border-radius: 999px;
-    background: radial-gradient(circle, var(--md-tertiary-container) 0%, transparent 72%);
-    filter: blur(1px);
+    position: absolute; inset: -18px;
+    border-radius: var(--shape-full);
+    background: radial-gradient(circle, var(--spark-glow) 0%, transparent 70%);
+    animation: pulse-glow 1.6s ease-in-out infinite;
   }
   .golden-ring {
-    position: absolute; inset: -4px;
-    border-radius: 999px;
-    border: 3px solid var(--md-tertiary);
-    box-shadow: 0 0 14px 4px var(--md-tertiary-container);
+    position: absolute; inset: -6px;
+    border-radius: var(--shape-full);
+    border: var(--border-chunky) solid var(--spark-ring);
+    box-shadow: 0 0 18px 5px var(--spark-glow);
   }
+  .golden-rays {
+    position: absolute; inset: -34px;
+    background: repeating-conic-gradient(from 0deg, var(--spark) 0deg 4deg, transparent 4deg 24deg);
+    border-radius: var(--shape-full);
+    opacity: 0.55;
+    mask: radial-gradient(circle, transparent 56%, black 58%, black 62%, transparent 64%);
+    -webkit-mask: radial-gradient(circle, transparent 56%, black 58%, black 62%, transparent 64%);
+    animation: spin-rays 6s linear infinite;
+  }
+  @keyframes pulse-glow { 0%, 100% { opacity: 0.85; transform: scale(1); } 50% { opacity: 1; transform: scale(1.08); } }
+  @keyframes spin-rays { from { transform: rotate(0deg); } to { transform: rotate(360deg); } }
+  @media (prefers-reduced-motion: reduce) {
+    .golden-overlay { animation: none; opacity: 1; }
+    .golden-rays { animation: none; }
+  }
+  .reduced-motion .golden-overlay { animation: none; opacity: 1; }
+  .reduced-motion .golden-rays { animation: none; }
 </style>
 </head>
 <body data-scheme="light">
   <h1>Cookie surface · 曲奇表面 — primary click target</h1>
   <p class="lede">
     The main <code>&lt;button&gt;</code> the whole game is built on. Minimum 88×88px hit target
-    (shown here at 96px), rendered with layered CSS radial-gradients for the chocolate-chip
-    texture — no image asset. States below: rest, hover, pressed, focus-visible, and
-    reduced-motion. The floating "+N" popup and the golden-cookie overlay are shown as separate
-    labelled variants since they compose onto the base button rather than replacing it.
+    (shown here at 104px), rendered with layered CSS radial-gradients for the chocolate-chip
+    texture — no image asset. Depth is a solid, offset "arcade cabinet" shadow in
+    <code>--md-primary-shadow</code> that compresses flat when pressed, not a Material 3 blur.
+    States below: rest, hover, pressed, focus-visible, and reduced-motion. The floating "+N" popup
+    and the golden-cookie overlay are shown as separate labelled variants since they compose onto
+    the base button rather than replacing it.
     <span style="font-family:var(--font-zh); display:block; margin-top:4px;">
-      成個遊戲嘅主按鈕。最少 88×88px 嘅可點擊範圍，用純CSS漸變畫出朱古力粒質感，唔使用圖片。
+      成個遊戲嘅主按鈕。最少 88×88px 嘅可點擊範圍，用純CSS漸變畫出朱古力粒質感，唔使用圖片。撳落去嗰陣個影會壓扁，好似街機掣咁。
     </span>
   </p>
   <button class="scheme-toggle" onclick="document.body.dataset.scheme = document.body.dataset.scheme === 'dark' ? 'light' : 'dark'">
@@ -121,20 +179,20 @@
     <div class="cell">
       <button class="cookie-btn" aria-label="Click the cookie · 撳曲奇">🍪</button>
       <div class="state-label">Rest · 靜止</div>
-      <p class="caption">Default idle state. Radial gradient gives it dimensionality without a bitmap.</p>
+      <p class="caption">Default idle state. The offset shadow beneath it is what makes it read as "press me", before any hover or click.</p>
     </div>
     <div class="cell">
-      <button class="cookie-btn" style="transform: scale(1.04);" aria-label="Click the cookie · 撳曲奇">🍪</button>
+      <button class="cookie-btn" style="transform: translateY(-3px) scale(1.04); box-shadow: 0 calc(var(--press-3) + 3px) 0 0 var(--md-primary-shadow), inset 0 -8px 12px rgba(0,0,0,0.20);" aria-label="Click the cookie · 撳曲奇">🍪</button>
       <div class="state-label">Hover · 滑鼠移入</div>
-      <p class="caption">Scales to 1.04x. Disabled entirely under reduced-motion (see below).</p>
+      <p class="caption">Lifts slightly and the shadow grows, as if it's rising off the counter. Disabled entirely under reduced-motion (see below).</p>
     </div>
     <div class="cell">
-      <button class="cookie-btn" style="transform: scale(0.94);" aria-label="Click the cookie · 撳曲奇">🍪</button>
+      <button class="cookie-btn" style="transform: translateY(var(--press-3)) scale(0.96); box-shadow: 0 0 0 0 var(--md-primary-shadow), inset 0 -3px 6px rgba(0,0,0,0.22);" aria-label="Click the cookie · 撳曲奇">🍪</button>
       <div class="state-label">Pressed · 撳落</div>
-      <p class="caption">Scales to 0.94x on :active. Same reduced-motion exemption applies.</p>
+      <p class="caption">Drops down by the shadow's own offset and the shadow disappears — the cookie visibly compresses into the counter. Same reduced-motion exemption applies.</p>
     </div>
     <div class="cell">
-      <button class="cookie-btn" style="outline: 3px solid var(--md-tertiary); outline-offset: 4px;" aria-label="Click the cookie · 撳曲奇">🍪</button>
+      <button class="cookie-btn" style="outline: 4px solid var(--md-tertiary); outline-offset: 5px;" aria-label="Click the cookie · 撳曲奇">🍪</button>
       <div class="state-label">Focus-visible · 鍵盤焦點</div>
       <p class="caption">Keyboard-reachable; tertiary-coloured ring meets 3:1 non-text contrast against the surface.</p>
     </div>
@@ -142,10 +200,11 @@
       <button class="cookie-btn" aria-label="Click the cookie · 撳曲奇">🍪</button>
       <div class="state-label">Reduced motion · 減少動態</div>
       <p class="caption">
-        When <code>prefers-reduced-motion: reduce</code>, hover/press scale transforms are
-        disabled entirely (this cell has <code>.reduced-motion</code> applied to demonstrate —
-        try hovering it, nothing moves). A brief opacity pulse replaces the scale in the shipped
-        app instead of removing feedback altogether.
+        When <code>prefers-reduced-motion: reduce</code>, hover/press transforms are disabled
+        entirely (this cell has <code>.reduced-motion</code> applied to demonstrate — try hovering
+        or clicking it, nothing moves). The box-shadow still snaps instantly from full depth to flat
+        on press — an un-animated state change, not motion — so the "pressed" feedback survives
+        without any movement.
       </p>
     </div>
     <div class="cell">
@@ -160,6 +219,7 @@
     Spawns above the click point on every click, drifts upward, fades out over ~700ms (or a
     static 400ms hold under reduced-motion). This is not a notification — it never persists,
     never stacks in a history, and is purely decorative feedback for the click that just happened.
+    Set in the display face with tabular numerals so rapid clicking never jitters the digits.
   </p>
   <div class="grid">
     <div class="cell">
@@ -167,7 +227,7 @@
       <div class="state-label">Standard click · 普通一擊</div>
     </div>
     <div class="cell">
-      <div class="popup" style="background: var(--md-tertiary); color: var(--md-on-tertiary); font-size: 22px;">+1,337</div>
+      <div class="popup" style="background: var(--md-tertiary); color: var(--md-on-tertiary); box-shadow: 0 3px 0 0 var(--md-tertiary-shadow); font-size: 24px;">+1,337</div>
       <div class="state-label">Golden-cookie click · 金曲奇一擊</div>
       <p class="caption">Uses the tertiary role exclusively — the one place in the app tertiary appears as a solid fill.</p>
     </div>
@@ -175,19 +235,31 @@
 
   <h2>Golden-cookie overlay · 金曲奇覆蓋層</h2>
   <p class="caption">
-    A time-limited bonus spawn: a soft tertiary-container glow plus a solid tertiary ring around
-    the same 96px button, replacing its texture with a brighter variant while it is live
-    (typically 13–15s). Clicking it triggers the golden-cookie popup above and a matching
-    non-blocking toast (see <code>narrator-toast.html</code>).
+    A time-limited bonus spawn: a bright <code>--spark</code> glow, a chunky <code>--spark-ring</code>
+    border, and a slow-spinning ray burst around the same 104px button, replacing its texture with a
+    brighter variant while it is live (typically 13–15s). Clicking it triggers the golden-cookie
+    popup above and a matching non-blocking toast (see <code>narrator-toast.html</code>). Under
+    reduced motion the pulse and spin stop but the glow, ring, and rays stay fully visible and static
+    — the "something special is here" signal never depends on the motion.
   </p>
   <div class="grid">
     <div class="cell">
       <div class="golden-overlay-wrap">
+        <div class="golden-rays"></div>
         <div class="golden-overlay"></div>
         <div class="golden-ring"></div>
-        <button class="cookie-btn" style="background: radial-gradient(circle at 35% 30%, var(--md-tertiary-container), var(--md-tertiary) 70%);" aria-label="Golden cookie available · 金曲奇出現">✨</button>
+        <button class="cookie-btn" style="background: radial-gradient(circle at 35% 28%, var(--spark-glow), var(--md-tertiary) 72%); box-shadow: 0 var(--press-3) 0 0 var(--md-tertiary-shadow), inset 0 -8px 12px rgba(0,0,0,0.18);" aria-label="Golden cookie available · 金曲奇出現">✨</button>
       </div>
       <div class="state-label">Golden cookie active · 金曲奇出現中</div>
+    </div>
+    <div class="cell reduced-motion">
+      <div class="golden-overlay-wrap">
+        <div class="golden-rays"></div>
+        <div class="golden-overlay"></div>
+        <div class="golden-ring"></div>
+        <button class="cookie-btn" style="background: radial-gradient(circle at 35% 28%, var(--spark-glow), var(--md-tertiary) 72%); box-shadow: 0 var(--press-3) 0 0 var(--md-tertiary-shadow), inset 0 -8px 12px rgba(0,0,0,0.18);" aria-label="Golden cookie available · 金曲奇出現">✨</button>
+      </div>
+      <div class="state-label">Golden cookie, reduced motion · 金曲奇，減少動態</div>
     </div>
   </div>
 </body>

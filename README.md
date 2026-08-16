@@ -1,4 +1,4 @@
-# Oak Kay
+# Material Cookie Clicker
 
 A Material Design 3 cookie clicker for Windows, built with Electron.
 
@@ -11,6 +11,7 @@ A Material Design 3 cookie clicker for Windows, built with Electron.
 ## Contents
 
 - [What it is](#what-it-is)
+- [The feature inventory is the tech tree](#the-feature-inventory-is-the-tech-tree)
 - [Install](#install)
 - [Build it yourself](#build-it-yourself)
 - [Documentation](#documentation)
@@ -27,7 +28,21 @@ Design 3 throughout, keyboard and screen-reader operable, and it works with the
 network unplugged.
 
 **Nobody ever pays a penny to use it.** No purchase, no licence, no
-subscription, no feature held behind an unlock.
+subscription, no feature held behind a paywall.
+
+## The feature inventory is the tech tree
+
+This application's own features — the command palette, the regex builder, the
+authenticator, the file converter, the local model manager, the appearance
+editor and the rest — also appear inside the game as **tools** you discover and
+unlock by playing, each granting a real gameplay bonus.
+
+**An unlock gates the gameplay bonus and the in-game surfacing only. It never
+gates the feature.** Every feature is reachable from settings and the command
+palette at all times, whether or not its tool has been unlocked. Nobody should
+have to farm cookies to get a regex builder, and this project's completeness
+rules forbid satisfying a feature contract by hiding the feature — so the
+separation is enforced in code and covered by a test, not left as an intention.
 
 ## Install
 

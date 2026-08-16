@@ -1,0 +1,70 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1" />
+<title>Statistics — Material Cookie Clicker</title>
+<meta name="description" content="The counters the engine actually keeps, including an honest clock-anomaly count." />
+<link rel="stylesheet" href="../assets/site.css" />
+</head>
+<body>
+<a class="skip-link" href="#main">Skip to main content</a>
+<header class="site-head">
+  <div class="wrap">
+    <a class="brand" href="../index.html"><span aria-hidden="true">&#127850;</span> Material Cookie Clicker</a>
+    <nav class="site-nav" aria-label="Primary">
+      <ul>
+        <li><a href="../index.html">Home</a></li>
+        <li><a href="../features/index.html">Features</a></li>
+        <li><a href="../index.html#download">Download</a></li>
+      </ul>
+    </nav>
+  </div>
+</header>
+<main id="main" class="wrap">
+  <article>
+    <h1>Statistics</h1>
+    <p class="lede">The counters the engine actually keeps, including an honest clock-anomaly count.</p>
+    <div class="inset" style="margin-bottom:18px">
+  <span class="label">Current state</span>
+  <p style="margin:0"><span class="tag">Rules engine: built (<code>src/shared/game/types.ts</code>, tracked through the reducer)</span></p>
+  <p style="margin:8px 0 0"><span class="tag tag--roadmap">Player-facing screen: roadmap, not built</span></p>
+</div>
+    
+<h2>What it does</h2>
+<p>The game state carries a small, deliberately short list of statistics, each maintained by the one mutation seam that owns all state changes:</p>
+<ul>
+  <li><strong>Total clicks</strong> &mdash; incremented on every click, and read as an unlock condition by achievements and tools.</li>
+  <li><strong>Total cookies baked</strong> &mdash; a big-number lifetime total.</li>
+  <li><strong>Clock-anomaly count</strong> &mdash; how many times a negative or nonsensical wall-clock delta was observed and rejected.</li>
+</ul>
+<p>Alongside these, the state exposes the current cookie total, the lifetime total, ascension points and total prestige count, the golden-cookie schedule position, and the timestamps of the last applied tick and the last successful save.</p>
+
+<h2>Why a clock-anomaly counter is a statistic</h2>
+<p>Because the alternative is silence. When the offline calculation rejects a backwards clock it must leave a trace somewhere the player can see, rather than quietly awarding nothing and looking broken. It is a visible number, not a hidden flag.</p>
+
+<h2>How it is configured</h2>
+<p>Nothing here is configurable; statistics are recorded, not tuned. Presentation is fixed by <code>design/stat-tile.html</code>: a raised outer plate with a recessed inner bezel the number sits down inside, a large tabular-numerals counter, a bilingual label, and an optional trend indicator that always pairs colour with a glyph rather than relying on colour alone.</p>
+
+<h2>Roadmap, not shipped</h2>
+<p>There is no statistics screen. The counters and the state shape are what exists today.</p>
+    <nav class="related plate" aria-labelledby="related-heading">
+      <h2 id="related-heading">Related articles</h2>
+      <ul>
+      <li><a href="cookie-clicking.html">Cookie clicking and the CPS loop</a></li>
+      <li><a href="prestige.html">Prestige (ascend)</a></li>
+      <li><a href="achievements.html">Achievements</a></li>
+      <li><a href="golden-cookies.html">Golden-cookie events</a></li>
+        <li><a href="index.html">All features &amp; search</a></li>
+      </ul>
+    </nav>
+  </article>
+</main>
+<footer class="site-foot">
+  <div class="wrap">
+    <p>Material Cookie Clicker is free, unsigned by permanent policy, and nobody ever pays anything to use it. This site is fully self-contained: no CDN, no remote font, no remote image, no analytics, no network request of any kind. Everything drawn here is drawn in CSS.</p>
+    <p><a href="https://github.com/Ding-Ding-Projects/material-cookie-clicker">Source code on GitHub</a> &middot; <a href="../features/index.html">All feature articles</a></p>
+  </div>
+</footer>
+</body>
+</html>

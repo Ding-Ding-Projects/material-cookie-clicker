@@ -1,0 +1,140 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1" />
+<title>Material Cookie Clicker — a bilingual arcade bakery for Windows</title>
+<meta name="description" content="A bilingual English and Hong Kong Cantonese cookie clicker for Windows, where the application’s own features are the game’s tech tree." />
+<link rel="stylesheet" href="assets/site.css" />
+</head>
+<body>
+<a class="skip-link" href="#main">Skip to main content</a>
+<header class="site-head">
+  <div class="wrap">
+    <a class="brand" href="index.html"><span aria-hidden="true">&#127850;</span> Material Cookie Clicker</a>
+    <nav class="site-nav" aria-label="Primary">
+      <ul>
+        <li><a href="index.html" aria-current="page">Home</a></li>
+        <li><a href="features/index.html">Features</a></li>
+        <li><a href="index.html#download">Download</a></li>
+      </ul>
+    </nav>
+  </div>
+</header>
+<main id="main" class="wrap">
+  <section class="plate hero" aria-labelledby="hero-heading">
+    <div class="hero-copy">
+      <h1 id="hero-heading">Material Cookie Clicker</h1>
+      <p class="lede">A cookie clicker for Windows where the application's own features &mdash; the command palette, the regex builder, the authenticator, the file converter &mdash; are the game's tech tree. Free, unsigned by policy, offline by design, and bilingual in English and Hong Kong Cantonese.</p>
+      <p><a class="btn btn--primary" href="#download">Download</a> <a class="btn" href="features/index.html">Browse the features</a></p>
+    </div>
+    <div class="hero-art">
+      <div class="cookie" role="img" aria-label="A chocolate-chip cookie drawn in CSS, seated on an arcade button base"></div>
+    </div>
+  </section>
+
+  <h2>What it is</h2>
+  <div class="bilingual">
+    <div class="inset">
+      <span class="label">English</span>
+      <p>Click a cookie. Buy fourteen tiers of increasingly unreasonable machinery, from a Cursor up to a Prism. Spend seventy-five upgrades, chase a hundred achievements, catch golden cookies, unlock the application's own twenty features as in-game tools, then ascend and throw it all away for a permanent multiplier. It runs with the network unplugged, it costs nothing, and it never asks you for an account.</p>
+    </div>
+    <div class="inset" lang="zh-HK">
+      <span class="label">香港廣東話</span>
+      <p>撳曲奇。由「掂手指」買到「稜鏡」，十四級越嚟越荒謬嘅機器。用七十五個升級、追一百個成就、執金曲奇、將個應用程式自己二十個功能解鎖做遊戲道具，然後飛昇，全部清晒換返個永久倍數。冇網都玩得，唔使畀錢，唔使開戶口。</p>
+    </div>
+  </div>
+
+  <h2>Where the project actually is</h2>
+  <div class="note note--warn">
+  <strong class="note-title">Read this before you download</strong>
+  <p>The game rules engine is real, typed and unit-tested today. <strong>The playable screens are not built yet.</strong> The installer you can download right now opens an Electron window whose body still reads &ldquo;The cookie-clicker game surface mounts here&rdquo;. Everything on this site that describes a screen is marked as roadmap, because it is.</p>
+</div>
+  <ul class="stats">
+    <li class="stat"><span class="v">14</span><span class="k">Generator tiers</span></li>
+    <li class="stat"><span class="v">75</span><span class="k">Upgrades</span></li>
+    <li class="stat"><span class="v">100</span><span class="k">Achievements</span></li>
+    <li class="stat"><span class="v">20</span><span class="k">Tools in the tree</span></li>
+  </ul>
+  <p>Those four numbers are counted from the definition lists in the source tree, not from a wish list. What they describe is the rules engine: pure TypeScript, unit-tested, with one mutation seam. The screens that would let you touch any of it are still to come.</p>
+
+  <h2 id="download">Download</h2>
+  <div class="plate">
+    <p>Windows installer, published on GitHub Releases.</p>
+    <p><a class="btn btn--primary" href="https://github.com/Ding-Ding-Projects/material-cookie-clicker/releases/latest">Get the latest release</a></p>
+    <div class="note note--warn">
+      <strong class="note-title">The installer is unsigned, on purpose and permanently</strong>
+      <p>There is no code-signing certificate and there will not be one. Windows SmartScreen will therefore warn you when you run the installer, and you will have to choose &ldquo;More info&rdquo; and then &ldquo;Run anyway&rdquo; to continue. That warning is accurate: Windows genuinely cannot verify who published this, and no amount of reassurance on a web page changes that. If you are not comfortable with it, do not install it &mdash; <a href="https://github.com/Ding-Ding-Projects/material-cookie-clicker">the full source is on GitHub</a> and you can build it yourself.</p>
+      <p>Nobody ever pays anything for this application, and it asks for no account, no key and no network access.</p>
+    </div>
+    <div class="note note--roadmap">
+      <strong class="note-title">What you get if you install it today</strong>
+      <p>An Electron application window with a working frameless title bar and a placeholder body. The game surface is not wired in yet. Install it to watch the release pipeline work, not to play a cookie clicker.</p>
+    </div>
+  </div>
+
+  <h2>Every feature area</h2>
+  <p>Each article below describes the behaviour, how it is configured, and how much of it is real today.</p>
+  <ul class="tickets">
+      <li class="ticket">
+        <h3>Cookie clicking and the CPS loop</h3>
+        <p>The primary click target, click multipliers, the cookies-per-second accumulator, and the offline-progress rules that make a closed window honest.</p>
+        <a class="ticket-link" href="features/cookie-clicking.html">Read more</a>
+      </li>
+      <li class="ticket">
+        <h3>The 14-tier generator ladder</h3>
+        <p>Cursor through Prism: fourteen generator tiers, a constant 1.15 cost curve, and the buy-quantity stepper.</p>
+        <a class="ticket-link" href="features/generator-ladder.html">Read more</a>
+      </li>
+      <li class="ticket">
+        <h3>Upgrades</h3>
+        <p>Seventy-five upgrades: five global ones plus five stacking tiers for each of the fourteen generators.</p>
+        <a class="ticket-link" href="features/upgrades.html">Read more</a>
+      </li>
+      <li class="ticket">
+        <h3>Achievements</h3>
+        <p>One hundred achievements, generated from four milestone families, with a permanent unlock and a marquee toast.</p>
+        <a class="ticket-link" href="features/achievements.html">Read more</a>
+      </li>
+      <li class="ticket">
+        <h3>Golden-cookie events</h3>
+        <p>A seeded, replayable random-event schedule: frenzy, click frenzy and windfall.</p>
+        <a class="ticket-link" href="features/golden-cookies.html">Read more</a>
+      </li>
+      <li class="ticket">
+        <h3>The Tools tech tree</h3>
+        <p>Twenty of the application’s own features, doubling as in-game unlockables — and the contract that an unlock never gates the real feature.</p>
+        <a class="ticket-link" href="features/tools-tech-tree.html">Read more</a>
+      </li>
+      <li class="ticket">
+        <h3>Statistics</h3>
+        <p>The counters the engine actually keeps, including an honest clock-anomaly count.</p>
+        <a class="ticket-link" href="features/statistics.html">Read more</a>
+      </li>
+      <li class="ticket">
+        <h3>Prestige (ascend)</h3>
+        <p>A cube-root ascension curve, +1% production per point, behind a two-key destructive-action gate.</p>
+        <a class="ticket-link" href="features/prestige.html">Read more</a>
+      </li>
+      <li class="ticket">
+        <h3>Bilingual text and the funny-level sliders</h3>
+        <p>English and Hong Kong Cantonese side by side, with two independent 1–5 humour sliders — one per language.</p>
+        <a class="ticket-link" href="features/language-and-humour.html">Read more</a>
+      </li>
+  </ul>
+  <p><a class="btn" href="features/index.html">Search all feature articles</a></p>
+
+  <h2>How this site is built</h2>
+  <div class="plate">
+    <p>This site follows the same design system as the game &mdash; the v2 &ldquo;arcade cabinet&rdquo; specs in <code>design/</code>: radial oven-glow backgrounds, marquee headings on bevelled plates, solid offset shadows with no blur anywhere, 2&ndash;7px borders, and the same colour tokens in light and dark. It is explicitly <em>not</em> Material Design 3; the role names (primary, surface, outline) are kept as vocabulary only.</p>
+    <p>It is also entirely self-contained. There is no CDN, no remote font, no remote image, no analytics and no network request of any kind: the cookie above is drawn with CSS gradients, the search index is baked into a local module, and the only external addresses anywhere in this site are the two GitHub links, which you have to click.</p>
+  </div>
+</main>
+<footer class="site-foot">
+  <div class="wrap">
+    <p>Material Cookie Clicker is free, unsigned by permanent policy, and nobody ever pays anything to use it. This site is fully self-contained: no CDN, no remote font, no remote image, no analytics, no network request of any kind. Everything drawn here is drawn in CSS.</p>
+    <p><a href="https://github.com/Ding-Ding-Projects/material-cookie-clicker">Source code on GitHub</a> &middot; <a href="features/index.html">All feature articles</a></p>
+  </div>
+</footer>
+</body>
+</html>

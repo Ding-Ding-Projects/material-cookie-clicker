@@ -1,0 +1,64 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1" />
+<title>Prestige (ascend) — Material Cookie Clicker</title>
+<meta name="description" content="A cube-root ascension curve, +1% production per point, behind a two-key destructive-action gate." />
+<link rel="stylesheet" href="../assets/site.css" />
+</head>
+<body>
+<a class="skip-link" href="#main">Skip to main content</a>
+<header class="site-head">
+  <div class="wrap">
+    <a class="brand" href="../index.html"><span aria-hidden="true">&#127850;</span> Material Cookie Clicker</a>
+    <nav class="site-nav" aria-label="Primary">
+      <ul>
+        <li><a href="../index.html">Home</a></li>
+        <li><a href="../features/index.html">Features</a></li>
+        <li><a href="../index.html#download">Download</a></li>
+      </ul>
+    </nav>
+  </div>
+</header>
+<main id="main" class="wrap">
+  <article>
+    <h1>Prestige (ascend)</h1>
+    <p class="lede">A cube-root ascension curve, +1% production per point, behind a two-key destructive-action gate.</p>
+    <div class="inset" style="margin-bottom:18px">
+  <span class="label">Current state</span>
+  <p style="margin:0"><span class="tag">Rules engine: built and unit-tested (<code>src/shared/game/prestige.ts</code>)</span></p>
+  <p style="margin:8px 0 0"><span class="tag tag--roadmap">Player-facing screen: roadmap, not built</span></p>
+</div>
+    
+<h2>What it does</h2>
+<p>Ascending resets your cookies, your lifetime total and every owned generator, and converts your progress into permanent ascension points. Each point adds <strong>+1%</strong> to total production, and that formula lives in exactly one place, imported by the multiplier computation rather than restated.</p>
+<p>Points earned are the genre-standard cube root of your lifetime cookies divided by a trillion, floored to a whole number. Ascending is only possible once lifetime cookies reach a trillion.</p>
+<p>What survives an ascension is explicit: ascension points, total prestige count, permanent unlocks, <strong>achievements and statistics</strong>. What is reset: cookies, lifetime cookies, generator counts, and every upgrade not on the permanent-unlock list.</p>
+
+<h2>The gate</h2>
+<p>Because ascending is irreversible, it sits behind this project's destructive-action super-confirmation contract rather than a plain confirm dialog. <code>design/prestige-gate.html</code> specifies two independently operated key toggles, a confirmation slider that stays disabled until both keys are on, an animated but non-blocking progress fill, a distinct completion state, and an always-available emergency exit. It ships two variants: an ordinary prestige, and a full wipe rendered in the error role rather than the primary one.</p>
+<p>The gate's own behaviour is deliberately not configurable. Softening a destructive-action confirmation defeats the point of having one. It is also not a security boundary &mdash; it is a safeguard against an accidental irreversible action, which is a different thing and should not be merged with this project's toy-lock language elsewhere.</p>
+
+<h2>Roadmap, not shipped</h2>
+<p>There is no ascend button and no gate in the application. The ascension curve, the reset semantics and the multiplier are what exists today.</p>
+    <nav class="related plate" aria-labelledby="related-heading">
+      <h2 id="related-heading">Related articles</h2>
+      <ul>
+      <li><a href="achievements.html">Achievements</a></li>
+      <li><a href="upgrades.html">Upgrades</a></li>
+      <li><a href="statistics.html">Statistics</a></li>
+      <li><a href="generator-ladder.html">The 14-tier generator ladder</a></li>
+        <li><a href="index.html">All features &amp; search</a></li>
+      </ul>
+    </nav>
+  </article>
+</main>
+<footer class="site-foot">
+  <div class="wrap">
+    <p>Material Cookie Clicker is free, unsigned by permanent policy, and nobody ever pays anything to use it. This site is fully self-contained: no CDN, no remote font, no remote image, no analytics, no network request of any kind. Everything drawn here is drawn in CSS.</p>
+    <p><a href="https://github.com/Ding-Ding-Projects/material-cookie-clicker">Source code on GitHub</a> &middot; <a href="../features/index.html">All feature articles</a></p>
+  </div>
+</footer>
+</body>
+</html>

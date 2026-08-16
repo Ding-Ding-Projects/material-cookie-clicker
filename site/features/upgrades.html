@@ -1,0 +1,67 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1" />
+<title>Upgrades — Material Cookie Clicker</title>
+<meta name="description" content="Seventy-five upgrades: five global ones plus five stacking tiers for each of the fourteen generators." />
+<link rel="stylesheet" href="../assets/site.css" />
+</head>
+<body>
+<a class="skip-link" href="#main">Skip to main content</a>
+<header class="site-head">
+  <div class="wrap">
+    <a class="brand" href="../index.html"><span aria-hidden="true">&#127850;</span> Material Cookie Clicker</a>
+    <nav class="site-nav" aria-label="Primary">
+      <ul>
+        <li><a href="../index.html">Home</a></li>
+        <li><a href="../features/index.html">Features</a></li>
+        <li><a href="../index.html#download">Download</a></li>
+      </ul>
+    </nav>
+  </div>
+</header>
+<main id="main" class="wrap">
+  <article>
+    <h1>Upgrades</h1>
+    <p class="lede">Seventy-five upgrades: five global ones plus five stacking tiers for each of the fourteen generators.</p>
+    <div class="inset" style="margin-bottom:18px">
+  <span class="label">Current state</span>
+  <p style="margin:0"><span class="tag">Rules engine: built (<code>src/shared/game/upgrades.ts</code>, 75 definitions)</span></p>
+  <p style="margin:8px 0 0"><span class="tag tag--roadmap">Player-facing screen: roadmap, not built</span></p>
+</div>
+    
+<h2>What it does</h2>
+<p>An upgrade is a one-time purchase that permanently multiplies something. There are <strong>75</strong> of them, and that number is not a target &mdash; it is what the definition list actually contains:</p>
+<ul>
+  <li><strong>5 global upgrades</strong>, unlocked by lifetime-cookie thresholds. Reinforced Finger doubles click power for 100 cookies; Sturdier Ovens adds 10% to all production; Double Click, Double Trouble doubles click power again; Industrial-Grade Yeast adds 25% to all production; Thousand-Finger Technique triples click power.</li>
+  <li><strong>70 per-generator upgrades</strong> &mdash; five tiers for each of the fourteen generators, unlocking at 1, 5, 25, 50 and 100 owned. Each tier doubles that generator's own output, so all five stacked reach a 32&times; multiplier on that tier at 100 owned.</li>
+</ul>
+<p>Three effect kinds exist and no more: a click multiplier, a multiplier on one named generator, and a global CPS multiplier. Unlock conditions are equally small: an owned count of a named generator, a lifetime-cookie threshold, or always available.</p>
+
+<h2>How it is configured</h2>
+<p>The thresholds and the per-tier multiplier are named constants at the top of the file, and the seventy per-generator upgrades are generated from them rather than typed out, so a change to the ladder cannot leave a stale upgrade behind. Prices for the generated tiers derive from the generator's own base cost.</p>
+<p>Presentation is fixed by <code>design/upgrade-card.html</code>: upgrades are ticket-shaped purchases with notches punched out of both edges, a dashed perforation and a price stub, in locked, unlocked-buyable and owned states, with a metallic treatment once owned and a hover tilt that has a still equivalent under reduced motion.</p>
+
+<h2>Roadmap, not shipped</h2>
+<p>There is no upgrade strip on screen. The definitions, their effects, and the multiplier computation that combines them with tool and prestige bonuses are what exists today.</p>
+    <nav class="related plate" aria-labelledby="related-heading">
+      <h2 id="related-heading">Related articles</h2>
+      <ul>
+      <li><a href="generator-ladder.html">The 14-tier generator ladder</a></li>
+      <li><a href="cookie-clicking.html">Cookie clicking and the CPS loop</a></li>
+      <li><a href="prestige.html">Prestige (ascend)</a></li>
+      <li><a href="tools-tech-tree.html">The Tools tech tree</a></li>
+        <li><a href="index.html">All features &amp; search</a></li>
+      </ul>
+    </nav>
+  </article>
+</main>
+<footer class="site-foot">
+  <div class="wrap">
+    <p>Material Cookie Clicker is free, unsigned by permanent policy, and nobody ever pays anything to use it. This site is fully self-contained: no CDN, no remote font, no remote image, no analytics, no network request of any kind. Everything drawn here is drawn in CSS.</p>
+    <p><a href="https://github.com/Ding-Ding-Projects/material-cookie-clicker">Source code on GitHub</a> &middot; <a href="../features/index.html">All feature articles</a></p>
+  </div>
+</footer>
+</body>
+</html>

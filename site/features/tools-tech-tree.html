@@ -1,0 +1,72 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1" />
+<title>The Tools tech tree — Material Cookie Clicker</title>
+<meta name="description" content="Twenty of the application’s own features, doubling as in-game unlockables — and the contract that an unlock never gates the real feature." />
+<link rel="stylesheet" href="../assets/site.css" />
+</head>
+<body>
+<a class="skip-link" href="#main">Skip to main content</a>
+<header class="site-head">
+  <div class="wrap">
+    <a class="brand" href="../index.html"><span aria-hidden="true">&#127850;</span> Material Cookie Clicker</a>
+    <nav class="site-nav" aria-label="Primary">
+      <ul>
+        <li><a href="../index.html">Home</a></li>
+        <li><a href="../features/index.html">Features</a></li>
+        <li><a href="../index.html#download">Download</a></li>
+      </ul>
+    </nav>
+  </div>
+</header>
+<main id="main" class="wrap">
+  <article>
+    <h1>The Tools tech tree</h1>
+    <p class="lede">Twenty of the application’s own features, doubling as in-game unlockables — and the contract that an unlock never gates the real feature.</p>
+    <div class="inset" style="margin-bottom:18px">
+  <span class="label">Current state</span>
+  <p style="margin:0"><span class="tag">Rules engine: built and unit-tested (<code>src/shared/game/tools.ts</code>, 20 definitions)</span></p>
+  <p style="margin:8px 0 0"><span class="tag tag--roadmap">Player-facing screen: roadmap, not built</span></p>
+</div>
+    
+<h2>The defining idea</h2>
+<p>Material Cookie Clicker's own application features are the game's tech tree. The command palette, the regex builder, the authenticator, the file converter, the local model manager, the appearance editor, the notification centre, local history, scheduled settings, the narrator, exports and bulk actions all appear in-game as <strong>tools</strong> you discover and buy with cookies, each granting a gameplay bonus. Twenty tools are defined today.</p>
+
+<div class="note">
+  <strong class="note-title">The one rule that must never erode</strong>
+  <p>Unlocking or buying a tool buys a <em>gameplay bonus</em> and its <em>in-game surfacing</em>. It never buys, unlocks, or gates the actual application feature. A player who never touches the tech tree still has the entire regex builder, from settings and from the command palette, at all times.</p>
+  <p>This is enforced structurally rather than by good intentions. Every tool definition carries a <code>gatesApplicationFeature</code> field that is a literal <code>false</code> with its reasoning recorded beside it; the module deliberately exports <strong>no</strong> predicate shaped like &ldquo;is this feature available yet&rdquo;, and that absence is the design rather than an oversight; and the test suite asserts both. If you are ever tempted to add a convenience helper answering &ldquo;can the user use X yet&rdquo;, that is this contract being eroded.</p>
+</div>
+
+<h2>What a tool is made of</h2>
+<p>Each tool has an English and a Cantonese name, a joke in both languages, one unlock condition and one gameplay effect. Unlock conditions are lifetime cookies, total clicks, an owned count of a named generator, a prestige count, a named achievement, or always. Effects are a click multiplier, a global CPS multiplier, a multiplier on one generator, a discount on a buy-max purchase, an extension to the offline-progress cap, or a bonus to the offline CPS fraction.</p>
+<p>For example, the Command Palette tool becomes available at 50 total clicks and grants +5% click power; the Regex Builder tool arrives at 10 Cursors and makes Cursors 10% better; Tab Groups does the same for Grandmas.</p>
+
+<h2>How it is configured</h2>
+<p>A player-facing switch, <code>toolProgressionEnabled</code>, decides whether a tool's bonus applies only once its condition is met (the default) or whether every bonus counts regardless. It changes the game display and the bonus. It never changes whether a feature is reachable &mdash; the same contract, restated as a setting.</p>
+<p><code>design/tool-card.html</code> gives every state, including undiscovered, a persistent &ldquo;Open it now&rdquo; callout in its own recessed bezel with a solid spark-ring border and an &ldquo;always available&rdquo; badge, deliberately unlike the dashed lock chrome around it &mdash; precisely because a chunky padlock could otherwise make the escape hatch read as part of the lock. <code>design/tools-tree.html</code> groups nodes into three jewel tiers, bronze through emerald to amethyst.</p>
+
+<h2>Roadmap, not shipped</h2>
+<p>There is no tools screen, and most of the twelve canonical application features behind the tools exist as logic modules rather than as surfaces you can open in the application yet. Their tech-tree layer &mdash; conditions, bonuses and the no-gating contract &mdash; is what exists today.</p>
+    <nav class="related plate" aria-labelledby="related-heading">
+      <h2 id="related-heading">Related articles</h2>
+      <ul>
+      <li><a href="upgrades.html">Upgrades</a></li>
+      <li><a href="achievements.html">Achievements</a></li>
+      <li><a href="statistics.html">Statistics</a></li>
+      <li><a href="language-and-humour.html">Bilingual text and the funny-level sliders</a></li>
+        <li><a href="index.html">All features &amp; search</a></li>
+      </ul>
+    </nav>
+  </article>
+</main>
+<footer class="site-foot">
+  <div class="wrap">
+    <p>Material Cookie Clicker is free, unsigned by permanent policy, and nobody ever pays anything to use it. This site is fully self-contained: no CDN, no remote font, no remote image, no analytics, no network request of any kind. Everything drawn here is drawn in CSS.</p>
+    <p><a href="https://github.com/Ding-Ding-Projects/material-cookie-clicker">Source code on GitHub</a> &middot; <a href="../features/index.html">All feature articles</a></p>
+  </div>
+</footer>
+</body>
+</html>

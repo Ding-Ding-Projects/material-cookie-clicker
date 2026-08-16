@@ -1,0 +1,72 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1" />
+<title>Cookie clicking and the CPS loop — Material Cookie Clicker</title>
+<meta name="description" content="The primary click target, click multipliers, the cookies-per-second accumulator, and the offline-progress rules that make a closed window honest." />
+<link rel="stylesheet" href="../assets/site.css" />
+</head>
+<body>
+<a class="skip-link" href="#main">Skip to main content</a>
+<header class="site-head">
+  <div class="wrap">
+    <a class="brand" href="../index.html"><span aria-hidden="true">&#127850;</span> Material Cookie Clicker</a>
+    <nav class="site-nav" aria-label="Primary">
+      <ul>
+        <li><a href="../index.html">Home</a></li>
+        <li><a href="../features/index.html">Features</a></li>
+        <li><a href="../index.html#download">Download</a></li>
+      </ul>
+    </nav>
+  </div>
+</header>
+<main id="main" class="wrap">
+  <article>
+    <h1>Cookie clicking and the CPS loop</h1>
+    <p class="lede">The primary click target, click multipliers, the cookies-per-second accumulator, and the offline-progress rules that make a closed window honest.</p>
+    <div class="inset" style="margin-bottom:18px">
+  <span class="label">Current state</span>
+  <p style="margin:0"><span class="tag">Rules engine: built and unit-tested (<code>src/shared/game/reducer.ts</code>, <code>cps.ts</code>, <code>offline-progress.ts</code>)</span></p>
+  <p style="margin:8px 0 0"><span class="tag tag--roadmap">Player-facing screen: roadmap, not built</span></p>
+</div>
+    
+<h2>What it does</h2>
+<p>Clicking the cookie adds a base click value of <strong>1</strong>, multiplied by every active click multiplier from upgrades, tools and prestige, to your cookie total and to your lifetime total. Each click also increments a total-click counter, which is itself an unlock condition for several achievements and tools.</p>
+<p>Independently of clicking, every generator you own contributes a fixed cookies-per-second rate. Total CPS is derived, never stored: it is recomputed from owned generators, their per-generator multipliers and the global multiplier every time it is asked for, so it can never drift out of step with what you own.</p>
+<p>Production over a period of time is a pure function of an elapsed-milliseconds delta the caller supplies. The engine never reads a clock itself and never assumes a frame rate, which is what makes the loop testable and what stops a throttled background window from quietly losing cookies.</p>
+
+<h2>Offline progress</h2>
+<p>When the game reopens, cookies earned while it was closed are computed from the last applied tick timestamp to now, at a configurable fraction of normal CPS and capped at a configurable maximum offline duration. The clock rules are deliberate and worth stating plainly:</p>
+<ul>
+  <li>A <strong>negative</strong> elapsed time &mdash; the clock moved backwards, or a save file was hand-edited into the future &mdash; counts as zero elapsed time and is recorded as a clock anomaly. The absolute value is never taken, because that would turn winding your clock back into free cookies.</li>
+  <li>An absurdly large forward jump is clamped to the cap rather than flagged; a real machine can plausibly be off for a long time.</li>
+  <li>A malformed timestamp never throws. Throwing here would brick loading a save, so anomalies are always reported through the result value instead.</li>
+</ul>
+
+<h2>How it is configured</h2>
+<p>The offline cap and the offline CPS fraction are options passed in by the caller, not constants baked into the loop. A separate wrapper widens those options with any active offline bonuses from the Tools tech tree before computing, so the core function keeps no hidden dependency on tool state.</p>
+<p>The <code>design/cookie-surface.html</code> spec fixes the presentation the screen must honour once it exists: rest, hover, pressed, focus-visible, reduced-motion and disabled states on a 168px arcade-button cookie, a floating &ldquo;+N&rdquo; popup that respects reduced motion, and a disabled state that carries a reason a screen reader can announce rather than a silently dead button.</p>
+
+<h2>Roadmap, not shipped</h2>
+<p>There is no click surface in the application yet: no cookie button, no live counter, no &ldquo;+N&rdquo; popup. The rules those things will drive are what exists today.</p>
+    <nav class="related plate" aria-labelledby="related-heading">
+      <h2 id="related-heading">Related articles</h2>
+      <ul>
+      <li><a href="generator-ladder.html">The 14-tier generator ladder</a></li>
+      <li><a href="upgrades.html">Upgrades</a></li>
+      <li><a href="golden-cookies.html">Golden-cookie events</a></li>
+      <li><a href="statistics.html">Statistics</a></li>
+        <li><a href="index.html">All features &amp; search</a></li>
+      </ul>
+    </nav>
+  </article>
+</main>
+<footer class="site-foot">
+  <div class="wrap">
+    <p>Material Cookie Clicker is free, unsigned by permanent policy, and nobody ever pays anything to use it. This site is fully self-contained: no CDN, no remote font, no remote image, no analytics, no network request of any kind. Everything drawn here is drawn in CSS.</p>
+    <p><a href="https://github.com/Ding-Ding-Projects/material-cookie-clicker">Source code on GitHub</a> &middot; <a href="../features/index.html">All feature articles</a></p>
+  </div>
+</footer>
+</body>
+</html>

@@ -14,6 +14,7 @@ import { matchesSearch } from '../game/local-regex-search.js';
 import { DieselDepot } from './DieselDepot.js';
 import { BULK_COPY, DISCLOSURE_COPY, GAME_SURFACE_COPY, LIST_COPY } from '../game/copy.js';
 import { useFastSnapshot, useGameDispatch, useStructureSnapshot } from '../game/GameProvider.js';
+import { generatorTargetKey, usePurchaseFxTarget } from '../game/purchase-fx.js';
 
 /** The tiny leaf that actually depends on live cookies: cost text + the buy button's
  *  enabled/disabled state. Subscribing to the fast slice HERE, rather than in the row or the
@@ -92,8 +93,12 @@ const GeneratorRow = memo(function GeneratorRow({
   onToggleSelect: () => void;
 }) {
   const stepperLabelId = `stepper-label-${def.id}`;
+  // The row is the purchase-feedback target: a successful buy bounces it, rolls the owned
+  // count and wiggles the icon. Registering the element is all this component does about it —
+  // the animation is started by the fx layer from the reducer's own state diff, never here.
+  const fxRef = usePurchaseFxTarget<HTMLDivElement>(generatorTargetKey(def.id));
   return (
-    <div className={`shop-row${owned > 0 ? ' owned' : ''}`}>
+    <div ref={fxRef} className={`shop-row${owned > 0 ? ' owned' : ''}`}>
       <input
         type="checkbox"
         className="select-checkbox"

@@ -5,6 +5,7 @@ import { formatBigNum } from '../../shared/game/format-number.js';
 import { DieselCanisterIcon } from '../assets/icons.js';
 import { DIESEL_COPY } from '../game/copy.js';
 import { useDieselExchange, useFastSnapshot, useGameDispatch, useStructureSnapshot } from '../game/GameProvider.js';
+import { DIESEL_TARGET_KEY, usePurchaseFxTarget } from '../game/purchase-fx.js';
 
 /** One litre a press. The curve is steep enough (15% a litre) that a bulk stepper here would
  *  be a way to spend a fortune by accident, and the whole point is a deliberate purchase. */
@@ -32,6 +33,9 @@ export function DieselDepot() {
   const fast = useFastSnapshot();
   const dispatch = useGameDispatch();
   const exchange = useDieselExchange();
+  // The card is where the pump sequence plays. Registered unconditionally-shaped (the hook
+  // runs before the disclosure early-return) so the rule of hooks holds.
+  const fxRef = usePurchaseFxTarget<HTMLElement>(DIESEL_TARGET_KEY);
 
   if (!computeDisclosure(structure).dieselDepot) return null;
 
@@ -53,6 +57,7 @@ export function DieselDepot() {
 
   return (
     <section
+      ref={fxRef}
       className="diesel-depot"
       aria-label={`${DIESEL_COPY.title.en} · ${DIESEL_COPY.title.yue}`}
     >

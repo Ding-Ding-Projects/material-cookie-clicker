@@ -13,6 +13,7 @@ import {
   useStructureSnapshot,
 } from './game/GameProvider';
 import { CONSOLE_EMBLEMS, PanelCorner } from './ConsoleEmblems';
+import { HUD_COOKIES_TARGET_KEY, PurchaseFxLayer, usePurchaseFxTarget } from './game/purchase-fx';
 import {
   bilingualText,
   CONSOLE_COPY,
@@ -86,7 +87,7 @@ function Hud() {
 
   return (
     <div className="hud" role="group" aria-label={`${GAME_SURFACE_COPY.hudLabel.en} · ${GAME_SURFACE_COPY.hudLabel.yue}`} aria-live="off">
-      <HudReadout label={GAME_SURFACE_COPY.hudCookies} value={fast.cookies} />
+      <HudReadout label={GAME_SURFACE_COPY.hudCookies} value={fast.cookies} fxKey={HUD_COOKIES_TARGET_KEY} />
       {disclosure.perSecondReadout ? <HudReadout label={GAME_SURFACE_COPY.hudPerSecond} value={fast.cps} /> : null}
       {disclosure.perClickReadout ? <HudReadout label={GAME_SURFACE_COPY.hudPerClick} value={clickValue} /> : null}
     </div>
@@ -96,11 +97,22 @@ function Hud() {
 /** One recessed bezel in the HUD. Both labels always show; the Cantonese *number* only shows when
  *  it actually reads differently from the English one (the two formatters agree on small values,
  *  and printing "4.06" twice would look like a rendering bug rather than a translation). */
-function HudReadout({ label, value }: { label: Bilingual; value: Parameters<typeof formatBigNum>[0] }) {
+function HudReadout({
+  label,
+  value,
+  fxKey,
+}: {
+  label: Bilingual;
+  value: Parameters<typeof formatBigNum>[0];
+  /** Set on the cookies readout only: it is where a purchase's coins fly FROM, and the bezel
+   *  that dips and settles when the reducer takes the cookies. */
+  fxKey?: string;
+}) {
   const en = formatBigNum(value, 'en');
   const yue = formatBigNum(value, 'yue');
+  const fxRef = usePurchaseFxTarget<HTMLDivElement>(fxKey ?? 'hud:unused');
   return (
-    <div className="hud__readout">
+    <div className="hud__readout" ref={fxKey ? fxRef : undefined}>
       <span className="hud__key">
         {label.en} · {label.yue}
       </span>
@@ -467,6 +479,10 @@ function GameShell() {
       <div className="milestone-region" role="status" aria-live="polite">
         {milestoneMessage ? `${milestoneMessage.en} · ${milestoneMessage.yue}` : ''}
       </div>
+
+      {/* The one purchase-feedback overlay for the whole game. It renders nothing until a
+          dispatch actually applies a purchase, and never takes part in layout. */}
+      <PurchaseFxLayer />
 
       <div className="shell-status" role="status" aria-live="polite">
         {shellStatus ? `${shellStatus.en} · ${shellStatus.yue}` : ''}

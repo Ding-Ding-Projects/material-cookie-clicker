@@ -796,3 +796,56 @@ export function DieselCanisterIcon({ extraClass }: { extraClass?: string } = {})
     </Art>
   );
 }
+
+/* ==========================================================================================
+ * Purchase-feedback art (src/renderer/game/purchase-fx.tsx). Two pieces the diesel mint
+ * sequence needs and nothing else draws: the pump nozzle that swings in, and a jerrycan whose
+ * fuel body is a separate, animatable element rather than part of the can's own path.
+ * ======================================================================================== */
+
+/** The nozzle on the end of the hose. Points down-left, so it reads as coming off a pump. */
+export function FuelNozzleIcon({ extraClass }: { extraClass?: string } = {}) {
+  return (
+    <Art extraClass={extraClass}>
+      <Base d="M13 8h10v9H13z" />
+      {/* the grip body */}
+      <path d="M12.6 6.4h8.2a1.8 1.8 0 0 1 1.8 1.8v5.2a1.8 1.8 0 0 1-1.8 1.8h-8.2z" fill={METAL_LO} stroke={INK} strokeWidth={1.6} />
+      {/* trigger */}
+      <path d="M14.6 15.2v2.6a2 2 0 0 0 2 2h1.2" fill="none" stroke={INK} strokeWidth={1.5} />
+      {/* the spout, angled at the can below */}
+      <path d="M22.6 9.4h4.2l-1.6 8.4-3 6.6" fill="none" stroke={INK} strokeWidth={1.8} />
+      {/* hose running back off the top-left of the frame */}
+      <path d="M12.6 8.6H7.4a3 3 0 0 0-3 3v3.2" fill="none" stroke={CRUST_DARK} strokeWidth={2.2} />
+      <path d="M13.4 7.6h6.2" stroke={METAL_HI} strokeWidth={1.3} />
+    </Art>
+  );
+}
+
+/**
+ * The gauge jerrycan. Same can as `DieselCanisterIcon`, except the fuel inside is its own
+ * `<rect>` carrying the class `fx-can__fuel`, anchored at the bottom of the can's interior so
+ * a `transform: scaleY()` on it reads as a level rising rather than a box growing both ways.
+ */
+export function JerrycanGaugeIcon({ extraClass }: { extraClass?: string } = {}) {
+  return (
+    <Art extraClass={extraClass}>
+      <path d="M7.5 12.5h17v15a1.6 1.6 0 0 1-1.6 1.6H9.1a1.6 1.6 0 0 1-1.6-1.6z" fill={CRUST_DARK} stroke="none" />
+      {/* the interior, painted before the fuel so the fuel sits inside it */}
+      <path d="M7.5 10.5h17v15a1.6 1.6 0 0 1-1.6 1.6H9.1a1.6 1.6 0 0 1-1.6-1.6z" fill={PLATE_DIM} stroke="none" />
+      <rect className="fx-can__fuel" x="8.4" y="11.4" width="15.2" height="15.2" fill={GOLD_DEEP} stroke="none" />
+      <rect className="fx-can__fuel fx-can__fuel--crest" x="8.4" y="11.4" width="15.2" height="1.6" fill={GOLD} stroke="none" />
+      {/* the can's outline and furniture, over the fuel */}
+      <path
+        d="M7.5 10.5h17v15a1.6 1.6 0 0 1-1.6 1.6H9.1a1.6 1.6 0 0 1-1.6-1.6z"
+        fill="none"
+        stroke={INK}
+        strokeWidth={1.6}
+      />
+      <path d="M10.6 13.8 21.4 23.8M21.4 13.8 10.6 23.8" stroke={EMERALD_LIGHT} strokeWidth={1.5} opacity={0.75} />
+      <path d="M11.4 10.4V8.4h9.2v2" fill="none" stroke={INK} strokeWidth={1.6} />
+      <rect className="fx-can__cap" x="18.4" y="6.2" width="4.6" height="3" rx="1.1" fill={METAL_LO} stroke={INK} strokeWidth={1.4} />
+      <path d="M20.7 6.2V4.6" stroke={INK} strokeWidth={1.4} />
+      <path d="M9.4 12.6a1 1 0 0 1 1-1h4" stroke={METAL_HI} strokeWidth={1.4} />
+    </Art>
+  );
+}

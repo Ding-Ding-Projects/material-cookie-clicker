@@ -4769,3 +4769,717 @@ ul.card-grid {
   color: var(--on-surface-variant);
   overflow-wrap: anywhere;
 }
+
+/* ============================================================================================
+ * PURCHASE FEEDBACK (src/renderer/game/purchase-fx.tsx, src/renderer/game/purchase-fx-core.ts).
+ *
+ * One motion language for every way the player spends cookies: a generator row, an upgrade
+ * ticket, the discovery ticket, and the diesel mint. All four share the cookie-coin flight and
+ * the HUD counter's dip, then each adds the gesture that belongs to it.
+ *
+ * Constraints this whole block obeys:
+ *   - only `transform`, `opacity` and colour are animated; nothing here animates width, height,
+ *     top/left, margin or padding, so no frame costs a layout;
+ *   - nothing loops. Every animation is one-shot with `both`, so nothing can flash repeatedly
+ *     and the WCAG three-flashes-a-second limit is met by construction;
+ *   - nothing moves a control. Row/ticket/card transforms are on the container, and everything
+ *     else lives in the fixed, `pointer-events: none` overlay — a buy button never travels out
+ *     from under the pointer that is on it;
+ *   - `prefers-reduced-motion: reduce` replaces travel with an instant state change that still
+ *     shows the OUTCOME: the filled can, the owned ticket, the new count (see the block at the
+ *     end of this file).
+ * ========================================================================================== */
+
+.purchase-fx {
+  position: fixed;
+  inset: 0;
+  pointer-events: none;
+  z-index: 60;
+  overflow: hidden;
+}
+
+/* --- the cookie coins ---------------------------------------------------------------------
+   Fired from the HUD's cookie bezel to whatever was bought, along a per-coin arc computed from
+   the real DOM rects at press time (purchase-fx-core.ts#planCoinFlight). The arc is done with
+   a mid-keyframe offset rather than a path, because a transform is all it costs. */
+.fx-coin {
+  position: absolute;
+  width: 16px;
+  height: 16px;
+  margin: -8px 0 0 -8px;
+  border-radius: var(--shape-full);
+  background: radial-gradient(circle at 34% 30%, var(--primary-container), var(--primary) 78%);
+  border: 2px solid var(--primary-shadow);
+  box-shadow: 0 2px 0 0 var(--primary-shadow);
+  animation: fx-coin-flight 620ms cubic-bezier(0.3, 0.7, 0.35, 1) both;
+  will-change: transform, opacity;
+}
+
+.fx-coin--golden {
+  background: radial-gradient(circle at 34% 30%, var(--spark), var(--spark-glow) 80%);
+  border-color: var(--spark-ring);
+  box-shadow: 0 2px 0 0 var(--spark-ring);
+}
+
+@keyframes fx-coin-flight {
+  0% {
+    opacity: 0;
+    transform: translate(0, 0) scale(0.5) rotate(0deg);
+  }
+  14% {
+    opacity: 1;
+    transform: translate(calc(var(--fx-dx) * 0.14 + var(--fx-arc-x) * 0.3), calc(var(--fx-dy) * 0.14 + var(--fx-arc-y) * 0.5))
+      scale(1) rotate(calc(var(--fx-spin) * 0.14));
+  }
+  55% {
+    opacity: 1;
+    transform: translate(calc(var(--fx-dx) * 0.55 + var(--fx-arc-x)), calc(var(--fx-dy) * 0.55 + var(--fx-arc-y)))
+      scale(1) rotate(calc(var(--fx-spin) * 0.55));
+  }
+  100% {
+    opacity: 0;
+    transform: translate(var(--fx-dx), var(--fx-dy)) scale(0.55) rotate(var(--fx-spin));
+  }
+}
+
+/* --- the counter dip ---------------------------------------------------------------------
+   The cookies really did leave, so the bezel sinks a little and settles back. */
+.fx-hud-dip {
+  animation: fx-hud-dip 420ms cubic-bezier(0.2, 0.9, 0.3, 1) both;
+}
+
+@keyframes fx-hud-dip {
+  0% {
+    transform: translateY(0) scale(1);
+  }
+  30% {
+    transform: translateY(3px) scale(0.985);
+  }
+  62% {
+    transform: translateY(-1px) scale(1.008);
+  }
+  100% {
+    transform: translateY(0) scale(1);
+  }
+}
+
+/* --- a generator row buying ---------------------------------------------------------------
+   Press-bounce on the row, odometer tick on the owned count, one-shot spin-up on the machine's
+   own drawing, and a warm glow sweeping left to right across the row. */
+.fx-row-buy {
+  position: relative;
+  animation: fx-row-bounce 420ms cubic-bezier(0.25, 1.4, 0.4, 1) both;
+}
+
+.fx-row-buy::after {
+  content: '';
+  position: absolute;
+  inset: 0;
+  border-radius: inherit;
+  pointer-events: none;
+  background: linear-gradient(100deg, transparent 34%, var(--spark-glow) 50%, transparent 66%);
+  opacity: 0;
+  animation: fx-row-sweep 640ms ease-out both;
+  will-change: transform, opacity;
+}
+
+@keyframes fx-row-bounce {
+  0% {
+    transform: scale(1);
+  }
+  26% {
+    transform: scale(0.965) translateY(2px);
+  }
+  62% {
+    transform: scale(1.022) translateY(-2px);
+  }
+  100% {
+    transform: scale(1);
+  }
+}
+
+@keyframes fx-row-sweep {
+  0% {
+    opacity: 0;
+    transform: translateX(-40%);
+  }
+  35% {
+    opacity: 0.38;
+  }
+  100% {
+    opacity: 0;
+    transform: translateX(40%);
+  }
+}
+
+/* The owned count rolls like an odometer wheel: the old figure lifts out of the top, the new
+   one arrives from the bottom. React has already swapped the text by the time this runs, so
+   what the eye reads is the new number landing. */
+.fx-row-buy .shop-row__owned {
+  display: inline-block;
+  animation: fx-odometer-roll 460ms cubic-bezier(0.2, 0.9, 0.25, 1) both;
+}
+
+@keyframes fx-odometer-roll {
+  0% {
+    transform: translateY(-90%);
+    opacity: 0;
+  }
+  45% {
+    transform: translateY(6%);
+    opacity: 1;
+  }
+  70% {
+    transform: translateY(-3%);
+  }
+  100% {
+    transform: translateY(0);
+    opacity: 1;
+  }
+}
+
+/* The machine itself reacts — a quick spin-up wobble, as if it just switched on. */
+.fx-row-buy .shop-row__icon .game-icon {
+  animation: fx-icon-spinup 560ms cubic-bezier(0.3, 1.2, 0.4, 1) both;
+  transform-origin: 50% 60%;
+}
+
+@keyframes fx-icon-spinup {
+  0% {
+    transform: rotate(0deg) scale(1);
+  }
+  22% {
+    transform: rotate(-13deg) scale(1.12);
+  }
+  48% {
+    transform: rotate(11deg) scale(1.1);
+  }
+  72% {
+    transform: rotate(-5deg) scale(1.04);
+  }
+  100% {
+    transform: rotate(0deg) scale(1);
+  }
+}
+
+/* --- an upgrade ticket being torn --------------------------------------------------------
+   A ticket is a perforated stub, so buying one tears it: the two halves shear apart along the
+   perforation, the stub drops away, and the ticket settles into its owned state with a spark.
+   The tear itself is drawn in the overlay, so the real ticket never changes size. */
+.fx-ticket-tear {
+  animation: fx-ticket-settle 620ms cubic-bezier(0.25, 1.3, 0.4, 1) both;
+}
+
+@keyframes fx-ticket-settle {
+  0% {
+    transform: rotate(0deg) scale(1);
+  }
+  18% {
+    transform: rotate(-2.5deg) scale(0.97);
+  }
+  46% {
+    transform: rotate(1.6deg) scale(1.03);
+  }
+  100% {
+    transform: rotate(0deg) scale(1);
+  }
+}
+
+.fx-tear {
+  position: absolute;
+  pointer-events: none;
+}
+
+.fx-tear__half,
+.fx-tear__stub {
+  position: absolute;
+  left: 0;
+  right: 0;
+  border-radius: var(--shape-sm);
+  background: var(--surface-lowest);
+  border: var(--border-chunky, 3px) solid var(--metal-lo);
+  will-change: transform, opacity;
+}
+
+/* The upper half lifts and tilts a touch; the lower half — the price stub — falls away. */
+.fx-tear__half--top {
+  top: 0;
+  height: 62%;
+  animation: fx-tear-top 560ms cubic-bezier(0.3, 0.9, 0.4, 1) both;
+}
+
+.fx-tear__stub {
+  top: 62%;
+  height: 38%;
+  border-top-style: dashed;
+  animation: fx-tear-stub 700ms cubic-bezier(0.4, 0.2, 0.6, 1) both;
+}
+
+@keyframes fx-tear-top {
+  0% {
+    opacity: 0.92;
+    transform: translate(0, 0) rotate(0deg);
+  }
+  40% {
+    opacity: 0.8;
+    transform: translate(-3px, -5px) rotate(-1.8deg);
+  }
+  100% {
+    opacity: 0;
+    transform: translate(-4px, -8px) rotate(-2.4deg);
+  }
+}
+
+@keyframes fx-tear-stub {
+  0% {
+    opacity: 0.95;
+    transform: translate(0, 0) rotate(0deg);
+  }
+  30% {
+    opacity: 0.9;
+    transform: translate(2px, 6px) rotate(3deg);
+  }
+  100% {
+    opacity: 0;
+    transform: translate(6px, 42px) rotate(11deg);
+  }
+}
+
+/* The stamp of ownership: one spark flash across the middle of the ticket. Decorative spark
+   tokens only, one shot, no repeat. */
+.fx-tear__spark {
+  position: absolute;
+  left: 50%;
+  top: 52%;
+  width: 46px;
+  height: 46px;
+  margin: -23px 0 0 -23px;
+  border-radius: var(--shape-full);
+  background: radial-gradient(circle, var(--spark) 0%, var(--spark-glow) 42%, transparent 72%);
+  animation: fx-spark-flash 520ms ease-out both;
+  will-change: transform, opacity;
+}
+
+@keyframes fx-spark-flash {
+  0% {
+    opacity: 0;
+    transform: scale(0.3);
+  }
+  30% {
+    opacity: 0.9;
+    transform: scale(1);
+  }
+  100% {
+    opacity: 0;
+    transform: scale(1.65);
+  }
+}
+
+/* --- the diesel mint ----------------------------------------------------------------------
+   The richest sequence in the game, and the one the owner asked for by name. Over about two
+   seconds: the depot card takes a pump-press, a nozzle swings in on its hose, the jerrycan's
+   fuel level rises, drops fall, the litres figure rolls up, and a voucher slip prints out
+   carrying the short prefix of the identifier the main process actually wrote.
+   Overlapping mints are queued by the fx layer, so this never plays twice at once. */
+.fx-depot-mint {
+  animation: fx-depot-press 900ms cubic-bezier(0.25, 1.2, 0.35, 1) both;
+}
+
+@keyframes fx-depot-press {
+  0% {
+    transform: scale(1);
+  }
+  16% {
+    transform: scale(0.985) translateY(3px);
+  }
+  46% {
+    transform: scale(1.012) translateY(-2px);
+  }
+  100% {
+    transform: scale(1);
+  }
+}
+
+.fx-depot-mint .diesel-depot__count {
+  display: inline-block;
+  animation: fx-odometer-roll 620ms cubic-bezier(0.2, 0.9, 0.25, 1) both;
+}
+
+.fx-pump {
+  position: absolute;
+  pointer-events: none;
+}
+
+/* The nozzle arrives from the upper right, on its hose, and swings down over the can. */
+.fx-pump__hose {
+  position: absolute;
+  right: 8%;
+  top: 4%;
+  width: 84px;
+  height: 84px;
+  font-size: 84px;
+  transform-origin: 78% 12%;
+  animation: fx-nozzle-swing 1900ms cubic-bezier(0.3, 0.9, 0.35, 1) both;
+  will-change: transform, opacity;
+}
+
+.fx-pump__nozzle {
+  width: 1em;
+  height: 1em;
+}
+
+@keyframes fx-nozzle-swing {
+  0% {
+    opacity: 0;
+    transform: translate(46px, -34px) rotate(28deg);
+  }
+  14% {
+    opacity: 1;
+    transform: translate(0, 0) rotate(4deg);
+  }
+  22%,
+  80% {
+    opacity: 1;
+    transform: translate(0, 0) rotate(0deg);
+  }
+  100% {
+    opacity: 0;
+    transform: translate(38px, -30px) rotate(24deg);
+  }
+}
+
+.fx-pump__can {
+  position: absolute;
+  left: 6%;
+  top: 10%;
+  width: 96px;
+  height: 96px;
+  font-size: 96px;
+  animation: fx-can-arrive 1900ms ease-out both;
+}
+
+.fx-pump__can-art {
+  width: 1em;
+  height: 1em;
+  filter: drop-shadow(0 4px 0 var(--primary-shadow));
+}
+
+@keyframes fx-can-arrive {
+  0% {
+    opacity: 0;
+    transform: translateY(10px) scale(0.9);
+  }
+  10%,
+  86% {
+    opacity: 1;
+    transform: translateY(0) scale(1);
+  }
+  100% {
+    opacity: 0;
+    transform: translateY(-6px) scale(0.98);
+  }
+}
+
+/* The fuel level. The rect is anchored at the bottom of the can's interior, so scaling it in Y
+   reads as a level rising rather than a box growing from its middle. */
+.fx-can__fuel {
+  transform-origin: 50% 27.4px;
+  animation: fx-fuel-rise 1500ms cubic-bezier(0.35, 0.15, 0.35, 1) both;
+}
+
+.fx-can__fuel--crest {
+  animation: fx-fuel-crest 1500ms cubic-bezier(0.35, 0.15, 0.35, 1) both;
+}
+
+@keyframes fx-fuel-rise {
+  0% {
+    transform: scaleY(0.02);
+  }
+  16% {
+    transform: scaleY(0.06);
+  }
+  86%,
+  100% {
+    transform: scaleY(0.82);
+  }
+}
+
+/* The crest is the bright line ON the surface of the fuel, so it TRANSLATES down to wherever
+   the level currently is instead of scaling with the body. */
+@keyframes fx-fuel-crest {
+  0% {
+    transform: translateY(14.9px);
+    opacity: 0.9;
+  }
+  16% {
+    transform: translateY(14.3px);
+  }
+  86%,
+  100% {
+    transform: translateY(2.7px);
+    opacity: 0.9;
+  }
+}
+
+/* The cap twists shut at the end of the pour. */
+.fx-pump .fx-can__cap {
+  transform-origin: 20.7px 7.7px;
+  animation: fx-cap-twist 1900ms ease-in-out both;
+}
+
+@keyframes fx-cap-twist {
+  0%,
+  74% {
+    transform: rotate(0deg) translateY(-1.5px);
+  }
+  84% {
+    transform: rotate(-160deg) translateY(0);
+  }
+  92% {
+    transform: rotate(-330deg) translateY(0);
+  }
+  100% {
+    transform: rotate(-360deg) translateY(0);
+  }
+}
+
+/* Fuel drops falling from the nozzle into the can. Four of them, staggered, each one shot. */
+.fx-pump__drops {
+  position: absolute;
+  left: 26%;
+  top: 18%;
+  width: 40px;
+  height: 60px;
+}
+
+.fx-pump__drop {
+  position: absolute;
+  top: 0;
+  width: 7px;
+  height: 10px;
+  border-radius: 50% 50% 50% 50% / 62% 62% 38% 38%;
+  background: linear-gradient(180deg, var(--spark) 0%, var(--spark-glow) 100%);
+  opacity: 0;
+  animation: fx-drop-fall 620ms ease-in both;
+  will-change: transform, opacity;
+}
+
+.fx-pump__drop:nth-child(1) {
+  left: 2px;
+  animation-delay: 260ms;
+}
+.fx-pump__drop:nth-child(2) {
+  left: 14px;
+  animation-delay: 520ms;
+}
+.fx-pump__drop:nth-child(3) {
+  left: 24px;
+  animation-delay: 820ms;
+}
+.fx-pump__drop:nth-child(4) {
+  left: 8px;
+  animation-delay: 1120ms;
+}
+
+@keyframes fx-drop-fall {
+  0% {
+    opacity: 0;
+    transform: translateY(-6px) scaleY(0.7);
+  }
+  20% {
+    opacity: 1;
+    transform: translateY(6px) scaleY(1);
+  }
+  86% {
+    opacity: 1;
+    transform: translateY(42px) scaleY(1.25);
+  }
+  100% {
+    opacity: 0;
+    transform: translateY(50px) scaleY(0.5);
+  }
+}
+
+/* The litres figure, rolling up beside the can. */
+.fx-pump__litres {
+  position: absolute;
+  left: 8%;
+  bottom: 24%;
+  font-family: var(--font-display);
+  font-size: 26px;
+  font-weight: 900;
+  font-variant-numeric: tabular-nums;
+  color: var(--on-surface);
+  text-shadow: 0 2px 0 var(--surface-lowest);
+  animation: fx-litres-roll 1900ms cubic-bezier(0.2, 0.9, 0.3, 1) both;
+}
+
+@keyframes fx-litres-roll {
+  0% {
+    opacity: 0;
+    transform: translateY(16px) scale(0.8);
+  }
+  22% {
+    opacity: 1;
+    transform: translateY(0) scale(1.18);
+  }
+  34%,
+  84% {
+    opacity: 1;
+    transform: translateY(0) scale(1);
+  }
+  100% {
+    opacity: 0;
+    transform: translateY(-10px) scale(0.95);
+  }
+}
+
+/* The voucher slip, printing out of the bottom of the card at the end of the sequence. It
+   carries the first eight characters of the identifier the ledger file actually received; with
+   no answer back from the main process yet it prints a row of dots instead of inventing one. */
+.fx-pump__voucher {
+  position: absolute;
+  right: 6%;
+  bottom: 10%;
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+  padding: 6px 10px;
+  border-radius: var(--shape-sm);
+  background: var(--surface-lowest);
+  border: 2px solid var(--metal-lo);
+  box-shadow: 0 3px 0 0 var(--primary-shadow);
+  animation: fx-voucher-print 900ms cubic-bezier(0.25, 1.2, 0.35, 1) both;
+  animation-delay: 1150ms;
+  will-change: transform, opacity;
+}
+
+.fx-pump__voucher-key {
+  font-family: var(--font-display);
+  font-size: 8px;
+  font-weight: 900;
+  letter-spacing: 0.22em;
+  color: var(--on-surface-variant);
+}
+
+.fx-pump__voucher-id {
+  font-family: var(--font-mono, ui-monospace, 'Cascadia Mono', Consolas, monospace);
+  font-size: 12px;
+  color: var(--on-surface);
+}
+
+@keyframes fx-voucher-print {
+  0% {
+    opacity: 0;
+    transform: translateY(-14px) rotate(-4deg) scaleY(0.6);
+  }
+  40% {
+    opacity: 1;
+    transform: translateY(2px) rotate(1.5deg) scaleY(1);
+  }
+  70% {
+    opacity: 1;
+    transform: translateY(0) rotate(0deg) scaleY(1);
+  }
+  100% {
+    opacity: 0;
+    transform: translateY(6px) rotate(0deg) scaleY(1);
+  }
+}
+
+/* --- reduced motion ----------------------------------------------------------------------
+   Nothing above travels, spins, bounces or falls under this setting. What replaces it is not
+   "nothing": every effect becomes an instant state change that is held briefly and then
+   released, so the player still sees WHAT HAPPENED — the row that was bought, the ticket that
+   is now owned, the can that is now full, the voucher that printed. The fx layer additionally
+   never spawns coins at all under this setting (purchase-fx.tsx), because a coin's whole
+   content is its flight. */
+@media (prefers-reduced-motion: reduce) {
+  .fx-coin {
+    display: none;
+  }
+
+  .fx-hud-dip {
+    animation: none;
+    background: var(--surface-highest);
+  }
+
+  .fx-row-buy,
+  .fx-ticket-tear,
+  .fx-depot-mint {
+    animation: none;
+  }
+
+  /* The bought thing is outlined in the spark ring for the length of the effect — an
+     un-animated change of state, held and then dropped, exactly as the pressed cookie does. */
+  .fx-row-buy,
+  .fx-depot-mint {
+    outline: 3px solid var(--spark-ring);
+    outline-offset: 2px;
+  }
+
+  .fx-row-buy::after {
+    animation: none;
+    opacity: 0.22;
+    transform: none;
+  }
+
+  .fx-row-buy .shop-row__owned,
+  .fx-row-buy .shop-row__icon .game-icon,
+  .fx-depot-mint .diesel-depot__count {
+    animation: none;
+  }
+
+  /* No tear: the ticket is simply shown as taken, with the stub already gone. */
+  .fx-tear__half,
+  .fx-tear__stub {
+    display: none;
+  }
+
+  .fx-tear__spark {
+    animation: fx-hold-out 480ms step-end both;
+    transform: scale(1);
+  }
+
+  /* The pump becomes a still picture of the result: a full can, the new litres figure, and the
+     voucher slip — all present immediately, held, then removed. */
+  .fx-pump__hose,
+  .fx-pump__drops {
+    display: none;
+  }
+
+  .fx-pump__can,
+  .fx-pump__litres,
+  .fx-pump__voucher {
+    animation: fx-hold-out 480ms step-end both;
+    animation-delay: 0ms;
+    transform: none;
+    opacity: 1;
+  }
+
+  .fx-can__fuel {
+    animation: none;
+    transform: scaleY(0.82);
+  }
+
+  .fx-can__fuel--crest {
+    animation: none;
+    transform: translateY(2.7px);
+  }
+
+  .fx-pump .fx-can__cap {
+    animation: none;
+    transform: none;
+  }
+}
+
+/* Shows something for the whole of its duration and then removes it, with no intermediate
+   states: a state change held, not a fade. */
+@keyframes fx-hold-out {
+  0% {
+    opacity: 1;
+  }
+  100% {
+    opacity: 0;
+  }
+}

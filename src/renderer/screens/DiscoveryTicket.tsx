@@ -5,6 +5,7 @@ import { isUpgradeUnlocked, REVEAL_UPGRADE_DEFINITIONS, type UpgradeDefinition }
 import { UpgradeIcon } from '../assets/icons.js';
 import { DISCLOSURE_COPY, type Bilingual } from '../game/copy.js';
 import { useFastSnapshot, useGameDispatch, useStructureSnapshot } from '../game/GameProvider.js';
+import { upgradeTargetKey, usePurchaseFxTarget } from '../game/purchase-fx.js';
 
 /**
  * How close to the price the player has to get before the ticket appears at all. Half the cost
@@ -47,6 +48,9 @@ export function DiscoveryTicket() {
   const dispatch = useGameDispatch();
 
   const disclosure = computeDisclosure(structure);
+  // Hooks run before the early returns below can skip them, so the key is derived from the
+  // component's own identity rather than from the (possibly absent) next reveal.
+  const fxRef = usePurchaseFxTarget<HTMLElement>(upgradeTargetKey('discovery'));
   // Once the strip is on screen it owns every remaining reveal. One purchase surface at a time.
   if (disclosure.upgradeStrip) return null;
 
@@ -102,6 +106,7 @@ export function DiscoveryTicket() {
 
   return (
     <section
+      ref={fxRef}
       className="panel discovery-ticket"
       aria-label={`${DISCLOSURE_COPY.discoveryLabel.en} · ${DISCLOSURE_COPY.discoveryLabel.yue}`}
     >

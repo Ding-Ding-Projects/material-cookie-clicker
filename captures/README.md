@@ -28,6 +28,10 @@ pixels.
 | `launch-shell.png` | The application launched from the real build: window opens, product name correct, theme surface rendering, custom title bar rather than the operating system's default. | `37c967b` |
 | `diesel-depot.png` | The Diesel Depot in the shop rail's footer, one litre after minting: litres and vouchers both at 1, the price already risen to 1.15 thousand for the next litre, and the consumption line reading "none yet — WinForge has not read the ledger". The voucher this press wrote was checked on disk at `%APPDATA%\DingDingProjects\exchange\diesel-vouchers.json`. | this commit |
 
+| `anim-generator.png` | A generator purchase mid-flight: cookie coins arcing out of the HUD counter toward the Cursor row, and the row itself lit by its warm sweep with the owned count already rolled to its new figure. | this commit |
+| `anim-ticket.png` | An upgrade ticket mid-tear: golden coins in the air, and the Cursor Upgrade (x1) ticket split along its perforation with the two halves offset and the spark flash over it. | this commit |
+| `anim-diesel-1.png` `-2.png` `-3.png` | Three phases of one diesel mint sequence on the depot card: the nozzle swinging in over a still-empty can with the litres figure rolling up; the can filling with fuel drops falling from the nozzle; and the printed voucher slip carrying the real identifier's short prefix (`11c54571`) that the main process wrote to the ledger. | this commit |
+
 **How the diesel capture was set up.** It ran from the built `dist/` on an
 off-screen desktop with a fresh, throwaway user-data directory, so the run
 started from a genuinely empty save. Reaching a Diesel Depot purchase by hand
@@ -43,6 +47,23 @@ and the mint was a real press of the real button.
 surface mounts here" because at that commit it genuinely did — the screens lane
 had not landed. It is kept as an honest baseline of the first successful launch,
 not passed off as the finished interface.
+
+
+**How the animation captures were taken.** Same off-screen desktop, same
+window-by-title-and-class resolution, same seeded-save route as the diesel
+capture below — a save in the application's own format written into the
+profile's `localStorage` over the running app's own devtools connection, then
+loaded normally. The purchases themselves are real presses of the real controls,
+issued through that same connection, on a slow repeat so that a PrintWindow
+capture taken from outside lands while an animation is genuinely in flight.
+Every frame here was opened and looked at; frames that caught the gap between
+animations were discarded rather than relabelled.
+
+A still cannot prove timing. What these images show is that each effect renders,
+is anchored to the right control, and carries real data (the voucher prefix is
+the one the ledger file received). What they do NOT show is the easing, the
+settle, or that nothing exceeds three flashes a second — those are properties of
+the CSS and of the one-shot, non-repeating animations it declares.
 
 ## `design/` — the design system
 

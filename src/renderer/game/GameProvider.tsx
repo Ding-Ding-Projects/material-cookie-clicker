@@ -41,6 +41,10 @@ export interface DieselExchangeStatus {
   readonly bridgeAvailable: boolean;
   readonly summary: LedgerSummary | null;
   readonly ledgerPath: string | null;
+  /** The identifier the main process wrote for the most recent voucher this session, or null
+   *  when nothing has been minted yet (or the write failed). The purchase-feedback layer prints
+   *  its short prefix on the voucher slip, so the slip shows a real id or nothing at all. */
+  readonly lastVoucherId: string | null;
   /** Set when the last mint could not be written. Never cleared by a later failure's absence. */
   readonly error: Bilingual | null;
   readonly refresh: () => void;
@@ -84,6 +88,7 @@ export function GameProvider({ children }: { children: ReactNode }) {
   const [dieselSummary, setDieselSummary] = useState<LedgerSummary | null>(null);
   const [dieselPath, setDieselPath] = useState<string | null>(null);
   const [dieselError, setDieselError] = useState<Bilingual | null>(null);
+  const [lastVoucherId, setLastVoucherId] = useState<string | null>(null);
 
   const nowCtx = (): ReducerCtx => ({ now: () => Date.now(), rng: rngRef.current });
 
@@ -179,6 +184,7 @@ export function GameProvider({ children }: { children: ReactNode }) {
         .then((response) => {
           if (response.ok) {
             setDieselPath(response.filePath);
+            setLastVoucherId(response.voucher.id);
             setDieselError(null);
             refreshDieselLedger();
           } else {
@@ -287,6 +293,7 @@ export function GameProvider({ children }: { children: ReactNode }) {
       bridgeAvailable: Boolean(dieselBridge),
       summary: dieselSummary,
       ledgerPath: dieselPath,
+      lastVoucherId,
       error: dieselError,
       refresh: refreshDieselLedger,
     },

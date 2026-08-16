@@ -15,6 +15,7 @@ import { UpgradeIcon, type UpgradeFamily } from '../assets/icons.js';
 import { createSearchState, SearchWithRegexBuilder } from '../components/SearchWithRegexBuilder.js';
 import { DISCLOSURE_COPY, GAME_SURFACE_COPY, LIST_COPY, type Bilingual } from '../game/copy.js';
 import { useFastSnapshot, useGameDispatch, useStructureSnapshot } from '../game/GameProvider.js';
+import { upgradeTargetKey, usePurchaseFxTarget } from '../game/purchase-fx.js';
 import { matchesSearch } from '../game/local-regex-search.js';
 
 /** One of exactly three card states, mirroring design/upgrade-card.html. */
@@ -145,6 +146,7 @@ const UpgradeTicket = memo(function UpgradeTicket({
 }) {
   const dispatch = useGameDispatch();
   const fast = useFastSnapshot();
+  const fxRef = usePurchaseFxTarget<HTMLButtonElement>(upgradeTargetKey(def.id));
 
   const effect = describeEffect(def);
   const stateLabel: Bilingual =
@@ -162,6 +164,7 @@ const UpgradeTicket = memo(function UpgradeTicket({
 
   return (
     <button
+      ref={fxRef}
       type="button"
       className={`mini-ticket ${state}`}
       disabled={!affordable}

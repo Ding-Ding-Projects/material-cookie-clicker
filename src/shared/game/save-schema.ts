@@ -1,0 +1,81 @@
+import { z } from "zod";
+
+/**
+ * Current on-disk save schema version. Bump this whenever `SaveDataLatest`'s shape changes,
+ * and add a forward-only migration entry in migrations.ts keyed by the *previous* version.
+ */
+export const SAVE_SCHEMA_VERSION = 1;
+
+const BigNumSchema = z.object({
+  mantissa: z.number(),
+  exponent: z.number(),
+});
+
+const OwnedGeneratorSchema = z.object({
+  id: z.string(),
+  count: z.number().int().nonnegative(),
+});
+
+const OwnedUpgradeSchema = z.object({
+  id: z.string(),
+  purchasedAtTickCount: z.number().int().nonnegative(),
+});
+
+const UnlockedAchievementSchema = z.object({
+  id: z.string(),
+  unlockedAtIso: z.string(),
+});
+
+const GoldenCookieEffectSchema = z.object({
+  kind: z.enum(["frenzy", "clickFrenzy", "windfall"]),
+  expiresAtEpochMs: z.number().optional(),
+  multiplier: z.number().optional(),
+});
+
+const GoldenCookieStateSchema = z.object({
+  isSpawned: z.boolean(),
+  spawnedAtEpochMs: z.number().optional(),
+  rngStreamIndex: z.number().int().nonnegative(),
+  activeEffect: GoldenCookieEffectSchema.optional(),
+  nextEligibleAtEpochMs: z.number(),
+});
+
+const PrestigeStateSchema = z.object({
+  ascensionPoints: z.number().int().nonnegative(),
+  totalPrestigeCount: z.number().int().nonnegative(),
+  permanentUnlockIds: z.array(z.string()),
+});
+
+const GameStatsSchema = z.object({
+  totalClicks: z.number().int().nonnegative(),
+  totalCookiesBaked: BigNumSchema,
+  clockAnomalyCount: z.number().int().nonnegative(),
+});
+
+/** Schema for save-format version 1. This is also, not coincidentally, the shape of GameState. */
+export const SaveDataV1Schema = z.object({
+  schemaVersion: z.literal(1),
+  cookies: BigNumSchema,
+  lifetimeCookies: BigNumSchema,
+  baseClickValue: BigNumSchema,
+  generators: z.array(OwnedGeneratorSchema),
+  upgrades: z.array(OwnedUpgradeSchema),
+  achievements: z.array(UnlockedAchievementSchema),
+  prestige: PrestigeStateSchema,
+  goldenCookie: GoldenCookieStateSchema,
+  stats: GameStatsSchema,
+  toolProgressionEnabled: z.boolean(),
+  lastTickAtIso: z.string(),
+  lastSavedAtIso: z.string(),
+});
+
+export type SaveDataV1 = z.infer<typeof SaveDataV1Schema>;
+
+/** The schema alias that always points at the current (latest) version's shape. */
+export const SaveDataLatestSchema = SaveDataV1Schema;
+export type SaveDataLatest = SaveDataV1;
+
+/** Minimal shape used only to read `schemaVersion` off of otherwise-unvalidated input. */
+export const SaveVersionProbeSchema = z.object({
+  schemaVersion: z.number().int().nonnegative(),
+});

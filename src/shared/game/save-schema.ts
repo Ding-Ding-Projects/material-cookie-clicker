@@ -4,7 +4,7 @@ import { z } from "zod";
  * Current on-disk save schema version. Bump this whenever `SaveDataLatest`'s shape changes,
  * and add a forward-only migration entry in migrations.ts keyed by the *previous* version.
  */
-export const SAVE_SCHEMA_VERSION = 2;
+export const SAVE_SCHEMA_VERSION = 3;
 
 const BigNumSchema = z.object({
   mantissa: z.number(),
@@ -83,9 +83,23 @@ export const SaveDataV2Schema = SaveDataV1Schema.omit({ schemaVersion: true }).e
 
 export type SaveDataV2 = z.infer<typeof SaveDataV2Schema>;
 
+/**
+ * Schema for save-format version 3. Structurally identical to version 2 — progressive
+ * disclosure (disclosure.ts) is DERIVED from owned upgrades and lifetime progress rather than
+ * stored, so it needs no field of its own. The version exists purely so `migrations.ts#
+ * migrateV2ToV3` runs once over every older save and grants it the three reveal upgrades it
+ * could never have bought, which is what keeps a pre-disclosure save from losing surfaces it
+ * always had.
+ */
+export const SaveDataV3Schema = SaveDataV2Schema.omit({ schemaVersion: true }).extend({
+  schemaVersion: z.literal(3),
+});
+
+export type SaveDataV3 = z.infer<typeof SaveDataV3Schema>;
+
 /** The schema alias that always points at the current (latest) version's shape. */
-export const SaveDataLatestSchema = SaveDataV2Schema;
-export type SaveDataLatest = SaveDataV2;
+export const SaveDataLatestSchema = SaveDataV3Schema;
+export type SaveDataLatest = SaveDataV3;
 
 /** Minimal shape used only to read `schemaVersion` off of otherwise-unvalidated input. */
 export const SaveVersionProbeSchema = z.object({

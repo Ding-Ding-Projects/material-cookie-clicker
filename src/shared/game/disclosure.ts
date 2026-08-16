@@ -1,0 +1,171 @@
+import { GENERATOR_DEFINITIONS } from "./generators.js";
+import { evaluateNewlyUnlockedTools } from "./tools.js";
+import { REVEAL_UPGRADE_DEFINITIONS, type RevealSurface, type UpgradeDefinition } from "./upgrades.js";
+import type { GameState } from "./types.js";
+
+/**
+ * PROGRESSIVE DISCLOSURE — what the player can currently SEE.
+ *
+ * A fresh save is one cookie and one number. Everything else on the game surface is earned:
+ * the shop rail, the upgrade ticket strip, hold-to-click, the per-second and per-click
+ * readouts, each of the four console emblem buttons, and each rung of the generator ladder.
+ *
+ * There are exactly two ways a surface is earned, and both are derived here from ordinary
+ * game state — nothing about disclosure is stored as its own persisted field:
+ *
+ *   1. BOUGHT. The shop rail, the upgrade strip and hold-to-click each have a real reveal
+ *      upgrade in UPGRADE_DEFINITIONS (upgrades.ts#REVEAL_UPGRADE_DEFINITIONS), purchased
+ *      through the ordinary `buyUpgrade` action and the one `applyGameAction` seam.
+ *   2. REACHED. The readouts and the console buttons appear the moment the progress they
+ *      describe first exists — your first generator, your first achievement, your first
+ *      discovered tool, and closing on the prestige threshold.
+ *
+ * WHAT THIS IS NOT. Every predicate below answers "does the player see this piece of the GAME
+ * yet". None of them answers "is a real application feature available", which is always yes
+ * and is never the game domain's question — see tools.ts#ToolDefinition.gatesApplicationFeature.
+ * Hiding the Tools console emblem hides a game panel; the Tools tech tree and its "Open it now"
+ * button behave exactly as before once that panel is open, for every tool in every state.
+ *
+ * SAVE COMPATIBILITY. Every predicate ORs its bought condition against progress the player
+ * already has, so a save written before disclosure existed never loses a surface it used to
+ * show. The v2 -> v3 migration (migrations.ts) additionally grants the three reveal upgrades
+ * outright to every pre-existing save, and the `prestige.totalPrestigeCount > 0` term below
+ * keeps an ascended player's surfaces after prestige wipes their non-permanent upgrades.
+ */
+
+/**
+ * The Prestige console emblem appears when the player crosses a thousandth of the 1e12 lifetime
+ * cookies `canPrestige` actually requires — close enough that ascension is a real prospect
+ * rather than a rumour, far enough that it is not dangled in front of a beginner.
+ *
+ * It is keyed off the ACHIEVEMENT for that milestone rather than off `lifetimeCookies`
+ * directly, and deliberately: `achievements` is part of the store's structural slice and only
+ * changes on a discrete unlock, whereas `lifetimeCookies` changes several times a second. A
+ * console cluster that re-derived itself from the cookie count would re-render four inline-SVG
+ * emblems on every tick, for a button whose answer changes exactly once in a run.
+ */
+export const PRESTIGE_CONSOLE_ACHIEVEMENT_ID = "lifetime_1000000000";
+
+export type ConsoleSurfaceId = "achievements" | "tools" | "statistics" | "prestige";
+
+export interface Disclosure {
+  /** The generator shop rail. Bought with Shop Sign. */
+  readonly shop: boolean;
+  /** The upgrade ticket strip. Bought with Upgrade Catalogue. */
+  readonly upgradeStrip: boolean;
+  /** Press-and-hold repeat clicking, and only then its hint line. Bought with Steady Hand. */
+  readonly holdToClick: boolean;
+  /** The per-second HUD readout and the hero's CPS line. Reached with the first generator. */
+  readonly perSecondReadout: boolean;
+  /** The per-click HUD readout. Reached with Steady Hand, which is when a click gains nuance. */
+  readonly perClickReadout: boolean;
+  /** Which console emblem buttons are bolted to the cabinet yet. */
+  readonly consoles: Readonly<Record<ConsoleSurfaceId, boolean>>;
+}
+
+function ownsUpgrade(state: GameState, upgradeId: string): boolean {
+  return state.upgrades.some((u) => u.id === upgradeId);
+}
+
+/** The reveal upgrade that turns on `surface`. Throws for an unknown surface, never silently. */
+export function revealUpgradeFor(surface: RevealSurface): UpgradeDefinition {
+  const def = REVEAL_UPGRADE_DEFINITIONS.find(
+    (d) => d.effect.kind === "reveal" && d.effect.surface === surface,
+  );
+  if (!def) throw new RangeError(`No reveal upgrade defines surface: ${surface}`);
+  return def;
+}
+
+function totalGeneratorsOwned(state: GameState): number {
+  return state.generators.reduce((sum, g) => sum + g.count, 0);
+}
+
+/** True once at least one tool's own unlock condition is met, or one was bought in the shop.
+ *  Deliberately does NOT consult `toolProgressionEnabled`: that toggle lives inside the Tools
+ *  panel, and letting it decide whether the panel's own button exists would lock a player who
+ *  turned it off out of ever turning it back on. */
+function hasDiscoveredATool(state: GameState): boolean {
+  if ((state.purchasedToolIds ?? []).length > 0) return true;
+  return evaluateNewlyUnlockedTools(state, new Set<string>()).length > 0;
+}
+
+/** Ascended players keep every surface: prestige wipes non-permanent upgrades, and re-earning
+ *  the shop sign after a full run would be a punishment nobody asked for. */
+function hasAscended(state: GameState): boolean {
+  return state.prestige.totalPrestigeCount > 0;
+}
+
+export function computeDisclosure(state: GameState): Disclosure {
+  const ascended = hasAscended(state);
+  const generatorsOwned = totalGeneratorsOwned(state);
+
+  const shop = ascended || ownsUpgrade(state, "reveal_shop_sign") || generatorsOwned > 0;
+  const upgradeStrip =
+    ascended ||
+    ownsUpgrade(state, "reveal_upgrade_catalogue") ||
+    // A pre-disclosure save could own any upgrade at all; if it owns one that is not itself a
+    // reveal, the strip is where it came from and must still be there.
+    state.upgrades.some((u) => !u.id.startsWith("reveal_"));
+  const holdToClick = ascended || ownsUpgrade(state, "reveal_steady_hand");
+
+  return {
+    shop,
+    upgradeStrip,
+    holdToClick,
+    perSecondReadout: generatorsOwned > 0 || ascended,
+    perClickReadout: holdToClick,
+    consoles: {
+      achievements: state.achievements.length > 0,
+      tools: hasDiscoveredATool(state),
+      statistics: generatorsOwned > 0,
+      prestige:
+        ascended || state.achievements.some((a) => a.id === PRESTIGE_CONSOLE_ACHIEVEMENT_ID),
+    },
+  };
+}
+
+/** True when press-and-hold repeat clicking is available. The hold controller consults this;
+ *  a discrete click is never gated, because clicking the cookie is the whole game. */
+export function isHoldToClickEnabled(state: GameState): boolean {
+  return computeDisclosure(state).holdToClick;
+}
+
+/**
+ * THE GENERATOR LADDER, one rung at a time.
+ *
+ * Only tiers the player already owns are named, plus the one tier they can buy next, plus a
+ * single unnamed "???" rung hinting that the ladder continues. Everything past that is absent
+ * from the list entirely — not a named locked row, not a search hit, not a bulk-select target.
+ * Buying the next tier therefore reveals exactly one new row, every time.
+ */
+export type LadderRowState = "available" | "mystery";
+
+export interface LadderRow {
+  readonly id: string;
+  readonly index: number;
+  readonly state: LadderRowState;
+}
+
+export function visibleGeneratorLadder(state: GameState): readonly LadderRow[] {
+  const ownedById = new Map(state.generators.map((g) => [g.id, g.count] as const));
+  // The deepest tier the player actually owns. Read from the WHOLE ladder rather than stopping
+  // at the first gap, so a save that somehow owns a deep tier without the shallow ones (an
+  // import, an older build) still sees every tier it owns instead of losing rows.
+  let deepestOwned = -1;
+  GENERATOR_DEFINITIONS.forEach((def, index) => {
+    if ((ownedById.get(def.id) ?? 0) > 0) deepestOwned = index;
+  });
+  // Named and buyable: everything down to one rung past the deepest tier owned. On a fresh save
+  // that is the Cursor alone.
+  const availableThrough = deepestOwned + 1;
+
+  const rows: LadderRow[] = [];
+  for (let index = 0; index <= availableThrough && index < GENERATOR_DEFINITIONS.length; index += 1) {
+    rows.push({ id: GENERATOR_DEFINITIONS[index]!.id, index, state: "available" });
+  }
+  const mysteryIndex = availableThrough + 1;
+  if (mysteryIndex < GENERATOR_DEFINITIONS.length) {
+    rows.push({ id: GENERATOR_DEFINITIONS[mysteryIndex]!.id, index: mysteryIndex, state: "mystery" });
+  }
+  return rows;
+}

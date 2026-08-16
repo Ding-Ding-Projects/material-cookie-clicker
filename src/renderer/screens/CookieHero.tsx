@@ -4,6 +4,7 @@ import { bnMulScalar } from '../../shared/game/big-number.js';
 import { formatBigNum } from '../../shared/game/format-number.js';
 import { isEffectActive } from '../../shared/game/golden-cookie.js';
 import { computeMultipliers } from '../../shared/game/upgrades.js';
+import { computeDisclosure } from '../../shared/game/disclosure.js';
 import { GoldenCookieIcon } from '../assets/icons.js';
 import { COOKIE_SCREEN_COPY } from '../game/copy.js';
 import { useFastSnapshot, useGameDispatch, useStructureSnapshot } from '../game/GameProvider.js';
@@ -42,6 +43,11 @@ export function CookieHero() {
   const lastPointRef = useRef<{ x: number; y: number } | null>(null);
 
   const goldenActive = structure.goldenCookie.isSpawned;
+  // Progressive disclosure (src/shared/game/disclosure.ts): a fresh save is the cookie alone.
+  // The per-second line arrives with the first generator, and press-and-hold — plus the hint
+  // that teaches it — only after the Steady Hand reveal upgrade is bought.
+  const disclosure = computeDisclosure(structure);
+  const holdEnabled = disclosure.holdToClick;
 
   const currentClickValue = useMemo(() => {
     const multipliers = computeMultipliers(structure);
@@ -82,9 +88,21 @@ export function CookieHero() {
     spawnPopup(`+${formatBigNum(currentClickValue, 'en')}`, wasGolden);
   }
 
-  const controllerRef = useRef(createHoldToClickController(performClick));
+  // The enabled predicate is read at press time rather than captured, so buying Steady Hand
+  // mid-session makes holding work immediately without waiting for a controller rebuild.
+  const holdEnabledRef = useRef(holdEnabled);
+  holdEnabledRef.current = holdEnabled;
+
+  const controllerRef = useRef(
+    createHoldToClickController(performClick, undefined, undefined, () => holdEnabledRef.current),
+  );
   useEffect(() => {
-    controllerRef.current = createHoldToClickController(performClick);
+    controllerRef.current = createHoldToClickController(
+      performClick,
+      undefined,
+      undefined,
+      () => holdEnabledRef.current,
+    );
     return () => controllerRef.current.stop();
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [currentClickValue, goldenActive]);
@@ -141,13 +159,17 @@ export function CookieHero() {
         ))}
       </div>
 
-      <div className="cookie-cps" aria-live="off">
-        {formatBigNum(fast.cps, 'en')} / sec · {COOKIE_SCREEN_COPY.cpsLabel.yue} {formatBigNum(fast.cps, 'yue')}
-      </div>
+      {disclosure.perSecondReadout ? (
+        <div className="cookie-cps" aria-live="off">
+          {formatBigNum(fast.cps, 'en')} / sec · {COOKIE_SCREEN_COPY.cpsLabel.yue} {formatBigNum(fast.cps, 'yue')}
+        </div>
+      ) : null}
 
-      <p className="cookie-hero__hint">
-        {COOKIE_SCREEN_COPY.holdHint.en} · {COOKIE_SCREEN_COPY.holdHint.yue}
-      </p>
+      {holdEnabled ? (
+        <p className="cookie-hero__hint">
+          {COOKIE_SCREEN_COPY.holdHint.en} · {COOKIE_SCREEN_COPY.holdHint.yue}
+        </p>
+      ) : null}
     </div>
   );
 }

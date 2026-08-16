@@ -2,7 +2,8 @@ import { memo, useMemo, useState, type ReactNode } from 'react';
 
 import { bnCompare, bnMulScalar } from '../../shared/game/big-number.js';
 import { formatBigNum } from '../../shared/game/format-number.js';
-import { costOfBulk, GENERATOR_DEFINITIONS, generatorCps, maxAffordable, type GeneratorDefinition } from '../../shared/game/generators.js';
+import { costOfBulk, generatorCps, getGeneratorDefinition, maxAffordable, type GeneratorDefinition } from '../../shared/game/generators.js';
+import { visibleGeneratorLadder } from '../../shared/game/disclosure.js';
 import { totalBuyMaxDiscount } from '../../shared/game/tools.js';
 import { GeneratorIcon } from '../assets/icons.js';
 import { BuyStepper, type BuyQuantity } from '../components/BuyStepper.js';
@@ -10,7 +11,7 @@ import { BulkToolbar } from '../components/BulkToolbar.js';
 import { createSearchState, SearchWithRegexBuilder } from '../components/SearchWithRegexBuilder.js';
 import { useSelection } from '../components/useSelection.js';
 import { matchesSearch } from '../game/local-regex-search.js';
-import { BULK_COPY, GAME_SURFACE_COPY, LIST_COPY } from '../game/copy.js';
+import { BULK_COPY, DISCLOSURE_COPY, GAME_SURFACE_COPY, LIST_COPY } from '../game/copy.js';
 import { useFastSnapshot, useGameDispatch, useStructureSnapshot } from '../game/GameProvider.js';
 
 /** The tiny leaf that actually depends on live cookies: cost text + the buy button's
@@ -20,12 +21,10 @@ const GeneratorBuyButton = memo(function GeneratorBuyButton({
   def,
   owned,
   quantity,
-  unlocked,
 }: {
   def: GeneratorDefinition;
   owned: number;
   quantity: BuyQuantity;
-  unlocked: boolean;
 }) {
   const dispatch = useGameDispatch();
   const fast = useFastSnapshot();
@@ -38,20 +37,9 @@ const GeneratorBuyButton = memo(function GeneratorBuyButton({
   const finalCost = discount > 0 ? bnMulScalar(rawCost, 1 - discount) : rawCost;
   const affordable = requestedQuantity > 0 && bnCompare(fast.cookies, finalCost) >= 0;
 
-  // A locked tier is expressed by the dimmed row plus the reason already printed in its
-  // sub-line, exactly as the design spec's shop-row[disabled] does — not by a full-width dead
-  // form button. What is left here is a small recessed lock plate, which is not a focus stop.
-  if (!unlocked) {
-    return (
-      <span className="shop-row__lock">
-        <span className="shop-row__lock-emblem" aria-hidden="true">
-          🔒
-        </span>
-        {LIST_COPY.locked.en} · {LIST_COPY.locked.yue}
-      </span>
-    );
-  }
-
+  // There is no locked-tier branch here any more. A tier the player cannot buy yet is not
+  // dimmed on this list — it is not on this list at all (see disclosure.ts#
+  // visibleGeneratorLadder and MysteryRow below), so every row that renders is a real buy.
   return (
     <button
       type="button"
@@ -65,10 +53,31 @@ const GeneratorBuyButton = memo(function GeneratorBuyButton({
   );
 });
 
+/**
+ * The unnamed rung at the bottom of the ladder (see disclosure.ts#visibleGeneratorLadder). It
+ * exists to say "there is more" and nothing else: no name, no icon, no price, no checkbox and
+ * no stepper — it is not a control, so it is not a focus stop, not a bulk-select target and not
+ * a search hit. Buying the tier above it turns it into a real, named row.
+ */
+function MysteryRow() {
+  return (
+    <div className="shop-row locked shop-row--mystery">
+      <div className="shop-row__icon" aria-hidden="true">
+        <span className="shop-row__lock-emblem">🔒</span>
+      </div>
+      <div className="shop-row__names">
+        <span className="shop-row__name">{DISCLOSURE_COPY.ladderMysteryName.en}</span>
+        <span className="shop-row__sub">
+          {DISCLOSURE_COPY.ladderMysteryHint.en} · {DISCLOSURE_COPY.ladderMysteryHint.yue}
+        </span>
+      </div>
+    </div>
+  );
+}
+
 const GeneratorRow = memo(function GeneratorRow({
   def,
   owned,
-  unlocked,
   quantity,
   onQuantityChange,
   selected,
@@ -76,7 +85,6 @@ const GeneratorRow = memo(function GeneratorRow({
 }: {
   def: GeneratorDefinition;
   owned: number;
-  unlocked: boolean;
   quantity: BuyQuantity;
   onQuantityChange: (q: BuyQuantity) => void;
   selected: boolean;
@@ -84,7 +92,7 @@ const GeneratorRow = memo(function GeneratorRow({
 }) {
   const stepperLabelId = `stepper-label-${def.id}`;
   return (
-    <div className={`shop-row${unlocked ? '' : ' locked'}${owned > 0 ? ' owned' : ''}`}>
+    <div className={`shop-row${owned > 0 ? ' owned' : ''}`}>
       <input
         type="checkbox"
         className="select-checkbox"
@@ -99,9 +107,7 @@ const GeneratorRow = memo(function GeneratorRow({
         <span className="shop-row__name">{def.nameEn}</span>
         <span className="shop-row__name-zh">{def.nameYue}</span>
         <span className="shop-row__sub">
-          {unlocked
-            ? `+${formatBigNum(generatorCps(def, 1), 'en')}/sec each · 每個 +${formatBigNum(generatorCps(def, 1), 'en')}`
-            : 'Buy the previous tier first · 買咗上一層先會出現'}
+          {`+${formatBigNum(generatorCps(def, 1), 'en')}/sec each · 每個 +${formatBigNum(generatorCps(def, 1), 'en')}`}
         </span>
       </div>
       <span className="shop-row__owned" aria-label={`${LIST_COPY.owned.en} ${owned} · ${LIST_COPY.owned.yue} ${owned}`}>
@@ -111,8 +117,8 @@ const GeneratorRow = memo(function GeneratorRow({
         Buy quantity for {def.nameEn} · {def.nameYue}購買數量
       </span>
       <div className="shop-row__controls">
-        <BuyStepper value={quantity} onChange={onQuantityChange} disabled={!unlocked} ariaLabelId={stepperLabelId} />
-        <GeneratorBuyButton def={def} owned={owned} quantity={quantity} unlocked={unlocked} />
+        <BuyStepper value={quantity} onChange={onQuantityChange} ariaLabelId={stepperLabelId} />
+        <GeneratorBuyButton def={def} owned={owned} quantity={quantity} />
       </div>
     </div>
   );
@@ -144,17 +150,24 @@ export function ShopRail() {
     return map;
   }, [structure.generators]);
 
-  // A generator tier unlocks once the previous tier has at least one unit owned; the first
-  // tier is always unlocked. This is purely a display/reachability convenience — the reducer
-  // itself already refuses an unaffordable purchase, this just avoids showing tier 9 as
-  // "buyable" before tier 8 exists.
-  const rows = GENERATOR_DEFINITIONS.map((def, index) => {
-    const previous = GENERATOR_DEFINITIONS[index - 1];
-    const unlocked = index === 0 || (previous ? (ownedById.get(previous.id) ?? 0) > 0 : true);
-    return { def, owned: ownedById.get(def.id) ?? 0, unlocked };
-  });
+  // Progressive disclosure of the ladder itself (disclosure.ts#visibleGeneratorLadder): the
+  // tiers the player owns, the one tier they can buy next, and a single unnamed rung after
+  // that. Everything deeper is ABSENT — not dimmed, not named, not findable — so each purchase
+  // reveals exactly one new row and the ladder's depth stays something to discover.
+  const ladder = visibleGeneratorLadder(structure);
+  const rows = ladder
+    .filter((row) => row.state === 'available')
+    .map((row) => {
+      const def = getGeneratorDefinition(row.id);
+      return { def, owned: ownedById.get(def.id) ?? 0 };
+    });
+  const hasMysteryRow = ladder.some((row) => row.state === 'mystery');
 
+  // Search matches only rows the player can already see. A hidden tier stays hidden: it must
+  // not become findable by typing its name, which would leak the very ladder being revealed.
   const visibleRows = rows.filter((row) => matchesSearch(`${row.def.nameEn} ${row.def.nameYue}`, search));
+  // The unnamed rung has no name to match against, so any active search filters it out too.
+  const showMysteryRow = hasMysteryRow && visibleRows.length === rows.length;
 
   async function runBulkBuy(): Promise<void> {
     setBusy(true);
@@ -162,7 +175,7 @@ export function ShopRail() {
     let skipped = 0;
     for (const id of selection.ids) {
       const row = rows.find((r) => r.def.id === id);
-      if (!row || !row.unlocked) {
+      if (!row) {
         skipped += 1;
         continue;
       }
@@ -254,13 +267,13 @@ export function ShopRail() {
                 key={row.def.id}
                 def={row.def}
                 owned={row.owned}
-                unlocked={row.unlocked}
                 quantity={quantities[row.def.id] ?? 1}
                 onQuantityChange={(q) => setQuantities((prev) => ({ ...prev, [row.def.id]: q }))}
                 selected={selection.has(row.def.id)}
                 onToggleSelect={() => selection.toggle(row.def.id)}
               />
             ))}
+            {showMysteryRow ? <MysteryRow /> : null}
           </div>
         )}
       </div>

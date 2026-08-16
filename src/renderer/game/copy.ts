@@ -101,6 +101,38 @@ export const COOKIE_SCREEN_COPY = {
   holdHint: { en: "Hold to click repeatedly", yue: "撳住可以連續撳擊" },
 } as const satisfies Record<string, Bilingual>;
 
+/**
+ * Progressive disclosure (see src/shared/game/disclosure.ts): the discovery ticket that carries
+ * the next reveal upgrade before the shop and the upgrade strip exist, and the unnamed rung at
+ * the bottom of the generator ladder.
+ */
+export const DISCLOSURE_COPY = {
+  discoveryLabel: { en: "A discovery", yue: "有發現" },
+  discoveryMystery: { en: "Something is missing here…", yue: "呢度好似爭咗啲嘢…" },
+  discoveryHint: {
+    en: "Keep clicking — you can almost afford it.",
+    yue: "繼續撳——就嚟夠錢買得起。",
+  },
+  discoveryBuy: { en: "Buy", yue: "買" },
+  revealShop: {
+    en: "Hangs a sign over the counter, and the generator shop with it.",
+    yue: "喺櫃枱上面掛塊招牌，順手帶埋成間生產器商店出嚟。",
+  },
+  revealUpgradeStrip: {
+    en: "A catalogue of every upgrade there is, pinned under the cookie.",
+    yue: "一本齊晒所有升級嘅目錄，釘喺曲奇下面。",
+  },
+  revealHoldToClick: {
+    en: "Steady enough to hold the cookie down and keep clicking.",
+    yue: "手夠穩，可以撳住曲奇連續撳落去。",
+  },
+  ladderMysteryName: { en: "???", yue: "???" },
+  ladderMysteryHint: {
+    en: "Buy the tier above to find out what this is.",
+    yue: "買咗上面嗰層，就知呢個係咩。",
+  },
+} as const satisfies Record<string, Bilingual>;
+
 export const LIST_COPY = {
   searchPlaceholderGenerators: { en: "Search generators…", yue: "搜尋生產建築…" },
   searchPlaceholderUpgrades: { en: "Search upgrades…", yue: "搜尋升級…" },

@@ -8,11 +8,12 @@ import {
   UPGRADE_DEFINITIONS,
   type UpgradeDefinition,
   type UnlockCondition,
+  type RevealSurface,
 } from '../../shared/game/upgrades.js';
 import type { GameState } from '../../shared/game/types.js';
 import { UpgradeIcon, type UpgradeFamily } from '../assets/icons.js';
 import { createSearchState, SearchWithRegexBuilder } from '../components/SearchWithRegexBuilder.js';
-import { GAME_SURFACE_COPY, LIST_COPY, type Bilingual } from '../game/copy.js';
+import { DISCLOSURE_COPY, GAME_SURFACE_COPY, LIST_COPY, type Bilingual } from '../game/copy.js';
 import { useFastSnapshot, useGameDispatch, useStructureSnapshot } from '../game/GameProvider.js';
 import { matchesSearch } from '../game/local-regex-search.js';
 
@@ -30,6 +31,10 @@ function familyFor(def: UpgradeDefinition): UpgradeFamily {
       return 'generator';
     case 'globalCpsMultiplier':
       return 'global';
+    // A reveal upgrade buys back a piece of the surface rather than a multiplier, so it wears
+    // the golden family: this is the ticket that turns something on.
+    case 'reveal':
+      return 'golden';
   }
 }
 
@@ -52,8 +57,17 @@ function describeEffect(def: UpgradeDefinition): Bilingual {
         en: `All production ×${def.effect.multiplier}.`,
         yue: `全局產量 ×${def.effect.multiplier}。`,
       };
+    case 'reveal':
+      return REVEAL_EFFECT_COPY[def.effect.surface];
   }
 }
+
+/** What each reveal upgrade actually turns on, in the ticket's own effect line. */
+const REVEAL_EFFECT_COPY: Readonly<Record<RevealSurface, Bilingual>> = {
+  shop: DISCLOSURE_COPY.revealShop,
+  upgradeStrip: DISCLOSURE_COPY.revealUpgradeStrip,
+  holdToClick: DISCLOSURE_COPY.revealHoldToClick,
+};
 
 interface UnlockProgress {
   readonly requirement: Bilingual;
@@ -68,6 +82,20 @@ function describeUnlock(condition: UnlockCondition, state: GameState): UnlockPro
   switch (condition.kind) {
     case 'always':
       return null;
+    case 'upgradeOwned': {
+      // A reveal chained behind another reveal. There is no counter to show — you either own
+      // the previous ticket or you do not — so this is a requirement line with a binary track.
+      const previous = UPGRADE_DEFINITIONS.find((u) => u.id === condition.upgradeId);
+      const owned = state.upgrades.some((u) => u.id === condition.upgradeId);
+      return {
+        requirement: {
+          en: `Requires ${previous?.nameEn ?? condition.upgradeId}.`,
+          yue: `需要先買${previous?.nameYue ?? condition.upgradeId}。`,
+        },
+        fraction: owned ? 1 : 0,
+        counter: null,
+      };
+    }
     case 'generatorOwned': {
       const gen = getGeneratorDefinition(condition.generatorId);
       const owned = state.generators.find((g) => g.id === condition.generatorId)?.count ?? 0;

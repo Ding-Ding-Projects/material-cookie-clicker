@@ -4381,3 +4381,208 @@ ul.card-grid {
 
 .achievement-toast__badge.achievement-badge--minted::after {
   inset: -5px;}
+
+/* ============================================================================================
+   PROGRESSIVE DISCLOSURE (src/shared/game/disclosure.ts)
+   Two new pieces of surface, both append-only additions that change nothing above them:
+   the discovery ticket that carries a reveal upgrade before the upgrade strip exists, and the
+   unnamed rung at the bottom of the generator ladder.
+   ============================================================================================ */
+
+/* The discovery ticket, shaped per design/upgrade-card.html: a real ticket with notches punched
+   out of both long edges, a dashed perforation, and the price set as a stub across the bottom.
+   It sits directly under the cookie, so it is deliberately the full width of the hero column
+   rather than a card in a strip — there is only ever one of these on screen at a time. */
+.discovery-ticket {
+  position: relative;
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+  padding: 14px 20px 16px;
+  overflow: hidden;
+  border: var(--border-chunky) solid var(--metal-lo);
+  border-radius: var(--shape-sm);
+  background: linear-gradient(180deg, var(--surface-lowest), var(--tertiary-container));
+  color: var(--on-tertiary-container);
+  box-shadow: var(--press-1), inset 0 3px 0 0 var(--bevel-hi);
+}
+
+/* The two punched holes. Decorative only, exactly as .mini-ticket does it. */
+.discovery-ticket::before,
+.discovery-ticket::after {
+  content: '';
+  position: absolute;
+  top: 50%;
+  width: 18px;
+  height: 18px;
+  margin-top: -9px;
+  border-radius: var(--shape-full);
+  background: var(--surface-high);
+  border: var(--border-thin) solid var(--metal-lo);
+}
+
+.discovery-ticket::before {
+  left: -11px;
+}
+
+.discovery-ticket::after {
+  right: -11px;
+}
+
+/* Before it is affordable the ticket is a nameless rumour: the same shape, quieter, in ordinary
+   surface tones rather than the golden tertiary family it earns once it can be taken. */
+.discovery-ticket--rumour {
+  border-color: var(--outline);
+  background: linear-gradient(180deg, var(--surface-low), var(--surface-highest));
+  color: var(--on-surface);
+}
+
+.discovery-ticket--rumour::before,
+.discovery-ticket--rumour::after {
+  border-color: var(--outline);
+}
+
+.discovery-ticket__glyph {
+  font-size: 26px;
+  line-height: 1;
+}
+
+.discovery-ticket__name {
+  font-family: var(--font-display);
+  font-weight: 900;
+  font-size: 17px;
+  line-height: 1.2;
+}
+
+.discovery-ticket__name-zh {
+  font-family: var(--font-zh);
+  font-weight: 700;
+  font-size: 14px;
+  line-height: 1.3;
+}
+
+.discovery-ticket__desc {
+  font-size: 13px;
+  line-height: 1.4;
+  color: inherit;
+}
+
+/* The perforation above the price stub: a dashed rule the ticket would tear along. */
+.discovery-ticket__perf {
+  margin: 8px 0 2px;
+  height: 0;
+  border-top: var(--border-thin) dashed var(--metal-lo);
+  opacity: 0.7;
+}
+
+.discovery-ticket--rumour .discovery-ticket__perf {
+  border-top-color: var(--outline);
+}
+
+.discovery-ticket__track {
+  display: block;
+  height: 8px;
+  border-radius: var(--shape-full);
+  background: var(--track);
+  overflow: hidden;
+}
+
+.discovery-ticket__fill {
+  display: block;
+  height: 100%;
+  background: var(--primary);
+}
+
+/* The price stub. On the rumour ticket it is plain text — there is nothing to press yet — and
+   on the live ticket it is the buy control, at the full 44px target with the cabinet's own
+   press travel. */
+.discovery-ticket__stub {
+  margin-top: 8px;
+  align-self: flex-start;
+  font-family: var(--font-display);
+  font-weight: 900;
+  font-size: 14px;
+  letter-spacing: 0.06em;
+  font-variant-numeric: tabular-nums;
+  color: var(--on-surface-variant);
+}
+
+.discovery-ticket__stub--buy {
+  font: inherit;
+  font-family: var(--font-display);
+  font-weight: 900;
+  font-size: 14px;
+  letter-spacing: 0.06em;
+  font-variant-numeric: tabular-nums;
+  min-height: 44px;
+  padding: 0 22px;
+  border: none;
+  border-radius: var(--shape-full);
+  cursor: pointer;
+  background: var(--primary);
+  color: var(--on-primary);
+  box-shadow: 0 4px 0 0 var(--primary-shadow);
+  transition: transform calc(90ms * var(--motion-scale, 1)) ease,
+    box-shadow calc(90ms * var(--motion-scale, 1)) ease;
+}
+
+.discovery-ticket__stub--buy:active {
+  transform: translateY(4px);
+  box-shadow: none;
+}
+
+.discovery-ticket__stub--buy:focus-visible {
+  outline: 3px solid var(--secondary);
+  outline-offset: 2px;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .discovery-ticket__stub--buy {
+    transition: none;
+  }
+
+  /* No travel: the stub inverts its base instead of moving, the same substitution every other
+     pressable in the cabinet makes under reduced motion. */
+  .discovery-ticket__stub--buy:active {
+    transform: none;
+    box-shadow: inset 0 3px 0 0 var(--bevel-lo);
+  }
+}
+
+/* The unnamed rung at the bottom of the generator ladder. It is not a control and holds no
+   controls, so it collapses to an icon plate and two lines of text; the dashed edge says
+   "unfinished" rather than "disabled", because there is nothing here to disable. */
+.shop-row--mystery {
+  /* Two cells, not four: this rung has no checkbox and no controls, so the ordinary row grid
+     would leave two empty tracks and misalign the little that IS here. */
+  grid-template-columns: 34px minmax(0, 1fr);
+  border-style: dashed;
+  cursor: default;
+}
+
+.shop-row--mystery .shop-row__name {
+  font-family: var(--font-display);
+  letter-spacing: 0.22em;
+}
+
+/* With the shop rail not yet revealed there is no second column to reserve: the stage collapses
+   to one, so the cookie sits in the middle of the cabinet rather than beside a blank plate. */
+.stage--solo {
+  grid-template-columns: minmax(0, 1fr);
+}
+
+/* The discovery ticket is a fixed-size stub. The selector has to out-specify the hero column's
+   "last panel takes the remaining height" rule (.stage__hero-column > .panel:last-child), which
+   would otherwise stretch this ticket down the whole cabinet. */
+.stage__hero-column > .panel.discovery-ticket:last-child,
+.stage__hero-column > .panel.discovery-ticket {
+  flex: 0 0 auto;
+}
+
+/* ...and with the ticket pinned to its own height, the cookie takes the space instead. This
+   only ever applies before the shop is revealed; once the stage has both columns the ordinary
+   hero/strip split is untouched. */
+.stage--solo .stage__hero-column > .panel.cookie-hero {
+  flex: 1;
+  min-height: 0;
+}

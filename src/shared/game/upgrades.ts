@@ -7,11 +7,28 @@ import type { GameState } from "./types.js";
 export type UpgradeEffect =
   | { readonly kind: "clickMultiplier"; readonly multiplier: number }
   | { readonly kind: "generatorMultiplier"; readonly generatorId: string; readonly multiplier: number }
-  | { readonly kind: "globalCpsMultiplier"; readonly multiplier: number };
+  | { readonly kind: "globalCpsMultiplier"; readonly multiplier: number }
+  /**
+   * A *reveal* upgrade. It multiplies nothing at all — buying it turns on a piece of the game's
+   * own surface (the shop rail, the upgrade strip, the hold-to-click behaviour). See
+   * disclosure.ts, which is the single place that reads these. Deliberately an ordinary
+   * UpgradeDefinition bought through the ordinary `buyUpgrade` action rather than a parallel
+   * mechanism, so progressive disclosure has no seam of its own.
+   *
+   * A reveal NEVER gates an application feature — it gates game UI panels and one game input
+   * behaviour only. See tools.ts#ToolDefinition.gatesApplicationFeature for the contract this
+   * is deliberately NOT shaped like.
+   */
+  | { readonly kind: "reveal"; readonly surface: RevealSurface };
+
+/** The game-surface pieces a reveal upgrade can turn on. Mirrored in disclosure.ts. */
+export type RevealSurface = "shop" | "upgradeStrip" | "holdToClick";
 
 export type UnlockCondition =
   | { readonly kind: "generatorOwned"; readonly generatorId: string; readonly atLeast: number }
   | { readonly kind: "lifetimeCookies"; readonly atLeast: BigNum }
+  /** Chains one upgrade behind another, which is how the three reveals form a ladder. */
+  | { readonly kind: "upgradeOwned"; readonly upgradeId: string }
   | { readonly kind: "always" };
 
 export interface UpgradeDefinition {
@@ -45,6 +62,43 @@ function buildGeneratorUpgradeTiers(): UpgradeDefinition[] {
   }
   return tiers;
 }
+
+/**
+ * The three reveal upgrades, in ladder order. A fresh save shows the cookie and the cookie
+ * counter and nothing else; each of these buys back one piece of the surface. They are cheap
+ * on purpose — they are the first minutes of the game, not a wall.
+ *
+ * Before the shop rail and the upgrade strip themselves exist there is nowhere to buy them
+ * from, so the renderer surfaces the next un-owned one as a single "discovery ticket" beside
+ * the cookie (see DiscoveryTicket.tsx). That ticket dispatches the same `buyUpgrade` action
+ * the strip does — there is exactly one purchase seam.
+ */
+export const REVEAL_UPGRADE_DEFINITIONS: readonly UpgradeDefinition[] = [
+  {
+    id: "reveal_shop_sign",
+    nameEn: "Shop Sign",
+    nameYue: "商店招牌",
+    cost: bnFromNumber(10),
+    effect: { kind: "reveal", surface: "shop" },
+    unlockCondition: { kind: "always" },
+  },
+  {
+    id: "reveal_upgrade_catalogue",
+    nameEn: "Upgrade Catalogue",
+    nameYue: "升級目錄",
+    cost: bnFromNumber(50),
+    effect: { kind: "reveal", surface: "upgradeStrip" },
+    unlockCondition: { kind: "upgradeOwned", upgradeId: "reveal_shop_sign" },
+  },
+  {
+    id: "reveal_steady_hand",
+    nameEn: "Steady Hand",
+    nameYue: "穩陣手勢",
+    cost: bnFromNumber(100),
+    effect: { kind: "reveal", surface: "holdToClick" },
+    unlockCondition: { kind: "upgradeOwned", upgradeId: "reveal_upgrade_catalogue" },
+  },
+];
 
 const GLOBAL_UPGRADE_DEFINITIONS: readonly UpgradeDefinition[] = [
   {
@@ -90,6 +144,7 @@ const GLOBAL_UPGRADE_DEFINITIONS: readonly UpgradeDefinition[] = [
 ];
 
 export const UPGRADE_DEFINITIONS: readonly UpgradeDefinition[] = [
+  ...REVEAL_UPGRADE_DEFINITIONS,
   ...GLOBAL_UPGRADE_DEFINITIONS,
   ...buildGeneratorUpgradeTiers(),
 ];
@@ -108,6 +163,8 @@ export function isUpgradeUnlocked(condition: UnlockCondition, state: GameState):
       const owned = state.generators.find((g) => g.id === condition.generatorId);
       return (owned?.count ?? 0) >= condition.atLeast;
     }
+    case "upgradeOwned":
+      return state.upgrades.some((u) => u.id === condition.upgradeId);
     case "lifetimeCookies":
       return bnCompare(state.lifetimeCookies, condition.atLeast) >= 0;
   }
@@ -148,6 +205,11 @@ export function computeMultipliers(state: GameState): DerivedMultipliers {
       }
       case "globalCpsMultiplier":
         globalCpsMultiplier *= def.effect.multiplier;
+        break;
+      case "reveal":
+        // A reveal changes what the player can SEE, never what they produce. Folding it in
+        // here as an explicit no-op keeps this switch exhaustive rather than silently
+        // defaulted, so a future effect kind cannot slip through unhandled.
         break;
     }
   }

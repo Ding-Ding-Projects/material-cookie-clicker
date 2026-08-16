@@ -43,6 +43,10 @@ const STRUCTURE_KEYS = [
   "prestige",
   "goldenCookie",
   "toolProgressionEnabled",
+  // Buying a tool early changes which console emblems progressive disclosure shows (see
+  // disclosure.ts#hasDiscoveredATool), so it has to wake the structural slice like any other
+  // discrete purchase. It only ever changes on a `buyTool` action, never on a tick.
+  "purchasedToolIds",
 ] as const satisfies readonly (keyof GameState)[];
 
 function computeFastSnapshot(state: GameState): FastSnapshot {

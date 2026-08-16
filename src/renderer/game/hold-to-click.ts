@@ -32,14 +32,25 @@ export interface HoldToClickController {
   isActive(): boolean;
 }
 
+/**
+ * `isEnabled` is progressive disclosure's one hook into input behaviour: until the player buys
+ * the Steady Hand reveal upgrade (see src/shared/game/disclosure.ts#isHoldToClickEnabled),
+ * holding the cookie does nothing at all — not even the immediate first click, which the
+ * button's own `onClick` already delivers. It is a predicate rather than a captured boolean so
+ * a controller built before the upgrade was bought starts working the instant it is.
+ *
+ * A DISCRETE click is never gated by this or anything else. Clicking the cookie is the game.
+ */
 export function createHoldToClickController(
   onClick: () => void,
   scheduler: HoldToClickScheduler = defaultHoldToClickScheduler,
   intervalMs: number = HOLD_TO_CLICK_INTERVAL_MS,
+  isEnabled: () => boolean = () => true,
 ): HoldToClickController {
   let handle: unknown = null;
   return {
     start(): void {
+      if (!isEnabled()) return;
       if (handle !== null) return;
       onClick(); // Fire immediately on press so holding never feels like it "missed" the first tap.
       handle = scheduler.schedule(onClick, intervalMs);

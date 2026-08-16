@@ -50,7 +50,7 @@ export function decodeSave(raw: unknown): DecodeSaveResult {
 /** Encodes a GameState into JSON-safe save data. The reverse of decodeSave; never throws. */
 export function encodeSave(state: GameState): SaveDataLatest {
   return {
-    schemaVersion: state.schemaVersion as 2,
+    schemaVersion: state.schemaVersion as 3,
     cookies: state.cookies,
     lifetimeCookies: state.lifetimeCookies,
     baseClickValue: state.baseClickValue,

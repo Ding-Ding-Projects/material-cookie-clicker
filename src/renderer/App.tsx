@@ -4,6 +4,7 @@ import { bnMulScalar } from '../shared/game/big-number.js';
 import { formatBigNum } from '../shared/game/format-number.js';
 import { isEffectActive } from '../shared/game/golden-cookie.js';
 import { computeMultipliers } from '../shared/game/upgrades.js';
+import { computeDisclosure } from '../shared/game/disclosure.js';
 import {
   GameProvider,
   useFastSnapshot,
@@ -23,6 +24,7 @@ import {
 } from './game/copy';
 import { AchievementsScreen, AchievementUnlockToast } from './screens/AchievementsScreen';
 import { CookieHero } from './screens/CookieHero';
+import { DiscoveryTicket } from './screens/DiscoveryTicket';
 import { ShopRail } from './screens/ShopRail';
 import { PrestigeScreen } from './screens/PrestigeScreen';
 import { StatisticsScreen } from './screens/StatisticsScreen';
@@ -77,11 +79,16 @@ function Hud() {
     return value;
   })();
 
+  // Progressive disclosure: a brand-new save has exactly one number on it, the cookie count.
+  // The rate readouts arrive when there is a rate to read — per-second with the first
+  // generator, per-click once Steady Hand makes a click something you can vary.
+  const disclosure = computeDisclosure(structure);
+
   return (
     <div className="hud" role="group" aria-label={`${GAME_SURFACE_COPY.hudLabel.en} · ${GAME_SURFACE_COPY.hudLabel.yue}`} aria-live="off">
       <HudReadout label={GAME_SURFACE_COPY.hudCookies} value={fast.cookies} />
-      <HudReadout label={GAME_SURFACE_COPY.hudPerSecond} value={fast.cps} />
-      <HudReadout label={GAME_SURFACE_COPY.hudPerClick} value={clickValue} />
+      {disclosure.perSecondReadout ? <HudReadout label={GAME_SURFACE_COPY.hudPerSecond} value={fast.cps} /> : null}
+      {disclosure.perClickReadout ? <HudReadout label={GAME_SURFACE_COPY.hudPerClick} value={clickValue} /> : null}
     </div>
   );
 }
@@ -110,13 +117,21 @@ function HudReadout({ label, value }: { label: Bilingual; value: Parameters<type
  * stays visible above it and no route changes.
  */
 function GameSurface() {
+  // Progressive disclosure (src/shared/game/disclosure.ts). A fresh save is the cookie and its
+  // counter, full stop: the shop rail and the upgrade strip are each bought back with a real
+  // upgrade, and until the strip exists the DiscoveryTicket beside the cookie is the one place
+  // those reveals can be bought from.
+  const structure = useStructureSnapshot();
+  const disclosure = computeDisclosure(structure);
+
   return (
-    <div className="stage">
+    <div className={`stage${disclosure.shop ? '' : ' stage--solo'}`}>
       <div className="stage__hero-column">
         <CookieHero />
-        <UpgradeStrip />
+        <DiscoveryTicket />
+        {disclosure.upgradeStrip ? <UpgradeStrip /> : null}
       </div>
-      <ShopRail />
+      {disclosure.shop ? <ShopRail /> : null}
     </div>
   );
 }
@@ -142,9 +157,21 @@ function CabinetConsole({
   onOpen: (id: SurfaceId, button: HTMLButtonElement) => void;
   buttonRefs: React.MutableRefObject<Partial<Record<SurfaceId, HTMLButtonElement | null>>>;
 }) {
+  // Each emblem is earned by the progress its panel is about: a first achievement, a first
+  // discovered tool, a first generator, a first sight of the prestige horizon. Hiding a button
+  // hides a GAME panel and nothing else — the Tools tech tree's contract that every real
+  // application feature stays reachable is untouched, and its "Open it now" control behaves
+  // identically the moment the panel is open (see tools.ts#gatesApplicationFeature).
+  const structure = useStructureSnapshot();
+  const disclosure = computeDisclosure(structure);
+  const visibleIds = SURFACE_IDS.filter((id) => disclosure.consoles[id]);
+  // An empty group with an accessible name is a label pointing at nothing; render no console
+  // at all until the first emblem is earned.
+  if (visibleIds.length === 0) return null;
+
   return (
     <div className="console" role="group" aria-label={`${CONSOLE_COPY.consoleLabel.en} · ${CONSOLE_COPY.consoleLabel.yue}`}>
-      {SURFACE_IDS.map((id) => {
+      {visibleIds.map((id) => {
         const label = SURFACE_LABELS[id];
         const open = id === openId;
         return (

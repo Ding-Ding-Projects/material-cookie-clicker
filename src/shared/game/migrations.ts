@@ -34,9 +34,35 @@ function migrateV1ToV2(input: Record<string, unknown>): Record<string, unknown> 
   return { ...input, schemaVersion: 2, purchasedToolIds: [] };
 }
 
+/**
+ * Version 2 -> 3: grants the three reveal upgrades (upgrades.ts#REVEAL_UPGRADE_DEFINITIONS).
+ *
+ * Progressive disclosure (disclosure.ts) hides the shop rail, the upgrade strip and
+ * hold-to-click until the matching reveal upgrade is bought. A version-2 save was written by a
+ * build where all three were simply always on and there was nothing to buy, so migrating one
+ * without granting them would silently TAKE surfaces away from a player who had been using
+ * them for weeks. Every older save is therefore handed all three outright, free, as though it
+ * had bought them long ago; a save created by this build starts at version 3 with none of them
+ * and earns each one properly.
+ *
+ * Ids are written literally rather than imported from upgrades.ts on purpose: a migration
+ * describes what a PAST format meant, and must keep meaning that even if the definition list
+ * is later reshuffled or renamed.
+ */
+function migrateV2ToV3(input: Record<string, unknown>): Record<string, unknown> {
+  const granted = ["reveal_shop_sign", "reveal_upgrade_catalogue", "reveal_steady_hand"];
+  const existing = Array.isArray(input.upgrades) ? (input.upgrades as { id?: unknown }[]) : [];
+  const alreadyOwned = new Set(existing.map((u) => u?.id));
+  const additions = granted
+    .filter((id) => !alreadyOwned.has(id))
+    .map((id) => ({ id, purchasedAtTickCount: 0 }));
+  return { ...input, schemaVersion: 3, upgrades: [...existing, ...additions] };
+}
+
 /** Ordered forward-only migrations, indexed by the version they migrate FROM. */
 export const MIGRATIONS: Readonly<Record<number, MigrationStep>> = {
   1: migrateV1ToV2,
+  2: migrateV2ToV3,
 };
 
 export interface MigrationResult {

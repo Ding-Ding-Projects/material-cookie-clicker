@@ -7,46 +7,256 @@
 <title>Material Cookie Clicker · Building Row · Generator List Item</title>
 <style>
   :root {
-    --md-primary: #7A4A1D; --md-on-primary: #FFFFFF; --md-primary-shadow: #4A2A0A;
-    --md-primary-container: #FFDCB8; --md-on-primary-container: #3A2100;
-    --md-secondary: #6B4C3F; --md-on-secondary: #FFFFFF;
-    --md-secondary-container: #FFDBCB; --md-on-secondary-container: #2C160B;
-    --md-surface: #FFF8F3; --md-on-surface: #211A14;
-    --md-surface-variant: #F0E0D0; --md-on-surface-variant: #4F4539;
-    --md-outline: #7C6F64;
-    --md-surface-container: #FCEBDD;
-    --md-surface-container-high: #F7E5D6;
+  /* ==== v2 BUILDING ROW: a HUD rack slot, not a list item ====
+     The row is a raised cabinet plate; the count and the cost sit in a recessed
+     readout; the buy control is a real arcade button with a 6px base and a domed
+     highlight; the stepper is a segmented cabinet switch with a pressed segment. */
+  .row {
+    grid-template-columns: 68px 1fr auto auto;
+    gap: 18px; padding: 16px 20px; min-height: 88px;
+    border-radius: var(--shape-lg);
+    border: var(--border-fat) solid var(--md-outline);
+    background: linear-gradient(180deg, var(--md-surface-container-high), var(--md-surface-container-highest));
+    box-shadow: var(--press-2), inset 0 3px 0 0 var(--bevel-hi);
+    margin-bottom: 18px;
+  }
+  .row .icon {
+    width: 64px; height: 64px; font-size: 30px;
+    border: var(--border-chunky) solid var(--md-primary-shadow);
+    background: radial-gradient(circle at 34% 28%, var(--md-primary-container), var(--md-primary) 88%);
+    color: var(--md-on-primary-container);
+    box-shadow: inset 0 6px 0 -3px rgba(255,255,255,0.45), 0 var(--drop-1) 0 0 var(--md-primary-shadow);
+  }
+  .row .name-en { font-family: var(--font-display); font-weight: 900; font-size: 19px; letter-spacing: 0.01em; }
+  .row .meta {
+    margin-top: 6px; gap: 14px; font-size: 13px; font-weight: 700;
+    color: var(--md-on-surface-variant);
+  }
+  .row .owned-chip {
+    font-family: var(--font-display); font-size: 20px; font-weight: 900;
+    padding: 8px 16px; border-radius: var(--shape-sm);
+    background: var(--panel-inset); color: var(--md-on-surface);
+    border: var(--border-thick) solid var(--md-outline);
+    box-shadow: inset 0 5px 0 -2px var(--bevel-lo);
+  }
+  .stepper {
+    background: var(--panel-inset); padding: 5px; gap: 5px;
+    border: var(--border-chunky) solid var(--md-outline);
+    box-shadow: inset 0 4px 0 -1px var(--bevel-lo);
+  }
+  .stepper button {
+    font-family: var(--font-display); font-size: 11px; letter-spacing: 0.1em;
+    text-transform: uppercase; min-height: 44px; min-width: 52px;
+  }
+  .stepper button.active {
+    background: linear-gradient(180deg, var(--md-primary), var(--md-primary-shadow));
+    color: var(--md-on-primary);
+    box-shadow: 0 var(--drop-1) 0 0 var(--md-primary-shadow), inset 0 3px 0 0 rgba(255,255,255,0.28);
+  }
+  .stepper button:focus-visible { outline: 4px solid var(--spark-ring); outline-offset: 3px; }
+  .buy-btn {
+    font-family: var(--font-display); font-size: 14px; font-weight: 900;
+    letter-spacing: 0.1em; text-transform: uppercase;
+    min-height: 56px; padding: 0 26px;
+    border-radius: var(--shape-sm);
+    border: var(--border-chunky) solid var(--md-primary-shadow);
+    background: linear-gradient(180deg, var(--md-primary) 0%, var(--md-primary) 55%, var(--md-primary-shadow) 100%);
+    box-shadow: 0 var(--drop-2) 0 0 var(--md-primary-shadow), inset 0 3px 0 0 rgba(255,255,255,0.30);
+  }
+  .buy-btn:active { transform: translateY(var(--drop-2)); box-shadow: none; }
+  .buy-btn:focus-visible { outline: 4px solid var(--spark-ring); outline-offset: 3px; }
+  .buy-btn[disabled] {
+    background: var(--md-surface-variant); color: var(--md-on-surface-variant);
+    border-color: var(--md-outline); box-shadow: inset 0 4px 0 0 var(--bevel-lo);
+  }
+  @media (prefers-reduced-motion: reduce) { .buy-btn:active { transform: none; box-shadow: inset 0 5px 0 0 rgba(0,0,0,0.30); } }
+  .row.locked { opacity: 0.62; }
+    /* ============================================================================
+       MATERIAL COOKIE CLICKER — v2 "ARCADE CABINET" TOKENS · LIGHT = BAKERY DAYTIME
+       Warm browns/golds kept from v1 (they were right); everything is deepened and a
+       cabinet-chrome layer is added on top: radial oven-glow backgrounds, inset HUD
+       bezels, metallic bevels, jewel tiers. Every text-bearing pair below — including
+       BOTH ends of the background gradient — is verified by design/_verify/contrast-check.mjs.
+       ============================================================================ */
+
+    /* --- role colours (M3 naming kept as vocabulary only; see README) --- */
+    --md-primary: #7A4A1D;
+    --md-on-primary: #FFFFFF;
+    --md-primary-container: #FFDCB8;
+    --md-on-primary-container: #3A2100;
+    --md-primary-shadow: #3C2107;      /* solid "3D base" under a pressable button — never a blur */
+    --md-secondary: #6B4C3F;
+    --md-on-secondary: #FFFFFF;
+    --md-secondary-container: #FFDBCB;
+    --md-on-secondary-container: #2C160B;
+    --md-secondary-shadow: #35211A;
+    --md-tertiary: #5C4E00;            /* golden-cookie role — never ordinary chrome */
+    --md-on-tertiary: #FFFFFF;
+    --md-tertiary-container: #F8E287;
+    --md-on-tertiary-container: #221B00;
+    --md-tertiary-shadow: #332900;
+    --md-error: #BA1A1A;
+    --md-on-error: #FFFFFF;
+    --md-error-container: #FFDAD6;
+    --md-on-error-container: #410002;
+    --md-error-shadow: #6E0000;
+
+    /* --- surfaces: deeper and warmer than v1's near-white cream --- */
+    --md-surface: #FFF3E6;
+    --md-on-surface: #1E1610;
+    --md-surface-variant: #F0DCC4;
+    --md-on-surface-variant: #4A3D2E;
+    --md-outline: #75634E;
+    --md-surface-container-lowest: #FFFFFF;
+    --md-surface-container-low: #FFF0DE;
+    --md-surface-container: #FBE8D2;
+    --md-surface-container-high: #F5DFC4;
+    --md-surface-container-highest: #EED5B4;
+    --md-shadow: #000000;
+
+    /* --- v2 cabinet chrome --- */
+    --bg-core: #FFF6EC;                /* centre of the radial oven glow */
+    --bg-mid: #FAECDA;
+    --bg-edge: #EFDCC0;                /* rim of the cabinet, where the glow falls off */
+    --panel-inset: #FFFBF4;            /* recessed HUD readout face behind a bezel */
+    --bevel-hi: rgba(255, 255, 255, 0.85);  /* top inner bevel highlight (non-text) */
+    --bevel-lo: rgba(90, 58, 24, 0.28);     /* bottom inner bevel shade (non-text) */
+    --metal-hi: #FFF0C4;               /* medal/badge metallic sweep, decorative only */
+    --metal-lo: #B98A2E;
+    --cabinet-frame: #6A4522;          /* the wooden counter / cabinet body, non-text */
+    --cabinet-frame-dark: #43290F;
+    --track: #E4CDAE;                  /* XP-bar / progress trough, non-text */
+
+    /* --- arcade spark accent. --spark and --spark-glow are DECORATIVE ONLY (blurred
+           glows and gradient fills) and never carry text. --spark-ring is the only
+           spark role allowed on text or a UI boundary, and is AA-verified. --- */
+    --spark: #FFC94D;
+    --spark-glow: #FF8A00;
+    --spark-ring: #9C4B00;
+
+    /* --- jewel tool-tier ladder: bronze -> emerald -> amethyst --- */
+    --tier1: #8A4E12;
+    --on-tier1: #FFFFFF;
+    --tier1-container: #FFDCBA;
+    --on-tier1-container: #2E1600;
+    --tier2: #1F6337;
+    --on-tier2: #FFFFFF;
+    --tier2-container: #B8F0C4;
+    --on-tier2-container: #04210D;
+    --tier3: #533593;
+    --on-tier3: #FFFFFF;
+    --tier3-container: #E6D9FF;
+    --on-tier3-container: #20004D;
+    --tier-accent: var(--tier1);
+    --on-tier-accent: var(--on-tier1);
+    --tier-accent-container: var(--tier1-container);
+    --on-tier-accent-container: var(--on-tier1-container);
+
+    /* --- type --- */
     --font-en: -apple-system, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
     --font-zh: "Segoe UI", "Microsoft JhengHei", var(--font-en);
     --font-display: "Segoe UI Black", "Arial Black", "Segoe UI", var(--font-en);
-    --shape-full: 999px; --shape-md: 18px; --shape-sm: 12px;
-    --border-thick: 3px; --border-chunky: 4px;
+
+    /* --- shape: v2 goes fatter again (v1 was 8-34, v2 is 10-40) --- */
+    --shape-none: 0px;
+    --shape-xs: 10px;
+    --shape-sm: 16px;
+    --shape-md: 22px;
+    --shape-lg: 28px;
+    --shape-xl: 34px;
+    --shape-2xl: 40px;
+    --shape-full: 999px;
+
+    /* --- borders: hairlines are banned in this theme --- */
+    --border-thin: 2px;
+    --border-thick: 3px;
+    --border-chunky: 4px;
+    --border-fat: 5px;
+
+    /* --- pressable depth. Two paired families, deliberately kept separate:
+           --drop-N is the LENGTH a control travels when pressed (also the height of
+           its solid base), --press-N is the ready-made box-shadow built from it.
+           Solid offsets only; a blurred drop shadow is not used anywhere in v2.
+           v2 deepens v1's 3-4px travel to 4-10px. --- */
+    --drop-1: 4px;
+    --drop-2: 6px;
+    --drop-3: 8px;
+    --drop-4: 10px;
+    --press-0: none;
+    --press-1: 0 var(--drop-1) 0 0 var(--md-outline);
+    --press-2: 0 var(--drop-2) 0 0 var(--md-outline);
+    --press-3: 0 var(--drop-3) 0 0 var(--md-outline);
+    --press-4: 0 var(--drop-4) 0 0 var(--cabinet-frame-dark);
   }
   [data-scheme="dark"] {
-    --md-primary: #FFB876; --md-on-primary: #4A2800; --md-primary-shadow: #A66A2E;
-    --md-primary-container: #693C00; --md-on-primary-container: #FFDCB8;
-    --md-secondary: #E6BEAC; --md-on-secondary: #44291E;
-    --md-secondary-container: #5D3F32; --md-on-secondary-container: #FFDBCB;
-    --md-surface: #18120D; --md-on-surface: #EDE0D9;
-    --md-surface-variant: #4F4539; --md-on-surface-variant: #D3C4B4;
-    --md-outline: #9C8F83;
-    --md-surface-container: #251D17;
-    --md-surface-container-high: #302722;
+    /* ============================================================================
+       DARK = ARCADE NIGHT. Not "the light theme with the lights off": the cabinet is
+       lit from inside, so the background glow gets BRIGHTER toward its centre while
+       the rim goes to near-black. Both ends are contrast-verified.
+       ============================================================================ */
+    --md-primary: #FFB876;
+    --md-on-primary: #4A2800;
+    --md-primary-container: #693C00;
+    --md-on-primary-container: #FFDCB8;
+    --md-primary-shadow: #2A1600;
+    --md-secondary: #E6BEAC;
+    --md-on-secondary: #44291E;
+    --md-secondary-container: #5D3F32;
+    --md-on-secondary-container: #FFDBCB;
+    --md-secondary-shadow: #24140D;
+    --md-tertiary: #DBC66E;
+    --md-on-tertiary: #383000;
+    --md-tertiary-container: #514600;
+    --md-on-tertiary-container: #F8E287;
+    --md-tertiary-shadow: #201C00;
+    --md-error: #FFB4AB;
+    --md-on-error: #690005;
+    --md-error-container: #93000A;
+    --md-on-error-container: #FFDAD6;
+    --md-error-shadow: #4A0004;
+
+    --md-surface: #120C08;
+    --md-on-surface: #F2E4D6;
+    --md-surface-variant: #453A2E;
+    --md-on-surface-variant: #D8C8B4;
+    --md-outline: #A08D78;
+    --md-surface-container-lowest: #0A0603;
+    --md-surface-container-low: #1A120B;
+    --md-surface-container: #221810;
+    --md-surface-container-high: #2C2016;
+    --md-surface-container-highest: #382A1E;
+    --md-shadow: #000000;
+
+    --bg-core: #2A1A0A;
+    --bg-mid: #1A1008;
+    --bg-edge: #0A0705;
+    --panel-inset: #0B0704;
+    --bevel-hi: rgba(255, 214, 160, 0.30);
+    --bevel-lo: rgba(0, 0, 0, 0.72);
+    --metal-hi: #FFE7A8;
+    --metal-lo: #8A6318;
+    --cabinet-frame: #3A2410;
+    --cabinet-frame-dark: #150C05;
+    --track: #2E2419;
+
+    --spark: #FFD97A;
+    --spark-glow: #FFA326;
+    --spark-ring: #FFC24D;
+
+    --tier1: #F2B27A;
+    --on-tier1: #3A1E00;
+    --tier1-container: #5A3208;
+    --on-tier1-container: #FFDCBA;
+    --tier2: #8FE3A6;
+    --on-tier2: #0C3018;
+    --tier2-container: #1B4A28;
+    --on-tier2-container: #B8F0C4;
+    --tier3: #CFBCFF;
+    --on-tier3: #2A0A5C;
+    --tier3-container: #3B2465;
+    --on-tier3-container: #E6D9FF;
   }
   * { box-sizing: border-box; }
-  body { margin: 0; font-family: var(--font-en); background: var(--md-surface); color: var(--md-on-surface); padding: 24px; }
-  h1 { font-family: var(--font-display); font-size: 30px; margin: 0 0 4px; }
-  h2 { font-size: 18px; margin: 32px 0 8px; }
-  p.lede, p.caption { color: var(--md-on-surface-variant); max-width: 74ch; }
-  button.scheme-toggle {
-    font: inherit; font-weight: 700; padding: 10px 20px; min-height: 44px;
-    border-radius: var(--shape-full); border: var(--border-thick) solid var(--md-outline);
-    background: var(--md-surface-container); color: var(--md-on-surface); cursor: pointer; margin: 16px 0 24px;
-    box-shadow: 0 3px 0 0 var(--md-outline); transition: transform 90ms ease, box-shadow 90ms ease;
-  }
-  button.scheme-toggle:active { transform: translateY(3px); box-shadow: none; }
-  @media (prefers-reduced-motion: reduce) { button.scheme-toggle { transition: none; } button.scheme-toggle:active { transform: none; } }
-  button.scheme-toggle:focus-visible { outline: 3px solid var(--md-primary); outline-offset: 2px; }
 
   .row {
     display: grid;
@@ -102,6 +312,113 @@
   .row.locked { opacity: 0.6; }
   .row.locked .icon { filter: grayscale(1); border-color: var(--md-outline); }
   .lock-icon { font-size: 20px; }
+  /* ==========================================================================
+     v2 SHARED CABINET CHROME — identical in every spec file so the bundle reads
+     as one machine. Radial oven-glow page, marquee headings, arcade toggle.
+     ========================================================================== */
+  body {
+    margin: 0;
+    padding: 28px clamp(16px, 4vw, 44px) 72px;
+    min-height: 100vh;
+    font-family: var(--font-en);
+    color: var(--md-on-surface);
+    background:
+      radial-gradient(ellipse 130% 95% at 50% -12%,
+        var(--bg-core) 0%, var(--bg-mid) 42%, var(--bg-edge) 100%),
+      var(--bg-edge);
+    background-attachment: fixed;
+  }
+  h1 {
+    font-family: var(--font-display);
+    font-weight: 900;
+    font-size: clamp(28px, 5vw, 50px);
+    line-height: 1.04;
+    letter-spacing: 0.045em;
+    text-transform: uppercase;
+    margin: 0 0 14px;
+    padding: 18px 22px;
+    color: var(--md-on-surface);
+    border: var(--border-fat) solid var(--md-outline);
+    border-radius: var(--shape-lg);
+    background:
+      linear-gradient(180deg, var(--md-surface-container-high) 0%, var(--md-surface-container-highest) 100%);
+    box-shadow: var(--press-4), inset 0 4px 0 0 var(--bevel-hi), inset 0 -4px 0 0 var(--bevel-lo);
+  }
+  h2 {
+    font-family: var(--font-display);
+    font-weight: 900;
+    font-size: 15px;
+    letter-spacing: 0.22em;
+    text-transform: uppercase;
+    color: var(--md-on-surface-variant);
+    margin: 40px 0 12px;
+    display: flex;
+    align-items: center;
+    gap: 12px;
+  }
+  h2::after {
+    content: "";
+    flex: 1;
+    height: 0;
+    border-top: var(--border-thick) solid var(--md-outline);
+    opacity: 0.55;
+  }
+  h3 {
+    font-family: var(--font-display);
+    font-size: 13px;
+    letter-spacing: 0.16em;
+    text-transform: uppercase;
+    color: var(--md-on-surface-variant);
+  }
+  p.lede, p.caption { color: var(--md-on-surface-variant); max-width: 74ch; line-height: 1.55; }
+  p.lede { font-size: 15px; }
+  button.scheme-toggle {
+    font-family: var(--font-display);
+    font-size: 13px;
+    letter-spacing: 0.14em;
+    text-transform: uppercase;
+    padding: 12px 26px;
+    min-height: 48px;
+    border-radius: var(--shape-full);
+    border: var(--border-chunky) solid var(--md-outline);
+    background: linear-gradient(180deg, var(--md-surface-container-low), var(--md-surface-container-highest));
+    color: var(--md-on-surface);
+    cursor: pointer;
+    margin: 18px 0 26px;
+    box-shadow: var(--press-2), inset 0 3px 0 0 var(--bevel-hi);
+    transition: transform 90ms ease, box-shadow 90ms ease;
+  }
+  button.scheme-toggle:active {
+    transform: translateY(5px);
+    box-shadow: none;
+  }
+  button.scheme-toggle:focus-visible { outline: 4px solid var(--spark-ring); outline-offset: 3px; }
+  @media (prefers-reduced-motion: reduce) {
+    button.scheme-toggle { transition: none; }
+    button.scheme-toggle:active { transform: none; box-shadow: inset 0 4px 0 0 var(--bevel-lo); }
+  }
+
+  /* --- reusable HUD idioms (see README "Game HUD idioms") --- */
+  .v2-marquee {
+    font-family: var(--font-display);
+    font-size: 12px;
+    letter-spacing: 0.24em;
+    text-transform: uppercase;
+    color: var(--md-on-surface-variant);
+  }
+  .v2-bezel {
+    border: var(--border-chunky) solid var(--md-outline);
+    border-radius: var(--shape-md);
+    background: var(--panel-inset);
+    box-shadow: inset 0 5px 0 0 var(--bevel-lo), inset 0 -3px 0 0 var(--bevel-hi);
+  }
+  .v2-counter {
+    font-family: var(--font-display);
+    font-weight: 900;
+    font-variant-numeric: tabular-nums;
+    letter-spacing: -0.01em;
+    line-height: 1;
+  }
 </style>
 </head>
 <body data-scheme="light">

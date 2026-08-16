@@ -423,10 +423,17 @@ export function App() {
   return (
     <div className="app-shell" data-language-mode={settings.languageMode}>
       <header className="title-bar" role="banner">
-        <span className="title-bar__label">Material Cookie Clicker</span>
+        {/* The cabinet's marquee: the game's name on a bevelled plate between two rivets. The
+            plate sits inside the drag region, so dragging the rail and double-clicking it to
+            toggle maximize still work anywhere that is not one of the three caps. */}
+        <span className="title-bar__marquee">
+          <span className="title-bar__rivet" aria-hidden="true" />
+          <span className="title-bar__label">Material Cookie Clicker</span>
+          <span className="title-bar__rivet" aria-hidden="true" />
+        </span>
         <div className="title-bar__controls" role="group" aria-label={bilingualText(TITLE_BAR_COPY.controlsLabel)}>
           <button type="button" className="title-bar__button" aria-label={bilingualText(TITLE_BAR_COPY.minimize)} onClick={minimize}>
-            &#x2013;
+            <span className="title-bar__glyph" aria-hidden="true">&#x2013;</span>
           </button>
           <button
             type="button"
@@ -434,7 +441,7 @@ export function App() {
             aria-label={bilingualText(TITLE_BAR_COPY.maximizeRestore)}
             onClick={toggleMaximize}
           >
-            &#x25A1;
+            <span className="title-bar__glyph" aria-hidden="true">&#x25A1;</span>
           </button>
           <button
             type="button"
@@ -442,7 +449,7 @@ export function App() {
             aria-label={bilingualText(TITLE_BAR_COPY.close)}
             onClick={close}
           >
-            &#x2715;
+            <span className="title-bar__glyph" aria-hidden="true">&#x2715;</span>
           </button>
         </div>
       </header>

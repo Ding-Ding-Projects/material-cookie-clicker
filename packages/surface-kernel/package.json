@@ -1,0 +1,54 @@
+{
+  "name": "@material-cookie-clicker/surface-kernel",
+  "version": "0.1.0",
+  "private": true,
+  "type": "module",
+  "description": "Framework-neutral engines shared by the documentation site and the desktop application.",
+  "//": [
+    "The '.' entry is conditional because this package has two kinds of consumer.",
+    "",
+    "Bundlers take 'default' and read the TypeScript source directly, which is how",
+    "the desktop renderer bundle and the documentation site have always consumed",
+    "it. Node takes 'node' and reads ./dist/index.js, because Node cannot load a",
+    "'.ts' file: it strips types only when asked (--experimental-strip-types, as",
+    "this package's own test script does) and not by default until 22.18.0, which",
+    "is newer than the pinned toolchain. Before this entry existed, every file Node",
+    "executed directly that imported this package by name died on the first import",
+    "with ERR_UNKNOWN_FILE_EXTENSION naming src/index.ts. That broke the desktop",
+    "build script, and separately the documentation-site build configuration.",
+    "",
+    "./dist is generated and git-ignored. 'npm run build' in this package writes",
+    "it, and the desktop workspace's 'prebuild' script runs that before its own",
+    "build, so nothing consuming the 'node' condition sees a stale or absent file.",
+    "A consumer that reaches it without building gets ERR_MODULE_NOT_FOUND naming",
+    "dist/index.js, which says what to do; the old failure did not."
+  ],
+  "exports": {
+    ".": {
+      "types": "./src/index.ts",
+      "node": "./dist/index.js",
+      "default": "./src/index.ts"
+    },
+    "./tokens.css": "./src/tokens.css"
+  },
+  "scripts": {
+    "build": "node scripts/build.mjs",
+    "prepare": "node scripts/build.mjs --if-available",
+    "test": "node --test --experimental-strip-types test/*.test.ts"
+  },
+  "files": [
+    "src",
+    "dist",
+    "README.md"
+  ],
+  "sideEffects": [
+    "./src/tokens.css"
+  ],
+  "engines": {
+    "node": ">=22.13.0"
+  },
+  "devDependencies": {
+    "esbuild": "0.28.0"
+  },
+  "license": "MIT"
+}

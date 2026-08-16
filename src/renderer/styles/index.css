@@ -51,6 +51,11 @@
 
   --font-en: -apple-system, 'Segoe UI', Roboto, Helvetica, Arial, sans-serif;
   --font-zh: 'Segoe UI', 'Microsoft JhengHei', var(--font-en);
+  /* The display face is a system stack on purpose — this app makes no network request of any
+     kind, and no local font file is bundled. See design/README.md, "Why the display face is a
+     system stack, not a bundled font". If a font file is ever added, this is the one place to
+     point it. */
+  --font-display: 'Segoe UI Black', 'Arial Black', 'Segoe UI', var(--font-en);
 
   /* The pre-existing scaffold's title-bar tokens, now sourced from the one shared token layer
      above instead of their own hard-coded hex values, so the title bar follows the same
@@ -1069,9 +1074,13 @@ body {
 }
 
 .stat-tile {
-  border-radius: var(--shape-medium);
-  padding: 14px;
+  border-radius: var(--shape-large);
+  padding: 16px;
   background: var(--surface-high);
+  /* Chunky bordered chrome rather than a soft tonal card — see design/README.md on the
+     deliberate departure from M3 elevation. */
+  border: 3px solid var(--outline);
+  box-shadow: 0 4px 0 0 var(--outline);
   display: flex;
   flex-direction: column;
   gap: 3px;
@@ -1092,36 +1101,171 @@ body {
 }
 
 .stat-tile__value {
-  font-size: 22px;
+  font-family: var(--font-display);
+  font-size: 26px;
+  font-weight: 900;
+  /* Tabular figures so a column of tiles always aligns digit-for-digit while the numbers
+     tick — required by design/stat-tile.html for every repeatedly-read figure. */
+  font-variant-numeric: tabular-nums;
+  margin-top: 4px;
+}
+
+/*
+ * Trend indicators. Colour is NEVER the only signal: every trend also carries a glyph
+ * (▲ / ▼ / ■) and an explicit + / − sign, so the direction survives any colour-vision
+ * difference and any monochrome rendering.
+ */
+.stat-tile__trend {
+  font-size: 12px;
+  font-weight: 600;
+  font-variant-numeric: tabular-nums;
+  margin-top: 4px;
+}
+
+.stat-tile__trend.up {
+  color: var(--tertiary);
+}
+
+.stat-tile__trend.down {
+  color: var(--error);
+}
+
+.stat-tile__trend.flat {
+  color: var(--on-surface-variant);
+}
+
+.stat-section-heading {
+  font-family: var(--font-display);
+  font-size: 18px;
+  margin: 28px 0 10px;
+}
+
+.stat-empty,
+.stat-footnote {
+  font-size: 13px;
+  color: var(--on-surface-variant);
+  max-width: 64ch;
+}
+
+.contribution-table {
+  border-collapse: collapse;
+  width: 100%;
+  max-width: 720px;
+  font-size: 13px;
+}
+
+.contribution-table__caption {
+  caption-side: bottom;
+  text-align: left;
+  padding-top: 8px;
+  font-size: 12px;
+  color: var(--on-surface-variant);
+}
+
+.contribution-table th,
+.contribution-table td {
+  text-align: left;
+  padding: 8px 10px;
+  border-bottom: 2px solid var(--outline-variant);
+}
+
+.contribution-table thead th {
+  font-size: 11px;
+  text-transform: uppercase;
+  letter-spacing: 0.4px;
+  color: var(--on-surface-variant);
+  border-bottom: 3px solid var(--outline);
+}
+
+.contribution-table tbody th {
   font-weight: 700;
+}
+
+.contribution-table__name-zh {
+  display: block;
+  font-family: var(--font-zh);
+  font-weight: 400;
+  font-size: 12px;
+  color: var(--on-surface-variant);
+}
+
+.contribution-table td.numeric {
+  font-variant-numeric: tabular-nums;
+  white-space: nowrap;
+}
+
+.contribution-bar {
+  display: block;
+  height: 6px;
+  margin-top: 4px;
+  min-width: 80px;
+  border-radius: var(--shape-full);
+  background: var(--surface-highest);
+  overflow: hidden;
+}
+
+.contribution-bar__fill {
+  display: block;
+  height: 100%;
+  background: var(--primary);
 }
 
 /* ---------------------------------------------------------------------------------------- *
  * Destructive gate (design/prestige-gate.html).
  * ---------------------------------------------------------------------------------------- */
+/*
+ * Deliberately heavier chrome than anything else in the theme: a 4px border, a deep solid
+ * offset shadow and a large radius. This is the one moment the game wants to feel weighty
+ * and slow rather than quick, and it should not be mistakable for an ordinary settings card.
+ */
 .gate {
-  border-radius: var(--shape-large);
-  padding: 20px;
-  max-width: 460px;
+  border-radius: 34px;
+  padding: 26px;
+  margin-top: 18px;
+  max-width: 480px;
   display: flex;
   flex-direction: column;
-  gap: 14px;
-  box-shadow: var(--elevation-3);
+  gap: 16px;
+  border: 4px solid var(--outline);
 }
 
 .gate.tone-prestige {
   background: var(--tertiary-container);
   color: var(--on-tertiary-container);
+  border-color: var(--tertiary);
+  box-shadow: 0 7px 0 0 var(--tertiary);
 }
 
 .gate.tone-wipe {
   background: var(--error-container);
   color: var(--on-error-container);
+  border-color: var(--error);
+  box-shadow: 0 7px 0 0 var(--error);
 }
 
 .gate h2 {
   margin: 0;
-  font-size: 17px;
+  font-family: var(--font-display);
+  font-size: 20px;
+}
+
+.gate-triggers {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 12px;
+  margin-top: 20px;
+}
+
+.projection-card__detail {
+  font-size: 12px;
+  color: var(--on-surface-variant);
+  margin-bottom: 0;
+}
+
+.permanent-shop-card__list {
+  margin: 0;
+  padding-left: 20px;
+  font-size: 13px;
 }
 
 .gate__impact {
@@ -1164,24 +1308,31 @@ body {
   }
 }
 
+/* 76x44: the toggle itself meets the 44px minimum target rather than relying on its
+   surrounding label to be hit. */
 .gate__key-toggle {
-  width: 60px;
-  height: 34px;
+  width: 76px;
+  height: 44px;
   border-radius: var(--shape-full);
-  border: 2px solid var(--outline);
+  border: 4px solid var(--outline);
   background: var(--surface);
   position: relative;
   cursor: pointer;
   font-size: 0;
 }
 
+.gate__key-toggle[disabled] {
+  opacity: 0.55;
+  cursor: not-allowed;
+}
+
 .gate__key-toggle::after {
   content: '';
   position: absolute;
-  top: 2px;
-  left: 2px;
-  width: 26px;
-  height: 26px;
+  top: 3px;
+  left: 3px;
+  width: 30px;
+  height: 30px;
   border-radius: var(--shape-full);
   background: var(--outline);
   transition: transform calc(150ms * var(--motion-scale, 1)) ease, background calc(150ms * var(--motion-scale, 1)) ease;
@@ -1192,7 +1343,7 @@ body {
 }
 
 .gate__key-toggle[aria-pressed='true']::after {
-  transform: translateX(26px);
+  transform: translateX(30px);
   background: var(--primary);
 }
 
@@ -1249,11 +1400,17 @@ body {
   background: var(--error);
 }
 
+/* The completion state is visually distinct from every intermediate state: a filled,
+   shadowed banner in the display face that replaces the slider row outright, so "done" can
+   never read as "still dragging". */
 .gate__completion {
-  font-weight: 700;
+  margin: 0;
+  font-family: var(--font-display);
+  font-weight: 900;
+  font-size: 16px;
   text-align: center;
-  padding: 8px;
-  border-radius: var(--shape-small);
+  padding: 12px;
+  border-radius: var(--shape-medium);
 }
 
 .gate.tone-prestige .gate__completion {
@@ -1268,10 +1425,11 @@ body {
 
 .gate__exit-btn {
   font: inherit;
-  font-weight: 700;
-  min-height: 40px;
+  font-weight: 800;
+  min-height: 44px;
+  padding: 0 18px;
   border-radius: var(--shape-full);
-  border: 1px solid var(--outline);
+  border: 3px solid var(--outline);
   background: transparent;
   cursor: pointer;
   align-self: center;

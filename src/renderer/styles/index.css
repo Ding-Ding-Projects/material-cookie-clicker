@@ -4154,6 +4154,9 @@ ul.card-grid {
 /* Belt-and-braces on the native marker across engines. */
 .hud-strip__summary::marker {
   content: '';
+}
+
+/* ============================================================================================ *
  * UI-AUDIT LANE: copy / bilingual, accessibility and delight fixes.
  *
  * Every rule below introduces a NEW class rather than editing an existing block — a sibling lane

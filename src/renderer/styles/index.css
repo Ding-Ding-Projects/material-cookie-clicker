@@ -58,6 +58,24 @@
   --border-chunky: 4px;
   --font-display: 'Segoe UI Black', 'Arial Black', 'Segoe UI', var(--font-en);
 
+
+  /* Jewel tool-tier ladder + arcade spark ring (design/tokens-color.html, design/tools-tree.html).
+     Tier 1 reuses the bakery bronze/primary family; tiers 2 and 3 are genuinely different hues
+     so the Tools tech tree visibly escalates rather than darkening one colour. */
+  --tier1: var(--primary);
+  --on-tier1: var(--on-primary);
+  --tier1-container: var(--primary-container);
+  --on-tier1-container: var(--on-primary-container);
+  --tier2: #256b3b;
+  --on-tier2: #ffffff;
+  --tier2-container: #b8f0c4;
+  --on-tier2-container: #04210d;
+  --tier3: #5b3b9c;
+  --on-tier3: #ffffff;
+  --tier3-container: #e6d9ff;
+  --on-tier3-container: #20004d;
+  --spark-ring: #d97300;
+
   --shape-full: 999px;
   --shape-large: 16px;
   --shape-medium: 12px;
@@ -115,6 +133,15 @@
     --spark-glow: #ffe8a3;
     --spark-ring: #ffc24d;
     --primary-shadow: #a66a2e;
+
+    --tier2: #8fe3a6;
+    --on-tier2: #0c3018;
+    --tier2-container: #1b4a28;
+    --on-tier2-container: #b8f0c4;
+    --tier3: #cfbcff;
+    --on-tier3: #2a0a5c;
+    --tier3-container: #3b2465;
+    --on-tier3-container: #e6d9ff;
   }
 }
 
@@ -148,6 +175,15 @@
   --spark-glow: #ffe8a3;
   --spark-ring: #ffc24d;
   --primary-shadow: #a66a2e;
+
+  --tier2: #8fe3a6;
+  --on-tier2: #0c3018;
+  --tier2-container: #1b4a28;
+  --on-tier2-container: #b8f0c4;
+  --tier3: #cfbcff;
+  --on-tier3: #2a0a5c;
+  --tier3-container: #3b2465;
+  --on-tier3-container: #e6d9ff;
 }
 
 * {
@@ -1622,4 +1658,247 @@ body {
 .permanent-shop-card h2 {
   margin: 0 0 6px;
   font-size: 15px;
+}
+
+/* ---------------------------------------------------------------------------------------- *
+ * Tools tech tree (design/tools-tree.html). Tier grouping, prerequisite arrows, the progress
+ * summary, and the per-tier jewel accent. Each .tools-tier block sets --tier-accent and its
+ * children inherit it through the cascade, so one declaration drives the chip, the node's top
+ * stripe, the mini progress fill and the unlocked-state glow.
+ * ---------------------------------------------------------------------------------------- */
+.tools-summary {
+  display: flex;
+  align-items: center;
+  gap: 20px;
+  flex-wrap: wrap;
+  background: var(--surface-high);
+  border: 3px solid var(--outline);
+  border-radius: var(--shape-large);
+  padding: 16px 20px;
+  margin-bottom: 16px;
+}
+
+.tools-summary__count {
+  font-weight: 800;
+  font-variant-numeric: tabular-nums;
+}
+
+.tools-summary__track {
+  width: 190px;
+  height: 12px;
+  border-radius: var(--shape-full);
+  background: var(--surface-highest);
+  border: 1px solid var(--outline);
+  overflow: hidden;
+}
+
+.tools-summary__fill {
+  height: 100%;
+  background: linear-gradient(90deg, var(--tier1), var(--tier2));
+}
+
+.tools-summary__toggle-wrap {
+  margin-left: auto;
+  display: flex;
+  align-items: center;
+  gap: 10px;
+}
+
+.tools-summary__toggle {
+  font: inherit;
+  font-weight: 700;
+  min-height: 44px;
+  padding: 0 16px;
+  border-radius: var(--shape-full);
+  border: 3px solid var(--outline);
+  background: var(--surface);
+  color: var(--on-surface);
+  cursor: pointer;
+}
+
+.tools-summary__toggle[aria-pressed='true'] {
+  border-color: var(--primary);
+  background: var(--primary-container);
+  color: var(--on-primary-container);
+}
+
+.tools-summary__toggle:focus-visible {
+  outline: 3px solid var(--primary);
+  outline-offset: 2px;
+}
+
+.tools-note {
+  background: var(--primary-container);
+  color: var(--on-primary-container);
+  border: 2px solid var(--primary);
+  border-radius: var(--shape-medium);
+  padding: 12px 16px;
+  font-size: 12px;
+  max-width: 74ch;
+  margin: 0 0 16px;
+}
+
+.tools-tier {
+  margin-bottom: 28px;
+}
+
+.tools-tier[data-tier='1'] {
+  --tier-accent: var(--tier1);
+  --on-tier-accent: var(--on-tier1);
+  --tier-accent-container: var(--tier1-container);
+  --on-tier-accent-container: var(--on-tier1-container);
+}
+
+.tools-tier[data-tier='2'] {
+  --tier-accent: var(--tier2);
+  --on-tier-accent: var(--on-tier2);
+  --tier-accent-container: var(--tier2-container);
+  --on-tier-accent-container: var(--on-tier2-container);
+}
+
+.tools-tier[data-tier='3'] {
+  --tier-accent: var(--tier3);
+  --on-tier-accent: var(--on-tier3);
+  --tier-accent-container: var(--tier3-container);
+  --on-tier-accent-container: var(--on-tier3-container);
+}
+
+.tools-tier__heading {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  flex-wrap: wrap;
+  margin: 0 0 4px;
+  font-size: 17px;
+}
+
+.tools-tier__chip {
+  display: inline-flex;
+  align-items: center;
+  font-weight: 800;
+  font-size: 11px;
+  padding: 3px 10px;
+  border-radius: var(--shape-full);
+  background: var(--tier-accent);
+  color: var(--on-tier-accent);
+}
+
+.tools-tier__prereq {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  font-size: 12px;
+  color: var(--on-surface-variant);
+  margin: 0 0 10px;
+  max-width: 74ch;
+}
+
+.tools-tier__arrow {
+  font-size: 20px;
+  font-weight: 900;
+  color: var(--tier-accent);
+}
+
+.tool-node {
+  border-top: 7px solid var(--tier-accent);
+  border-right: 3px solid var(--outline);
+  border-bottom: 3px solid var(--outline);
+  border-left: 3px solid var(--outline);
+}
+
+.tool-node.undiscovered {
+  border-style: dashed;
+  border-top-style: solid;
+}
+
+.tool-node.unlocked {
+  border: 4px solid var(--tier-accent);
+  border-top-width: 7px;
+  background: var(--tier-accent-container);
+  color: var(--on-tier-accent-container);
+}
+
+.tool-node.ready {
+  box-shadow: 0 0 0 3px var(--tier-accent-container);
+}
+
+.tool-node .item-card__progress-fill {
+  background: var(--tier-accent);
+}
+
+.tool-node__chip {
+  align-self: flex-start;
+  border-radius: var(--shape-full);
+  padding: 2px 10px;
+  font-size: 11px;
+  font-weight: 800;
+  background: var(--surface-highest);
+  color: var(--on-surface-variant);
+}
+
+.tool-node.ready .tool-node__chip {
+  background: var(--tier-accent-container);
+  color: var(--on-tier-accent-container);
+}
+
+.tool-node.unlocked .tool-node__chip {
+  background: var(--tier-accent);
+  color: var(--on-tier-accent);
+}
+
+.tool-node.unlocked .item-card__name-zh,
+.tool-node.unlocked .item-card__desc,
+.tool-node.unlocked .item-card__progress-line {
+  color: inherit;
+}
+
+/* The "Open it now" callout is deliberately NOT part of the lock chrome: its own solid spark
+   ring, its own fill, its own badge, present and fully enabled in every node state including
+   undiscovered. Never grey it out, never hide it. */
+.tool-node .open-real-feature {
+  display: flex;
+  flex-direction: column;
+  align-items: flex-start;
+  gap: 8px;
+  border: 3px solid var(--spark-ring);
+  border-radius: var(--shape-medium);
+  background: var(--surface);
+  color: var(--on-surface);
+  padding: 10px 12px;
+  margin-top: auto;
+  filter: none;
+  opacity: 1;
+}
+
+.open-real-feature__badge {
+  font-size: 11px;
+  font-weight: 800;
+  text-transform: uppercase;
+  letter-spacing: 0.3px;
+  color: var(--spark-ring);
+}
+
+.tool-node .open-real-feature__button {
+  min-height: 40px;
+  border-width: 3px;
+  font-size: 12.5px;
+  background: var(--surface);
+}
+
+.tool-node.undiscovered {
+  filter: none;
+}
+
+.tool-node.undiscovered .item-card__icon,
+.tool-node.undiscovered .item-card__name-en,
+.tool-node.undiscovered .item-card__name-zh,
+.tool-node.undiscovered .item-card__desc {
+  filter: grayscale(1);
+  color: var(--on-surface-variant);
+}
+
+ul.card-grid {
+  list-style: none;
+  margin: 0;
+  padding: 0;
 }

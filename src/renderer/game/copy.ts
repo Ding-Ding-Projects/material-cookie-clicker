@@ -107,6 +107,12 @@ export const TOOLS_SCREEN_COPY = {
     en: "Unlocking a tool here only turns on its game bonus and its tech-tree display. The real application feature has always been available.",
     yue: "喺呢度解鎖工具淨係開返個遊戲加成同科技樹顯示，真正嘅應用程式功能一直都用得到。",
   },
+  /** The one-line marquee form of `principle`. The full sentence stays in the disclosure. */
+  principleHeadline: {
+    en: "Every real app feature is already open.",
+    yue: "所有真正應用程式功能一直都開住。",
+  },
+  principleMore: { en: "What unlocking actually does", yue: "解鎖實際做咗啲咩" },
   openItNow: { en: "Open it now", yue: "而家開啟" },
   openItNowNote: {
     en: "This app feature is already available — this button opens it directly, whether or not the tool below is unlocked.",
@@ -140,6 +146,10 @@ export const TOOLS_SCREEN_COPY = {
     en: "This toggle only changes the game's tech-tree display and its gameplay bonuses. It never changes what real application features are available — every one of them is reachable from Settings and the command palette either way.",
     yue: "呢個掣淨係改變遊戲科技樹嘅顯示同遊戲加成，唔會改變真正應用程式功能嘅可用性——嗰啲功能一直都可以喺設定同指令面板用到。",
   },
+  /** The caption form of `progressionNote`; the full note stays in the disclosure beside it. */
+  progressionCaption: { en: "Display + bonuses only", yue: "淨係影響顯示同加成" },
+  progressionMore: { en: "What this toggle changes", yue: "呢個掣改變咩" },
+  toolsUnlockedLabel: { en: "Tools unlocked", yue: "已解鎖工具" },
   cannotAfford: { en: "Not enough cookies yet", yue: "曲奇仲未夠" },
   progressionToggleOn: { en: "Tool progression: on", yue: "工具進度：開" },
   progressionToggleOff: {

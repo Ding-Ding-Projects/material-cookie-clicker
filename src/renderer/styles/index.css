@@ -2589,79 +2589,239 @@ body {
  * children inherit it through the cascade, so one declaration drives the chip, the node's top
  * stripe, the mini progress fill and the unlocked-state glow.
  * ---------------------------------------------------------------------------------------- */
-.tools-summary {
-  display: flex;
-  align-items: center;
-  gap: 20px;
-  flex-wrap: wrap;
-  background: var(--surface-high);
-  border: var(--border-thick) solid var(--outline);
-  box-shadow: 0 5px 0 0 var(--outline);
-  border-radius: var(--shape-large);
-  padding: 18px 22px;
-  margin-bottom: 16px;
+/* A HUD strip: one bold marquee line whose full paragraph lives in a native <details>
+   disclosure, so the meaning is kept in full while the screen reads as a cabinet, not an
+   essay. <summary> is focusable and Enter/Space-operable for free. */
+.hud-strip {
+  border-radius: var(--shape-medium);
+  margin: 0 0 14px;
 }
 
-.tools-summary__count {
-  font-family: var(--font-display);
-  font-size: 16px;
-  font-weight: 900;
-  font-variant-numeric: tabular-nums;
-}
-
-.tools-summary__track {
-  width: 190px;
-  height: 16px;
-  border-radius: var(--shape-full);
-  background: var(--surface-highest);
-  border: var(--border-thick) solid var(--outline);
-  overflow: hidden;
-}
-
-.tools-summary__fill {
-  height: 100%;
-  background: linear-gradient(90deg, var(--tier1), var(--tier2));
-}
-
-.tools-summary__toggle-wrap {
-  margin-left: auto;
+.hud-strip__summary {
   display: flex;
   align-items: center;
   gap: 10px;
+  flex-wrap: wrap;
+  min-height: 44px;
+  padding: 6px 14px;
+  cursor: pointer;
+  list-style: none;
+  border-radius: inherit;
 }
 
-.tools-summary__toggle {
-  font: inherit;
+.hud-strip__summary::-webkit-details-marker {
+  display: none;
+}
+
+.hud-strip__summary:focus-visible {
+  outline: 3px solid var(--spark-ring);
+  outline-offset: 3px;
+}
+
+.hud-strip__headline {
+  /* basis 0 so the "more" chip always shares the first line instead of being pushed down. */
+  flex: 1 1 0;
+  min-width: 0;
+  font-family: var(--font-display);
+  font-weight: 900;
+  letter-spacing: 0.01em;
+}
+
+/* The affordance that says "there is more text behind this line", and which way it points. */
+.hud-strip__more {
+  margin-left: auto;
+  flex: 0 0 auto;
+  font-size: 11px;
+  font-weight: 800;
+  padding: 4px 10px;
+  border-radius: var(--shape-full);
+  border: var(--border-thin) solid currentcolor;
+}
+
+.hud-strip__more::after {
+  content: ' ▾';
+}
+
+.hud-strip[open] .hud-strip__more::after {
+  content: ' ▴';
+}
+
+.hud-strip__body {
+  margin: 0;
+  padding: 0 14px 12px;
+  font-size: 12px;
+  line-height: 1.5;
+  max-width: 74ch;
+}
+
+/* The contract banner. Loud on purpose: it is the project's one non-negotiable rule. */
+.hud-strip--contract {
+  background: var(--primary-container);
+  color: var(--on-primary-container);
+  border: var(--border-chunky) solid var(--primary);
+  box-shadow: var(--press-1);
+}
+
+.hud-strip--contract .hud-strip__headline {
+  font-size: 15px;
+}
+
+.hud-strip--contract .hud-strip__flash {
+  font-size: 18px;
+}
+
+@media (prefers-reduced-motion: no-preference) {
+  .hud-strip--contract:not([open]) .hud-strip__flash {
+    animation: hud-strip-flash 2.4s steps(1, end) infinite;
+  }
+}
+
+@keyframes hud-strip-flash {
+  0%,
+  70% {
+    opacity: 1;
+  }
+  71%,
+  100% {
+    opacity: 0.45;
+  }
+}
+
+/* The toggle's caption form, sitting inline in the HUD row rather than as its own paragraph. */
+.hud-strip--caption {
+  margin: 0;
+  color: var(--on-surface-variant);
+  max-width: 22ch;
+}
+
+.hud-strip--caption .hud-strip__summary {
+  min-height: 44px;
+  padding: 4px 8px;
+  gap: 8px;
+}
+
+.hud-strip--caption .hud-strip__headline {
+  font-family: inherit;
   font-weight: 700;
+  font-size: 11px;
+}
+
+.hud-strip--caption .hud-strip__more {
+  margin-left: 0;
+  font-size: 10px;
+  padding: 3px 8px;
+  flex: 0 0 auto;
+}
+
+/* Collapsed to the chevron in the HUD row; the words stay in the accessibility tree. */
+.hud-strip--caption .hud-strip__more-text {
+  position: absolute;
+  width: 1px;
+  height: 1px;
+  overflow: hidden;
+  clip-path: inset(50%);
+  white-space: nowrap;
+}
+
+.hud-strip--caption .hud-strip__body {
+  padding: 0 8px 8px;
+  font-size: 11px;
+}
+
+/* One HUD row: bezelled counter, XP trough, progression toggle. design/stat-tile.html. */
+.tools-hud {
+  display: flex;
+  align-items: center;
+  gap: 16px;
+  flex-wrap: wrap;
+  background: var(--surface-high);
+  border: var(--border-thick) solid var(--outline);
+  box-shadow: var(--press-2), inset 0 4px 0 0 var(--bevel-hi);
+  border-radius: var(--shape-large);
+  padding: 10px 16px;
+  margin-bottom: 16px;
+}
+
+.tools-hud__counter {
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+  padding: 6px 14px;
+  border-radius: var(--shape-small);
+  background: var(--panel-inset);
+  box-shadow: inset 0 5px 0 -2px var(--bevel-lo), inset 0 -3px 0 0 var(--bevel-hi);
+}
+
+.tools-hud__counter-value {
+  font-family: var(--font-display);
+  font-weight: 900;
+  font-size: 22px;
+  line-height: 1;
+  font-variant-numeric: tabular-nums;
+  color: var(--on-surface);
+}
+
+.tools-hud__counter-sep {
+  margin: 0 2px;
+  color: var(--on-surface-variant);
+}
+
+.tools-hud__counter-label {
+  font-size: 10px;
+  font-weight: 800;
+  text-transform: uppercase;
+  letter-spacing: 0.06em;
+  color: var(--on-surface-variant);
+}
+
+.tools-hud__track {
+  flex: 1 1 0;
+  min-width: 120px;
+  height: 18px;
+  border-radius: var(--shape-full);
+  background: var(--track);
+  border: var(--border-thick) solid var(--outline);
+  box-shadow: inset 0 3px 0 0 var(--bevel-lo);
+  overflow: hidden;
+}
+
+.tools-hud__fill {
+  height: 100%;
+  background: linear-gradient(90deg, var(--tier1), var(--tier2));
+  box-shadow: inset 0 3px 0 0 var(--bevel-hi);
+}
+
+.tools-hud__toggle-wrap {
+  flex: 0 1 auto;
+  min-width: 0;
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  flex-wrap: wrap;
+}
+
+.tools-hud__toggle {
+  font: inherit;
+  font-weight: 800;
+  font-size: 12px;
   min-height: 44px;
   padding: 0 16px;
   border-radius: var(--shape-full);
-  border: 3px solid var(--outline);
+  border: var(--border-thick) solid var(--outline);
   background: var(--surface);
   color: var(--on-surface);
   cursor: pointer;
 }
 
-.tools-summary__toggle[aria-pressed='true'] {
+.tools-hud__toggle[aria-pressed='true'] {
   border-color: var(--primary);
   background: var(--primary-container);
   color: var(--on-primary-container);
 }
 
-.tools-summary__toggle:focus-visible {
-  outline: 3px solid var(--primary);
-  outline-offset: 2px;
-}
-
-.tools-note {
-  background: var(--primary-container);
-  color: var(--on-primary-container);
-  border: 2px solid var(--primary);
-  border-radius: var(--shape-medium);
-  padding: 12px 16px;
-  font-size: 12px;
-  max-width: 74ch;
-  margin: 0 0 16px;
+.tools-hud__toggle:focus-visible {
+  outline: 3px solid var(--spark-ring);
+  outline-offset: 3px;
 }
 
 .tools-tier {

@@ -229,28 +229,58 @@ export function ToolsScreen({ onOpenApplicationFeature }: ToolsScreenProps = {})
         {TOOLS_SCREEN_COPY.title.en}
         <span className="screen-title-zh">{TOOLS_SCREEN_COPY.title.yue}</span>
       </h1>
-      <p className="tools-note">
-        🎮 {TOOLS_SCREEN_COPY.principle.en} · {TOOLS_SCREEN_COPY.principle.yue}
-      </p>
+      {/*
+        The contract banner. It is compressed to one marquee line, NOT weakened: the full
+        sentence is one keystroke away in the disclosure below, which is honestly collapsed by
+        default because the headline above it already states the rule outright.
+      */}
+      <details className="hud-strip hud-strip--contract">
+        <summary className="hud-strip__summary">
+          <span className="hud-strip__flash" aria-hidden="true">
+            🎮
+          </span>
+          <span className="hud-strip__headline">
+            {TOOLS_SCREEN_COPY.principleHeadline.en} · {TOOLS_SCREEN_COPY.principleHeadline.yue}
+          </span>
+          <span className="hud-strip__more">
+            <span className="hud-strip__more-text">
+              {TOOLS_SCREEN_COPY.principleMore.en} · {TOOLS_SCREEN_COPY.principleMore.yue}
+            </span>
+          </span>
+        </summary>
+        <p className="hud-strip__body">
+          {TOOLS_SCREEN_COPY.principle.en} · {TOOLS_SCREEN_COPY.principle.yue}
+        </p>
+      </details>
 
-      <div className="tools-summary">
-        <span className="tools-summary__count">
-          {unlockedCount} / {rows.length} tools unlocked · {rows.length} 個工具入面已解鎖 {unlockedCount} 個
+      {/* One HUD row: bezelled counter + bar + the progression toggle and its caption. */}
+      <div className="tools-hud">
+        <span className="tools-hud__counter">
+          <span className="tools-hud__counter-value">
+            {unlockedCount}
+            <span className="tools-hud__counter-sep" aria-hidden="true">
+              /
+            </span>
+            {rows.length}
+          </span>
+          <span className="tools-hud__counter-label">
+            {TOOLS_SCREEN_COPY.toolsUnlockedLabel.en} · {TOOLS_SCREEN_COPY.toolsUnlockedLabel.yue}
+          </span>
         </span>
         <div
-          className="tools-summary__track"
+          className="tools-hud__track"
           role="progressbar"
           aria-valuemin={0}
           aria-valuemax={100}
           aria-valuenow={percent}
-          aria-label="Tools unlocked · 已解鎖工具"
+          aria-label={`${TOOLS_SCREEN_COPY.toolsUnlockedLabel.en} · ${TOOLS_SCREEN_COPY.toolsUnlockedLabel.yue}`}
         >
-          <div className="tools-summary__fill" style={{ width: `${percent}%` }} />
+          <div className="tools-hud__fill" style={{ width: `${percent}%` }} />
         </div>
-        <div className="tools-summary__toggle-wrap">
+        <div className="tools-hud__toggle-wrap">
           <button
             type="button"
-            className="tools-summary__toggle"
+            className="tools-hud__toggle"
             aria-pressed={progressionOn}
             onClick={() => dispatch({ type: 'setToolProgression', enabled: !progressionOn })}
           >
@@ -258,11 +288,25 @@ export function ToolsScreen({ onOpenApplicationFeature }: ToolsScreenProps = {})
               ? `${TOOLS_SCREEN_COPY.progressionToggleOn.en} · ${TOOLS_SCREEN_COPY.progressionToggleOn.yue}`
               : `${TOOLS_SCREEN_COPY.progressionToggleOff.en} · ${TOOLS_SCREEN_COPY.progressionToggleOff.yue}`}
           </button>
+          <details className="hud-strip hud-strip--caption">
+            <summary className="hud-strip__summary">
+              <span className="hud-strip__headline">
+                {TOOLS_SCREEN_COPY.progressionCaption.en} · {TOOLS_SCREEN_COPY.progressionCaption.yue}
+              </span>
+              {/* In the tight HUD row the label is kept for screen readers and collapsed to the
+                  chevron visually, so the row stays one line. */}
+              <span className="hud-strip__more">
+                <span className="hud-strip__more-text">
+                  {TOOLS_SCREEN_COPY.progressionMore.en} · {TOOLS_SCREEN_COPY.progressionMore.yue}
+                </span>
+              </span>
+            </summary>
+            <p className="hud-strip__body">
+              {TOOLS_SCREEN_COPY.progressionNote.en} · {TOOLS_SCREEN_COPY.progressionNote.yue}
+            </p>
+          </details>
         </div>
       </div>
-      <p className="tools-note">
-        {TOOLS_SCREEN_COPY.progressionNote.en} · {TOOLS_SCREEN_COPY.progressionNote.yue}
-      </p>
 
       <SearchWithRegexBuilder
         idPrefix="tools-search"

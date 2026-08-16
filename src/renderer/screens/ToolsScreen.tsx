@@ -239,7 +239,7 @@ export function ToolsScreen({ onOpenApplicationFeature }: ToolsScreenProps = {})
       */}
       <details className="hud-strip hud-strip--contract">
         <summary className="hud-strip__summary">
-          <span className="hud-strip__flash" aria-hidden="true">
+          <span className="hud-strip__flash hud-strip__flash--finite" aria-hidden="true">
             🎮
           </span>
           <span className="hud-strip__headline">

@@ -8,23 +8,13 @@ import {
 } from '../../shared/game/achievements.js';
 import { AchievementMedal, type MedalFamily } from '../assets/icons.js';
 import { createSearchState, SearchWithRegexBuilder } from '../components/SearchWithRegexBuilder.js';
-import { LIST_COPY, type Bilingual } from '../game/copy.js';
+import { ACHIEVEMENTS_COPY, bilingualText, LIST_COPY, type Bilingual } from '../game/copy.js';
 import { useGameStoreInstance, useStructureSnapshot } from '../game/GameProvider.js';
 import { matchesSearch } from '../game/local-regex-search.js';
 import { detectMilestones, describeMilestone } from '../game/narration.js';
 
 /** Matches design/achievement-badge.html's "~6s auto-dismiss". */
 const TOAST_DISMISS_MS = 6_000;
-
-const ACHIEVEMENTS_COPY = {
-  lockedName: { en: '???', yue: '未解鎖' },
-  lockedHint: {
-    en: 'Not unlocked yet — its name and icon stay hidden until you earn it.',
-    yue: '仲未解鎖——攞到之前個名同圖示都會收埋。',
-  },
-  unlockedToastTitle: { en: 'Achievement unlocked', yue: '成就解鎖' },
-  dismissToast: { en: 'Dismiss', yue: '關閉' },
-} as const satisfies Record<string, Bilingual>;
 
 /** Which struck medal face an achievement wears, taken from what it actually rewards. */
 function medalFor(condition: AchievementCondition): MedalFamily {
@@ -47,13 +37,19 @@ const AchievementCell = memo(function AchievementCell({
   def: AchievementDefinition;
   unlocked: boolean;
 }) {
+  // The unlocked badge's name is the SAME sentence the milestone region announces and the
+  // unlock toast shows — one phrasing, produced by describeMilestone, not three.
   const label = unlocked
-    ? `Achievement unlocked: ${def.nameEn} · 成就已解鎖：${def.nameYue}`
-    : `${ACHIEVEMENTS_COPY.lockedHint.en} · ${ACHIEVEMENTS_COPY.lockedHint.yue}`;
+    ? bilingualText(describeMilestone({ kind: 'achievement', id: def.id }))
+    : bilingualText(ACHIEVEMENTS_COPY.lockedHint);
 
   return (
     <div className="achievement-cell">
-      <div className={`achievement-badge ${unlocked ? 'unlocked' : 'locked'}`} role="img" aria-label={label} tabIndex={0}>
+      {/* role="img" is a static role, so the badge is NOT a tab stop: making dozens of purely
+          informational medals focusable forced keyboard users to Tab through the whole grid to
+          reach the panel's close button. The aria-label keeps every badge in the accessibility
+          tree and reachable in a screen reader's browse mode. */}
+      <div className={`achievement-badge ${unlocked ? 'unlocked achievement-badge--minted' : 'locked'}`} role="img" aria-label={label}>
         <AchievementMedal family={unlocked ? medalFor(def.condition) : 'locked'} />
       </div>
       <div className="achievement-name">{unlocked ? def.nameEn : ACHIEVEMENTS_COPY.lockedName.en}</div>
@@ -71,24 +67,22 @@ interface ToastState {
 let toastKeySeq = 0;
 
 /**
- * The Achievements screen: every achievement in the shared domain as a locked silhouette or an
- * unlocked medal badge, plus the celebratory unlock toast.
+ * The cabinet-wide unlock celebration (design/achievement-badge.html): a corner-anchored medal
+ * toast that fires the MOMENT an achievement unlocks, wherever the player happens to be.
  *
- * The toast is driven by the SAME narration seam the status region uses — `detectMilestones` /
- * `describeMilestone` over each store dispatch — rather than a second, parallel notion of "what
- * just happened", so the two can never disagree. The toast is decorative and `aria-hidden`: the
- * milestone status region rendered by the shell is the single announcement to assistive tech, so
- * an unlock is never read out twice.
+ * It used to live inside the Achievements panel, which meant it could only ever be seen while
+ * that panel was open — i.e. almost never, since achievements unlock during play. The shell
+ * renders it now, so the medal always shows. It is driven by the SAME narration seam the status
+ * region uses (`detectMilestones` / `describeMilestone` over each store dispatch) rather than a
+ * second notion of "what just happened", so the two can never disagree, and it is `aria-hidden`:
+ * the milestone status region is the single announcement to assistive tech, so an unlock is
+ * never read out twice.
  */
-export function AchievementsScreen() {
-  const structure = useStructureSnapshot();
+export function AchievementUnlockToast() {
   const store = useGameStoreInstance();
-  const [search, setSearch] = useState(createSearchState());
   const [toast, setToast] = useState<ToastState | null>(null);
   const [toastPaused, setToastPaused] = useState(false);
   const timerRef = useRef<ReturnType<typeof setTimeout> | null>(null);
-
-  const unlockedIds = useMemo(() => new Set(structure.achievements.map((a) => a.id)), [structure.achievements]);
 
   useEffect(() => {
     const unsubscribe = store.onDispatch((previous, next, action) => {
@@ -112,6 +106,40 @@ export function AchievementsScreen() {
       if (timerRef.current) clearTimeout(timerRef.current);
     };
   }, [toast, toastPaused]);
+
+  if (!toast) return null;
+
+  return (
+    <div
+      key={toast.key}
+      className="achievement-toast"
+      aria-hidden="true"
+      onMouseEnter={() => setToastPaused(true)}
+      onMouseLeave={() => setToastPaused(false)}
+      onFocusCapture={() => setToastPaused(true)}
+      onBlurCapture={() => setToastPaused(false)}
+    >
+      <div className="achievement-badge unlocked achievement-badge--minted achievement-toast__badge">
+        <AchievementMedal family={toast.medal} />
+      </div>
+      <div className="achievement-toast__text">
+        <strong>{bilingualText(ACHIEVEMENTS_COPY.unlockedToastTitle)}</strong>
+        {bilingualText(toast.message)}
+      </div>
+    </div>
+  );
+}
+
+/**
+ * The Achievements screen: every achievement in the shared domain as a locked silhouette or an
+ * unlocked medal badge. The unlock toast itself is rendered by the shell (see
+ * `AchievementUnlockToast`) so the celebration is not trapped behind this panel being open.
+ */
+export function AchievementsScreen() {
+  const structure = useStructureSnapshot();
+  const [search, setSearch] = useState(createSearchState());
+
+  const unlockedIds = useMemo(() => new Set(structure.achievements.map((a) => a.id)), [structure.achievements]);
 
   const visible = ACHIEVEMENT_DEFINITIONS.filter((def) => {
     const unlocked = unlockedIds.has(def.id);
@@ -149,27 +177,6 @@ export function AchievementsScreen() {
         </div>
       )}
 
-      {toast ? (
-        <div
-          key={toast.key}
-          className="achievement-toast"
-          aria-hidden="true"
-          onMouseEnter={() => setToastPaused(true)}
-          onMouseLeave={() => setToastPaused(false)}
-          onFocusCapture={() => setToastPaused(true)}
-          onBlurCapture={() => setToastPaused(false)}
-        >
-          <div className="achievement-badge unlocked achievement-toast__badge">
-            <AchievementMedal family={toast.medal} />
-          </div>
-          <div className="achievement-toast__text">
-            <strong>
-              {ACHIEVEMENTS_COPY.unlockedToastTitle.en} · {ACHIEVEMENTS_COPY.unlockedToastTitle.yue}
-            </strong>
-            {toast.message.en} · {toast.message.yue}
-          </div>
-        </div>
-      ) : null}
     </div>
   );
 }

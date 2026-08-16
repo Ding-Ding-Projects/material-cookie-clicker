@@ -1,4 +1,4 @@
-import { memo, useMemo, useState } from 'react';
+import { memo, useMemo, useState, type ReactNode } from 'react';
 
 import { bnCompare, bnMulScalar } from '../../shared/game/big-number.js';
 import { formatBigNum } from '../../shared/game/format-number.js';
@@ -136,7 +136,7 @@ export function ShopRail() {
   // Below ~900px the CSS turns this rail into a bottom-sheet drawer; the handle is what taps it
   // down and back up. At rail width the handle is hidden and the body is always shown.
   const [drawerOpen, setDrawerOpen] = useState(true);
-  const [resultText, setResultText] = useState<string | null>(null);
+  const [resultText, setResultText] = useState<ReactNode | null>(null);
 
   const ownedById = useMemo(() => {
     const map = new Map<string, number>();
@@ -172,7 +172,24 @@ export function ShopRail() {
       if (after > before) bought += 1;
       else skipped += 1;
     }
-    setResultText(`✅ ${bought} bought, ⚠️ ${skipped} skipped · 買咗 ${bought} 項，跳過 ${skipped} 項`);
+    // Drawn status marks, not stock OS emoji: each mark carries its own glyph (a tick, a bang)
+    // AND its own colour role, so the two outcomes are never distinguished by colour alone.
+    setResultText(
+      <>
+        <span className="bulk-status bulk-status--ok">
+          <span className="bulk-status__mark" aria-hidden="true">
+            ✓
+          </span>
+          {bought} {BULK_COPY.bulkBought.en} · {BULK_COPY.bulkBought.yue}
+        </span>
+        <span className="bulk-status bulk-status--skipped">
+          <span className="bulk-status__mark" aria-hidden="true">
+            !
+          </span>
+          {skipped} {BULK_COPY.bulkSkipped.en} · {BULK_COPY.bulkSkipped.yue}
+        </span>
+      </>,
+    );
     setBusy(false);
   }
 

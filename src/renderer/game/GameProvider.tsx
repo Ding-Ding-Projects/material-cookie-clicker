@@ -101,7 +101,7 @@ export function GameProvider({ children }: { children: ReactNode }) {
         }
       } else if (loaded.outcome === 'quarantined') {
         store.replaceState(createInitialGameState(nowIso));
-        setOfflineNotice(OFFLINE_COPY.saveCorrupt(loaded.detail ?? 'unknown error'));
+        setOfflineNotice(OFFLINE_COPY.saveCorrupt(loaded.detail ?? OFFLINE_COPY.saveCorruptUnknown));
       } else {
         store.replaceState(createInitialGameState(nowIso));
       }

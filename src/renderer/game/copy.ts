@@ -38,6 +38,18 @@ export const TAB_COPY = {
  * destination: the pinned HUD readouts, the two panel headings, and the name of the game
  * surface itself in the secondary dock.
  */
+/**
+ * The OS-style window chrome across the top of the shell. These are the only three controls that
+ * are present on every single frame of the app, so their accessible names follow the same
+ * `en · yue` contract as every other control rather than being English-only.
+ */
+export const TITLE_BAR_COPY = {
+  controlsLabel: { en: "Window controls", yue: "視窗控制" },
+  minimize: { en: "Minimize window", yue: "縮細視窗" },
+  maximizeRestore: { en: "Maximize or restore window", yue: "放大或還原視窗" },
+  close: { en: "Close window", yue: "閂咗視窗" },
+} as const satisfies Record<string, Bilingual>;
+
 export const GAME_SURFACE_COPY = {
   surfaceLabel: { en: "Game", yue: "遊戲" },
   surfaceTitle: { en: "The bakery", yue: "餅店" },
@@ -101,7 +113,6 @@ export const LIST_COPY = {
   buyMax: { en: "Max", yue: "全部" },
   alreadyOwned: { en: "Already owned", yue: "已經擁有" },
   noResults: { en: "Nothing matches this search.", yue: "搵唔到符合嘅結果。" },
-  reviewPreview: { en: "Review before buying", yue: "購買前先review下" },
 } as const satisfies Record<string, Bilingual>;
 
 export const BULK_COPY = {
@@ -112,6 +123,13 @@ export const BULK_COPY = {
   buySelected: (count: number): Bilingual => ({ en: `Buy ${count} selected`, yue: `買落${count} 項已選` }),
   exportSelected: (count: number): Bilingual => ({ en: `Export ${count} selected`, yue: `匯出 ${count} 項已選` }),
   clearSelection: { en: "Clear selection", yue: "清除選擇" },
+  /**
+   * The honest partial result of a bulk buy. The status marks beside the two numbers are drawn
+   * in CSS (`.bulk-status`), never stock colour emoji, and each one carries its own glyph as
+   * well as its own colour so the two outcomes are never told apart by colour alone.
+   */
+  bulkBought: { en: "Bought", yue: "買咗" },
+  bulkSkipped: { en: "Skipped", yue: "跳過" },
   selectAllMatching: { en: "Select all matching", yue: "選取全部符合項" },
   inFlight: { en: "Working…", yue: "處理緊…" },
 } as const satisfies Record<string, Bilingual | ((...args: any[]) => Bilingual)>;
@@ -183,6 +201,23 @@ export const STATS_SCREEN_COPY = {
   toolsUnlocked: { en: "Tools Unlocked", yue: "已解鎖工具" },
   clockAnomalies: { en: "Clock Anomalies Caught", yue: "捕捉到嘅時鐘異常" },
   lifetimeCookies: { en: "Lifetime Cookies", yue: "一生累積曲奇" },
+  lifetimeCookiesThisRun: { en: "Lifetime Cookies (this run)", yue: "今次一生累積曲奇" },
+  productionMultiplier: { en: "Production Multiplier", yue: "產量加成" },
+} as const satisfies Record<string, Bilingual>;
+
+/**
+ * The achievements panel and the cabinet-wide unlock celebration. This lives here rather than
+ * beside the screen so the badge label, the toast title and the milestone narration all read
+ * from one place; the unlock sentence itself comes from `describeMilestone` in narration.ts, so
+ * there is exactly one phrasing of "Achievement unlocked: …" in the app.
+ */
+export const ACHIEVEMENTS_COPY = {
+  lockedName: { en: "???", yue: "未解鎖" },
+  lockedHint: {
+    en: "Not unlocked yet — its name and icon stay hidden until you earn it.",
+    yue: "仲未解鎖——攞到之前個名同圖示都會收埋。",
+  },
+  unlockedToastTitle: { en: "Achievement unlocked", yue: "成就解鎖" },
 } as const satisfies Record<string, Bilingual>;
 
 export const PRESTIGE_SCREEN_COPY = {
@@ -242,8 +277,13 @@ export const OFFLINE_COPY = {
     en: "Your device clock moved backwards, so no offline cookies were awarded this time.",
     yue: "你部機嘅時鐘郁咗去返轉頭，所以今次冇離線曲奇獎勵。",
   },
-  saveCorrupt: (detail: string): Bilingual => ({
-    en: `Your previous save could not be read (${detail}). It was kept, unread, next to a fresh save so nothing is lost.`,
-    yue: `舊存檔讀唔到（${detail}）。原檔保留咗喺新存檔隔籬，冇整走過任何嘢。`,
+  /**
+   * The reason is itself a `Bilingual` (see persistence.ts) rather than a raw English string, so
+   * the Cantonese sentence never ends up carrying an untranslated English clause in brackets.
+   */
+  saveCorrupt: (detail: Bilingual): Bilingual => ({
+    en: `Your previous save could not be read (${detail.en}). It was kept, unread, next to a fresh save so nothing is lost.`,
+    yue: `舊存檔讀唔到（${detail.yue}）。原檔保留咗喺新存檔隔籬，冇整走過任何嘢。`,
   }),
+  saveCorruptUnknown: { en: "unknown error", yue: "不明錯誤" },
 } as const satisfies Record<string, Bilingual | ((...args: any[]) => Bilingual)>;

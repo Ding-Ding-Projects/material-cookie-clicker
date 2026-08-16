@@ -10,23 +10,23 @@ import { DEFAULT_PREFERENCES, validatePreferences, type Preferences } from "./pr
 
 export const STORAGE_KEYS = {
   /** Replaces the shipped `...preferences.v1` record; see the migration below. */
-  preferences: "oak-kay.site.preferences.v2",
-  vocabulary: "oak-kay.site.vocabulary.v1",
-  history: "oak-kay.site.history.v1",
-  notifications: "oak-kay.site.notifications.v1",
-  appearance: "oak-kay.site.appearance.v1",
-  locks: "oak-kay.site.locks.v1",
-  tabs: "oak-kay.site.tabs.v1",
-  schedules: "oak-kay.site.schedules.v1",
-  tickets: "oak-kay.site.support-tickets.v1",
-  authenticator: "oak-kay.site.authenticator.v1",
-  identity: "oak-kay.site.identity.v1",
+  preferences: "material-cookie-clicker.site.preferences.v2",
+  vocabulary: "material-cookie-clicker.site.vocabulary.v1",
+  history: "material-cookie-clicker.site.history.v1",
+  notifications: "material-cookie-clicker.site.notifications.v1",
+  appearance: "material-cookie-clicker.site.appearance.v1",
+  locks: "material-cookie-clicker.site.locks.v1",
+  tabs: "material-cookie-clicker.site.tabs.v1",
+  schedules: "material-cookie-clicker.site.schedules.v1",
+  tickets: "material-cookie-clicker.site.support-tickets.v1",
+  authenticator: "material-cookie-clicker.site.authenticator.v1",
+  identity: "material-cookie-clicker.site.identity.v1",
 } as const;
 
 export type StorageKeyName = keyof typeof STORAGE_KEYS;
 
 /** The superseded preference key, kept so an existing record can be read once. */
-export const LEGACY_PREFERENCES_KEY = "oak-kay.site.preferences.v1";
+export const LEGACY_PREFERENCES_KEY = "material-cookie-clicker.site.preferences.v1";
 
 /**
  * Upgrades a version 1 preference record to version 2. Unknown or missing

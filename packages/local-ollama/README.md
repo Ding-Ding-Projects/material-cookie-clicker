@@ -1,6 +1,6 @@
 # Local Ollama suite
 
-`@oak-kay/local-ollama` is a framework-neutral TypeScript package for a local Ollama model store, durable pull queue, streamed chat, conservative hardware-fit evidence, and allowlisted local harness launches. It includes an accessible browser-style tab surface that a future privileged Windows desktop shell can mount.
+`@material-cookie-clicker/local-ollama` is a framework-neutral TypeScript package for a local Ollama model store, durable pull queue, streamed chat, conservative hardware-fit evidence, and allowlisted local harness launches. It includes an accessible browser-style tab surface that a future privileged Windows desktop shell can mount.
 
 ## Runtime boundary
 

@@ -7,7 +7,7 @@ import {
   matchesSearch,
   type BuilderToken,
   type SearchState,
-} from "@oak-kay/surface-kernel";
+} from "@material-cookie-clicker/surface-kernel";
 
 import {
   filterCatalogVariants,

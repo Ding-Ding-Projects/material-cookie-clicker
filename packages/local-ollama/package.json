@@ -1,5 +1,5 @@
 {
-  "name": "@oak-kay/local-ollama",
+  "name": "@material-cookie-clicker/local-ollama",
   "version": "0.1.0",
   "private": true,
   "description": "Local-only Ollama model store, pull queue, chat, and allowlisted harness orchestration.",
@@ -12,7 +12,7 @@
     "test": "node --test --experimental-strip-types test/*.test.ts"
   },
   "dependencies": {
-    "@oak-kay/surface-kernel": "0.1.0"
+    "@material-cookie-clicker/surface-kernel": "0.1.0"
   },
   "files": [
     "src",

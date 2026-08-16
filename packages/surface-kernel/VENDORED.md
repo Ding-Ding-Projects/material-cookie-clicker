@@ -1,6 +1,6 @@
-# Vendored package: `@oak-kay/surface-kernel`
+# Vendored package: `@material-cookie-clicker/surface-kernel`
 
-This package is **vendored**, not written for Oak Kay. It is copied wholesale from a
+This package is **vendored**, not written for Material Cookie Clicker. It is copied wholesale from a
 public sibling repository owned by the same organization, and it must stay that way.
 
 ## Source
@@ -41,9 +41,9 @@ so the `"node"` condition exists specifically to point Node consumers at
 
 | File | Change | Reason |
 | --- | --- | --- |
-| `package.json` | `"name"` changed from `@material-tax-reporting/surface-kernel` to `@oak-kay/surface-kernel` | Rehoming into the `@oak-kay` workspace scope. Nothing else in the manifest was touched — the conditional `exports` map, `scripts`, `files`, `sideEffects`, `engines`, and `devDependencies` are byte-identical to upstream. |
-| `src/storage-keys.ts` | Every `"material-tax-reporting.site.*"` storage-key literal (and `LEGACY_PREFERENCES_KEY`) rewritten to `"oak-kay.site.*"` | These are live, load-bearing identifiers — the actual `localStorage`/persistence keys a consuming app reads and writes at runtime, not documentation. Leaving the old organization/product name baked into Oak Kay's persisted data would be wrong on its own terms, independent of the rename above. |
-| `README.md` | The package name in the opening sentence updated to `@oak-kay/surface-kernel`; a passing reference to "the documentation site and the desktop application" (upstream's own two consumers) generalized to "a documentation site and a desktop application", since Oak Kay is neither of those specific upstream products | Cosmetic/accuracy only; no behavioral content changed. |
+| `package.json` | `"name"` changed from `@material-tax-reporting/surface-kernel` to `@material-cookie-clicker/surface-kernel` | Rehoming into the `@material-cookie-clicker` workspace scope. Nothing else in the manifest was touched — the conditional `exports` map, `scripts`, `files`, `sideEffects`, `engines`, and `devDependencies` are byte-identical to upstream. |
+| `src/storage-keys.ts` | Every `"material-tax-reporting.site.*"` storage-key literal (and `LEGACY_PREFERENCES_KEY`) rewritten to `"material-cookie-clicker.site.*"` | These are live, load-bearing identifiers — the actual `localStorage`/persistence keys a consuming app reads and writes at runtime, not documentation. Leaving the old organization/product name baked into Material Cookie Clicker's persisted data would be wrong on its own terms, independent of the rename above. |
+| `README.md` | The package name in the opening sentence updated to `@material-cookie-clicker/surface-kernel`; a passing reference to "the documentation site and the desktop application" (upstream's own two consumers) generalized to "a documentation site and a desktop application", since Material Cookie Clicker is neither of those specific upstream products | Cosmetic/accuracy only; no behavioral content changed. |
 
 No other file was modified. Every other `.ts` file, `test/*.test.ts`, `tokens.css`,
 `tsconfig.json`, and `scripts/build.mjs` are byte-identical to the upstream commit
@@ -58,7 +58,7 @@ repeating the vendoring steps above (copy → rename → rewrite storage keys �
 re-verify) against the new commit. A locally patched vendored package silently
 stops matching its source, and from that point on nobody — not the next agent,
 not a human maintainer — can tell which version of the logic is actually
-running in Oak Kay without diffing every file by hand. Recording the exact
+running in Material Cookie Clicker without diffing every file by hand. Recording the exact
 upstream SHA above is what makes that diff possible; do not let it go stale.
 
 When re-vendoring, reapply exactly the two live-identifier changes listed in

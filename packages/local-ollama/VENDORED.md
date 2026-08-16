@@ -1,6 +1,6 @@
-# Vendored package: `@oak-kay/local-ollama`
+# Vendored package: `@material-cookie-clicker/local-ollama`
 
-This package is **vendored**, not written for Oak Kay. It is copied wholesale from a
+This package is **vendored**, not written for Material Cookie Clicker. It is copied wholesale from a
 public sibling repository owned by the same organization, and it must stay that way.
 
 ## Source
@@ -27,10 +27,10 @@ has no `scripts/` helper and no build-generated `dist/` directory upstream
 (its `exports` map points straight at `./src/index.ts`), so there was nothing
 else to bring across.
 
-## Dependency on `@oak-kay/surface-kernel`
+## Dependency on `@material-cookie-clicker/surface-kernel`
 
 This package's `package.json` declares a single workspace dependency,
-`@oak-kay/surface-kernel` (renamed from `@material-tax-reporting/surface-kernel`
+`@material-cookie-clicker/surface-kernel` (renamed from `@material-tax-reporting/surface-kernel`
 — see below). Three source files import from it by bare specifier:
 `src/catalog.ts`, `src/controller.ts`, and `src/view-model.ts`. All three
 import statements were rewritten in place; nothing else in those files changed.
@@ -39,11 +39,11 @@ import statements were rewritten in place; nothing else in those files changed.
 
 | File | Change | Reason |
 | --- | --- | --- |
-| `package.json` | `"name"` changed from `@material-tax-reporting/local-ollama` to `@oak-kay/local-ollama`; the `dependencies` entry changed from `@material-tax-reporting/surface-kernel` to `@oak-kay/surface-kernel` | Rehoming into the `@oak-kay` workspace scope, and pointing at this repository's own vendored copy of the kernel package under its new name. Nothing else in the manifest was touched. |
-| `src/catalog.ts` | Import specifier `@material-tax-reporting/surface-kernel` → `@oak-kay/surface-kernel` | Follows the sibling package's rename; the import would otherwise resolve to nothing in this workspace. |
+| `package.json` | `"name"` changed from `@material-tax-reporting/local-ollama` to `@material-cookie-clicker/local-ollama`; the `dependencies` entry changed from `@material-tax-reporting/surface-kernel` to `@material-cookie-clicker/surface-kernel` | Rehoming into the `@material-cookie-clicker` workspace scope, and pointing at this repository's own vendored copy of the kernel package under its new name. Nothing else in the manifest was touched. |
+| `src/catalog.ts` | Import specifier `@material-tax-reporting/surface-kernel` → `@material-cookie-clicker/surface-kernel` | Follows the sibling package's rename; the import would otherwise resolve to nothing in this workspace. |
 | `src/controller.ts` | Same import-specifier rewrite | Same reason. |
 | `src/view-model.ts` | Same import-specifier rewrite | Same reason. |
-| `README.md` | Package name in the opening sentence updated to `@oak-kay/local-ollama` | Cosmetic/accuracy only; no behavioral content changed. |
+| `README.md` | Package name in the opening sentence updated to `@material-cookie-clicker/local-ollama` | Cosmetic/accuracy only; no behavioral content changed. |
 
 No other file was modified. Every other `.ts` file and `test/*.test.ts` is
 byte-identical to the upstream commit above.
@@ -57,9 +57,9 @@ repeating the vendoring steps above (copy → rename package and dependency →
 rewrite the three import specifiers → re-verify) against the new commit. A
 locally patched vendored package silently stops matching its source, and from
 that point on nobody can tell which version of the logic is actually running
-in Oak Kay without diffing every file by hand. Recording the exact upstream
+in Material Cookie Clicker without diffing every file by hand. Recording the exact upstream
 SHA above is what makes that diff possible; do not let it go stale. Re-vendor
-`@oak-kay/surface-kernel` and this package together — they are one upstream
+`@material-cookie-clicker/surface-kernel` and this package together — they are one upstream
 commit, and mixing SHAs between them is exactly the drift this rule exists to
 prevent.
 
@@ -73,16 +73,16 @@ prevent.
 - **The package's own test suite (`node --test --experimental-strip-types
   test/*.test.ts`) could NOT be run to a real pass/fail count, and this must
   not be read as "verified".** Reason: this package imports
-  `@oak-kay/surface-kernel` by bare specifier, which Node can only resolve
+  `@material-cookie-clicker/surface-kernel` by bare specifier, which Node can only resolve
   through `node_modules` — and that resolution depends on a root-level
   workspace `package.json` (declaring the npm/pnpm workspace and running
   `npm install`/`npm ci` to link the sibling package), which this pig is
   scoped to `packages/**` only and does **not** own. No such root manifest
   exists yet in this worktree.
   - As a one-off local diagnostic (not committed, not part of this package),
-    a manual `node_modules/@oak-kay/surface-kernel` symlink was created to
+    a manual `node_modules/@material-cookie-clicker/surface-kernel` symlink was created to
     check what would happen next. Under that symlink, Node's ESM resolver
-    picked up `@oak-kay/surface-kernel`'s `"node"` export condition, which
+    picked up `@material-cookie-clicker/surface-kernel`'s `"node"` export condition, which
     points at `./dist/index.js` — and `dist/` is upstream's own git-ignored,
     generated-by-`npm run build` output (see `surface-kernel/VENDORED.md`
     and the explanatory comment in `surface-kernel/package.json`). Building

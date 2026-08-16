@@ -17,7 +17,7 @@
  *     names the action that can fill it, instead of leaving a blank field.
  */
 
-import type { BuilderToken, SearchMatch, SearchState } from "@oak-kay/surface-kernel";
+import type { BuilderToken, SearchMatch, SearchState } from "@material-cookie-clicker/surface-kernel";
 
 import type { OfficialCatalogSnapshot, OfficialCatalogVariant } from "./catalog.ts";
 import type { ChatAttachment } from "./chat.ts";

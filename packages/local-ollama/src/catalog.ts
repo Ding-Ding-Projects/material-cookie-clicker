@@ -1,4 +1,4 @@
-import { matchesSearch, type SearchState } from "@oak-kay/surface-kernel";
+import { matchesSearch, type SearchState } from "@material-cookie-clicker/surface-kernel";
 
 const OFFICIAL_LIBRARY_ORIGIN = "https://ollama.com";
 const OFFICIAL_LIBRARY_PATH = "/library";

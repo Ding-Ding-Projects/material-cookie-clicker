@@ -1,6 +1,6 @@
 # Shared surface kernel
 
-`@oak-kay/surface-kernel` is a dependency-free, framework-neutral TypeScript package holding the cross-cutting logic a documentation site and a desktop application both need: the anchored regular-expression search engine, preferences, language and humour resolution, personal vocabulary, the command registry, notifications, append-only history, exports, appearance overrides, colour, presentation locks, tabs, schedules, narration, identity, the conversion registry, documentation and changelog parsing, one-time passwords, QR matrix encoding, support tickets, the transfer state machine, and the Material 3 token set.
+`@material-cookie-clicker/surface-kernel` is a dependency-free, framework-neutral TypeScript package holding the cross-cutting logic a documentation site and a desktop application both need: the anchored regular-expression search engine, preferences, language and humour resolution, personal vocabulary, the command registry, notifications, append-only history, exports, appearance overrides, colour, presentation locks, tabs, schedules, narration, identity, the conversion registry, documentation and changelog parsing, one-time passwords, QR matrix encoding, support tickets, the transfer state machine, and the Material 3 token set.
 
 ## Boundary
 

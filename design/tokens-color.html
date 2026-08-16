@@ -4,124 +4,193 @@
 <head>
 <meta charset="UTF-8" />
 <meta name="viewport" content="width=device-width, initial-scale=1" />
-<title>Material Cookie Clicker · Color Tokens · Cosy Bakery Arcade</title>
+<title>Material Cookie Clicker · Color Tokens · Arcade Cabinet v2</title>
 <style>
   :root {
-    /* ---- Material Cookie Clicker light scheme: baked-cookie brown/gold primary, golden-cookie tertiary ----
-       Hex values are unchanged from the project's original Material 3 palette on purpose: they
-       were already a warm, appetising brown/gold and every pair below is real-world AA-verified.
-       What changed is everything AROUND these colours — shape, weight, shadow, texture, and two
-       new colour families (the arcade spark accent and the jewel tool-tier ladder) layered on top. */
+    /* ============================================================================
+       MATERIAL COOKIE CLICKER — v2 "ARCADE CABINET" TOKENS · LIGHT = BAKERY DAYTIME
+       Warm browns/golds kept from v1 (they were right); everything is deepened and a
+       cabinet-chrome layer is added on top: radial oven-glow backgrounds, inset HUD
+       bezels, metallic bevels, jewel tiers. Every text-bearing pair below — including
+       BOTH ends of the background gradient — is verified by design/_verify/contrast-check.mjs.
+       ============================================================================ */
+
+    /* --- role colours (M3 naming kept as vocabulary only; see README) --- */
     --md-primary: #7A4A1D;
     --md-on-primary: #FFFFFF;
     --md-primary-container: #FFDCB8;
     --md-on-primary-container: #3A2100;
-    --md-primary-shadow: #4A2A0A; /* solid "3D base" beneath a pressable primary button, not a blur */
+    --md-primary-shadow: #3C2107;      /* solid "3D base" under a pressable button — never a blur */
     --md-secondary: #6B4C3F;
     --md-on-secondary: #FFFFFF;
     --md-secondary-container: #FFDBCB;
     --md-on-secondary-container: #2C160B;
-    --md-secondary-shadow: #401F14;
-    --md-tertiary: #5C4E00;
+    --md-secondary-shadow: #35211A;
+    --md-tertiary: #5C4E00;            /* golden-cookie role — never ordinary chrome */
     --md-on-tertiary: #FFFFFF;
     --md-tertiary-container: #F8E287;
     --md-on-tertiary-container: #221B00;
-    --md-tertiary-shadow: #3A3000;
-    --md-surface: #FFF8F3;
-    --md-on-surface: #211A14;
-    --md-surface-variant: #F0E0D0;
-    --md-on-surface-variant: #4F4539;
-    --md-outline: #7C6F64;
+    --md-tertiary-shadow: #332900;
     --md-error: #BA1A1A;
     --md-on-error: #FFFFFF;
     --md-error-container: #FFDAD6;
     --md-on-error-container: #410002;
-    --md-error-shadow: #7A0000;
+    --md-error-shadow: #6E0000;
+
+    /* --- surfaces: deeper and warmer than v1's near-white cream --- */
+    --md-surface: #FFF3E6;
+    --md-on-surface: #1E1610;
+    --md-surface-variant: #F0DCC4;
+    --md-on-surface-variant: #4A3D2E;
+    --md-outline: #75634E;
     --md-surface-container-lowest: #FFFFFF;
-    --md-surface-container-low: #FFF1E6;
-    --md-surface-container: #FCEBDD;
-    --md-surface-container-high: #F7E5D6;
-    --md-surface-container-highest: #F1DFCE;
+    --md-surface-container-low: #FFF0DE;
+    --md-surface-container: #FBE8D2;
+    --md-surface-container-high: #F5DFC4;
+    --md-surface-container-highest: #EED5B4;
     --md-shadow: #000000;
 
-    /* ---- Arcade spark accent — decorative only, NEVER used for body text ----
-       A single verified-safe ring/border tone (--spark-ring, 3:1 vs surface, used sparingly for
-       borders, focus-adjacent glows, and "new!" callouts) plus an unverified, purely-decorative
-       fill/glow tone (--spark) used only for gradients and blurred glow shapes that never carry
-       text of their own. This is the "saturated accent for golden-cookie moments" — separate
-       from the AA-verified tertiary role, which stays reserved for actual on-colour text. */
-    --spark: #FFC72C;
-    --spark-glow: #FFE066;
-    --spark-ring: #D97300;
+    /* --- v2 cabinet chrome --- */
+    --bg-core: #FFF6EC;                /* centre of the radial oven glow */
+    --bg-mid: #FAECDA;
+    --bg-edge: #EFDCC0;                /* rim of the cabinet, where the glow falls off */
+    --panel-inset: #FFFBF4;            /* recessed HUD readout face behind a bezel */
+    --bevel-hi: rgba(255, 255, 255, 0.85);  /* top inner bevel highlight (non-text) */
+    --bevel-lo: rgba(90, 58, 24, 0.28);     /* bottom inner bevel shade (non-text) */
+    --metal-hi: #FFF0C4;               /* medal/badge metallic sweep, decorative only */
+    --metal-lo: #B98A2E;
+    --cabinet-frame: #6A4522;          /* the wooden counter / cabinet body, non-text */
+    --cabinet-frame-dark: #43290F;
+    --track: #E4CDAE;                  /* XP-bar / progress trough, non-text */
 
-    /* ---- Jewel tool tiers — the late-game escalation ladder ----
-       Tier 1 reuses the primary bronze/brown above (the tech tree always opens on home ground).
-       Tier 2 is a verdant emerald; Tier 3 a deep amethyst. Each step is a genuinely different
-       jewel family, not a darker tint of the last one, so a glance at the tools-tree screen reads
-       as "I am getting somewhere" rather than "the same chip got slightly darker." */
-    --tier1: var(--md-primary); --on-tier1: var(--md-on-primary);
-    --tier1-container: var(--md-primary-container); --on-tier1-container: var(--md-on-primary-container);
-    --tier2: #256B3B; --on-tier2: #FFFFFF; --tier2-container: #B8F0C4; --on-tier2-container: #04210D;
-    --tier3: #5B3B9C; --on-tier3: #FFFFFF; --tier3-container: #E6D9FF; --on-tier3-container: #20004D;
+    /* --- arcade spark accent. --spark and --spark-glow are DECORATIVE ONLY (blurred
+           glows and gradient fills) and never carry text. --spark-ring is the only
+           spark role allowed on text or a UI boundary, and is AA-verified. --- */
+    --spark: #FFC94D;
+    --spark-glow: #FF8A00;
+    --spark-ring: #9C4B00;
 
-    /* ---- Shape — bigger, more confident radii; 1px hairlines read as productivity software ---- */
+    /* --- jewel tool-tier ladder: bronze -> emerald -> amethyst --- */
+    --tier1: #8A4E12;
+    --on-tier1: #FFFFFF;
+    --tier1-container: #FFDCBA;
+    --on-tier1-container: #2E1600;
+    --tier2: #1F6337;
+    --on-tier2: #FFFFFF;
+    --tier2-container: #B8F0C4;
+    --on-tier2-container: #04210D;
+    --tier3: #533593;
+    --on-tier3: #FFFFFF;
+    --tier3-container: #E6D9FF;
+    --on-tier3-container: #20004D;
+    --tier-accent: var(--tier1);
+    --on-tier-accent: var(--on-tier1);
+    --tier-accent-container: var(--tier1-container);
+    --on-tier-accent-container: var(--on-tier1-container);
+
+    /* --- type --- */
+    --font-en: -apple-system, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
+    --font-zh: "Segoe UI", "Microsoft JhengHei", var(--font-en);
+    --font-display: "Segoe UI Black", "Arial Black", "Segoe UI", var(--font-en);
+
+    /* --- shape: v2 goes fatter again (v1 was 8-34, v2 is 10-40) --- */
     --shape-none: 0px;
-    --shape-xs: 8px;
-    --shape-sm: 12px;
-    --shape-md: 18px;
-    --shape-lg: 26px;
+    --shape-xs: 10px;
+    --shape-sm: 16px;
+    --shape-md: 22px;
+    --shape-lg: 28px;
     --shape-xl: 34px;
+    --shape-2xl: 40px;
     --shape-full: 999px;
 
-    /* ---- Border weight — chunky and confident ---- */
+    /* --- borders: hairlines are banned in this theme --- */
     --border-thin: 2px;
     --border-thick: 3px;
     --border-chunky: 4px;
+    --border-fat: 5px;
 
-    --font-display: "Segoe UI Black", "Arial Black", "Segoe UI", var(--font-en);
-    --font-en: -apple-system, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
-    --font-zh: "Segoe UI", "Microsoft JhengHei", "PMingLiU", var(--font-en);
+    /* --- pressable depth. Two paired families, deliberately kept separate:
+           --drop-N is the LENGTH a control travels when pressed (also the height of
+           its solid base), --press-N is the ready-made box-shadow built from it.
+           Solid offsets only; a blurred drop shadow is not used anywhere in v2.
+           v2 deepens v1's 3-4px travel to 4-10px. --- */
+    --drop-1: 4px;
+    --drop-2: 6px;
+    --drop-3: 8px;
+    --drop-4: 10px;
+    --press-0: none;
+    --press-1: 0 var(--drop-1) 0 0 var(--md-outline);
+    --press-2: 0 var(--drop-2) 0 0 var(--md-outline);
+    --press-3: 0 var(--drop-3) 0 0 var(--md-outline);
+    --press-4: 0 var(--drop-4) 0 0 var(--cabinet-frame-dark);
   }
   [data-scheme="dark"] {
+    /* ============================================================================
+       DARK = ARCADE NIGHT. Not "the light theme with the lights off": the cabinet is
+       lit from inside, so the background glow gets BRIGHTER toward its centre while
+       the rim goes to near-black. Both ends are contrast-verified.
+       ============================================================================ */
     --md-primary: #FFB876;
     --md-on-primary: #4A2800;
     --md-primary-container: #693C00;
     --md-on-primary-container: #FFDCB8;
-    --md-primary-shadow: #A66A2E;
+    --md-primary-shadow: #2A1600;
     --md-secondary: #E6BEAC;
     --md-on-secondary: #44291E;
     --md-secondary-container: #5D3F32;
     --md-on-secondary-container: #FFDBCB;
-    --md-secondary-shadow: #8A5C48;
+    --md-secondary-shadow: #24140D;
     --md-tertiary: #DBC66E;
     --md-on-tertiary: #383000;
     --md-tertiary-container: #514600;
     --md-on-tertiary-container: #F8E287;
-    --md-tertiary-shadow: #8F7A20;
-    --md-surface: #18120D;
-    --md-on-surface: #EDE0D9;
-    --md-surface-variant: #4F4539;
-    --md-on-surface-variant: #D3C4B4;
-    --md-outline: #9C8F83;
+    --md-tertiary-shadow: #201C00;
     --md-error: #FFB4AB;
     --md-on-error: #690005;
     --md-error-container: #93000A;
     --md-on-error-container: #FFDAD6;
-    --md-error-shadow: #7A2A24;
-    --md-surface-container-lowest: #120D09;
-    --md-surface-container-low: #211A14;
-    --md-surface-container: #251D17;
-    --md-surface-container-high: #302722;
-    --md-surface-container-highest: #3B322C;
+    --md-error-shadow: #4A0004;
 
-    --spark: #FFD666;
-    --spark-glow: #FFE8A3;
+    --md-surface: #120C08;
+    --md-on-surface: #F2E4D6;
+    --md-surface-variant: #453A2E;
+    --md-on-surface-variant: #D8C8B4;
+    --md-outline: #A08D78;
+    --md-surface-container-lowest: #0A0603;
+    --md-surface-container-low: #1A120B;
+    --md-surface-container: #221810;
+    --md-surface-container-high: #2C2016;
+    --md-surface-container-highest: #382A1E;
+    --md-shadow: #000000;
+
+    --bg-core: #2A1A0A;
+    --bg-mid: #1A1008;
+    --bg-edge: #0A0705;
+    --panel-inset: #0B0704;
+    --bevel-hi: rgba(255, 214, 160, 0.30);
+    --bevel-lo: rgba(0, 0, 0, 0.72);
+    --metal-hi: #FFE7A8;
+    --metal-lo: #8A6318;
+    --cabinet-frame: #3A2410;
+    --cabinet-frame-dark: #150C05;
+    --track: #2E2419;
+
+    --spark: #FFD97A;
+    --spark-glow: #FFA326;
     --spark-ring: #FFC24D;
 
-    --tier1: var(--md-primary); --on-tier1: var(--md-on-primary);
-    --tier1-container: var(--md-primary-container); --on-tier1-container: var(--md-on-primary-container);
-    --tier2: #8FE3A6; --on-tier2: #0C3018; --tier2-container: #1B4A28; --on-tier2-container: #B8F0C4;
-    --tier3: #CFBCFF; --on-tier3: #2A0A5C; --tier3-container: #3B2465; --on-tier3-container: #E6D9FF;
+    --tier1: #F2B27A;
+    --on-tier1: #3A1E00;
+    --tier1-container: #5A3208;
+    --on-tier1-container: #FFDCBA;
+    --tier2: #8FE3A6;
+    --on-tier2: #0C3018;
+    --tier2-container: #1B4A28;
+    --on-tier2-container: #B8F0C4;
+    --tier3: #CFBCFF;
+    --on-tier3: #2A0A5C;
+    --tier3-container: #3B2465;
+    --on-tier3-container: #E6D9FF;
   }
   * { box-sizing: border-box; }
   body {
@@ -131,23 +200,9 @@
     color: var(--md-on-surface);
     padding: 24px;
   }
-  h1 { font-family: var(--font-display); font-size: 30px; margin: 0 0 4px; letter-spacing: 0.2px; }
   h2 { font-size: 20px; margin: 32px 0 12px; border-bottom: var(--border-thin) solid var(--md-outline); padding-bottom: 8px; }
   p.lede { color: var(--md-on-surface-variant); max-width: 70ch; margin: 0 0 16px; }
   .toggle-row { display: flex; gap: 8px; align-items: center; margin: 16px 0 24px; }
-  button.scheme-toggle {
-    font: inherit;
-    font-weight: 700;
-    padding: 10px 20px;
-    min-height: 44px;
-    border-radius: var(--shape-full);
-    border: var(--border-thick) solid var(--md-outline);
-    background: var(--md-primary-container);
-    color: var(--md-on-primary-container);
-    cursor: pointer;
-    box-shadow: 0 3px 0 0 var(--md-outline);
-  }
-  button.scheme-toggle:active { transform: translateY(3px); box-shadow: none; }
   @media (prefers-reduced-motion: reduce) { button.scheme-toggle:active { transform: none; } }
   button.scheme-toggle:focus-visible {
     outline: 3px solid var(--md-primary);
@@ -174,6 +229,113 @@
     background: var(--md-surface-container); border-radius: var(--shape-md);
     border: var(--border-thin) dashed var(--md-outline);
     padding: 10px 14px; font-size: 12px; margin-top: 8px; max-width: 74ch;
+  }
+  /* ==========================================================================
+     v2 SHARED CABINET CHROME — identical in every spec file so the bundle reads
+     as one machine. Radial oven-glow page, marquee headings, arcade toggle.
+     ========================================================================== */
+  body {
+    margin: 0;
+    padding: 28px clamp(16px, 4vw, 44px) 72px;
+    min-height: 100vh;
+    font-family: var(--font-en);
+    color: var(--md-on-surface);
+    background:
+      radial-gradient(ellipse 130% 95% at 50% -12%,
+        var(--bg-core) 0%, var(--bg-mid) 42%, var(--bg-edge) 100%),
+      var(--bg-edge);
+    background-attachment: fixed;
+  }
+  h1 {
+    font-family: var(--font-display);
+    font-weight: 900;
+    font-size: clamp(28px, 5vw, 50px);
+    line-height: 1.04;
+    letter-spacing: 0.045em;
+    text-transform: uppercase;
+    margin: 0 0 14px;
+    padding: 18px 22px;
+    color: var(--md-on-surface);
+    border: var(--border-fat) solid var(--md-outline);
+    border-radius: var(--shape-lg);
+    background:
+      linear-gradient(180deg, var(--md-surface-container-high) 0%, var(--md-surface-container-highest) 100%);
+    box-shadow: var(--press-4), inset 0 4px 0 0 var(--bevel-hi), inset 0 -4px 0 0 var(--bevel-lo);
+  }
+  h2 {
+    font-family: var(--font-display);
+    font-weight: 900;
+    font-size: 15px;
+    letter-spacing: 0.22em;
+    text-transform: uppercase;
+    color: var(--md-on-surface-variant);
+    margin: 40px 0 12px;
+    display: flex;
+    align-items: center;
+    gap: 12px;
+  }
+  h2::after {
+    content: "";
+    flex: 1;
+    height: 0;
+    border-top: var(--border-thick) solid var(--md-outline);
+    opacity: 0.55;
+  }
+  h3 {
+    font-family: var(--font-display);
+    font-size: 13px;
+    letter-spacing: 0.16em;
+    text-transform: uppercase;
+    color: var(--md-on-surface-variant);
+  }
+  p.lede, p.caption { color: var(--md-on-surface-variant); max-width: 74ch; line-height: 1.55; }
+  p.lede { font-size: 15px; }
+  button.scheme-toggle {
+    font-family: var(--font-display);
+    font-size: 13px;
+    letter-spacing: 0.14em;
+    text-transform: uppercase;
+    padding: 12px 26px;
+    min-height: 48px;
+    border-radius: var(--shape-full);
+    border: var(--border-chunky) solid var(--md-outline);
+    background: linear-gradient(180deg, var(--md-surface-container-low), var(--md-surface-container-highest));
+    color: var(--md-on-surface);
+    cursor: pointer;
+    margin: 18px 0 26px;
+    box-shadow: var(--press-2), inset 0 3px 0 0 var(--bevel-hi);
+    transition: transform 90ms ease, box-shadow 90ms ease;
+  }
+  button.scheme-toggle:active {
+    transform: translateY(5px);
+    box-shadow: none;
+  }
+  button.scheme-toggle:focus-visible { outline: 4px solid var(--spark-ring); outline-offset: 3px; }
+  @media (prefers-reduced-motion: reduce) {
+    button.scheme-toggle { transition: none; }
+    button.scheme-toggle:active { transform: none; box-shadow: inset 0 4px 0 0 var(--bevel-lo); }
+  }
+
+  /* --- reusable HUD idioms (see README "Game HUD idioms") --- */
+  .v2-marquee {
+    font-family: var(--font-display);
+    font-size: 12px;
+    letter-spacing: 0.24em;
+    text-transform: uppercase;
+    color: var(--md-on-surface-variant);
+  }
+  .v2-bezel {
+    border: var(--border-chunky) solid var(--md-outline);
+    border-radius: var(--shape-md);
+    background: var(--panel-inset);
+    box-shadow: inset 0 5px 0 0 var(--bevel-lo), inset 0 -3px 0 0 var(--bevel-hi);
+  }
+  .v2-counter {
+    font-family: var(--font-display);
+    font-weight: 900;
+    font-variant-numeric: tabular-nums;
+    letter-spacing: -0.01em;
+    line-height: 1;
   }
 </style>
 </head>
@@ -293,11 +455,22 @@
 
   <h2>Jewel tool tiers · 工具寶石層級 — the late-game ladder</h2>
   <p class="caption">
-    Tier 1 reuses the primary bronze above. Tier 2 (emerald) and Tier 3 (amethyst) are genuinely
+    v2 gives tier 1 its own bronze rather than borrowing the primary, so all three rungs are real
+    jewel families. Tier 2 (emerald) and Tier 3 (amethyst) are genuinely
     different jewel families rather than darker tints of the same hue, so the Tools tech tree
     visibly escalates tier over tier. See <code>tools-tree.html</code> and <code>tool-card.html</code>.
   </p>
   <div class="grid">
+    <div class="swatch" style="background:var(--tier1); color:var(--on-tier1);">
+      <span class="role">tier1 (bronze)</span>
+      <span class="hex" id="hexTier1"></span>
+      <span class="ratio pass" id="ratioTier1"></span>
+    </div>
+    <div class="swatch" style="background:var(--tier1-container); color:var(--on-tier1-container);">
+      <span class="role">tier1-container</span>
+      <span class="hex" id="hexTier1Container"></span>
+      <span class="ratio pass" id="ratioTier1Container"></span>
+    </div>
     <div class="swatch" style="background:var(--tier2); color:var(--on-tier2);">
       <span class="role">tier2 (emerald)</span>
       <span class="hex" id="hexTier2"></span>
@@ -375,6 +548,57 @@
     </div>
   </div>
 
+  <h2>Cabinet chrome · 機櫃外殼 — v2's new structural roles</h2>
+  <p class="caption">
+    v2 stopped painting flat panels. The page background is a radial <em>oven glow</em> built from
+    three stops (<code>--bg-core</code> → <code>--bg-mid</code> → <code>--bg-edge</code>), which
+    means body text sits on a <strong>range</strong> of colours rather than one, so all three stops
+    are contrast-checked, not just an average. <code>--panel-inset</code> is the recessed HUD
+    readout face behind a bezel (score tiles, shop rows, the regex field). The rest —
+    <code>--bevel-hi</code>/<code>--bevel-lo</code>, <code>--metal-hi</code>/<code>--metal-lo</code>,
+    <code>--cabinet-frame</code>, <code>--track</code> — are structural and decorative only: bevel
+    highlights, medal metal, the wooden cabinet body, and the XP-bar trough. None of them ever
+    carries text.
+    <span class="zh" style="display:block; margin-top:6px;">v2 唔再用平面色塊：背景係焗爐光暈漸變，所以三個漸變位都要計對比度；<code>--panel-inset</code> 係凹入去嘅數字面板。</span>
+  </p>
+  <div class="grid">
+    <div class="swatch" style="background:var(--bg-core); color:var(--md-on-surface); border-color:var(--md-outline);">
+      <span class="role">bg-core (glow centre)</span>
+      <span class="hex" id="hexBgCore"></span>
+      <span class="ratio pass" id="ratioBgCore"></span>
+    </div>
+    <div class="swatch" style="background:var(--bg-mid); color:var(--md-on-surface); border-color:var(--md-outline);">
+      <span class="role">bg-mid (falloff)</span>
+      <span class="hex" id="hexBgMid"></span>
+      <span class="ratio pass" id="ratioBgMid"></span>
+    </div>
+    <div class="swatch" style="background:var(--bg-edge); color:var(--md-on-surface); border-color:var(--md-outline);">
+      <span class="role">bg-edge (cabinet rim)</span>
+      <span class="hex" id="hexBgEdge"></span>
+      <span class="ratio pass" id="ratioBgEdge"></span>
+    </div>
+    <div class="swatch" style="background:var(--panel-inset); color:var(--md-on-surface); border-color:var(--md-outline); box-shadow: inset 0 5px 0 -2px var(--bevel-lo);">
+      <span class="role">panel-inset (HUD bezel face)</span>
+      <span class="hex" id="hexPanelInset"></span>
+      <span class="ratio pass" id="ratioPanelInset"></span>
+    </div>
+    <div class="swatch" style="background:linear-gradient(135deg, var(--metal-hi), var(--metal-lo)); color:var(--md-on-tertiary-container); border-color:var(--md-outline);">
+      <span class="role">metal-hi / metal-lo</span>
+      <span class="hex">medal bevel sweep</span>
+      <span class="ratio">decorative only — never a text background</span>
+    </div>
+    <div class="swatch" style="background:var(--cabinet-frame); color:#FFFFFF; border-color:var(--md-outline);">
+      <span class="role">cabinet-frame</span>
+      <span class="hex" id="hexCabinetFrame"></span>
+      <span class="ratio">structural frame / deep base only — never text</span>
+    </div>
+    <div class="swatch" style="background:var(--track); color:var(--md-on-surface); border-color:var(--md-outline);">
+      <span class="role">track (XP-bar trough)</span>
+      <span class="hex" id="hexTrack"></span>
+      <span class="ratio">progress trough — labels sit beside the bar, never on it</span>
+    </div>
+  </div>
+
   <h2>Computed contrast ratios (live, in-page) · 即時計算對比度</h2>
   <p class="caption">
     This page recomputes every ratio in your browser, in plain JavaScript, using the same
@@ -409,6 +633,12 @@
       ['SurfaceVariant', '--md-surface-variant', '--md-on-surface-variant'],
       ['Error', '--md-error', '--md-on-error'],
       ['ErrorContainer', '--md-error-container', '--md-on-error-container'],
+      ['BgCore', '--bg-core', '--md-on-surface'],
+      ['BgMid', '--bg-mid', '--md-on-surface'],
+      ['BgEdge', '--bg-edge', '--md-on-surface'],
+      ['PanelInset', '--panel-inset', '--md-on-surface'],
+      ['Tier1', '--tier1', '--on-tier1'],
+      ['Tier1Container', '--tier1-container', '--on-tier1-container'],
       ['Tier2', '--tier2', '--on-tier2'],
       ['Tier2Container', '--tier2-container', '--on-tier2-container'],
       ['Tier3', '--tier3', '--on-tier3'],
@@ -441,6 +671,8 @@
     document.getElementById('hexTertiaryShadow').textContent = css('--md-tertiary-shadow');
     document.getElementById('hexErrorShadow').textContent = css('--md-error-shadow');
     document.getElementById('hexSpark').textContent = css('--spark');
+    document.getElementById('hexCabinetFrame').textContent = css('--cabinet-frame');
+    document.getElementById('hexTrack').textContent = css('--track');
     window.__contrastReport = report;
   }
   render();

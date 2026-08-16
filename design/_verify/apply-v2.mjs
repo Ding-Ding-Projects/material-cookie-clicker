@@ -1,12 +1,12 @@
-<!-- @dsCard group="Game Surfaces" -->
-<!DOCTYPE html>
-<html lang="en">
-<head>
-<meta charset="UTF-8" />
-<meta name="viewport" content="width=device-width, initial-scale=1" />
-<title>Material Cookie Clicker · Achievement Badge</title>
-<style>
-  :root {
+// One-shot migration helper used to swap every spec file onto the v2 "arcade cabinet" token
+// blocks and shared cabinet chrome. Kept out of the shipped app; re-runnable (idempotent).
+// Run from repo root: node design/_verify/apply-v2.mjs
+import fs from 'node:fs';
+import path from 'node:path';
+
+const dir = path.join(process.cwd(), 'design');
+
+const ROOT = `  :root {
     /* ============================================================================
        MATERIAL COOKIE CLICKER — v2 "ARCADE CABINET" TOKENS · LIGHT = BAKERY DAYTIME
        Warm browns/golds kept from v1 (they were right); everything is deepened and a
@@ -123,8 +123,9 @@
     --press-2: 0 var(--drop-2) 0 0 var(--md-outline);
     --press-3: 0 var(--drop-3) 0 0 var(--md-outline);
     --press-4: 0 var(--drop-4) 0 0 var(--cabinet-frame-dark);
-  }
-  [data-scheme="dark"] {
+  }`;
+
+const DARK = `  [data-scheme="dark"] {
     /* ============================================================================
        DARK = ARCADE NIGHT. Not "the light theme with the lights off": the cabinet is
        lit from inside, so the background glow gets BRIGHTER toward its centre while
@@ -191,83 +192,9 @@
     --on-tier3: #2A0A5C;
     --tier3-container: #3B2465;
     --on-tier3-container: #E6D9FF;
-  }
-  * { box-sizing: border-box; }
-  .row { display: flex; gap: 24px; flex-wrap: wrap; align-items: flex-start; }
-  .cell { display: flex; flex-direction: column; align-items: center; gap: 8px; width: 150px; }
+  }`;
 
-  /* Medal-style badge: a chunky outer ring plus an inset highlight bevel so it reads as a real
-     minted medal rather than a flat coloured circle. */
-  /* v2: a struck METAL medal. The rim is a conic metallic sweep (pure CSS, no image),
-     the face is domed by a two-stop radial, and the whole thing sits on a solid base so
-     it has physical thickness rather than being a coloured circle. */
-  .badge {
-    width: 108px; height: 108px; border-radius: var(--shape-full);
-    display: flex; align-items: center; justify-content: center; font-size: 42px;
-    border: var(--border-fat) solid transparent;
-    position: relative;
-  }
-  .badge.locked {
-    background: var(--md-surface-variant); color: var(--md-on-surface-variant);
-    border-color: var(--md-outline);
-    filter: grayscale(1) brightness(0.85);
-    box-shadow:
-      inset 0 6px 0 -1px var(--bevel-lo),
-      inset 0 -4px 0 0 var(--bevel-hi),
-      0 6px 0 0 var(--md-outline);
-  }
-  .badge.unlocked {
-    background:
-      radial-gradient(circle at 36% 28%, var(--metal-hi) 0%, var(--spark) 34%, var(--md-tertiary) 78%);
-    color: var(--md-on-tertiary);
-    border-color: var(--metal-lo);
-    box-shadow:
-      inset 0 6px 0 -1px rgba(255, 255, 255, 0.55),
-      inset 0 -10px 0 -2px var(--md-tertiary-shadow),
-      0 0 0 5px var(--md-tertiary-container),
-      0 0 0 9px var(--metal-lo),
-      0 8px 0 0 var(--md-tertiary-shadow),
-      0 0 34px 4px var(--spark-glow);
-  }
-  /* the minted rim: a rotating conic sheen, held still under reduced motion */
-  .badge.unlocked::after {
-    content: ""; position: absolute; inset: -9px; border-radius: var(--shape-full);
-    background: conic-gradient(var(--metal-hi), var(--metal-lo), var(--metal-hi), var(--metal-lo), var(--metal-hi));
-    z-index: -1;
-    animation: mint 6s linear infinite;
-  }
-  @keyframes mint { to { transform: rotate(360deg); } }
-  .badge:focus-visible { outline: 4px solid var(--spark-ring); outline-offset: 6px; }
-  .badge-name { font-family: var(--font-display); font-size: 12px; font-weight: 900; letter-spacing: 0.14em; text-transform: uppercase; text-align: center; }
-  .badge-name-zh { font-family: var(--font-zh); font-size: 12px; color: var(--md-on-surface-variant); text-align: center; }
-  @media (prefers-reduced-motion: reduce) {
-    .badge.unlocked::after { animation: none; }
-  }
-
-  .toast {
-    position: fixed; bottom: 24px; right: 24px;
-    background: linear-gradient(180deg, var(--md-surface-container-high), var(--md-surface-container-highest));
-    color: var(--md-on-surface);
-    border-radius: var(--shape-lg); padding: 8px; max-width: 360px;
-    border: var(--border-fat) solid var(--spark-ring);
-    box-shadow: var(--press-3), inset 0 4px 0 0 var(--bevel-hi);
-  }
-  .toast .marquee {
-    font-family: var(--font-display); font-size: 11px; font-weight: 900;
-    letter-spacing: 0.24em; text-transform: uppercase;
-    background: var(--md-tertiary-container); color: var(--md-on-tertiary-container);
-    border-radius: var(--shape-sm) var(--shape-sm) 0 0;
-    padding: 12px 14px; margin: -8px -8px 8px;
-  }
-  .toast .face {
-    border-radius: var(--shape-sm); padding: 14px;
-    background: var(--panel-inset);
-    box-shadow: inset 0 5px 0 -2px var(--bevel-lo);
-    display: flex; gap: 14px; align-items: center;
-  }
-  .toast .badge { width: 56px; height: 56px; font-size: 24px; flex-shrink: 0; border-width: var(--border-chunky); }
-  .toast-text { font-size: 13px; line-height: 1.5; }
-  .toast-text strong { display: block; font-family: var(--font-display); font-size: 17px; font-weight: 900; }
+const CHROME = `
   /* ==========================================================================
      v2 SHARED CABINET CHROME — identical in every spec file so the bundle reads
      as one machine. Radial oven-glow page, marquee headings, arcade toggle.
@@ -375,50 +302,19 @@
     letter-spacing: -0.01em;
     line-height: 1;
   }
-</style>
-</head>
-<body data-scheme="light">
-  <h1>Achievement badge · 成就徽章</h1>
-  <p class="lede">
-    Locked badges render as a greyscale silhouette with a dulled bevel so a player knows an
-    achievement exists without spoiling its name or icon; unlocked badges are struck like a real
-    minted medal — a bright radial fill, a chunky ring in the arcade spark accent, and a bevelled
-    highlight — matching the golden-cookie visual language.
-    <span style="font-family:var(--font-zh); display:block;">未解鎖嘅徽章淨係顯示灰色剪影，解鎖之後先顯示好似真獎牌咁嘅金色圖示同光環效果。</span>
-  </p>
-  <button class="scheme-toggle" onclick="document.body.dataset.scheme = document.body.dataset.scheme === 'dark' ? 'light' : 'dark'">
-    🌗 Toggle light / dark · 切換淺色／深色
-  </button>
+`;
 
-  <h2>Locked vs unlocked · 未解鎖 / 已解鎖</h2>
-  <div class="row">
-    <div class="cell">
-      <div class="badge locked" role="img" aria-label="Locked achievement · 未解鎖成就" tabindex="0">❔</div>
-      <div class="badge-name">???</div>
-      <div class="badge-name-zh">未解鎖</div>
-    </div>
-    <div class="cell">
-      <div class="badge unlocked" role="img" aria-label="Achievement unlocked: Hundred Bakeries · 成就已解鎖：百間麵包店" tabindex="0">💯</div>
-      <div class="badge-name">Hundred Bakeries</div>
-      <div class="badge-name-zh">百間麵包店</div>
-    </div>
-  </div>
-
-  <h2>Unlock toast · 解鎖提示</h2>
-  <p class="caption">
-    A non-blocking, corner-anchored toast fires the moment an achievement unlocks, with a chunky
-    offset shadow and a spark-accent left border so it reads as a celebratory pop-up rather than a
-    routine system message. Auto-dismisses after ~6s; hovering or focusing it pauses the timer.
-    Never modal, never interrupts a click.
-  </p>
-  <div class="row" style="position: relative; height: 140px; width: 100%;">
-    <div class="toast" style="position: absolute; bottom: 0; right: 0;">
-      <div class="badge unlocked">💯</div>
-      <div class="toast-text">
-        <strong>Achievement unlocked · 成就解鎖</strong>
-        Hundred Bakeries · 百間麵包店
-      </div>
-    </div>
-  </div>
-</body>
-</html>
+const files = fs.readdirSync(dir).filter((f) => f.endsWith('.html'));
+for (const f of files) {
+  const p = path.join(dir, f);
+  // Normalise to LF first: these files have historically had mixed endings, and the
+  // multiline (^/$) anchors below silently fail on CRLF lines.
+  let s = fs.readFileSync(p, 'utf8').split('\r\n').join('\n');
+  s = s.replace(/^  :root \{[\s\S]*?^  \}$/m, () => ROOT);
+  s = s.replace(/^  \[data-scheme="dark"\] \{[\s\S]*?^  \}$/m, () => DARK);
+  // strip a previously-applied chrome block so this stays idempotent
+  s = s.replace(/\r?\n  \/\* =+\r?\n     v2 SHARED CABINET CHROME[\s\S]*?\r?\n<\/style>/, '\n</style>');
+  s = s.replace(/\n<\/style>/, CHROME + '</style>');
+  fs.writeFileSync(p, s);
+  console.log('updated', f);
+}

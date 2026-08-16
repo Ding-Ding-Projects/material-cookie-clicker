@@ -1,6 +1,6 @@
-import { migrateToLatest, SaveVersionTooNewError } from "./migrations";
-import { SaveDataLatestSchema, SaveVersionProbeSchema, type SaveDataLatest } from "./save-schema";
-import type { GameState } from "./types";
+import { migrateToLatest, SaveVersionTooNewError } from "./migrations.js";
+import { SaveDataLatestSchema, SaveVersionProbeSchema, type SaveDataLatest } from "./save-schema.js";
+import type { GameState } from "./types.js";
 
 export type DecodeSaveResult =
   | { readonly ok: true; readonly state: GameState }

@@ -1,7 +1,7 @@
-import { bnFromNumber, bnMulScalar, type BigNum } from "./big-number";
-import { totalCps } from "./cps";
-import { totalOfflineBonuses } from "./tools";
-import type { GameState } from "./types";
+import { bnFromNumber, bnMulScalar, type BigNum } from "./big-number.js";
+import { totalCps } from "./cps.js";
+import { totalOfflineBonuses } from "./tools.js";
+import type { GameState } from "./types.js";
 
 export interface OfflineProgressOptions {
   /** Hard cap on how much elapsed wall-clock time counts toward offline production, in ms. */

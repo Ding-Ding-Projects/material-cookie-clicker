@@ -1,5 +1,5 @@
-import { bnCompare, bnFromNumber, type BigNum } from "./big-number";
-import type { GameState } from "./types";
+import { bnCompare, bnFromNumber, type BigNum } from "./big-number.js";
+import type { GameState } from "./types.js";
 
 /**
  * The Tools tech tree turns the application's OWN canonical features (Command Palette,

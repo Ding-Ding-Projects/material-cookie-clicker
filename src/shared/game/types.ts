@@ -1,4 +1,4 @@
-import type { BigNum } from "./big-number";
+import type { BigNum } from "./big-number.js";
 
 /** Small discrete counters use plain `number` — see big-number.ts header comment for why. */
 

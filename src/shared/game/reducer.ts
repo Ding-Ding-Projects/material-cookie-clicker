@@ -1,6 +1,6 @@
-import { bnAdd, bnClampNonNegative, bnCompare, bnFromNumber, bnMulScalar, bnSub, type BigNum } from "./big-number";
-import { totalCps } from "./cps";
-import { evaluateAchievements } from "./achievements";
+import { bnAdd, bnClampNonNegative, bnCompare, bnFromNumber, bnMulScalar, bnSub, type BigNum } from "./big-number.js";
+import { totalCps } from "./cps.js";
+import { evaluateAchievements } from "./achievements.js";
 import {
   collectGoldenCookie as collectGoldenCookiePure,
   despawnIfExpired,
@@ -8,13 +8,13 @@ import {
   isEffectActive,
   type GoldenCookieConfig,
   DEFAULT_GOLDEN_COOKIE_CONFIG,
-} from "./golden-cookie";
-import { costOfBulk, costOfNext, getGeneratorDefinition, maxAffordable } from "./generators";
-import { computeOfflineProgressWithTools, type OfflineProgressOptions } from "./offline-progress";
-import { canPrestige, performPrestige } from "./prestige";
-import { totalBuyMaxDiscount } from "./tools";
-import { computeMultipliers, getUpgradeDefinition, isUpgradeUnlocked } from "./upgrades";
-import type { GameState, RngPort } from "./types";
+} from "./golden-cookie.js";
+import { costOfBulk, costOfNext, getGeneratorDefinition, maxAffordable } from "./generators.js";
+import { computeOfflineProgressWithTools, type OfflineProgressOptions } from "./offline-progress.js";
+import { canPrestige, performPrestige } from "./prestige.js";
+import { totalBuyMaxDiscount } from "./tools.js";
+import { computeMultipliers, getUpgradeDefinition, isUpgradeUnlocked } from "./upgrades.js";
+import type { GameState, RngPort } from "./types.js";
 
 export interface ReducerCtx {
   readonly now: () => number;

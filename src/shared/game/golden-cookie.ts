@@ -1,6 +1,6 @@
-import { bnFromNumber, bnMulScalar, type BigNum } from "./big-number";
-import { totalCps } from "./cps";
-import type { GameState, GoldenCookieEffectState, GoldenCookieState, RngPort } from "./types";
+import { bnFromNumber, bnMulScalar, type BigNum } from "./big-number.js";
+import { totalCps } from "./cps.js";
+import type { GameState, GoldenCookieEffectState, GoldenCookieState, RngPort } from "./types.js";
 
 /**
  * splitmix32 — a small, fast, deterministic PRNG. Chosen (over `Math.random()`) because the

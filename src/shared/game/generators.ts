@@ -9,7 +9,7 @@ import {
   bnPow,
   bnSub,
   type BigNum,
-} from "./big-number";
+} from "./big-number.js";
 
 export interface GeneratorDefinition {
   readonly id: string;

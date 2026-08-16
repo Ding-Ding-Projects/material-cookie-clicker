@@ -1,4 +1,4 @@
-import { SAVE_SCHEMA_VERSION } from "./save-schema";
+import { SAVE_SCHEMA_VERSION } from "./save-schema.js";
 
 /**
  * A save version newer than SAVE_SCHEMA_VERSION is a save written by a NEWER app build.

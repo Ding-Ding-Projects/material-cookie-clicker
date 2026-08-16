@@ -4,7 +4,7 @@ import { z } from "zod";
  * Current on-disk save schema version. Bump this whenever `SaveDataLatest`'s shape changes,
  * and add a forward-only migration entry in migrations.ts keyed by the *previous* version.
  */
-export const SAVE_SCHEMA_VERSION = 1;
+export const SAVE_SCHEMA_VERSION = 2;
 
 const BigNumSchema = z.object({
   mantissa: z.number(),
@@ -71,9 +71,21 @@ export const SaveDataV1Schema = z.object({
 
 export type SaveDataV1 = z.infer<typeof SaveDataV1Schema>;
 
+/**
+ * Schema for save-format version 2. Adds `purchasedToolIds` (Tools shop — see tool-shop.ts):
+ * ids of tools bought early with cookies, skipping their natural unlock condition. A version-1
+ * save has no such field on disk; `migrations.ts#migrateV1ToV2` supplies `[]` for it.
+ */
+export const SaveDataV2Schema = SaveDataV1Schema.omit({ schemaVersion: true }).extend({
+  schemaVersion: z.literal(2),
+  purchasedToolIds: z.array(z.string()),
+});
+
+export type SaveDataV2 = z.infer<typeof SaveDataV2Schema>;
+
 /** The schema alias that always points at the current (latest) version's shape. */
-export const SaveDataLatestSchema = SaveDataV1Schema;
-export type SaveDataLatest = SaveDataV1;
+export const SaveDataLatestSchema = SaveDataV2Schema;
+export type SaveDataLatest = SaveDataV2;
 
 /** Minimal shape used only to read `schemaVersion` off of otherwise-unvalidated input. */
 export const SaveVersionProbeSchema = z.object({

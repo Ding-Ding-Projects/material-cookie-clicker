@@ -73,6 +73,15 @@ export interface GameState {
    */
   readonly toolProgressionEnabled: boolean;
 
+  /**
+   * Ids of tools bought early with cookies through the Tools shop (see tool-shop.ts), skipping
+   * their natural unlock condition. A purchased tool's gameplay bonus is active immediately and
+   * stays active — see tools.ts#isToolBonusActive, which ORs this against the unlock condition.
+   * Buying a tool is exactly like its condition being met early; it is still never a gate on the
+   * real application feature, which tools.ts#ToolDefinition.gatesApplicationFeature keeps false.
+   */
+  readonly purchasedToolIds: readonly string[];
+
   /** ISO-8601 timestamp of the last tick that was actually applied. */
   readonly lastTickAtIso: string;
   /** ISO-8601 timestamp of the last successful save. */

@@ -280,9 +280,15 @@ function isUnlockConditionMet(condition: ToolUnlockCondition, state: GameState):
  * When `state.toolProgressionEnabled` is false, every bonus is treated as active regardless
  * of its unlock condition — the player has opted out of the grind and sees everything
  * unlocked, which still has no bearing on feature availability either way.
+ *
+ * A tool bought early through the Tools shop (see tool-shop.ts, `state.purchasedToolIds`) is
+ * also active regardless of its unlock condition — buying it is exactly like meeting the
+ * condition early. `state.purchasedToolIds` defaults to `[]` on a fresh game and is optional
+ * chained here so a state object built before this field existed still reads safely.
  */
 export function isToolBonusActive(state: GameState, toolId: string): boolean {
   if (!state.toolProgressionEnabled) return true;
+  if ((state.purchasedToolIds ?? []).includes(toolId)) return true;
   const def = getToolDefinition(toolId);
   return isUnlockConditionMet(def.unlockCondition, state);
 }

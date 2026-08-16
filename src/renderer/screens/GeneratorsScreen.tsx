@@ -8,7 +8,7 @@ import { BuyStepper, type BuyQuantity } from '../components/BuyStepper.js';
 import { BulkToolbar } from '../components/BulkToolbar.js';
 import { createSearchState, SearchWithRegexBuilder } from '../components/SearchWithRegexBuilder.js';
 import { useSelection } from '../components/useSelection.js';
-import { matchesSearch } from '@material-cookie-clicker/surface-kernel';
+import { matchesSearch } from '../game/local-regex-search.js';
 import { BULK_COPY, LIST_COPY } from '../game/copy.js';
 import { useFastSnapshot, useGameDispatch, useStructureSnapshot } from '../game/GameProvider.js';
 

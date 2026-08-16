@@ -5,7 +5,7 @@ import {
   createSearchState,
   insertToken,
   type SearchState,
-} from '@material-cookie-clicker/surface-kernel';
+} from '../game/local-regex-search.js';
 
 import type { Bilingual } from '../game/copy.js';
 

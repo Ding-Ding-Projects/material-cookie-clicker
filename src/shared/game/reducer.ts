@@ -12,7 +12,8 @@ import {
 import { costOfBulk, costOfNext, getGeneratorDefinition, maxAffordable } from "./generators.js";
 import { computeOfflineProgressWithTools, type OfflineProgressOptions } from "./offline-progress.js";
 import { canPrestige, performPrestige } from "./prestige.js";
-import { totalBuyMaxDiscount } from "./tools.js";
+import { toolPrice } from "./tool-shop.js";
+import { isToolBonusActive, totalBuyMaxDiscount } from "./tools.js";
 import { computeMultipliers, getUpgradeDefinition, isUpgradeUnlocked } from "./upgrades.js";
 import type { GameState, RngPort } from "./types.js";
 
@@ -27,6 +28,8 @@ export type GameAction =
   | { readonly type: "buyGenerator"; readonly generatorId: string }
   | { readonly type: "buyGeneratorBulk"; readonly generatorId: string; readonly quantity: number | "max" }
   | { readonly type: "buyUpgrade"; readonly upgradeId: string }
+  | { readonly type: "buyTool"; readonly toolId: string }
+  | { readonly type: "setToolProgression"; readonly enabled: boolean }
   | { readonly type: "tick"; readonly elapsedMs: number }
   | { readonly type: "collectGoldenCookie" }
   | { readonly type: "prestige" }
@@ -131,6 +134,30 @@ function handleBuyUpgrade(state: GameState, ctx: ReducerCtx, upgradeId: string):
   return withAchievements(nextState, nowIso(ctx));
 }
 
+/**
+ * Buys a tool's bonus early with cookies, skipping its unlock condition (tool-shop.ts). A
+ * no-op when the bonus is already active (purchased or naturally unlocked) or unaffordable —
+ * mirrors handleBuyUpgrade's refuse-silently shape rather than throwing.
+ */
+function handleBuyTool(state: GameState, ctx: ReducerCtx, toolId: string): GameState {
+  if (isToolBonusActive(state, toolId)) return state;
+  const price = toolPrice(toolId);
+  if (bnCompare(state.cookies, price) < 0) return state;
+
+  const nextState: GameState = {
+    ...state,
+    cookies: bnClampNonNegative(bnSub(state.cookies, price)),
+    purchasedToolIds: [...state.purchasedToolIds, toolId],
+  };
+
+  return withAchievements(nextState, nowIso(ctx));
+}
+
+function handleSetToolProgression(state: GameState, enabled: boolean): GameState {
+  if (state.toolProgressionEnabled === enabled) return state;
+  return { ...state, toolProgressionEnabled: enabled };
+}
+
 function handleTick(state: GameState, ctx: ReducerCtx, elapsedMs: number): GameState {
   if (elapsedMs <= 0) return state;
 
@@ -207,6 +234,10 @@ export function applyGameAction(state: GameState, action: GameAction, ctx: Reduc
       return handleBuyGeneratorBulk(state, ctx, action.generatorId, action.quantity);
     case "buyUpgrade":
       return handleBuyUpgrade(state, ctx, action.upgradeId);
+    case "buyTool":
+      return handleBuyTool(state, ctx, action.toolId);
+    case "setToolProgression":
+      return handleSetToolProgression(state, action.enabled);
     case "tick":
       return handleTick(state, ctx, action.elapsedMs);
     case "collectGoldenCookie":
@@ -224,7 +255,7 @@ export { costOfNext };
 export function createInitialGameState(nowIsoString: string): GameState {
   const zero = bnFromNumber(0);
   return {
-    schemaVersion: 1,
+    schemaVersion: 2,
     cookies: zero,
     lifetimeCookies: zero,
     baseClickValue: bnFromNumber(1),
@@ -235,6 +266,7 @@ export function createInitialGameState(nowIsoString: string): GameState {
     goldenCookie: { isSpawned: false, rngStreamIndex: 0, nextEligibleAtEpochMs: 0 },
     stats: { totalClicks: 0, totalCookiesBaked: zero, clockAnomalyCount: 0 },
     toolProgressionEnabled: true,
+    purchasedToolIds: [],
     lastTickAtIso: nowIsoString,
     lastSavedAtIso: nowIsoString,
   };

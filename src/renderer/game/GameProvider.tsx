@@ -34,6 +34,14 @@ interface GameContextValue {
   readonly offlineNotice: Bilingual | null;
   readonly dismissOfflineNotice: () => void;
   readonly milestoneMessage: Bilingual | null;
+  /**
+   * Erases the persisted save and returns the live store to a fresh game. This is the
+   * irreversible "full wipe" behind the destructive-action gate in PrestigeScreen; it is
+   * deliberately NOT a reducer action, because a reducer action cannot reach the persistence
+   * backend, and a wipe that cleared memory but left the save file on disk would resurrect
+   * itself on the next launch.
+   */
+  readonly wipeAllSaveData: () => Promise<void>;
 }
 
 const GameContext = createContext<GameContextValue | null>(null);
@@ -182,6 +190,12 @@ export function GameProvider({ children }: { children: ReactNode }) {
     offlineNotice,
     dismissOfflineNotice: () => setOfflineNotice(null),
     milestoneMessage,
+    wipeAllSaveData: async () => {
+      // Order matters: clear the backend FIRST, so that if the fresh state's autosave races
+      // in behind us it writes over an already-empty slot rather than us deleting it.
+      await persistenceRef.current.wipe();
+      store.replaceState(createInitialGameState(new Date().toISOString()));
+    },
   };
 
   return <GameContext.Provider value={value}>{children}</GameContext.Provider>;
@@ -204,6 +218,10 @@ export function useGameReady(): boolean {
 export function useOfflineNotice(): { notice: Bilingual | null; dismiss: () => void } {
   const { offlineNotice, dismissOfflineNotice } = useGameContext();
   return { notice: offlineNotice, dismiss: dismissOfflineNotice };
+}
+
+export function useWipeAllSaveData(): () => Promise<void> {
+  return useGameContext().wipeAllSaveData;
 }
 
 export function useMilestoneMessage(): Bilingual | null {

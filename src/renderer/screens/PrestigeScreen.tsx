@@ -111,10 +111,13 @@ export function PrestigeScreen() {
           {PRESTIGE_SCREEN_COPY.permanentShopTitle.en} · {PRESTIGE_SCREEN_COPY.permanentShopTitle.yue}
         </h2>
         {permanentUnlockIds.length === 0 ? (
-          <p>
-            {PRESTIGE_SCREEN_COPY.permanentShopEmpty.en}
-            <br />
-            {PRESTIGE_SCREEN_COPY.permanentShopEmpty.yue}
+          <p className="empty-slot">
+            <span className="empty-slot__key">Nothing yet · 未有</span>
+            <span className="empty-slot__text">
+              {PRESTIGE_SCREEN_COPY.permanentShopEmpty.en}
+              <br />
+              {PRESTIGE_SCREEN_COPY.permanentShopEmpty.yue}
+            </span>
           </p>
         ) : (
           <ul className="permanent-shop-card__list">

@@ -1,0 +1,23 @@
+{
+  "name": "@oak-kay/local-ollama",
+  "version": "0.1.0",
+  "private": true,
+  "description": "Local-only Ollama model store, pull queue, chat, and allowlisted harness orchestration.",
+  "type": "module",
+  "exports": {
+    ".": "./src/index.ts"
+  },
+  "scripts": {
+    "build": "tsc -p tsconfig.json",
+    "test": "node --test --experimental-strip-types test/*.test.ts"
+  },
+  "dependencies": {
+    "@oak-kay/surface-kernel": "0.1.0"
+  },
+  "files": [
+    "src",
+    "README.md"
+  ],
+  "sideEffects": false,
+  "license": "MIT"
+}

@@ -1,0 +1,85 @@
+/*
+ * Shared Material 3 tokens.
+ *
+ * The complete light palette is defined on bare :root so a page always has a
+ * full set of values. Dark values are redefined twice: once for the system
+ * preference, guarded so an explicit light choice still wins, and once for an
+ * explicit dark choice.
+ */
+
+:root {
+  --surface: #fdfbff;
+  --surface-low: #f6f2fa;
+  --surface-high: #f0ecf4;
+  --surface-highest: #eae6ee;
+  --on-surface: #1b1b1f;
+  --on-surface-variant: #45464f;
+  --outline: #767680;
+  --outline-variant: #c6c6d0;
+  --primary: #4355b9;
+  --on-primary: #ffffff;
+  --primary-container: #dee0ff;
+  --on-primary-container: #00105c;
+  --error: #ba1a1a;
+  --on-error: #ffffff;
+  --error-container: #ffdad6;
+  --on-error-container: #410002;
+
+  --density-scale: 1;
+  --motion-scale: 1;
+  --font-scale: 1;
+}
+
+@media (prefers-color-scheme: dark) {
+  :root:not([data-theme="light"]) {
+    --surface: #1b1b1f;
+    --surface-low: #131316;
+    --surface-high: #26262a;
+    --surface-highest: #313135;
+    --on-surface: #e4e1e6;
+    --on-surface-variant: #c6c6d0;
+    --outline: #90909a;
+    --outline-variant: #45464f;
+    --primary: #bcc2ff;
+    --on-primary: #0d2178;
+    --primary-container: #2a3990;
+    --on-primary-container: #dee0ff;
+    --error: #ffb4ab;
+    --on-error: #690005;
+    --error-container: #93000a;
+    --on-error-container: #ffdad6;
+  }
+}
+
+:root[data-theme="dark"] {
+  --surface: #1b1b1f;
+  --surface-low: #131316;
+  --surface-high: #26262a;
+  --surface-highest: #313135;
+  --on-surface: #e4e1e6;
+  --on-surface-variant: #c6c6d0;
+  --outline: #90909a;
+  --outline-variant: #45464f;
+  --primary: #bcc2ff;
+  --on-primary: #0d2178;
+  --primary-container: #2a3990;
+  --on-primary-container: #dee0ff;
+  --error: #ffb4ab;
+  --on-error: #690005;
+  --error-container: #93000a;
+  --on-error-container: #ffdad6;
+}
+
+:root[data-density="compact"] {
+  --density-scale: 0.85;
+}
+
+:root[data-motion="reduce"] {
+  --motion-scale: 0;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  :root:not([data-motion="full"]) {
+    --motion-scale: 0;
+  }
+}

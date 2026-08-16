@@ -68,6 +68,23 @@
   --cabinet-frame-dark: #43290f;
   --track: #e4cdae;
 
+  /* The cabinet frame is dark wood in BOTH themes, so anything painted on it (the marquee text
+     in the title bar, the anchored-panel title) needs its own on-colour role rather than
+     --on-surface, which flips with the theme. --cabinet-hover is the wash a frame-mounted
+     control gets on hover. */
+  --on-cabinet: #fff5e6;
+  --cabinet-hover: rgba(255, 245, 230, 0.16);
+
+  /* The drifting highlight on the console caps. Bright enough to read as a sheen on the cream
+     light-theme dome; the dark twin is warm and much dimmer so it does not strobe. */
+  --sheen: rgba(255, 255, 255, 0.5);
+
+  /* Wood-grain stripe tints layered over the cabinet rim. Sampled from the frame palette of
+     each theme, so the grain stays visible instead of inverting into grey banding. */
+  --grain-dark: rgba(106, 69, 34, 0.035);
+  --grain-hi: rgba(255, 255, 255, 0.025);
+  --grain-deep: rgba(67, 41, 15, 0.03);
+
   /* Chunky pressable depth (design-v2/tokens-shape-elevation.html). --drop-N is the LENGTH a
      control travels when pressed (also the height of its solid base); --press-N is the ready-made
      box-shadow built from it. Solid offsets only — v2 uses no blurred drop shadow anywhere. */
@@ -119,10 +136,6 @@
   /* The oven glow behind the whole cabinet: a radial gradient that is BRIGHT at its core and
      falls off to the cabinet rim (design-v2/game-layout.html). Pure CSS, no image asset. */
   --oven-glow: radial-gradient(ellipse 130% 95% at 50% -12%, var(--bg-core) 0%, var(--bg-mid) 42%, var(--bg-edge) 100%);
-
-  --elevation-1: 0 1px 3px rgba(0, 0, 0, 0.3), 0 4px 8px 3px rgba(0, 0, 0, 0.15);
-  --elevation-2: 0 2px 3px rgba(0, 0, 0, 0.3), 0 6px 10px 4px rgba(0, 0, 0, 0.15);
-  --elevation-3: 0 4px 4px rgba(0, 0, 0, 0.3), 0 8px 12px 6px rgba(0, 0, 0, 0.15);
 
   --font-en: -apple-system, 'Segoe UI', Roboto, Helvetica, Arial, sans-serif;
   --font-zh: 'Segoe UI', 'Microsoft JhengHei', var(--font-en);
@@ -190,6 +203,13 @@
     --cabinet-frame-dark: #150c05;
     --track: #2e2419;
 
+    --on-cabinet: #fff5e6;
+    --cabinet-hover: rgba(255, 245, 230, 0.16);
+    --sheen: rgba(255, 214, 160, 0.16);
+    --grain-dark: rgba(0, 0, 0, 0.07);
+    --grain-hi: rgba(255, 214, 160, 0.03);
+    --grain-deep: rgba(0, 0, 0, 0.1);
+
     --spark: #ffd97a;
     --spark-glow: #ffa326;
     --spark-ring: #ffc24d;
@@ -255,6 +275,13 @@
   --cabinet-frame-dark: #150c05;
   --track: #2e2419;
 
+  --on-cabinet: #fff5e6;
+  --cabinet-hover: rgba(255, 245, 230, 0.16);
+  --sheen: rgba(255, 214, 160, 0.16);
+  --grain-dark: rgba(0, 0, 0, 0.07);
+  --grain-hi: rgba(255, 214, 160, 0.03);
+  --grain-deep: rgba(0, 0, 0, 0.1);
+
   --spark: #ffd97a;
   --spark-glow: #ffa326;
   --spark-ring: #ffc24d;
@@ -307,7 +334,7 @@ body {
   height: 44px;
   padding-inline-start: 18px;
   background: linear-gradient(180deg, var(--cabinet-frame) 0%, var(--cabinet-frame-dark) 100%);
-  color: #fff;
+  color: var(--on-cabinet);
   border-bottom: var(--border-fat) solid var(--cabinet-frame-dark);
   box-shadow: inset 0 3px 0 0 var(--bevel-hi);
   -webkit-app-region: drag;
@@ -322,7 +349,7 @@ body {
   font-size: 13px;
   letter-spacing: 0.24em;
   text-transform: uppercase;
-  color: #fff;
+  color: var(--on-cabinet);
 }
 
 .title-bar__controls {
@@ -336,13 +363,13 @@ body {
   height: 100%;
   border: none;
   background: transparent;
-  color: #fff;
+  color: var(--on-cabinet);
   font-size: 14px;
   cursor: pointer;
 }
 
 .title-bar__button:hover {
-  background: rgba(255, 255, 255, 0.16);
+  background: var(--cabinet-hover);
 }
 
 .title-bar__button:focus-visible {
@@ -351,8 +378,8 @@ body {
 }
 
 .title-bar__button--close:hover {
-  background: #c0392b;
-  color: #fff;
+  background: var(--error);
+  color: var(--on-error);
 }
 
 .app-content {
@@ -400,7 +427,7 @@ body {
   flex: 1 1 180px;
   min-width: 150px;
   border-radius: var(--shape-md);
-  padding: 8px 16px;
+  padding: 12px 16px;
   background: var(--panel-inset);
   border: var(--border-chunky) solid var(--outline);
   box-shadow: inset 0 5px 0 -2px var(--bevel-lo);
@@ -414,14 +441,17 @@ body {
   text-transform: uppercase;
   color: var(--on-surface-variant);
   display: block;
-  margin-bottom: 2px;
+  /* The spec treats these keys as engraved single-line plates; letting the bilingual label wrap
+     would make the three bezels different heights. */
+  white-space: nowrap;
+  margin-bottom: 4px;
 }
 
 .hud__value {
   font-family: var(--font-display);
   font-weight: 900;
   font-variant-numeric: tabular-nums;
-  font-size: clamp(20px, 2.6vw, 34px);
+  font-size: clamp(24px, 3.6vw, 40px);
   line-height: 1.05;
   letter-spacing: -0.02em;
   color: var(--on-surface);
@@ -559,6 +589,20 @@ body {
   overflow: hidden;
 }
 
+/* Everything below the handle: the part that is hidden when the narrow drawer is tapped down. */
+.shop-rail__body {
+  display: flex;
+  flex-direction: column;
+  min-height: 0;
+  flex: 1;
+}
+
+/* The drawer handle only exists in the narrow bottom-sheet layout; at rail width the shop is
+   always open and there is nothing to tap down. */
+.shop-rail__handle {
+  display: none;
+}
+
 .shop-rail__list {
   flex: 1;
   min-height: 0;
@@ -635,7 +679,7 @@ body {
   content: '';
   position: absolute;
   inset: -40% -60%;
-  background: linear-gradient(105deg, transparent 38%, rgba(255, 255, 255, 0.5) 50%, transparent 62%);
+  background: linear-gradient(105deg, transparent 38%, var(--sheen) 50%, transparent 62%);
   transform: translateX(-70%);
   animation: console-sheen 7s ease-in-out infinite;
   pointer-events: none;
@@ -752,8 +796,9 @@ body {
   position: fixed;
   inset: 0;
   z-index: 40;
+  /* A plain dim, no backdrop blur: the spec's rule is that the game is dimmed but STILL THERE
+     and still ticking behind the dialog. */
   background: rgba(20, 11, 4, 0.58);
-  backdrop-filter: blur(1.5px);
   animation: scrim-in 140ms ease-out;
 }
 
@@ -868,7 +913,7 @@ body {
   font-weight: 900;
   letter-spacing: 0.12em;
   text-transform: uppercase;
-  color: #fff5e6;
+  color: var(--on-cabinet);
   text-shadow: 0 2px 0 rgba(0, 0, 0, 0.55);
 }
 
@@ -1053,13 +1098,22 @@ body {
   font: inherit;
   font-size: 12px;
   font-weight: 700;
-  min-height: 32px;
-  padding: 0 12px;
+  /* A pressable cap, not a hairline ghost link: hairlines are banned in this theme, so it gets
+     the chunky border and solid press-offset base every other control has. */
+  min-height: 44px;
+  padding: 0 16px;
   border-radius: var(--shape-full);
-  border: 1px solid var(--outline);
-  background: transparent;
+  border: var(--border-thick) solid var(--outline);
+  background: var(--surface-low);
   color: var(--on-surface);
+  box-shadow: var(--press-1);
   cursor: pointer;
+  transition: transform 90ms ease, box-shadow 90ms ease;
+}
+
+.offline-banner__dismiss:active {
+  transform: translateY(var(--drop-1));
+  box-shadow: var(--press-0);
 }
 
 .offline-banner__dismiss:focus-visible {
@@ -1509,6 +1563,63 @@ body {
   box-shadow: inset 0 4px 0 -1px var(--bevel-lo);
 }
 
+/* Locked tiers: the spec expresses "locked" as the dimmed row plus the reason in the sub-line,
+   with no separate dead CTA. This is the small recessed lock plate that replaces the greyed-out
+   full-width form button that used to sit in the controls column. */
+.shop-row__lock {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 6px;
+  min-height: 44px;
+  padding: 0 14px;
+  border-radius: var(--shape-sm);
+  background: var(--panel-inset);
+  border: var(--border-thick) solid var(--outline);
+  box-shadow: inset 0 4px 0 -1px var(--bevel-lo);
+  color: var(--on-surface-variant);
+  font-family: var(--font-display);
+  font-size: 10px;
+  font-weight: 900;
+  letter-spacing: 0.18em;
+  text-transform: uppercase;
+  white-space: nowrap;
+}
+
+.shop-row__lock-emblem {
+  font-size: 14px;
+  line-height: 1;
+}
+
+/* The shared empty slot: an empty list is a recessed, labelled plate in the cabinet, not a line
+   of flowed body copy in a beige void. Used by the shop rail and the permanent-upgrade card. */
+.empty-slot {
+  margin: 0;
+  padding: 18px 16px;
+  border-radius: var(--shape-md);
+  background: var(--panel-inset);
+  border: var(--border-chunky) solid var(--outline);
+  box-shadow: inset 0 5px 0 -2px var(--bevel-lo);
+  text-align: center;
+  color: var(--on-surface-variant);
+}
+
+.empty-slot__key {
+  display: block;
+  font-family: var(--font-display);
+  font-size: 10px;
+  font-weight: 900;
+  letter-spacing: 0.24em;
+  text-transform: uppercase;
+  margin-bottom: 6px;
+}
+
+.empty-slot__text {
+  display: block;
+  font-size: 13px;
+  line-height: 1.45;
+}
+
 /* Already producing: the slot warms up and gains the spark ring, so the generators actually
    earning for you are obvious at a glance. */
 .shop-row.owned {
@@ -1607,16 +1718,53 @@ body {
     box-shadow: 0 -8px 0 0 var(--cabinet-frame-dark);
   }
 
-  /* The drag handle that says "this is a drawer on this surface", not a route. */
-  .shop-rail::before {
+  /* Each readout takes a full row at phone width, so the three bezels stack instead of wrapping
+     into an uneven grid beside the console. */
+  .hud__readout,
+  .cabinet-head .hud__readout {
+    flex: 1 1 100%;
+  }
+
+  /* The drag handle that says "this is a drawer on this surface", not a route. It is a real
+     button: tapping it (or pressing Enter/Space on it) drops the sheet down to just its handle
+     and title, leaving the cookie fully visible — the spec's "tapped down, not navigated away
+     from". The 8px bar is drawn inside a 44px-tall hit area. */
+  .shop-rail__handle {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    align-self: center;
+    width: 100%;
+    min-height: 44px;
+    padding: 0;
+    border: none;
+    background: transparent;
+    cursor: pointer;
+    flex-shrink: 0;
+  }
+
+  .shop-rail__handle::before {
     content: '';
     display: block;
     width: 72px;
     height: 8px;
     border-radius: var(--shape-full);
     background: var(--outline);
-    margin: 0 auto 10px;
-    flex-shrink: 0;
+  }
+
+  .shop-rail__handle:focus-visible {
+    outline: 3px solid var(--spark-ring);
+    outline-offset: -3px;
+    border-radius: var(--shape-sm);
+  }
+
+  /* Tapped down: only the handle and the shop title stay on screen. */
+  .shop-rail.collapsed {
+    max-height: none;
+  }
+
+  .shop-rail.collapsed .shop-rail__body {
+    display: none;
   }
 
   .cookie-hero {
@@ -1693,12 +1841,26 @@ body {
   color: var(--on-surface);
   border-radius: var(--shape-large);
   padding: 16px;
-  box-shadow: var(--elevation-2);
+  /* Cabinet hardware, not a floating web autocomplete: a fat outline and a solid press-offset
+     base instead of a blurred M3 elevation, plus the same notch idiom the anchored panel uses
+     to point back at the control that opened it. */
+  border: var(--border-fat) solid var(--outline);
+  box-shadow: var(--press-3), inset 0 5px 0 0 var(--bevel-hi);
   display: flex;
   flex-direction: column;
   gap: 10px;
-  border: 1px solid var(--outline);
   z-index: 8;
+}
+
+.regex-popover::before {
+  content: '';
+  position: absolute;
+  top: -16px;
+  left: 28px;
+  width: 30px;
+  height: 18px;
+  background: var(--outline);
+  clip-path: polygon(50% 0, 100% 100%, 0 100%);
 }
 
 .regex-popover label {
@@ -2348,8 +2510,8 @@ body {
      and part of the bakery, rather than dropping a cold grey disc onto the counter. */
   filter: grayscale(0.55) brightness(0.97);
   box-shadow:
-    inset 0 3px 0 0 rgba(255, 255, 255, 0.25),
-    inset 0 -4px 0 0 rgba(0, 0, 0, 0.15);
+    inset 0 3px 0 0 var(--bevel-hi),
+    inset 0 -4px 0 0 var(--bevel-lo);
 }
 
 .achievement-badge.unlocked {
@@ -2357,7 +2519,7 @@ body {
   color: var(--on-tertiary);
   border-color: var(--spark-ring);
   box-shadow:
-    inset 0 3px 0 0 rgba(255, 255, 255, 0.45),
+    inset 0 3px 0 0 var(--bevel-hi),
     inset 0 -6px 0 0 var(--tertiary-shadow),
     0 0 0 4px var(--tertiary-container),
     0 0 16px 2px var(--spark-glow);
@@ -2762,7 +2924,7 @@ body {
 .gate__anim-track {
   height: 8px;
   border-radius: var(--shape-full);
-  background: rgba(0, 0, 0, 0.15);
+  background: var(--track);
   overflow: hidden;
 }
 
@@ -3415,9 +3577,9 @@ ul.card-grid {
 .cabinet {
   background-image: repeating-linear-gradient(
       92deg,
-      rgba(106, 69, 34, 0.035) 0 5px,
-      rgba(255, 255, 255, 0.025) 5px 13px,
-      rgba(67, 41, 15, 0.03) 13px 22px
+      var(--grain-dark) 0 5px,
+      var(--grain-hi) 5px 13px,
+      var(--grain-deep) 13px 22px
     ),
     radial-gradient(ellipse 90% 70% at 30% 0%, var(--bg-core) 0%, var(--bg-mid) 55%, var(--bg-edge) 100%);
   background-color: var(--bg-edge);

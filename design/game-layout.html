@@ -326,19 +326,84 @@
   .shop-row:focus-visible { outline: 4px solid var(--spark-ring); outline-offset: 3px; }
   .shop-row[disabled] { opacity: 0.55; cursor: not-allowed; }
 
-  /* --- the ONLY navigation on the cabinet: secondary surfaces --- */
-  .secondary-tabs { display: flex; gap: 10px; flex-wrap: wrap; margin-top: 14px; }
-  .secondary-tabs button {
-    font-family: var(--font-display); font-size: 11px; font-weight: 900;
-    letter-spacing: 0.14em; text-transform: uppercase;
-    min-height: 44px; padding: 0 16px; border-radius: var(--shape-sm); cursor: pointer;
-    background: var(--md-surface-container-high); color: var(--md-on-surface);
-    border: var(--border-thick) solid var(--md-outline);
-    box-shadow: var(--press-1);
+  /* --- THE CONSOLE CLUSTER: how the four secondary surfaces are reached ---
+     A bottom row of text tabs read as website navigation, so there is none. Instead four arcade
+     buttons are bolted to the cabinet frame beside the HUD, each with a drawn emblem, and each
+     one GROWS ITS SURFACE AS AN ANCHORED DIALOG over the still-running game. --- */
+  .console {
+    display: inline-flex; gap: 8px; padding: 7px 9px; border-radius: var(--shape-md);
+    border: var(--border-chunky) solid var(--cabinet-frame-dark);
+    background: linear-gradient(180deg, var(--cabinet-frame) 0%, var(--cabinet-frame-dark) 100%);
+    box-shadow: inset 0 3px 0 0 rgba(255,255,255,0.16), inset 0 -3px 0 0 rgba(0,0,0,0.4);
   }
-  .secondary-tabs button:active { transform: translateY(var(--drop-1)); box-shadow: none; }
-  .secondary-tabs button:focus-visible { outline: 4px solid var(--spark-ring); outline-offset: 3px; }
-  @media (prefers-reduced-motion: reduce) { .secondary-tabs button:active { transform: none; box-shadow: inset 0 3px 0 0 var(--bevel-lo); } }
+  .console button {
+    position: relative; overflow: hidden; cursor: pointer;
+    width: 96px; min-height: 44px; padding: 7px 4px 6px;
+    display: flex; flex-direction: column; align-items: center; justify-content: center; gap: 2px;
+    color: var(--md-on-surface); border: var(--border-thick) solid var(--md-outline);
+    border-radius: var(--shape-sm);
+    background: radial-gradient(ellipse 120% 90% at 50% -10%, var(--md-surface-container-lowest) 0%, var(--md-surface-container-high) 55%, var(--md-surface-container-highest) 100%);
+    box-shadow: var(--press-2), inset 0 4px 0 0 var(--bevel-hi), inset 0 -4px 0 0 var(--bevel-lo);
+  }
+  /* Idle sheen: a highlight drifting across the dome every few seconds, staggered per button. */
+  .console button::after {
+    content: ''; position: absolute; inset: -40% -60%; pointer-events: none;
+    background: linear-gradient(105deg, transparent 38%, rgba(255,255,255,0.5) 50%, transparent 62%);
+    transform: translateX(-70%); animation: sheen 7s ease-in-out infinite;
+  }
+  .console button:nth-child(2)::after { animation-delay: 0.9s; }
+  .console button:nth-child(3)::after { animation-delay: 1.8s; }
+  .console button:nth-child(4)::after { animation-delay: 2.7s; }
+  @keyframes sheen { 0%,62% { transform: translateX(-75%); } 84%,100% { transform: translateX(75%); } }
+  .console .emblem { width: 30px; height: 30px; display: block; filter: drop-shadow(0 2px 0 var(--bevel-lo)); animation: bob 4.6s ease-in-out infinite; }
+  .console button:nth-child(2) .emblem { animation-delay: .5s; }
+  .console button:nth-child(3) .emblem { animation-delay: 1s; }
+  .console button:nth-child(4) .emblem { animation-delay: 1.5s; }
+  @keyframes bob { 0%,100% { transform: translateY(0); } 50% { transform: translateY(-2px); } }
+  .console .lb { font-family: var(--font-display); font-size: 8px; font-weight: 900; white-space: nowrap; letter-spacing: 0.06em; text-transform: uppercase; color: var(--md-on-surface-variant); line-height: 1; }
+  .console .lb-zh { font-size: 10px; font-weight: 700; color: var(--md-on-surface-variant); line-height: 1; }
+  .console button:active, .console button[aria-expanded='true'] { transform: translateY(var(--drop-2)); box-shadow: inset 0 4px 0 0 var(--bevel-lo); }
+  .console button[aria-expanded='true'] { border-color: var(--md-primary); background: radial-gradient(ellipse 120% 90% at 50% -10%, var(--md-primary-container) 0%, var(--md-surface-container-high) 90%); }
+  .console button:focus-visible { outline: 4px solid var(--spark-ring); outline-offset: 3px; }
+
+  /* --- THE ANCHORED PANEL: a real modal dialog that grows out of its button --- */
+  .anchor-demo { position: relative; margin-top: 14px; border-radius: var(--shape-lg); padding: 14px; overflow: hidden; background: var(--md-surface-container); border: var(--border-thick) dashed var(--md-outline-variant); }
+  .anchor-demo .ghost { filter: saturate(0.85); }
+  .scrim { position: absolute; inset: 0; background: rgba(20,11,4,0.58); }
+  .panel-dialog {
+    position: relative; margin: 26px 10px 10px auto; width: min(520px, 100%);
+    border: var(--border-fat) solid var(--md-outline); border-radius: var(--shape-lg);
+    background: linear-gradient(180deg, var(--md-surface-container-high), var(--md-surface-container-highest));
+    box-shadow: var(--press-4), inset 0 5px 0 0 var(--bevel-hi), 0 18px 40px rgba(0,0,0,0.45);
+    /* The whole point: the origin is the BUTTON, not the screen centre. */
+    transform-origin: var(--anchor-x, 78%) 0;
+    animation: grow 180ms cubic-bezier(0.2, 1.1, 0.4, 1);
+  }
+  @keyframes grow { from { opacity: 0; transform: translateY(-10px) scale(0.72); } to { opacity: 1; transform: none; } }
+  .panel-dialog .notch { position: absolute; top: -16px; left: var(--notch-x, 78%); margin-left: -15px; width: 30px; height: 18px; background: var(--md-outline); clip-path: polygon(50% 0, 100% 100%, 0 100%); }
+  .panel-bar {
+    display: flex; align-items: center; gap: 12px; padding: 12px 14px;
+    border-bottom: var(--border-chunky) solid var(--md-outline);
+    border-radius: calc(var(--shape-lg) - 6px) calc(var(--shape-lg) - 6px) 0 0;
+    background: linear-gradient(180deg, var(--cabinet-frame) 0%, var(--cabinet-frame-dark) 100%);
+    box-shadow: inset 0 3px 0 0 rgba(255,255,255,0.16);
+  }
+  .crest { flex: 0 0 auto; display: flex; align-items: center; justify-content: center; width: 48px; height: 48px; border-radius: var(--shape-sm); border: var(--border-thick) solid var(--metal-lo); background: radial-gradient(ellipse 120% 100% at 50% 0%, var(--md-surface-container-high) 0%, var(--md-surface-container-highest) 100%); box-shadow: inset 0 3px 0 0 var(--bevel-hi), 0 3px 0 0 rgba(0,0,0,0.45); }
+  .crest .emblem { width: 34px; height: 34px; }
+  .panel-bar h3 { flex: 1; margin: 0; font-family: var(--font-display); font-size: 20px; font-weight: 900; letter-spacing: 0.12em; text-transform: uppercase; color: #FFF5E6; text-shadow: 0 2px 0 rgba(0,0,0,0.55); }
+  .panel-bar h3 span { font-size: 13px; letter-spacing: 0.06em; text-transform: none; opacity: 0.92; }
+  .panel-close { width: 44px; height: 44px; cursor: pointer; font-size: 18px; font-weight: 900; display: flex; align-items: center; justify-content: center; color: var(--md-on-secondary-container); background: var(--md-secondary-container); border: var(--border-thick) solid var(--md-outline); border-radius: var(--shape-sm); box-shadow: var(--press-1); }
+  .panel-close:focus-visible { outline: 4px solid var(--spark-ring); outline-offset: 2px; }
+  .panel-body { padding: 14px; max-height: 200px; overflow-y: auto; color: var(--md-on-surface); font-size: 13px; }
+  .corner { position: absolute; bottom: 7px; width: 20px; height: 20px; pointer-events: none; }
+  .corner.l { left: 6px; transform: scaleY(-1); }
+  .corner.r { right: 6px; transform: scale(-1,-1); }
+  @media (prefers-reduced-motion: reduce) {
+    .console button::after, .console .emblem { animation: none; }
+    .console button::after { opacity: 0; }
+    .console button:active { transform: none; box-shadow: inset 0 3px 0 0 var(--bevel-lo); }
+    .panel-dialog { animation: none; }
+  }
 
   /* --- callouts naming each region --- */
   .tag {
@@ -517,10 +582,11 @@
 
   <div class="swatch-note">
     <strong>The rule · 規則</strong>
-    Shops, upgrades and the cookie are never on different pages. Tabs exist only for genuinely
-    secondary surfaces a player visits deliberately and briefly — statistics, prestige, the tools
-    tech tree, the achievements gallery. If a control participates in the core loop, it lives on
-    this surface. 商店同升級永遠唔會分開放喺唔同版面；只有統計、轉生、工具科技樹、成就呢啲次要畫面先用分頁。
+    Shops, upgrades and the cookie are never on different pages — and neither are the secondary
+    surfaces. There is no tab bar at all: statistics, prestige, the tools tech tree and the
+    achievements gallery each open as an anchored dialog on top of the game, which stays visible
+    and keeps ticking behind them. If a control participates in the core loop, it lives on this
+    surface. 商店同升級永遠唔會分開放喺唔同版面；統計、轉生、工具科技樹、成就係喺遊戲畫面之上彈出嘅面板，唔係分頁。
   </div>
 
   <h2>Wide layout · 闊版面</h2>
@@ -601,12 +667,48 @@
       </div>
     </div>
 
-    <div class="secondary-tabs" role="group" aria-label="Secondary surfaces · 次要畫面">
-      <button>Stats · 統計</button>
-      <button>Achievements · 成就</button>
-      <button>Tools tree · 工具樹</button>
-      <button>Prestige · 轉生</button>
-      <button>Settings · 設定</button>
+    <!-- The console cluster is bolted to the cabinet frame beside the HUD, not laid along the
+         bottom edge: four arcade caps with drawn emblems read as hardware, a row of words reads
+         as a website menu. Pressing one opens its surface as an anchored dialog (below). -->
+    <div class="console" role="group" aria-label="Cabinet console · 機櫃控制台">
+      <button type="button" aria-haspopup="dialog" aria-expanded="false" aria-label="Open Achievements panel · 打開成就板"><svg class="emblem" viewBox="0 0 32 32" aria-hidden="true" focusable="false"><defs><linearGradient id="ra0" x1="0" y1="0" x2="0" y2="1"><stop offset="0" stop-color="var(--tier1-container)"/><stop offset="1" stop-color="var(--tier1)"/></linearGradient><radialGradient id="fa0" cx="0.34" cy="0.28" r="0.85"><stop offset="0" stop-color="var(--metal-hi)"/><stop offset="0.45" stop-color="var(--spark)"/><stop offset="1" stop-color="var(--metal-lo)"/></radialGradient></defs><path d="M7 2h6l3 8-6 4z" fill="url(#ra0)" stroke="var(--spark-ring)" stroke-width="1.2" stroke-linejoin="round"/><path d="M25 2h-6l-3 8 6 4z" fill="url(#ra0)" stroke="var(--spark-ring)" stroke-width="1.2" stroke-linejoin="round"/><circle cx="16" cy="21" r="9.4" fill="url(#fa0)" stroke="var(--spark-ring)" stroke-width="2"/><circle cx="16" cy="21" r="6.4" fill="none" stroke="var(--spark-ring)" stroke-width="1" opacity="0.55"/><path d="M16 15.6l1.7 3.5 3.8.5-2.8 2.7.7 3.8-3.4-1.8-3.4 1.8.7-3.8-2.8-2.7 3.8-.5z" fill="var(--metal-hi)" stroke="var(--spark-ring)" stroke-width="0.8" stroke-linejoin="round"/></svg><span class="lb">Achievements</span><span class="lb-zh">成就</span></button>
+      <button type="button" aria-haspopup="dialog" aria-expanded="false" aria-label="Open Tools panel · 打開工具板"><svg class="emblem" viewBox="0 0 32 32" aria-hidden="true" focusable="false"><defs><linearGradient id="ga1" x1="0" y1="0" x2="0.3" y2="1"><stop offset="0" stop-color="var(--tier3-container)"/><stop offset="1" stop-color="var(--tier3)"/></linearGradient><linearGradient id="sa1" x1="0" y1="0" x2="0" y2="1"><stop offset="0" stop-color="var(--md-surface-container-lowest)"/><stop offset="1" stop-color="var(--md-outline)"/></linearGradient></defs><path d="M4.6 6.6a5.4 5.4 0 0 0 6.8 6.9l13 13a2.6 2.6 0 0 0 3.7-3.7l-13-13A5.4 5.4 0 0 0 8.2 3l3.1 3.1-1.8 3.4-3.5 1.4z" fill="url(#sa1)" stroke="var(--md-outline)" stroke-width="1.3" stroke-linejoin="round"/><path d="M21.5 3.5l7 4.2-2.6 7.4-8.8.2-3-7z" fill="url(#ga1)" stroke="var(--tier3)" stroke-width="1.4" stroke-linejoin="round"/><path d="M14.1 8.3l14.4-.6-5.8 7.6z" fill="var(--tier3-container)" opacity="0.75"/></svg><span class="lb">Tools</span><span class="lb-zh">工具</span></button>
+      <button type="button" aria-haspopup="dialog" aria-expanded="false" aria-label="Open Statistics panel · 打開統計板"><svg class="emblem" viewBox="0 0 32 32" aria-hidden="true" focusable="false"><defs><radialGradient id="da2" cx="0.5" cy="1.1" r="1"><stop offset="0" stop-color="var(--md-surface-container-lowest)"/><stop offset="1" stop-color="var(--md-surface-container-highest)"/></radialGradient></defs><circle cx="16" cy="16" r="13.4" fill="url(#da2)" stroke="var(--tier2)" stroke-width="2.6"/><circle cx="16" cy="16" r="10.4" fill="none" stroke="var(--tier2)" stroke-width="0.9" opacity="0.45"/><path d="M6.4 11.2l2.4 1.2M16 4.6v2.7M25.6 11.2l-2.4 1.2" stroke="var(--tier2)" stroke-width="1.6" stroke-linecap="round"/><path d="M11 22v-4.4M15 22v-7.4M19 22v-5.6M23 22v-9" stroke="var(--tier2)" stroke-width="2" stroke-linecap="round" opacity="0.5"/><path d="M16 16L23 9.6" stroke="var(--md-on-surface)" stroke-width="2.6" stroke-linecap="round"/><circle cx="16" cy="16" r="2.8" fill="var(--md-on-surface)"/><circle cx="16" cy="16" r="1.1" fill="var(--md-surface-container-lowest)"/></svg><span class="lb">Statistics</span><span class="lb-zh">統計</span></button>
+      <button type="button" aria-haspopup="dialog" aria-expanded="false" aria-label="Open Prestige panel · 打開轉生板"><svg class="emblem" viewBox="0 0 32 32" aria-hidden="true" focusable="false"><defs><radialGradient id="ca3" cx="0.5" cy="0.42" r="0.62"><stop offset="0" stop-color="var(--metal-hi)"/><stop offset="0.5" stop-color="var(--spark)"/><stop offset="1" stop-color="var(--spark-glow)"/></radialGradient></defs><path d="M4.6 27a12.6 12.6 0 0 1 22.8 0" fill="none" stroke="var(--spark-ring)" stroke-width="2.4" stroke-linecap="round" opacity="0.7"/><path d="M16 2.4l3 9.4 9.4 3-9.4 3-3 9.4-3-9.4-9.4-3 9.4-3z" fill="url(#ca3)" stroke="var(--spark-ring)" stroke-width="1.5" stroke-linejoin="round"/><path d="M6.4 5.6l1.2 3 3 1.2-3 1.2-1.2 3-1.2-3-3-1.2 3-1.2z" fill="var(--spark)" opacity="0.85"/></svg><span class="lb">Prestige</span><span class="lb-zh">轉生</span></button>
+    </div>
+  </div>
+
+
+  <h2>Anchored dialogs · 定點彈窗</h2>
+  <p class="caption">
+    Pressing a console button does not change page. The surface grows out of that button as a
+    modal dialog over the game: the cap stays pressed in, the panel's <code>transform-origin</code>
+    is the cap's centre, and a notch on the panel's top edge points back at it. The game is dimmed
+    but still there, and the tick loop keeps running behind the scrim.
+  </p>
+  <div class="anchor-demo">
+    <div class="ghost">
+      <div class="console" role="group" aria-label="Cabinet console · 機櫃控制台">
+      <button type="button" aria-haspopup="dialog" aria-expanded="false" aria-label="Open Achievements panel · 打開成就板"><svg class="emblem" viewBox="0 0 32 32" aria-hidden="true" focusable="false"><defs><linearGradient id="rb0" x1="0" y1="0" x2="0" y2="1"><stop offset="0" stop-color="var(--tier1-container)"/><stop offset="1" stop-color="var(--tier1)"/></linearGradient><radialGradient id="fb0" cx="0.34" cy="0.28" r="0.85"><stop offset="0" stop-color="var(--metal-hi)"/><stop offset="0.45" stop-color="var(--spark)"/><stop offset="1" stop-color="var(--metal-lo)"/></radialGradient></defs><path d="M7 2h6l3 8-6 4z" fill="url(#rb0)" stroke="var(--spark-ring)" stroke-width="1.2" stroke-linejoin="round"/><path d="M25 2h-6l-3 8 6 4z" fill="url(#rb0)" stroke="var(--spark-ring)" stroke-width="1.2" stroke-linejoin="round"/><circle cx="16" cy="21" r="9.4" fill="url(#fb0)" stroke="var(--spark-ring)" stroke-width="2"/><circle cx="16" cy="21" r="6.4" fill="none" stroke="var(--spark-ring)" stroke-width="1" opacity="0.55"/><path d="M16 15.6l1.7 3.5 3.8.5-2.8 2.7.7 3.8-3.4-1.8-3.4 1.8.7-3.8-2.8-2.7 3.8-.5z" fill="var(--metal-hi)" stroke="var(--spark-ring)" stroke-width="0.8" stroke-linejoin="round"/></svg><span class="lb">Achievements</span><span class="lb-zh">成就</span></button>
+      <button type="button" aria-haspopup="dialog" aria-expanded="false" aria-label="Open Tools panel · 打開工具板"><svg class="emblem" viewBox="0 0 32 32" aria-hidden="true" focusable="false"><defs><linearGradient id="gb1" x1="0" y1="0" x2="0.3" y2="1"><stop offset="0" stop-color="var(--tier3-container)"/><stop offset="1" stop-color="var(--tier3)"/></linearGradient><linearGradient id="sb1" x1="0" y1="0" x2="0" y2="1"><stop offset="0" stop-color="var(--md-surface-container-lowest)"/><stop offset="1" stop-color="var(--md-outline)"/></linearGradient></defs><path d="M4.6 6.6a5.4 5.4 0 0 0 6.8 6.9l13 13a2.6 2.6 0 0 0 3.7-3.7l-13-13A5.4 5.4 0 0 0 8.2 3l3.1 3.1-1.8 3.4-3.5 1.4z" fill="url(#sb1)" stroke="var(--md-outline)" stroke-width="1.3" stroke-linejoin="round"/><path d="M21.5 3.5l7 4.2-2.6 7.4-8.8.2-3-7z" fill="url(#gb1)" stroke="var(--tier3)" stroke-width="1.4" stroke-linejoin="round"/><path d="M14.1 8.3l14.4-.6-5.8 7.6z" fill="var(--tier3-container)" opacity="0.75"/></svg><span class="lb">Tools</span><span class="lb-zh">工具</span></button>
+      <button type="button" aria-haspopup="dialog" aria-expanded="false" aria-label="Open Statistics panel · 打開統計板"><svg class="emblem" viewBox="0 0 32 32" aria-hidden="true" focusable="false"><defs><radialGradient id="db2" cx="0.5" cy="1.1" r="1"><stop offset="0" stop-color="var(--md-surface-container-lowest)"/><stop offset="1" stop-color="var(--md-surface-container-highest)"/></radialGradient></defs><circle cx="16" cy="16" r="13.4" fill="url(#db2)" stroke="var(--tier2)" stroke-width="2.6"/><circle cx="16" cy="16" r="10.4" fill="none" stroke="var(--tier2)" stroke-width="0.9" opacity="0.45"/><path d="M6.4 11.2l2.4 1.2M16 4.6v2.7M25.6 11.2l-2.4 1.2" stroke="var(--tier2)" stroke-width="1.6" stroke-linecap="round"/><path d="M11 22v-4.4M15 22v-7.4M19 22v-5.6M23 22v-9" stroke="var(--tier2)" stroke-width="2" stroke-linecap="round" opacity="0.5"/><path d="M16 16L23 9.6" stroke="var(--md-on-surface)" stroke-width="2.6" stroke-linecap="round"/><circle cx="16" cy="16" r="2.8" fill="var(--md-on-surface)"/><circle cx="16" cy="16" r="1.1" fill="var(--md-surface-container-lowest)"/></svg><span class="lb">Statistics</span><span class="lb-zh">統計</span></button>
+      <button type="button" aria-haspopup="dialog" aria-expanded="true" aria-label="Open Prestige panel · 打開轉生板"><svg class="emblem" viewBox="0 0 32 32" aria-hidden="true" focusable="false"><defs><radialGradient id="cb3" cx="0.5" cy="0.42" r="0.62"><stop offset="0" stop-color="var(--metal-hi)"/><stop offset="0.5" stop-color="var(--spark)"/><stop offset="1" stop-color="var(--spark-glow)"/></radialGradient></defs><path d="M4.6 27a12.6 12.6 0 0 1 22.8 0" fill="none" stroke="var(--spark-ring)" stroke-width="2.4" stroke-linecap="round" opacity="0.7"/><path d="M16 2.4l3 9.4 9.4 3-9.4 3-3 9.4-3-9.4-9.4-3 9.4-3z" fill="url(#cb3)" stroke="var(--spark-ring)" stroke-width="1.5" stroke-linejoin="round"/><path d="M6.4 5.6l1.2 3 3 1.2-3 1.2-1.2 3-1.2-3-3-1.2 3-1.2z" fill="var(--spark)" opacity="0.85"/></svg><span class="lb">Prestige</span><span class="lb-zh">轉生</span></button>
+    </div>
+    </div>
+    <div class="scrim"></div>
+    <div class="panel-dialog" style="--anchor-x: 88%; --notch-x: 88%" role="dialog" aria-modal="true" aria-labelledby="demo-panel-title">
+      <span class="notch"></span>
+      <svg class="corner l" viewBox="0 0 20 20" aria-hidden="true" focusable="false"><path d="M2 18V6a4 4 0 0 1 4-4h12" fill="none" stroke="var(--metal-hi)" stroke-width="2.2" stroke-linecap="round" opacity="0.55"/><circle cx="6.5" cy="6.5" r="2.2" fill="var(--metal-lo)" stroke="var(--metal-hi)" stroke-width="1"/></svg><svg class="corner r" viewBox="0 0 20 20" aria-hidden="true" focusable="false"><path d="M2 18V6a4 4 0 0 1 4-4h12" fill="none" stroke="var(--metal-hi)" stroke-width="2.2" stroke-linecap="round" opacity="0.55"/><circle cx="6.5" cy="6.5" r="2.2" fill="var(--metal-lo)" stroke="var(--metal-hi)" stroke-width="1"/></svg>
+      <div class="panel-bar">
+        <span class="crest"><svg class="emblem" viewBox="0 0 32 32" aria-hidden="true" focusable="false"><defs><radialGradient id="cp" cx="0.5" cy="0.42" r="0.62"><stop offset="0" stop-color="var(--metal-hi)"/><stop offset="0.5" stop-color="var(--spark)"/><stop offset="1" stop-color="var(--spark-glow)"/></radialGradient></defs><path d="M4.6 27a12.6 12.6 0 0 1 22.8 0" fill="none" stroke="var(--spark-ring)" stroke-width="2.4" stroke-linecap="round" opacity="0.7"/><path d="M16 2.4l3 9.4 9.4 3-9.4 3-3 9.4-3-9.4-9.4-3 9.4-3z" fill="url(#cp)" stroke="var(--spark-ring)" stroke-width="1.5" stroke-linejoin="round"/><path d="M6.4 5.6l1.2 3 3 1.2-3 1.2-1.2 3-1.2-3-3-1.2 3-1.2z" fill="var(--spark)" opacity="0.85"/></svg></span>
+        <h3 id="demo-panel-title">Prestige <span>轉生</span></h3>
+        <button class="panel-close" type="button" aria-label="Close panel · 閂咗塊板">✕</button>
+      </div>
+      <div class="panel-body">
+        The surface's own content goes here and scrolls <em>inside</em> the panel — the page body
+        never scrolls. The 44px close button is always present, so the backdrop is never the only
+        way out. 面板內部自己滾動。
+      </div>
     </div>
   </div>
 
@@ -673,14 +775,28 @@
       most the lower portion of the narrow layout and the cookie stays visible and clickable above it.</li>
     <li><strong>The HUD readouts are pinned</strong> and use the same recessed bezel as
       <code>stat-tile.html</code>, so a number means the same thing everywhere.</li>
-    <li><strong>Tabs are for secondary surfaces only</strong> — statistics, achievements, the tools
-      tech tree, prestige, settings. Adding a core-loop control to a tab is a spec violation.</li>
+    <li><strong>No tab bar exists.</strong> The four secondary surfaces are reached from the
+      console cluster and open as anchored dialogs over the game; the game surface is always the
+      base and is never replaced. Adding a core-loop control to one of those panels is still a
+      spec violation. 唔好再用分頁列。</li>
+    <li><strong>The anchored dialog is a real dialog.</strong> <code>role="dialog"</code>,
+      <code>aria-modal="true"</code>, labelled by its own header, focus moved into it on open and
+      trapped until it closes, Escape closes, a click on the dimmed game behind closes, and focus
+      returns to the button that opened it. The 44px close button is always present — the backdrop
+      is never the only way out. The panel scrolls internally; the body never scrolls.</li>
+    <li><strong>It grows from its button.</strong> <code>transform-origin</code> is set to the
+      pressed button's centre and the notch points back at it, so the panel reads as that button
+      opening rather than as a web modal dropped over the page.</li>
+    <li><strong>Console buttons are buttons, not tabs.</strong> <code>aria-haspopup="dialog"</code>
+      plus <code>aria-expanded</code>, each with a bilingual accessible name, all ≥44px, reachable
+      in reading order — no roving tabindex, because nothing here is a tablist.</li>
     <li><strong>Every control here is ≥44px</strong>, keyboard reachable in reading order, and
       focus-ringed in the spark accent; the drawer is a region on the same document, not a modal,
       so focus is never trapped.</li>
     <li><strong>Reduced motion:</strong> the press-compression on the cookie, the tickets and the
-      shop rows becomes an instant inset state change rather than a transition, and the drawer
-      snaps between positions instead of sliding.</li>
+      shop rows becomes an instant inset state change rather than a transition, the drawer snaps
+      between positions instead of sliding, the console's sheen and emblem float stop entirely,
+      and the anchored panel appears and disappears with no scale, slide or fade.</li>
   </ul>
 </body>
 </html>

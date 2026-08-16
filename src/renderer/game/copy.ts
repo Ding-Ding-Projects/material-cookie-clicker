@@ -52,6 +52,20 @@ export const GAME_SURFACE_COPY = {
   secondaryLabel: { en: "Secondary surfaces", yue: "次要畫面" },
 } as const satisfies Record<string, Bilingual>;
 
+/**
+ * The console cluster bolted to the cabinet frame and the anchored panels it opens. These are
+ * NOT navigation: the game surface never goes away, so every string here talks about opening
+ * and closing a panel rather than going to a page.
+ */
+export const CONSOLE_COPY = {
+  consoleLabel: { en: "Cabinet console", yue: "機櫃控制台" },
+  close: { en: "Close panel", yue: "閂咗塊板" },
+  open: (en: string, yue: string): Bilingual => ({
+    en: `Open ${en} panel`,
+    yue: `打開${yue}板`,
+  }),
+} as const satisfies Record<string, Bilingual | ((...args: any[]) => Bilingual)>;
+
 export const SHELL_COPY = {
   tabsLabel: { en: "Game sections", yue: "遊戲分頁" },
   dismiss: { en: "Dismiss", yue: "收起" },

@@ -1,4 +1,4 @@
-import { useCallback, useEffect, useRef, useState, type KeyboardEvent } from 'react';
+import { useCallback, useEffect, useLayoutEffect, useRef, useState, type ReactNode } from 'react';
 
 import { bnMulScalar } from '../shared/game/big-number.js';
 import { formatBigNum } from '../shared/game/format-number.js';
@@ -11,7 +11,8 @@ import {
   useOfflineNotice,
   useStructureSnapshot,
 } from './game/GameProvider';
-import { GAME_SURFACE_COPY, SHELL_COPY, TAB_COPY, type Bilingual } from './game/copy';
+import { CONSOLE_EMBLEMS, PanelCorner } from './ConsoleEmblems';
+import { CONSOLE_COPY, GAME_SURFACE_COPY, SHELL_COPY, TAB_COPY, type Bilingual } from './game/copy';
 import { AchievementsScreen } from './screens/AchievementsScreen';
 import { CookieHero } from './screens/CookieHero';
 import { ShopRail } from './screens/ShopRail';
@@ -21,43 +22,29 @@ import { ToolsScreen, type OpenApplicationFeature } from './screens/ToolsScreen'
 import { UpgradeStrip } from './screens/UpgradeStrip';
 
 /**
- * The dock order. `game` is the single surface the core loop lives on — clicking the cookie,
- * buying a generator and buying an upgrade all happen there with NO navigation between them.
- * The other four are genuinely secondary surfaces a player visits deliberately and briefly, and
- * they are the only reason a tab strip exists at all. Adding a core-loop control to one of them
- * would be a spec violation (design-v2/game-layout.html).
+ * The four secondary surfaces. The game surface is NOT in this list, because it is not a
+ * destination any more: it is the base of the screen and it never goes away. Each entry here is
+ * a panel that grows out of its own console button on top of the still-running game.
+ *
+ * Adding a core-loop control (clicking the cookie, buying a generator, buying an upgrade) to any
+ * of these would still be a spec violation — those three live on the game surface only
+ * (design/game-layout.html).
  */
-const TAB_IDS = ['game', 'achievements', 'tools', 'statistics', 'prestige'] as const;
+const SURFACE_IDS = ['achievements', 'tools', 'statistics', 'prestige'] as const;
 
-type TabId = (typeof TAB_IDS)[number];
+type SurfaceId = (typeof SURFACE_IDS)[number];
 
-/** v2 because the destination set changed: the old cookie/generators/upgrades tabs no longer
- *  exist, so a stored v1 choice must not resurrect a page that is now part of the game surface. */
-const ACTIVE_TAB_KEY = 'material-cookie-clicker:active-tab:v2';
-
-function isTabId(value: unknown): value is TabId {
-  return typeof value === 'string' && (TAB_IDS as readonly string[]).includes(value);
-}
-
-function readStoredTab(): TabId {
-  try {
-    const stored = window.localStorage.getItem(ACTIVE_TAB_KEY);
-    if (isTabId(stored)) return stored;
-  } catch {
-    // Private-mode / disabled storage: the tab choice simply does not persist.
-  }
-  return 'game';
-}
-
-/** Both labels for every dock button. The game surface has no TAB_COPY entry of its own because
- *  it is not one of the "sections" that list named; it is the game. */
-const TAB_LABELS: Readonly<Record<TabId, Bilingual>> = {
-  game: GAME_SURFACE_COPY.surfaceLabel,
+const SURFACE_LABELS: Readonly<Record<SurfaceId, Bilingual>> = {
   achievements: TAB_COPY.achievements,
   tools: TAB_COPY.tools,
   statistics: TAB_COPY.statistics,
   prestige: TAB_COPY.prestige,
 };
+
+
+/** Where a panel is allowed to grow from, measured in the viewport, so the open animation and the
+ *  notch both point back at the button the player actually pressed. */
+type Anchor = { x: number; y: number };
 
 /** How long a shell announcement stays in the status region before it clears itself. */
 const SHELL_STATUS_MS = 6_000;
@@ -126,6 +113,172 @@ function GameSurface() {
   );
 }
 
+/** The drawn emblem for one surface. Decorative in every position it appears — the button and
+ *  the panel header both carry their own accessible name. */
+function ConsoleEmblem({ id }: { id: SurfaceId }) {
+  const Drawing = CONSOLE_EMBLEMS[id];
+  return <Drawing />;
+}
+
+/**
+ * The console cluster bolted to the cabinet frame. Four arcade buttons, each with its own
+ * emblem and a small label. They are plain buttons — deliberately NOT a tablist — because
+ * pressing one opens a panel over the game rather than navigating anywhere.
+ */
+function CabinetConsole({
+  openId,
+  onOpen,
+  buttonRefs,
+}: {
+  openId: SurfaceId | null;
+  onOpen: (id: SurfaceId, button: HTMLButtonElement) => void;
+  buttonRefs: React.MutableRefObject<Partial<Record<SurfaceId, HTMLButtonElement | null>>>;
+}) {
+  return (
+    <div className="console" role="group" aria-label={`${CONSOLE_COPY.consoleLabel.en} · ${CONSOLE_COPY.consoleLabel.yue}`}>
+      {SURFACE_IDS.map((id) => {
+        const label = SURFACE_LABELS[id];
+        const open = id === openId;
+        return (
+          <button
+            key={id}
+            type="button"
+            className="console__button"
+            id={`console-${id}`}
+            aria-haspopup="dialog"
+            aria-expanded={open}
+            aria-label={`${CONSOLE_COPY.open(label.en, label.yue).en} · ${CONSOLE_COPY.open(label.en, label.yue).yue}`}
+            data-open={open ? 'true' : undefined}
+            ref={(node) => {
+              buttonRefs.current[id] = node;
+            }}
+            onClick={(event) => onOpen(id, event.currentTarget)}
+          >
+            <ConsoleEmblem id={id} />
+            <span className="console__label" aria-hidden="true">
+              {label.en}
+            </span>
+            <span className="console__label-zh" aria-hidden="true">
+              {label.yue}
+            </span>
+          </button>
+        );
+      })}
+    </div>
+  );
+}
+
+const FOCUSABLE_SELECTOR =
+  'a[href], button:not([disabled]), input:not([disabled]), select:not([disabled]), textarea:not([disabled]), [tabindex]:not([tabindex="-1"])';
+
+/**
+ * One secondary surface, opened as a real modal dialog that grows out of its console button.
+ *
+ * The accessibility contract, in full: role="dialog" + aria-modal, labelled by its own heading,
+ * focus moves to the close button on open and is trapped inside until it closes, Escape closes,
+ * a click on the dimmed game surface behind closes, and focus goes back to the button that
+ * opened it. The panel scrolls internally — the page body never does. `prefers-reduced-motion`
+ * is handled in CSS: the grow animation is simply not applied, so the panel appears at once.
+ */
+function AnchoredPanel({
+  surfaceId,
+  label,
+  anchor,
+  onClose,
+  children,
+}: {
+  surfaceId: SurfaceId;
+  label: Bilingual;
+  anchor: Anchor;
+  onClose: () => void;
+  children: ReactNode;
+}) {
+  const panelRef = useRef<HTMLDivElement | null>(null);
+  const closeRef = useRef<HTMLButtonElement | null>(null);
+  const titleId = `panel-title-${surfaceId}`;
+
+  // Point the panel back at its button: the top edge sits just under the button, the grow
+  // animation starts from the button's centre, and the notch lines up with it too.
+  useLayoutEffect(() => {
+    const node = panelRef.current;
+    if (!node) return;
+    const top = Math.round(anchor.y + 26);
+    node.style.top = `${top}px`;
+    node.style.maxHeight = `${Math.max(240, Math.round(window.innerHeight - top - 28))}px`;
+    const rect = node.getBoundingClientRect();
+    const originX = Math.min(Math.max(anchor.x - rect.left, 0), rect.width);
+    node.style.setProperty('--anchor-x', `${Math.round(originX)}px`);
+    node.style.setProperty('--notch-x', `${Math.round(Math.min(Math.max(originX, 30), rect.width - 30))}px`);
+  }, [anchor]);
+
+  useEffect(() => {
+    closeRef.current?.focus();
+  }, []);
+
+  return (
+    <div
+      className="overlay-scrim"
+      onMouseDown={(event) => {
+        if (event.target === event.currentTarget) onClose();
+      }}
+    >
+      <div
+        className="anchored-panel"
+        role="dialog"
+        aria-modal="true"
+        aria-labelledby={titleId}
+        ref={panelRef}
+        onKeyDown={(event) => {
+          if (event.key === 'Escape') {
+            event.stopPropagation();
+            onClose();
+            return;
+          }
+          if (event.key !== 'Tab') return;
+          const node = panelRef.current;
+          if (!node) return;
+          const focusable = Array.from(node.querySelectorAll<HTMLElement>(FOCUSABLE_SELECTOR)).filter(
+            (element) => element.offsetParent !== null || element === document.activeElement,
+          );
+          if (focusable.length === 0) return;
+          const first = focusable[0];
+          const last = focusable[focusable.length - 1];
+          if (event.shiftKey && document.activeElement === first) {
+            event.preventDefault();
+            last.focus();
+          } else if (!event.shiftKey && document.activeElement === last) {
+            event.preventDefault();
+            first.focus();
+          }
+        }}
+      >
+        <span className="anchored-panel__notch" aria-hidden="true" />
+        <PanelCorner className="anchored-panel__corner anchored-panel__corner--left" />
+        <PanelCorner className="anchored-panel__corner anchored-panel__corner--right" />
+        <div className="anchored-panel__bar">
+          <span className="anchored-panel__crest">
+            <ConsoleEmblem id={surfaceId} />
+          </span>
+          <h2 className="anchored-panel__title" id={titleId}>
+            <span>{label.en}</span>
+            <span className="anchored-panel__title-zh">{label.yue}</span>
+          </h2>
+          <button
+            type="button"
+            className="anchored-panel__close"
+            ref={closeRef}
+            aria-label={`${CONSOLE_COPY.close.en} · ${CONSOLE_COPY.close.yue}`}
+            onClick={onClose}
+          >
+            <span aria-hidden="true">&#x2715;</span>
+          </button>
+        </div>
+        <div className="anchored-panel__body">{children}</div>
+      </div>
+    </div>
+  );
+}
+
 export function App() {
   const minimize = useCallback(() => window.materialCookieClicker?.window.minimize(), []);
   const toggleMaximize = useCallback(() => window.materialCookieClicker?.window.toggleMaximize(), []);
@@ -157,20 +310,30 @@ export function App() {
 }
 
 function GameShell() {
-  const [activeTab, setActiveTab] = useState<TabId>(readStoredTab);
+  // Which panel is open, if any, and where it grows from. Nothing about this is persisted: the
+  // game surface is always the base state, so a reload never reopens a panel over it.
+  const [openSurface, setOpenSurface] = useState<SurfaceId | null>(null);
+  const [anchor, setAnchor] = useState<Anchor>({ x: 0, y: 0 });
   const [shellStatus, setShellStatus] = useState<Bilingual | null>(null);
   const statusTimerRef = useRef<ReturnType<typeof setTimeout> | null>(null);
-  const tabRefs = useRef<Partial<Record<TabId, HTMLButtonElement | null>>>({});
+  const buttonRefs = useRef<Partial<Record<SurfaceId, HTMLButtonElement | null>>>({});
   const { notice: offlineNotice, dismiss: dismissOfflineNotice } = useOfflineNotice();
   const milestoneMessage = useMilestoneMessage();
 
-  useEffect(() => {
-    try {
-      window.localStorage.setItem(ACTIVE_TAB_KEY, activeTab);
-    } catch {
-      // Non-fatal: persistence of the tab choice is a convenience, not game state.
-    }
-  }, [activeTab]);
+  const openPanel = useCallback((id: SurfaceId, button: HTMLButtonElement) => {
+    const rect = button.getBoundingClientRect();
+    setAnchor({ x: rect.left + rect.width / 2, y: rect.bottom });
+    setOpenSurface(id);
+  }, []);
+
+  // Closing always hands focus back to the button that opened the panel, so the keyboard never
+  // gets dropped at the top of the document.
+  const closePanel = useCallback(() => {
+    setOpenSurface((current) => {
+      if (current) buttonRefs.current[current]?.focus();
+      return null;
+    });
+  }, []);
 
   useEffect(() => {
     return () => {
@@ -198,101 +361,35 @@ function GameShell() {
     [announce],
   );
 
-  const focusTab = useCallback((id: TabId) => {
-    setActiveTab(id);
-    tabRefs.current[id]?.focus();
-  }, []);
-
-  const onTabKeyDown = useCallback(
-    (event: KeyboardEvent<HTMLButtonElement>, index: number) => {
-      // Horizontal dock, so Left/Right move; Up/Down are accepted too because the dock edge is
-      // a layout choice and players reach for both. Home/End jump to the ends.
-      let nextIndex: number | null = null;
-      switch (event.key) {
-        case 'ArrowDown':
-        case 'ArrowRight':
-          nextIndex = (index + 1) % TAB_IDS.length;
-          break;
-        case 'ArrowUp':
-        case 'ArrowLeft':
-          nextIndex = (index - 1 + TAB_IDS.length) % TAB_IDS.length;
-          break;
-        case 'Home':
-          nextIndex = 0;
-          break;
-        case 'End':
-          nextIndex = TAB_IDS.length - 1;
-          break;
-        default:
-          return;
-      }
-      event.preventDefault();
-      focusTab(TAB_IDS[nextIndex]);
-    },
-    [focusTab],
-  );
-
   return (
     <main className="app-content" id="root-content">
-      {/* One cabinet. The HUD is pinned to its top, the body holds either the game surface or one
-          secondary surface, and the dock along the bottom is the only navigation in the app. */}
-      <div className="cabinet">
-        <Hud />
-
-        <div
-          className="cabinet-body"
-          role="tabpanel"
-          id={`panel-${activeTab}`}
-          aria-labelledby={`tab-${activeTab}`}
-          tabIndex={0}
-        >
-          {activeTab === 'game' ? (
-            <GameSurface />
-          ) : (
-            <div className="tab-panel">
-              {activeTab === 'achievements' && <AchievementsScreen />}
-              {activeTab === 'tools' && <ToolsScreen onOpenApplicationFeature={openApplicationFeature} />}
-              {activeTab === 'statistics' && <StatisticsScreen />}
-              {activeTab === 'prestige' && <PrestigeScreen />}
-            </div>
-          )}
+      {/* One cabinet, one surface. The HUD is pinned to its top with the console cluster bolted
+          on beside it, and the game fills the rest — permanently. Secondary surfaces are panels
+          that grow out of a console button on top of it; the tick loop keeps running behind. */}
+      <div className="cabinet" data-panel-open={openSurface ? 'true' : undefined}>
+        <div className="cabinet-head">
+          <Hud />
+          <CabinetConsole openId={openSurface} onOpen={openPanel} buttonRefs={buttonRefs} />
         </div>
 
-        <div
-          className="cabinet-dock"
-          role="tablist"
-          aria-orientation="horizontal"
-          aria-label={`${SHELL_COPY.tabsLabel.en} · ${SHELL_COPY.tabsLabel.yue}`}
-        >
-          {TAB_IDS.map((id, index) => {
-            const label = TAB_LABELS[id];
-            const selected = id === activeTab;
-            return (
-              <button
-                key={id}
-                type="button"
-                role="tab"
-                id={`tab-${id}`}
-                className={`cabinet-dock__button${id === 'game' ? ' cabinet-dock__button--game' : ''}`}
-                aria-selected={selected}
-                aria-controls={`panel-${id}`}
-                // Roving tabindex: exactly one tab is in the page tab order at a time, and the
-                // arrow keys move between the rest.
-                tabIndex={selected ? 0 : -1}
-                ref={(node) => {
-                  tabRefs.current[id] = node;
-                }}
-                onClick={() => setActiveTab(id)}
-                onKeyDown={(event) => onTabKeyDown(event, index)}
-              >
-                {id === 'game' ? <span aria-hidden="true">🍪</span> : null}
-                <span>{label.en}</span>
-                <span className="cabinet-dock__label-zh">{label.yue}</span>
-              </button>
-            );
-          })}
+        <div className="cabinet-body">
+          <GameSurface />
         </div>
       </div>
+
+      {openSurface && (
+        <AnchoredPanel
+          surfaceId={openSurface}
+          label={SURFACE_LABELS[openSurface]}
+          anchor={anchor}
+          onClose={closePanel}
+        >
+          {openSurface === 'achievements' && <AchievementsScreen />}
+          {openSurface === 'tools' && <ToolsScreen onOpenApplicationFeature={openApplicationFeature} />}
+          {openSurface === 'statistics' && <StatisticsScreen />}
+          {openSurface === 'prestige' && <PrestigeScreen />}
+        </AnchoredPanel>
+      )}
 
       {offlineNotice && (
         <div className="offline-banner" role="status">

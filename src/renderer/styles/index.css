@@ -569,98 +569,404 @@ body {
   padding-right: 4px;
 }
 
-/* --- the ONLY navigation on the cabinet: the secondary-surface dock. Deliberately smaller and
-       quieter than anything in the game loop. --- */
-.cabinet-dock {
+/* ---------------------------------------------------------------------------------------- *
+ * THE CONSOLE CLUSTER — four arcade buttons bolted to the top-right of the cabinet frame.
+ *
+ * This replaces the old bottom dock of text tabs, which read as website navigation. These are
+ * hardware: domed caps on a riveted plate, each with its own CSS-drawn emblem, a chunky press
+ * travel and a slow idle sheen. There is no tablist and no selected state to navigate between
+ * — pressing one grows a panel over the game, which never leaves the screen.
+ * ---------------------------------------------------------------------------------------- */
+.cabinet-head {
   display: flex;
-  gap: 8px;
-  flex-wrap: wrap;
+  align-items: stretch;
+  gap: 12px;
   flex-shrink: 0;
-  align-items: center;
+  flex-wrap: wrap;
 }
 
-.cabinet-dock__button {
+.cabinet-head .hud {
+  flex: 1 1 420px;
+}
+
+/* The console eats real width, so the readouts are allowed to run narrower here than their
+   standalone minimum rather than wrapping onto a second row and doubling the head height. */
+.cabinet-head .hud__readout {
+  flex: 1 1 140px;
+  min-width: 110px;
+}
+
+.console {
+  flex: 0 0 auto;
+  display: flex;
+  align-items: stretch;
+  gap: 8px;
+  padding: 7px 9px;
+  border-radius: var(--shape-md);
+  border: var(--border-chunky) solid var(--cabinet-frame-dark);
+  background: linear-gradient(180deg, var(--cabinet-frame) 0%, var(--cabinet-frame-dark) 100%);
+  box-shadow: inset 0 3px 0 0 rgba(255, 255, 255, 0.16), inset 0 -3px 0 0 rgba(0, 0, 0, 0.4);
+}
+
+.console__button {
+  position: relative;
   font: inherit;
-  font-family: var(--font-display);
-  font-size: 11px;
-  font-weight: 900;
-  letter-spacing: 0.14em;
-  text-transform: uppercase;
-  min-height: 44px;
-  padding: 0 14px;
-  border-radius: var(--shape-sm);
   cursor: pointer;
-  background: var(--surface-high);
+  width: 96px;
+  min-height: 44px;
+  padding: 7px 4px 6px;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  gap: 2px;
+  overflow: hidden;
   color: var(--on-surface);
   border: var(--border-thick) solid var(--outline);
-  box-shadow: var(--press-1);
-  display: flex;
-  align-items: center;
-  gap: 8px;
-  transition: transform 80ms ease, box-shadow 80ms ease, background 80ms ease;
+  border-radius: var(--shape-sm);
+  background: radial-gradient(ellipse 120% 90% at 50% -10%, var(--surface-lowest) 0%, var(--surface-high) 55%, var(--surface-highest) 100%);
+  box-shadow: var(--press-2), inset 0 4px 0 0 var(--bevel-hi), inset 0 -4px 0 0 var(--bevel-lo);
+  transition: transform 90ms ease, box-shadow 90ms ease, filter 90ms ease;
 }
 
-.cabinet-dock__label-zh {
-  font-family: var(--font-zh);
-  font-size: 12px;
-  font-weight: 700;
+/* The idle sheen: a soft highlight that drifts across the dome every few seconds so the cluster
+   reads as lit hardware rather than a strip of links. Removed entirely under reduced motion. */
+.console__button::after {
+  content: '';
+  position: absolute;
+  inset: -40% -60%;
+  background: linear-gradient(105deg, transparent 38%, rgba(255, 255, 255, 0.5) 50%, transparent 62%);
+  transform: translateX(-70%);
+  animation: console-sheen 7s ease-in-out infinite;
+  pointer-events: none;
+}
+
+.console__button:nth-child(2)::after {
+  animation-delay: 0.9s;
+}
+
+.console__button:nth-child(3)::after {
+  animation-delay: 1.8s;
+}
+
+.console__button:nth-child(4)::after {
+  animation-delay: 2.7s;
+}
+
+@keyframes console-sheen {
+  0%,
+  62% {
+    transform: translateX(-75%);
+  }
+  84%,
+  100% {
+    transform: translateX(75%);
+  }
+}
+
+.console__label {
+  font-family: var(--font-display);
+  font-size: 8px;
+  font-weight: 900;
+  white-space: nowrap;
   letter-spacing: 0.06em;
-  opacity: 0.9;
+  text-transform: uppercase;
+  color: var(--on-surface-variant);
+  line-height: 1;
 }
 
-/* The game surface is the home button: wider, warmer, and always first in reading order. */
-.cabinet-dock__button--game {
-  padding: 0 18px;
-  font-size: 12px;
-  background: var(--primary-container);
-  color: var(--on-primary-container);
+.console__label-zh {
+  font-family: var(--font-zh);
+  font-size: 10px;
+  font-weight: 700;
+  color: var(--on-surface-variant);
+  line-height: 1;
 }
 
-.cabinet-dock__button[aria-selected='true'] {
-  background: var(--primary-container);
-  color: var(--on-primary-container);
+.console__button:hover {
+  filter: brightness(1.05);
+}
+
+.console__button:active,
+.console__button[data-open='true'] {
+  transform: translateY(var(--drop-2));
+  box-shadow: inset 0 4px 0 0 var(--bevel-lo);
+}
+
+.console__button[data-open='true'] {
   border-color: var(--primary);
-  box-shadow: var(--press-1), inset 0 0 0 2px var(--primary);
+  background: radial-gradient(ellipse 120% 90% at 50% -10%, var(--primary-container) 0%, var(--surface-high) 90%);
 }
 
-.cabinet-dock__button:active {
-  transform: translateY(var(--drop-1));
-  box-shadow: none;
-}
-
-.cabinet-dock__button:focus-visible {
+.console__button:focus-visible {
   outline: 4px solid var(--spark-ring);
   outline-offset: 3px;
 }
 
+/* --- the drawn emblems (src/renderer/ConsoleEmblems.tsx). Inline SVG, inline gradients, token
+       colours: nothing to fetch, so the cabinet is identical offline. --- */
+.emblem {
+  display: block;
+  width: 30px;
+  height: 30px;
+  flex: 0 0 auto;
+  filter: drop-shadow(0 2px 0 var(--bevel-lo));
+}
+
+/* A slow float on the emblem only — the cap itself stays put, so the cluster looks alive
+   without anything moving under the pointer. */
+.console__button .emblem {
+  animation: emblem-bob 4.6s ease-in-out infinite;
+}
+
+.console__button:nth-child(2) .emblem {
+  animation-delay: 0.5s;
+}
+
+.console__button:nth-child(3) .emblem {
+  animation-delay: 1s;
+}
+
+.console__button:nth-child(4) .emblem {
+  animation-delay: 1.5s;
+}
+
+@keyframes emblem-bob {
+  0%,
+  100% {
+    transform: translateY(0);
+  }
+  50% {
+    transform: translateY(-2px);
+  }
+}
+
+/* ---------------------------------------------------------------------------------------- *
+ * THE ANCHORED PANEL — a secondary surface opened ON TOP of the running game.
+ *
+ * It is a real modal dialog (role/aria-modal/focus trap/Escape/backdrop click, all in App.tsx);
+ * everything here is the look: a heavy plate that grows out of its console button, with a notch
+ * pointing back at it and the game dimmed but still ticking behind.
+ * ---------------------------------------------------------------------------------------- */
+.overlay-scrim {
+  position: fixed;
+  inset: 0;
+  z-index: 40;
+  background: rgba(20, 11, 4, 0.58);
+  backdrop-filter: blur(1.5px);
+  animation: scrim-in 140ms ease-out;
+}
+
+@keyframes scrim-in {
+  from {
+    opacity: 0;
+  }
+  to {
+    opacity: 1;
+  }
+}
+
+.anchored-panel {
+  position: fixed;
+  right: 22px;
+  top: 160px;
+  width: min(760px, calc(100vw - 44px));
+  max-height: calc(100vh - 200px);
+  display: flex;
+  flex-direction: column;
+  overflow: visible;
+  border: var(--border-fat) solid var(--outline);
+  border-radius: var(--shape-lg);
+  background: linear-gradient(180deg, var(--surface-high), var(--surface-highest));
+  box-shadow: var(--press-4), inset 0 5px 0 0 var(--bevel-hi), 0 18px 40px rgba(0, 0, 0, 0.45);
+  transform-origin: var(--anchor-x, 100%) 0;
+  animation: panel-grow 180ms cubic-bezier(0.2, 1.1, 0.4, 1);
+}
+
+@keyframes panel-grow {
+  from {
+    opacity: 0;
+    transform: translateY(-10px) scale(0.72);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0) scale(1);
+  }
+}
+
+/* The notch: a bevelled tab on the top edge that lines up with the button that opened this. */
+.anchored-panel__notch {
+  position: absolute;
+  top: -16px;
+  left: var(--notch-x, 50%);
+  width: 30px;
+  height: 18px;
+  margin-left: -15px;
+  background: var(--outline);
+  clip-path: polygon(50% 0, 100% 100%, 0 100%);
+}
+
+.anchored-panel__bar {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  flex-shrink: 0;
+  padding: 12px 14px;
+  border-bottom: var(--border-chunky) solid var(--outline);
+  border-radius: calc(var(--shape-lg) - 6px) calc(var(--shape-lg) - 6px) 0 0;
+  background: linear-gradient(180deg, var(--cabinet-frame) 0%, var(--cabinet-frame-dark) 100%);
+  box-shadow: inset 0 3px 0 0 rgba(255, 255, 255, 0.16);
+}
+
+.anchored-panel__crest {
+  flex: 0 0 auto;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 48px;
+  height: 48px;
+  border-radius: var(--shape-sm);
+  border: var(--border-thick) solid var(--metal-lo);
+  background: radial-gradient(ellipse 120% 100% at 50% 0%, var(--surface-high) 0%, var(--surface-highest) 100%);
+  box-shadow: inset 0 3px 0 0 var(--bevel-hi), 0 3px 0 0 rgba(0, 0, 0, 0.45);
+}
+
+.anchored-panel__crest .emblem {
+  width: 34px;
+  height: 34px;
+}
+
+/* Riveted brackets in the panel's bottom corners — cabinet chrome, never content. They sit
+   below the header plate so they never crowd the crest or the close button. */
+.anchored-panel__corner {
+  position: absolute;
+  bottom: 7px;
+  width: 20px;
+  height: 20px;
+  pointer-events: none;
+}
+
+.anchored-panel__corner--left {
+  left: 6px;
+  transform: scaleY(-1);
+}
+
+.anchored-panel__corner--right {
+  right: 6px;
+  transform: scale(-1, -1);
+}
+
+.anchored-panel__title {
+  flex: 1;
+  margin: 0;
+  display: flex;
+  align-items: baseline;
+  gap: 10px;
+  flex-wrap: wrap;
+  font-family: var(--font-display);
+  font-size: clamp(16px, 2.2vw, 22px);
+  font-weight: 900;
+  letter-spacing: 0.12em;
+  text-transform: uppercase;
+  color: #fff5e6;
+  text-shadow: 0 2px 0 rgba(0, 0, 0, 0.55);
+}
+
+.anchored-panel__title-zh {
+  font-family: var(--font-zh);
+  font-size: 14px;
+  letter-spacing: 0.06em;
+  text-transform: none;
+  opacity: 0.92;
+}
+
+.anchored-panel__close {
+  font: inherit;
+  cursor: pointer;
+  flex: 0 0 auto;
+  width: 44px;
+  height: 44px;
+  font-size: 18px;
+  font-weight: 900;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  color: var(--on-secondary-container);
+  background: var(--secondary-container);
+  border: var(--border-thick) solid var(--outline);
+  border-radius: var(--shape-sm);
+  box-shadow: var(--press-1);
+  transition: transform 80ms ease, box-shadow 80ms ease;
+}
+
+.anchored-panel__close:active {
+  transform: translateY(var(--drop-1));
+  box-shadow: none;
+}
+
+.anchored-panel__close:focus-visible {
+  outline: 4px solid var(--spark-ring);
+  outline-offset: 2px;
+}
+
+/* The panel scrolls inside itself — the page body never scrolls. */
+.anchored-panel__body {
+  flex: 1;
+  min-height: 0;
+  display: flex;
+  flex-direction: column;
+  overflow: hidden;
+  border-radius: 0 0 calc(var(--shape-lg) - 6px) calc(var(--shape-lg) - 6px);
+}
+
+/* The panel bar already names the surface in both languages, so the screen's own marquee title
+   would be the same words twice in a row. */
+.anchored-panel__body > .screen > h1 {
+  display: none;
+}
+
+/* The game surface stays visible behind the panel, just pushed back a step. */
+.cabinet[data-panel-open='true'] .cabinet-body {
+  filter: saturate(0.85);
+}
+
 @media (prefers-reduced-motion: reduce) {
-  .cabinet-dock__button {
+  .console__button,
+  .anchored-panel__close {
     transition: none;
   }
 
-  .cabinet-dock__button:active {
+  .console__button::after {
+    animation: none;
+    opacity: 0;
+  }
+
+  .console__button .emblem {
+    animation: none;
+  }
+
+  .console__button:active {
     transform: none;
     box-shadow: inset 0 3px 0 0 var(--bevel-lo);
   }
+
+  /* No grow, no fade: the panel is simply there, and gone again. */
+  .overlay-scrim,
+  .anchored-panel {
+    animation: none;
+  }
 }
 
-/* The secondary tabpanel fills the cabinet body; the active `.screen` scrolls inside it. */
-.tab-panel {
-  flex: 1;
-  display: flex;
-  flex-direction: column;
-  min-width: 0;
-  min-height: 0;
-  overflow: hidden;
-  border-radius: var(--shape-lg);
-  border: var(--border-fat) solid var(--outline);
-  background: linear-gradient(180deg, var(--surface-high), var(--surface-highest));
-  box-shadow: var(--press-2), inset 0 4px 0 0 var(--bevel-hi);
-}
+@media (max-width: 900px) {
+  .console__button {
+    width: 82px;
+  }
 
-.tab-panel:focus-visible {
-  outline: 4px solid var(--spark-ring);
-  outline-offset: -4px;
+  .anchored-panel {
+    left: 12px;
+    right: 12px;
+    width: auto;
+  }
 }
 
 /* Shell-level announcements (e.g. an application feature with no window to open yet). Sits

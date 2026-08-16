@@ -4,6 +4,7 @@ import { bnCompare, bnMulScalar } from '../../shared/game/big-number.js';
 import { formatBigNum } from '../../shared/game/format-number.js';
 import { costOfBulk, GENERATOR_DEFINITIONS, generatorCps, maxAffordable, type GeneratorDefinition } from '../../shared/game/generators.js';
 import { totalBuyMaxDiscount } from '../../shared/game/tools.js';
+import { GeneratorIcon } from '../assets/icons.js';
 import { BuyStepper, type BuyQuantity } from '../components/BuyStepper.js';
 import { BulkToolbar } from '../components/BulkToolbar.js';
 import { createSearchState, SearchWithRegexBuilder } from '../components/SearchWithRegexBuilder.js';
@@ -58,25 +59,6 @@ const GeneratorBuyButton = memo(function GeneratorBuyButton({
   );
 });
 
-/** A slot in the shop rail needs to look like the machine it sells, not like fourteen identical
- *  factories. The glyph is chosen per generator id; unknown ids fall back to the factory. */
-const GENERATOR_ICONS: Readonly<Record<string, string>> = {
-  cursor: '👆',
-  grandma: '👵',
-  farm: '🌾',
-  mine: '⛏️',
-  factory: '🏭',
-  bank: '🏦',
-  temple: '⛩️',
-  wizardTower: '🧙',
-  shipment: '🚀',
-  alchemyLab: '⚗️',
-  portal: '🌀',
-  timeMachine: '⏳',
-  antimatterCondenser: '⚛️',
-  prism: '🔮',
-};
-
 const GeneratorRow = memo(function GeneratorRow({
   def,
   owned,
@@ -105,7 +87,7 @@ const GeneratorRow = memo(function GeneratorRow({
         aria-label={`Select ${def.nameEn} · 選取${def.nameYue}`}
       />
       <div className="shop-row__icon" aria-hidden="true">
-        {GENERATOR_ICONS[def.id] ?? '🏭'}
+        <GeneratorIcon id={def.id} />
       </div>
       <div className="shop-row__names">
         <span className="shop-row__name">{def.nameEn}</span>

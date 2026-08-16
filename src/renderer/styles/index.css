@@ -3004,3 +3004,182 @@ ul.card-grid {
   margin: 0;
   padding: 0;
 }
+
+/* ==========================================================================================
+ * ILLUSTRATED GAME ART (appended block — new classes only).
+ *
+ * src/renderer/assets/icons.tsx draws every generator, upgrade family, achievement medal and
+ * tool as an inline SVG instead of an emoji. These rules give those drawings their slot and
+ * add the ambient bakery texture around them: crumbs behind the ticket strip, wood grain on
+ * the cabinet frame, embers rising behind the cookie. All decorative, all pure CSS, all still
+ * offline, and all silenced under prefers-reduced-motion.
+ * ======================================================================================== */
+
+/* Each drawing fills the slot its screen already sized in `font-size`, so wiring the art in
+   changed no layout metric anywhere: 24px shop rows, 22px tickets, 34px tool cards, 40px
+   medals. `1em` is the whole trick. */
+.game-icon {
+  width: 1em;
+  height: 1em;
+  display: block;
+  flex: 0 0 auto;
+  overflow: visible;
+}
+
+.shop-row__icon .game-icon,
+.item-card__icon .game-icon,
+.mini-ticket__glyph .game-icon {
+  margin-inline: auto;
+}
+
+/* A drawn machine needs a couple more pixels than a glyph did to stay readable. Both of these
+   grow the ART only, inside space the row/ticket had already reserved: the shop rail's icon
+   column is a fixed 34px, and a ticket is 154x100 with slack under its glyph line. */
+.shop-row__icon .game-icon {
+  width: 34px;
+  height: 34px;
+}
+
+.mini-ticket__glyph .game-icon {
+  width: 26px;
+  height: 26px;
+}
+
+/* A medal face is drawn edge-to-edge, so it fills its struck ring rather than floating in it. */
+.achievement-badge .game-icon {
+  width: 100%;
+  height: 100%;
+}
+
+.achievement-toast__badge .game-icon {
+  width: 88%;
+  height: 88%;
+}
+
+/* The tier jewel in a Tools heading sits on the text baseline like the emoji chip it replaced. */
+.tools-tier__gem {
+  display: inline-flex;
+  width: 1.15em;
+  height: 1.15em;
+  vertical-align: -0.22em;
+  margin-inline-end: 6px;
+}
+
+/* The hero cookie: the button zeroes its font-size to keep stock emoji off the dough, so the
+   drawing has to be sized in pixels rather than in ems. */
+.cookie-btn--art .cookie-btn__art {
+  width: calc(var(--cookie-size, 208px) * 0.82);
+  height: calc(var(--cookie-size, 208px) * 0.82);
+  position: relative;
+  z-index: 2;
+  pointer-events: none;
+}
+
+/* With a real golden cookie drawn on the face, the old sparkle character stuck on top of it
+   would be a second, worse cookie. The state stays non-colour-coded: the drawing itself changes
+   shape (ray burst) and the accessible name still says which cookie this is. */
+.cookie-target-wrap.golden .cookie-btn--art::after {
+  content: none;
+}
+
+/* --- ambient bakery texture ------------------------------------------------------------ */
+
+/* Crumb scatter behind the upgrade tickets: the strip should look like a counter that has had
+   cookies on it, not a blank shelf. Radial gradients only — no image, no request. */
+.upgrade-strip--crumbs {
+  position: relative;
+  background-image: radial-gradient(circle at 6% 78%, var(--primary-shadow) 0 1.6px, transparent 2px),
+    radial-gradient(circle at 17% 22%, var(--primary) 0 1.3px, transparent 1.8px),
+    radial-gradient(circle at 31% 88%, var(--primary-shadow) 0 1.1px, transparent 1.6px),
+    radial-gradient(circle at 44% 12%, var(--primary) 0 1.8px, transparent 2.2px),
+    radial-gradient(circle at 58% 70%, var(--primary-shadow) 0 1.2px, transparent 1.7px),
+    radial-gradient(circle at 73% 30%, var(--primary) 0 1.5px, transparent 2px),
+    radial-gradient(circle at 88% 84%, var(--primary-shadow) 0 1.3px, transparent 1.8px),
+    radial-gradient(circle at 96% 40%, var(--primary) 0 1.1px, transparent 1.6px);
+  background-size: 260px 120px;
+  background-repeat: repeat;
+  opacity: 1;
+}
+
+/* Wood grain on the cabinet frame: fine, low-contrast stripes running along the counter, the
+   way the v2 mock shows a wooden body rather than a flat brown fill. This one re-states an
+   existing selector rather than adding a class, because the cabinet element lives in App.tsx
+   and this lane must not touch that file; it only layers a background-image over the same
+   oven-glow gradient the original rule already sets. */
+.cabinet {
+  background-image: repeating-linear-gradient(
+      92deg,
+      rgba(106, 69, 34, 0.035) 0 5px,
+      rgba(255, 255, 255, 0.025) 5px 13px,
+      rgba(67, 41, 15, 0.03) 13px 22px
+    ),
+    radial-gradient(ellipse 90% 70% at 30% 0%, var(--bg-core) 0%, var(--bg-mid) 55%, var(--bg-edge) 100%);
+  background-color: var(--bg-edge);
+}
+
+/* Oven embers behind the cookie: three slow motes drifting up out of the pool of oven light.
+   Purely decorative, never near text, and completely still under reduced motion. */
+.cookie-embers {
+  position: absolute;
+  inset: -60px -40px -10px;
+  pointer-events: none;
+  overflow: hidden;
+  border-radius: var(--shape-full);
+  z-index: 0;
+}
+
+.cookie-embers__mote {
+  position: absolute;
+  bottom: 8%;
+  width: 7px;
+  height: 7px;
+  border-radius: var(--shape-full);
+  background: radial-gradient(circle, var(--spark) 0%, var(--spark-glow) 60%, transparent 72%);
+  opacity: 0;
+  animation: cookie-ember-rise calc(5.5s * var(--motion-scale, 1)) ease-in-out infinite;
+}
+
+.cookie-embers__mote:nth-child(1) {
+  left: 22%;
+  animation-delay: 0s;
+}
+
+.cookie-embers__mote:nth-child(2) {
+  left: 52%;
+  width: 5px;
+  height: 5px;
+  animation-delay: calc(1.8s * var(--motion-scale, 1));
+}
+
+.cookie-embers__mote:nth-child(3) {
+  left: 78%;
+  width: 9px;
+  height: 9px;
+  animation-delay: calc(3.4s * var(--motion-scale, 1));
+}
+
+@keyframes cookie-ember-rise {
+  0% {
+    transform: translateY(0) scale(0.7);
+    opacity: 0;
+  }
+  18% {
+    opacity: 0.85;
+  }
+  70% {
+    opacity: 0.5;
+  }
+  100% {
+    transform: translateY(-150px) scale(1.15);
+    opacity: 0;
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  /* Reduced motion keeps the embers as a still glow rather than removing the warmth. */
+  .cookie-embers__mote {
+    animation: none;
+    opacity: 0.4;
+    bottom: 26%;
+  }
+}

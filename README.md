@@ -69,6 +69,27 @@ non-interactive run that exits non-zero on the first real failure.
 Categorized feature documentation lives under `docs/`, and the documentation
 site is published from `site/`.
 
+## Captures
+
+Real screenshots of the built application, taken from the packaged `dist/`
+running on an off-screen desktop via Win32 PrintWindow (light theme). What
+they do not show: the dark theme (never captured), a real-window narrow-width
+resize (the shop-drawer breakpoint was verified by patching built CSS), or a
+golden-cookie spawn.
+
+<details>
+<summary>The five shipped surfaces</summary>
+
+| Surface | Capture |
+| --- | --- |
+| The single game surface — HUD, cookie hero, docked shop rail, upgrade ticket strip | ![The game surface: HUD readouts showing cookies, per-second and per-click values above the cookie hero, with the shop rail docked right and the upgrade ticket strip below](captures/app/surface-game.png) |
+| Achievements tab — unlocked medal beside locked silhouettes, 2 / 100 counter | ![The Achievements tab: the First Bite medal unlocked with a spark ring, rows of locked silhouette badges, and the 2 of 100 unlocked counter](captures/app/surface-achievements.png) |
+| Tools tech tree — 1 / 20 unlocked, the always-available contract banner | ![The Tools tab: the tech-tree summary showing 1 of 20 tools unlocked and the banner stating unlocking a tool never gates the real application feature](captures/app/surface-tools.png) |
+| Statistics tab — HUD-bezel stat tiles with tabular numerals | ![The Statistics tab: a grid of recessed stat tiles showing total cookies, lifetime cookies, cookies per second, click power and related counters](captures/app/surface-statistics.png) |
+| Prestige tab — ascension projection and the two-key destructive gate | ![The Prestige tab: ascension point and multiplier tiles with the ascension projection panel and the destructive action controls](captures/app/surface-prestige.png) |
+
+</details>
+
 ## License
 
 Apache-2.0.

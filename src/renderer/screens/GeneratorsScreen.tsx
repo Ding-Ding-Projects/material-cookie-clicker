@@ -77,7 +77,7 @@ const GeneratorRow = memo(function GeneratorRow({
 }) {
   const stepperLabelId = `stepper-label-${def.id}`;
   return (
-    <div className={`building-row${unlocked ? '' : ' locked'}`}>
+    <div className={`building-row${unlocked ? '' : ' locked'}${owned > 0 ? ' owned' : ''}`}>
       <input
         type="checkbox"
         className="select-checkbox"

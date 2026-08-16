@@ -51,6 +51,9 @@
   /* Chunky pressable depth (design/tokens-shape-elevation.html): a SOLID offset shadow in a
      darker shade of the surface's own colour, not a blur. */
   --primary-shadow: #4a2a0a;
+  /* Decorative shadow-only shades (never behind text), so the destructive gate presses with the
+     same physics as everything else. */
+  --error-shadow: #7a0000;
   --press-1: 0 3px 0 0 var(--outline);
   --press-2: 0 4px 0 0 var(--primary-shadow);
   --press-3: 0 5px 0 0 var(--outline);
@@ -76,10 +79,18 @@
   --on-tier3-container: #20004d;
   --spark-ring: #d97300;
 
+  /* Shape scale — bigger, more confident radii than M3's defaults
+     (design/tokens-shape-elevation.html). Nothing in this theme is a timid 8px web card. */
   --shape-full: 999px;
-  --shape-large: 16px;
-  --shape-medium: 12px;
-  --shape-small: 8px;
+  --shape-xl: 34px;
+  --shape-large: 26px;
+  --shape-medium: 18px;
+  --shape-small: 12px;
+
+  /* The cosy oven glow that sits behind the whole app (design/cookie-surface.html). Pure CSS,
+     no image asset, no network request. */
+  --oven-glow: radial-gradient(ellipse 1100px 620px at 50% -12%, var(--primary-container) 0%, transparent 62%),
+    radial-gradient(ellipse 700px 420px at 8% 108%, var(--secondary-container) 0%, transparent 66%);
 
   --elevation-1: 0 1px 3px rgba(0, 0, 0, 0.3), 0 4px 8px 3px rgba(0, 0, 0, 0.15);
   --elevation-2: 0 2px 3px rgba(0, 0, 0, 0.3), 0 6px 10px 4px rgba(0, 0, 0, 0.15);
@@ -133,6 +144,7 @@
     --spark-glow: #ffe8a3;
     --spark-ring: #ffc24d;
     --primary-shadow: #a66a2e;
+    --error-shadow: #7a2a24;
 
     --tier2: #8fe3a6;
     --on-tier2: #0c3018;
@@ -175,6 +187,7 @@
   --spark-glow: #ffe8a3;
   --spark-ring: #ffc24d;
   --primary-shadow: #a66a2e;
+  --error-shadow: #7a2a24;
 
   --tier2: #8fe3a6;
   --on-tier2: #0c3018;
@@ -198,8 +211,11 @@ body,
 }
 
 body {
-  font-family: 'Segoe UI', system-ui, sans-serif;
-  background: var(--material-cookie-clicker-surface);
+  font-family: var(--font-en);
+  /* Cosy bakery oven-glow ambiance behind the whole app — the single biggest reason the shell
+     stops reading as a flat web page. Fixed so it does not slide with scrolled content. */
+  background: var(--oven-glow), var(--material-cookie-clicker-surface);
+  background-attachment: fixed;
   color: var(--material-cookie-clicker-on-surface);
 }
 
@@ -213,16 +229,20 @@ body {
   display: flex;
   align-items: center;
   justify-content: space-between;
-  height: 40px;
-  padding-inline-start: 12px;
+  height: 44px;
+  padding-inline-start: 16px;
   background: var(--material-cookie-clicker-title-bar);
+  border-bottom: var(--border-chunky) solid var(--outline);
   -webkit-app-region: drag;
   user-select: none;
 }
 
+/* The marquee across the top of the cabinet, not a browser chrome strip. */
 .title-bar__label {
-  font-weight: 600;
-  font-size: 14px;
+  font-family: var(--font-display);
+  font-weight: 900;
+  font-size: 15px;
+  letter-spacing: 0.4px;
 }
 
 .title-bar__controls {
@@ -264,31 +284,36 @@ body {
  * tabs.ts ordering/activation reducer. Seven fixed destinations, so no overflow/pin/group UI
  * is wired here; those exist in the shared engine for a future surface with more tabs.
  * ---------------------------------------------------------------------------------------- */
+/* The control column of an arcade cabinet: a recessed bezel holding a stack of real, chunky,
+   pressable buttons. Every tab carries its own solid offset shadow at rest, so the whole column
+   reads as hardware even before anything is hovered. */
 .tab-strip {
   display: flex;
   flex-direction: column;
-  width: 208px;
+  width: 216px;
   flex-shrink: 0;
-  padding: 12px 8px;
-  gap: 2px;
+  padding: 16px 12px 24px;
+  gap: 12px;
   background: var(--surface-low);
-  border-inline-end: 1px solid var(--outline-variant);
+  border-inline-end: var(--border-chunky) solid var(--outline);
+  box-shadow: inset -6px 0 0 0 rgba(0, 0, 0, 0.08);
   overflow-y: auto;
 }
 
 .tab-strip__button {
   font: inherit;
-  font-size: 13px;
-  font-weight: 600;
+  font-family: var(--font-display);
+  font-size: 14px;
+  font-weight: 900;
+  letter-spacing: 0.2px;
   text-align: start;
   display: flex;
   flex-direction: column;
   gap: 1px;
   padding: 10px 14px;
-  min-height: 44px;
-  border: none;
+  min-height: 52px;
   border-radius: var(--shape-medium);
-  background: transparent;
+  background: var(--surface-high);
   color: var(--on-surface);
   cursor: pointer;
 }
@@ -296,25 +321,30 @@ body {
 /* Chunky pressable: a solid offset shadow (never a blur) that the button compresses into on
    press, per design/tokens-shape-elevation.html. */
 .tab-strip__button {
-  border: var(--border-thick) solid transparent;
-  box-shadow: 0 0 0 0 transparent;
+  border: var(--border-thick) solid var(--outline);
+  box-shadow: 0 4px 0 0 var(--outline);
   transition: transform 80ms ease, box-shadow 80ms ease, background 80ms ease;
 }
 
 .tab-strip__button:hover {
-  background: var(--surface-high);
+  background: var(--surface-highest);
+  transform: translateY(-1px);
+  box-shadow: 0 5px 0 0 var(--outline);
 }
 
+/* The selected destination is visibly popped out of the bezel with a warm fill and its own
+   deeper shadow — never a tinted web sidebar row. */
 .tab-strip__button[aria-selected='true'] {
   background: var(--primary-container);
   color: var(--on-primary-container);
   border-color: var(--primary);
-  box-shadow: var(--press-2);
-  transform: translateY(-2px);
+  box-shadow: 0 6px 0 0 var(--primary), 0 0 0 3px var(--primary-container);
+  transform: translateY(-3px);
 }
 
-.tab-strip__button:active {
-  transform: translateY(2px);
+.tab-strip__button:active,
+.tab-strip__button[aria-selected='true']:active {
+  transform: translateY(3px);
   box-shadow: 0 0 0 0 transparent;
 }
 
@@ -336,9 +366,9 @@ body {
 
 .tab-strip__label-zh {
   font-family: var(--font-zh);
-  font-size: 11px;
-  font-weight: 400;
-  opacity: 0.85;
+  font-size: 12px;
+  font-weight: 700;
+  opacity: 0.9;
 }
 
 /* The tabpanel is the scroll container's parent; the active `.screen` fills it. */
@@ -365,10 +395,11 @@ body {
   background: var(--secondary-container);
   color: var(--on-secondary-container);
   border-radius: var(--shape-medium);
-  box-shadow: var(--elevation-2);
-  padding: 10px 14px;
+  border: var(--border-thick) solid var(--secondary);
+  box-shadow: 0 5px 0 0 var(--secondary);
+  padding: 12px 16px;
   font-size: 13px;
-  font-weight: 600;
+  font-weight: 700;
   z-index: 20;
 }
 
@@ -386,17 +417,22 @@ body {
   min-width: 0;
 }
 
+/* Every screen title is set in the display face, big and black-weight — the game shouting its
+   own name, per design/tokens-type.html. */
 .screen h1 {
-  font-size: 20px;
-  margin: 0;
+  font-family: var(--font-display);
+  font-weight: 900;
+  font-size: 32px;
+  line-height: 1.05;
+  margin: 0 0 4px;
 }
 
 .screen h1 .screen-title-zh {
   font-family: var(--font-zh);
-  font-weight: 400;
-  font-size: 14px;
+  font-weight: 700;
+  font-size: 18px;
   color: var(--on-surface-variant);
-  margin-inline-start: 8px;
+  margin-inline-start: 10px;
 }
 
 /* ---------------------------------------------------------------------------------------- *
@@ -410,8 +446,8 @@ body {
   background: var(--surface-highest);
   color: var(--on-surface);
   border-radius: var(--shape-medium);
-  border: 1px solid var(--outline-variant);
-  box-shadow: var(--elevation-2);
+  border: var(--border-thick) solid var(--outline);
+  box-shadow: 0 5px 0 0 var(--outline);
   padding: 12px 14px;
   display: flex;
   flex-direction: column;
@@ -450,10 +486,11 @@ body {
   background: var(--tertiary-container);
   color: var(--on-tertiary-container);
   border-radius: var(--shape-medium);
-  box-shadow: var(--elevation-2);
-  padding: 10px 14px;
+  border: var(--border-thick) solid var(--tertiary);
+  box-shadow: 0 5px 0 0 var(--tertiary);
+  padding: 12px 16px;
   font-size: 13px;
-  font-weight: 600;
+  font-weight: 700;
   z-index: 20;
 }
 
@@ -471,86 +508,160 @@ body {
   padding-top: 32px;
 }
 
+/* The headline number of the entire game. Display face, black weight, tabular figures so the
+   digits do not jitter as they tick. */
 .cookie-counter {
-  font-size: 40px;
-  font-weight: 700;
+  font-family: var(--font-display);
+  font-size: clamp(3rem, 8vw, 4.5rem);
+  font-weight: 900;
+  line-height: 1;
+  font-variant-numeric: tabular-nums;
+  letter-spacing: -1px;
+  text-shadow: 0 4px 0 var(--primary-container);
 }
 
 .cookie-cps {
-  font-size: 15px;
+  font-family: var(--font-display);
+  font-size: 18px;
+  font-variant-numeric: tabular-nums;
   color: var(--on-surface-variant);
+  background: var(--surface-high);
+  border: var(--border-thick) solid var(--outline);
+  box-shadow: 0 3px 0 0 var(--outline);
+  border-radius: var(--shape-full);
+  padding: 8px 20px;
 }
 
 .cookie-target-wrap {
   position: relative;
-  width: 112px;
-  height: 112px;
-  margin: 8px 0;
+  width: 232px;
+  height: 232px;
+  margin: 20px 0 28px;
+}
+
+/* The cookie sits in its own pool of oven light so it never floats on a plain panel. */
+.cookie-target-wrap::before {
+  content: '';
+  position: absolute;
+  inset: -76px;
+  border-radius: var(--shape-full);
+  background: radial-gradient(circle, var(--primary-container) 0%, transparent 70%);
+  opacity: 0.9;
+  pointer-events: none;
 }
 
 .cookie-btn {
   position: relative;
-  width: 112px;
-  height: 112px;
+  width: 232px;
+  height: 232px;
   border-radius: var(--shape-full);
   border: none;
   cursor: pointer;
-  background: radial-gradient(circle at 35% 30%, var(--primary-container), var(--primary) 70%);
-  box-shadow: 0 4px 10px rgba(0, 0, 0, 0.25), inset 0 -6px 10px rgba(0, 0, 0, 0.18);
+  background: radial-gradient(circle at 35% 28%, var(--primary-container), var(--primary) 68%);
+  /* Chunky pressable depth: a SOLID offset shadow in baked brown, never a blur. */
+  box-shadow: 0 12px 0 0 var(--primary-shadow), inset 0 -16px 24px rgba(0, 0, 0, 0.22);
   display: flex;
   align-items: center;
   justify-content: center;
-  font-size: 40px;
-  transition: transform calc(120ms * var(--motion-scale, 1)) ease;
+  /* The cookie is drawn entirely in CSS — dough gradient plus chocolate chips. The button's
+     emoji text content is hidden so a stock colour glyph never sits on top of it like a
+     sticker; the accessible name lives on aria-label, which is unaffected. */
+  font-size: 0;
+  z-index: 1;
+  transition: transform calc(110ms * var(--motion-scale, 1)) ease,
+    box-shadow calc(110ms * var(--motion-scale, 1)) ease;
 }
 
+/* Chocolate-chip texture via layered radial-gradients — no image asset, fully offline. */
 .cookie-btn::before {
   content: '';
   position: absolute;
-  inset: 8px;
+  inset: 16px;
   border-radius: var(--shape-full);
-  background-image: radial-gradient(circle at 25% 30%, var(--on-primary-container) 4%, transparent 5%),
-    radial-gradient(circle at 60% 20%, var(--on-primary-container) 4%, transparent 5%),
-    radial-gradient(circle at 75% 55%, var(--on-primary-container) 4%, transparent 5%),
-    radial-gradient(circle at 40% 65%, var(--on-primary-container) 4%, transparent 5%),
-    radial-gradient(circle at 20% 75%, var(--on-primary-container) 4%, transparent 5%);
-  opacity: 0.55;
+  background-image: radial-gradient(circle at 25% 30%, var(--on-primary-container) 5%, transparent 6%),
+    radial-gradient(circle at 60% 18%, var(--on-primary-container) 5%, transparent 6%),
+    radial-gradient(circle at 78% 55%, var(--on-primary-container) 5%, transparent 6%),
+    radial-gradient(circle at 40% 66%, var(--on-primary-container) 5%, transparent 6%),
+    radial-gradient(circle at 18% 76%, var(--on-primary-container) 5%, transparent 6%),
+    radial-gradient(circle at 55% 45%, var(--on-primary-container) 5%, transparent 6%),
+    radial-gradient(circle at 70% 82%, var(--on-primary-container) 4%, transparent 5%),
+    radial-gradient(circle at 32% 12%, var(--on-primary-container) 4%, transparent 5%);
+  opacity: 0.6;
   pointer-events: none;
 }
 
+/* Rises off the counter on hover, and compresses flat into it on press. */
 .cookie-btn:hover {
-  transform: scale(1.04);
+  transform: translateY(-4px) scale(1.03);
+  box-shadow: 0 16px 0 0 var(--primary-shadow), inset 0 -16px 24px rgba(0, 0, 0, 0.22);
 }
 
 .cookie-btn:active {
-  transform: scale(0.94);
+  transform: translateY(12px) scale(0.97);
+  box-shadow: 0 0 0 0 var(--primary-shadow), inset 0 -6px 12px rgba(0, 0, 0, 0.26);
 }
 
 .cookie-btn:focus-visible {
-  outline: 3px solid var(--tertiary);
-  outline-offset: 4px;
+  outline: 4px solid var(--tertiary);
+  outline-offset: 6px;
 }
 
 .cookie-target-wrap.golden .cookie-btn {
-  background: radial-gradient(circle at 35% 30%, var(--tertiary-container), var(--tertiary) 70%);
+  background: radial-gradient(circle at 35% 28%, var(--tertiary-container), var(--tertiary) 68%);
+  box-shadow: 0 12px 0 0 var(--tertiary-shadow), inset 0 -16px 24px rgba(0, 0, 0, 0.22);
 }
 
+/* A golden cookie is unmistakable without relying on colour alone: it grows a sparkle mark of
+   its own now that the button's own emoji text is hidden. */
+.cookie-target-wrap.golden .cookie-btn::after {
+  content: 'º8';
+  font-size: 76px;
+  line-height: 1;
+  position: relative;
+  z-index: 2;
+}
+
+/* Arcade sparkle burst (design/cookie-surface.html): a bright pulsing glow plus a chunky spark
+   ring. Decorative --spark tokens only — never near text. */
 .golden-overlay-wrap::before {
   content: '';
   position: absolute;
-  inset: -8px;
+  inset: -34px;
   border-radius: var(--shape-full);
-  background: radial-gradient(circle, var(--tertiary-container) 0%, transparent 72%);
-  filter: blur(1px);
+  background: radial-gradient(circle, var(--spark-glow) 0%, transparent 70%);
+  animation: golden-pulse calc(1.6s * var(--motion-scale, 1)) ease-in-out infinite;
+  pointer-events: none;
 }
 
 .golden-overlay-wrap::after {
   content: '';
   position: absolute;
-  inset: -4px;
+  inset: -10px;
   border-radius: var(--shape-full);
-  border: 3px solid var(--tertiary);
-  box-shadow: 0 0 14px 4px var(--tertiary-container);
+  border: var(--border-chunky) solid var(--spark-ring);
+  box-shadow: 0 0 22px 6px var(--spark-glow);
+  pointer-events: none;
+}
+
+@keyframes golden-pulse {
+  0%,
+  100% {
+    opacity: 0.8;
+    transform: scale(1);
+  }
+  50% {
+    opacity: 1;
+    transform: scale(1.07);
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  /* Reduced-motion equivalent: the glow stays fully lit instead of pulsing, so the golden
+     moment is still unmistakable without any movement. */
+  .golden-overlay-wrap::before {
+    animation: none;
+    opacity: 1;
+  }
 }
 
 .click-popup {
@@ -561,21 +672,26 @@ body {
   display: inline-flex;
   align-items: center;
   justify-content: center;
-  min-width: 48px;
-  padding: 4px 10px;
+  min-width: 68px;
+  padding: 8px 16px;
   border-radius: var(--shape-full);
   background: var(--primary);
   color: var(--on-primary);
-  font-weight: 700;
-  font-size: 14px;
+  font-family: var(--font-display);
+  font-weight: 900;
+  font-size: 22px;
+  font-variant-numeric: tabular-nums;
+  box-shadow: 0 4px 0 0 var(--primary-shadow);
   pointer-events: none;
+  z-index: 3;
   animation: click-popup-float 700ms ease-out both;
 }
 
 .click-popup.golden {
   background: var(--tertiary);
   color: var(--on-tertiary);
-  font-size: 16px;
+  box-shadow: 0 4px 0 0 var(--tertiary-shadow);
+  font-size: 26px;
 }
 
 @keyframes click-popup-float {
@@ -621,7 +737,8 @@ body {
   display: flex;
   align-items: center;
   gap: 8px;
-  border: 1px solid var(--outline);
+  border: var(--border-thick) solid var(--outline);
+  box-shadow: 0 3px 0 0 var(--outline);
   border-radius: var(--shape-full);
   background: var(--surface-high);
   padding: 4px 6px 4px 16px;
@@ -775,13 +892,16 @@ body {
   flex-wrap: wrap;
   background: var(--surface-high);
   border-radius: var(--shape-medium);
-  padding: 10px 16px;
-  box-shadow: var(--elevation-1);
+  padding: 12px 18px;
+  border: var(--border-thick) solid var(--outline);
+  box-shadow: 0 4px 0 0 var(--outline);
 }
 
 .bulk-toolbar__count {
-  font-weight: 700;
-  font-size: 13px;
+  font-family: var(--font-display);
+  font-weight: 900;
+  font-size: 14px;
+  font-variant-numeric: tabular-nums;
   background: var(--primary-container);
   color: var(--on-primary-container);
   border-radius: var(--shape-full);
@@ -792,13 +912,31 @@ body {
   font: inherit;
   font-size: 13px;
   font-weight: 600;
-  min-height: 40px;
-  padding: 0 14px;
+  min-height: 44px;
+  padding: 0 16px;
   border-radius: var(--shape-full);
-  border: 1px solid var(--outline);
+  border: var(--border-thick) solid var(--outline);
   background: var(--surface);
   color: var(--on-surface);
+  box-shadow: 0 3px 0 0 var(--outline);
   cursor: pointer;
+  transition: transform calc(90ms * var(--motion-scale, 1)) ease,
+    box-shadow calc(90ms * var(--motion-scale, 1)) ease;
+}
+
+.bulk-toolbar button.action:active:not([disabled]) {
+  transform: translateY(3px);
+  box-shadow: none;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .bulk-toolbar button.action {
+    transition: none;
+  }
+
+  .bulk-toolbar button.action:active:not([disabled]) {
+    transform: none;
+  }
 }
 
 .bulk-toolbar button.action:focus-visible {
@@ -822,31 +960,46 @@ body {
 /* ---------------------------------------------------------------------------------------- *
  * Generator rows (design/building-row.html).
  * ---------------------------------------------------------------------------------------- */
+/* Each generator is a physical slab on the counter: chunky outline, solid offset shadow, no
+   hairlines anywhere (design/building-row.html). */
 .building-row {
   display: grid;
   grid-template-columns: 44px 1fr auto auto auto;
-  gap: 14px;
+  gap: 16px;
   align-items: center;
-  padding: 10px 14px;
+  padding: 14px 18px;
   border-radius: var(--shape-medium);
   background: var(--surface-high);
-  min-height: 60px;
+  border: var(--border-thick) solid var(--outline);
+  box-shadow: 0 4px 0 0 var(--outline);
+  min-height: 72px;
+}
+
+/* Already producing: a warm fill and a ring, so the generators actually earning for you pop out
+   of the list at a glance instead of reading as one uniform stack of rows. */
+.building-row.owned {
+  background: var(--primary-container);
+  color: var(--on-primary-container);
+  border-color: var(--primary);
+  box-shadow: 0 5px 0 0 var(--primary), 0 0 0 3px var(--primary-container);
 }
 
 .building-row.locked {
   opacity: 0.6;
+  border-style: dashed;
 }
 
 .building-row__icon {
-  width: 40px;
-  height: 40px;
+  width: 48px;
+  height: 48px;
   border-radius: var(--shape-full);
   background: var(--primary-container);
   color: var(--on-primary-container);
+  border: var(--border-thick) solid var(--primary);
   display: flex;
   align-items: center;
   justify-content: center;
-  font-size: 19px;
+  font-size: 24px;
 }
 
 .building-row.locked .building-row__icon {
@@ -860,32 +1013,42 @@ body {
 }
 
 .building-row__name-en {
-  font-weight: 600;
-  font-size: 14px;
+  font-family: var(--font-display);
+  font-weight: 900;
+  font-size: 16px;
 }
 
 .building-row__name-zh {
   font-family: var(--font-zh);
-  font-size: 12px;
+  font-weight: 700;
+  font-size: 13px;
   color: var(--on-surface-variant);
+}
+
+.building-row.owned .building-row__name-zh,
+.building-row.owned .building-row__meta {
+  color: inherit;
 }
 
 .building-row__meta {
   display: flex;
-  gap: 12px;
-  font-size: 12px;
+  gap: 16px;
+  font-size: 13px;
+  font-variant-numeric: tabular-nums;
   color: var(--on-surface-variant);
   margin-top: 2px;
   flex-wrap: wrap;
 }
 
 .owned-chip {
-  background: var(--secondary-container);
-  color: var(--on-secondary-container);
+  background: var(--secondary);
+  color: var(--on-secondary);
   border-radius: var(--shape-full);
-  padding: 2px 10px;
-  font-weight: 700;
-  font-size: 11px;
+  padding: 4px 12px;
+  font-family: var(--font-display);
+  font-weight: 900;
+  font-size: 12px;
+  font-variant-numeric: tabular-nums;
   justify-self: start;
 }
 
@@ -894,17 +1057,18 @@ body {
   align-items: center;
   gap: 4px;
   background: var(--surface);
-  border: 1px solid var(--outline);
+  border: var(--border-thick) solid var(--outline);
   border-radius: var(--shape-full);
-  padding: 2px;
+  padding: 3px;
 }
 
 .stepper button {
   font: inherit;
-  font-weight: 700;
-  font-size: 11px;
-  min-width: 40px;
-  min-height: 32px;
+  font-family: var(--font-display);
+  font-weight: 900;
+  font-size: 12px;
+  min-width: 44px;
+  min-height: 36px;
   border: none;
   border-radius: var(--shape-full);
   background: transparent;
@@ -920,6 +1084,7 @@ body {
 .stepper button.active {
   background: var(--primary);
   color: var(--on-primary);
+  box-shadow: 0 2px 0 0 var(--primary-shadow);
 }
 
 .stepper button:focus-visible {
@@ -929,16 +1094,37 @@ body {
 
 .buy-btn {
   font: inherit;
-  font-weight: 700;
-  font-size: 13px;
-  min-height: 40px;
-  padding: 0 16px;
+  font-family: var(--font-display);
+  font-weight: 900;
+  font-size: 14px;
+  font-variant-numeric: tabular-nums;
+  min-height: 44px;
+  padding: 0 22px;
   border-radius: var(--shape-full);
   border: none;
   cursor: pointer;
   background: var(--primary);
   color: var(--on-primary);
+  box-shadow: 0 4px 0 0 var(--primary-shadow);
   white-space: nowrap;
+  transition: transform calc(90ms * var(--motion-scale, 1)) ease,
+    box-shadow calc(90ms * var(--motion-scale, 1)) ease;
+}
+
+/* Compresses flat like a real arcade-cabinet button. */
+.buy-btn:active:not([disabled]) {
+  transform: translateY(4px);
+  box-shadow: none;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .buy-btn {
+    transition: none;
+  }
+
+  .buy-btn:active:not([disabled]) {
+    transform: none;
+  }
 }
 
 .buy-btn:focus-visible {
@@ -949,6 +1135,7 @@ body {
 .buy-btn[disabled] {
   background: var(--surface-highest);
   color: var(--on-surface-variant);
+  box-shadow: none;
   cursor: not-allowed;
   opacity: 0.85;
 }
@@ -963,20 +1150,37 @@ body {
  * ---------------------------------------------------------------------------------------- */
 .card-grid {
   display: grid;
-  grid-template-columns: repeat(auto-fill, minmax(240px, 1fr));
-  gap: 16px;
+  grid-template-columns: repeat(auto-fill, minmax(250px, 1fr));
+  gap: 20px;
 }
 
 .item-card {
+  position: relative;
   border-radius: var(--shape-large);
-  padding: 16px;
+  padding: 18px;
   background: var(--surface-high);
   border: var(--border-thick) solid var(--outline);
+  /* Solid offset shadow, never a blur: every card is a physical tile on the counter. */
+  box-shadow: 0 5px 0 0 var(--outline);
   display: flex;
   flex-direction: column;
   gap: 8px;
-  min-height: 160px;
+  min-height: 170px;
   transition: transform calc(140ms * var(--motion-scale, 1)) ease;
+}
+
+/* Colour stripe across the top of every card — the single cue that turns a grid of panels into
+   a shelf of collectible tiles. Tool nodes override the colour per tier below. */
+.item-card::before {
+  content: '';
+  position: absolute;
+  top: -3px;
+  left: -3px;
+  right: -3px;
+  height: 10px;
+  border-radius: var(--shape-large) var(--shape-large) 0 0;
+  background: var(--card-accent, var(--primary));
+  pointer-events: none;
 }
 
 /* Pure delight: a live card tilts a couple of degrees on hover. Disabled outright under
@@ -1007,25 +1211,44 @@ body {
 
 .item-card.owned,
 .item-card.unlocked {
+  --card-accent: var(--tertiary);
   border: var(--border-chunky) solid var(--tertiary);
   background: var(--tertiary-container);
   color: var(--on-tertiary-container);
   /* Spark-accented owned glow: the celebratory ring from design/upgrade-card.html. */
-  box-shadow: 0 0 0 4px var(--tertiary-container), 0 0 16px 2px var(--spark-ring);
+  box-shadow: 0 5px 0 0 var(--tertiary), 0 0 0 4px var(--tertiary-container),
+    0 0 18px 3px var(--spark-ring);
+}
+
+/* Owned/unlocked cards carry the chunkier 4px border, so their stripe has to reach one pixel
+   further out to stay flush with it. */
+.item-card.owned::before,
+.item-card.unlocked::before {
+  top: -4px;
+  left: -4px;
+  right: -4px;
+}
+
+.item-card.locked {
+  --card-accent: var(--outline);
 }
 
 .item-card__icon {
-  font-size: 26px;
+  font-size: 34px;
+  line-height: 1;
+  margin-top: 4px;
 }
 
 .item-card__name-en {
-  font-weight: 700;
-  font-size: 14px;
+  font-family: var(--font-display);
+  font-weight: 900;
+  font-size: 16px;
 }
 
 .item-card__name-zh {
   font-family: var(--font-zh);
-  font-size: 12px;
+  font-weight: 700;
+  font-size: 13px;
   color: var(--on-surface-variant);
 }
 
@@ -1058,8 +1281,9 @@ body {
 
 .item-card__buy {
   font: inherit;
-  font-weight: 800;
-  font-size: 13px;
+  font-family: var(--font-display);
+  font-weight: 900;
+  font-size: 14px;
   font-variant-numeric: tabular-nums;
   min-height: 44px;
   border-radius: var(--shape-full);
@@ -1141,8 +1365,8 @@ body {
   display: flex;
   align-items: center;
   gap: 8px;
-  border-top: 1px solid var(--outline);
-  padding-top: 8px;
+  border-top: var(--border-thick) solid var(--outline);
+  padding-top: 10px;
   margin-top: auto;
 }
 
@@ -1193,8 +1417,8 @@ body {
  * ---------------------------------------------------------------------------------------- */
 .achievement-grid {
   display: grid;
-  grid-template-columns: repeat(auto-fill, minmax(120px, 1fr));
-  gap: 16px;
+  grid-template-columns: repeat(auto-fill, minmax(140px, 1fr));
+  gap: 20px;
 }
 
 .achievement-cell {
@@ -1207,13 +1431,13 @@ body {
 
 /* Struck like a real minted medal: a chunky ring plus an inset bevel, not a flat circle. */
 .achievement-badge {
-  width: 72px;
-  height: 72px;
+  width: 92px;
+  height: 92px;
   border-radius: var(--shape-full);
   display: flex;
   align-items: center;
   justify-content: center;
-  font-size: 30px;
+  font-size: 40px;
   border: var(--border-chunky) solid transparent;
 }
 
@@ -1221,7 +1445,9 @@ body {
   background: var(--surface-highest);
   color: var(--on-surface-variant);
   border-color: var(--outline);
-  filter: grayscale(1) brightness(0.85);
+  /* Struck-but-not-yet-earned, not switched off: a partial desaturation keeps the medal warm
+     and part of the bakery, rather than dropping a cold grey disc onto the counter. */
+  filter: grayscale(0.55) brightness(0.97);
   box-shadow:
     inset 0 3px 0 0 rgba(255, 255, 255, 0.25),
     inset 0 -4px 0 0 rgba(0, 0, 0, 0.15);
@@ -1244,12 +1470,14 @@ body {
 }
 
 .achievement-name {
-  font-size: 13px;
-  font-weight: 700;
+  font-family: var(--font-display);
+  font-size: 14px;
+  font-weight: 900;
 }
 
 .achievement-name-zh {
   font-family: var(--font-zh);
+  font-weight: 700;
   font-size: 12px;
   color: var(--on-surface-variant);
 }
@@ -1303,21 +1531,34 @@ body {
  * ---------------------------------------------------------------------------------------- */
 .stat-grid {
   display: grid;
-  grid-template-columns: repeat(auto-fill, minmax(170px, 1fr));
-  gap: 14px;
+  grid-template-columns: repeat(auto-fill, minmax(190px, 1fr));
+  gap: 18px;
 }
 
 .stat-tile {
+  position: relative;
   border-radius: var(--shape-large);
-  padding: 16px;
+  padding: 18px;
   background: var(--surface-high);
   /* Chunky bordered chrome rather than a soft tonal card — see design/README.md on the
      deliberate departure from M3 elevation. */
-  border: 3px solid var(--outline);
-  box-shadow: 0 4px 0 0 var(--outline);
+  border: var(--border-thick) solid var(--outline);
+  box-shadow: 0 5px 0 0 var(--outline);
   display: flex;
   flex-direction: column;
   gap: 3px;
+}
+
+/* Same accent stripe as the cards, so a stat board and an upgrade shelf read as one system. */
+.stat-tile::before {
+  content: '';
+  position: absolute;
+  top: -3px;
+  left: -3px;
+  right: -3px;
+  height: 8px;
+  border-radius: var(--shape-large) var(--shape-large) 0 0;
+  background: var(--tertiary);
 }
 
 .stat-tile__label-en {
@@ -1336,7 +1577,7 @@ body {
 
 .stat-tile__value {
   font-family: var(--font-display);
-  font-size: 26px;
+  font-size: 32px;
   font-weight: 900;
   /* Tabular figures so a column of tiles always aligns digit-for-digit while the numbers
      tick — required by design/stat-tile.html for every repeatedly-read figure. */
@@ -1370,7 +1611,8 @@ body {
 
 .stat-section-heading {
   font-family: var(--font-display);
-  font-size: 18px;
+  font-weight: 900;
+  font-size: 22px;
   margin: 28px 0 10px;
 }
 
@@ -1480,7 +1722,8 @@ body {
 .gate h2 {
   margin: 0;
   font-family: var(--font-display);
-  font-size: 20px;
+  font-weight: 900;
+  font-size: 24px;
 }
 
 .gate-triggers {
@@ -1678,28 +1921,49 @@ body {
 .gate-trigger {
   align-self: flex-start;
   font: inherit;
-  font-weight: 700;
-  font-size: 13px;
-  min-height: 44px;
-  padding: 0 18px;
+  font-family: var(--font-display);
+  font-weight: 900;
+  font-size: 14px;
+  min-height: 48px;
+  padding: 0 22px;
   border-radius: var(--shape-full);
   border: none;
   cursor: pointer;
+  transition: transform calc(90ms * var(--motion-scale, 1)) ease,
+    box-shadow calc(90ms * var(--motion-scale, 1)) ease;
+}
+
+.gate-trigger:active:not([disabled]) {
+  transform: translateY(5px);
+  box-shadow: none;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .gate-trigger {
+    transition: none;
+  }
+
+  .gate-trigger:active:not([disabled]) {
+    transform: none;
+  }
 }
 
 .gate-trigger.tone-prestige {
   background: var(--primary);
   color: var(--on-primary);
+  box-shadow: 0 5px 0 0 var(--primary-shadow);
 }
 
 .gate-trigger.tone-wipe {
   background: var(--error);
   color: var(--on-error);
+  box-shadow: 0 5px 0 0 var(--error-shadow);
 }
 
 .gate-trigger[disabled] {
   background: var(--surface-highest);
   color: var(--on-surface-variant);
+  box-shadow: none;
   cursor: not-allowed;
 }
 
@@ -1710,16 +1974,20 @@ body {
 
 .projection-card,
 .permanent-shop-card {
-  border-radius: var(--shape-medium);
-  padding: 16px;
+  border-radius: var(--shape-large);
+  padding: 18px;
   background: var(--surface-high);
+  border: var(--border-thick) solid var(--outline);
+  box-shadow: 0 5px 0 0 var(--outline);
   max-width: 520px;
 }
 
 .projection-card h2,
 .permanent-shop-card h2 {
   margin: 0 0 6px;
-  font-size: 15px;
+  font-family: var(--font-display);
+  font-weight: 900;
+  font-size: 18px;
 }
 
 /* ---------------------------------------------------------------------------------------- *
@@ -1734,23 +2002,26 @@ body {
   gap: 20px;
   flex-wrap: wrap;
   background: var(--surface-high);
-  border: 3px solid var(--outline);
+  border: var(--border-thick) solid var(--outline);
+  box-shadow: 0 5px 0 0 var(--outline);
   border-radius: var(--shape-large);
-  padding: 16px 20px;
+  padding: 18px 22px;
   margin-bottom: 16px;
 }
 
 .tools-summary__count {
-  font-weight: 800;
+  font-family: var(--font-display);
+  font-size: 16px;
+  font-weight: 900;
   font-variant-numeric: tabular-nums;
 }
 
 .tools-summary__track {
   width: 190px;
-  height: 12px;
+  height: 16px;
   border-radius: var(--shape-full);
   background: var(--surface-highest);
-  border: 1px solid var(--outline);
+  border: var(--border-thick) solid var(--outline);
   overflow: hidden;
 }
 
@@ -1831,7 +2102,9 @@ body {
   gap: 10px;
   flex-wrap: wrap;
   margin: 0 0 4px;
-  font-size: 17px;
+  font-family: var(--font-display);
+  font-weight: 900;
+  font-size: 22px;
 }
 
 .tools-tier__chip {
@@ -1861,27 +2134,41 @@ body {
   color: var(--tier-accent);
 }
 
+/* The tier jewel drives the shared card top stripe, so a tool node escalates in colour up the
+   tree without needing its own border hack. */
 .tool-node {
-  border-top: 7px solid var(--tier-accent);
-  border-right: 3px solid var(--outline);
-  border-bottom: 3px solid var(--outline);
-  border-left: 3px solid var(--outline);
+  --card-accent: var(--tier-accent);
+  border: var(--border-thick) solid var(--outline);
+  box-shadow: 0 5px 0 0 var(--outline);
 }
 
 .tool-node.undiscovered {
   border-style: dashed;
-  border-top-style: solid;
+}
+
+/* A tool node always flies its tier colour, locked or not — the tier is what the stripe is
+   there to communicate, and it does not stop being true while the node is locked. */
+.tool-node.locked,
+.tool-node.undiscovered {
+  --card-accent: var(--tier-accent);
 }
 
 .tool-node.unlocked {
-  border: 4px solid var(--tier-accent);
-  border-top-width: 7px;
+  border: var(--border-chunky) solid var(--tier-accent);
   background: var(--tier-accent-container);
   color: var(--on-tier-accent-container);
+  box-shadow: 0 5px 0 0 var(--tier-accent), 0 0 0 4px var(--tier-accent-container),
+    0 0 18px 3px var(--spark-ring);
+}
+
+.tool-node.unlocked::before {
+  top: -4px;
+  left: -4px;
+  right: -4px;
 }
 
 .tool-node.ready {
-  box-shadow: 0 0 0 3px var(--tier-accent-container);
+  box-shadow: 0 5px 0 0 var(--outline), 0 0 0 4px var(--tier-accent-container);
 }
 
 .tool-node .item-card__progress-fill {

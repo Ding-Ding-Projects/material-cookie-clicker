@@ -2,6 +2,7 @@ import { decodeSave, encodeSave, type DecodeSaveResult } from "../../shared/game
 import type { GameIpcApi } from "../../shared/game/ipc-contracts.js";
 import type { OfflineProgressOptions } from "../../shared/game/offline-progress.js";
 import type { GameState } from "../../shared/game/types.js";
+import type { Bilingual } from "./copy.js";
 
 /**
  * Persistence, with a graceful two-tier strategy.
@@ -24,7 +25,19 @@ export const OFFLINE_PROGRESS_OPTIONS: OfflineProgressOptions = {
 export interface LoadedSave {
   readonly outcome: "fresh" | "loaded" | "quarantined";
   readonly state: GameState | null;
-  readonly detail: string | null;
+  /**
+   * Why the load did not go cleanly, as a bilingual pair. This used to be a bare English string
+   * that OFFLINE_COPY.saveCorrupt interpolated into BOTH language variants, which left the
+   * Cantonese sentence carrying an untranslated English clause. Every reason produced here now
+   * has a real yue rendering; the only English that can survive is a raw engine message, and
+   * that is explicitly framed as such in both languages.
+   */
+  readonly detail: Bilingual | null;
+}
+
+/** Frames a raw, untranslatable engine message so the yue sentence still reads as Cantonese. */
+function rawEngineDetail(message: string): Bilingual {
+  return { en: message, yue: `系統訊息：${message}` };
 }
 
 export interface GamePersistence {
@@ -52,11 +65,15 @@ function decodeRaw(raw: string): DecodeSaveResult | { ok: false; reason: "malfor
   }
 }
 
-function describeDecodeFailure(result: Exclude<DecodeSaveResult, { ok: true }>): string {
+function describeDecodeFailure(result: Exclude<DecodeSaveResult, { ok: true }>): Bilingual {
   if (result.reason === "future-version") {
-    return `Save was written by a newer version (schema ${result.foundVersion}; this build supports up to ${result.maxSupportedVersion}).`;
+    return {
+      en: `Save was written by a newer version (schema ${result.foundVersion}; this build supports up to ${result.maxSupportedVersion}).`,
+      yue: `存檔係新版本寫嘅（結構版本 ${result.foundVersion}；呢個版本最多支援到 ${result.maxSupportedVersion}）。`,
+    };
   }
-  return result.detail;
+  if (result.reason === "malformed") return { en: "malformed save data", yue: "存檔格式錯誤" };
+  return rawEngineDetail(result.detail);
 }
 
 /**
@@ -81,7 +98,10 @@ export function createLocalStoragePersistence(storage: StorageLike): GamePersist
           return {
             outcome: "loaded",
             state: backupResult.state,
-            detail: `Primary save was unreadable (${describeDecodeFailure(primaryResult)}); recovered from the previous autosave instead.`,
+            detail: {
+              en: `Primary save was unreadable (${describeDecodeFailure(primaryResult).en}); recovered from the previous autosave instead.`,
+              yue: `主存檔讀唔到（${describeDecodeFailure(primaryResult).yue}）；改為由上一次自動存檔復原。`,
+            },
           };
         }
       }
@@ -121,7 +141,7 @@ export function createIpcPersistence(bridge: GameIpcApi): GamePersistence {
         if (decoded.ok) return { outcome: "loaded", state: decoded.state, detail: null };
         return { outcome: "quarantined", state: null, detail: describeDecodeFailure(decoded) };
       }
-      return { outcome: "quarantined", state: null, detail: response.detail };
+      return { outcome: "quarantined", state: null, detail: rawEngineDetail(response.detail) };
     },
     async save(state: GameState): Promise<void> {
       await bridge.save(encodeSave(state));

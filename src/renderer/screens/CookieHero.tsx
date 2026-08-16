@@ -1,4 +1,4 @@
-import { useEffect, useMemo, useRef, useState } from 'react';
+import { useEffect, useMemo, useRef, useState, type CSSProperties } from 'react';
 
 import { bnMulScalar } from '../../shared/game/big-number.js';
 import { formatBigNum } from '../../shared/game/format-number.js';
@@ -13,6 +13,9 @@ interface Popup {
   readonly id: number;
   readonly text: string;
   readonly golden: boolean;
+  /** Where the popup spawns, as a percentage of the wrap's width/height. */
+  readonly x: number;
+  readonly y: number;
 }
 
 let popupIdSeq = 0;
@@ -32,6 +35,11 @@ export function CookieHero() {
   const structure = useStructureSnapshot();
   const [popups, setPopups] = useState<Popup[]>([]);
   const buttonRef = useRef<HTMLButtonElement | null>(null);
+  const wrapRef = useRef<HTMLDivElement | null>(null);
+  /** The last pointer position over the cookie, so a popup spawns where the player actually
+   *  pressed. Keyboard and hold-to-repeat clicks have no pointer, so they get a small scatter
+   *  around the centre instead — either way, no two popups land exactly on top of each other. */
+  const lastPointRef = useRef<{ x: number; y: number } | null>(null);
 
   const goldenActive = structure.goldenCookie.isSpawned;
 
@@ -47,8 +55,24 @@ export function CookieHero() {
 
   function spawnPopup(text: string, golden: boolean): void {
     const id = ++popupIdSeq;
-    setPopups((prev) => [...prev.slice(-5), { id, text, golden }]);
+    const point = lastPointRef.current;
+    // Fixed-point spawning made rapid clicking read as one strobing pill, because up to six
+    // concurrent popups rendered at identical coordinates. Spawn above the click instead.
+    const x = point ? point.x : 50 + (Math.random() * 30 - 15);
+    const y = point ? point.y : 34 + (Math.random() * 16 - 8);
+    lastPointRef.current = null;
+    setPopups((prev) => [...prev.slice(-5), { id, text, golden, x, y }]);
     setTimeout(() => setPopups((prev) => prev.filter((p) => p.id !== id)), 750);
+  }
+
+  /** Records a pointer position as a percentage of the cookie wrap, clamped inside it. */
+  function recordPoint(clientX: number, clientY: number): void {
+    const rect = wrapRef.current?.getBoundingClientRect();
+    if (!rect || rect.width === 0 || rect.height === 0) return;
+    lastPointRef.current = {
+      x: Math.min(Math.max(((clientX - rect.left) / rect.width) * 100, 10), 90),
+      y: Math.min(Math.max(((clientY - rect.top) / rect.height) * 100, 8), 92),
+    };
   }
 
   function performClick(): void {
@@ -67,7 +91,14 @@ export function CookieHero() {
 
   return (
     <div className="panel cookie-hero">
-      <div className={`cookie-target-wrap${goldenActive ? ' golden' : ''}${goldenActive ? ' golden-overlay-wrap' : ''}`}>
+      <div
+        ref={wrapRef}
+        className={`cookie-target-wrap${goldenActive ? ' golden' : ''}${goldenActive ? ' golden-overlay-wrap' : ''}`}
+      >
+        {/* The spinning ray-burst the golden moment is built around (design/cookie-surface.html).
+            Pure CSS: a repeating conic gradient behind a ring mask. Under reduced motion it stays
+            fully visible but stops rotating, exactly as the spec calls for. */}
+        {goldenActive ? <span className="golden-rays" aria-hidden="true" /> : null}
         {/* Oven embers drifting up behind the cookie. Decorative, and still under reduced motion. */}
         <span className="cookie-embers" aria-hidden="true">
           <span className="cookie-embers__mote" />
@@ -77,11 +108,16 @@ export function CookieHero() {
         <button
           ref={buttonRef}
           type="button"
-          className="cookie-btn cookie-btn--art"
+          className="cookie-btn cookie-btn--art cookie-btn--lift"
           aria-label={goldenActive ? `${COOKIE_SCREEN_COPY.goldenAvailable.en} · ${COOKIE_SCREEN_COPY.goldenAvailable.yue}` : `${COOKIE_SCREEN_COPY.clickTarget.en} · ${COOKIE_SCREEN_COPY.clickTarget.yue}`}
-          onClick={performClick}
+          onClick={(event) => {
+            // A keyboard-activated click reports 0,0 detail; only a real pointer has a position.
+            if (event.detail > 0) recordPoint(event.clientX, event.clientY);
+            performClick();
+          }}
           onPointerDown={(event) => {
             event.preventDefault();
+            recordPoint(event.clientX, event.clientY);
             controllerRef.current.start();
           }}
           onPointerUp={() => controllerRef.current.stop()}
@@ -94,7 +130,12 @@ export function CookieHero() {
           {goldenActive ? <GoldenCookieIcon extraClass="cookie-btn__art" /> : null}
         </button>
         {popups.map((popup) => (
-          <span key={popup.id} className={`click-popup${popup.golden ? ' golden' : ''}`} aria-hidden="true">
+          <span
+            key={popup.id}
+            className={`click-popup click-popup--at-point${popup.golden ? ' golden' : ''}`}
+            style={{ '--popup-x': `${popup.x}%`, '--popup-y': `${popup.y}%` } as CSSProperties}
+            aria-hidden="true"
+          >
             {popup.text}
           </span>
         ))}

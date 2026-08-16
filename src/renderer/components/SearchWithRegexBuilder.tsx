@@ -7,7 +7,7 @@ import {
   type SearchState,
 } from '../game/local-regex-search.js';
 
-import type { Bilingual } from '../game/copy.js';
+import { bilingualText, LIST_COPY, type Bilingual } from '../game/copy.js';
 
 export { createSearchState };
 export type { SearchState };
@@ -62,7 +62,7 @@ export function SearchWithRegexBuilder({ idPrefix, state, onChange, placeholder,
           type="button"
           className="builder-toggle"
           aria-pressed={state.builderOpen}
-          aria-label="Open regex builder · 開啟規則運算式產生器"
+          aria-label={bilingualText(LIST_COPY.regexBuilderOpen)}
           aria-controls={`${idPrefix}-${reactId}-popover`}
           aria-expanded={state.builderOpen}
           onClick={() => onChange({ ...state, builderOpen: !state.builderOpen })}
@@ -103,14 +103,20 @@ export function SearchWithRegexBuilder({ idPrefix, state, onChange, placeholder,
           </div>
           <div className="regex-token-list" role="group" aria-label="Insert token · 插入符號">
             {BUILDER_TOKENS.map((token) => (
-              <button key={token.id} type="button" title={`${token.label} — ${token.detail}`} onClick={() => onChange(insertToken(state, token))}>
+              <button
+                key={token.id}
+                type="button"
+                title={`${bilingualText(token.label)} — ${bilingualText(token.detail)}`}
+                aria-label={`${bilingualText(token.label)} — ${bilingualText(token.detail)}`}
+                onClick={() => onChange(insertToken(state, token))}
+              >
                 {token.insert}
               </button>
             ))}
           </div>
           <p style={{ margin: 0, fontSize: 12 }}>
             {patternError
-              ? `⚠ ${patternError}`
+              ? `⚠ ${bilingualText(patternError)}`
               : 'Evaluated locally, bounded, never transmitted. · 喺本機評估，有上限，唔會傳送出去。'}
           </p>
         </div>

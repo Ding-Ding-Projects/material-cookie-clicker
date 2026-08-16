@@ -12,8 +12,16 @@ import {
   useStructureSnapshot,
 } from './game/GameProvider';
 import { CONSOLE_EMBLEMS, PanelCorner } from './ConsoleEmblems';
-import { CONSOLE_COPY, GAME_SURFACE_COPY, SHELL_COPY, TAB_COPY, type Bilingual } from './game/copy';
-import { AchievementsScreen } from './screens/AchievementsScreen';
+import {
+  bilingualText,
+  CONSOLE_COPY,
+  GAME_SURFACE_COPY,
+  SHELL_COPY,
+  TAB_COPY,
+  TITLE_BAR_COPY,
+  type Bilingual,
+} from './game/copy';
+import { AchievementsScreen, AchievementUnlockToast } from './screens/AchievementsScreen';
 import { CookieHero } from './screens/CookieHero';
 import { ShopRail } from './screens/ShopRail';
 import { PrestigeScreen } from './screens/PrestigeScreen';
@@ -155,10 +163,10 @@ function CabinetConsole({
             onClick={(event) => onOpen(id, event.currentTarget)}
           >
             <ConsoleEmblem id={id} />
-            <span className="console__label" aria-hidden="true">
+            <span className="console__label console__label--legible" aria-hidden="true">
               {label.en}
             </span>
-            <span className="console__label-zh" aria-hidden="true">
+            <span className="console__label-zh console__label-zh--legible" aria-hidden="true">
               {label.yue}
             </span>
           </button>
@@ -199,16 +207,28 @@ function AnchoredPanel({
 
   // Point the panel back at its button: the top edge sits just under the button, the grow
   // animation starts from the button's centre, and the notch lines up with it too.
+  // Recomputed on every window resize as well as on open. Without the listener a maximize or a
+  // window resize left the panel at its stale `top`, which could push the header — and with it
+  // the only visible close button — off the bottom of the new viewport while focus stayed
+  // trapped inside. The top is also clamped so the header always stays on screen.
   useLayoutEffect(() => {
-    const node = panelRef.current;
-    if (!node) return;
-    const top = Math.round(anchor.y + 26);
-    node.style.top = `${top}px`;
-    node.style.maxHeight = `${Math.max(240, Math.round(window.innerHeight - top - 28))}px`;
-    const rect = node.getBoundingClientRect();
-    const originX = Math.min(Math.max(anchor.x - rect.left, 0), rect.width);
-    node.style.setProperty('--anchor-x', `${Math.round(originX)}px`);
-    node.style.setProperty('--notch-x', `${Math.round(Math.min(Math.max(originX, 30), rect.width - 30))}px`);
+    const place = () => {
+      const node = panelRef.current;
+      if (!node) return;
+      // Never start the panel so far down that its header would sit below the viewport: leave
+      // at least a header's worth of room plus the bottom margin.
+      const maxTop = Math.max(0, window.innerHeight - 240 - 28);
+      const top = Math.max(0, Math.min(Math.round(anchor.y + 26), maxTop));
+      node.style.top = `${top}px`;
+      node.style.maxHeight = `${Math.max(160, Math.round(window.innerHeight - top - 28))}px`;
+      const rect = node.getBoundingClientRect();
+      const originX = Math.min(Math.max(anchor.x - rect.left, 0), rect.width);
+      node.style.setProperty('--anchor-x', `${Math.round(originX)}px`);
+      node.style.setProperty('--notch-x', `${Math.round(Math.min(Math.max(originX, 30), rect.width - 30))}px`);
+    };
+    place();
+    window.addEventListener('resize', place);
+    return () => window.removeEventListener('resize', place);
   }, [anchor]);
 
   useEffect(() => {
@@ -288,14 +308,24 @@ export function App() {
     <div className="app-shell">
       <header className="title-bar" role="banner">
         <span className="title-bar__label">Material Cookie Clicker</span>
-        <div className="title-bar__controls" role="group" aria-label="Window controls">
-          <button type="button" className="title-bar__button" aria-label="Minimize window" onClick={minimize}>
+        <div className="title-bar__controls" role="group" aria-label={bilingualText(TITLE_BAR_COPY.controlsLabel)}>
+          <button type="button" className="title-bar__button" aria-label={bilingualText(TITLE_BAR_COPY.minimize)} onClick={minimize}>
             &#x2013;
           </button>
-          <button type="button" className="title-bar__button" aria-label="Maximize or restore window" onClick={toggleMaximize}>
+          <button
+            type="button"
+            className="title-bar__button"
+            aria-label={bilingualText(TITLE_BAR_COPY.maximizeRestore)}
+            onClick={toggleMaximize}
+          >
             &#x25A1;
           </button>
-          <button type="button" className="title-bar__button title-bar__button--close" aria-label="Close window" onClick={close}>
+          <button
+            type="button"
+            className="title-bar__button title-bar__button--close"
+            aria-label={bilingualText(TITLE_BAR_COPY.close)}
+            onClick={close}
+          >
             &#x2715;
           </button>
         </div>
@@ -395,11 +425,17 @@ function GameShell() {
         <div className="offline-banner" role="status">
           <span>{offlineNotice.en}</span>
           <span>{offlineNotice.yue}</span>
-          <button type="button" className="offline-banner__dismiss" onClick={dismissOfflineNotice}>
+          <button type="button" className="offline-banner__dismiss offline-banner__dismiss--target" onClick={dismissOfflineNotice}>
             {SHELL_COPY.dismiss.en} · {SHELL_COPY.dismiss.yue}
           </button>
         </div>
       )}
+
+      {/* The medal celebration, cabinet-wide: an achievement unlocks during PLAY, so the toast
+          lives on the shell rather than inside the Achievements panel that the player almost
+          never has open at that moment. It is aria-hidden — the milestone region below is the
+          single spoken announcement. */}
+      <AchievementUnlockToast />
 
       <div className="milestone-region" role="status" aria-live="polite">
         {milestoneMessage ? `${milestoneMessage.en} · ${milestoneMessage.yue}` : ''}

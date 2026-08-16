@@ -3489,3 +3489,230 @@ ul.card-grid {
     bottom: 26%;
   }
 }
+
+/* ============================================================================================ *
+ * UI-AUDIT LANE: copy / bilingual, accessibility and delight fixes.
+ *
+ * Every rule below introduces a NEW class rather than editing an existing block — a sibling lane
+ * owns the blocks above. Where a fix is an override it relies on this file's cascade order plus
+ * the extra class the component now carries, so nothing above needs touching.
+ * ============================================================================================ */
+
+/* --- Buy stepper: "Max" is the only word on the stepper, so it shows both languages ---------- */
+.stepper .stepper__max {
+  display: inline-flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  line-height: 1.05;
+  gap: 1px;
+}
+
+.stepper__max-zh {
+  font-family: var(--font-zh);
+  font-size: 9px;
+  font-weight: 700;
+}
+
+/* --- Bulk-buy result: drawn status marks, never stock colour emoji --------------------------- */
+/* Colour AND glyph: a tick for bought, a bang for skipped, so the two outcomes are never told
+   apart by colour alone (WCAG 1.4.1). */
+.bulk-status {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  margin-right: 14px;
+  font-weight: 700;
+}
+
+.bulk-status__mark {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 18px;
+  height: 18px;
+  border-radius: var(--shape-full);
+  font-family: var(--font-display);
+  font-size: 12px;
+  font-weight: 900;
+  line-height: 1;
+  flex-shrink: 0;
+}
+
+.bulk-status--ok .bulk-status__mark {
+  background: var(--tertiary);
+  color: var(--on-tertiary);
+  border: var(--border-thin) solid var(--tertiary-shadow);
+}
+
+.bulk-status--skipped .bulk-status__mark {
+  background: var(--error-container);
+  color: var(--on-error-container);
+  border: var(--border-thin) solid var(--error);
+}
+
+/* --- Console button labels: 8px is below any practical legibility floor ---------------------- */
+.console__button .console__label--legible {
+  font-size: 11px;
+  letter-spacing: 0.04em;
+}
+
+.console__button .console__label-zh--legible {
+  font-size: 11px;
+}
+
+/* --- Offline banner dismiss: the first control a returning player hits, at the 44px minimum --- */
+.offline-banner .offline-banner__dismiss--target {
+  min-height: 44px;
+  padding: 0 18px;
+  border: var(--border-thin) solid var(--outline);
+}
+
+/* --- Contract banner: a blink must not run past five seconds (WCAG 2.2.2) -------------------- */
+/* Two cycles = 4.8s, then it settles fully lit. Still gated behind reduced motion above, which
+   removes the animation entirely. */
+@media (prefers-reduced-motion: no-preference) {
+  .hud-strip--contract:not([open]) .hud-strip__flash--finite {
+    animation: hud-strip-flash-finite calc(2.4s * var(--motion-scale, 1)) steps(1, end) 2 both;
+  }
+}
+
+@keyframes hud-strip-flash-finite {
+  0%,
+  70% {
+    opacity: 1;
+  }
+  71%,
+  99% {
+    opacity: 0.45;
+  }
+  100% {
+    opacity: 1;
+  }
+}
+
+/* --- Cookie hover: the spec's arcade-button rise, not a nudge (design/cookie-surface.html) ---- */
+.cookie-btn--lift:hover {
+  transform: translateY(-4px) scale(1.03);
+  box-shadow: 0 calc(var(--drop-4) + 4px) 0 0 var(--primary-shadow),
+    0 calc(var(--drop-4) + 4px) 0 5px var(--cabinet-frame-dark),
+    inset 0 10px 0 -4px rgba(255, 255, 255, 0.45), inset 0 -14px 18px rgba(0, 0, 0, 0.3);
+}
+
+.cookie-target-wrap.golden .cookie-btn--lift:hover {
+  box-shadow: 0 calc(var(--drop-4) + 4px) 0 0 var(--tertiary-shadow),
+    0 calc(var(--drop-4) + 4px) 0 5px var(--cabinet-frame-dark),
+    inset 0 10px 0 -4px rgba(255, 255, 255, 0.45), inset 0 -14px 18px rgba(0, 0, 0, 0.3);
+}
+
+@media (prefers-reduced-motion: reduce) {
+  /* The existing reduced-motion block already zeroes the hover transform; this keeps the new
+     class from re-introducing it. */
+  .cookie-btn--lift:hover {
+    transform: none;
+  }
+}
+
+/* --- Golden ray-burst (design/cookie-surface.html): the third golden layer, previously absent - */
+.golden-rays {
+  position: absolute;
+  inset: -34px;
+  border-radius: var(--shape-full);
+  background: repeating-conic-gradient(from 0deg, var(--spark) 0deg 4deg, transparent 4deg 24deg);
+  opacity: 0.55;
+  mask: radial-gradient(circle, transparent 56%, black 58%, black 62%, transparent 64%);
+  -webkit-mask: radial-gradient(circle, transparent 56%, black 58%, black 62%, transparent 64%);
+  animation: spin-rays calc(6s * var(--motion-scale, 1)) linear infinite;
+  pointer-events: none;
+  z-index: 0;
+}
+
+@keyframes spin-rays {
+  from {
+    transform: rotate(0deg);
+  }
+  to {
+    transform: rotate(360deg);
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  /* Reduced-motion equivalent, exactly as the spec writes it: the rays stay fully visible, they
+     simply stop turning. */
+  .golden-rays {
+    animation: none;
+  }
+}
+
+/* --- +N popups spawn above the click instead of all stacking on one point -------------------- */
+.click-popup--at-point {
+  left: var(--popup-x, 50%);
+  top: var(--popup-y, 40%);
+  transform: translate(-50%, -100%);
+  animation-name: click-popup-float-at-point;
+}
+
+@keyframes click-popup-float-at-point {
+  0% {
+    opacity: 1;
+    transform: translate(-50%, -100%);
+  }
+  100% {
+    opacity: 0;
+    transform: translate(-50%, calc(-100% - 36px));
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  /* No travel: the pill simply appears where the click landed and fades. */
+  .click-popup--at-point {
+    animation-name: click-popup-static;
+    transform: translate(-50%, -100%);
+  }
+}
+
+/* --- Unlocked achievement badge: the v2 minted-metal medal (design/achievement-badge.html) ---- */
+.achievement-badge.unlocked.achievement-badge--minted {
+  position: relative;
+  background: radial-gradient(circle at 36% 28%, var(--metal-hi) 0%, var(--spark) 34%, var(--tertiary) 78%);
+  color: var(--on-tertiary);
+  border-color: var(--metal-lo);
+  box-shadow: inset 0 6px 0 -1px rgba(255, 255, 255, 0.55), inset 0 -10px 0 -2px var(--tertiary-shadow),
+    0 0 0 5px var(--tertiary-container), 0 0 0 9px var(--metal-lo), 0 8px 0 0 var(--tertiary-shadow),
+    0 0 34px 4px var(--spark-glow);
+}
+
+/* The minted rim: a rotating conic sheen, held still under reduced motion. */
+.achievement-badge.unlocked.achievement-badge--minted::after {
+  content: '';
+  position: absolute;
+  inset: -9px;
+  border-radius: var(--shape-full);
+  background: conic-gradient(var(--metal-hi), var(--metal-lo), var(--metal-hi), var(--metal-lo), var(--metal-hi));
+  z-index: -1;
+  animation: badge-mint calc(6s * var(--motion-scale, 1)) linear infinite;
+  pointer-events: none;
+}
+
+@keyframes badge-mint {
+  to {
+    transform: rotate(360deg);
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .achievement-badge.unlocked.achievement-badge--minted::after {
+    animation: none;
+  }
+}
+
+/* The toast's small badge keeps the medal treatment but not the fat double ring, which would
+   overflow the toast's own padding. */
+.achievement-toast__badge.achievement-badge--minted {
+  box-shadow: inset 0 4px 0 -1px rgba(255, 255, 255, 0.55), inset 0 -6px 0 -2px var(--tertiary-shadow),
+    0 0 0 3px var(--metal-lo), 0 0 18px 3px var(--spark-glow);
+}
+
+.achievement-toast__badge.achievement-badge--minted::after {
+  inset: -5px;
+}

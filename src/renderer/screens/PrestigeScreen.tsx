@@ -4,7 +4,7 @@ import { formatBigNum } from '../../shared/game/format-number.js';
 import { ascensionValue, canPrestige, prestigeMultiplierFor } from '../../shared/game/prestige.js';
 import { getUpgradeDefinition } from '../../shared/game/upgrades.js';
 import { DestructiveGate } from '../components/DestructiveGate.js';
-import { PRESTIGE_SCREEN_COPY, TAB_COPY, type Bilingual } from '../game/copy.js';
+import { PRESTIGE_SCREEN_COPY, STATS_SCREEN_COPY, TAB_COPY, type Bilingual } from '../game/copy.js';
 import {
   useFastSnapshot,
   useGameDispatch,
@@ -27,6 +27,17 @@ import {
  * two can never be confused for each other mid-drag.
  */
 type OpenGate = 'none' | 'prestige' | 'wipe';
+
+/** One prestige standing tile. Same markup StatisticsScreen renders, same copy source. */
+function PrestigeStatTile({ label, value }: { label: Bilingual; value: string }) {
+  return (
+    <div className="stat-tile">
+      <span className="stat-tile__label-en">{label.en}</span>
+      <span className="stat-tile__label-zh">{label.yue}</span>
+      <span className="stat-tile__value">{value}</span>
+    </div>
+  );
+}
 
 export function PrestigeScreen() {
   const dispatch = useGameDispatch();
@@ -57,26 +68,15 @@ export function PrestigeScreen() {
       </h1>
 
       <div className="stat-grid" aria-live="off">
-        <div className="stat-tile">
-          <span className="stat-tile__label-en">Ascension Points</span>
-          <span className="stat-tile__label-zh">飛升點</span>
-          <span className="stat-tile__value">{ascensionPoints.toLocaleString('en-US')}</span>
-        </div>
-        <div className="stat-tile">
-          <span className="stat-tile__label-en">Production Multiplier</span>
-          <span className="stat-tile__label-zh">產量加成</span>
-          <span className="stat-tile__value">×{multiplier.toFixed(2)}</span>
-        </div>
-        <div className="stat-tile">
-          <span className="stat-tile__label-en">Prestige Runs</span>
-          <span className="stat-tile__label-zh">轉生次數</span>
-          <span className="stat-tile__value">{totalPrestigeCount.toLocaleString('en-US')}</span>
-        </div>
-        <div className="stat-tile">
-          <span className="stat-tile__label-en">Lifetime Cookies (this run)</span>
-          <span className="stat-tile__label-zh">今次一生累積曲奇</span>
-          <span className="stat-tile__value">{formatBigNum(fast.lifetimeCookies, 'en')}</span>
-        </div>
+        {/* Labels come from STATS_SCREEN_COPY, the same block StatisticsScreen reads, so the two
+            screens can never drift into two different names for the same number. */}
+        <PrestigeStatTile label={STATS_SCREEN_COPY.ascensionPoints} value={ascensionPoints.toLocaleString('en-US')} />
+        <PrestigeStatTile label={STATS_SCREEN_COPY.productionMultiplier} value={`×${multiplier.toFixed(2)}`} />
+        <PrestigeStatTile label={STATS_SCREEN_COPY.prestigeRuns} value={totalPrestigeCount.toLocaleString('en-US')} />
+        <PrestigeStatTile
+          label={STATS_SCREEN_COPY.lifetimeCookiesThisRun}
+          value={formatBigNum(fast.lifetimeCookies, 'en')}
+        />
       </div>
 
       <section className="projection-card">

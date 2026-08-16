@@ -1,0 +1,62 @@
+name: Deploy Pages
+
+on:
+  push:
+    branches: [main]
+    paths:
+      - 'site/**'
+      - '.github/workflows/pages.yml'
+  workflow_run:
+    workflows: [Release]
+    types: [completed]
+  workflow_dispatch: {}
+
+permissions:
+  contents: read
+  pages: write
+  id-token: write
+
+concurrency:
+  group: pages
+  cancel-in-progress: false
+
+jobs:
+  deploy:
+    if: >-
+      github.event_name != 'workflow_run' ||
+      (github.event.workflow_run.conclusion == 'success' && github.event.workflow_run.head_branch == 'main')
+    runs-on: ubuntu-24.04
+    timeout-minutes: 30
+    environment:
+      name: github-pages
+      url: ${{ steps.deployment.outputs.page_url }}
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+      - name: Generate and validate the complete static-site release manifest
+        shell: bash
+        env:
+          GH_TOKEN: ${{ secrets.RELEASE_TOKEN || secrets.ORG_TOKEN || secrets.GITHUB_TOKEN }}
+        run: |
+          gh api --paginate --slurp "repos/${GITHUB_REPOSITORY}/releases?per_page=100" > release-inventory.raw.json
+          node scripts/compact-release-inventory.mjs --input release-inventory.raw.json --output release-inventory.json
+          node scripts/generate-release-changelog.mjs --fallback --inventory release-inventory.json --repository "$GITHUB_REPOSITORY" --output-ts /tmp/generated-changelog.ts --output-site site/assets/generated-changelog.mjs --output-json /tmp/release-changelog.json
+          test -s site/assets/generated-changelog.mjs
+          grep -q 'GENERATED_SITE_RELEASE_MANIFEST' site/assets/generated-changelog.mjs
+      - name: Verify the GitHub-hosted runner inventory
+        shell: bash
+        run: |
+          echo "Runner OS: $RUNNER_OS"
+          echo "Runner architecture: $RUNNER_ARCH"
+          git --version
+          test "$RUNNER_OS" = 'Linux'
+          test "$RUNNER_ARCH" = 'X64'
+      - uses: actions/configure-pages@v5
+        with:
+          enablement: true
+      - uses: actions/upload-pages-artifact@v3
+        with:
+          path: site
+      - id: deployment
+        uses: actions/deploy-pages@v4

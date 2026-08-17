@@ -52,9 +52,10 @@ describe("disclosure: a fresh save shows nothing but the cookie", () => {
       upgradeStrip: false,
       holdToClick: false,
       dieselDepot: false,
+      dieselFactory: false,
       perSecondReadout: false,
       perClickReadout: false,
-      consoles: { achievements: false, tools: false, statistics: false, prestige: false },
+      consoles: { achievements: false, tools: false, statistics: false, prestige: false, factory: false },
     });
   });
 
@@ -88,6 +89,7 @@ describe("disclosure: each reveal upgrade flips exactly its own surface", () => 
       tools: false,
       statistics: false,
       prestige: false,
+      factory: false,
     });
     expect(bnToNumber(after.cookies)).toBeCloseTo(0, 6);
   });
@@ -433,6 +435,17 @@ describe("disclosure: save compatibility", () => {
       ...v2Save(),
       schemaVersion: SAVE_SCHEMA_VERSION,
       dieselDepot: { litresMinted: 0, vouchersMinted: 0, cookiesSpent: { mantissa: 0, exponent: 0 } },
+      dieselFactory: {
+        equipment: [],
+        upgradeIds: [],
+        crude: 0,
+        litres: 0,
+        lifetimeCrude: 0,
+        lifetimeLitres: 0,
+        cookiesInvested: { mantissa: 0, exponent: 0 },
+        autoShipEnabled: false,
+        stalledSeconds: 0,
+      },
     });
     expect(decoded.ok).toBe(true);
     if (!decoded.ok) return;

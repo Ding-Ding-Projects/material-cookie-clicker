@@ -74,6 +74,7 @@ export class GameStore {
   #fastSnapshot: FastSnapshot;
 
   readonly #fastListeners = new Set<Listener>();
+  readonly #factoryListeners = new Set<Listener>();
   readonly #statsListeners = new Set<Listener>();
   readonly #structureListeners = new Set<Listener>();
   readonly #dispatchListeners = new Set<DispatchListener>();
@@ -87,10 +88,25 @@ export class GameStore {
   getFastSnapshot = (): FastSnapshot => this.#fastSnapshot;
   getStatsSnapshot = (): GameState["stats"] => this.#state.stats;
   getStructureSnapshot = (): GameState => this.#state;
+  getFactorySnapshot = (): GameState["dieselFactory"] => this.#state.dieselFactory;
 
   subscribeFast = (listener: Listener): (() => void) => {
     this.#fastListeners.add(listener);
     return () => this.#fastListeners.delete(listener);
+  };
+  /**
+   * The diesel factory's own slice (diesel-factory.ts).
+   *
+   * It needs to be its own subscription rather than riding on `fast`, and the reason is a bug
+   * this had before it was one: the factory moves on a plain tick while `cookies` may not move
+   * at all — a player with a refinery and no generators earns nothing per second — so a panel
+   * subscribed to the fast slice sat frozen at 0 L while the tanks really were filling. It is
+   * not the structure slice either, because it changes several times a second and would drag
+   * the whole generator/upgrade/achievement tree along with it.
+   */
+  subscribeFactory = (listener: Listener): (() => void) => {
+    this.#factoryListeners.add(listener);
+    return () => this.#factoryListeners.delete(listener);
   };
   subscribeStats = (listener: Listener): (() => void) => {
     this.#statsListeners.add(listener);
@@ -119,6 +135,9 @@ export class GameStore {
       this.#fastSnapshot = computeFastSnapshot(next);
       this.#fastListeners.forEach((listener) => listener());
     }
+    if (next.dieselFactory !== previous.dieselFactory) {
+      this.#factoryListeners.forEach((listener) => listener());
+    }
     if (next.stats !== previous.stats) {
       this.#statsListeners.forEach((listener) => listener());
     }
@@ -137,6 +156,7 @@ export class GameStore {
     this.#state = next;
     this.#fastSnapshot = computeFastSnapshot(next);
     this.#fastListeners.forEach((listener) => listener());
+    this.#factoryListeners.forEach((listener) => listener());
     this.#statsListeners.forEach((listener) => listener());
     this.#structureListeners.forEach((listener) => listener());
     this.#dispatchListeners.forEach((listener) => listener(previous, next, { type: "tick", elapsedMs: 0 }));

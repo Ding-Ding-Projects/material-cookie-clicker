@@ -37,7 +37,7 @@ file is older evidence from earlier lanes, kept for the record.
 | `game-progressed.png` | The full surface: three HUD plates, all four console emblems, the cookie hero with its per-second and hold-to-click lines, the `UPGRADES` strip at 6 / 79, the shop rail, and the Diesel Depot docked as the rail's footer. |
 | `game-dark.png` | The same surface in the dark "arcade night" theme. |
 | `dialog-achievements.png` `dialog-tools.png` `dialog-statistics.png` `dialog-prestige.png` | Each of the four anchored dialogs, open over the dimmed game surface and pointed at the console emblem that opened it: 15 / 100 achievements, 9 / 20 tools, ten stat tiles, and the ascension projection below the trillion-cookie threshold. |
-| `diesel-mint.png` | One frame of the Diesel Depot's mint animation: the can pouring, the nozzle sweeping in behind it, a ghosted `14` rolling up under the litres figure, and the printed slip carrying `ed2d41c7` — a voucher identifier that really is in `%APPDATA%\DingDingProjects\exchange\diesel-vouchers.json`. |
+| `diesel-mint.png` | **Superseded — see the diesel factory set below.** One frame of the Diesel Depot's mint animation, from the build where cookies bought litres outright: the can pouring, the nozzle sweeping in behind it, a ghosted `14` rolling up under the litres figure, and the printed slip carrying `ed2d41c7` — a voucher identifier that really is in `%APPDATA%\DingDingProjects\exchange\diesel-vouchers.json`. |
 
 **How this set was taken.** From the built `dist/`, launched by the real
 `electron` binary onto an off-screen Windows desktop named `CaptureRefresh`,
@@ -97,6 +97,51 @@ attempt: the shelf collapsed to a row of count badges the first time, because it
 was competing with the cookie panel for the same flex space, and the milk tide
 was invisible the first time, because it was rising behind opaque cabinet panels
 with nowhere to be seen.
+
+### The diesel factory set
+
+Three images from one session on the off-screen desktop `FactoryCapture`, all
+opened and looked at afterwards. They replace the evidence for a mechanic that
+no longer exists: the older `diesel-mint.png` above shows the build where cookies
+bought litres outright, and diesel is manufactured now.
+
+| File | What it shows |
+| --- | --- |
+| `factory-floor.png` | The Diesel Factory panel with the line **running**. Three stations joined by animated pipes — a nodding-donkey derrick pulling 3.75 barrels a second, three fractionating columns achieving 1.00 of their rated 1.00 litres a second, and two tank gauges reading 63.2 of 85 litres. Fifty wells, fifty refinery stills, three storage tanks and two factory upgrades, every one bought by a real press of a real button. |
+| `factory-stalled.png` | The same panel a minute later, **stalled**. The tanks reached 85 of 85 litres, so refining stopped and the refining readout dropped to `0 / 1.00 L/s` while the rating stayed where it was; the yard filled behind it, so intake stopped too. All three stations carry the stall border and the status line names both reasons. This is the honest-halt behaviour, photographed rather than asserted. |
+| `factory-ship.png` | The WinForge shipping station after a real press of Ship. Four figures that answer four different questions and are kept apart: ready to ship 31 L (the game's number), litres shipped 510 L (the game's number), vouchers minted 85 (counted from the ledger **file**), consumed by WinForge 76 (counted from `consumedAt` fields only WinForge writes). Below it the equipment shop's Crude Well row at 50 owned. |
+
+**How this set was taken.** From the built `dist/`, launched by the real
+`electron` binary onto an off-screen Windows desktop named `FactoryCapture`,
+with `--remote-debugging-port` so the run could be driven and a throwaway
+`--user-data-dir` so it started from an empty save. The window was maximised
+through the application's own title-bar API (2582x1550 device pixels at 144 DPI)
+and every image is a Win32 `PrintWindow` capture of that one window, resolved by
+title and class from the desktop's window list.
+
+The run was given a starting balance — a save in the application's own format
+carrying 5 billion cookies and nothing else, written into the profile's
+`localStorage` over the running app's own devtools connection and then loaded
+normally. **Everything past that balance was bought through the interface**: the
+four reveal upgrades (Shop Sign, Upgrade Catalogue, Steady Hand, Fuel Contract)
+on their discovery tickets, then fifty Crude Wells, fifty Refinery Stills, three
+Storage Tanks, and the Wider Bore, Trayed Column and Depot Telemetry upgrades —
+each one a mouse-down/mouse-up posted to the window at the control's real
+coordinates. No equipment and no upgrade was written into the save.
+
+**The shipments are real, and they prove the point.** Six vouchers were written
+to `%APPDATA%\DingDingProjects\exchange\diesel-vouchers.json` during this run,
+and every single one carries **exactly 85 litres** — the tank's full capacity —
+because that is all the tanks ever held. The old depot could mint any number of
+litres the player could afford; this one cannot exceed what was manufactured.
+The `cookiesSpent` figure falls across the six (72.2M, then 24.0M, 18.1M, 14.5M,
+12.1M) exactly as amortization over a growing lifetime production predicts.
+
+One thing found by looking rather than by testing: the first pass of this panel
+sat frozen at `0.0 / 85 L` while the save underneath it really was filling,
+because the factory rode on the store's `fast` slice and a player with a
+refinery and no generators has a static cookie count. The factory has its own
+store slice now, and these captures are from the fixed build.
 
 ### The manual-purchase set
 
@@ -231,6 +276,13 @@ appears **identically** on an undiscovered card and a fully unlocked one. It is
 never greyed out and never hidden behind the silhouette.
 
 ## Not captured yet
+
+- The factory's **automation** branch actually shipping by itself when a tank
+  crosses its threshold. It is unit-tested, and the Ship-automatically switch is
+  in `factory-ship.png` with its threshold caption, but no capture shows a lorry
+  leaving without a press.
+- The factory panel under **reduced motion**, where the pipe flow and the derrick
+  stop dead. That is declared in CSS and asserted nowhere else.
 
 - The command palette and the appearance editor — neither exists in the
   application yet. The settings surface DOES exist now and is captured; see

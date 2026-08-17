@@ -73,7 +73,7 @@ export function decodeSave(raw: unknown): DecodeSaveResult {
 export function encodeSave(state: GameState): SaveDataOnDisk {
   return {
     randomEvents: encodeRandomEvents(state.randomEvents),
-    schemaVersion: state.schemaVersion as 4,
+    schemaVersion: state.schemaVersion as 5,
     cookies: state.cookies,
     lifetimeCookies: state.lifetimeCookies,
     baseClickValue: state.baseClickValue,
@@ -89,6 +89,11 @@ export function encodeSave(state: GameState): SaveDataOnDisk {
     goldenCookie: { ...state.goldenCookie },
     stats: { ...state.stats },
     dieselDepot: { ...state.dieselDepot },
+    dieselFactory: {
+      ...state.dieselFactory,
+      equipment: state.dieselFactory.equipment.map((e) => ({ id: e.id, count: e.count })),
+      upgradeIds: [...state.dieselFactory.upgradeIds],
+    },
     toolProgressionEnabled: state.toolProgressionEnabled,
     purchasedToolIds: [...state.purchasedToolIds],
     lastTickAtIso: state.lastTickAtIso,

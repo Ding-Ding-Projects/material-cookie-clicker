@@ -1,14 +1,4 @@
-import {
-  bnCompare,
-  bnDiv,
-  bnFromNumber,
-  bnMul,
-  bnMulScalar,
-  bnPow,
-  bnSub,
-  bnToNumber,
-  type BigNum,
-} from "./big-number.js";
+import { bnToNumber, type BigNum } from "./big-number.js";
 
 /**
  * THE DIESEL VOUCHER EXCHANGE — the cookie-side half of a two-application contract.
@@ -179,38 +169,21 @@ export function summarizeLedger(ledger: DieselVoucherLedger): LedgerSummary {
   return { voucherCount: ledger.vouchers.length, totalLitres, consumedCount };
 }
 
-// ----------------------------------------------------------------- the price curve ----
+// ------------------------------------------------------------------- the receipt string ----
 
 /**
- * THE RATE. The first litre costs a thousand cookies, and every litre already minted makes the
- * next one 15% dearer — the same 1.15 growth ratio every generator tier uses (generators.ts),
- * so the depot reads as one more rung of an economy the player already understands rather than
- * a bolt-on. Ten litres cost about 20,300 cookies; a hundred litres about 1.74 billion. That
- * keeps it a real sink at every stage of a run instead of a rounding error by mid-game.
+ * THERE IS NO PRICE CURVE HERE ANY MORE, and that is the point.
  *
- * The curve is over LIFETIME litres minted, not litres currently held, because a voucher leaves
- * this application for good the moment it is written. There is nothing to sell back.
+ * An earlier build sold litres for cookies on a 1.15 curve — `costOfLitre`, `costOfLitres` and
+ * `maxAffordableLitres` lived at this spot. Diesel is manufactured now (diesel-factory.ts):
+ * cookies buy wells, refining columns and tanks, and the litres those tanks hold are the only
+ * litres the depot can ship. The functions were DELETED rather than left behind unused, because
+ * a dead cookies-per-litre rate sitting in the file is exactly the thing a future change would
+ * pick back up by accident.
+ *
+ * What survives is this one formatter, because a voucher still carries a cookie figure — see
+ * diesel-factory.ts#amortizedCookiesFor for what that figure now means.
  */
-export const DIESEL_FIRST_LITRE_COST = 1000;
-export const DIESEL_COST_RATIO = 1.15;
-
-/** Cost of one litre when `alreadyMinted` litres have been minted over the save's lifetime. */
-export function costOfLitre(alreadyMinted: number): BigNum {
-  return bnMulScalar(bnPow(bnFromNumber(DIESEL_COST_RATIO), alreadyMinted), DIESEL_FIRST_LITRE_COST);
-}
-
-/**
- * Cost of `quantity` litres bought in one press, summed as the geometric series
- * `first * r^minted * (r^quantity - 1) / (r - 1)` rather than litre-by-litre, so a large
- * purchase costs the same whether it is made in one press or many.
- */
-export function costOfLitres(alreadyMinted: number, quantity: number): BigNum {
-  if (quantity <= 0) return bnFromNumber(0);
-  const ratio = bnFromNumber(DIESEL_COST_RATIO);
-  const head = bnMulScalar(bnPow(ratio, alreadyMinted), DIESEL_FIRST_LITRE_COST);
-  const series = bnDiv(bnSub(bnPow(ratio, quantity), bnFromNumber(1)), bnFromNumber(DIESEL_COST_RATIO - 1));
-  return bnMul(head, series);
-}
 
 /**
  * Renders a cookie amount as the decimal/scientific string a voucher's `cookiesSpent` carries.
@@ -224,15 +197,4 @@ export function cookiesSpentString(value: BigNum): string {
     return Number.isInteger(asNumber) ? String(asNumber) : asNumber.toFixed(2);
   }
   return `${value.mantissa.toFixed(6)}e${value.exponent}`;
-}
-
-/** The most litres `budget` cookies can buy, given `alreadyMinted`. Never negative. */
-export function maxAffordableLitres(alreadyMinted: number, budget: BigNum): number {
-  let quantity = 0;
-  // Small, bounded, and honest: the curve grows 15% a litre, so even an absurd budget stops
-  // well inside this cap, and a loop cannot drift the way a closed-form logarithm can.
-  while (quantity < 10000 && bnCompare(budget, costOfLitres(alreadyMinted, quantity + 1)) >= 0) {
-    quantity += 1;
-  }
-  return quantity;
 }

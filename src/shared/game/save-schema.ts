@@ -4,7 +4,7 @@ import { z } from "zod";
  * Current on-disk save schema version. Bump this whenever `SaveDataLatest`'s shape changes,
  * and add a forward-only migration entry in migrations.ts keyed by the *previous* version.
  */
-export const SAVE_SCHEMA_VERSION = 4;
+export const SAVE_SCHEMA_VERSION = 5;
 
 const BigNumSchema = z.object({
   mantissa: z.number(),
@@ -124,9 +124,37 @@ export const SaveDataV4Schema = SaveDataV3Schema.omit({ schemaVersion: true }).e
 
 export type SaveDataV4 = z.infer<typeof SaveDataV4Schema>;
 
+/**
+ * Schema for save-format version 5. Adds `dieselFactory` — the nested production economy that
+ * now MAKES the diesel the depot ships (diesel-factory.ts): the equipment on the floor, the
+ * factory upgrades bought, the crude in the yard, the litres in the tanks, and the lifetime
+ * totals the amortized receipt is derived from.
+ *
+ * The stock levels are stored as plain fractional numbers rather than big numbers on purpose:
+ * they are bounded by tank capacity, which is a physical quantity in the tens of thousands, not
+ * a cookie count that outgrows IEEE-754. `migrations.ts#migrateV4ToV5` supplies an empty floor
+ * for an older save, which is the truth — that build had no factory, so nothing was ever built.
+ */
+export const SaveDataV5Schema = SaveDataV4Schema.omit({ schemaVersion: true }).extend({
+  schemaVersion: z.literal(5),
+  dieselFactory: z.object({
+    equipment: z.array(z.object({ id: z.string(), count: z.number().int().nonnegative() })),
+    upgradeIds: z.array(z.string()),
+    crude: z.number().nonnegative(),
+    litres: z.number().nonnegative(),
+    lifetimeCrude: z.number().nonnegative(),
+    lifetimeLitres: z.number().nonnegative(),
+    cookiesInvested: BigNumSchema,
+    autoShipEnabled: z.boolean(),
+    stalledSeconds: z.number().nonnegative(),
+  }),
+});
+
+export type SaveDataV5 = z.infer<typeof SaveDataV5Schema>;
+
 /** The schema alias that always points at the current (latest) version's shape. */
-export const SaveDataLatestSchema = SaveDataV4Schema;
-export type SaveDataLatest = SaveDataV4;
+export const SaveDataLatestSchema = SaveDataV5Schema;
+export type SaveDataLatest = SaveDataV5;
 
 /** Minimal shape used only to read `schemaVersion` off of otherwise-unvalidated input. */
 export const SaveVersionProbeSchema = z.object({

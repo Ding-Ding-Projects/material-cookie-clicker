@@ -48,6 +48,7 @@ import { CookieHero } from './screens/CookieHero';
 import { DiscoveryTicket } from './screens/DiscoveryTicket';
 import { MilkTide } from './screens/MilkTide';
 import { ShopRail } from './screens/ShopRail';
+import { FactoryScreen } from './screens/FactoryScreen';
 import { PrestigeScreen } from './screens/PrestigeScreen';
 import { RandomEventIndicator, RandomEventStage, RandomEventToast } from './screens/RandomEventStage';
 import { StatisticsScreen } from './screens/StatisticsScreen';
@@ -76,6 +77,7 @@ const SURFACE_LABELS: Readonly<Record<PanelId, Bilingual>> = {
   tools: TAB_COPY.tools,
   statistics: TAB_COPY.statistics,
   prestige: TAB_COPY.prestige,
+  factory: TAB_COPY.factory,
   settings: SETTINGS_COPY.title,
 };
 
@@ -177,7 +179,7 @@ function HudReadout({
  * Below ~900px the CSS turns the rail into a bottom drawer on this same surface — the cookie
  * stays visible above it and no route changes.
  */
-function GameSurface() {
+function GameSurface({ onOpenFactory }: { onOpenFactory: (button: HTMLButtonElement) => void }) {
   // Progressive disclosure (src/shared/game/disclosure.ts). A fresh save is the cookie and its
   // counter, full stop: the shop rail and the upgrade strip are each bought back with a real
   // upgrade, and until the strip exists the DiscoveryTicket beside the cookie is the one place
@@ -196,7 +198,7 @@ function GameSurface() {
         <DiscoveryTicket />
         {disclosure.upgradeStrip ? <UpgradeStrip /> : null}
       </div>
-      {disclosure.shop ? <ShopRail /> : null}
+      {disclosure.shop ? <ShopRail onOpenFactory={onOpenFactory} /> : null}
       {/* The tide is the LAST child of the stage and is positioned over it, so it rises behind
           the cookie and the shelf rather than pushing either of them anywhere. */}
       <MilkTide />
@@ -526,6 +528,16 @@ function GameShell() {
     setSettingsEntry(null);
   }, []);
 
+  /** The depot status card in the shop rail's footer is a door into the factory panel: it opens
+   *  the same anchored dialog the console emblem does, anchored to the card's own button so the
+   *  panel still grows out of the control the player actually pressed. */
+  const openFactoryPanel = useCallback((button: HTMLButtonElement) => {
+    const rect = button.getBoundingClientRect();
+    setAnchor({ x: rect.left + rect.width / 2, y: rect.bottom });
+    setOpenSurface('factory');
+    setSettingsEntry(null);
+  }, []);
+
   useEffect(() => {
     return () => {
       if (statusTimerRef.current) clearTimeout(statusTimerRef.current);
@@ -575,7 +587,7 @@ function GameShell() {
         </div>
 
         <div className="cabinet-body">
-          <GameSurface />
+          <GameSurface onOpenFactory={openFactoryPanel} />
         </div>
       </div>
 
@@ -586,6 +598,7 @@ function GameShell() {
           anchor={anchor}
           onClose={closePanel}
         >
+          {openSurface === 'factory' && <FactoryScreen />}
           {openSurface === 'achievements' && <AchievementsScreen />}
           {openSurface === 'tools' && <ToolsScreen onOpenApplicationFeature={openApplicationFeature} />}
           {openSurface === 'statistics' && <StatisticsScreen />}

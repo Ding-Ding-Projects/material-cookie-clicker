@@ -143,7 +143,7 @@ const GeneratorRow = memo(function GeneratorRow({
  * The search field, multi-select and bulk-buy toolbar are carried over unchanged — they were
  * working affordances of the old screen and none of them is part of a route.
  */
-export function ShopRail() {
+export function ShopRail({ onOpenFactory }: { onOpenFactory?: (button: HTMLButtonElement) => void }) {
   const dispatch = useGameDispatch();
   const structure = useStructureSnapshot();
   const [search, setSearch] = useState(createSearchState());
@@ -290,7 +290,7 @@ export function ShopRail() {
         {/* The rail's footer. The depot is not a generator tier, so it sits below the ladder and
             outside the search field's reach rather than pretending to be a row. It renders
             nothing at all until the Fuel Contract reveal is bought. */}
-        <DieselDepot />
+        <DieselDepot onOpenFactory={onOpenFactory} />
       </div>
     </section>
   );

@@ -48,6 +48,23 @@ it("seeds a progressed save", () => {
     ],
     stats: { totalClicks: 12_400, totalCookiesBaked: bnFromNumber(9e19), clockAnomalyCount: 0 },
     dieselDepot: { litresMinted: 14, vouchersMinted: 3, cookiesSpent: bnFromNumber(5e4) },
+    // A floor with real equipment on it, so a capture of the factory panel shows a running line
+    // and a stocked equipment shelf rather than an empty yard.
+    dieselFactory: {
+      equipment: [
+        { id: "crude_well", count: 50 },
+        { id: "refinery_still", count: 50 },
+        { id: "storage_tank", count: 3 },
+      ],
+      upgradeIds: ["fx_wider_bore", "fx_deep_drilling"],
+      crude: 120,
+      litres: 41,
+      lifetimeCrude: 9_400,
+      lifetimeLitres: 3_100,
+      cookiesInvested: bnFromNumber(8e8),
+      autoShipEnabled: false,
+      stalledSeconds: 0,
+    },
     prestige: {
       ascensionPoints: 42,
       totalPrestigeCount: 3,
@@ -58,8 +75,13 @@ it("seeds a progressed save", () => {
 
   // Own a realistic slice of the catalogue: everything unlocked and cheap enough that a player
   // at this stage would obviously have bought it.
+  // The reveals unlock in a chain (each one's condition names the one before it), so a single
+  // pass over the catalogue would only ever catch the first. They are all bought at this stage
+  // of a real run, so they are named outright rather than filtered for.
   const owned = UPGRADE_DEFINITIONS.filter(
-    (def) => isUpgradeUnlocked(def.unlockCondition, state) && def.cost.exponent < 13,
+    (def) =>
+      def.effect.kind === "reveal" ||
+      (isUpgradeUnlocked(def.unlockCondition, state) && def.cost.exponent < 13),
   ).map((def, i) => ({ id: def.id, purchasedAtTickCount: i }));
   state = { ...state, upgrades: owned };
 

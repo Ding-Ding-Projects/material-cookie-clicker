@@ -198,22 +198,30 @@ export function GameProvider({ children }: { children: ReactNode }) {
 
   // THE MINT SIDE EFFECT.
   //
-  // The reducer already did the whole game half of a diesel purchase — checked the reveal,
-  // checked the price, deducted the cookies, recorded the litres — and it did it purely. What
-  // it cannot do is write a file. This observer is the seam where that happens, and it is the
-  // SAME seam autosave uses: subscribe to dispatches, look at what actually changed, and ask
-  // the main process to do the I/O. A mint the reducer refused changes nothing, so this sees
+  // The reducer already did the whole game half of a shipment — checked the reveal, checked the
+  // tanks really hold the litres, drew them down, recorded the shipment — and it did it purely.
+  // What it cannot do is write a file. This observer is the seam where that happens, and it is
+  // the SAME seam autosave uses: subscribe to dispatches, look at what actually changed, and ask
+  // the main process to do the I/O. A shipment the reducer refused changes nothing, so this sees
   // no litres and writes no voucher.
+  //
+  // It watches the STATE DIFF rather than the action kind, because there are now two ways a
+  // shipment happens: the player pressing Ship, and an automation upgrade shipping on a `tick`.
+  // Both draw from the same tanks through the same reducer helper, so both deserve a voucher —
+  // and keying off the diff means neither can be forgotten when a third way is added.
   useEffect(() => {
-    const unsubscribe = store.onDispatch((previous, next, action) => {
-      if (action.type !== 'mintDiesel') return;
+    const unsubscribe = store.onDispatch((previous, next) => {
       const litres = next.dieselDepot.litresMinted - previous.dieselDepot.litresMinted;
       if (litres <= 0) return;
       if (!dieselBridge) {
         setDieselError(DIESEL_COPY.noBridge);
         return;
       }
-      const cookiesSpent = cookiesSpentString(bnSub(previous.cookies, next.cookies));
+      // The amortized share of what the plant cost to build (diesel-factory.ts), which is what
+      // `cookiesSpent` means now that no cookies are handed over at the shipping counter.
+      const cookiesSpent = cookiesSpentString(
+        bnSub(next.dieselDepot.cookiesSpent, previous.dieselDepot.cookiesSpent),
+      );
       void dieselBridge
         .mint({ litres, cookiesSpent })
         .then((response) => {
@@ -373,6 +381,21 @@ export function useMilestoneMessage(): Bilingual | null {
 export function useFastSnapshot(): FastSnapshot {
   const { store } = useGameContext();
   return useSyncExternalStore(store.subscribeFast, store.getFastSnapshot, store.getFastSnapshot);
+}
+
+/**
+ * The diesel factory's subtree (diesel-factory.ts). It has its OWN store slice, and must: the
+ * factory moves on every tick that the line produces something, which is not the same set of
+ * ticks on which `cookies` moves — a player with a refinery and no generators has a static
+ * cookie count and a filling tank. Riding on the fast slice left the gauges frozen at zero
+ * while the save underneath them really was accruing litres; this is that bug's fix.
+ *
+ * `tickFactory` returns the SAME object when a bare floor does nothing, so a game with no
+ * factory built never re-renders for this at all.
+ */
+export function useFactorySnapshot(): GameState['dieselFactory'] {
+  const { store } = useGameContext();
+  return useSyncExternalStore(store.subscribeFactory, store.getFactorySnapshot, store.getFactorySnapshot);
 }
 
 /** Stats slice: `state.stats` alone — also updates every click/tick. */

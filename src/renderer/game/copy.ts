@@ -80,6 +80,7 @@ export const TAB_COPY = {
   tools: { en: "Tools", yue: "工具" },
   statistics: { en: "Statistics", yue: "統計" },
   prestige: { en: "Prestige", yue: "轉生" },
+  factory: { en: "Diesel Factory", yue: "柴油廠" },
 } as const satisfies Record<string, Bilingual>;
 
 /**
@@ -186,8 +187,8 @@ export const DISCLOSURE_COPY = {
     yue: "手夠穩，可以撳住曲奇連續撳落去。",
   },
   revealDieselDepot: {
-    en: "A fuel counter at the back of the shop, selling diesel to WinForge.",
-    yue: "商店後面開個油站，賣柴油畀 WinForge。",
+    en: "A signed contract to supply WinForge with diesel — and a refinery to actually make it.",
+    yue: "同 WinForge 簽咗供柴油嘅合約——同埋一間真係煉到油嘅廠。",
   },
   ladderMysteryName: { en: "???", yue: "???" },
   ladderMysteryHint: {
@@ -370,10 +371,10 @@ export const PRESTIGE_SCREEN_COPY = {
 export const DIESEL_COPY = {
   title: { en: "Diesel Depot", yue: "柴油補給站" },
   subtitle: {
-    en: "Cookies into diesel for WinForge's emergency generators.",
-    yue: "用曲奇換 WinForge 應急發電機嘅柴油。",
+    en: "Diesel manufactured in your own refinery, shipped to WinForge's emergency generators.",
+    yue: "喺自己間廠煉出嚟嘅柴油，運去 WinForge 嘅應急發電機。",
   },
-  litresLabel: { en: "Litres minted", yue: "已開出公升" },
+  litresLabel: { en: "Litres shipped", yue: "已出貨公升" },
   vouchersLabel: { en: "Vouchers minted", yue: "已開出憑證" },
   consumedLabel: { en: "Consumed by WinForge", yue: "WinForge 已用" },
   /** The honest answer while the WinForge reader does not exist. Not a zero dressed as a fact. */
@@ -407,6 +408,122 @@ export const DIESEL_COPY = {
   handoffNote: {
     en: "Vouchers are minted here and consumed in WinForge, which reads the same file. This game never marks one used.",
     yue: "憑證喺呢度開出，喺 WinForge 度使用，兩邊讀同一個檔。呢隻遊戲永遠唔會自己話用咗。",
+  },
+} as const satisfies Record<string, Bilingual | ((...args: any[]) => Bilingual)>;
+
+/**
+ * THE DIESEL FACTORY (src/shared/game/diesel-factory.ts) — the nested subgame's own surface.
+ *
+ * Every line here is written against a factory that can stall, because it can. The readouts say
+ * what the line is doing right now rather than what it is rated for, the stall messages name
+ * which stage stopped and why, and nothing on this panel ever says a litre exists before the
+ * refinery has actually made it.
+ */
+export const FACTORY_COPY = {
+  title: { en: "Diesel Factory", yue: "柴油廠" },
+  subtitle: {
+    en: "Cookies buy the plant. The plant makes the diesel. Nothing here comes out of thin air.",
+    yue: "曲奇買廠房，廠房煉柴油。呢度冇一滴油係憑空變出嚟。",
+  },
+  floorTitle: { en: "Production floor", yue: "生產現場" },
+  shopTitle: { en: "Equipment", yue: "設備" },
+  upgradesTitle: { en: "Factory upgrades", yue: "工廠升級" },
+  stationTitle: { en: "WinForge shipping station", yue: "WinForge 出貨站" },
+
+  stageIntake: { en: "Crude intake", yue: "原油進料" },
+  stageRefining: { en: "Refining", yue: "煉製" },
+  stageStorage: { en: "Storage", yue: "儲存" },
+  stageDepot: { en: "Depot", yue: "油庫" },
+
+  crudeLabel: { en: "Crude in the yard", yue: "油場原油" },
+  litresLabel: { en: "Diesel in the tanks", yue: "缸入面嘅柴油" },
+  crudeRate: { en: "Crude per second", yue: "每秒原油" },
+  refiningRate: { en: "Litres per second", yue: "每秒公升" },
+  efficiencyLabel: { en: "Crude per litre", yue: "每公升耗原油" },
+  capacityLabel: { en: "Tank capacity", yue: "油缸容量" },
+  lifetimeLitres: { en: "Litres manufactured", yue: "已煉製公升" },
+  shippedLabel: { en: "Litres shipped", yue: "已出貨公升" },
+  /** What is in the tank right now and could go on the next lorry. Not what has gone. */
+  readyLabel: { en: "Ready to ship", yue: "可以出貨" },
+
+  barrels: (value: string): Bilingual => ({ en: `${value} bbl`, yue: `${value} 桶` }),
+  litres: (value: string): Bilingual => ({ en: `${value} L`, yue: `${value} 公升` }),
+
+  /** The three honest states of the line. Only one is ever shown at a time. */
+  stateRunning: { en: "Running", yue: "運作中" },
+  stateIdleNoPlant: {
+    en: "Nothing built yet — buy a well and a still to start the line.",
+    yue: "重未起過嘢——買一口井同一支煉油塔就開得工。",
+  },
+  stateStarvedOfCrude: {
+    en: "Refining is waiting on crude. The columns are rated higher than the wells can feed.",
+    yue: "煉油塔等緊原油。塔嘅產能高過啲井供得到嘅量。",
+  },
+  stateTanksFull: {
+    en: "Tanks are full, so refining has stopped. Ship some diesel or buy another tank.",
+    yue: "油缸滿咗，煉油已經停低。出啲貨，或者再買個缸。",
+  },
+  stateNoRefining: {
+    en: "Crude is coming in with nothing to refine it. Buy a refining unit.",
+    yue: "原油入緊嚟但冇嘢煉。買部煉油設備啦。",
+  },
+  yardFullNote: {
+    en: "The yard is full too, so intake has stopped as well.",
+    yue: "油場都滿埋，所以連進料都停咗。",
+  },
+
+  tankGaugeLabel: (percent: string): Bilingual => ({
+    en: `Tank level, ${percent}% full`,
+    yue: `油缸液位，滿咗 ${percent}%`,
+  }),
+  yardGaugeLabel: (percent: string): Bilingual => ({
+    en: `Crude yard level, ${percent}% full`,
+    yue: `油場原油量，滿咗 ${percent}%`,
+  }),
+
+  buy: { en: "Buy", yue: "買" },
+  owned: { en: "Owned", yue: "擁有" },
+  cannotAfford: { en: "Not enough cookies yet", yue: "曲奇仲未夠" },
+  equipmentQuantity: { en: "How many to buy", yue: "買幾多部" },
+  emptyUpgrades: {
+    en: "No factory upgrade is offered yet. Each one asks for a piece of plant to already be running.",
+    yue: "暫時未有工廠升級。每個都要有相應設備行緊先會出。",
+  },
+  branchThroughput: { en: "Throughput", yue: "產能" },
+  branchEfficiency: { en: "Efficiency", yue: "效率" },
+  branchCapacity: { en: "Capacity", yue: "容量" },
+  branchAutomation: { en: "Automation", yue: "自動化" },
+
+  shipButton: (litres: number): Bilingual => ({
+    en: `Ship ${litres} L to WinForge`,
+    yue: `出 ${litres} 公升去 WinForge`,
+  }),
+  shipNothing: {
+    en: "Nothing to ship — the tanks do not hold a whole litre yet.",
+    yue: "冇嘢出得——啲缸重未夠一整公升。",
+  },
+  shipNote: {
+    en: "Shipping draws the tanks down. A voucher is written for litres this factory really made; no cookies change hands at this counter.",
+    yue: "出貨會由油缸度扣走。憑證寫住呢間廠真係煉到嘅公升數；喺呢個櫃枱唔會有曲奇易手。",
+  },
+  autoShipLabel: { en: "Ship automatically", yue: "自動出貨" },
+  autoShipAt: (percent: string): Bilingual => ({
+    en: `Sends a lorry once the tanks reach ${percent}% full.`,
+    yue: `油缸滿到 ${percent}% 就會開車出貨。`,
+  }),
+  autoShipLocked: {
+    en: "Buy an automation upgrade to hand this press over to a level gauge.",
+    yue: "買咗自動化升級，先可以將呢粒掣交畀液位錶。",
+  },
+  investedLabel: { en: "Cookies invested in the plant", yue: "投喺廠房嘅曲奇" },
+  amortizedNote: {
+    en: "A voucher's cookie figure is now the shipment's share of what the plant cost to build, not a price paid at the counter.",
+    yue: "憑證上面嗰個曲奇數字，而家係呢批貨攤分建廠成本嘅份額，唔係喺櫃枱畀嘅價錢。",
+  },
+  openFactory: { en: "Open the Diesel Factory", yue: "打開柴油廠" },
+  depotCardHint: {
+    en: "The whole depot moved into the Diesel Factory panel. This card is the status light.",
+    yue: "成個油庫搬咗入柴油廠面板。呢張卡淨係盞狀態燈。",
   },
 } as const satisfies Record<string, Bilingual | ((...args: any[]) => Bilingual)>;
 

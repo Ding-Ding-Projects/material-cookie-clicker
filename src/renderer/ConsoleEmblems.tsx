@@ -170,6 +170,41 @@ export function GearEmblem({ className }: EmblemProps) {
   );
 }
 
+/** DIESEL FACTORY — a refinery skyline: two fractionating columns behind a bunded storage tank,
+ *  with a feed pipe running in from the left and a plume off the taller column. The tank is
+ *  drawn part-filled, because a tank level is the one number this whole subgame is about. */
+export function RefineryEmblem({ className }: EmblemProps) {
+  return (
+    <svg {...frame(className)}>
+      <defs>
+        <linearGradient id="mcc-refinery-steel" x1="0" y1="0" x2="0" y2="1">
+          <stop offset="0" stopColor="var(--metal-hi)" />
+          <stop offset="1" stopColor="var(--metal-lo)" />
+        </linearGradient>
+        <linearGradient id="mcc-refinery-fuel" x1="0" y1="0" x2="0" y2="1">
+          <stop offset="0" stopColor="var(--tier2-container)" />
+          <stop offset="1" stopColor="var(--tier2)" />
+        </linearGradient>
+      </defs>
+      {/* the plume, drawn first so the columns sit over it */}
+      <path d="M20.6 6.4c2.2-1.6 4.4-.6 4.6 1.4" fill="none" stroke="var(--metal-hi)" strokeWidth="1.6" strokeLinecap="round" opacity="0.5" />
+      {/* feed pipe in from the left */}
+      <path d="M1.4 20h5.2v-6" fill="none" stroke="var(--outline)" strokeWidth="1.8" strokeLinecap="round" strokeLinejoin="round" />
+      {/* the two columns */}
+      <rect x="4.4" y="8.2" width="5.2" height="17" rx="1.4" fill="url(#mcc-refinery-steel)" stroke="var(--spark-ring)" strokeWidth="1.2" />
+      <rect x="11.6" y="4.4" width="6" height="20.8" rx="1.5" fill="url(#mcc-refinery-steel)" stroke="var(--spark-ring)" strokeWidth="1.2" />
+      <path d="M4.9 13h4.2M4.9 17.6h4.2M12.1 10h5M12.1 15h5M12.1 20h5" stroke="var(--outline)" strokeWidth="0.9" opacity="0.6" />
+      {/* the storage tank, part filled */}
+      <rect x="19.4" y="14" width="10.4" height="11.2" rx="1.6" fill="var(--surface-lowest)" stroke="var(--spark-ring)" strokeWidth="1.5" />
+      <path d="M19.4 19.4h10.4v4.2a1.6 1.6 0 0 1-1.6 1.6H21a1.6 1.6 0 0 1-1.6-1.6z" fill="url(#mcc-refinery-fuel)" />
+      <path d="M19.4 19.4h10.4" stroke="var(--tier2)" strokeWidth="1.1" />
+      {/* the hardstanding everything sits on */}
+      <path d="M2.2 25.6h27.6" stroke="var(--outline)" strokeWidth="2.2" strokeLinecap="round" />
+      <path d="M6 11.4a3.4 3.4 0 0 1 1.6-2" fill="none" stroke="#fff" strokeWidth="1.4" strokeLinecap="round" opacity="0.55" />
+    </svg>
+  );
+}
+
 /** Decorative rivets/brackets for the panel header plate — chrome, never content. */
 export function PanelCorner({ className }: EmblemProps) {
   return (
@@ -181,6 +216,7 @@ export function PanelCorner({ className }: EmblemProps) {
 }
 
 export const CONSOLE_EMBLEMS = {
+  factory: RefineryEmblem,
   achievements: MedalEmblem,
   tools: GemWrenchEmblem,
   statistics: GaugeEmblem,

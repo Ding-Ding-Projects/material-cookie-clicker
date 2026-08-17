@@ -2192,6 +2192,175 @@ body {
 }
 
 /* ---------------------------------------------------------------------------------------- *
+ * The advanced regex builder: the composer shelves, the live lab and the pattern history.
+ * All of it lives INSIDE .regex-popover, so nothing here reaches the rail or the shelves.
+ * The popover is taller than it was, so it caps its own height and scrolls internally rather
+ * than growing off the bottom of a short window.
+ * ---------------------------------------------------------------------------------------- */
+.regex-popover {
+  width: 380px;
+  max-height: min(70vh, 560px);
+  overflow-y: auto;
+}
+
+.regex-token-list__heading {
+  flex: 1 0 100%;
+  font-size: 10px;
+  font-weight: 700;
+  letter-spacing: 0.06em;
+  text-transform: uppercase;
+  opacity: 0.72;
+}
+
+.regex-composers {
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+  padding: 10px;
+  border: 1px solid var(--outline);
+  border-radius: var(--shape-small);
+}
+
+.regex-composer {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 6px;
+  align-items: center;
+}
+
+.regex-composer label {
+  flex: 1 0 100%;
+  margin-bottom: 0;
+}
+
+.regex-composer input[type='text'] {
+  flex: 1 1 120px;
+  width: auto;
+}
+
+.regex-composer button {
+  font: inherit;
+  font-size: 11px;
+  min-height: 28px;
+  padding: 0 10px;
+  border-radius: var(--shape-full);
+  border: 1px solid var(--outline);
+  background: var(--surface);
+  color: var(--on-surface);
+  cursor: pointer;
+}
+
+.regex-composer button:focus-visible,
+.regex-history button:focus-visible,
+.regex-lab textarea:focus-visible {
+  outline: 3px solid var(--primary);
+  outline-offset: 2px;
+}
+
+.regex-composer__error {
+  margin: 0;
+  font-size: 11px;
+  color: var(--error, #b3261e);
+}
+
+.regex-lab {
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+  padding: 10px;
+  border: 1px solid var(--outline);
+  border-radius: var(--shape-small);
+}
+
+.regex-lab__sample {
+  width: 100%;
+  border-radius: var(--shape-small);
+  border: 1px solid var(--outline);
+  padding: 6px 8px;
+  font: inherit;
+  font-size: 12px;
+  background: var(--surface);
+  color: var(--on-surface);
+  resize: vertical;
+}
+
+.regex-lab__highlight {
+  margin: 0;
+  font-size: 12px;
+  font-family: ui-monospace, 'Cascadia Mono', Consolas, monospace;
+  white-space: pre-wrap;
+  word-break: break-word;
+  max-height: 96px;
+  overflow-y: auto;
+  background: var(--surface);
+  border-radius: var(--shape-small);
+  padding: 6px 8px;
+  min-height: 20px;
+}
+
+.regex-lab__highlight mark {
+  background: var(--primary);
+  color: var(--on-primary);
+  border-radius: 3px;
+}
+
+.regex-lab__summary,
+.regex-lab__explain {
+  margin: 0;
+  font-size: 11px;
+}
+
+.regex-lab__explain {
+  opacity: 0.85;
+}
+
+.regex-lab__captures {
+  width: 100%;
+  border-collapse: collapse;
+  font-size: 11px;
+}
+
+.regex-lab__captures caption {
+  text-align: left;
+  font-weight: 700;
+  font-size: 10px;
+  letter-spacing: 0.06em;
+  text-transform: uppercase;
+  opacity: 0.72;
+  padding-bottom: 4px;
+}
+
+.regex-lab__captures th,
+.regex-lab__captures td {
+  border-bottom: 1px solid var(--outline);
+  padding: 3px 4px;
+  text-align: left;
+}
+
+.regex-history {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 6px;
+}
+
+.regex-history button {
+  font: inherit;
+  font-size: 11px;
+  font-family: ui-monospace, 'Cascadia Mono', Consolas, monospace;
+  min-height: 26px;
+  max-width: 100%;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+  padding: 0 8px;
+  border-radius: var(--shape-full);
+  border: 1px dashed var(--outline);
+  background: var(--surface);
+  color: var(--on-surface);
+  cursor: pointer;
+}
+
+/* ---------------------------------------------------------------------------------------- *
  * Bulk-action toolbar (design/bulk-toolbar.html).
  * ---------------------------------------------------------------------------------------- */
 .bulk-toolbar {

@@ -49,7 +49,7 @@ X yet", that is this contract being eroded.
 
 | Thing | Evidence |
 | --- | --- |
-| Project test suite | **26 files, 590 tests, all passing** (`npx vitest run tests`) |
+| Project test suite | **27 files, 626 tests, all passing** (`npx vitest run tests`) |
 | `packages/surface-kernel` | **89 tests passing** (`npm test` in that package) |
 | `packages/local-ollama` | **37 tests passing** — previously unverifiable, now green once the workspace was wired |
 | Smoke test | **7/7** (`npm run smoke`) |

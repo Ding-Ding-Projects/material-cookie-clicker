@@ -2,6 +2,7 @@ import type { BigNum } from "./big-number.js";
 import {
   grantedRungIdsForMigration,
   grantedRungIdsForV7Migration,
+  grantedRungIdsForV8Migration,
   MIGRATION_GRANT_LIFETIME_THRESHOLD,
 } from "./control-unlocks.js";
 import { SAVE_SCHEMA_VERSION } from "./save-schema.js";
@@ -210,6 +211,46 @@ function migrateV6ToV7(input: Record<string, unknown>): Record<string, unknown> 
   };
 }
 
+/**
+ * Version 7 -> 8: grants the first advanced regex rung, and nothing else.
+ *
+ * The owner's decree that the regex builder be "more advanced and purchased, upgradable" added
+ * a SHARED `regex` ladder (control-unlocks.ts) whose two rungs are new capabilities. A save that
+ * had bought a surface's token palette owned what was then the whole builder, and this release
+ * moved the top of that ladder — so `regex.groups` is granted to a save past the same threshold,
+ * and the 12,000-cookie live lab is bought by everybody. The full argument, including why the lab
+ * is deliberately excluded, is on `V8_GRANDFATHERED_RUNG_IDS`.
+ *
+ * Mechanically this is the version-7 step with a different frozen list: same defensive BigNum
+ * read of the lifetime figure, same appending to whatever the save already carries, same filter
+ * so a hand-edited file cannot end up with a duplicate, and no chaining of the earlier grants.
+ */
+function migrateV7ToV8(input: Record<string, unknown>): Record<string, unknown> {
+  const raw = input.lifetimeCookies;
+  let lifetime: BigNum = { mantissa: 0, exponent: 0 };
+  if (raw && typeof raw === "object") {
+    const pair = raw as { mantissa?: unknown; exponent?: unknown };
+    if (typeof pair.mantissa === "number" && typeof pair.exponent === "number") {
+      lifetime = { mantissa: pair.mantissa, exponent: pair.exponent };
+    }
+  }
+
+  const existing = input.controlUnlocks;
+  let owned: string[] = [];
+  if (existing && typeof existing === "object") {
+    const list = (existing as { purchasedRungIds?: unknown }).purchasedRungIds;
+    if (Array.isArray(list)) owned = list.filter((id): id is string => typeof id === "string");
+  }
+
+  const granted = grantedRungIdsForV8Migration(lifetime).filter((id) => !owned.includes(id));
+
+  return {
+    ...input,
+    schemaVersion: 8,
+    controlUnlocks: { purchasedRungIds: [...owned, ...granted] },
+  };
+}
+
 /** Ordered forward-only migrations, indexed by the version they migrate FROM. */
 export const MIGRATIONS: Readonly<Record<number, MigrationStep>> = {
   1: migrateV1ToV2,
@@ -218,6 +259,7 @@ export const MIGRATIONS: Readonly<Record<number, MigrationStep>> = {
   4: migrateV4ToV5,
   5: migrateV5ToV6,
   6: migrateV6ToV7,
+  7: migrateV7ToV8,
 };
 
 export { MIGRATION_GRANT_LIFETIME_THRESHOLD };

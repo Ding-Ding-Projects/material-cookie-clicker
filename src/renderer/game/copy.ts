@@ -919,6 +919,8 @@ export const CONTROL_COPY = {
   groupChrome: { en: "The window itself", yue: "個窗本身" },
   groupSettings: { en: "Settings entries", yue: "設定項目" },
   groupSearch: { en: "Search fields", yue: "搜尋欄" },
+  /** One shared ladder rather than four, so it gets its own catalogue heading. */
+  groupRegex: { en: "The advanced regex builder", yue: "進階規則運算式產生器" },
   groupStepper: { en: "Buy quantity", yue: "購買數量" },
   groupBulk: { en: "Bulk actions", yue: "批量操作" },
   groupToggle: { en: "Feature switches", yue: "功能開關" },

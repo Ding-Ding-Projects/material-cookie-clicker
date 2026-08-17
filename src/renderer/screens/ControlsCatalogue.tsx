@@ -30,12 +30,13 @@ import { matchesSearch } from '../game/local-regex-search.js';
  * that it is an exception.
  */
 
-const GROUP_ORDER: readonly ControlGroup[] = ['chrome', 'settings', 'search', 'stepper', 'bulk', 'toggle'];
+const GROUP_ORDER: readonly ControlGroup[] = ['chrome', 'settings', 'search', 'regex', 'stepper', 'bulk', 'toggle'];
 
 const GROUP_HEADINGS: Readonly<Record<ControlGroup, { en: string; yue: string }>> = {
   chrome: CONTROL_COPY.groupChrome,
   settings: CONTROL_COPY.groupSettings,
   search: CONTROL_COPY.groupSearch,
+  regex: CONTROL_COPY.groupRegex,
   stepper: CONTROL_COPY.groupStepper,
   bulk: CONTROL_COPY.groupBulk,
   toggle: CONTROL_COPY.groupToggle,

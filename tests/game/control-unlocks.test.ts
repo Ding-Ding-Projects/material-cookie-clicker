@@ -287,6 +287,23 @@ describe("control-unlocks: the confirmation threshold", () => {
     expect(needsPurchaseConfirmation(withCookies(0), "chrome.drag")).toBe(true);
   });
 
+  it("never interrupts a late-game balance that has overflowed a double", () => {
+    // Past 1e308 the balance reads as Infinity through `bnToNumber`. That is a very large jar,
+    // not an unreadable one, and one per cent of it clears every price in the table — so the
+    // idle player buying a 10-cookie drag handle is not stopped and asked about it.
+    const astronomical = freshState({ cookies: { mantissa: 3.5, exponent: 400 } });
+    expect(bnToNumber(astronomical.cookies)).toBe(Number.POSITIVE_INFINITY);
+    for (const rungId of ["chrome.drag", "stepper.max", "search.tools.tokens"]) {
+      expect(needsPurchaseConfirmation(astronomical, rungId)).toBe(false);
+    }
+  });
+
+  it("still asks when the balance is genuinely unreadable", () => {
+    expect(needsPurchaseConfirmation(freshState({ cookies: { mantissa: Number.NaN, exponent: 3 } }), "chrome.drag")).toBe(
+      true,
+    );
+  });
+
   it("keeps the documented fraction at one percent", () => {
     expect(CONTROL_CONFIRM_BALANCE_FRACTION).toBe(0.01);
   });
@@ -354,7 +371,33 @@ describe("control-unlocks: the migration policy", () => {
 
   it("grants nothing for a nonsense lifetime figure", () => {
     expect(grantedRungIdsForMigration(Number.NaN)).toEqual([]);
-    expect(grantedRungIdsForMigration(Number.POSITIVE_INFINITY)).toEqual([]);
+    expect(grantedRungIdsForMigration({ mantissa: Number.NaN, exponent: 12 })).toEqual([]);
+  });
+
+  it("grants an astronomically large save the whole table rather than nothing", () => {
+    // A 1e400-scale lifetime total is what a deep idle save actually looks like, and it does not
+    // survive `bnToNumber` — it overflows to Infinity. Infinity is above the threshold, not
+    // unreadable, and the grandfather clause exists for exactly this player.
+    const astronomical = { mantissa: 1.234, exponent: 400 };
+    expect(bnToNumber(astronomical)).toBe(Number.POSITIVE_INFINITY);
+    expect(grantedRungIdsForMigration(astronomical)).toEqual(V6_GRANDFATHERED_RUNG_IDS);
+    expect(grantedRungIdsForMigration(Number.POSITIVE_INFINITY)).toEqual(V6_GRANDFATHERED_RUNG_IDS);
+  });
+
+  it("carries that through the real v5 → v6 migration, so a maxed save keeps its controls", () => {
+    const migrated = migrateToLatest(
+      { schemaVersion: 5, lifetimeCookies: { mantissa: 4.2, exponent: 400 } },
+      5,
+    );
+    expect(migrated.finalVersion).toBeGreaterThanOrEqual(6);
+    expect((migrated.data.controlUnlocks as { purchasedRungIds: string[] }).purchasedRungIds).toEqual([
+      ...V6_GRANDFATHERED_RUNG_IDS,
+    ]);
+  });
+
+  it("still grants a tiny save nothing when it goes through the same migration", () => {
+    const migrated = migrateToLatest({ schemaVersion: 5, lifetimeCookies: { mantissa: 5, exponent: 1 } }, 5);
+    expect((migrated.data.controlUnlocks as { purchasedRungIds: string[] }).purchasedRungIds).toEqual([]);
   });
 
   it("keeps the frozen list a real subset of the live registry", () => {

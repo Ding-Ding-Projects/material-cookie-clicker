@@ -709,9 +709,15 @@ export function computeMultipliers(state: GameState): DerivedMultipliers {
   globalCpsMultiplier *= reborn.globalCpsMultiplier;
 
   // THE HOUSE (home-construction.ts). Folded in here, at the one derivation seam, rather than
-  // anywhere near the CPS pipeline itself — so the coziness curve is applied exactly once, to
-  // clicks and production alike, and offline progress gets it for free because offline progress
-  // already goes through this function. A save with no house multiplies by exactly 1.
+  // anywhere near the CPS pipeline itself — so each of the house's two bonuses is applied
+  // exactly once, and offline progress gets them for free because offline progress already goes
+  // through this function. A save with no house multiplies by exactly 1.
+  //
+  // The two are NOT the same bonus wearing two hats. `clickMultiplier` is the four furniture
+  // click bonuses and nothing else; the COZINESS CURVE is production-only and reaches only
+  // `globalCpsMultiplier`. That is the economy home-construction.ts documents and derives its
+  // ×1.5108 / ×1.1922 ceilings from — a click share of the curve would make those figures wrong
+  // — so anything tuning the house should read that file's note before moving the curve.
   const home = computeHomeBonuses(state.homeConstruction ?? createInitialHomeState());
   clickMultiplier *= home.clickMultiplier;
   globalCpsMultiplier *= home.globalCpsMultiplier;

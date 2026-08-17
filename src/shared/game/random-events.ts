@@ -1,6 +1,6 @@
 /* ------------------------------------------------------------------------------------------
- * Random events: a scheduler and a pool of six events that interrupt an ordinary session at
- * random-but-bounded intervals.
+ * Random events: a scheduler and a pool of sixteen events that interrupt an ordinary session at
+ * random-but-bounded intervals, plus the Mouse Raid on its own hourly clock.
  *
  * This module is the SECOND random-event system in the game and it deliberately does not
  * replace the first. golden-cookie.ts owns the golden cookie — one overlay, three effects, its
@@ -43,6 +43,7 @@ import { z } from "zod";
 
 import { bnAdd, bnCompare, bnFromNumber, bnMulScalar, type BigNum } from "./big-number.js";
 import { totalCps } from "./cps.js";
+import { isEffectActive } from "./golden-cookie.js";
 import { computeMultipliers } from "./upgrades.js";
 import type { GameState, RngPort } from "./types.js";
 
@@ -464,11 +465,17 @@ export const RANDOM_EVENT_DEFINITIONS: readonly RandomEventDefinition[] = [
    *   - SERVE IT NOW  — a lump sum, right now, `tasteTestServeCpsSeconds` of production.
    *   - SEND IT BACK  — nothing now, and `TASTE_TEST_BUFF_MS` at ×`TASTE_TEST_BUFF_MULTIPLIER`.
    *
-   * The two are tuned to be worth roughly the same in a vacuum (five minutes of production
-   * either way), so the choice is genuinely about circumstance rather than about which button is
-   * secretly correct: the lump is better if you are about to buy something, the buff is better if
-   * you are about to sit and watch, and it is strictly better if a frenzy is already running,
-   * because it multiplies into that stack and a lump sum does not.
+   * The two are tuned to be worth the same in a vacuum — five minutes of production either way —
+   * so the choice is genuinely about circumstance rather than about which button is secretly
+   * correct: the lump is better if you are about to buy something, the buff is better if you are
+   * about to sit and watch, and it is strictly better if a frenzy is already running, because it
+   * multiplies into that stack and a lump sum does not.
+   *
+   * THE PARITY IS INCREMENTAL, which is why the multiplier is ×6 and not ×5. A minute at ×N is
+   * worth (N − 1) minutes of EXTRA production, because the baseline minute would have been
+   * produced anyway. At ×5 the buff was +240 seconds against the lump's 300, so "serve" was the
+   * arithmetically correct answer in a vacuum and the question had a hidden right button after
+   * all. Sixty seconds at ×6 is +300, which is the lump exactly.
    *
    * Letting the window run out chooses neither and pays nothing. That is stated in the copy and
    * on the site rather than being a trap: an event that made indecision the best option would
@@ -591,9 +598,15 @@ export const COMBO_EXTEND_MS = 400;
 /** The most a Combo Window can ever last, measured from the instant it spawned. */
 export const COMBO_MAX_DURATION_MS = 30_000;
 
-/** How long the Taste Test's "send it back" buff runs, and what it multiplies production by. */
+/**
+ * How long the Taste Test's "send it back" buff runs, and what it multiplies production by.
+ *
+ * ×6 for sixty seconds is +300 seconds of production over the baseline that would have accrued
+ * anyway, which is `tasteTestServeCpsSeconds` exactly — the parity the event's design note
+ * promises, measured the way a player actually experiences it.
+ */
 export const TASTE_TEST_BUFF_MS = 60_000;
-export const TASTE_TEST_BUFF_MULTIPLIER = 5;
+export const TASTE_TEST_BUFF_MULTIPLIER = 6;
 
 /** The Taste Test's two answers. Anything else is refused by the domain. */
 export type RandomEventChoiceId = "serve" | "send_back";
@@ -657,7 +670,23 @@ export interface RandomEventPayoutConfig {
   readonly rainDropCpsSeconds: number;
   /** Clicks' worth of value each caught rain drop is ALSO worth, so rain pays on a fresh save. */
   readonly rainDropClicks: number;
-  /** Seconds of current production Grandma's batch pays instantly. */
+  /**
+   * Seconds of current production Grandma's batch pays instantly.
+   *
+   * SIZED AGAINST ITS OWN DRAW RATE, like every other number in this file. At weight 10 it is
+   * the common filler boon, and a common boon has to pay less per draw than a rare one or the
+   * pool's reward curve runs backwards. The comparison that decides it is the Production Frenzy,
+   * the event this file calls the pool's headline: weight 4, ×7 for 77s, worth +462 seconds of
+   * standing production, so 18.5 seconds per draw. Grandma at 150 is 15 seconds per draw — above
+   * a Lucky Crumb's 10.8 (weight 12, 90s) and below the headline, which is the order a player
+   * would guess from how often they see each one.
+   *
+   * It was 600 when this pool shipped, which was 60 seconds per draw: three times the headline
+   * frenzy's expectation, and about the same as the once-every-fifteen-hours Burnt Batch Frenzy.
+   * That was not a tuning choice with a reason behind it — it was the one payout in this config
+   * with no note explaining its size, and it made the rarest events in the game feel like nothing
+   * much when they finally arrived.
+   */
   readonly grandmasBatchCpsSeconds: number;
   /** Seconds of current production a Lucky Crumb pays instantly. */
   readonly luckyCrumbCpsSeconds: number;
@@ -689,6 +718,13 @@ export interface RandomEventPayoutConfig {
    * seconds' worth of production; the rebound pays forty-five, so sitting through the shortage
    * is worth thirty seconds of production rather than being a wash. A setback whose compensation
    * exactly cancelled it would be a thirty-second animation with no consequence either way.
+   *
+   * BOTH HALVES ARE MEASURED AT THE SAME RATE, which is what makes that arithmetic true rather
+   * than true-on-a-quiet-save. The dip multiplies LIVE production, so during a golden frenzy it
+   * costs fifteen frenzy-scaled seconds; the rebound is therefore paid at the highest live
+   * multiplier the shortage ran under (`ActiveRandomEvent.peakLiveCpsMultiplier`), not at the
+   * standing rate. Without that the shortage was a net loss of sixty standing seconds under a
+   * ×7 frenzy — the one moment its own copy is loudest about being worth sitting through.
    */
   readonly flourShortageReboundCpsSeconds: number;
   /** Seconds of production the FIRST sprinkle of a storm is worth. */
@@ -702,7 +738,7 @@ export interface RandomEventPayoutConfig {
 export const DEFAULT_RANDOM_EVENT_PAYOUTS: RandomEventPayoutConfig = {
   rainDropCpsSeconds: 20,
   rainDropClicks: 15,
-  grandmasBatchCpsSeconds: 600,
+  grandmasBatchCpsSeconds: 150,
   luckyCrumbCpsSeconds: 90,
   luckyCrumbFlatCookies: 25,
   raidDefendedCpsSeconds: 120,
@@ -1153,6 +1189,20 @@ export interface ActiveRandomEvent {
    * cannot outlive the slot, cannot stack with itself, and is saved and restored for free.
    */
   readonly choiceTaken?: RandomEventChoiceId;
+  /**
+   * The largest GOLDEN-COOKIE production multiplier seen while this event has been on screen.
+   *
+   * Written only for the Flour Shortage, and it is what makes that event's stated guarantee —
+   * "sitting through it leaves you ahead" — true rather than nearly true. The dip is a
+   * multiplier on live production, so a shortage that overlaps a golden frenzy costs the player
+   * frenzy-scaled seconds; a rebound paid at the standing rate would then be a net LOSS,
+   * precisely when a player is most likely to be watching the counter. Paying the rebound at
+   * the same peak the dip was suffering keeps the loss and the compensation on the same scale.
+   *
+   * Absent on every other event and on any shortage saved by a build before this field existed;
+   * both read as "no frenzy seen", which is the ordinary case and pays exactly as before.
+   */
+  readonly peakLiveCpsMultiplier?: number;
 }
 
 export interface ResolvedRandomEvent {
@@ -1241,7 +1291,27 @@ export function createInitialRandomEventsState(): RandomEventsState {
  * disk, defaulted on read, and a save written by this build still loads in a build without it
  * (the unknown key is ignored). save-codec.ts calls the two functions below and nothing else
  * knows this state is stored at all.
+ *
+ * WHAT THAT TOLERANCE USED TO COST, AND WHY THERE IS A VERSION NOW. The id list below is a
+ * CLOSED enum, and this design explicitly invites a later build to add a seventeenth event
+ * without touching the save's schema version. The first save written by such a build and then
+ * opened by this one carries an id this enum rejects, the whole block fails to parse — and the
+ * old all-or-nothing decode threw the entire sidecar away. Losing a schedule and a
+ * half-finished event is genuinely fine; they were going to expire anyway. Losing the
+ * CONSUMABLES is not: Whack Passes are bought with cookies and are the only durable, paid thing
+ * stored here. So the sidecar now carries its own version number, and the decode salvages in
+ * layers rather than all-or-nothing (see `decodeRandomEvents`).
  */
+
+/**
+ * The sidecar's own version, independent of the save's `schemaVersion`.
+ *
+ * It is written on every save and defaulted to 1 when absent, so a save from before this field
+ * existed reads as version 1 and needs no migration. Its job is not to gate parsing — the
+ * salvage below does that — it is so a build reading a sidecar from the FUTURE can say so
+ * precisely instead of guessing from a parse failure.
+ */
+export const RANDOM_EVENTS_SIDECAR_VERSION = 1;
 const RandomEventIdSchema = z.enum([
   "cookie_rain",
   "grandmas_batch",
@@ -1299,9 +1369,12 @@ const ActiveRandomEventSchema = z.object({
   startingShare: z.number().optional(),
   armed: z.array(RaidConsumableIdSchema).optional(),
   choiceTaken: z.enum(["serve", "send_back"]).optional(),
+  peakLiveCpsMultiplier: z.number().positive().optional(),
 });
 
 export const RandomEventsStateSchema = z.object({
+  /* Absent in every sidecar written before this field existed, which is exactly version 1. */
+  sidecarVersion: z.number().int().positive().default(RANDOM_EVENTS_SIDECAR_VERSION),
   active: ActiveRandomEventSchema.nullable(),
   nextEligibleAtEpochMs: z.number(),
   rngStreamIndex: z.number().int().nonnegative(),
@@ -1343,6 +1416,7 @@ export type RandomEventsSaveData = z.infer<typeof RandomEventsStateSchema>;
 
 export function encodeRandomEvents(state: RandomEventsState): RandomEventsSaveData {
   return {
+    sidecarVersion: RANDOM_EVENTS_SIDECAR_VERSION,
     active: state.active
       ? {
           ...state.active,
@@ -1350,6 +1424,7 @@ export function encodeRandomEvents(state: RandomEventsState): RandomEventsSaveDa
           mice: state.active.mice ? state.active.mice.map((mouse) => ({ ...mouse })) : undefined,
           armed: state.active.armed ? [...state.active.armed] : undefined,
           choiceTaken: state.active.choiceTaken,
+          peakLiveCpsMultiplier: state.active.peakLiveCpsMultiplier,
         }
       : null,
     nextEligibleAtEpochMs: state.nextEligibleAtEpochMs,
@@ -1378,12 +1453,65 @@ export function encodeRandomEvents(state: RandomEventsState): RandomEventsSaveDa
  * Reads the field back off raw save data. Anything unreadable — absent, wrong shape, written by
  * a build that stored something else here — becomes a fresh scheduler rather than an error,
  * because a save is never worth refusing over an event that was going to expire anyway.
+ *
+ * IT SALVAGES IN THREE LAYERS, cheapest first, and the order is the point:
+ *
+ *   1. The whole block parses. Nothing to salvage; this is every ordinary load.
+ *   2. It does not, but it becomes parseable once an UNRECOGNISED EVENT ID is dropped. That is
+ *      the expected shape of a sidecar written by a later build that added an event without
+ *      bumping anything — the id it names is a real event, just not one this build knows. The
+ *      event and the "last resolved" note are dropped (this build cannot render an event it
+ *      has no definition for) and everything else survives intact: consumables, both schedules,
+ *      the raid history, the counters.
+ *   3. It still does not parse. Then the schedule is genuinely lost — but the CONSUMABLES are
+ *      pulled out on their own if they can be read at all, because those were bought with
+ *      cookies. A schedule regenerates on the next tick; a Whack Pass does not.
+ *
+ * The rule behind all three: this function may throw away state the game can rebuild, and may
+ * never silently throw away something the player paid for.
  */
+/**
+ * Drops the wire-only version field. It is a fact about the FILE, not about the scheduler, and
+ * keeping it out of the runtime state means nothing downstream can start branching on it.
+ */
+function withoutSidecarVersion(data: RandomEventsSaveData): RandomEventsState {
+  const { sidecarVersion: _version, ...state } = data;
+  return state;
+}
+
 export function decodeRandomEvents(raw: unknown): RandomEventsState {
   if (raw === undefined || raw === null) return createInitialRandomEventsState();
+
   const parsed = RandomEventsStateSchema.safeParse(raw);
-  if (!parsed.success) return createInitialRandomEventsState();
-  return parsed.data;
+  if (parsed.success) return withoutSidecarVersion(parsed.data);
+
+  if (typeof raw === "object") {
+    const record = raw as Record<string, unknown>;
+
+    const withoutUnknownIds = { ...record };
+    let droppedAnId = false;
+    for (const key of ["active", "lastResolved"] as const) {
+      const value = record[key];
+      if (value && typeof value === "object") {
+        const id = (value as { id?: unknown }).id;
+        if (typeof id === "string" && !RandomEventIdSchema.safeParse(id).success) {
+          withoutUnknownIds[key] = null;
+          droppedAnId = true;
+        }
+      }
+    }
+    if (droppedAnId) {
+      const retried = RandomEventsStateSchema.safeParse(withoutUnknownIds);
+      if (retried.success) return withoutSidecarVersion(retried.data);
+    }
+
+    const consumables = RaidConsumablesSchema.safeParse(record.consumables);
+    if (consumables.success) {
+      return { ...createInitialRandomEventsState(), consumables: consumables.data };
+    }
+  }
+
+  return createInitialRandomEventsState();
 }
 
 /* --------------------------------------------------------------------- the scheduler */
@@ -1493,6 +1621,38 @@ export function mouseRaidDefenceReward(
     bnMulScalar(totalCps(gameState), payouts.raidDefendedCpsSeconds),
     bnFromNumber(payouts.raidDefendedFlatCookies),
   );
+}
+
+/**
+ * The golden cookie's production multiplier at this instant, 1 when no frenzy is live.
+ *
+ * Read here rather than through `effective-cps.ts` because that module composes the golden
+ * effect WITH this one's, and what the Flour Shortage needs is the other factor on its own: the
+ * rate the dip was applied on top of. `isEffectActive` is imported so the moment an effect stops
+ * counting is decided in exactly one place.
+ */
+function liveGoldenCpsMultiplier(gameState: GameState, nowEpochMs: number): number {
+  const effect = gameState.goldenCookie.activeEffect;
+  if (!effect || effect.kind !== "frenzy" || effect.multiplier === undefined) return 1;
+  return isEffectActive(effect, nowEpochMs) ? effect.multiplier : 1;
+}
+
+/**
+ * Records the biggest golden multiplier the active Flour Shortage has seen, returning the SAME
+ * state object whenever there is nothing new to record — which is every tick of every other
+ * event, and most ticks of this one.
+ */
+function withPeakMultiplier(
+  state: RandomEventsState,
+  gameState: GameState,
+  nowEpochMs: number,
+): RandomEventsState {
+  const active = state.active;
+  if (!active || active.id !== "flour_shortage") return state;
+  const live = liveGoldenCpsMultiplier(gameState, nowEpochMs);
+  const peak = active.peakLiveCpsMultiplier ?? 1;
+  if (live <= peak) return state;
+  return { ...state, active: { ...active, peakLiveCpsMultiplier: live } };
 }
 
 export interface RandomEventTickResult {
@@ -1621,14 +1781,25 @@ export function tickRandomEvents(
       // The Flour Shortage is the one event that PAYS on expiry: the late lorry arrives the
       // moment the window closes. Everything else expires paying nothing, and `expiryPayout`
       // returns zero for them.
-      instantBonus: expiryPayout(expired.id, gameState, config.payouts),
+      instantBonus: expiryPayout(
+        expired.id,
+        gameState,
+        config.payouts,
+        Math.max(expired.peakLiveCpsMultiplier ?? 1, liveGoldenCpsMultiplier(gameState, nowEpochMs)),
+      ),
       raidTheft: null,
     };
   }
 
   // 2 and 3 — no overlap, and not over a golden cookie. Both rules live on the ACTIVE SLOT, so
   // the raid inherits them for free by taking that same slot.
-  if (state.active !== null) return quiet;
+  if (state.active !== null) {
+    // The one thing a tick does to an event still running: remember the biggest golden frenzy
+    // the Flour Shortage has had to live through, so its rebound can be paid at that rate. Any
+    // other event, and any tick that sees nothing new, returns the state object untouched.
+    const tracked = withPeakMultiplier(state, gameState, nowEpochMs);
+    return tracked === state ? quiet : { randomEvents: tracked, instantBonus: zero, raidTheft: null };
+  }
   if (options.blocked) return quiet;
 
   // 4 — the raid's own clock, checked before the pool's so that on the rare tick where both are
@@ -1766,9 +1937,16 @@ export function expiryPayout(
   id: RandomEventId,
   gameState: GameState,
   payouts: RandomEventPayoutConfig = DEFAULT_RANDOM_EVENT_PAYOUTS,
+  /**
+   * The highest live production multiplier the event ran under, 1 for an ordinary window. The
+   * Flour Shortage's rebound is scaled by it so the compensation is measured at the same rate
+   * the dip was measured at; see `flourShortageReboundCpsSeconds`.
+   */
+  peakLiveCpsMultiplier = 1,
 ): BigNum {
   if (id !== "flour_shortage") return bnFromNumber(0);
-  return bnMulScalar(totalCps(gameState), payouts.flourShortageReboundCpsSeconds);
+  const scale = Number.isFinite(peakLiveCpsMultiplier) ? Math.max(1, peakLiveCpsMultiplier) : 1;
+  return bnMulScalar(totalCps(gameState), payouts.flourShortageReboundCpsSeconds * scale);
 }
 
 /** What the Taste Test's "serve it now" answer pays, at the instant it is pressed. */

@@ -163,12 +163,12 @@ export const EVENT_EXTRA_COPY = {
     en: `Serve it now — ${amount} cookies straight away`,
     yue: `即刻賣咗佢——即時攞 ${amount} 粒曲奇`,
   }),
-  chooseSendBack: { en: "Send it back — production ×5 for a minute", yue: "退返轉頭——一分鐘產量 ×5" },
+  chooseSendBack: { en: "Send it back — production ×6 for a minute", yue: "退返轉頭——一分鐘產量 ×6" },
   chooseNote: {
     en: "Worth about the same either way. Let the clock run out and you get neither.",
     yue: "兩邊價值差唔多。等到時間過晒就兩樣都冇。",
   },
-  buffRunning: { en: "The better tray is out — production ×5.", yue: "好嗰盤出爐喇——產量 ×5。" },
+  buffRunning: { en: "The better tray is out — production ×6.", yue: "好嗰盤出爐喇——產量 ×6。" },
   comboNote: { en: "Every click keeps the window open longer.", yue: "每撳一下，個窗口就開耐啲。" },
   clotNote: {
     en: "Production is halved until it clears. There is no button for this one — wait it out.",

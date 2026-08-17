@@ -1,4 +1,4 @@
-import { bnToNumber } from "./big-number.js";
+import type { BigNum } from "./big-number.js";
 import { grantedRungIdsForMigration, MIGRATION_GRANT_LIFETIME_THRESHOLD } from "./control-unlocks.js";
 import { SAVE_SCHEMA_VERSION } from "./save-schema.js";
 
@@ -135,14 +135,18 @@ function migrateV4ToV5(input: Record<string, unknown>): Record<string, unknown> 
  *
  * The lifetime figure is read defensively — a big-number pair off disk that is missing or
  * malformed reads as zero, and zero grants nothing, which is the safe direction to fail in.
+ * It is handed to the policy as a BigNum PAIR rather than as a plain number: a deep late-game
+ * lifetime total is past 1e308 and does not survive the conversion to a double, and a save that
+ * big is the most-played save there is, not a corrupt one. Comparing the pair is what keeps it
+ * on the granting side of the threshold.
  */
 function migrateV5ToV6(input: Record<string, unknown>): Record<string, unknown> {
   const raw = input.lifetimeCookies;
-  let lifetime = 0;
+  let lifetime: BigNum = { mantissa: 0, exponent: 0 };
   if (raw && typeof raw === "object") {
     const pair = raw as { mantissa?: unknown; exponent?: unknown };
     if (typeof pair.mantissa === "number" && typeof pair.exponent === "number") {
-      lifetime = bnToNumber({ mantissa: pair.mantissa, exponent: pair.exponent });
+      lifetime = { mantissa: pair.mantissa, exponent: pair.exponent };
     }
   }
 

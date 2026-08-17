@@ -549,12 +549,21 @@ export function canBuyControlRung(state: GameState, rungId: string): boolean {
  */
 export const CONTROL_CONFIRM_BALANCE_FRACTION = 0.01;
 
-/** Whether pressing this rung's plate should ask first. Also true when it is unaffordable. */
+/**
+ * Whether pressing this rung's plate should ask first. Also true when it is unaffordable.
+ *
+ * The balance is read through `bnToNumber`, which OVERFLOWS TO INFINITY once an idle save gets
+ * past 1e308 — a magnitude BigNum exists precisely to represent. Infinity is not a malformed
+ * balance, it is a very large one, and one per cent of it is larger than every price in this
+ * table, so it takes the same branch a rich finite balance does: no confirmation. Only a
+ * balance that is genuinely unreadable (NaN) or actually empty asks first.
+ */
 export function needsPurchaseConfirmation(state: GameState, rungId: string): boolean {
   const found = RUNG_INDEX.get(rungId);
   if (!found) return false;
   const balance = bnToNumber(state.cookies);
-  if (!Number.isFinite(balance) || balance <= 0) return true;
+  if (Number.isNaN(balance) || balance <= 0) return true;
+  if (balance === Number.POSITIVE_INFINITY) return false;
   return found.rung.price > balance * CONTROL_CONFIRM_BALANCE_FRACTION;
 }
 
@@ -635,8 +644,23 @@ export const V6_GRANDFATHERED_RUNG_IDS: readonly string[] = [
  * What a save carrying `lifetimeCookies` should be given when it crosses into schema version 6.
  * Pure and exported so `tests/game/control-unlocks.test.ts` can assert the policy directly
  * rather than through a decoded save file.
+ *
+ * IT TAKES A BigNum OR A PLAIN NUMBER, and the BigNum form is the one the migration uses. A
+ * lifetime total is an economy value, and an economy value past 1e308 does not survive
+ * `bnToNumber` — it overflows to Infinity. That overflow used to be read as "malformed, grant
+ * nothing", which denied the grandfather clause to exactly the deepest, longest-played saves it
+ * exists to protect: a maxed-out save woke up unable to drag its own window. Infinity is
+ * provably ABOVE the threshold, never below it, so a comparison is the right instrument and
+ * `bnCompare` does it without ever converting. NaN is the one genuinely unreadable value, and
+ * it still grants nothing, which is the safe direction to fail in.
  */
-export function grantedRungIdsForMigration(lifetimeCookies: number): readonly string[] {
-  if (!Number.isFinite(lifetimeCookies)) return [];
-  return lifetimeCookies > MIGRATION_GRANT_LIFETIME_THRESHOLD ? V6_GRANDFATHERED_RUNG_IDS : [];
+export function grantedRungIdsForMigration(lifetimeCookies: number | BigNum): readonly string[] {
+  const threshold = bnFromNumber(MIGRATION_GRANT_LIFETIME_THRESHOLD);
+  if (typeof lifetimeCookies === "number") {
+    if (Number.isNaN(lifetimeCookies)) return [];
+    if (lifetimeCookies === Number.POSITIVE_INFINITY) return V6_GRANDFATHERED_RUNG_IDS;
+    return lifetimeCookies > MIGRATION_GRANT_LIFETIME_THRESHOLD ? V6_GRANDFATHERED_RUNG_IDS : [];
+  }
+  if (!Number.isFinite(lifetimeCookies.mantissa) || !Number.isFinite(lifetimeCookies.exponent)) return [];
+  return bnCompare(lifetimeCookies, threshold) > 0 ? V6_GRANDFATHERED_RUNG_IDS : [];
 }

@@ -560,11 +560,15 @@ function handleSetToolProgression(state: GameState, enabled: boolean): GameState
  * All of it runs off the SAME `elapsedMs` and the same `nowMs`, so a paused game pauses every
  * economy together and none of them can drift apart from the others.
  *
- * The order between 3 and 6 is chosen for readability rather than forced by data: the theft
- * belongs next to the event result it comes out of; production reads no cookies and the theft
- * reads no litres and neither reads a room, so no two of these can observe each other's
- * half-finished state. Achievements are genuinely last, because they must see the finished tick
- * and not a room that is about to be built.
+ * THE ORDER OF 3 TO 6 IS FORCED BY DATA, and reordering them would silently change payouts.
+ * Every event payout in random-events.ts is derived from `totalCps`, which folds in the home's
+ * coziness through `computeMultipliers` — so on the tick a room finishes, running step 6 before
+ * step 3 would pay that tick's event at the new room's rate. Step 4 is the same story from the
+ * other end: the theft is a fraction of the balance, so moving anything that touches cookies
+ * across it changes what the mice take. The order below is the one the payouts were tuned
+ * against: cookies, then events, then the theft they produced, then the two builds.
+ * Achievements are genuinely last, because they must see the finished tick and not a room that
+ * is about to be built.
  */
 function handleTick(state: GameState, ctx: ReducerCtx, elapsedMs: number): GameState {
   if (elapsedMs <= 0) return state;
@@ -791,22 +795,75 @@ function handleSetPermanentUpgrade(state: GameState, upgradeId: string, pinned: 
   };
 }
 
-function handleImportSave(action: Extract<GameAction, { type: "importSave" }>): GameState {
+/**
+ * AN EVENT THAT RAN OUT WHILE THE APP WAS SHUT, SETTLED BEFORE THE OFFLINE CHEQUE IS WRITTEN.
+ *
+ * This is the load path — `GameProvider` dispatches `importSave` at startup, not just when
+ * somebody picks a file — so "a save with a Mouse Raid still on screen" is simply what quitting
+ * mid-raid produces. Left alone, that raid expired on the FIRST ORDINARY TICK after load, and a
+ * raid's theft is a fraction of the balance AT THE MOMENT IT RESOLVES: a player who saved five
+ * seconds into a raid and came back after a night away lost up to eighty per cent of a balance
+ * grown by the entire night, for twenty seconds they were never given a chance to play.
+ *
+ * So the raid is resolved HERE, against the pre-offline balance — the jar as it stood when the
+ * window closed, which is the only balance the mice were ever in the room with. The two honest
+ * options were this and voiding the raid outright; voiding was rejected because it makes
+ * quitting the app a free escape from a raid in progress, and a rule that rewards force-quitting
+ * is worse than one that charges an honest price. The mice take what they could have taken; the
+ * night's earnings were never on the counter and cannot be stolen.
+ *
+ * It runs through `tickRandomEvents` rather than reimplementing expiry, with `blocked: true` so
+ * this settling tick can only CLOSE things and never spawn a new event against a player who has
+ * not seen the screen yet. A stocked Whack Pass still spends itself here, exactly as it would
+ * have online: the pass exists to stop cookies leaving, and this is cookies leaving.
+ */
+function settleExpiredEventsOnLoad(
+  saved: GameState,
+  ctx: ReducerCtx,
+  nowMs: number,
+): { readonly state: GameState; readonly bonus: BigNum; readonly stolen: BigNum } {
+  const zero = bnFromNumber(0);
+  const result = tickRandomEvents(saved.randomEvents, saved, nowMs, ctx.rng, {
+    blocked: true,
+    config: ctx.randomEventConfig ?? DEFAULT_RANDOM_EVENT_CONFIG,
+  });
+  if (result.randomEvents === saved.randomEvents) return { state: saved, bonus: zero, stolen: zero };
+
+  const stolen = result.raidTheft?.stolen ?? zero;
+  // Clamped against the PRE-offline balance for the same reason the tick clamps: a raid can
+  // empty the jar, never overdraw it.
+  const takeable = bnCompare(stolen, saved.cookies) > 0 ? saved.cookies : stolen;
+  return {
+    state: { ...saved, randomEvents: result.randomEvents },
+    bonus: result.instantBonus,
+    stolen: takeable,
+  };
+}
+
+function handleImportSave(action: Extract<GameAction, { type: "importSave" }>, ctx: ReducerCtx): GameState {
   // Note: deliberately ignores the reducer's current live `state` -- importing a save
   // wholesale replaces it with `action.savedState`, which is the whole point of import.
-  const offlineResult = computeOfflineProgressWithTools(action.savedState, action.nowIso, action.offlineOptions);
+  const settled = settleExpiredEventsOnLoad(action.savedState, ctx, Date.parse(action.nowIso) || ctx.now());
+  const savedState = settled.state;
+
+  const offlineResult = computeOfflineProgressWithTools(savedState, action.nowIso, action.offlineOptions);
+  // What the settling tick paid out (a Flour Shortage's rebound, say) is earned cookies like any
+  // other and joins the offline cheque; what the mice took is not, and is handled below.
+  const earned = bnAdd(offlineResult.cookiesEarned, settled.bonus);
 
   const stats = {
-    ...action.savedState.stats,
-    clockAnomalyCount:
-      action.savedState.stats.clockAnomalyCount + (offlineResult.wasClockAnomaly ? 1 : 0),
-    totalCookiesBaked: bnAdd(action.savedState.stats.totalCookiesBaked, offlineResult.cookiesEarned),
+    ...savedState.stats,
+    clockAnomalyCount: savedState.stats.clockAnomalyCount + (offlineResult.wasClockAnomaly ? 1 : 0),
+    totalCookiesBaked: bnAdd(savedState.stats.totalCookiesBaked, earned),
   };
 
+  // Balance order: settle the raid against the old jar, then pay the earnings into it.
+  // Lifetime and the baked total move only with the earnings — the mice take cookies out of the
+  // jar, they do not un-bake them, exactly as in `handleTick`.
   const nextState: GameState = {
-    ...action.savedState,
-    cookies: bnAdd(action.savedState.cookies, offlineResult.cookiesEarned),
-    lifetimeCookies: bnAdd(action.savedState.lifetimeCookies, offlineResult.cookiesEarned),
+    ...savedState,
+    cookies: bnAdd(bnClampNonNegative(bnSub(savedState.cookies, settled.stolen)), earned),
+    lifetimeCookies: bnAdd(savedState.lifetimeCookies, earned),
     stats,
     lastTickAtIso: action.nowIso,
   };
@@ -881,7 +938,7 @@ export function applyGameAction(state: GameState, action: GameAction, ctx: Reduc
     case "setPermanentUpgrade":
       return handleSetPermanentUpgrade(state, action.upgradeId, action.pinned);
     case "importSave":
-      return handleImportSave(action);
+      return handleImportSave(action, ctx);
   }
 }
 

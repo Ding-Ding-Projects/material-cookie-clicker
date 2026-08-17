@@ -26,6 +26,7 @@ import {
   mouseTargetIds,
   RAID_CAPTURE_EVENT_CONFIG,
   rainDropPayout,
+  POOL_WEIGHT_TOTAL,
   RANDOM_EVENT_DEFINITIONS,
   randomEventClickMultiplier,
   randomEventCpsMultiplier,
@@ -264,9 +265,30 @@ describe("random events: effect arithmetic", () => {
   const state = producingState();
   const cps = bnToNumber(totalCps(state));
 
-  it("pays Grandma's Surprise Batch as ten minutes of production", () => {
+  it("pays Grandma's Surprise Batch as two and a half minutes of production", () => {
     expect(cps).toBeGreaterThan(0);
-    expect(bnToNumber(instantPayout("grandmas_batch", state))).toBeCloseTo(cps * 600, 4);
+    expect(bnToNumber(instantPayout("grandmas_batch", state))).toBeCloseTo(cps * 150, 4);
+  });
+
+  it("keeps the pool's reward curve tracking its rarity", () => {
+    // Expected seconds of standing production PER DRAW, which is what a player actually feels.
+    // A common filler boon must not out-earn the events the file calls its headline and its
+    // jackpot — that inversion is what a weight-10 600-second batch used to produce.
+    const weightOf = (id: string) =>
+      RANDOM_EVENT_DEFINITIONS.find((def) => def.id === id)!.weight / POOL_WEIGHT_TOTAL;
+    const timedValue = (id: string) => {
+      const def = RANDOM_EVENT_DEFINITIONS.find((entry) => entry.id === id)!;
+      return (def.durationMs / 1000) * (def.cpsMultiplier - 1);
+    };
+
+    const grandma = weightOf("grandmas_batch") * DEFAULT_RANDOM_EVENT_PAYOUTS.grandmasBatchCpsSeconds;
+    const luckyCrumb = weightOf("lucky_crumb") * DEFAULT_RANDOM_EVENT_PAYOUTS.luckyCrumbCpsSeconds;
+    const frenzy = weightOf("production_frenzy") * timedValue("production_frenzy");
+    const burnt = weightOf("burnt_batch_frenzy") * timedValue("burnt_batch_frenzy");
+
+    expect(grandma).toBeGreaterThan(luckyCrumb);
+    expect(grandma).toBeLessThan(frenzy);
+    expect(frenzy).toBeLessThan(burnt);
   });
 
   it("pays a Lucky Crumb as ninety seconds of production plus a flat floor", () => {
@@ -1054,5 +1076,115 @@ describe("mouse raid: through the reducer", () => {
     const decoded = decodeRandomEvents(encodeRandomEvents(state.randomEvents));
     expect(decoded).toEqual(state.randomEvents);
     expect(decoded.active?.pendingTargetIds).toEqual(["mouse:0", "mouse:1", "mouse:2", "mouse:3"]);
+  });
+
+  /* ----------------------------------------------------------- a raid that outlived the app */
+
+  it("settles a raid that ran out while the app was closed against the PRE-offline balance", () => {
+    const saved = stateWithRaid(5, 1_000_000);
+    const savedAtMs = MOUSE_RAID_DEFINITION.durationMs / 4; // saved a few seconds into the raid
+    const savedAt = new Date(savedAtMs).toISOString();
+    const returnedAt = new Date(savedAtMs + 8 * 60 * 60 * 1000).toISOString(); // a night away
+
+    const imported = applyGameAction(
+      freshState(),
+      {
+        type: "importSave",
+        savedState: { ...saved, lastTickAtIso: savedAt },
+        nowIso: returnedAt,
+        offlineOptions: { maxOfflineMs: 8 * 60 * 60 * 1000, offlineCpsFactor: 0.5 },
+      },
+      ctxAt(Date.parse(returnedAt)),
+    );
+
+    // Five of five got away: eighty per cent of the jar as it stood when the app closed, and not
+    // a cookie of the night's offline earnings.
+    const stolen = bnToNumber(imported.randomEvents.lastRaid?.stolen ?? bnFromNumber(0));
+    expect(stolen).toBeCloseTo(1_000_000 * 0.8, 0);
+    const offline = bnToNumber(totalCps(saved)) * (8 * 60 * 60) * 0.5;
+    expect(bnToNumber(imported.cookies)).toBeCloseTo(1_000_000 * 0.2 + offline, 0);
+    expect(imported.randomEvents.active).toBeNull();
+  });
+
+  it("leaves a raid still inside its window alone when the save is reloaded straight away", () => {
+    const saved = stateWithRaid(5, 1_000_000);
+    const nowIso = new Date(1_000).toISOString();
+    const imported = applyGameAction(
+      freshState(),
+      {
+        type: "importSave",
+        savedState: { ...saved, lastTickAtIso: nowIso },
+        nowIso,
+        offlineOptions: { maxOfflineMs: 1_000, offlineCpsFactor: 0.5 },
+      },
+      ctxAt(1_000),
+    );
+    expect(imported.randomEvents.active?.id).toBe("mouse_raid");
+    expect(bnToNumber(imported.cookies)).toBeCloseTo(1_000_000, 4);
+  });
+});
+
+/* --------------------------------------------------------------- the sidecar's own salvage */
+
+describe("random events: what a sidecar decode refuses to throw away", () => {
+  function stocked(): RandomEventsState {
+    return {
+      ...createInitialRandomEventsState(),
+      spawnCount: 12,
+      raidCount: 3,
+      nextEligibleAtEpochMs: 900_000,
+      raidNextEligibleAtEpochMs: 1_800_000,
+      consumables: {
+        whack_pass: { stock: 2, purchased: 5 },
+        bigger_whack: { stock: 1, purchased: 1 },
+        half_hp_whack: { stock: 0, purchased: 4 },
+      },
+    };
+  }
+
+  it("stamps its own version on the way out and reads a version-less sidecar as version one", () => {
+    const encoded = encodeRandomEvents(stocked()) as unknown as Record<string, unknown>;
+    expect(encoded.sidecarVersion).toBe(1);
+
+    const { sidecarVersion: _dropped, ...older } = encoded;
+    expect(decodeRandomEvents(older)).toEqual(stocked());
+  });
+
+  it("keeps everything but the unknown event when a later build's id comes back", () => {
+    // Exactly what a build that adds a seventeenth event without a version bump would write.
+    const fromTheFuture = {
+      ...(encodeRandomEvents(stocked()) as unknown as Record<string, unknown>),
+      sidecarVersion: 2,
+      lastResolved: { id: "biscuit_tsunami", resolvedAtEpochMs: 500, claimedCount: 0, endedEarly: false },
+    };
+
+    const decoded = decodeRandomEvents(fromTheFuture);
+    expect(decoded.lastResolved).toBeNull();
+    expect(decoded.consumables).toEqual(stocked().consumables);
+    expect(decoded.nextEligibleAtEpochMs).toBe(900_000);
+    expect(decoded.raidNextEligibleAtEpochMs).toBe(1_800_000);
+    expect(decoded.spawnCount).toBe(12);
+    expect(decoded.raidCount).toBe(3);
+  });
+
+  it("salvages the cookie-bought consumables even when the rest of the block is rubbish", () => {
+    const mangled = {
+      active: "not an event at all",
+      nextEligibleAtEpochMs: "soon",
+      rngStreamIndex: -4,
+      consumables: stocked().consumables,
+    };
+
+    const decoded = decodeRandomEvents(mangled);
+    expect(decoded.consumables).toEqual(stocked().consumables);
+    // The schedule is genuinely gone, and that is fine: it regenerates on the next tick.
+    expect(decoded.active).toBeNull();
+    expect(decoded.spawnCount).toBe(0);
+  });
+
+  it("still falls back to a fresh scheduler when there is nothing left to salvage", () => {
+    expect(decodeRandomEvents({ consumables: "gone", active: 7 })).toEqual(createInitialRandomEventsState());
+    expect(decodeRandomEvents(undefined)).toEqual(createInitialRandomEventsState());
+    expect(decodeRandomEvents("not even an object")).toEqual(createInitialRandomEventsState());
   });
 });

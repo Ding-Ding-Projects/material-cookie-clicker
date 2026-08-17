@@ -105,7 +105,8 @@ export interface GameState {
    * The general random-event scheduler and whatever it currently has on screen — see
    * random-events.ts. Separate from `goldenCookie` on purpose: the golden cookie is one
    * specific overlay with its own window and its own three effects, and this is the pool of
-   * six events that interrupt play around it. The two share the reducer's RngPort and clock,
+   * sixteen events (plus the separately-clocked Mouse Raid, which is deliberately not in the
+   * draw) that interrupt play around it. The two share the reducer's RngPort and clock,
    * and the scheduler declines to roll while a golden cookie is up, so the stage never has two
    * random things on it at once.
    */

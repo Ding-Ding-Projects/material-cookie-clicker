@@ -546,14 +546,14 @@ describe("Taste Test: both branches", () => {
     expect(randomEventClickMultiplier(state, 1_000)).toBe(1);
   });
 
-  it("makes the two answers worth about the same, so neither is the secret right button", () => {
+  it("makes the two answers worth exactly the same, so neither is the secret right button", () => {
     const gameState = producingState();
     const lump = bnToNumber(tasteTestServePayout(gameState));
     const cps = bnToNumber(totalCps(gameState));
-    // The buff is worth (multiplier - 1) × its duration of extra production.
+    // The buff is worth (multiplier - 1) × its duration of EXTRA production: the baseline minute
+    // would have been produced anyway, so counting it would flatter the buff by a whole minute.
     const buff = cps * ((TASTE_TEST_BUFF_MULTIPLIER - 1) * (TASTE_TEST_BUFF_MS / 1000));
-    expect(buff / lump).toBeGreaterThan(0.75);
-    expect(buff / lump).toBeLessThan(1.4);
+    expect(buff).toBeCloseTo(lump, 4);
   });
 
   it("refuses a second answer, a late answer, and an answer to something that did not ask", () => {
@@ -618,6 +618,49 @@ describe("Flour Shortage", () => {
     const def = getRandomEventDefinition("flour_shortage");
     const lost = (def.durationMs / 1000) * (1 - def.cpsMultiplier);
     expect(DEFAULT_RANDOM_EVENT_PAYOUTS.flourShortageReboundCpsSeconds).toBeGreaterThan(lost);
+  });
+
+  it("keeps that promise under a golden frenzy, where the dip costs frenzy-scaled seconds", () => {
+    const gameState = producingState();
+    const cps = bnToNumber(totalCps(gameState));
+    const def = getRandomEventDefinition("flour_shortage");
+    const frenzy = 7;
+
+    // What the dip actually costs when it is applied on top of a ×7 frenzy: thirty seconds at
+    // half of a rate that was seven times standing, against what those thirty seconds would
+    // otherwise have paid.
+    const lost = (def.durationMs / 1000) * frenzy * (1 - def.cpsMultiplier) * cps;
+    const rebound = bnToNumber(expiryPayout("flour_shortage", gameState, DEFAULT_RANDOM_EVENT_PAYOUTS, frenzy));
+
+    expect(rebound).toBeGreaterThan(lost);
+    // And on a quiet save nothing changes: the peak is 1 and the rebound is the plain 45 seconds.
+    expect(bnToNumber(expiryPayout("flour_shortage", gameState, DEFAULT_RANDOM_EVENT_PAYOUTS, 1))).toBeCloseTo(
+      cps * DEFAULT_RANDOM_EVENT_PAYOUTS.flourShortageReboundCpsSeconds,
+      4,
+    );
+  });
+
+  it("remembers the frenzy it lived through and pays the rebound at that rate", () => {
+    const frenzy = 7;
+    const base = producingState({ cookies: bnFromNumber(0) });
+    const cps = bnToNumber(totalCps(base));
+    const withFrenzy: GameState = {
+      ...withActive(base, "flour_shortage", 0),
+      goldenCookie: {
+        ...base.goldenCookie,
+        activeEffect: { kind: "frenzy", multiplier: frenzy, expiresAtEpochMs: 20_000 },
+      },
+    };
+
+    // A tick inside the window records the frenzy; by the time the lorry arrives the frenzy is
+    // long over, and the rebound still has to be measured at the rate the dip was suffered at.
+    const during = applyGameAction(withFrenzy, { type: "tick", elapsedMs: 1_000 }, ctxAt(10_000));
+    expect(during.randomEvents.active?.peakLiveCpsMultiplier).toBe(frenzy);
+
+    const after = applyGameAction(during, { type: "tick", elapsedMs: 1_000 }, ctxAt(60_000));
+    expect(after.randomEvents.active).toBeNull();
+    const rebound = bnToNumber(after.cookies) - bnToNumber(during.cookies) - cps;
+    expect(rebound).toBeCloseTo(cps * DEFAULT_RANDOM_EVENT_PAYOUTS.flourShortageReboundCpsSeconds * frenzy, 2);
   });
 
   it("hands the rebound to the balance through a real reducer tick", () => {

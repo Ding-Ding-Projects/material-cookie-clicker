@@ -1346,6 +1346,156 @@ function MouseRaidArt() {
   );
 }
 
+/* ------------------------------------------------- the frenzy class, and the new events */
+
+/**
+ * The emblems for the events added alongside the frenzies.
+ *
+ * Two drawing rules on top of the file's existing ones, so a player can read the CLASS of an
+ * event off its emblem before reading its name:
+ *
+ *   - anything in the frenzy class is drawn in the spark palette (gold, warm) with rays or heat
+ *     coming off it;
+ *   - anything that costs production — the Clot, the Flour Shortage — is drawn in the alarm
+ *     palette (cold, red-outlined) and never carries a spark, because a setback with a gold
+ *     twinkle on it reads as a present at emblem size.
+ */
+
+/** Production Frenzy: an oven going flat out, heat rolling off the top. */
+function ProductionFrenzyArt() {
+  return (
+    <Art>
+      <rect x="4" y="10" width="24" height="18" rx="3" fill={GOLD} stroke={GOLD_RING} />
+      <rect x="7.5" y="15" width="17" height="9" rx="2" fill={GOLD_DEEP} stroke="none" />
+      <circle cx="10" cy="12.5" r="1.1" fill={PLATE} stroke="none" />
+      <circle cx="13.5" cy="12.5" r="1.1" fill={PLATE} stroke="none" />
+      <path d="M9 8q2-2 0-4M16 8q2-2 0-4M23 8q2-2 0-4" fill="none" stroke={GOLD_DEEP} strokeWidth="1.8" />
+      <path d="M16 16.5l-2.5 3.5h2.5l-1.5 3 4-4h-2.5l1.5-2.5Z" fill={METAL_HI} stroke="none" />
+    </Art>
+  );
+}
+
+/** Click Frenzy: a pointer with three shockwaves coming off it. */
+function ClickFrenzyArt() {
+  return (
+    <Art>
+      <path d="M11 5l11 11-4.5 1.2 3 6-3 1.5-3-6L11 22Z" fill={GOLD} stroke={GOLD_RING} />
+      <path d="M23 8a7 7 0 0 1 3 4M25.5 4.5a11 11 0 0 1 4 6" fill="none" stroke={GOLD_DEEP} strokeWidth="1.7" />
+      <path d="M6 10a7 7 0 0 1 1.5-4" fill="none" stroke={GOLD_DEEP} strokeWidth="1.7" />
+    </Art>
+  );
+}
+
+/** Burnt Batch Frenzy: a scorched tray with flame coming off it. Gold, not alarm — nothing
+ *  is taken by this event, and painting the player's best moment in the error role would lie. */
+function BurntBatchFrenzyArt() {
+  return (
+    <Art>
+      <path d="M4 20h24v4a3 3 0 0 1-3 3H7a3 3 0 0 1-3-3Z" fill={CRUST_DARK} stroke={INK} />
+      <circle cx="11" cy="19" r="3" fill={CHIP} stroke={INK} strokeWidth="1.2" />
+      <circle cx="19" cy="19" r="3" fill={CHIP} stroke={INK} strokeWidth="1.2" />
+      <path d="M16 3q4 4 1.5 7Q22 9 21 14.5q-1 4-5 4t-5-4Q10 9 14.5 10 12 7 16 3Z" fill={GOLD_DEEP} stroke={GOLD_RING} />
+      <path d="M16 8.5q2 3 0 5.5-2-2.5 0-5.5Z" fill={GOLD} stroke="none" />
+    </Art>
+  );
+}
+
+/** Clot: a mixer bowl with the dough seized in a solid lump, and the paddle stuck in it. */
+function ClotArt() {
+  return (
+    <Art>
+      <path d="M6 12h20l-2.5 13a3 3 0 0 1-3 2.4h-9A3 3 0 0 1 8.5 25Z" fill={ALARM_LIGHT} stroke={ALARM} />
+      <path d="M4.5 10h23v2.5h-23Z" fill={PLATE_DIM} stroke={ALARM} strokeWidth="1.2" />
+      <path d="M16 3v7" stroke={ALARM} strokeWidth="2" />
+      <path d="M11 20q0-4 5-4t5 4q0 4-5 4t-5-4Z" fill={PLATE_DIM} stroke={ALARM} strokeWidth="1.6" />
+      <path d="M13 18.5l6 4M19 18.5l-6 4" stroke={ALARM} strokeWidth="1.3" />
+    </Art>
+  );
+}
+
+/** Combo Window: a pointer inside a bracketed window, with a chain of beats under it. */
+function ComboWindowArt() {
+  return (
+    <Art>
+      <path d="M7 5H4v22h3M25 5h3v22h-3" fill="none" stroke={GOLD_RING} strokeWidth="2" />
+      <path d="M12 6l8 8-3.5 1 2.5 5-2.5 1.2-2.5-5L12 19Z" fill={GOLD} stroke={GOLD_RING} />
+      <circle cx="12" cy="25" r="1.6" fill={GOLD_DEEP} stroke="none" />
+      <circle cx="16" cy="25" r="1.6" fill={GOLD_DEEP} stroke="none" />
+      <circle cx="20" cy="25" r="1.6" fill={GOLD} stroke="none" />
+    </Art>
+  );
+}
+
+/** Delivery Rush: a van with three stacked parcels in the back. */
+function DeliveryRushArt() {
+  return (
+    <Art>
+      <path d="M3 10h14v12H3Z" fill={EMERALD_LIGHT} stroke={EMERALD} />
+      <path d="M17 13h5.5l5 5v4H17Z" fill={PLATE_DIM} stroke={EMERALD} />
+      <circle cx="9" cy="24" r="3" fill={PLATE_DIM} stroke={INK} strokeWidth="1.6" />
+      <circle cx="23" cy="24" r="3" fill={PLATE_DIM} stroke={INK} strokeWidth="1.6" />
+      <rect x="5.5" y="12.5" width="4" height="4" rx="0.8" fill={DOUGH} stroke={CRUST} strokeWidth="1.1" />
+      <rect x="10.5" y="12.5" width="4" height="4" rx="0.8" fill={DOUGH} stroke={CRUST} strokeWidth="1.1" />
+      <rect x="8" y="17" width="4" height="4" rx="0.8" fill={DOUGH} stroke={CRUST} strokeWidth="1.1" />
+    </Art>
+  );
+}
+
+/** Taste Test: one cookie on a fork, with a question mark of steam over it. */
+function TasteTestArt() {
+  return (
+    <Art>
+      <path d="M6 4v7q0 2 2 2h6q2 0 2-2V4" fill="none" stroke={METAL_LO} strokeWidth="2" />
+      <path d="M11 13v15" stroke={METAL_LO} strokeWidth="2.2" />
+      <path d="M6 4v6M11 4v6" stroke={METAL_LO} strokeWidth="1.5" />
+      <circle cx="22" cy="20" r="7" fill={DOUGH} stroke={CRUST} strokeWidth="1.6" />
+      <circle cx="20" cy="18" r="1.5" fill={CHIP} stroke="none" />
+      <circle cx="24.5" cy="21" r="1.5" fill={CHIP} stroke="none" />
+      <path d="M20 8q0-2.5 2.5-2.5T25 8q0 2-2.5 2.5V12" fill="none" stroke={GOLD_DEEP} strokeWidth="1.8" />
+    </Art>
+  );
+}
+
+/** Flour Shortage: an empty flour sack, tipped over. Alarm-coloured, no spark. */
+function FlourShortageArt() {
+  return (
+    <Art>
+      <path d="M10 9q6-3 12 0l3 15a3 3 0 0 1-3 3.4H10A3 3 0 0 1 7 24Z" fill={PLATE_DIM} stroke={ALARM} strokeWidth="1.6" />
+      <path d="M10 9q3 3 6 0t6 0" fill="none" stroke={ALARM} strokeWidth="1.4" />
+      <path d="M12 16h8M12 20h5" stroke={ALARM} strokeWidth="1.6" opacity="0.55" />
+      <circle cx="7" cy="27" r="1.3" fill={ALARM_LIGHT} stroke={ALARM} strokeWidth="1" />
+      <circle cx="26" cy="26" r="1.1" fill={ALARM_LIGHT} stroke={ALARM} strokeWidth="1" />
+    </Art>
+  );
+}
+
+/** Night Shift: a moon over a lit oven window. */
+function NightShiftArt() {
+  return (
+    <Art>
+      <path d="M13 3a8 8 0 1 0 8 8 6 6 0 0 1-8-8Z" fill={PLATE_DIM} stroke={AMETHYST} strokeWidth="1.6" />
+      <rect x="6" y="16" width="20" height="12" rx="3" fill={AMETHYST_LIGHT} stroke={AMETHYST} />
+      <rect x="9.5" y="19.5" width="13" height="6" rx="1.6" fill={GOLD} stroke={GOLD_RING} strokeWidth="1.2" />
+      <circle cx="26.5" cy="7" r="1.2" fill={GOLD} stroke="none" />
+      <circle cx="23" cy="4" r="0.9" fill={GOLD} stroke="none" />
+    </Art>
+  );
+}
+
+/** Sprinkle Storm: a shaker with sprinkles coming out of it at an angle. */
+function SprinkleStormArt() {
+  return (
+    <Art>
+      <path d="M8 4h9l1.5 8h-12Z" fill={PLATE_DIM} stroke={CRUST} />
+      <path d="M6.5 12h13l-1 4h-11Z" fill={PLATE} stroke={CRUST} />
+      <path d="M9.5 7.5h1.2M13 6.5h1.2M11 9.5h1.2" stroke={CRUST} strokeWidth="1.4" />
+      <path d="M9 20l3.5-2M14 24l3.5-2M19 19l3.5-2M16 28.5l3.5-2M23.5 25l3.5-2M25 13.5l3.5-2" stroke={GOLD_DEEP} strokeWidth="2.2" strokeLinecap="round" />
+      <path d="M20 27l2.5-1.5" stroke={EMERALD} strokeWidth="2.2" strokeLinecap="round" />
+      <path d="M12 24.5l2.5-1.5" stroke={AMETHYST} strokeWidth="2.2" strokeLinecap="round" />
+    </Art>
+  );
+}
+
 /** The emblem for one event id, for the HUD indicator and the toast. */
 export const RANDOM_EVENT_ART: Record<string, () => ReactElement> = {
   cookie_rain: CookieRainArt,
@@ -1354,5 +1504,38 @@ export const RANDOM_EVENT_ART: Record<string, () => ReactElement> = {
   sugar_rush: SugarRushArt,
   lucky_crumb: LuckyCrumbArt,
   market_day: MarketDayArt,
+  production_frenzy: ProductionFrenzyArt,
+  click_frenzy: ClickFrenzyArt,
+  burnt_batch_frenzy: BurntBatchFrenzyArt,
+  clot: ClotArt,
+  combo_window: ComboWindowArt,
+  delivery_rush: DeliveryRushArt,
+  taste_test: TasteTestArt,
+  flour_shortage: FlourShortageArt,
+  night_shift: NightShiftArt,
+  sprinkle_storm: SprinkleStormArt,
   mouse_raid: MouseRaidArt,
 };
+
+/** One sprinkle, for the Sprinkle Storm's targets: a coloured baton with a bevel on it. */
+export function SprinkleArt({ extraClass }: { extraClass?: string } = {}) {
+  return (
+    <Art extraClass={extraClass}>
+      <rect x="6" y="12" width="20" height="8" rx="4" fill={GOLD} stroke={GOLD_RING} strokeWidth="1.8" />
+      <path d="M9.5 14.5h13" stroke={METAL_HI} strokeWidth="2" strokeLinecap="round" opacity="0.85" />
+    </Art>
+  );
+}
+
+/** One parcel, for the Delivery Rush's chain: a taped box with a label on it. */
+export function ParcelArt({ extraClass }: { extraClass?: string } = {}) {
+  return (
+    <Art extraClass={extraClass}>
+      <path d="M4 10h24v16a2 2 0 0 1-2 2H6a2 2 0 0 1-2-2Z" fill={DOUGH} stroke={CRUST} strokeWidth="1.8" />
+      <path d="M3 6h26v5H3Z" fill={PLATE_DIM} stroke={CRUST} strokeWidth="1.6" />
+      <path d="M16 6v22" stroke={CRUST} strokeWidth="1.8" />
+      <rect x="18" y="15" width="7" height="6" rx="1" fill={PLATE} stroke={CRUST} strokeWidth="1.3" />
+      <path d="M19.5 17.5h4M19.5 19.2h2.5" stroke={CRUST} strokeWidth="1.1" />
+    </Art>
+  );
+}

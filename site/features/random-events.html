@@ -4,7 +4,7 @@
 <meta charset="utf-8" />
 <meta name="viewport" content="width=device-width, initial-scale=1" />
 <title>Random events — Material Cookie Clicker</title>
-<meta name="description" content="Six events on a bounded random schedule plus an hourly Mouse Raid that can take 80% of your cookies, photographed running." />
+<meta name="description" content="Sixteen events on a bounded random schedule &mdash; frenzies, a Clot, a chain, a choice &mdash; plus an hourly Mouse Raid that can take 80% of your cookies, photographed running." />
 <link rel="stylesheet" href="../assets/site.css" />
 </head>
 <body>
@@ -24,10 +24,10 @@
 <main id="main" class="wrap">
   <article>
     <h1>Random events</h1>
-    <p class="lede">Six events on a bounded random schedule, plus a rare Mouse Raid on its own hourly clock that can take up to 80% of your cookies if you do not whack the mice. All photographed running.</p>
+    <p class="lede">Sixteen events on a bounded random schedule &mdash; big frenzies, a Clot that halves production, a delivery chain, a two-button choice &mdash; plus a rare Mouse Raid on its own hourly clock that can take up to 80% of your cookies if you do not whack the mice. Photographed running.</p>
     <div class="inset" style="margin-bottom:18px">
   <span class="label">Current state</span>
-  <p style="margin:0"><span class="tag">Shipped</span> the scheduler, all six pool events and the Mouse Raid are in the build (<code>src/shared/game/random-events.ts</code>), and four of them were photographed on the running game surface.</p>
+  <p style="margin:0"><span class="tag">Shipped</span> the scheduler, all sixteen pool events and the Mouse Raid are in the build (<code>src/shared/game/random-events.ts</code>). Five of them &mdash; Cookie Rain, the Oven Hiccup, the Mouse Raid, a Production Frenzy and a Taste Test &mdash; have been photographed on the running game surface; the rest are described from their shipped definitions rather than from a picture, and this page says which is which.</p>
 </div>
 
     <h2>From the running application</h2>
@@ -40,23 +40,59 @@
       <figcaption><strong>Oven Hiccup, the one setback.</strong> The indicator, the marquee and the thump-to-fix button are all rendered in the error role rather than the spark one, so the event that takes something away never looks like the ones that give. Captured the same way.</figcaption>
     </figure>
 
+    <figure class="capture">
+      <img src="../assets/captures/frenzy-production.png" alt="The game surface during a Production Frenzy. The HUD's fourth plate is olive-green and ringed in gold, reading Production Frenzy in English and Cantonese beside a small oven drawing, with a draining amber bar and the figure 67s. The cookies plate reads 40 quintillion, per second reads 14,302,000,300 and per click reads 136.32. Below the plates a Raid Supplies shelf shows the three consumables at 0 of 3 each. The rest of the surface is the ordinary game: the hero cookie, the upgrades strip at 67 of 179, and the shop rail with Cursor at 220." width="2582" height="1550" loading="lazy" />
+      <figcaption><strong>A Production Frenzy, 67 seconds from the end of its 77.</strong> The frenzy class gets a warm plate with a gold ring round it, so the good weather is legible before the name is read. Captured from the built application running on an off-screen Windows desktop named <code>FrenzyCapture</code>, photographed with the Win32 PrintWindow API, window maximised, with the developer capture flag pinning the draw to this event &mdash; the event itself is the real one, at its real duration and its real arithmetic. <strong>One honest gap in this picture:</strong> the PER SECOND plate reads the base production figure and does not fold in the frenzy, and it does not fold in a golden cookie's frenzy either. That readout predates this work and is not something this lane changed; the cookies really do accrue at seven times the rate the plate shows.</figcaption>
+    </figure>
+    <figure class="capture">
+      <img src="../assets/captures/frenzy-choice.png" alt="The same game surface during a Taste Test. The fourth HUD plate is quiet and grey rather than gold, reading Taste Test in English and Cantonese with a draining bar and the figure 9s. Over the lower half of the stage sits a dark rounded card reading, in English and then Cantonese, A tray is out and it is borderline. Serve it now, or send it back for a better one? Below the question are two equally sized buttons: a brown one reading Serve it now, 4,290,600,089,997 cookies straight away, and an olive one reading Send it back, production times five for a minute, each with its Cantonese line. Under both, a smaller line reads Worth about the same either way. Let the clock run out and you get neither." width="2582" height="1550" loading="lazy" />
+      <figcaption><strong>The Taste Test, waiting for an answer.</strong> Two ordinary focusable buttons, the same size and the same weight as each other &mdash; styling the lump sum as the primary action would answer the question for the player. The serve button prints the literal figure it will pay, computed from the same domain function the reducer uses when it is pressed, and the note underneath says outright that letting the clock run out gives you neither. Captured the same way.</figcaption>
+    </figure>
+
     <h2>What it does</h2>
-    <p>Every few minutes, one event out of a pool of six interrupts an ordinary session. Some pay out, one costs you production, and two of them put real buttons on the game stage that you can press.</p>
+    <p>Every few minutes, one event out of a pool of sixteen interrupts an ordinary session. Most pay out, three cost you production for a while, one asks you a question with two buttons, and four of them put real buttons on the game stage that you can press. Only one event is ever running: there is no configuration under which two share the stage.</p>
     <div class="scroller">
     <table>
-      <caption>The event pool, with its shipped defaults</caption>
-      <thead><tr><th scope="col">Event</th><th scope="col">Shape</th><th scope="col">What it does</th><th scope="col">Duration</th></tr></thead>
+      <caption>The event pool, with its shipped defaults and its draw weight out of 100</caption>
+      <thead><tr><th scope="col">Event</th><th scope="col">Class</th><th scope="col">What it does</th><th scope="col">Duration</th><th scope="col">Weight</th></tr></thead>
       <tbody>
-        <tr><td>Cookie Rain</td><td>Clickable</td><td>Twelve falling cookies; each one caught pays twenty seconds of production plus fifteen clicks&rsquo; worth</td><td>20 seconds</td></tr>
-        <tr><td>Grandma&rsquo;s Surprise Batch</td><td>Instant</td><td>Ten minutes of current production, paid at once</td><td>&mdash;</td></tr>
-        <tr><td>Oven Hiccup</td><td>Clickable setback</td><td>Production drops to 40%; one press of the oven ends it early</td><td>30 seconds</td></tr>
-        <tr><td>Sugar Rush</td><td>Timed</td><td>Click value &times;7</td><td>15 seconds</td></tr>
-        <tr><td>Lucky Crumb</td><td>Instant</td><td>Ninety seconds of production plus a flat 25 cookies</td><td>&mdash;</td></tr>
-        <tr><td>Market Day</td><td>Timed</td><td>15% of every purchase handed back</td><td>60 seconds</td></tr>
+        <tr><td>Lucky Crumb</td><td>Boon</td><td>Ninety seconds of production plus a flat 25 cookies, paid at once</td><td>&mdash;</td><td>12</td></tr>
+        <tr><td>Cookie Rain</td><td>Boon</td><td>Twelve falling cookies; each one caught pays twenty seconds of production plus fifteen clicks&rsquo; worth</td><td>20 seconds</td><td>10</td></tr>
+        <tr><td>Grandma&rsquo;s Surprise Batch</td><td>Boon</td><td>Ten minutes of current production, paid at once</td><td>&mdash;</td><td>10</td></tr>
+        <tr><td>Market Day</td><td>Boon</td><td>15% of every purchase handed back</td><td>60 seconds</td><td>10</td></tr>
+        <tr><td>Sugar Rush</td><td>Frenzy</td><td>Click value &times;7</td><td>15 seconds</td><td>8</td></tr>
+        <tr><td>Sprinkle Storm</td><td>Boon</td><td>Ten sprinkles; each one caught makes the next worth 30% more, so clearing the stage pays 23.5 sprinkles rather than ten</td><td>18 seconds</td><td>8</td></tr>
+        <tr><td>Night Shift</td><td>Tradeoff</td><td>Production &times;3 and click value &times;0.25 &mdash; excellent if you put the mouse down, nearly worthless if you do not</td><td>45 seconds</td><td>7</td></tr>
+        <tr><td>Delivery Rush</td><td>Chain</td><td>Three parcels that must be sent in order; each pays 45 seconds of production and finishing all three pays 180 more</td><td>14 seconds</td><td>6</td></tr>
+        <tr><td>Oven Hiccup</td><td>Setback</td><td>Production drops to 40%; one press of the oven ends it early</td><td>30 seconds</td><td>6</td></tr>
+        <tr><td>Taste Test</td><td>Choice</td><td>Two buttons: five minutes&rsquo; production now, or production &times;5 for a minute. Answer neither and you get neither</td><td>15 seconds</td><td>5</td></tr>
+        <tr><td>Production Frenzy</td><td>Frenzy</td><td>Production &times;7</td><td>77 seconds</td><td>4</td></tr>
+        <tr><td>Flour Shortage</td><td>Setback</td><td>Production halved &mdash; then 45 seconds&rsquo; production lands in one lump when it ends, which is more than the dip cost</td><td>30 seconds</td><td>4</td></tr>
+        <tr><td>Clot</td><td>Setback</td><td>Production halved. No button, no way to end it early &mdash; you wait it out</td><td>66 seconds</td><td>3</td></tr>
+        <tr><td>Combo Window</td><td>Frenzy</td><td>Click value &times;5, and every click pushes the window out by 0.4s, up to a hard ceiling of 30 seconds</td><td>8&ndash;30 seconds</td><td>3</td></tr>
+        <tr><td>Click Frenzy</td><td>Frenzy</td><td>Click value &times;777</td><td>13 seconds</td><td>3</td></tr>
+        <tr><td>Burnt Batch Frenzy</td><td>Frenzy</td><td>Production &times;666 &mdash; the rarest thing in the pool, about one every fifteen hours of play</td><td>6 seconds</td><td>1</td></tr>
       </tbody>
     </table>
     </div>
-    <p>The draw is weighted, not uniform. The two plain windfalls are the most likely, and the Oven Hiccup is the least &mdash; an interruption that takes something away should be the one you remember, not the one you resent.</p>
+
+    <h3>The three that cost you something, stated plainly</h3>
+    <p>Thirteen draws in every hundred are an event that makes your counter climb more slowly, and this page is not going to bury them under the good ones. The <strong>Oven Hiccup</strong> drops production to 40% for thirty seconds and gives you a button that ends it immediately. The <strong>Flour Shortage</strong> halves production for thirty seconds and then pays forty-five seconds&rsquo; worth in one lump when it ends &mdash; you come out ahead, but for half a minute you really are producing less. The <strong>Clot</strong> halves production for sixty-six seconds and there is nothing at all you can do about it.</p>
+    <p>The Clot exists on purpose and it is the reason the frenzies are worth anything. A pool whose every face is a present is not weather, it is a drip feed, and you stop reading the marquee. None of the three touches your balance, your lifetime total or your click value &mdash; they slow production down and nothing else. The one thing in this game that can take cookies you already have is the Mouse Raid, below.</p>
+
+    <h3>How the multipliers stack</h3>
+    <p>There are exactly two sources of a live multiplier: a <a href="golden-cookies.html">golden cookie</a>&rsquo;s frenzy, and whatever this pool is currently running. Only one pool event exists at a time, so the worst case is always one of each.</p>
+    <ul>
+      <li><strong>They multiply.</strong> A Production Frenzy inside a golden frenzy is &times;7 by &times;7 = <strong>&times;49</strong>. Two effects that arrived independently both apply; taking one away because the other landed would punish you for good luck.</li>
+      <li><strong>Penalties multiply too, and are never capped.</strong> A Clot during a golden frenzy is &times;7 by 0.5 = &times;3.5 &mdash; still a good minute, and visibly a worse one than it would have been.</li>
+      <li><strong>The upside is capped, at a stated ceiling.</strong> Combined production is capped at <strong>&times;1000</strong> and combined click value at <strong>&times;10000</strong>. Those exist for one case each: a Burnt Batch Frenzy (&times;666) inside a golden frenzy would otherwise be &times;4662. Both ceilings are far above anything a single event can reach alone, so hitting one always means two rare things coincided &mdash; the cap never quietly eats an ordinary buff.</li>
+      <li><strong>Sugar Rush is not special.</strong> It is a pool event like any other and goes through exactly the same rule.</li>
+    </ul>
+    <p>The whole matrix is under test: every event against nothing, against a golden frenzy and against a golden click frenzy, including the two combinations that reach a ceiling and the ones that go the other way.</p>
+
+    <h3>How often, and how that changed</h3>
+    <p>The gap between two events is a flat one-minute cooldown plus a rolled delay. When the pool held six events that delay was three to ten minutes, which worked out at about <strong>eight events an hour</strong>. With sixteen events it is four to twelve minutes, which is about <strong>6.7 an hour</strong> &mdash; nearly three times as many faces and <em>fewer</em> interruptions, because more variety is supposed to make each event rarer rather than make the session busier. At that rate a Production Frenzy lands about once every 3.7 hours, a Click Frenzy about once every five, and a Burnt Batch Frenzy about once every fifteen.</p>
+    <p>The draw is weighted, not uniform, and the weights above are literally the numbers in the code &mdash; they sum to exactly one hundred, which a test pins down, so a weight reads as a percentage without any arithmetic. A long seeded run asserts each event really is drawn at its stated rate.</p>
 
     <h2 id="mouse-raid">The Mouse Raid</h2>
     <p>Roughly once an hour, mice get onto the counter. Three to five of them scurry across the game stage for twenty seconds, each one a real button you can whack. Every mouse still loose when the twenty seconds are up carries cookies away with it, and if all of them get away the raid takes <strong>eighty per cent of your current balance</strong>. Whack every one and it takes nothing at all, and pays you a small bonus for the trouble.</p>
@@ -110,7 +146,7 @@
 
     <h3>Rarity, and the rails around it</h3>
     <ul>
-      <li><strong>Its own clock, not the pool&rsquo;s.</strong> The raid is never drawn from the weighted bag the other six events come from. It runs on a separate <strong>thirty-to-sixty-minute</strong> window &mdash; rare by the clock rather than rare by the dice &mdash; because an eighty-per-cent loss sharing a bag with Lucky Crumb would be either too light to be a raid or too frequent to be fair.</li>
+      <li><strong>Its own clock, not the pool&rsquo;s.</strong> The raid is never drawn from the weighted bag the other sixteen events come from. It runs on a separate <strong>thirty-to-sixty-minute</strong> window &mdash; rare by the clock rather than rare by the dice &mdash; because an eighty-per-cent loss sharing a bag with Lucky Crumb would be either too light to be a raid or too frequent to be fair.</li>
       <li><strong>Unpredictable inside that window.</strong> The gap is drawn uniformly across the whole half-hour band, so at any moment the best guess available is &ldquo;some time in the next half hour&rdquo; and no mental clock does better. Nothing in the interface tells you more: there is no countdown, no warning and no readable state before a raid lands &mdash; the HUD plate and the mice appear together, at the moment it starts. And the session&rsquo;s randomness is seeded from real entropy at start-up rather than from a constant, so no two installations share a timeline and a schedule worked out once is a schedule for nobody. Reloading cannot dodge a raid either: the instant the next one is due is saved as a wall-clock time and reloading does not move it.</li>
       <li><strong>Still one event at a time.</strong> It occupies the same single active slot as everything else here, so it can never land on top of a Cookie Rain, and a golden cookie waiting to be clicked still blocks it.</li>
       <li><strong>Never in a fresh save&rsquo;s first ten minutes.</strong> The opening minutes are the tutorial by another name, and a raid there teaches the wrong lesson.</li>
@@ -123,8 +159,8 @@
     <ul>
       <li><strong>One at a time, ever.</strong> While an event is running, no roll happens at all. There is no configuration under which two events share the stage.</li>
       <li><strong>Never over a golden cookie.</strong> The <a href="golden-cookies.html">golden cookie</a> is a separate system with its own window, but it lands on the same surface, so the event scheduler declines to roll while one is waiting to be clicked.</li>
-      <li><strong>A cooldown, then a window.</strong> When an event resolves, a flat quiet minute starts, and only then does a rolled delay of three to ten minutes begin. Whatever the dice say, there is always at least a minute of ordinary play between two events.</li>
-      <li><strong>Ending it early ends it properly.</strong> Catching the last rain drop, or thumping the oven, resolves the event there and then and starts the same cooldown. The reward for answering an event is getting your session back, not a shorter wait for the next one.</li>
+      <li><strong>A cooldown, then a window.</strong> When an event resolves, a flat quiet minute starts, and only then does a rolled delay of four to twelve minutes begin. Whatever the dice say, there is always at least a minute of ordinary play between two events.</li>
+      <li><strong>Ending it early ends it properly.</strong> Catching the last rain drop or sprinkle, sending the last parcel, thumping the oven, or serving the tray in a Taste Test resolves the event there and then and starts the same cooldown. The reward for answering an event is getting your session back, not a shorter wait for the next one.</li>
     </ul>
 
     <h2>Seeded, not random</h2>
@@ -136,10 +172,11 @@
 
     <h2>Accessibility</h2>
     <p>Every clickable event target is a real button with a real accessible name and a hit area comfortably over 44&nbsp;pixels &mdash; never a decorated container with a click handler on it. Each event is announced once, in both languages, through the same throttled status region that already announces achievements and purchases; the marquee on screen is a duplicate of that announcement and is hidden from assistive technology so nothing is said twice.</p>
-    <p>Under a reduced-motion preference the rain stops moving and becomes twelve still crumbs laid down the same stage, in the same columns, at the same size, worth exactly the same cookies, and the oven chip stops shaking. Nothing becomes unreachable and nothing becomes harder to hit; the only thing that goes away is the motion. No event gates anything: the worst one costs production for thirty seconds and hands you a button to end it sooner.</p>
+    <p>The Taste Test is two ordinary focusable buttons in a card with a name on it; each button&rsquo;s accessible name states what it pays, including the literal figure on the lump-sum one, and the note under them says outright that letting the clock run out gives you neither. In a Delivery Rush the two parcels that are not next are real buttons carrying <code>disabled</code>, dimmed rather than hidden, and their accessible names say &ldquo;not this one yet&rdquo; &mdash; a disabled control that explains itself beats an enabled one that silently does nothing.</p>
+    <p>Under a reduced-motion preference the rain stops moving and becomes twelve still crumbs laid down the same stage, in the same columns, at the same size, worth exactly the same cookies; the sprinkles stop bobbing and stay exactly where they were, at the same 46-pixel size and the same escalating value; the live parcel stops nudging and is marked by its colour and its enabled state alone; the frenzy plate keeps its gold ring and stops pulsing; and the oven chip stops shaking. Nothing becomes unreachable and nothing becomes harder to hit; the only thing that goes away is the motion. No event gates anything: the worst one costs production for thirty seconds and hands you a button to end it sooner.</p>
 
     <h2>How it is configured</h2>
-    <p>The spawn window, the cooldown and every payout are fields of one configuration object with a documented default set, not constants buried in the scheduler. A second, deliberately developer-only configuration exists for capture and smoke runs, which shortens the window to a few seconds; it is reached by setting a single local-storage key before the game starts and by nothing else. There is no button, no settings row and no in-game control that summons an event, because a random event you can summon is not a random event.</p>
+    <p>The spawn window, the cooldown and every payout are fields of one configuration object with a documented default set, not constants buried in the scheduler. Deliberately developer-only configurations exist for capture and smoke runs: one shortens the window to a few seconds, one shortens the raid&rsquo;s hour instead, and one pins the draw to a single named event so that a 1%-weight frenzy can be photographed honestly rather than waited fifteen hours for. All three are reached by setting a single local-storage key before the game starts and by nothing else, and none of them relaxes a rule the player is subject to &mdash; the event that fires is the real event, with its real duration and its real arithmetic. There is no button, no settings row and no in-game control that summons an event, because a random event you can summon is not a random event.</p>
 
     <nav class="related plate" aria-labelledby="related-heading">
       <h2 id="related-heading">Related articles</h2>

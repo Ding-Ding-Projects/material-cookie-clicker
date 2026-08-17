@@ -131,16 +131,23 @@ function simulate(
 /* --------------------------------------------------------------------------- the pool */
 
 describe("random events: the pool", () => {
-  it("has six distinct events, each with a real effect", () => {
-    expect(RANDOM_EVENT_DEFINITIONS).toHaveLength(6);
-    expect(new Set(RANDOM_EVENT_DEFINITIONS.map((d) => d.id)).size).toBe(6);
+  it("has sixteen distinct events, each with a real effect", () => {
+    // Six when this module shipped, sixteen after the frenzy class and the five events designed
+    // alongside it. The count is asserted rather than derived so that adding an event to the
+    // pool is always a deliberate act with a test to update.
+    expect(RANDOM_EVENT_DEFINITIONS).toHaveLength(16);
+    expect(new Set(RANDOM_EVENT_DEFINITIONS.map((d) => d.id)).size).toBe(16);
     for (const def of RANDOM_EVENT_DEFINITIONS) {
       const hasEffect =
         def.cpsMultiplier !== 1 ||
         def.clickMultiplier !== 1 ||
         def.rebateFraction !== 0 ||
         def.targetCount > 0 ||
-        def.shape === "instant";
+        def.shape === "instant" ||
+        // A choice event's effect is whichever answer the player presses, so its own definition
+        // carries multipliers of one. `chooseRandomEventOption` is where its arithmetic lives
+        // and there are tests for both of its branches further down.
+        def.shape === "choice";
       expect(hasEffect, `${def.id} does nothing`).toBe(true);
       expect(def.weight).toBeGreaterThan(0);
       expect(def.nameEn.length).toBeGreaterThan(0);
@@ -148,9 +155,18 @@ describe("random events: the pool", () => {
     }
   });
 
-  it("includes exactly one setback, so the pool is not all upside", () => {
-    expect(RANDOM_EVENT_DEFINITIONS.filter((d) => d.isSetback).map((d) => d.id)).toEqual(["oven_hiccup"]);
-    expect(getRandomEventDefinition("oven_hiccup").cpsMultiplier).toBeLessThan(1);
+  it("includes three setbacks, so the pool is not all upside", () => {
+    // One when the pool was six events; three now. Every one of them costs PRODUCTION and
+    // nothing else — no event in the common pool touches the balance, which is what keeps the
+    // Mouse Raid the only thing in the game that can take cookies you already have.
+    expect(RANDOM_EVENT_DEFINITIONS.filter((d) => d.isSetback).map((d) => d.id)).toEqual([
+      "oven_hiccup",
+      "clot",
+      "flour_shortage",
+    ]);
+    for (const def of RANDOM_EVENT_DEFINITIONS.filter((d) => d.isSetback)) {
+      expect(def.cpsMultiplier, `${def.id} claims to be a setback`).toBeLessThan(1);
+    }
   });
 
   it("gives every timed and clickable event a positive duration, and instants none", () => {
@@ -198,7 +214,7 @@ describe("random events: scheduler determinism", () => {
     }
   });
 
-  it("honours the shipped three-to-ten-minute window too", () => {
+  it("honours the shipped four-to-twelve-minute window too", () => {
     const config = DEFAULT_RANDOM_EVENT_CONFIG;
     const log = simulate(42, config, 6 * 60 * 60 * 1000);
     expect(log.length).toBeGreaterThan(20);
@@ -210,8 +226,11 @@ describe("random events: scheduler determinism", () => {
   });
 
   it("draws from the whole pool rather than one event over and over", () => {
+    // An hour of the fast schedule is a few hundred draws, which is nowhere near enough to be
+    // sure of seeing a 1%-weight event, so this asserts breadth rather than completeness: the
+    // full weight ledger is pinned by the rarity tests below.
     const seen = new Set(simulate(2026, FAST_RANDOM_EVENT_CONFIG, 60 * 60 * 1000).map((e) => e.id));
-    expect(seen.size).toBe(6);
+    expect(seen.size).toBeGreaterThanOrEqual(12);
   });
 
   it("does not spawn while a golden cookie is holding the stage", () => {
@@ -367,8 +386,10 @@ describe("random events: configuration and persistence", () => {
   });
 
   it("keeps the shipped window measured in minutes, not seconds", () => {
-    expect(DEFAULT_RANDOM_EVENT_CONFIG.minDelayMs).toBe(3 * 60 * 1000);
-    expect(DEFAULT_RANDOM_EVENT_CONFIG.maxDelayMs).toBe(10 * 60 * 1000);
+    // Widened from three-to-ten when the pool grew from six events to sixteen: more faces in
+    // the bag is supposed to make each one rarer, not make the session busier.
+    expect(DEFAULT_RANDOM_EVENT_CONFIG.minDelayMs).toBe(4 * 60 * 1000);
+    expect(DEFAULT_RANDOM_EVENT_CONFIG.maxDelayMs).toBe(12 * 60 * 1000);
     expect(DEFAULT_RANDOM_EVENT_CONFIG.cooldownMs).toBeGreaterThan(0);
   });
 

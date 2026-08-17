@@ -39,6 +39,36 @@ file is older evidence from earlier lanes, kept for the record.
 | `dialog-achievements.png` `dialog-tools.png` `dialog-statistics.png` `dialog-prestige.png` | Each of the four anchored dialogs, open over the dimmed game surface and pointed at the console emblem that opened it: 15 / 100 achievements, 9 / 20 tools, ten stat tiles, and the ascension projection below the trillion-cookie threshold. |
 | `diesel-mint.png` | **Superseded — see the diesel factory set below.** One frame of the Diesel Depot's mint animation, from the build where cookies bought litres outright: the can pouring, the nozzle sweeping in behind it, a ghosted `14` rolling up under the litres figure, and the printed slip carrying `ed2d41c7` — a voucher identifier that really is in `%APPDATA%\DingDingProjects\exchange\diesel-vouchers.json`. |
 
+### The frenzy-class events
+
+| File | What it shows |
+| --- | --- |
+| `frenzy-production.png` | A **Production Frenzy** running, 67 seconds into its 77. The HUD's event plate carries the frenzy class accent — a warm plate with a gold ring — beside the oven emblem, a draining bar and the countdown. |
+| `frenzy-choice.png` | A **Taste Test**, waiting for an answer. The two-button card sits over the lower stage: the question in both languages, a brown "serve it now" button carrying the literal figure it pays (4,290,600,089,997 cookies), an olive "send it back" button offering production ×5 for a minute, and the line saying that answering neither gives you neither. The HUD plate for a choice event is deliberately quiet rather than gold. |
+
+**How these two were taken.** From the built `dist/`, launched by the real
+`electron` binary onto an off-screen Windows desktop named `FrenzyCapture` on
+its own debugging port, with a throwaway `--user-data-dir`. The window was
+maximised through the application's own title-bar API (2582x1550 device pixels
+at 144 DPI) and both images are Win32 `PrintWindow` captures of that one window,
+resolved by title and class. The save is the same progressed one the other
+captures use, written into `localStorage` over the devtools connection and then
+loaded normally.
+
+The draw was pinned to one event with the developer-only local-storage flag
+(`material-cookie-clicker:events:fast` set to `event:production_frenzy` and then
+`event:taste_test`). That flag decides **which** event fires and nothing else:
+the event that lands is the real event with its real duration, its real
+arithmetic and the real one-event-at-a-time rule. Waiting for a Production
+Frenzy on the shipped schedule would be about a four-hour wait, and for a Burnt
+Batch Frenzy about fifteen hours, which is not a capture process.
+
+**What is not captured.** Eleven of the sixteen pool events have no picture yet:
+Grandma's Surprise Batch, Sugar Rush, Lucky Crumb, Market Day, Click Frenzy,
+Burnt Batch Frenzy, Clot, Combo Window, Delivery Rush, Flour Shortage, Night
+Shift and Sprinkle Storm. The site article describes them from their shipped
+definitions and says so plainly rather than implying a photograph exists.
+
 **How this set was taken.** From the built `dist/`, launched by the real
 `electron` binary onto an off-screen Windows desktop named `CaptureRefresh`,
 with `--remote-debugging-port` so the run could be driven and a throwaway

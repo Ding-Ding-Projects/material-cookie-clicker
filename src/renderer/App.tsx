@@ -49,7 +49,12 @@ import { DiscoveryTicket } from './screens/DiscoveryTicket';
 import { MilkTide } from './screens/MilkTide';
 import { ShopRail } from './screens/ShopRail';
 import { PrestigeScreen } from './screens/PrestigeScreen';
-import { RandomEventIndicator, RandomEventStage, RandomEventToast } from './screens/RandomEventStage';
+import {
+  MouseRaidAftermathToast,
+  RandomEventIndicator,
+  RandomEventStage,
+  RandomEventToast,
+} from './screens/RandomEventStage';
 import { StatisticsScreen } from './screens/StatisticsScreen';
 import { ToolsScreen, type OpenApplicationFeature } from './screens/ToolsScreen';
 import { UpgradeStrip } from './screens/UpgradeStrip';
@@ -618,6 +623,11 @@ function GameShell() {
       {/* The same treatment for a random event landing. Also aria-hidden: narration.ts already
           put this event through the one milestone region that speaks. */}
       <RandomEventToast />
+
+      {/* What a Mouse Raid actually cost, or what defending it paid, with the literal figure in
+          it. Real content rather than aria-hidden decoration — the status region announced the
+          outcome once, and this is the copy of it a player can go back and read. */}
+      <MouseRaidAftermathToast />
 
       <div className="milestone-region" role="status" aria-live="polite">
         {milestoneMessage ? `${bilingualText(milestoneMessage)}` : ''}

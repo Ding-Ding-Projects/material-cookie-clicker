@@ -10,6 +10,7 @@ import {
   DEFAULT_GOLDEN_COOKIE_CONFIG,
 } from "./golden-cookie.js";
 import {
+  clearLastRaid,
   clearLastResolved,
   clickRandomEventTarget,
   createInitialRandomEventsState,
@@ -42,6 +43,16 @@ export interface ReducerCtx {
    * is set, and tests pass their own so a scheduler assertion never has to wait ten minutes.
    */
   readonly randomEventConfig?: RandomEventConfig;
+  /**
+   * True when the game window is hidden or minimised, read at dispatch time by GameProvider.
+   *
+   * It does NOT pause any clock — every timestamp in this game is wall-clock epoch ms and
+   * offline-progress.ts already credits time the app was not running, so a second
+   * visibility-aware clock would make two halves of the same save disagree. Its one job is to
+   * keep a Mouse Raid from starting against a window nobody can see; see
+   * random-events.ts#tickRandomEvents.
+   */
+  readonly windowHidden?: boolean;
 }
 
 export type GameAction =
@@ -70,8 +81,20 @@ export type GameAction =
    * cannot pay twice.
    */
   | { readonly type: "randomEventClick"; readonly targetId: string }
+  /**
+   * A whack on one mouse of an active Mouse Raid. Its own action kind rather than a
+   * `randomEventClick` with a differently-shaped id, because it is its own gesture with its own
+   * arithmetic: a whack pays nothing by itself (what it buys is the share of the balance that
+   * mouse would have carried off) and only the LAST whack pays, as the defended bonus. Keeping
+   * it separate also means a stray `mouse:` id cannot reach the rain/oven path, and the
+   * transcript of a session says plainly which gesture happened.
+   */
+  | { readonly type: "randomEventWhack"; readonly mouseId: string }
   /** Clears the finished-event record behind the "what just happened" toast. */
   | { readonly type: "randomEventResolve" }
+  /** Clears the finished-raid record behind the aftermath toast. Separate from the above
+   *  because the two toasts are separate surfaces saying different things. */
+  | { readonly type: "randomEventRaidDismiss" }
   | { readonly type: "prestige" }
   /**
    * Buys one node of the Reborn tree (reborn.ts) with ascension points. Additive, and shaped
@@ -272,11 +295,27 @@ function handleTick(state: GameState, ctx: ReducerCtx, elapsedMs: number): GameS
   // RngPort, and is told whether a golden cookie is currently holding the stage.
   const eventResult = tickRandomEvents(nextState.randomEvents, nextState, nowMs, ctx.rng, {
     blocked: goldenCookie.isSpawned,
+    hidden: ctx.windowHidden ?? false,
     config: ctx.randomEventConfig ?? DEFAULT_RANDOM_EVENT_CONFIG,
   });
   nextState = { ...nextState, randomEvents: eventResult.randomEvents };
   if (eventResult.instantBonus.mantissa !== 0) {
     nextState = addCookies(nextState, eventResult.instantBonus);
+  }
+
+  // A MOUSE RAID THAT WAS NOT FULLY DEFENDED.
+  //
+  // The theft is applied here and deliberately NOT through `addCookies` with a negative amount:
+  // that helper also advances `lifetimeCookies` and `stats.totalCookiesBaked`, and those two are
+  // history rather than balance. The mice take cookies out of the jar; they do not un-bake them,
+  // they do not revoke the achievements that lifetime total already unlocked, and they do not
+  // claw back ascension points hours after the fact. So exactly one number moves, and it is
+  // clamped at zero so a raid can empty the jar but never overdraw it.
+  if (eventResult.raidTheft && eventResult.raidTheft.stolen.mantissa !== 0) {
+    nextState = {
+      ...nextState,
+      cookies: bnClampNonNegative(bnSub(nextState.cookies, eventResult.raidTheft.stolen)),
+    };
   }
 
   return withAchievements(nextState, nowIso(ctx));
@@ -304,6 +343,22 @@ function handleRandomEventClick(state: GameState, ctx: ReducerCtx, targetId: str
   if (result.bonus.mantissa !== 0) nextState = addCookies(nextState, result.bonus);
 
   return withAchievements(nextState, nowIso(ctx));
+}
+
+/**
+ * One whack. Routed through the same pure `clickRandomEventTarget` seam as every other event
+ * target — one place decides whether a target was really there — but gated on the id shape, so
+ * this action can only ever hit a mouse.
+ */
+function handleRandomEventWhack(state: GameState, ctx: ReducerCtx, mouseId: string): GameState {
+  if (!mouseId.startsWith("mouse:")) return state;
+  return handleRandomEventClick(state, ctx, mouseId);
+}
+
+function handleRandomEventRaidDismiss(state: GameState): GameState {
+  const randomEvents = clearLastRaid(state.randomEvents);
+  if (randomEvents === state.randomEvents) return state;
+  return { ...state, randomEvents };
 }
 
 function handleRandomEventResolve(state: GameState): GameState {
@@ -432,8 +487,12 @@ export function applyGameAction(state: GameState, action: GameAction, ctx: Reduc
       return handleCollectGoldenCookie(state, ctx);
     case "randomEventClick":
       return handleRandomEventClick(state, ctx, action.targetId);
+    case "randomEventWhack":
+      return handleRandomEventWhack(state, ctx, action.mouseId);
     case "randomEventResolve":
       return handleRandomEventResolve(state);
+    case "randomEventRaidDismiss":
+      return handleRandomEventRaidDismiss(state);
     case "prestige":
       return handlePrestige(state, ctx);
     case "buyRebornNode":

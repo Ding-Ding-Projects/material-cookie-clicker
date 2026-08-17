@@ -4,7 +4,7 @@
 <meta charset="utf-8" />
 <meta name="viewport" content="width=device-width, initial-scale=1" />
 <title>Random events — Material Cookie Clicker</title>
-<meta name="description" content="Six events on a bounded random schedule, one of them a setback, all of them photographed running." />
+<meta name="description" content="Six events on a bounded random schedule plus an hourly Mouse Raid that can take 80% of your cookies, photographed running." />
 <link rel="stylesheet" href="../assets/site.css" />
 </head>
 <body>
@@ -24,10 +24,10 @@
 <main id="main" class="wrap">
   <article>
     <h1>Random events</h1>
-    <p class="lede">Six events on a bounded random schedule, one of them a setback, all of them photographed running.</p>
+    <p class="lede">Six events on a bounded random schedule, plus a rare Mouse Raid on its own hourly clock that can take up to 80% of your cookies if you do not whack the mice. All photographed running.</p>
     <div class="inset" style="margin-bottom:18px">
   <span class="label">Current state</span>
-  <p style="margin:0"><span class="tag">Shipped</span> the scheduler and all six events are in the build (<code>src/shared/game/random-events.ts</code>), and two of them were photographed on the running game surface.</p>
+  <p style="margin:0"><span class="tag">Shipped</span> the scheduler, all six pool events and the Mouse Raid are in the build (<code>src/shared/game/random-events.ts</code>), and four of them were photographed on the running game surface.</p>
 </div>
 
     <h2>From the running application</h2>
@@ -57,6 +57,45 @@
     </table>
     </div>
     <p>The draw is weighted, not uniform. The two plain windfalls are the most likely, and the Oven Hiccup is the least &mdash; an interruption that takes something away should be the one you remember, not the one you resent.</p>
+
+    <h2 id="mouse-raid">The Mouse Raid</h2>
+    <p>Roughly once an hour, mice get onto the counter. Three to five of them scurry across the game stage for twenty seconds, each one a real button you can whack. Every mouse still loose when the twenty seconds are up carries cookies away with it, and if all of them get away the raid takes <strong>eighty per cent of your current balance</strong>. Whack every one and it takes nothing at all, and pays you a small bonus for the trouble.</p>
+    <figure class="capture">
+      <img src="../assets/captures/mice-raid.png" alt="The game surface during a Mouse Raid. Five round pink buttons, each carrying a small grey mouse with a red ear, a red nose, whiskers and a cookie crumb under its belly, are scattered across the lower half of the stage, running over the upgrade shelf and the shop rail. The fourth HUD plate is pink and outlined in red, reading Mouse Raid in English and Cantonese with a draining dark red bar, the figure 10s, and the line 5 of 5 mice left with its Cantonese equivalent. The cookies plate reads 320 quadrillion." width="1557" height="1093" loading="lazy" />
+      <figcaption><strong>Five mice, mid-raid.</strong> Each one is a real button with its own accessible name and a 56-pixel hit area around a 36-pixel drawing &mdash; deliberately larger than the sprite, because a minimum target size measured against a stationary control is not the same promise when the control is crossing the stage. The HUD plate counts down and counts the mice still loose. Captured from the built application running on an off-screen Windows desktop, photographed with the Win32 PrintWindow API.</figcaption>
+    </figure>
+    <figure class="capture">
+      <img src="../assets/captures/mice-aftermath.png" alt="The same surface just after a raid ended. A wide pink card sits over the lower half of the stage reading: 2 of 4 mice got away with 16 quintillion cookies, the same sentence in Cantonese below it, and in smaller type, Your lifetime total is untouched — they took cookies, not history, again in both languages. A Dismiss button sits at its right. The cookies plate above now reads 24 quintillion." width="1557" height="1093" loading="lazy" />
+      <figcaption><strong>The aftermath, with the arithmetic showing.</strong> Two of the four mice were whacked with real clicks, so the raid took eighty per cent scaled by the two that escaped &mdash; forty per cent of a forty-quintillion balance, and the counter above the card reads twenty-four quintillion afterwards. The card states the amount rather than the percentage, because a percentage is not a number you can check against your own counter.</figcaption>
+    </figure>
+
+    <h3>What it takes, exactly</h3>
+    <p>The theft is <code>balance &times; 0.8 &times; escaped / total</code>, so one mouse of five getting away costs sixteen per cent and all five cost the full eighty. It is scaled rather than all-or-nothing on purpose: a raid you nearly stopped should cost you nearly nothing, and whacking four of five visibly buys back four fifths of your balance.</p>
+    <div class="scroller">
+    <table>
+      <caption>What one raid of five mice costs, by how many got away</caption>
+      <thead><tr><th scope="col">Mice that escaped</th><th scope="col">Share of your balance taken</th></tr></thead>
+      <tbody>
+        <tr><td>0 &mdash; all whacked</td><td>Nothing, plus a defended bonus of two minutes&rsquo; production and 250 cookies</td></tr>
+        <tr><td>1 of 5</td><td>16%</td></tr>
+        <tr><td>2 of 5</td><td>32%</td></tr>
+        <tr><td>3 of 5</td><td>48%</td></tr>
+        <tr><td>4 of 5</td><td>64%</td></tr>
+        <tr><td>5 of 5</td><td>80% &mdash; the ceiling, and the most a raid can ever take</td></tr>
+      </tbody>
+    </table>
+    </div>
+    <p><strong>It takes cookies, not history.</strong> The theft comes off your balance and never off your lifetime total or your baked-cookies statistic. Those two are the record of what this save has ever produced; they gate achievements and the prestige projection, and a mouse eating a biscuit does not un-bake it. Letting a raid rewind them would make it quietly retroactive &mdash; revoking achievements and ascension points hours after the fact &mdash; which is a far worse punishment than the one you agreed to. So a raid is expensive and it is survivable, and nothing it does can move a number that only ever goes up.</p>
+
+    <h3>Rarity, and the rails around it</h3>
+    <ul>
+      <li><strong>Its own clock, not the pool&rsquo;s.</strong> The raid is never drawn from the weighted bag the other six events come from. It runs on a separate fifty-to-seventy-five-minute window &mdash; rare by the clock rather than rare by the dice &mdash; because an eighty-per-cent loss sharing a bag with Lucky Crumb would be either too light to be a raid or too frequent to be fair.</li>
+      <li><strong>Still one event at a time.</strong> It occupies the same single active slot as everything else here, so it can never land on top of a Cookie Rain, and a golden cookie waiting to be clicked still blocks it.</li>
+      <li><strong>Never in a fresh save&rsquo;s first ten minutes.</strong> The opening minutes are the tutorial by another name, and a raid there teaches the wrong lesson.</li>
+      <li><strong>Never below a thousand cookies.</strong> Eighty per cent of four hundred cookies is not a robbery, it is noise, and it is noise aimed at exactly the player least able to read a new mechanic. The raid waits rather than re-rolling.</li>
+      <li><strong>Never against a window you are not looking at.</strong> Nothing about the game clock pauses when the window is hidden &mdash; cookies keep accruing exactly as they do while the app is closed, which is what the offline-progress rules already promise &mdash; but a raid will not <em>start</em> against a hidden or minimised window. It fires on the first tick after you come back, so the twenty seconds you get are twenty seconds you could actually see.</li>
+    </ul>
+    <p>Because the whole scheduler is seeded rather than random, all of that is testable rather than hopeful: the suite drives twelve hours of simulated play from a fixed seed and asserts the raid count lands in the nine-to-fourteen range an hourly event implies, that no raid ever began inside an exclusion, and that the theft arithmetic is exact for every escaped-mouse count.</p>
 
     <h2>The scheduling rules, stated plainly</h2>
     <ul>

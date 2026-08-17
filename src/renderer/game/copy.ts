@@ -131,6 +131,46 @@ export const RANDOM_EVENT_COPY = {
 } as const satisfies Record<string, Bilingual>;
 
 /**
+ * The Mouse Raid's own strings.
+ *
+ * Every one of them says what actually happened with a real figure in it. "Some cookies were
+ * stolen" would be the easy line to write and the one the player cannot check; the aftermath
+ * toast prints the literal grouped amount that left the jar, and says outright that the
+ * lifetime total was not touched, because that is the part a player would otherwise have to
+ * discover by staring at two counters.
+ */
+export const MOUSE_RAID_COPY = {
+  stageLabel: { en: "Mice on the counter", yue: "枱上面嘅老鼠" },
+  whack: { en: "Whack the mouse", yue: "拍走隻老鼠" },
+  miceLeft: (remaining: number, total: number): Bilingual => ({
+    en: `${remaining} of ${total} mice left`,
+    yue: `仲有 ${remaining} / ${total} 隻老鼠`,
+  }),
+  warning: {
+    en: "Every mouse that gets away takes cookies with it.",
+    yue: "走甩一隻，就俾佢哋帶走一啲曲奇。",
+  },
+  ceiling: {
+    en: "A raid can take up to 80% of your cookies.",
+    yue: "一次打劫最多可以攞走你 80% 曲奇。",
+  },
+  defended: (reward: string): Bilingual => ({
+    en: `Raid defended — every mouse chased off. Nothing stolen, and ${reward} cookies for the trouble.`,
+    yue: `打劫擋咗——隻隻老鼠都拍走咗。冇損失，仲有 ${reward} 粒曲奇做辛苦費。`,
+  }),
+  stolen: (amount: string, escaped: number, total: number): Bilingual => ({
+    en: `${escaped} of ${total} mice got away with ${amount} cookies.`,
+    yue: `${total} 隻之中走甩咗 ${escaped} 隻，帶走咗 ${amount} 粒曲奇。`,
+  }),
+  historyNote: {
+    en: "Your lifetime total is untouched — they took cookies, not history.",
+    yue: "累計總數冇變——佢哋攞走嘅係曲奇，唔係紀錄。",
+  },
+  aftermathLabel: { en: "Raid aftermath", yue: "打劫之後" },
+  dismiss: { en: "Dismiss", yue: "收起" },
+} as const satisfies Record<string, Bilingual | ((...args: any[]) => Bilingual)>;
+
+/**
  * The console cluster bolted to the cabinet frame and the anchored panels it opens. These are
  * NOT navigation: the game surface never goes away, so every string here talks about opening
  * and closing a panel rather than going to a page.

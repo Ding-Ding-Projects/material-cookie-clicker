@@ -5,6 +5,7 @@ import { totalCps } from "../../src/shared/game/cps";
 import { createSplitMix32Rng } from "../../src/shared/game/golden-cookie";
 import { applyGameAction, type ReducerCtx } from "../../src/shared/game/reducer";
 import {
+  clearLastRaid,
   clickRandomEventTarget,
   createInitialRandomEventsState,
   decodeRandomEvents,
@@ -14,6 +15,15 @@ import {
   FAST_RANDOM_EVENT_CONFIG,
   getRandomEventDefinition,
   instantPayout,
+  miceRemaining,
+  pickRandomEventId,
+  MOUSE_RAID_DEFINITION,
+  MOUSE_RAID_MAX_MICE,
+  MOUSE_RAID_MIN_MICE,
+  mouseRaidDefenceReward,
+  mouseRaidTheft,
+  mouseTargetIds,
+  RAID_CAPTURE_EVENT_CONFIG,
   rainDropPayout,
   RANDOM_EVENT_DEFINITIONS,
   randomEventClickMultiplier,
@@ -212,7 +222,13 @@ describe("random events: scheduler determinism", () => {
   });
 
   it("returns the identical state object when a tick changes nothing", () => {
-    const state: RandomEventsState = { ...createInitialRandomEventsState(), nextEligibleAtEpochMs: 500_000 };
+    // Both clocks have to be already scheduled for a tick to be a genuine no-op: the FIRST tick
+    // of any save seeds the raid clock (see the raid suite below), which is a real change.
+    const state: RandomEventsState = {
+      ...createInitialRandomEventsState(),
+      nextEligibleAtEpochMs: 500_000,
+      raidNextEligibleAtEpochMs: 500_000,
+    };
     const result = tickRandomEvents(state, producingState(), 1_000, fixedRng(0.5), { blocked: false });
     expect(result.randomEvents).toBe(state);
     expect(bnToNumber(result.instantBonus)).toBe(0);
@@ -359,6 +375,9 @@ describe("random events: configuration and persistence", () => {
       rngStreamIndex: 17,
       lastResolved: { id: "sugar_rush", resolvedAtEpochMs: 3_000, claimedCount: 0, endedEarly: false },
       spawnCount: 4,
+      raidNextEligibleAtEpochMs: 3_600_000,
+      lastRaid: null,
+      raidCount: 0,
     };
     expect(decodeRandomEvents(encodeRandomEvents(state))).toEqual(state);
   });
@@ -463,5 +482,463 @@ describe("random events: through the reducer", () => {
     }
     expect(sawSpawn).toBe(true);
     expect(state.randomEvents.active !== null || state.randomEvents.lastResolved !== null).toBe(true);
+  });
+});
+
+/* ========================================================================= the mouse raid */
+
+/** A save rich enough to be worth raiding, with real production behind it. */
+function raidableState(cookies = 1e9): GameState {
+  return producingState({ cookies: bnFromNumber(cookies), lifetimeCookies: bnFromNumber(cookies * 2) });
+}
+
+/** The shipped raid window with the common pool silenced, so a run isolates the raid clock. */
+const RAID_ONLY_CONFIG: RandomEventConfig = {
+  ...DEFAULT_RANDOM_EVENT_CONFIG,
+  minDelayMs: 1_000_000_000,
+  maxDelayMs: 1_000_000_000,
+};
+
+interface RaidLogEntry {
+  readonly spawnedAt: number;
+  readonly resolvedAt: number;
+  readonly mice: number;
+}
+
+/**
+ * Drives the scheduler at the real 200ms cadence and reports every RAID it produced. Pure: the
+ * whole run is a function of (seed, config, options), with no clock and no Math.random.
+ */
+function simulateRaids(
+  seed: number,
+  config: RandomEventConfig,
+  durationMs: number,
+  options: { blocked?: boolean; hidden?: boolean; gameState?: GameState } = {},
+): RaidLogEntry[] {
+  const rng = createSplitMix32Rng(seed);
+  const gameState = options.gameState ?? raidableState();
+  let state: RandomEventsState = createInitialRandomEventsState();
+  const log: RaidLogEntry[] = [];
+  let open: { spawnedAt: number; mice: number } | null = null;
+
+  for (let now = 0; now <= durationMs; now += 200) {
+    const before = state;
+    state = tickRandomEvents(state, gameState, now, rng, {
+      blocked: options.blocked ?? false,
+      hidden: options.hidden ?? false,
+      config,
+    }).randomEvents;
+
+    if (before.active?.id !== "mouse_raid" && state.active?.id === "mouse_raid") {
+      open = { spawnedAt: now, mice: state.active.pendingTargetIds.length };
+    } else if (open && before.active?.id === "mouse_raid" && state.active === null) {
+      log.push({ ...open, resolvedAt: now });
+      open = null;
+    }
+  }
+  return log;
+}
+
+describe("mouse raid: the schedule", () => {
+  it("fires roughly hourly over a long seeded run", () => {
+    const log = simulateRaids(20_260, RAID_ONLY_CONFIG, 12 * 60 * 60 * 1000);
+    // Twelve hours of play at fifty-to-seventy-five-minute gaps: nine to fourteen raids.
+    expect(log.length).toBeGreaterThanOrEqual(9);
+    expect(log.length).toBeLessThanOrEqual(14);
+
+    for (let i = 1; i < log.length; i += 1) {
+      const gap = log[i].spawnedAt - log[i - 1].resolvedAt;
+      expect(gap).toBeGreaterThanOrEqual(RAID_ONLY_CONFIG.raidMinDelayMs - MOUSE_RAID_DEFINITION.durationMs);
+      // One tick of slack: the scheduler can only notice its own eligibility on a tick boundary.
+      expect(gap).toBeLessThanOrEqual(RAID_ONLY_CONFIG.raidMaxDelayMs + 200);
+    }
+  });
+
+  it("never raids a fresh save in its first ten minutes", () => {
+    for (const seed of [1, 2, 3, 7, 99, 4242]) {
+      const log = simulateRaids(seed, RAID_ONLY_CONFIG, 3 * 60 * 60 * 1000);
+      expect(log.length).toBeGreaterThan(0);
+      expect(log[0].spawnedAt).toBeGreaterThanOrEqual(DEFAULT_RANDOM_EVENT_CONFIG.raidFreshGraceMs);
+      // Under the shipped window the real first raid is far later than the bare grace floor.
+      expect(log[0].spawnedAt).toBeGreaterThanOrEqual(DEFAULT_RANDOM_EVENT_CONFIG.raidMinDelayMs);
+    }
+  });
+
+  it("honours the grace floor even under a developer schedule that would otherwise beat it", () => {
+    const impatient: RandomEventConfig = {
+      ...RAID_CAPTURE_EVENT_CONFIG,
+      raidFreshGraceMs: 10 * 60 * 1000,
+    };
+    const log = simulateRaids(5, impatient, 30 * 60 * 1000);
+    expect(log.length).toBeGreaterThan(0);
+    expect(log[0].spawnedAt).toBeGreaterThanOrEqual(10 * 60 * 1000);
+  });
+
+  it("brings three to five mice, and not always the same number", () => {
+    const log = simulateRaids(777, RAID_CAPTURE_EVENT_CONFIG, 60 * 60 * 1000);
+    expect(log.length).toBeGreaterThan(20);
+    const counts = new Set<number>();
+    for (const raid of log) {
+      expect(raid.mice).toBeGreaterThanOrEqual(MOUSE_RAID_MIN_MICE);
+      expect(raid.mice).toBeLessThanOrEqual(MOUSE_RAID_MAX_MICE);
+      counts.add(raid.mice);
+    }
+    expect(counts.size).toBeGreaterThan(1);
+  });
+
+  it("replays exactly from the same seed, and differs from another", () => {
+    const a = simulateRaids(31, RAID_CAPTURE_EVENT_CONFIG, 20 * 60 * 1000);
+    expect(simulateRaids(31, RAID_CAPTURE_EVENT_CONFIG, 20 * 60 * 1000)).toEqual(a);
+    expect(simulateRaids(32, RAID_CAPTURE_EVENT_CONFIG, 20 * 60 * 1000)).not.toEqual(a);
+  });
+
+  it("never fires while a golden cookie is holding the stage", () => {
+    expect(simulateRaids(11, RAID_CAPTURE_EVENT_CONFIG, 60 * 60 * 1000, { blocked: true })).toEqual([]);
+  });
+
+  it("never fires against a hidden window, and fires as soon as it comes back", () => {
+    expect(simulateRaids(12, RAID_CAPTURE_EVENT_CONFIG, 60 * 60 * 1000, { hidden: true })).toEqual([]);
+
+    // Deferred, not re-rolled: the same run visible again raids on the first eligible tick.
+    const rng = createSplitMix32Rng(12);
+    const gameState = raidableState();
+    let state = createInitialRandomEventsState();
+    for (let now = 0; now <= 60_000; now += 200) {
+      state = tickRandomEvents(state, gameState, now, rng, {
+        blocked: false,
+        hidden: true,
+        config: RAID_CAPTURE_EVENT_CONFIG,
+      }).randomEvents;
+    }
+    expect(state.active).toBeNull();
+    expect(state.raidNextEligibleAtEpochMs).toBeLessThanOrEqual(60_000);
+
+    const next = tickRandomEvents(state, gameState, 60_200, rng, {
+      blocked: false,
+      hidden: false,
+      config: RAID_CAPTURE_EVENT_CONFIG,
+    }).randomEvents;
+    expect(next.active?.id).toBe("mouse_raid");
+  });
+
+  it("never raids a player holding less than a thousand cookies", () => {
+    const broke = producingState({ cookies: bnFromNumber(999) });
+    expect(simulateRaids(13, RAID_CAPTURE_EVENT_CONFIG, 60 * 60 * 1000, { gameState: broke })).toEqual([]);
+  });
+
+  it("never lands on top of another event, because it takes the same active slot", () => {
+    const both: RandomEventConfig = { ...RAID_CAPTURE_EVENT_CONFIG, minDelayMs: 2_000, maxDelayMs: 6_000 };
+    const rng = createSplitMix32Rng(2027);
+    const gameState = raidableState();
+    let state = createInitialRandomEventsState();
+    for (let now = 0; now <= 60 * 60 * 1000; now += 200) {
+      const next = tickRandomEvents(state, gameState, now, rng, { blocked: false, config: both }).randomEvents;
+      // A spawn may only ever happen into an empty slot.
+      if (next.active !== null && state.active !== null) expect(next.active).toBe(state.active);
+      state = next;
+    }
+    expect(state.raidCount).toBeGreaterThan(0);
+    expect(state.spawnCount).toBeGreaterThan(state.raidCount);
+  });
+
+  it("keeps the raid out of the weighted pool entirely", () => {
+    const rng = createSplitMix32Rng(4);
+    for (let i = 0; i < 5_000; i += 1) expect(pickRandomEventId(rng)).not.toBe("mouse_raid");
+    expect(RANDOM_EVENT_DEFINITIONS.some((d) => d.id === "mouse_raid")).toBe(false);
+  });
+
+  it("resolves the capture-only flag value to the raid schedule and nothing else to it", () => {
+    expect(resolveRandomEventConfig("raid")).toBe(RAID_CAPTURE_EVENT_CONFIG);
+    expect(resolveRandomEventConfig("RAID")).toBe(DEFAULT_RANDOM_EVENT_CONFIG);
+    expect(resolveRandomEventConfig("1")).toBe(FAST_RANDOM_EVENT_CONFIG);
+    // Even the capture schedule keeps the balance rail: fairness is not a capture setting.
+    expect(RAID_CAPTURE_EVENT_CONFIG.raidMinCookies).toBe(DEFAULT_RANDOM_EVENT_CONFIG.raidMinCookies);
+    expect(RAID_CAPTURE_EVENT_CONFIG.raidStealCeiling).toBe(0.8);
+  });
+
+  it("keeps the shipped raid window at roughly an hour, measured in tens of minutes", () => {
+    expect(DEFAULT_RANDOM_EVENT_CONFIG.raidMinDelayMs).toBe(50 * 60 * 1000);
+    expect(DEFAULT_RANDOM_EVENT_CONFIG.raidMaxDelayMs).toBe(75 * 60 * 1000);
+    expect(DEFAULT_RANDOM_EVENT_CONFIG.raidFreshGraceMs).toBe(10 * 60 * 1000);
+  });
+});
+
+describe("mouse raid: what it takes", () => {
+  const cookies = bnFromNumber(1_000_000);
+
+  it("scales the eighty per cent ceiling by how many mice escaped", () => {
+    const table: readonly (readonly [number, number])[] = [
+      [0, 0],
+      [1, 0.16],
+      [2, 0.32],
+      [3, 0.48],
+      [4, 0.64],
+      [5, 0.8],
+    ];
+    for (const [escaped, fraction] of table) {
+      expect(bnToNumber(mouseRaidTheft(cookies, escaped, 5))).toBeCloseTo(1_000_000 * fraction, 3);
+    }
+  });
+
+  it("takes exactly the ceiling and never more, whatever the mouse count", () => {
+    for (const total of [3, 4, 5]) {
+      expect(bnToNumber(mouseRaidTheft(cookies, total, total))).toBeCloseTo(800_000, 3);
+      expect(bnToNumber(mouseRaidTheft(cookies, total + 3, total))).toBeCloseTo(800_000, 3);
+    }
+  });
+
+  it("takes nothing at all when every mouse was whacked", () => {
+    expect(bnToNumber(mouseRaidTheft(cookies, 0, 4))).toBe(0);
+  });
+
+  it("scales with the balance, so it is never a fixed catastrophe or a fixed rounding error", () => {
+    expect(bnToNumber(mouseRaidTheft(bnFromNumber(2_000), 5, 5))).toBeCloseTo(1_600, 6);
+    expect(bnToNumber(mouseRaidTheft(bnFromNumber(1e30), 5, 5)) / 1e29).toBeCloseTo(8, 6);
+  });
+
+  it("pays a full defence as two minutes of production plus a flat floor", () => {
+    const state = raidableState();
+    const cps = bnToNumber(totalCps(state));
+    expect(bnToNumber(mouseRaidDefenceReward(state))).toBeCloseTo(cps * 120 + 250, 3);
+  });
+
+  it("pays a full defence something even on a save with no production", () => {
+    expect(bnToNumber(mouseRaidDefenceReward(freshState()))).toBe(250);
+  });
+});
+
+describe("mouse raid: whacking", () => {
+  function raidState(mice: number, startedAtEpochMs = 0): RandomEventsState {
+    return {
+      ...createInitialRandomEventsState(),
+      raidNextEligibleAtEpochMs: 10_000_000,
+      active: {
+        id: "mouse_raid",
+        startedAtEpochMs,
+        endsAtEpochMs: startedAtEpochMs + MOUSE_RAID_DEFINITION.durationMs,
+        pendingTargetIds: mouseTargetIds(mice),
+        claimedCount: 0,
+      },
+    };
+  }
+
+  it("takes one mouse off the stage per whack and pays nothing until the last", () => {
+    const game = raidableState();
+    let state = raidState(3);
+    const first = clickRandomEventTarget(state, game, "mouse:0", 1_000, fixedRng(0.5));
+    expect(first.claimed).toBe(true);
+    expect(bnToNumber(first.bonus)).toBe(0);
+    expect(miceRemaining(first.randomEvents)).toBe(2);
+    expect(first.randomEvents.active?.claimedCount).toBe(1);
+    state = first.randomEvents;
+
+    const second = clickRandomEventTarget(state, game, "mouse:1", 1_200, fixedRng(0.5));
+    expect(bnToNumber(second.bonus)).toBe(0);
+    expect(miceRemaining(second.randomEvents)).toBe(1);
+  });
+
+  it("ends the raid on the last whack, banks a defended outcome and pays the bonus", () => {
+    const game = raidableState();
+    let state = raidState(3);
+    for (const id of ["mouse:0", "mouse:1"]) {
+      state = clickRandomEventTarget(state, game, id, 1_000, fixedRng(0.5)).randomEvents;
+    }
+    const last = clickRandomEventTarget(state, game, "mouse:2", 2_000, fixedRng(0.5));
+
+    expect(last.claimed).toBe(true);
+    expect(bnToNumber(last.bonus)).toBeCloseTo(bnToNumber(mouseRaidDefenceReward(game)), 3);
+    expect(last.randomEvents.active).toBeNull();
+    expect(last.randomEvents.lastRaid).toMatchObject({
+      defended: true,
+      miceTotal: 3,
+      miceWhacked: 3,
+      miceEscaped: 0,
+    });
+    expect(bnToNumber(last.randomEvents.lastRaid!.stolen)).toBe(0);
+    // Its own clock restarts; the pool gets a plain cooldown rather than the raid's hour.
+    expect(last.randomEvents.raidNextEligibleAtEpochMs).toBeGreaterThan(2_000);
+    expect(last.randomEvents.lastResolved).toMatchObject({ id: "mouse_raid", endedEarly: true });
+  });
+
+  it("refuses a mouse that has already been whacked, so a double click cannot count twice", () => {
+    const game = raidableState();
+    const once = clickRandomEventTarget(raidState(4), game, "mouse:0", 1_000, fixedRng(0.5));
+    const twice = clickRandomEventTarget(once.randomEvents, game, "mouse:0", 1_050, fixedRng(0.5));
+    expect(twice.claimed).toBe(false);
+    expect(twice.randomEvents).toBe(once.randomEvents);
+  });
+
+  it("refuses a whack after the window has closed", () => {
+    const late = clickRandomEventTarget(raidState(4), raidableState(), "mouse:0", 30_000, fixedRng(0.5));
+    expect(late.claimed).toBe(false);
+  });
+
+  it("steals from the escapees when the window runs out, and records exactly what went", () => {
+    const game = raidableState(1_000_000);
+    let state = raidState(5);
+    state = clickRandomEventTarget(state, game, "mouse:0", 1_000, fixedRng(0.5)).randomEvents;
+    state = clickRandomEventTarget(state, game, "mouse:1", 1_100, fixedRng(0.5)).randomEvents;
+
+    const result = tickRandomEvents(state, game, MOUSE_RAID_DEFINITION.durationMs, createSplitMix32Rng(3), {
+      blocked: false,
+      config: DEFAULT_RANDOM_EVENT_CONFIG,
+    });
+
+    expect(result.raidTheft).not.toBeNull();
+    expect(result.raidTheft).toMatchObject({ miceTotal: 5, miceWhacked: 2, miceEscaped: 3, defended: false });
+    // Three of five escaped: 80% x 3/5 = 48%.
+    expect(bnToNumber(result.raidTheft!.stolen)).toBeCloseTo(480_000, 2);
+    expect(result.randomEvents.lastRaid).toEqual(result.raidTheft);
+    expect(result.randomEvents.active).toBeNull();
+  });
+
+  it("clears the finished-raid record on demand, and is a no-op when there is none", () => {
+    const withRaid: RandomEventsState = {
+      ...createInitialRandomEventsState(),
+      lastRaid: {
+        resolvedAtEpochMs: 1,
+        miceTotal: 4,
+        miceWhacked: 1,
+        miceEscaped: 3,
+        stolen: bnFromNumber(10),
+        reward: bnFromNumber(0),
+        defended: false,
+      },
+    };
+    expect(clearLastRaid(withRaid).lastRaid).toBeNull();
+    const empty = createInitialRandomEventsState();
+    expect(clearLastRaid(empty)).toBe(empty);
+  });
+
+  it("round-trips a finished raid through the save seam", () => {
+    const state: RandomEventsState = {
+      ...createInitialRandomEventsState(),
+      raidNextEligibleAtEpochMs: 4_200_000,
+      raidCount: 3,
+      lastRaid: {
+        resolvedAtEpochMs: 99_000,
+        miceTotal: 5,
+        miceWhacked: 4,
+        miceEscaped: 1,
+        stolen: bnFromNumber(1.234e12),
+        reward: bnFromNumber(0),
+        defended: false,
+      },
+    };
+    expect(decodeRandomEvents(encodeRandomEvents(state))).toEqual(state);
+  });
+
+  it("reads a save written before the raid existed as a save where none has happened", () => {
+    const old = {
+      active: null,
+      nextEligibleAtEpochMs: 500_000,
+      rngStreamIndex: 9,
+      lastResolved: null,
+      spawnCount: 2,
+    };
+    const decoded = decodeRandomEvents(old);
+    expect(decoded.nextEligibleAtEpochMs).toBe(500_000);
+    expect(decoded.spawnCount).toBe(2);
+    expect(decoded.raidNextEligibleAtEpochMs).toBe(0);
+    expect(decoded.lastRaid).toBeNull();
+    expect(decoded.raidCount).toBe(0);
+  });
+});
+
+describe("mouse raid: through the reducer", () => {
+  function stateWithRaid(mice: number, cookies: number): GameState {
+    const base = raidableState(cookies);
+    return {
+      ...base,
+      randomEvents: {
+        ...createInitialRandomEventsState(),
+        raidNextEligibleAtEpochMs: 10_000_000,
+        active: {
+          id: "mouse_raid",
+          startedAtEpochMs: 0,
+          endsAtEpochMs: MOUSE_RAID_DEFINITION.durationMs,
+          pendingTargetIds: mouseTargetIds(mice),
+          claimedCount: 0,
+        },
+      },
+    };
+  }
+
+  it("takes the theft off the balance and leaves history alone", () => {
+    const before = stateWithRaid(4, 1_000_000);
+    const lifetimeBefore = bnToNumber(before.lifetimeCookies);
+    const accrued = bnToNumber(totalCps(before)) * (MOUSE_RAID_DEFINITION.durationMs / 1000);
+
+    const after = applyGameAction(
+      before,
+      { type: "tick", elapsedMs: MOUSE_RAID_DEFINITION.durationMs },
+      ctxAt(MOUSE_RAID_DEFINITION.durationMs),
+    );
+
+    // Four of four escaped: the full eighty per cent, taken off the tick-accrued balance.
+    const balanceBeforeTheft = bnToNumber(before.cookies) + accrued;
+    expect(bnToNumber(after.cookies) / balanceBeforeTheft).toBeCloseTo(0.2, 6);
+    // History only ever went UP, by exactly what the tick baked.
+    expect(bnToNumber(after.lifetimeCookies) - lifetimeBefore).toBeCloseTo(accrued, 0);
+    expect(after.randomEvents.lastRaid?.defended).toBe(false);
+    expect(after.randomEvents.lastRaid?.miceEscaped).toBe(4);
+  });
+
+  it("never overdraws the jar", () => {
+    const before: GameState = { ...stateWithRaid(5, 5_000), generators: [] };
+    const after = applyGameAction(
+      before,
+      { type: "tick", elapsedMs: MOUSE_RAID_DEFINITION.durationMs },
+      ctxAt(MOUSE_RAID_DEFINITION.durationMs),
+    );
+    expect(bnToNumber(after.cookies)).toBeGreaterThanOrEqual(0);
+    expect(bnToNumber(after.cookies)).toBeCloseTo(1_000, 3);
+  });
+
+  it("credits a full defence through the one reducer seam", () => {
+    let state = stateWithRaid(3, 1_000_000);
+    const reward = bnToNumber(mouseRaidDefenceReward(state));
+    for (const mouseId of ["mouse:0", "mouse:1", "mouse:2"]) {
+      state = applyGameAction(state, { type: "randomEventWhack", mouseId }, ctxAt(1_000));
+    }
+    expect(bnToNumber(state.cookies)).toBeCloseTo(1_000_000 + reward, 2);
+    expect(state.randomEvents.lastRaid?.defended).toBe(true);
+    expect(state.randomEvents.active).toBeNull();
+  });
+
+  it("is a no-op for a whack that is not aimed at a mouse that is there", () => {
+    const state = stateWithRaid(3, 1_000_000);
+    expect(applyGameAction(state, { type: "randomEventWhack", mouseId: "rain:0" }, ctxAt(1_000))).toBe(state);
+    expect(applyGameAction(state, { type: "randomEventWhack", mouseId: "mouse:9" }, ctxAt(1_000))).toBe(state);
+  });
+
+  it("clears the aftermath record on randomEventRaidDismiss, and is a no-op when there is none", () => {
+    let state = stateWithRaid(2, 1_000_000);
+    state = applyGameAction(
+      state,
+      { type: "tick", elapsedMs: MOUSE_RAID_DEFINITION.durationMs },
+      ctxAt(MOUSE_RAID_DEFINITION.durationMs),
+    );
+    expect(state.randomEvents.lastRaid).not.toBeNull();
+
+    const cleared = applyGameAction(state, { type: "randomEventRaidDismiss" }, ctxAt(1));
+    expect(cleared.randomEvents.lastRaid).toBeNull();
+    expect(applyGameAction(cleared, { type: "randomEventRaidDismiss" }, ctxAt(1))).toBe(cleared);
+  });
+
+  it("stays pure: no raid action mutates the state handed to it", () => {
+    const before = stateWithRaid(3, 1_000_000);
+    const snapshot = JSON.parse(JSON.stringify(before));
+    applyGameAction(before, { type: "randomEventWhack", mouseId: "mouse:0" }, ctxAt(1_000));
+    applyGameAction(before, { type: "randomEventRaidDismiss" }, ctxAt(1_000));
+    applyGameAction(before, { type: "tick", elapsedMs: 25_000 }, ctxAt(25_000));
+    expect(JSON.parse(JSON.stringify(before))).toEqual(snapshot);
+  });
+
+  it("survives a save round trip mid-raid, mice and all", () => {
+    const state = stateWithRaid(4, 1_000_000);
+    const decoded = decodeRandomEvents(encodeRandomEvents(state.randomEvents));
+    expect(decoded).toEqual(state.randomEvents);
+    expect(decoded.active?.pendingTargetIds).toEqual(["mouse:0", "mouse:1", "mouse:2", "mouse:3"]);
   });
 });

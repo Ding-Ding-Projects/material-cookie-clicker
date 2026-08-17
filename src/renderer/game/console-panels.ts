@@ -7,8 +7,18 @@ import type { ConsoleSurfaceId, Disclosure } from "../../shared/game/disclosure.
  * than inferring from a rendered tree, and neither needs React to decide.
  */
 
-/** The four GAME surfaces. Each is earned — see disclosure.ts. */
-export const GAME_SURFACE_IDS: readonly ConsoleSurfaceId[] = ["achievements", "tools", "statistics", "prestige"];
+/**
+ * The GAME surfaces, in cabinet order. Each is earned — see disclosure.ts. The Factory sits
+ * first because it is the only one that is a game in its own right rather than a report on the
+ * game, and because it is bought outright (with the Fuel Contract) rather than reached.
+ */
+export const GAME_SURFACE_IDS: readonly ConsoleSurfaceId[] = [
+  "factory",
+  "achievements",
+  "tools",
+  "statistics",
+  "prestige",
+];
 
 /**
  * SETTINGS is the fifth emblem and is NOT a game surface.

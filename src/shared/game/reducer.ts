@@ -9,7 +9,19 @@ import {
   type GoldenCookieConfig,
   DEFAULT_GOLDEN_COOKIE_CONFIG,
 } from "./golden-cookie.js";
-import { costOfLitres } from "./diesel-exchange.js";
+import {
+  amortizedCookiesFor,
+  autoShipQuantity,
+  createInitialFactoryState,
+  equipmentBulkCost,
+  getEquipmentDefinition,
+  getFactoryUpgradeDefinition,
+  isFactoryUpgradeOffered,
+  ownsFactoryUpgrade,
+  equipmentOwned as factoryEquipmentOwned,
+  shippableLitres,
+  tickFactory,
+} from "./diesel-factory.js";
 import { computeDisclosure } from "./disclosure.js";
 import { costOfBulk, costOfNext, getGeneratorDefinition, maxAffordable } from "./generators.js";
 import { computeOfflineProgressWithTools, type OfflineProgressOptions } from "./offline-progress.js";
@@ -32,14 +44,26 @@ export type GameAction =
   | { readonly type: "buyUpgrade"; readonly upgradeId: string }
   | { readonly type: "buyTool"; readonly toolId: string }
   /**
-   * Buys `litres` of diesel for WinForge with cookies (diesel-exchange.ts). The reducer does
-   * the whole GAME half of that purchase — check the depot is revealed, check the price, deduct
-   * the cookies, record the litres — and nothing else. Writing the actual voucher to the shared
-   * ledger file is a side effect of this action having been dispatched, performed by
-   * GameProvider through the main-process bridge, exactly as autosave is. The domain never
-   * touches a file system, so a mint is as replayable and testable as a click.
+   * SHIPS `litres` of diesel out of the factory's tanks as a voucher for WinForge.
+   *
+   * The action kind is unchanged from the build where cookies bought litres outright, because
+   * what it does to the ledger is unchanged — it still mints one voucher — but where the litres
+   * COME FROM is completely different. They are drawn DOWN from tank stock the factory
+   * manufactured (diesel-factory.ts). No cookies are deducted here: cookies were spent on the
+   * equipment, and the voucher records the amortized share of that spend.
+   *
+   * The reducer does the whole GAME half — check the depot is revealed, check the stock is
+   * really there, draw it down, record the shipment — and nothing else. Writing the voucher to
+   * the shared ledger file is a side effect of this action having been dispatched, performed by
+   * GameProvider through the main-process bridge, exactly as autosave is.
    */
   | { readonly type: "mintDiesel"; readonly litres: number }
+  /** Buys factory equipment with cookies — the ONE place cookies enter the factory economy. */
+  | { readonly type: "buyFactoryEquipment"; readonly equipmentId: string; readonly quantity: number }
+  /** Buys one factory upgrade with cookies. Offered by condition, bought by press, never given. */
+  | { readonly type: "buyFactoryUpgrade"; readonly upgradeId: string }
+  /** Player switch for automatic shipping. Does nothing until an automation upgrade is bought. */
+  | { readonly type: "setFactoryAutoShip"; readonly enabled: boolean }
   | { readonly type: "setToolProgression"; readonly enabled: boolean }
   | { readonly type: "tick"; readonly elapsedMs: number }
   | { readonly type: "collectGoldenCookie" }
@@ -167,30 +191,95 @@ function handleBuyTool(state: GameState, ctx: ReducerCtx, toolId: string): GameS
 }
 
 /**
- * Refuses silently, in the same shape as every other purchase here, when the depot has not been
- * revealed, when the quantity is not a positive whole number of litres, or when the cookies are
- * not there. A refusal returns the state unchanged, which is also what tells the provider's
- * observer that no voucher should be written.
+ * SHIPPING, which is a withdrawal and not a purchase.
+ *
+ * Refuses silently, in the same shape as every other transition here, when the factory has not
+ * been revealed, when the quantity is not a positive whole number of litres, or — the honest
+ * one — when the tanks do not actually hold that many litres. There is no cookie check, because
+ * shipping costs no cookies: the equipment did. A refusal returns the state unchanged, which is
+ * also what tells the provider's observer that no voucher should be written.
  */
-function handleMintDiesel(state: GameState, ctx: ReducerCtx, litresRequested: number): GameState {
+function shipFromTanks(state: GameState, ctx: ReducerCtx, litresRequested: number): GameState {
   if (!computeDisclosure(state).dieselDepot) return state;
   const litres = Math.floor(litresRequested);
   if (!Number.isFinite(litres) || litres <= 0) return state;
+  if (shippableLitres(state.dieselFactory) < litres) return state;
 
-  const cost = costOfLitres(state.dieselDepot.litresMinted, litres);
-  if (bnCompare(state.cookies, cost) < 0) return state;
+  const attributed = amortizedCookiesFor(state.dieselFactory, litres);
 
   const nextState: GameState = {
     ...state,
-    cookies: bnClampNonNegative(bnSub(state.cookies, cost)),
+    dieselFactory: { ...state.dieselFactory, litres: state.dieselFactory.litres - litres },
     dieselDepot: {
       litresMinted: state.dieselDepot.litresMinted + litres,
       vouchersMinted: state.dieselDepot.vouchersMinted + 1,
-      cookiesSpent: bnAdd(state.dieselDepot.cookiesSpent, cost),
+      cookiesSpent: bnAdd(state.dieselDepot.cookiesSpent, attributed),
     },
   };
 
   return withAchievements(nextState, nowIso(ctx));
+}
+
+/**
+ * Buys factory equipment. This and `handleBuyFactoryUpgrade` are the ONLY two transitions in
+ * the whole game where cookies enter the diesel economy — the owner's rule, enforced by there
+ * being nowhere else that touches both `cookies` and `dieselFactory`.
+ */
+function handleBuyFactoryEquipment(
+  state: GameState,
+  ctx: ReducerCtx,
+  equipmentId: string,
+  quantityRequested: number,
+): GameState {
+  if (!computeDisclosure(state).dieselFactory) return state;
+  const quantity = Math.floor(quantityRequested);
+  if (!Number.isFinite(quantity) || quantity <= 0) return state;
+
+  const def = getEquipmentDefinition(equipmentId);
+  const owned = factoryEquipmentOwned(state.dieselFactory, equipmentId);
+  const cost = equipmentBulkCost(def, owned, quantity);
+  if (bnCompare(state.cookies, cost) < 0) return state;
+
+  const equipment = state.dieselFactory.equipment.some((e) => e.id === equipmentId)
+    ? state.dieselFactory.equipment.map((e) => (e.id === equipmentId ? { ...e, count: e.count + quantity } : e))
+    : [...state.dieselFactory.equipment, { id: equipmentId, count: quantity }];
+
+  const nextState: GameState = {
+    ...state,
+    cookies: bnClampNonNegative(bnSub(state.cookies, cost)),
+    dieselFactory: {
+      ...state.dieselFactory,
+      equipment,
+      cookiesInvested: bnAdd(state.dieselFactory.cookiesInvested, cost),
+    },
+  };
+
+  return withAchievements(nextState, nowIso(ctx));
+}
+
+function handleBuyFactoryUpgrade(state: GameState, ctx: ReducerCtx, upgradeId: string): GameState {
+  if (!computeDisclosure(state).dieselFactory) return state;
+  const def = getFactoryUpgradeDefinition(upgradeId);
+  if (ownsFactoryUpgrade(state.dieselFactory, upgradeId)) return state;
+  if (!isFactoryUpgradeOffered(state.dieselFactory, def.unlockCondition)) return state;
+  if (bnCompare(state.cookies, def.cost) < 0) return state;
+
+  const nextState: GameState = {
+    ...state,
+    cookies: bnClampNonNegative(bnSub(state.cookies, def.cost)),
+    dieselFactory: {
+      ...state.dieselFactory,
+      upgradeIds: [...state.dieselFactory.upgradeIds, upgradeId],
+      cookiesInvested: bnAdd(state.dieselFactory.cookiesInvested, def.cost),
+    },
+  };
+
+  return withAchievements(nextState, nowIso(ctx));
+}
+
+function handleSetFactoryAutoShip(state: GameState, enabled: boolean): GameState {
+  if (state.dieselFactory.autoShipEnabled === enabled) return state;
+  return { ...state, dieselFactory: { ...state.dieselFactory, autoShipEnabled: enabled } };
 }
 
 function handleSetToolProgression(state: GameState, enabled: boolean): GameState {
@@ -217,6 +306,17 @@ function handleTick(state: GameState, ctx: ReducerCtx, elapsedMs: number): GameS
   let goldenCookie = despawnIfExpired(nextState.goldenCookie, nowMs, ctx.rng, config);
   goldenCookie = maybeSpawnGoldenCookie(goldenCookie, nowMs, ctx.rng, config);
   nextState = { ...nextState, goldenCookie, lastTickAtIso: nowIso(ctx) };
+
+  // THE FACTORY RUNS ON THE SAME CLOCK. One slice of the production line per game tick, from
+  // the same elapsed milliseconds the cookie accrual used — so the two economies can never
+  // drift apart, and a paused game pauses the refinery too.
+  nextState = { ...nextState, dieselFactory: tickFactory(nextState.dieselFactory, elapsedMs / 1000).state };
+
+  // Automation, if it was bought AND switched on, is a shipment like any other: it goes through
+  // the same withdrawal that the ship button does, so it can never ship a litre that is not in
+  // the tank, and the provider's observer writes its voucher exactly as it writes a manual one.
+  const automatic = autoShipQuantity(nextState.dieselFactory);
+  if (automatic > 0) nextState = shipFromTanks(nextState, ctx, automatic);
 
   return withAchievements(nextState, nowIso(ctx));
 }
@@ -277,7 +377,13 @@ export function applyGameAction(state: GameState, action: GameAction, ctx: Reduc
     case "buyTool":
       return handleBuyTool(state, ctx, action.toolId);
     case "mintDiesel":
-      return handleMintDiesel(state, ctx, action.litres);
+      return shipFromTanks(state, ctx, action.litres);
+    case "buyFactoryEquipment":
+      return handleBuyFactoryEquipment(state, ctx, action.equipmentId, action.quantity);
+    case "buyFactoryUpgrade":
+      return handleBuyFactoryUpgrade(state, ctx, action.upgradeId);
+    case "setFactoryAutoShip":
+      return handleSetFactoryAutoShip(state, action.enabled);
     case "setToolProgression":
       return handleSetToolProgression(state, action.enabled);
     case "tick":
@@ -297,7 +403,7 @@ export { costOfNext };
 export function createInitialGameState(nowIsoString: string): GameState {
   const zero = bnFromNumber(0);
   return {
-    schemaVersion: 4,
+    schemaVersion: 5,
     cookies: zero,
     lifetimeCookies: zero,
     baseClickValue: bnFromNumber(1),
@@ -308,6 +414,7 @@ export function createInitialGameState(nowIsoString: string): GameState {
     goldenCookie: { isSpawned: false, rngStreamIndex: 0, nextEligibleAtEpochMs: 0 },
     stats: { totalClicks: 0, totalCookiesBaked: zero, clockAnomalyCount: 0 },
     dieselDepot: { litresMinted: 0, vouchersMinted: 0, cookiesSpent: zero },
+    dieselFactory: createInitialFactoryState(),
     toolProgressionEnabled: true,
     purchasedToolIds: [],
     lastTickAtIso: nowIsoString,

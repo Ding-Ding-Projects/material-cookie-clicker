@@ -1,0 +1,107 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1" />
+<title>The diesel factory — Material Cookie Clicker</title>
+<meta name="description" content="Cookies buy the plant; the plant makes the diesel. A four-stage production line — wells, refining, tanks, depot — that stalls honestly and ships real litres to WinForge." />
+<link rel="stylesheet" href="../assets/site.css" />
+</head>
+<body>
+<a class="skip-link" href="#main">Skip to main content</a>
+<header class="site-head">
+  <div class="wrap">
+    <a class="brand" href="../index.html"><span aria-hidden="true">&#127850;</span> Material Cookie Clicker</a>
+    <nav class="site-nav" aria-label="Primary">
+      <ul>
+        <li><a href="../index.html">Home</a></li>
+        <li><a href="../features/index.html">Features</a></li>
+        <li><a href="../index.html#download">Download</a></li>
+      </ul>
+    </nav>
+  </div>
+</header>
+<main id="main" class="wrap">
+  <article>
+    <h1>The diesel factory</h1>
+    <p class="lede">Cookies buy the plant. The plant makes the diesel. A four-stage production line that stalls honestly when a stage cannot run, and ships real litres to a second application.</p>
+    <div class="inset" style="margin-bottom:18px">
+  <span class="label">Current state</span>
+  <p style="margin:0"><span class="tag">Shipped</span> the Diesel Factory is its own console panel in this release; the economy is in <code>src/shared/game/diesel-factory.ts</code>.</p>
+</div>
+
+    <h2>What changed, and why</h2>
+    <p>An earlier build sold diesel outright. You pressed a button, a thousand cookies vanished, and a litre existed. Nothing made it &mdash; the litre came out of thin air, and the price curve was the only thing standing between a player and an unlimited supply of fuel for a nuclear plant simulator.</p>
+    <p>That is gone. Diesel is <strong>manufactured</strong> now, by a small refinery you build and run, and cookies touch it in exactly one place: <strong>buying equipment</strong>. There is no cookies-to-litres exchange rate anywhere in the game any more.</p>
+
+    <h2>From the running application</h2>
+    <figure class="capture">
+      <img src="../assets/captures/factory-floor.png" alt="The Diesel Factory panel open as an anchored dialog over the dimmed cookie surface, hanging from the DIESEL FACTORY console emblem. A production floor shows three stations joined by pipes: CRUDE INTAKE with a nodding-donkey derrick reading 3.75 bbl per second, REFINING with three fractionating columns reading 1.00 of 1.00 litres per second, and STORAGE with two vertical gauges, a dark crude gauge nearly full and a green diesel gauge at about three quarters, reading 63.2 of 85 litres. All three stations are outlined in green and the status line reads Running. Six figure tiles below give crude in the yard 169.6 of 170 barrels, crude per second 3.75, litres per second 1.00, crude per litre 2.125 barrels, tank capacity 85 litres and litres manufactured 403.2." width="2582" height="1550" loading="lazy" />
+      <figcaption><strong>The production floor, running.</strong> Fifty wells feeding fifty refinery stills, three storage tanks, and two factory upgrades &mdash; every one of them bought by a real press of a real button. The tank gauge is the real fill fraction, not a decoration. Captured from the built application on an off-screen Windows desktop, photographed with the Win32 PrintWindow API, window maximised.</figcaption>
+    </figure>
+
+    <h2>The line, stage by stage</h2>
+    <p>Wells and importers pull <strong>crude</strong> out of the ground. Refining units convert crude into <strong>litres</strong>, at a throughput and at an efficiency. Storage tanks hold the litres and are <strong>finite</strong>. The depot ships litres out as vouchers, drawing the tanks down.</p>
+    <p>Every arrow in that chain can stall, and stalls honestly:</p>
+    <ul>
+      <li>A refinery with no crude in the yard refines nothing.</li>
+      <li>A refinery with a full tank in front of it refines nothing <em>either</em>, and the crude it would have used stays in the yard rather than evaporating.</li>
+      <li>Wells pumping into a full yard stop pumping.</li>
+      <li>The depot cannot ship a litre the tanks do not hold. The button is dead and says why.</li>
+    </ul>
+    <p>The panel shows which stage stopped by dimming it and naming the reason, and it separates the rate the plant is <em>rated</em> for from the rate it is <em>currently achieving</em> &mdash; two readouts, never one.</p>
+
+    <h2>The rate curve</h2>
+    <table>
+      <thead><tr><th>Equipment</th><th>First unit</th><th>Growth</th><th>What one unit does</th></tr></thead>
+      <tbody>
+        <tr><td>Crude Well</td><td>2,000</td><td>&times;1.15</td><td>+0.05 barrels/sec</td></tr>
+        <tr><td>Crude Importer</td><td>24,000</td><td>&times;1.15</td><td>+0.5 barrels/sec</td></tr>
+        <tr><td>Refinery Still</td><td>8,000</td><td>&times;1.15</td><td>+0.02 litres/sec of throughput</td></tr>
+        <tr><td>Catalytic Cracker</td><td>120,000</td><td>&times;1.15</td><td>+0.2 litres/sec</td></tr>
+        <tr><td>Storage Tank</td><td>5,000</td><td>&times;1.15</td><td>+25 litres of tank, +50 barrels of yard</td></tr>
+        <tr><td>Transfer Pump</td><td>40,000</td><td>&times;1.15</td><td>+8% throughput on every refining unit</td></tr>
+      </tbody>
+    </table>
+    <p>Every line grows <strong>1.15 a unit</strong> &mdash; the same house ratio the generator ladder uses, so the factory shop reads without being taught anything new. Conversion starts at <strong>2.5 barrels per litre</strong>; storage starts at a 10-litre drum and a 20-barrel hardstanding.</p>
+    <p>Those numbers teach the mechanic by themselves. <strong>One well feeds exactly one still</strong> &mdash; 0.05 barrels a second produced against 0.02 &times; 2.5 = 0.05 demanded &mdash; and one importer feeds exactly one cracker. Buy wells alone and the yard backs up; buy stills alone and they idle. A fresh floor also runs out of <em>yard</em> before it runs out of <em>drum</em>: twenty barrels is eight litres and the drum holds ten, which is why the first Storage Tank raises both numbers at once.</p>
+
+    <h2>Fourteen factory upgrades, in four branches</h2>
+    <ul>
+      <li><strong>Throughput</strong> &mdash; Wider Bore, Deep Drilling and Pipeline Spur on the intake side; Hot Feed and Continuous Run on the refining side.</li>
+      <li><strong>Efficiency</strong> &mdash; Trayed Column, Vacuum Distillation and Hydrocracking cut the barrels each litre costs. The only branch that makes an existing line cheaper to run rather than bigger.</li>
+      <li><strong>Capacity</strong> &mdash; Bunded Bay, Floating Roof and Tank Farm raise the ceiling the line stalls against.</li>
+      <li><strong>Automation</strong> &mdash; Depot Telemetry ships at a full tank, Dispatch Desk at half, Night Shift at a quarter. Automation is bought <em>and then switched on</em>; buying it never starts it.</li>
+    </ul>
+    <p>Nothing unlocks itself. An upgrade whose condition is not met is <em>absent</em> rather than dimmed, the same rule the generator ladder follows, so a locked list never becomes a list of spoilers. The factory itself arrives with the <strong>Fuel Contract</strong> upgrade &mdash; signing a contract to supply WinForge is what gives you a reason to build a refinery &mdash; and that purchase grants a surface, never a piece of equipment. The floor starts bare.</p>
+
+    <h2>Shipping to WinForge</h2>
+    <figure class="capture">
+      <img src="../assets/captures/factory-ship.png" alt="The WinForge shipping station section of the Diesel Factory panel. A wide button reads Ship 31 L to WinForge in English and Cantonese. Below it a note says shipping draws the tanks down, a voucher is written for litres this factory really made, and no cookies change hands at this counter. A dashed panel holds a Ship automatically checkbox with the caption sends a lorry once the tanks reach 100 percent full. Four figure tiles read ready to ship 31 litres, litres shipped 510 litres, vouchers minted 85, and consumed by WinForge 76. The ledger path at the bottom reads the AppData DingDingProjects exchange diesel-vouchers.json file. The equipment shop begins below with a Crude Well row showing 50 owned and a buy button priced 2,167,315 cookies." width="2582" height="1550" loading="lazy" />
+      <figcaption><strong>The shipping station.</strong> Six shipments in this run, every one of them exactly 85 litres &mdash; the tank's full capacity &mdash; because that is all the tanks held. The vouchers really are in the shared ledger file named at the bottom of the card.</figcaption>
+    </figure>
+    <p>Shipping is a <strong>withdrawal</strong>, not a purchase. It writes one voucher into a small JSON file that a separate application, WinForge, reads to fuel its reactor simulator's emergency diesel generators. The <a href="../index.html">whole contract</a> is documented in the repository, and the file format has not changed.</p>
+    <p>One thing about that file <em>has</em> been clarified. A voucher carries a <code>cookiesSpent</code> figure, and nobody pays cookies at the shipping counter any more, so the number is now the shipment's amortized share of what the plant cost to build: cookies invested, times this shipment's litres over every litre the plant has ever made. The field is still a string, still a receipt, and the schema version is still 1 &mdash; a reader written against the old format needs no change at all.</p>
+
+    <h2>In the shipped build</h2>
+    <p>The factory is a console emblem and an anchored dialog, bilingual throughout, with the production floor, the equipment shop, the upgrade tree and the shipping station all on one scrolling surface. The Diesel Depot card in the shop rail's footer became a compact status light with a tank gauge and a door into the panel &mdash; there is one Ship button in the game, not two.</p>
+    <p>What is not photographed: the <strong>automation</strong> branch actually shipping by itself on a timer, which is unit-tested but has never been on screen for a camera; and the <strong>reduced-motion</strong> rendering, which is declared in CSS and asserted nowhere else. Those are gaps in evidence, not features known to be broken.</p>
+    <nav class="related plate" aria-labelledby="related-heading">
+      <h2 id="related-heading">Related articles</h2>
+      <ul>
+      <li><a href="upgrades.html">Upgrades</a></li>
+      <li><a href="generator-ladder.html">The 14-tier generator ladder</a></li>
+      <li><a href="cookie-clicking.html">Cookie clicking and the CPS loop</a></li>
+        <li><a href="index.html">All features &amp; search</a></li>
+      </ul>
+    </nav>
+  </article>
+</main>
+<footer class="site-foot">
+  <div class="wrap">
+    <p>Material Cookie Clicker is free, unsigned by permanent policy, and nobody ever pays anything to use it. This site is fully self-contained: no CDN, no remote font, no remote image, no analytics, no network request of any kind. Every graphic is either drawn in CSS or a screenshot of the application stored in this repository.</p>
+    <p><a href="https://github.com/Ding-Ding-Projects/material-cookie-clicker">Source code on GitHub</a> &middot; <a href="../features/index.html">All feature articles</a></p>
+  </div>
+</footer>
+</body>
+</html>

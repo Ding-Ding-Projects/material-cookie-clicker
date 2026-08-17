@@ -72,11 +72,41 @@ function migrateV3ToV4(input: Record<string, unknown>): Record<string, unknown> 
   };
 }
 
+/**
+ * Version 4 -> 5: adds `dieselFactory`, the production economy that now makes the diesel
+ * (diesel-factory.ts).
+ *
+ * Nothing is granted, and one thing deliberately is NOT undone. A version-4 save may already
+ * carry `dieselDepot.litresMinted` from the build where cookies bought litres outright; those
+ * vouchers were really written to the shared ledger and really are a record of what that player
+ * did, so the counter is left exactly as it is. What changes for them is only what happens
+ * NEXT: the depot now draws from tanks, the tanks start empty, and the floor starts bare. The
+ * factory is bought a piece at a time like everything else in this game.
+ */
+function migrateV4ToV5(input: Record<string, unknown>): Record<string, unknown> {
+  return {
+    ...input,
+    schemaVersion: 5,
+    dieselFactory: {
+      equipment: [],
+      upgradeIds: [],
+      crude: 0,
+      litres: 0,
+      lifetimeCrude: 0,
+      lifetimeLitres: 0,
+      cookiesInvested: { mantissa: 0, exponent: 0 },
+      autoShipEnabled: false,
+      stalledSeconds: 0,
+    },
+  };
+}
+
 /** Ordered forward-only migrations, indexed by the version they migrate FROM. */
 export const MIGRATIONS: Readonly<Record<number, MigrationStep>> = {
   1: migrateV1ToV2,
   2: migrateV2ToV3,
   3: migrateV3ToV4,
+  4: migrateV4ToV5,
 };
 
 export interface MigrationResult {

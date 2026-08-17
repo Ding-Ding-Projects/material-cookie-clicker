@@ -6132,3 +6132,625 @@ ul.card-grid {
     transform: none;
   }
 }
+
+/* -------------------------------------------------------------------------------------------
+ * THE DIESEL FACTORY (src/renderer/screens/FactoryScreen.tsx)
+ *
+ * The nested subgame's own console surface, drawn in the v2 arcade language: bevelled plates,
+ * solid offset shadows rather than blurred ones, and every colour taken from the same tokens
+ * the cabinet already uses so light and dark repaint themselves.
+ *
+ * THE ONE RULE THIS SECTION FOLLOWS THROUGHOUT: nothing here is decorative about a number.
+ * A gauge's fill is the real fill fraction, a pipe animates only while diesel is genuinely
+ * moving through it, and a station is dark because that stage of the line has genuinely
+ * stopped. Under prefers-reduced-motion the flow animation is removed entirely and the state
+ * is still fully legible, because the stations and the printed readouts carry it anyway.
+ *
+ * Appended at the end of the sheet, in this file's established order, so nothing above it is
+ * touched.
+ * ---------------------------------------------------------------------------------------- */
+.factory-screen {
+  display: flex;
+  flex-direction: column;
+  gap: 18px;
+}
+
+.factory-lede {
+  margin: 0;
+  font-size: 13px;
+  line-height: 1.5;
+  color: var(--on-surface-variant);
+}
+
+.factory-section__title {
+  margin: 0 0 10px;
+  font-family: var(--font-display);
+  font-weight: 900;
+  font-size: 12px;
+  letter-spacing: 0.12em;
+  text-transform: uppercase;
+  color: var(--on-surface-variant);
+}
+
+.factory-floor,
+.factory-shop,
+.factory-tree,
+.factory-station-card {
+  padding: 14px 16px 16px;
+  border-radius: var(--shape-lg, 16px);
+  border: 2px solid var(--outline-variant);
+  background: var(--panel-inset);
+  box-shadow: inset 0 2px 0 0 var(--bevel-hi), 0 3px 0 0 var(--bevel-lo);
+}
+
+/* ---------------------------------------------------------------- the production line ---- */
+
+.factory-line {
+  display: flex;
+  align-items: stretch;
+  gap: 4px;
+  flex-wrap: wrap;
+}
+
+.factory-station {
+  flex: 1 1 150px;
+  min-width: 130px;
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+  padding: 12px 10px;
+  border-radius: var(--shape-md, 12px);
+  border: 2px solid var(--outline-variant);
+  background: var(--surface-lowest);
+  /* The lit/dark state is carried by BOTH the border colour and the opacity of the drawing, so
+     it is never colour alone that tells the two apart. */
+  transition: opacity calc(160ms * var(--motion-scale, 1)) ease;
+}
+
+.factory-station[data-state="running"] {
+  border-color: var(--tier2);
+}
+
+.factory-station[data-state="stalled"] {
+  border-color: var(--spark-ring);
+  background: var(--surface-highest);
+}
+
+.factory-station[data-state="idle"] {
+  opacity: 0.55;
+}
+
+.factory-station__name {
+  display: flex;
+  flex-direction: column;
+  font-family: var(--font-display);
+  font-weight: 900;
+  font-size: 11px;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+  color: var(--on-surface);
+}
+
+.factory-station__name-zh {
+  font-size: 11px;
+  letter-spacing: 0;
+  text-transform: none;
+  color: var(--on-surface-variant);
+}
+
+.factory-station__body {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 8px;
+  min-height: 84px;
+  justify-content: flex-end;
+}
+
+.factory-readout {
+  font-variant-numeric: tabular-nums;
+  font-weight: 800;
+  font-size: 13px;
+  color: var(--on-surface);
+}
+
+/* The nodding donkey. Its beam rocks only while the well is actually pumping. */
+.factory-derrick {
+  position: relative;
+  display: block;
+  width: 56px;
+  height: 44px;
+  border-bottom: 3px solid var(--outline);
+}
+
+.factory-derrick::before {
+  content: '';
+  position: absolute;
+  left: 30px;
+  top: 8px;
+  width: 4px;
+  height: 33px;
+  background: var(--outline);
+  border-radius: 2px;
+}
+
+.factory-derrick__beam {
+  position: absolute;
+  left: 6px;
+  top: 12px;
+  width: 44px;
+  height: 6px;
+  border-radius: 3px;
+  background: var(--metal-lo);
+  transform-origin: 70% 50%;
+}
+
+.factory-station[data-state="running"] .factory-derrick__beam {
+  animation: factory-nod calc(2200ms * var(--motion-scale, 1)) ease-in-out infinite;
+}
+
+@keyframes factory-nod {
+  0%,
+  100% {
+    transform: rotate(-11deg);
+  }
+  50% {
+    transform: rotate(11deg);
+  }
+}
+
+/* The fractionating columns. */
+.factory-columns {
+  display: flex;
+  align-items: flex-end;
+  gap: 5px;
+  height: 46px;
+}
+
+.factory-columns__unit {
+  width: 12px;
+  height: 30px;
+  border-radius: 3px 3px 1px 1px;
+  border: 2px solid var(--outline);
+  background: linear-gradient(var(--metal-hi), var(--metal-lo));
+}
+
+.factory-columns__unit--tall {
+  height: 46px;
+}
+
+.factory-station[data-state="running"] .factory-columns__unit {
+  border-color: var(--tier2);
+}
+
+/* The pipe between two stations. Dashes travel along it only while something is flowing. */
+.factory-pipe {
+  align-self: center;
+  flex: 0 0 44px;
+  height: 12px;
+  border-radius: 6px;
+  border: 2px solid var(--outline);
+  background: var(--outline-variant);
+}
+
+.factory-pipe[data-flowing] {
+  background-image: repeating-linear-gradient(90deg, var(--tier2) 0 6px, transparent 6px 12px);
+  background-size: 12px 100%;
+  animation: factory-flow calc(700ms * var(--motion-scale, 1)) linear infinite;
+}
+
+@keyframes factory-flow {
+  to {
+    background-position: 12px 0;
+  }
+}
+
+/* ------------------------------------------------------------------------- the gauges ---- */
+
+.factory-tanks {
+  display: flex;
+  align-items: flex-end;
+  gap: 8px;
+  height: 60px;
+}
+
+.factory-gauge {
+  position: relative;
+  width: 26px;
+  height: 58px;
+  border-radius: 4px 4px 2px 2px;
+  border: 2px solid var(--outline);
+  background: var(--surface-highest);
+  overflow: hidden;
+}
+
+.factory-gauge__fill {
+  position: absolute;
+  left: 0;
+  bottom: 0;
+  width: 100%;
+  /* The height is set inline from the real fill fraction — this is the number, not a flourish. */
+  transition: height calc(200ms * var(--motion-scale, 1)) linear;
+}
+
+.factory-gauge[data-variant="diesel"] .factory-gauge__fill {
+  background: linear-gradient(var(--tier2-container), var(--tier2));
+}
+
+.factory-gauge[data-variant="crude"] .factory-gauge__fill {
+  background: linear-gradient(var(--metal-lo), var(--on-surface));
+}
+
+.factory-gauge__ticks {
+  position: absolute;
+  inset: 0;
+  background-image: repeating-linear-gradient(0deg, transparent 0 13px, var(--outline-variant) 13px 14px);
+  opacity: 0.7;
+}
+
+.factory-state {
+  margin: 12px 0 0;
+  font-size: 12px;
+  line-height: 1.5;
+  font-weight: 700;
+  color: var(--on-surface);
+}
+
+.factory-figures {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(140px, 1fr));
+  gap: 8px;
+  margin: 12px 0 0;
+}
+
+.factory-figure {
+  padding: 8px 10px;
+  border-radius: var(--shape-sm, 8px);
+  background: var(--surface-lowest);
+  border: 1px solid var(--outline-variant);
+}
+
+.factory-figure dt {
+  margin: 0;
+  font-size: 10px;
+  letter-spacing: 0.06em;
+  text-transform: uppercase;
+  color: var(--on-surface-variant);
+}
+
+.factory-figure dd {
+  margin: 2px 0 0;
+  font-variant-numeric: tabular-nums;
+  font-weight: 900;
+  font-size: 14px;
+  color: var(--on-surface);
+}
+
+/* ------------------------------------------------------------------ the equipment shop ---- */
+
+.factory-shop__list {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+}
+
+.factory-row {
+  display: grid;
+  grid-template-columns: 8px 1fr auto;
+  align-items: center;
+  gap: 10px;
+  padding: 10px 12px;
+  border-radius: var(--shape-md, 12px);
+  border: 2px solid var(--outline-variant);
+  background: var(--surface-lowest);
+}
+
+/* Each station in the chain gets its own colour stripe, so the shop reads in the same order
+   the production floor above it does. */
+.factory-row__role {
+  align-self: stretch;
+  border-radius: 4px;
+  background: var(--outline-variant);
+}
+
+.factory-row__role[data-role="intake"] {
+  background: var(--on-surface);
+}
+.factory-row__role[data-role="refining"] {
+  background: var(--tier2);
+}
+.factory-row__role[data-role="storage"] {
+  background: var(--spark-ring);
+}
+.factory-row__role[data-role="boost"] {
+  background: var(--primary);
+}
+
+.factory-row__names {
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+  min-width: 0;
+}
+
+.factory-row__name {
+  font-family: var(--font-display);
+  font-weight: 900;
+  font-size: 13px;
+  color: var(--on-surface);
+}
+
+.factory-row__name-zh {
+  font-size: 12px;
+  color: var(--on-surface);
+}
+
+.factory-row__sub {
+  font-size: 11px;
+  line-height: 1.45;
+  color: var(--on-surface-variant);
+}
+
+.factory-row__owned {
+  font-variant-numeric: tabular-nums;
+  font-weight: 900;
+  font-size: 16px;
+  color: var(--on-surface);
+  min-width: 2ch;
+  text-align: right;
+}
+
+.factory-row__controls {
+  grid-column: 1 / -1;
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  flex-wrap: wrap;
+}
+
+/* -------------------------------------------------------------------- the upgrade tree ---- */
+
+.factory-branch {
+  margin-top: 12px;
+}
+
+.factory-branch__title {
+  margin: 0 0 8px;
+  font-family: var(--font-display);
+  font-weight: 900;
+  font-size: 11px;
+  letter-spacing: 0.1em;
+  text-transform: uppercase;
+  color: var(--on-surface);
+  padding-left: 10px;
+  border-left: 4px solid var(--outline-variant);
+}
+
+.factory-branch[data-branch="throughput"] .factory-branch__title {
+  border-left-color: var(--tier2);
+}
+.factory-branch[data-branch="efficiency"] .factory-branch__title {
+  border-left-color: var(--primary);
+}
+.factory-branch[data-branch="capacity"] .factory-branch__title {
+  border-left-color: var(--spark-ring);
+}
+.factory-branch[data-branch="automation"] .factory-branch__title {
+  border-left-color: var(--on-surface);
+}
+
+.factory-branch__cards {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(220px, 1fr));
+  gap: 8px;
+}
+
+.factory-upgrade {
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+  padding: 10px 12px;
+  border-radius: var(--shape-md, 12px);
+  border: 2px solid var(--outline-variant);
+  background: var(--surface-lowest);
+}
+
+.factory-upgrade--owned {
+  border-color: var(--tier2);
+}
+
+.factory-upgrade__names {
+  display: flex;
+  flex-direction: column;
+}
+
+.factory-upgrade__name {
+  font-family: var(--font-display);
+  font-weight: 900;
+  font-size: 13px;
+  color: var(--on-surface);
+}
+
+.factory-upgrade__name-zh {
+  font-size: 12px;
+  color: var(--on-surface);
+}
+
+.factory-upgrade__blurb {
+  margin: 0;
+  font-size: 11px;
+  line-height: 1.45;
+  color: var(--on-surface-variant);
+}
+
+.factory-upgrade__chip {
+  align-self: flex-start;
+  padding: 3px 10px;
+  border-radius: var(--shape-full);
+  background: var(--tier2-container);
+  color: var(--tier2);
+  font-weight: 900;
+  font-size: 11px;
+}
+
+/* --------------------------------------------------------------- the shipping station ---- */
+
+.factory-ship {
+  width: 100%;
+  font: inherit;
+  font-family: var(--font-display);
+  font-weight: 900;
+  font-size: 13px;
+  font-variant-numeric: tabular-nums;
+  min-height: 44px;
+  padding: 0 18px;
+  border: none;
+  border-radius: var(--shape-full);
+  cursor: pointer;
+  background: var(--tertiary);
+  color: var(--on-tertiary);
+  box-shadow: 0 4px 0 0 var(--tertiary-shadow);
+  transition: transform calc(90ms * var(--motion-scale, 1)) ease, box-shadow calc(90ms * var(--motion-scale, 1)) ease;
+}
+
+.factory-ship:active:not([disabled]) {
+  transform: translateY(4px);
+  box-shadow: none;
+}
+
+.factory-ship:focus-visible {
+  outline: 3px solid var(--secondary);
+  outline-offset: 2px;
+}
+
+.factory-ship[disabled] {
+  background: var(--surface-highest);
+  color: var(--on-surface-variant);
+  box-shadow: none;
+  cursor: not-allowed;
+  opacity: 0.85;
+}
+
+.factory-auto {
+  margin-top: 10px;
+  padding: 10px 12px;
+  border-radius: var(--shape-md, 12px);
+  border: 2px dashed var(--outline-variant);
+}
+
+.factory-auto__switch {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  min-height: 44px;
+  font-weight: 800;
+  font-size: 12px;
+  color: var(--on-surface);
+  cursor: pointer;
+}
+
+.factory-auto__switch input {
+  width: 22px;
+  height: 22px;
+  accent-color: var(--primary);
+  cursor: pointer;
+}
+
+.factory-auto__switch input[disabled] {
+  cursor: not-allowed;
+}
+
+.factory-note {
+  margin: 8px 0 0;
+  font-size: 11px;
+  line-height: 1.5;
+  color: var(--on-surface-variant);
+}
+
+.factory-note--problem {
+  color: var(--error);
+  font-weight: 700;
+}
+
+.factory-path {
+  margin: 8px 0 0;
+  font-family: var(--font-mono, ui-monospace, monospace);
+  font-size: 10px;
+  word-break: break-all;
+  color: var(--on-surface-variant);
+}
+
+/* ----------------------------------------------- the depot status card in the shop rail ---- */
+
+.diesel-depot--status .diesel-depot__bar {
+  position: relative;
+  margin-top: 10px;
+  height: 12px;
+  border-radius: 6px;
+  border: 2px solid var(--outline);
+  background: var(--surface-highest);
+  overflow: hidden;
+}
+
+.diesel-depot__bar-fill {
+  display: block;
+  height: 100%;
+  /* Width is the real fill fraction, set inline. */
+  background: linear-gradient(90deg, var(--tier2-container), var(--tier2));
+  transition: width calc(200ms * var(--motion-scale, 1)) linear;
+}
+
+.diesel-depot__open {
+  margin-top: 12px;
+  width: 100%;
+  font: inherit;
+  font-family: var(--font-display);
+  font-weight: 900;
+  font-size: 12px;
+  min-height: 44px;
+  padding: 0 14px;
+  border: none;
+  border-radius: var(--shape-full);
+  cursor: pointer;
+  background: var(--tertiary);
+  color: var(--on-tertiary);
+  box-shadow: 0 4px 0 0 var(--tertiary-shadow);
+}
+
+.diesel-depot__open:active {
+  transform: translateY(4px);
+  box-shadow: none;
+}
+
+.diesel-depot__open:focus-visible {
+  outline: 3px solid var(--secondary);
+  outline-offset: 2px;
+}
+
+/* REDUCED MOTION. Every moving thing above stops dead rather than slowing down, and the state
+   it was communicating is still on screen: the stations keep their lit/dark borders, the pipes
+   keep their solid colour, and the gauges jump straight to their real fill. */
+@media (prefers-reduced-motion: reduce) {
+  .factory-station[data-state="running"] .factory-derrick__beam {
+    animation: none;
+    transform: rotate(-11deg);
+  }
+  .factory-pipe[data-flowing] {
+    animation: none;
+    background-image: none;
+    background-color: var(--tier2);
+  }
+  .factory-gauge__fill,
+  .diesel-depot__bar-fill {
+    transition: none;
+  }
+  .factory-ship,
+  .diesel-depot__open {
+    transition: none;
+  }
+  .factory-ship:active:not([disabled]),
+  .diesel-depot__open:active {
+    transform: none;
+    box-shadow: inset 0 4px 0 0 var(--bevel-lo);
+  }
+}

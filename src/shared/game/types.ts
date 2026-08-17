@@ -1,4 +1,5 @@
 import type { BigNum } from "./big-number.js";
+import type { DieselFactoryState } from "./diesel-factory.js";
 
 /** Small discrete counters use plain `number` — see big-number.ts header comment for why. */
 
@@ -55,10 +56,18 @@ export interface GameStats {
  * has since consumed, which only the ledger file itself can answer.
  */
 export interface DieselDepotState {
-  /** Lifetime litres minted. Also the position on the price curve — see costOfLitres. */
+  /**
+   * Lifetime litres shipped out as vouchers. Cookies no longer buy these: the litres are
+   * MANUFACTURED by the diesel factory (diesel-factory.ts) and this counter records how many of
+   * them left for WinForge.
+   */
   readonly litresMinted: number;
   readonly vouchersMinted: number;
-  /** Lifetime cookies paid into the depot. */
+  /**
+   * Lifetime cookies attributed to shipped diesel — the amortized share of what was spent on
+   * factory equipment and factory upgrades (diesel-factory.ts#amortizedCookiesFor). It is no
+   * longer a purchase price, because there is no longer a purchase.
+   */
   readonly cookiesSpent: BigNum;
 }
 
@@ -79,6 +88,12 @@ export interface GameState {
   readonly goldenCookie: GoldenCookieState;
   readonly stats: GameStats;
   readonly dieselDepot: DieselDepotState;
+  /**
+   * The diesel factory: the nested production economy that actually makes the litres the depot
+   * ships (diesel-factory.ts). Ticks on the same wall clock as the cookie side, through the
+   * same one reducer seam.
+   */
+  readonly dieselFactory: DieselFactoryState;
 
   /**
    * Player-facing switch for the Tools tech tree's progression gate (see tools.ts). When

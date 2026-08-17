@@ -51,7 +51,7 @@ import type { GameState } from "./types.js";
  */
 export const PRESTIGE_CONSOLE_ACHIEVEMENT_ID = "lifetime_1000000000";
 
-export type ConsoleSurfaceId = "achievements" | "tools" | "statistics" | "prestige";
+export type ConsoleSurfaceId = "achievements" | "tools" | "statistics" | "prestige" | "factory";
 
 export interface Disclosure {
   /** The generator shop rail. Bought with Shop Sign. */
@@ -66,6 +66,13 @@ export interface Disclosure {
    * did not exist before this version and nobody can lose a surface they never had.
    */
   readonly dieselDepot: boolean;
+  /**
+   * The Diesel Factory panel — the whole nested subgame (diesel-factory.ts). Bought with the
+   * same Fuel Contract upgrade the depot is: signing a contract to supply WinForge is what gives
+   * you a reason to build a refinery, so one purchase opens the factory and the depot status
+   * card that links to it. There is no separate second reveal to buy.
+   */
+  readonly dieselFactory: boolean;
   /** The per-second HUD readout and the hero's CPS line. Reached with the first generator. */
   readonly perSecondReadout: boolean;
   /** The per-click HUD readout. Reached with Steady Hand, which is when a click gains nuance. */
@@ -130,6 +137,7 @@ export function computeDisclosure(state: GameState): Disclosure {
     // could take away, and inventing a free grant would put a cookie-spending panel in front of
     // a player who never chose it.
     dieselDepot: ownsUpgrade(state, "reveal_fuel_contract"),
+    dieselFactory: ownsUpgrade(state, "reveal_fuel_contract"),
     perSecondReadout: generatorsOwned > 0 || ascended,
     perClickReadout: holdToClick,
     consoles: {
@@ -138,6 +146,9 @@ export function computeDisclosure(state: GameState): Disclosure {
       statistics: generatorsOwned > 0,
       prestige:
         ascended || state.achievements.some((a) => a.id === PRESTIGE_CONSOLE_ACHIEVEMENT_ID),
+      // The factory emblem is the one console button that is BOUGHT rather than reached: it
+      // arrives with the Fuel Contract, exactly like the depot card it replaces the guts of.
+      factory: ownsUpgrade(state, "reveal_fuel_contract"),
     },
   };
 }

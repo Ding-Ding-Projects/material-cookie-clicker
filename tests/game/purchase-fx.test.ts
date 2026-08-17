@@ -65,15 +65,19 @@ describe("detectPurchase — gating on what the reducer actually did", () => {
     expect(intent?.targetKey).toBe(upgradeTargetKey("reveal_shop_sign"));
   });
 
-  it("returns nothing for a mint the reducer refused, and the litres total for one it applied", () => {
-    const poor = withCookies(freshState(), 10);
-    expect(detectThrough(poor, { type: "mintDiesel", litres: 1 }).intent).toBeNull();
+  it("returns nothing for a shipment the reducer refused, and the litres total for one it applied", () => {
+    // Refused because the tanks are empty: cookies buy the plant now, never a litre, so a rich
+    // player with no refinery ships exactly nothing.
+    const dry = withCookies(freshState(), 5_000_000);
+    expect(detectThrough(dry, { type: "mintDiesel", litres: 1 }).intent).toBeNull();
 
-    // The depot needs its reveal chain before a mint is legal at all.
+    // The factory needs its reveal chain before a shipment is legal at all, and it needs the
+    // litre to actually be in the tank.
     let state = withCookies(freshState(), 5_000_000);
     for (const id of ["reveal_shop_sign", "reveal_upgrade_catalogue", "reveal_fuel_contract"]) {
       state = applyGameAction(state, { type: "buyUpgrade", upgradeId: id }, CTX);
     }
+    state = { ...state, dieselFactory: { ...state.dieselFactory, litres: 1, lifetimeLitres: 1 } };
     const { next, intent } = detectThrough(state, { type: "mintDiesel", litres: 1 });
     expect(next.dieselDepot.litresMinted).toBe(1);
     expect(intent?.kind).toBe("diesel");

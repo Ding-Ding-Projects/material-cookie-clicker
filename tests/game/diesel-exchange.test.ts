@@ -9,14 +9,9 @@ import { computeDisclosure } from "../../src/shared/game/disclosure";
 import {
   appendVoucher,
   cookiesSpentString,
-  costOfLitre,
-  costOfLitres,
   createEmptyLedger,
-  DIESEL_COST_RATIO,
-  DIESEL_FIRST_LITRE_COST,
   DIESEL_LEDGER_DIR_SEGMENTS,
   DIESEL_LEDGER_FILE_NAME,
-  maxAffordableLitres,
   parseLedger,
   serializeLedger,
   summarizeLedger,
@@ -31,7 +26,7 @@ function ctxAt(epochMs = 0): ReducerCtx {
   return { now: () => epochMs, rng: fixedRng(0.5) };
 }
 
-/** A state with the Fuel Contract already bought, which is what reveals the depot. */
+/** A state with the Fuel Contract already bought, which is what reveals the depot and factory. */
 function depotState(cookies: number) {
   return freshState({
     cookies: bnFromNumber(cookies),
@@ -40,6 +35,20 @@ function depotState(cookies: number) {
       { id: "reveal_fuel_contract", purchasedAtTickCount: 0 },
     ],
   });
+}
+
+/** The same, with diesel already in the tanks — the only thing that makes a shipment possible. */
+function stockedState(cookies: number, litres: number, invested = 0) {
+  const base = depotState(cookies);
+  return {
+    ...base,
+    dieselFactory: {
+      ...base.dieselFactory,
+      litres,
+      lifetimeLitres: litres,
+      cookiesInvested: bnFromNumber(invested),
+    },
+  };
 }
 
 function voucher(overrides: Partial<DieselVoucher> = {}): DieselVoucher {
@@ -53,55 +62,32 @@ function voucher(overrides: Partial<DieselVoucher> = {}): DieselVoucher {
   };
 }
 
-describe("diesel depot: the price curve", () => {
-  it("charges a thousand cookies for the very first litre", () => {
-    expect(bnToNumber(costOfLitre(0))).toBeCloseTo(DIESEL_FIRST_LITRE_COST, 6);
-  });
+describe("diesel depot: shipping through the one reducer seam", () => {
+  it("draws the litres DOWN from the tanks and takes no cookies at all", () => {
+    const before = stockedState(5000, 4, 12_000);
+    const after = applyGameAction(before, { type: "mintDiesel", litres: 3 }, ctxAt());
 
-  it("raises the price 15% per litre already minted, like a generator tier", () => {
-    expect(bnToNumber(costOfLitre(1))).toBeCloseTo(DIESEL_FIRST_LITRE_COST * DIESEL_COST_RATIO, 4);
-    expect(bnToNumber(costOfLitre(10))).toBeCloseTo(DIESEL_FIRST_LITRE_COST * DIESEL_COST_RATIO ** 10, 2);
-  });
-
-  it("costs the same whether litres are bought together or one at a time", () => {
-    const together = bnToNumber(costOfLitres(0, 5));
-    let separately = 0;
-    for (let minted = 0; minted < 5; minted += 1) separately += bnToNumber(costOfLitre(minted));
-    expect(together).toBeCloseTo(separately, 4);
-  });
-
-  it("buys nothing with an empty pocket, and stops exactly at the budget", () => {
-    expect(maxAffordableLitres(0, bnFromNumber(0))).toBe(0);
-    expect(maxAffordableLitres(0, bnFromNumber(999))).toBe(0);
-    expect(maxAffordableLitres(0, bnFromNumber(1000))).toBe(1);
-    expect(maxAffordableLitres(0, bnFromNumber(2150))).toBe(2);
-  });
-});
-
-describe("diesel depot: minting through the one reducer seam", () => {
-  it("deducts exactly the price and accrues the litres", () => {
-    const before = depotState(5000);
-    const after = applyGameAction(before, { type: "mintDiesel", litres: 1 }, ctxAt());
-
-    expect(bnToNumber(after.cookies)).toBeCloseTo(5000 - DIESEL_FIRST_LITRE_COST, 4);
-    expect(after.dieselDepot.litresMinted).toBe(1);
+    // The counter is a withdrawal, not a till: the cookie balance is untouched.
+    expect(bnToNumber(after.cookies)).toBeCloseTo(5000, 6);
+    expect(after.dieselFactory.litres).toBeCloseTo(1, 9);
+    expect(after.dieselDepot.litresMinted).toBe(3);
     expect(after.dieselDepot.vouchersMinted).toBe(1);
-    expect(bnToNumber(after.dieselDepot.cookiesSpent)).toBeCloseTo(DIESEL_FIRST_LITRE_COST, 4);
   });
 
-  it("charges the risen price on the second litre", () => {
-    let state = depotState(5000);
-    state = applyGameAction(state, { type: "mintDiesel", litres: 1 }, ctxAt());
-    const afterFirst = bnToNumber(state.cookies);
-    state = applyGameAction(state, { type: "mintDiesel", litres: 1 }, ctxAt());
-
-    expect(afterFirst - bnToNumber(state.cookies)).toBeCloseTo(DIESEL_FIRST_LITRE_COST * DIESEL_COST_RATIO, 3);
-    expect(state.dieselDepot.litresMinted).toBe(2);
-    expect(state.dieselDepot.vouchersMinted).toBe(2);
+  it("writes the amortized share of what the plant cost, not a price paid at the counter", () => {
+    // 12,000 cookies built a factory that has made four litres, so three of them carry 9,000.
+    const after = applyGameAction(stockedState(5000, 4, 12_000), { type: "mintDiesel", litres: 3 }, ctxAt());
+    expect(bnToNumber(after.dieselDepot.cookiesSpent)).toBeCloseTo(9_000, 3);
   });
 
-  it("refuses a mint the player cannot afford, changing nothing at all", () => {
-    const before = depotState(999);
+  it("refuses a shipment the tanks cannot cover, however many cookies the player has", () => {
+    const before = stockedState(1e12, 2);
+    const after = applyGameAction(before, { type: "mintDiesel", litres: 3 }, ctxAt());
+    expect(after).toBe(before);
+  });
+
+  it("refuses a shipment from an empty tank, changing nothing at all", () => {
+    const before = depotState(1e12);
     const after = applyGameAction(before, { type: "mintDiesel", litres: 1 }, ctxAt());
     expect(after).toBe(before);
   });
@@ -129,19 +115,20 @@ describe("diesel depot: minting through the one reducer seam", () => {
   });
 
   it("refuses zero, negative and fractional litres", () => {
-    const before = depotState(1_000_000);
+    const before = stockedState(1_000_000, 50);
     for (const litres of [0, -3, 0.4]) {
       expect(applyGameAction(before, { type: "mintDiesel", litres }, ctxAt())).toBe(before);
     }
   });
 
   it("survives a save round trip with its totals intact", () => {
-    const minted = applyGameAction(depotState(5000), { type: "mintDiesel", litres: 1 }, ctxAt());
-    const decoded = decodeSave(encodeSave(minted));
+    const shipped = applyGameAction(stockedState(5000, 4, 12_000), { type: "mintDiesel", litres: 1 }, ctxAt());
+    const decoded = decodeSave(encodeSave(shipped));
     expect(decoded.ok).toBe(true);
     if (!decoded.ok) return;
     expect(decoded.state.dieselDepot.litresMinted).toBe(1);
-    expect(bnToNumber(decoded.state.dieselDepot.cookiesSpent)).toBeCloseTo(DIESEL_FIRST_LITRE_COST, 4);
+    expect(bnToNumber(decoded.state.dieselDepot.cookiesSpent)).toBeCloseTo(3_000, 3);
+    expect(decoded.state.dieselFactory.litres).toBeCloseTo(3, 9);
   });
 });
 

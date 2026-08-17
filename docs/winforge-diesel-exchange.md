@@ -60,7 +60,7 @@ ledger.
 | `id` | string | Unique across the file. A UUID in practice. A reader must never renumber or reorder. |
 | `mintedAt` | string | ISO-8601 UTC instant, stamped by the process that minted the voucher — the game's main process, from its own clock, never from a window script. |
 | `litres` | integer | Litres of diesel this voucher is worth. Always positive and whole. |
-| `cookiesSpent` | string | What the player paid, as a decimal (`"1000"`) or scientific (`"1.234560e21"`) string. A **string** because the cookie economy outgrows a JSON number within an ordinary session. It is a receipt: no consumer needs to do arithmetic on it. |
+| `cookiesSpent` | string | What these litres cost the player, as a decimal (`"1000"`) or scientific (`"1.234560e21"`) string. A **string** because the cookie economy outgrows a JSON number within an ordinary session. It is a receipt: no consumer needs to do arithmetic on it. See *A clarification to `cookiesSpent`* below — the field's type, name and meaning are unchanged at version 1, but where the number comes from has changed. |
 | `consumedAt` | string or null | `null` until WinForge consumes the voucher; then WinForge's own ISO-8601 instant. |
 
 ## Who is allowed to do what
@@ -97,36 +97,102 @@ single-user hobby exchange between two applications a person runs at their desk,
 transaction log. If it ever needs to be stronger, the next step is a lock file beside the
 ledger — not a database.
 
-## The price a player pays
+## A clarification to `cookiesSpent` (still schema version 1)
 
-The first litre costs **1,000 cookies**, and every litre already minted makes the next one
-**15% dearer** — the same 1.15 growth ratio the game's generator tiers use, so the depot reads
-as one more rung of an economy the player already understands.
+An earlier build of the game sold litres directly: press a button, a thousand cookies vanish, a
+litre exists. `cookiesSpent` was that price, and nothing else.
 
-| Lifetime litres minted | Price of the next litre | Total spent to get there |
-| ---: | ---: | ---: |
-| 0 | 1,000 | 0 |
-| 1 | 1,150 | 1,000 |
-| 5 | 2,011 | 6,742 |
-| 10 | 4,046 | 20,304 |
-| 25 | 32,919 | 212,793 |
-| 50 | 1,083,657 | 7,217,716 |
-| 100 | 1,174,313,451 | 7,828,749,670 |
+The game does not work that way any more. Diesel is **manufactured** now, by a small refinery
+the player builds and runs (see the section below). Cookies never buy a litre; they buy the
+plant. So the honest question a voucher's cookie figure answers is no longer *what did you pay
+at the counter* — nobody pays anything at the counter — but *what did these litres cost to
+make*. The game answers it by amortization:
 
-Diesel is therefore a real cookie sink at every stage of a run rather than a rounding error by
-mid-game, and a hundred litres is a genuine project. The curve is over *lifetime* litres minted,
-not litres held: a voucher leaves the game for good the moment it is written, and there is
-nothing to sell back.
+```
+cookiesSpent = cookies spent on the plant x (litres on this voucher / litres the plant has ever made)
+```
 
-The depot is not on screen at the start of a run. It arrives with a **Fuel Contract** upgrade
-(500 cookies), which itself requires the **Shop Sign** — the depot lives in the shop rail's
-footer, so there has to be a rail first.
+**Nothing in the format changes.** The field is still present, still a string, still a decimal or
+scientific figure, still a receipt no reader has to do arithmetic on. `schemaVersion` stays at
+`1` and a WinForge reader written against the table above needs no change of any kind. This
+section exists so that a reader who compares two vouchers and finds the figures do not follow a
+neat 1.15 curve any more knows why: the number is an attribution of build cost, not a price.
+
+A consequence worth stating plainly: the figure can be **`"0"`**. A player who has built nothing
+and shipped nothing cannot ship at all, but a player whose plant was a gift of a save-file edit,
+or whose lifetime production is enormous relative to a small shipment, can legitimately produce
+a voucher whose amortized share rounds to zero. Zero is a true statement about attribution, not
+a missing value, and readers must accept it.
+
+## The game side: where the litres come from
+
+The whole cookie-side economy of diesel now lives in `src/shared/game/diesel-factory.ts`. It is
+a four-stage production line, ticking on the same wall clock as the rest of the game:
+
+```
+wells / importers  ->  refining units  ->  storage tanks  ->  the depot ships vouchers
+     (crude)            (crude -> litres)     (finite)          (draws the tanks down)
+```
+
+Every stage can stall, and stalls honestly. A refinery with no crude refines nothing. A refinery
+with a full tank in front of it refines nothing either, and the crude it would have used stays
+in the yard. The depot cannot ship a litre the tanks do not hold.
+
+### The rate curve
+
+| Equipment | Cost of the first | Growth | What one unit does |
+| --- | ---: | ---: | --- |
+| Crude Well | 2,000 | x1.15 | +0.05 barrels/sec |
+| Crude Importer | 24,000 | x1.15 | +0.5 barrels/sec |
+| Refinery Still | 8,000 | x1.15 | +0.02 litres/sec of refining throughput |
+| Catalytic Cracker | 120,000 | x1.15 | +0.2 litres/sec |
+| Storage Tank | 5,000 | x1.15 | +25 litres of tank, +50 barrels of yard |
+| Transfer Pump | 40,000 | x1.15 | +8% refining throughput, on every refining unit |
+
+Every line grows **1.15 a unit** — the same house ratio the generator ladder and the old litre
+curve both used, so the factory shop reads without being taught anything new. A bulk purchase is
+summed as a geometric series, so ten units bought at once cost exactly what ten units bought one
+at a time would.
+
+Conversion starts at **2.5 barrels of crude per litre** of diesel. Storage starts at a
+**10-litre drum** and a **20-barrel hardstanding**, before a single tank is bought.
+
+Those numbers are chosen so the first two purchases teach the mechanic by themselves: **one well
+feeds exactly one still** (0.05 barrels/sec produced against 0.02 x 2.5 = 0.05 barrels/sec
+demanded), and one importer feeds exactly one cracker. Buy wells alone and the yard backs up to
+its cap; buy stills alone and they idle. A balanced pair makes a litre every fifty seconds.
+
+Note that a *fresh* floor runs out of **yard** before it runs out of **drum**: twenty barrels is
+eight litres, and the drum holds ten. That is why the first Storage Tank raises both numbers at
+once, and it is why the tank is the cheapest thing on the list after the well.
+
+### The upgrade tree
+
+Fourteen factory upgrades in four branches, each bought with cookies through the same reducer
+seam as everything else in the game, and each offered only once the plant it improves is
+actually running:
+
+- **Throughput** (5) — Wider Bore, Deep Drilling and Pipeline Spur on the intake side; Hot Feed
+  and Continuous Run on the refining side.
+- **Efficiency** (3) — Trayed Column (x0.85), Vacuum Distillation (x0.8) and Hydrocracking
+  (x0.75) on the barrels-per-litre figure. This is the only branch that makes an existing line
+  cheaper to run rather than bigger.
+- **Capacity** (3) — Bunded Bay (x1.5), Floating Roof (x2) and Tank Farm (x3) on both the tank
+  and the yard.
+- **Automation** (3) — Depot Telemetry ships when a tank is completely full, Dispatch Desk at
+  half a tank, Night Shift at a quarter. Automation is bought *and* then switched on by the
+  player; buying it never starts it.
+
+The factory is not on screen at the start of a run. It arrives with the same **Fuel Contract**
+upgrade (500 cookies) that used to reveal the depot, which itself requires the **Shop Sign** —
+signing a contract to supply WinForge is what gives you a reason to build a refinery. Buying
+that upgrade grants a *surface*, never a piece of equipment: the floor starts bare.
 
 ## What the game does NOT claim
 
 The Diesel Depot card shows three separate things and keeps them separate:
 
-- **litres minted** — from the game's own save;
+- **litres shipped** — from the game's own save, and never more than the tanks really held;
 - **vouchers minted** — counted from the ledger file itself;
 - **consumed by WinForge** — counted from `consumedAt` fields in that same file, which only
   WinForge ever writes. While no WinForge reader exists, this reads "none yet — WinForge has not

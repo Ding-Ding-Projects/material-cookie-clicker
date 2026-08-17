@@ -951,6 +951,7 @@ export const CONTROL_COPY = {
   groupStepper: { en: "Buy quantity", yue: "購買數量" },
   groupBulk: { en: "Bulk actions", yue: "批量操作" },
   groupToggle: { en: "Feature switches", yue: "功能開關" },
+  groupLook: { en: "The look of the thing", yue: "個樣" },
   /** The plate that replaces the drag region on the title bar until dragging is bought. */
   dragPlate: (price: string): Bilingual => ({
     en: `Dragging this window costs ${price} cookies`,

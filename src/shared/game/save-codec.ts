@@ -73,7 +73,7 @@ export function decodeSave(raw: unknown): DecodeSaveResult {
 export function encodeSave(state: GameState): SaveDataOnDisk {
   return {
     randomEvents: encodeRandomEvents(state.randomEvents),
-    schemaVersion: state.schemaVersion as 8,
+    schemaVersion: state.schemaVersion as 9,
     cookies: state.cookies,
     lifetimeCookies: state.lifetimeCookies,
     baseClickValue: state.baseClickValue,

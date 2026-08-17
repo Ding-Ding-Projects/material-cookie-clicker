@@ -9,6 +9,7 @@ import {
   getControlUnlock,
   hasControlRung,
   V8_GRANDFATHERED_RUNG_IDS,
+  V9_GRANDFATHERED_RUNG_IDS,
 } from "../../src/shared/game/control-unlocks";
 import { applyGameAction } from "../../src/shared/game/reducer";
 import { migrateToLatest } from "../../src/shared/game/migrations";
@@ -100,7 +101,11 @@ describe("advanced regex builder: the shared ladder", () => {
       7,
     );
     const grantedIds = (played.data.controlUnlocks as { purchasedRungIds: string[] }).purchasedRungIds;
-    expect(grantedIds).toEqual(["regex.groups"]);
+    // Walking to the latest schema also runs v8 -> v9, which hands a played save the whole look
+    // ladder (control-unlocks.ts, V9_GRANDFATHERED_RUNG_IDS): every existing save has been
+    // looking at the finished cabinet since the day it was written. What this test is about is
+    // the regex grant, so it asserts that one exactly and lets the look grant follow it.
+    expect(grantedIds).toEqual(["regex.groups", ...V9_GRANDFATHERED_RUNG_IDS]);
     // The twelve-thousand-cookie lab is a workbench no older build ever shipped. Nobody lost it,
     // so nobody is handed it.
     expect(grantedIds).not.toContain("regex.lab");
@@ -122,7 +127,8 @@ describe("advanced regex builder: the shared ladder", () => {
       7,
     );
     const ids = (already.data.controlUnlocks as { purchasedRungIds: string[] }).purchasedRungIds;
-    expect(ids).toEqual(["regex.groups"]);
+    expect(ids).toEqual(["regex.groups", ...V9_GRANDFATHERED_RUNG_IDS]);
+    expect(ids.filter((id) => id === "regex.groups")).toHaveLength(1);
   });
 });
 

@@ -20,6 +20,7 @@ import {
   V6_GRANDFATHERED_RUNG_IDS,
   V7_GRANDFATHERED_RUNG_IDS,
   V8_GRANDFATHERED_RUNG_IDS,
+  V9_GRANDFATHERED_RUNG_IDS,
 } from "../../src/shared/game/control-unlocks";
 import { migrateToLatest } from "../../src/shared/game/migrations";
 import { applyGameAction, createInitialGameState } from "../../src/shared/game/reducer";
@@ -459,6 +460,7 @@ describe("control-unlocks: the migration policy", () => {
       ...V6_GRANDFATHERED_RUNG_IDS,
       ...V7_GRANDFATHERED_RUNG_IDS,
       ...V8_GRANDFATHERED_RUNG_IDS,
+      ...V9_GRANDFATHERED_RUNG_IDS,
     ]);
   });
 
@@ -491,6 +493,7 @@ describe("control-unlocks: the migration policy", () => {
       ...V6_GRANDFATHERED_RUNG_IDS,
       ...V7_GRANDFATHERED_RUNG_IDS,
       ...V8_GRANDFATHERED_RUNG_IDS,
+      ...V9_GRANDFATHERED_RUNG_IDS,
     ]);
 
     const barely = migrateToLatest({ schemaVersion: 5, lifetimeCookies: { mantissa: 4, exponent: 2 } }, 5);
@@ -510,11 +513,13 @@ describe("control-unlocks: the migration policy", () => {
       6,
     );
     expect(played.finalVersion).toBe(SAVE_SCHEMA_VERSION);
-    // Walking to the latest schema also runs v7 → v8, which appends its own one-id grant.
+    // Walking to the latest schema also runs v7 → v8, which appends its own one-id grant, and
+    // v8 → v9, which appends the whole look ladder.
     expect((played.data.controlUnlocks as { purchasedRungIds: string[] }).purchasedRungIds).toEqual([
       "chrome.drag",
       ...V7_GRANDFATHERED_RUNG_IDS,
       ...V8_GRANDFATHERED_RUNG_IDS,
+      ...V9_GRANDFATHERED_RUNG_IDS,
     ]);
     // It chains nothing: the rest of the v6 table is NOT re-granted by this step.
     expect((played.data.controlUnlocks as { purchasedRungIds: string[] }).purchasedRungIds).not.toContain(

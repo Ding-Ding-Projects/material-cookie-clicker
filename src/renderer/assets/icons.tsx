@@ -41,23 +41,56 @@ const AMETHYST = 'var(--tier3, #533593)';
 const AMETHYST_LIGHT = 'var(--tier3-container, #e6d9ff)';
 const HIGHLIGHT = 'rgba(255, 255, 255, 0.7)';
 
-/** Every drawing shares one canvas and one stroke weight, which is what makes twenty
- *  separately-drawn machines read as one set rather than twenty clip-art finds. */
+/**
+ * Every drawing shares one canvas and one stroke weight, which is what makes twenty
+ * separately-drawn machines read as one set rather than twenty clip-art finds.
+ *
+ * IT ALSO EMITS A PLAIN GLYPH BESIDE ITSELF, and exactly one of the two is ever displayed.
+ *
+ * The illustrated set is a purchase now (control-unlocks.ts, the `look` ladder's `look.art`
+ * rung): the owner's decree is that a fresh save is "a purely super plain cheaply made app", and
+ * a hand-drawn twenty-machine icon set is not that. Until the rung is bought, `[data-look-art=
+ * 'off']` in THE PLAIN LAYER hides the svg and shows the span, which is a single lifeless
+ * `▪` in the text colour — deliberately the same mark for every entity, because a cheap app
+ * would not have drawn twenty of them either.
+ *
+ * NOTHING A SCREEN READER HEARS CHANGES. Both elements are `aria-hidden`, in both states; the
+ * name has always come from the adjacent text or the parent's `aria-label`, and it still does.
+ * The rung sells a picture, never a label.
+ */
 function Art({ children, extraClass }: { children: ReactNode; extraClass?: string }) {
   return (
-    <svg
-      className={extraClass ? `game-icon ${extraClass}` : 'game-icon'}
-      viewBox="0 0 32 32"
-      aria-hidden="true"
-      focusable="false"
-      stroke={INK}
-      strokeWidth={1.4}
-      strokeLinejoin="round"
-      strokeLinecap="round"
-      fill="none"
-    >
-      {children}
-    </svg>
+    <>
+      <PlainGlyph />
+      <svg
+        className={extraClass ? `game-icon ${extraClass}` : 'game-icon'}
+        viewBox="0 0 32 32"
+        aria-hidden="true"
+        focusable="false"
+        stroke={INK}
+        strokeWidth={1.4}
+        strokeLinejoin="round"
+        strokeLinecap="round"
+        fill="none"
+      >
+        {children}
+      </svg>
+    </>
+  );
+}
+
+/**
+ * The cheap stand-in for a drawing, shown only while `look.art` is unbought.
+ *
+ * It is emitted unconditionally and hidden by CSS rather than being conditionally rendered in
+ * React, because it must switch the instant the rung is bought without any component having to
+ * subscribe to the save. Purely decorative, and `aria-hidden` in every state.
+ */
+function PlainGlyph() {
+  return (
+    <span className="game-icon-plain" aria-hidden="true">
+      ▪
+    </span>
   );
 }
 

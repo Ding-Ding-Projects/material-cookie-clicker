@@ -957,7 +957,7 @@ export { costOfNext };
 export function createInitialGameState(nowIsoString: string): GameState {
   const zero = bnFromNumber(0);
   return {
-    schemaVersion: 8,
+    schemaVersion: 9,
     cookies: zero,
     lifetimeCookies: zero,
     baseClickValue: bnFromNumber(1),

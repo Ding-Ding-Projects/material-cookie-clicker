@@ -4,7 +4,7 @@ import { z } from "zod";
  * Current on-disk save schema version. Bump this whenever `SaveDataLatest`'s shape changes,
  * and add a forward-only migration entry in migrations.ts keyed by the *previous* version.
  */
-export const SAVE_SCHEMA_VERSION = 8;
+export const SAVE_SCHEMA_VERSION = 9;
 
 const BigNumSchema = z.object({
   mantissa: z.number(),
@@ -247,9 +247,28 @@ export const SaveDataV8Schema = SaveDataV7Schema.omit({ schemaVersion: true }).e
 
 export type SaveDataV8 = z.infer<typeof SaveDataV8Schema>;
 
+/**
+ * Schema for save-format version 9. IDENTICAL IN SHAPE ONCE MORE — only the version literal moves.
+ *
+ * Same instrument, one decree later, and the biggest content change any of these version bumps has
+ * carried. The owner asked that "the app should start with a purely super plain cheaply made app
+ * with just a cookie", which turns the application's entire appearance into a seven-rung `look`
+ * ladder in the control registry rather than into a new save field. Every save that already exists
+ * has been looking at the finished arcade cabinet since the day it was written, so a played save
+ * has to be handed that look rather than woken up as a white page — and a grant is something only
+ * a migration step can do.
+ *
+ * `migrations.ts#migrateV8ToV9` is the whole of it, and it grants exactly the seven look rungs.
+ */
+export const SaveDataV9Schema = SaveDataV8Schema.omit({ schemaVersion: true }).extend({
+  schemaVersion: z.literal(9),
+});
+
+export type SaveDataV9 = z.infer<typeof SaveDataV9Schema>;
+
 /** The schema alias that always points at the current (latest) version's shape. */
-export const SaveDataLatestSchema = SaveDataV8Schema;
-export type SaveDataLatest = SaveDataV8;
+export const SaveDataLatestSchema = SaveDataV9Schema;
+export type SaveDataLatest = SaveDataV9;
 
 /** Minimal shape used only to read `schemaVersion` off of otherwise-unvalidated input. */
 export const SaveVersionProbeSchema = z.object({

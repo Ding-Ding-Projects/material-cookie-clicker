@@ -3,6 +3,7 @@ import {
   grantedRungIdsForMigration,
   grantedRungIdsForV7Migration,
   grantedRungIdsForV8Migration,
+  grantedRungIdsForV9Migration,
   MIGRATION_GRANT_LIFETIME_THRESHOLD,
 } from "./control-unlocks.js";
 import { SAVE_SCHEMA_VERSION } from "./save-schema.js";
@@ -251,6 +252,51 @@ function migrateV7ToV8(input: Record<string, unknown>): Record<string, unknown> 
   };
 }
 
+/**
+ * Version 8 -> 9: grants the whole look ladder, all seven rungs.
+ *
+ * The owner's decree — "the app should start with a purely super plain cheaply made app with just
+ * a cookie" — turns the application's entire appearance into a purchase. A fresh save is a white
+ * page with a grey circle on it that says COOKIE, and the arcade cabinet is assembled a layer at
+ * a time (control-unlocks.ts, the `look` control).
+ *
+ * This step is the easiest grant in the file to argue and the largest. The earlier steps each put
+ * a price on a control that used to be free and asked whether a player who had been USING it
+ * should lose it. This one puts a price on what the application LOOKS LIKE, and every save in
+ * existence has been looking at the finished cabinet since the day it was written. Throwing that
+ * away on update would not read as the joke landing; it would read as the artwork having been
+ * deleted, and the player would be right.
+ *
+ * So: same threshold, same defensive BigNum read of the lifetime figure, same appending to
+ * whatever the save already carries, same duplicate filter, no chaining of the earlier grants. A
+ * save under the threshold starts plain and buys the look like a fresh save does.
+ */
+function migrateV8ToV9(input: Record<string, unknown>): Record<string, unknown> {
+  const raw = input.lifetimeCookies;
+  let lifetime: BigNum = { mantissa: 0, exponent: 0 };
+  if (raw && typeof raw === "object") {
+    const pair = raw as { mantissa?: unknown; exponent?: unknown };
+    if (typeof pair.mantissa === "number" && typeof pair.exponent === "number") {
+      lifetime = { mantissa: pair.mantissa, exponent: pair.exponent };
+    }
+  }
+
+  const existing = input.controlUnlocks;
+  let owned: string[] = [];
+  if (existing && typeof existing === "object") {
+    const list = (existing as { purchasedRungIds?: unknown }).purchasedRungIds;
+    if (Array.isArray(list)) owned = list.filter((id): id is string => typeof id === "string");
+  }
+
+  const granted = grantedRungIdsForV9Migration(lifetime).filter((id) => !owned.includes(id));
+
+  return {
+    ...input,
+    schemaVersion: 9,
+    controlUnlocks: { purchasedRungIds: [...owned, ...granted] },
+  };
+}
+
 /** Ordered forward-only migrations, indexed by the version they migrate FROM. */
 export const MIGRATIONS: Readonly<Record<number, MigrationStep>> = {
   1: migrateV1ToV2,
@@ -260,6 +306,7 @@ export const MIGRATIONS: Readonly<Record<number, MigrationStep>> = {
   5: migrateV5ToV6,
   6: migrateV6ToV7,
   7: migrateV7ToV8,
+  8: migrateV8ToV9,
 };
 
 export { MIGRATION_GRANT_LIFETIME_THRESHOLD };

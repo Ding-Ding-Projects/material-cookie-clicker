@@ -6,6 +6,7 @@ import { isEffectActive } from '../shared/game/golden-cookie.js';
 import { computeMultipliers } from '../shared/game/upgrades.js';
 import { computeDisclosure, type ConsoleSurfaceId } from '../shared/game/disclosure.js';
 import { controlRungPrice, isControlUnlocked } from '../shared/game/control-unlocks.js';
+import { LOOK_ATTRIBUTES, lookTierAttributes } from '../shared/game/look-tiers.js';
 import {
   CATALOGUE_PANEL_ID,
   consolePanelIds,
@@ -616,13 +617,55 @@ export function App() {
   return (
     <AppSettingsProvider value={settingsContext}>
       <GameProvider>
-        <LanguageModeGate stored={settings.languageMode}>
-          <TitleBar />
-          <GameShell />
-        </LanguageModeGate>
+        <LookTierGate>
+          <LanguageModeGate stored={settings.languageMode}>
+            <TitleBar />
+            <GameShell />
+          </LanguageModeGate>
+        </LookTierGate>
       </GameProvider>
     </AppSettingsProvider>
   );
+}
+
+/**
+ * Reads the seven look rungs (control-unlocks.ts `look`) off the save and writes them onto the
+ * document root as `data-look-*="on" | "off"`.
+ *
+ * THE OWNER'S DECREE this exists for: "the app should start with a purely super plain cheaply
+ * made app with just a cookie". So the whole v2 arcade-bakery appearance is earned, and this is
+ * the one place the DOM is told how much of it has been paid for. What each `off` state actually
+ * looks like lives in exactly one other place — THE PLAIN LAYER at the foot of styles/index.css —
+ * and the reasoning for the split is written out in shared/game/look-tiers.ts.
+ *
+ * THE ATTRIBUTES GO ON `document.documentElement`, NOT ON A COMPONENT'S OWN ELEMENT, and that is
+ * the whole reason this is an effect rather than a set of JSX props. The colour, shape, type and
+ * motion tokens are declared on `:root`; re-mapping them anywhere lower would re-theme that
+ * subtree and leave everything rendered outside it — the anchored panels, the title bar, the
+ * toasts — in full v2 colours. They are ALSO spread onto the cabinet element by `GameShell`, so
+ * the state is readable in the DOM where someone would look for it.
+ *
+ * It is a LAYOUT effect so the attributes are in place before the browser paints. A paint of a
+ * fully-earned cabinet in plain grey, for one frame on every load, is exactly the flash this
+ * ordering avoids.
+ */
+function LookTierGate({ children }: { children: ReactNode }) {
+  const structure = useStructureSnapshot();
+  const attributes = lookTierAttributes(structure);
+  // The dependency is the VALUES, joined, rather than the object: `lookTierAttributes` builds a
+  // fresh object every render, so an identity dependency would re-run on every tick of the game
+  // loop for a set of attributes that changes about seven times in a playthrough.
+  const signature = LOOK_ATTRIBUTES.map((attribute) => attributes[attribute]).join('|');
+
+  useLayoutEffect(() => {
+    const root = document.documentElement;
+    const values = signature.split('|');
+    LOOK_ATTRIBUTES.forEach((attribute, index) => {
+      root.setAttribute(attribute, values[index]);
+    });
+  }, [signature]);
+
+  return <>{children}</>;
 }
 
 /**
@@ -670,6 +713,7 @@ function GameShell() {
   // sends the keyboard here rather than opening a panel nobody has paid for yet.
   const settingsSlotRef = useRef<HTMLButtonElement | null>(null);
   const settingsBought = useControlRung(SETTINGS_OPEN_RUNG_ID);
+  const lookAttributes = lookTierAttributes(useStructureSnapshot());
   const { notice: offlineNotice, dismiss: dismissOfflineNotice } = useOfflineNotice();
   const milestoneMessage = useMilestoneMessage();
 
@@ -759,7 +803,11 @@ function GameShell() {
       {/* One cabinet, one surface. The HUD is pinned to its top with the console cluster bolted
           on beside it, and the game fills the rest — permanently. Secondary surfaces are panels
           that grow out of a console button on top of it; the tick loop keeps running behind. */}
-      <div className="cabinet" data-panel-open={openSurface ? 'true' : undefined}>
+      {/* The look tiers are mirrored onto the cabinet element itself. The document root is what
+          the plain layer actually keys off (LookTierGate says why), but the cabinet IS the thing
+          being assembled, and a reader inspecting it should be able to see how much of it has
+          been bought without walking up to <html>. */}
+      <div className="cabinet" data-panel-open={openSurface ? 'true' : undefined} {...lookAttributes}>
         <div className="cabinet-head">
           <Hud />
           <CabinetConsole

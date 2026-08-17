@@ -108,6 +108,19 @@ import type { GameState } from "./types.js";
  *                                        upgrade: the bulk-buy toolbar  1,200
  *   toggle    Tool progression switch    unlock                           300
  *   toggle    Factory auto-ship switch   unlock                         2,500
+ *   look      The look of the thing      unlock: colour                    50
+ *                                        upgrade: the cabinet             250
+ *                                        upgrade: display typography      750
+ *                                        upgrade: the oven glow         1,800
+ *                                        upgrade: illustrated art       4,000
+ *                                        upgrade: motion                8,000
+ *                                        upgrade: the dark theme       15,000
+ *
+ * The `look` ladder is a FOURTH band of its own and breaks the three above on purpose: it runs
+ * from the cheapest end of the table to the most expensive thing in it, because it is not one
+ * control but the whole appearance of the application sold a layer at a time. A fresh save is
+ * deliberately a plain white form with a grey button on it, by the owner's decree, and the
+ * arcade cabinet assembles over roughly the first hour. See the entry itself for the argument.
  *
  * ────────────────────────────────────────────────────────────────────────────────────────────
  * THE MIGRATION POLICY, STATED PLAINLY BECAUSE IT IS A REAL COMPROMISE
@@ -119,7 +132,15 @@ import type { GameState } from "./types.js";
  */
 
 /** The coarse grouping the Settings catalogue renders as sections. */
-export type ControlGroup = "chrome" | "settings" | "search" | "regex" | "stepper" | "bulk" | "toggle";
+export type ControlGroup =
+  | "chrome"
+  | "settings"
+  | "search"
+  | "regex"
+  | "stepper"
+  | "bulk"
+  | "toggle"
+  | "look";
 
 /** One rung of one control's ladder. Rung index 0 is the unlock; anything above it is an upgrade. */
 export interface ControlRungDefinition {
@@ -644,6 +665,108 @@ export const CONTROL_UNLOCKS: readonly ControlUnlockDefinition[] = [
       },
     ],
   },
+  {
+    // ────────────────────────────────────────────────────────────────────────────────────────
+    // THE LOOK. One ladder, seven rungs, and the reason it is a ladder rather than seven
+    // separate controls.
+    //
+    // The owner's decree, in their own words: "the app should start with a purely super plain
+    // cheaply made app with just a cookie". Everything this build looks like — the warm bakery
+    // palette, the wooden cabinet frame, the display typography on the marquee, the oven glow
+    // and its embers, the illustrated icon set, the press travel under every button, the dark
+    // theme — is now EARNED. A save that has never bought a look rung renders as a plain
+    // white page with system-font text and #ddd buttons, and that plainness is the deliberate
+    // starting state rather than a fallback for a failure.
+    //
+    // WHY A LADDER. A look assembles in an order. Painting the cabinet frame before there is a
+    // palette to paint it in produces brown wood on a grey page; putting display type on a
+    // marquee that has no bezel produces a heavy word floating in nothing. Each rung below is
+    // the ground the next one stands on, so the ladder's bottom-up rule is the feature's own
+    // rule rather than an invented one. It also means the catalogue prints the whole
+    // transformation as one readable sequence with one running price.
+    //
+    // WHAT EACH RUNG'S ABSENCE LOOKS LIKE is not "broken" — it is a specific, coherent, cheap
+    // alternative, listed in styles/index.css under THE PLAIN LAYER. The floors that hold at
+    // every rung including none of them: AA text contrast, a visible focus ring, 44px targets,
+    // reduced-motion respected, and every price legible on its coin-slot plate. The economy has
+    // to be playable from the plain state, because the plain state is where it starts.
+    //
+    // WHAT IS DELIBERATELY NOT SOLD HERE: legibility. There is no rung that buys readable text,
+    // a focus ring, or a big enough button. Those are floors, and a floor is never a price.
+    // ────────────────────────────────────────────────────────────────────────────────────────
+    id: "look",
+    group: "look",
+    nameEn: "The look of the thing",
+    nameYue: "個樣",
+    whereEn: "The whole application, all at once",
+    whereYue: "成個程式，一次過",
+    rungs: [
+      {
+        id: "look.palette",
+        nameEn: "Colour",
+        nameYue: "顏色",
+        detailEn:
+          "Buys the warm bakery palette. Until it is bought the application is white, grey and black, like a form.",
+        detailYue: "買返暖笠笠嘅餅店色系。未買之前，成個程式白白灰灰黑黑，好似張表格咁。",
+        price: 50,
+      },
+      {
+        id: "look.cabinet",
+        nameEn: "The cabinet",
+        nameYue: "機櫃",
+        detailEn:
+          "Buys the wooden frame, the bevels, the chunky borders and the rounded corners. Before it, every edge is a 1px grey hairline and every corner is square.",
+        detailYue: "買返木框、斜邊、粗邊同圓角。未買之前，每條邊都係一像素灰線，每隻角都係直角。",
+        price: 250,
+      },
+      {
+        id: "look.marquee",
+        nameEn: "Display typography",
+        nameYue: "招牌字體",
+        detailEn:
+          "Buys the heavy letter-spaced display face on the marquee, the panel titles and the HUD. Before it, everything is the system font at normal weight.",
+        detailYue: "買返招牌、面板標題同儀表板嗰隻粗身、拉開字距嘅字體。未買之前，全部都係系統字體、正常粗幼。",
+        price: 750,
+      },
+      {
+        id: "look.glow",
+        nameEn: "The oven glow",
+        nameYue: "焗爐嘅光",
+        detailEn:
+          "Buys the radial oven glow behind the cabinet, the drifting embers and the crumbs on the counter. Before it, the background is one flat colour.",
+        detailYue: "買返機櫃背後嘅焗爐光暈、飄嘅火屑同枱面嘅餅碎。未買之前，個背景淨係一隻淨色。",
+        price: 1_800,
+      },
+      {
+        id: "look.art",
+        nameEn: "The illustrated art",
+        nameYue: "插畫",
+        detailEn:
+          "Buys the drawn icon set and the drawn hero cookie. Before it, the cookie is a circle with the word COOKIE on it and every icon is a plain glyph. The names screen readers announce are identical either way.",
+        detailYue:
+          "買返成套手繪圖示同手繪主角曲奇。未買之前，粒曲奇係個圓圈上面寫住 COOKIE，每個圖示都係普通符號。讀屏軟件讀到嘅名，買唔買都一樣。",
+        price: 4_000,
+      },
+      {
+        id: "look.motion",
+        nameEn: "Motion",
+        nameYue: "動態",
+        detailEn:
+          "Buys the press travel under every button and the animations across the application. Reduced-motion is still honoured after buying it — that is a floor, not a rung.",
+        detailYue: "買返每個掣㩒落去嗰段行程同成個程式嘅動畫。買咗之後一樣尊重「減少動態」設定 — 嗰樣係底線，唔係可以買嘅嘢。",
+        price: 8_000,
+      },
+      {
+        id: "look.dark",
+        nameEn: "The dark theme",
+        nameYue: "深色主題",
+        detailEn:
+          "Buys the ability to follow the system's dark theme at all. Before it, the application stays light whatever the operating system says.",
+        detailYue: "買返跟系統轉深色主題嘅能力。未買之前，作業系統話咩都好，程式一樣淺色。",
+        price: 15_000,
+      },
+    ],
+  },
 ];
 
 /** Every rung id in the registry, in catalogue order. */
@@ -874,6 +997,44 @@ export const V7_GRANDFATHERED_RUNG_IDS: readonly string[] = [
  * which is not grandfathering, it is a giveaway. Every save buys the lab.
  */
 export const V8_GRANDFATHERED_RUNG_IDS: readonly string[] = ["regex.groups"];
+
+/**
+ * The rungs a grandfathered save is granted when it crosses into schema version 9: the WHOLE
+ * look ladder, all seven rungs of it.
+ *
+ * This is the largest grant any migration in this file has made since version 6, and it is the
+ * easiest one to argue. Versions 6, 7 and 8 each put a price on a control that used to be free,
+ * and the question was whether a player who had been USING that control should lose it. Version
+ * 9 puts a price on what the application LOOKS LIKE — and every save in existence has been
+ * looking at the full v2 arcade-bakery cabinet since the day it was written. They did not merely
+ * use it; it is the only thing they have ever seen.
+ *
+ * Waking a built-out save up as a white page with #ddd buttons would not read as a joke landing.
+ * It would read, correctly, as the update having thrown the artwork away. So a save past the same
+ * 1,000-lifetime-cookie threshold every other grant uses keeps the look it earned, entire, and a
+ * fresh save assembles it a rung at a time from plain.
+ *
+ * The list is frozen at exactly these seven ids for the same reason the others are frozen: a look
+ * tier invented after this migration was written was never seen by an older save, so granting it
+ * would be a giveaway rather than grandfathering.
+ */
+export const V9_GRANDFATHERED_RUNG_IDS: readonly string[] = [
+  "look.palette",
+  "look.cabinet",
+  "look.marquee",
+  "look.glow",
+  "look.art",
+  "look.motion",
+  "look.dark",
+];
+
+/**
+ * What a version-8 save carrying `lifetimeCookies` is given as it crosses into version 9.
+ * Same threshold, same defensive reading of the value, frozen grant list — see above.
+ */
+export function grantedRungIdsForV9Migration(lifetimeCookies: number | BigNum): readonly string[] {
+  return grantedRungIdsForMigration(lifetimeCookies).length > 0 ? V9_GRANDFATHERED_RUNG_IDS : [];
+}
 
 /**
  * What a version-7 save carrying `lifetimeCookies` is given as it crosses into version 8.

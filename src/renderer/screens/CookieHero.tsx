@@ -192,6 +192,16 @@ export function CookieHero() {
               assets/icons.tsx). The button underneath keeps its arcade physics and stays the
               solid base the cookie sits on; the drawing simply overhangs it. The golden state
               is the same geometry, gilded — so it is unmistakably this cookie, gone gold. */}
+          {/* THE PLAIN COOKIE. `look.art` is a purchase (control-unlocks.ts), and until it is
+              bought this is what the game's one and only button is: a grey circle with the word
+              COOKIE printed on it in the system font. It is emitted next to the drawing rather
+              than instead of it, and THE PLAIN LAYER in styles/index.css shows exactly one of
+              the two, so buying the rung swaps them with no component subscribing to the save.
+              It is aria-hidden like the drawing is — the button's own aria-label has always
+              carried the name and still does, so the plain state announces identically. */}
+          <span className="cookie-btn__plain" aria-hidden="true">
+            COOKIE
+          </span>
           <HeroCookieArt golden={goldenActive} extraClass="cookie-btn__art" />
         </button>
         {popups.map((popup) => (

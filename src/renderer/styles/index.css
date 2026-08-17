@@ -158,7 +158,7 @@
    the cabinet is lit from inside, so the background glow gets BRIGHTER toward its centre while
    the rim goes to near-black. Both ends of that gradient are contrast-verified upstream. */
 @media (prefers-color-scheme: dark) {
-  :root:not([data-theme='light']) {
+  :root[data-look-dark='on']:not([data-theme='light']) {
     color-scheme: dark;
 
     --surface: #120c08;
@@ -230,7 +230,7 @@
   }
 }
 
-:root[data-theme='dark'] {
+:root[data-look-dark='on'][data-theme='dark'] {
   color-scheme: dark;
 
   --surface: #120c08;
@@ -1426,7 +1426,7 @@ body {
 }
 
 @media (prefers-color-scheme: dark) {
-  :root:not([data-theme='light']) {
+  :root[data-look-dark='on']:not([data-theme='light']) {
     /* Arcade night: a dim bakery lit by the oven's embers. The biscuit keeps its identity — the
        browns stay browns — it is simply exposed several stops darker, and the light falling on
        it is ember-orange rather than daylight. */
@@ -1448,7 +1448,7 @@ body {
   }
 }
 
-:root[data-theme='dark'] {
+:root[data-look-dark='on'][data-theme='dark'] {
   --cookie-centre: #c69456;
   --cookie-mid: #9c6931;
   --cookie-edge: #6e4317;
@@ -3353,12 +3353,12 @@ body {
   background: rgba(255, 255, 255, 0.35);
 }
 
-:root[data-theme='dark'] .gate__key {
+:root[data-look-dark='on'][data-theme='dark'] .gate__key {
   background: rgba(0, 0, 0, 0.25);
 }
 
 @media (prefers-color-scheme: dark) {
-  :root:not([data-theme='light']) .gate__key {
+  :root[data-look-dark='on']:not([data-theme='light']) .gate__key {
     background: rgba(0, 0, 0, 0.25);
   }
 }
@@ -10382,3 +10382,476 @@ ul.card-grid {
   text-overflow: ellipsis;
   white-space: nowrap;
 }
+
+/* ============================================================================================
+ * THE PLAIN LAYER
+ *
+ * The owner's decree: "the app should start with a purely super plain cheaply made app with
+ * just a cookie". Everything above this comment is the finished v2 arcade cabinet, and it is now
+ * EARNED — a fresh save owns none of it and buys it back a layer at a time
+ * (shared/game/control-unlocks.ts, the `look` ladder; shared/game/look-tiers.ts for how owned
+ * rungs become the `data-look-*` attributes this block reads).
+ *
+ * ────────────────────────────────────────────────────────────────────────────────────────────
+ * THE IMPLEMENTATION RULE: NOTHING ABOVE IS DUPLICATED.
+ * ────────────────────────────────────────────────────────────────────────────────────────────
+ * The v2 sheet stays the single source of truth for what this application looks like when it is
+ * fully bought. This layer does not restate it in grey. It works in two moves, in this order:
+ *
+ *   1. TOKEN RE-MAPPING, which does almost all of the work. Every rule above reads its colours,
+ *      radii, border widths and elevations through `var(...)`, so re-declaring roughly sixty
+ *      custom properties on `:root` repaints ten thousand lines of component CSS at once. A
+ *      plain-state colour is therefore never written twice and can never drift out of step with
+ *      the component that uses it.
+ *   2. A SHORT LIST OF STRUCTURAL OVERRIDES, for the handful of places where v2 paints something
+ *      that is not expressible as a token — a wood-grain `repeating-linear-gradient`, an inset
+ *      bevel built from literal rgba, a decorative pseudo-element. Each one is listed below with
+ *      the surface it belongs to. This list is deliberately an AUDIT OF THE HIGH-TRAFFIC
+ *      SURFACES rather than of every selector in the file; the surfaces that were NOT audited
+ *      are named in the known-gaps note at the end of this block, rather than being quietly left
+ *      to look however they look.
+ *
+ * ────────────────────────────────────────────────────────────────────────────────────────────
+ * THE FLOORS, WHICH ARE NOT FOR SALE AT ANY TIER
+ * ────────────────────────────────────────────────────────────────────────────────────────────
+ * These hold in the plain state exactly as they hold in the bought one, and
+ * `tests/game/look-tiers.test.ts` asserts each of them:
+ *
+ *   • AA CONTRAST. Plain is #111 on #ffffff (18.9:1) for body text and #333 on #ffffff (12.6:1)
+ *     for secondary text. The one token that needed care is the error role, which the shared
+ *     surface-kernel defines: #ba1a1a on white is 5.9:1, so it is kept rather than greyed.
+ *   • A VISIBLE FOCUS RING. v2 draws focus with a 3-4px --spark-ring outline. In plain,
+ *     --spark-ring is #555555 on white (7.5:1) and every one of those rules keeps working
+ *     unchanged, because the ring is a token, not a decoration.
+ *   • 44px TARGETS. Nothing in this layer touches width, height, min-height or padding on any
+ *     control. Not one rule below changes a hit area.
+ *   • REDUCED MOTION. `look.motion` buys motion; it can never buy motion back from someone who
+ *     asked the operating system not to have it. The reduced-motion queries above are untouched,
+ *     and the motion-off rule here is a superset of them, so `motion bought + prefers-reduced-
+ *     motion` is still, exactly as `motion unbought` is.
+ *   • THE ECONOMY STAYS PLAYABLE. Coin-slot plates and their printed prices are plain-state
+ *     surfaces first and foremost — that is where every player meets them — so they take the
+ *     ordinary text and outline tokens and are never dimmed or de-emphasised here.
+ * ========================================================================================== */
+
+/* ------------------------------------------------------------------ look.palette — COLOUR
+ * Unbought: the application is white, grey and near-black, like an unstyled internal form.
+ * Every role below keeps its MEANING (a container is still lighter than its outline, an
+ * on-colour is still readable on its pair) and simply loses its hue. That is what makes the
+ * plain state read as cheap-but-coherent rather than as a stylesheet that failed to load.
+ * -------------------------------------------------------------------------------------- */
+:root[data-look-palette='off'] {
+  color-scheme: light;
+
+  --surface: #ffffff;
+  --surface-lowest: #ffffff;
+  --surface-low: #ffffff;
+  --surface-container: #f2f2f2;
+  --surface-high: #eeeeee;
+  --surface-highest: #e4e4e4;
+  --on-surface: #111111;
+  --surface-variant: #eeeeee;
+  --on-surface-variant: #333333;
+  --outline: #999999;
+  --outline-variant: #cccccc;
+
+  /* The "primary" of a cheap app is just dark grey. --primary is used as a text colour on light
+     containers in several places, so it stays dark enough to be AA there (#333 on #eee = 10.9:1). */
+  --primary: #333333;
+  --on-primary: #ffffff;
+  --primary-container: #dddddd;
+  --on-primary-container: #111111;
+  --primary-shadow: #999999;
+
+  --secondary: #333333;
+  --on-secondary: #ffffff;
+  --secondary-container: #dddddd;
+  --on-secondary-container: #111111;
+  --secondary-shadow: #999999;
+
+  --tertiary: #333333;
+  --on-tertiary: #ffffff;
+  --tertiary-container: #dddddd;
+  --on-tertiary-container: #111111;
+  --tertiary-shadow: #999999;
+
+  /* The spark roles. --spark and --spark-glow are decorative and go flat grey; --spark-ring is
+     the one that is allowed on text and on a UI boundary, and it is THE FOCUS RING, so it is
+     picked for contrast rather than for looking cheap: #555 on white is 7.5:1. */
+  --spark: #dddddd;
+  --spark-glow: #cccccc;
+  --spark-ring: #555555;
+
+  /* The cabinet chrome roles. A cheap app has no cabinet, so these collapse to page white and a
+     single grey rule; the bevel and grain roles go fully transparent, which switches off every
+     inset highlight in the sheet without any rule above knowing it happened. */
+  --bg-core: #ffffff;
+  --bg-mid: #ffffff;
+  --bg-edge: #ffffff;
+  --panel-inset: #ffffff;
+  --bevel-hi: transparent;
+  --bevel-lo: transparent;
+  --metal-hi: #dddddd;
+  --metal-lo: #aaaaaa;
+  --cabinet-frame: #eeeeee;
+  --cabinet-frame-dark: #999999;
+  --track: #dddddd;
+  --sheen: transparent;
+  --grain-dark: transparent;
+  --grain-hi: transparent;
+  --grain-deep: transparent;
+  /* The frame is now light grey rather than dark wood, so the text painted on it has to flip
+     from cream to near-black or the title bar would be white-on-#eee. */
+  --on-cabinet: #111111;
+  --cabinet-hover: rgba(0, 0, 0, 0.08);
+
+  /* The oven glow is a token, so switching the background from a radial gradient to a flat white
+     is a one-line change rather than an override on `.cabinet`. */
+  --oven-glow: #ffffff;
+
+  /* The jewel tool tiers. A cheap app does not have bronze, emerald and amethyst; it has three
+     shades of grey, which still ORDER correctly, so the tech tree's escalation is legible. */
+  --tier1: #666666;
+  --on-tier1: #ffffff;
+  --tier1-container: #e8e8e8;
+  --on-tier1-container: #111111;
+  --tier2: #4d4d4d;
+  --on-tier2: #ffffff;
+  --tier2-container: #dedede;
+  --on-tier2-container: #111111;
+  --tier3: #333333;
+  --on-tier3: #ffffff;
+  --tier3-container: #d4d4d4;
+  --on-tier3-container: #111111;
+
+  --error-shadow: #999999;
+
+  /* The hero cookie's own baked palette. It is still a cookie shape underneath, but with the art
+     tier unbought it is not drawn at all — these values only matter in the narrow window where
+     `look.art` is owned and `look.palette` is not, which the ladder makes unreachable. They are
+     set anyway so that window would be grey rather than half-painted. */
+  --cookie-centre: #e8e8e8;
+  --cookie-mid: #d4d4d4;
+  --cookie-edge: #b4b4b4;
+  --cookie-crust: #8a8a8a;
+  --cookie-chip: #555555;
+  --cookie-chip-hi: #999999;
+  --cookie-crumb: #bbbbbb;
+  --cookie-lit: rgba(255, 255, 255, 0.6);
+  --oven-lamp: transparent;
+  --gold-centre: #eeeeee;
+  --gold-mid: #cccccc;
+  --gold-edge: #999999;
+  --gold-deep: #666666;
+  --gold-hi: #ffffff;
+}
+
+/* The places v2 paints a literal colour that no token can reach: the wood grain and inset bevel
+   on the title bar, the same on the console housing, and the metal rivets. Each is switched to a
+   flat token fill. */
+:root[data-look-palette='off'] .title-bar {
+  background-image: none;
+  background-color: var(--surface-high);
+  box-shadow: none;
+}
+
+:root[data-look-palette='off'] .console {
+  background: var(--surface-high);
+  box-shadow: none;
+}
+
+:root[data-look-palette='off'] .title-bar__rivet {
+  display: none;
+}
+
+/* ------------------------------------------------------------------ look.cabinet — THE FRAME
+ * Unbought: no wood, no bevels, no chunky borders, no rounded corners. Every edge in the
+ * application becomes a 1px solid grey hairline and every corner becomes 2px, which is the
+ * entire visual vocabulary of a cheaply made application. Done as tokens, so it reaches every
+ * bordered surface in the sheet at once.
+ *
+ * --shape-full is deliberately NOT flattened: a circle is a shape, not a bevel, and the plain
+ * cookie is still a circle. Flattening it would have squared off every pill and rivet in the
+ * application for no gain.
+ * ---------------------------------------------------------------------------------------- */
+:root[data-look-cabinet='off'] {
+  --shape-none: 0px;
+  --shape-xs: 2px;
+  --shape-sm: 2px;
+  --shape-md: 2px;
+  --shape-lg: 2px;
+  --shape-xl: 2px;
+  --shape-2xl: 2px;
+  --shape-large: 2px;
+  --shape-medium: 2px;
+  --shape-small: 2px;
+
+  --border-thin: 1px;
+  --border-thick: 1px;
+  --border-chunky: 1px;
+  --border-fat: 1px;
+
+  /* No solid offset bases: a cheap button is flat. --drop-N is kept as a small length rather
+     than zeroed, because `:active { transform: translateY(var(--drop-4)) }` reads it and a
+     button that does not move at all when pressed reads as unresponsive rather than as cheap.
+     Two pixels is the cheap-app amount of travel. */
+  --drop-1: 1px;
+  --drop-2: 1px;
+  --drop-3: 2px;
+  --drop-4: 2px;
+  --press-0: none;
+  --press-1: none;
+  --press-2: none;
+  --press-3: none;
+  --press-4: none;
+}
+
+:root[data-look-cabinet='off'] .cabinet {
+  box-shadow: none;
+}
+
+:root[data-look-cabinet='off'] .title-bar {
+  border-bottom: 1px solid var(--outline);
+  box-shadow: none;
+}
+
+:root[data-look-cabinet='off'] .title-bar__marquee,
+:root[data-look-cabinet='off'] .panel,
+:root[data-look-cabinet='off'] .console__button,
+:root[data-look-cabinet='off'] .anchored-panel {
+  box-shadow: none;
+  background: var(--surface-high);
+}
+
+/* The cookie button loses its baked dome and its five-layer base and becomes what a cheap app's
+   one button is: a flat circle with a 1px grey ring. The hit area is untouched. */
+:root[data-look-cabinet='off'] .cookie-btn {
+  background: var(--primary-container);
+  border: 1px solid var(--outline);
+  box-shadow: none;
+}
+
+:root[data-look-cabinet='off'] .cookie-btn:hover {
+  transform: none;
+  box-shadow: none;
+}
+
+:root[data-look-cabinet='off'] .cookie-btn:active {
+  transform: translateY(2px);
+  box-shadow: none;
+}
+
+/* The chocolate-chip gradient texture is part of the frame job, not of the art: it is painted on
+   the BUTTON rather than drawn in the SVG. */
+:root[data-look-cabinet='off'] .cookie-btn::before {
+  display: none;
+}
+
+/* -------------------------------------------------------------- look.marquee — DISPLAY TYPE
+ * Unbought: one system font, normal weight, no letter-spacing, no all-caps display face. The
+ * marquee, the panel titles, the HUD values and the console labels all read `--font-display`, so
+ * re-pointing that one token at the body stack does most of it; the weight and tracking are set
+ * literally because v2 writes them as literals rather than as tokens.
+ * ---------------------------------------------------------------------------------------- */
+:root[data-look-marquee='off'] {
+  --font-display: var(--font-en);
+}
+
+:root[data-look-marquee='off'] .title-bar__label,
+:root[data-look-marquee='off'] .panel__title,
+:root[data-look-marquee='off'] .console__label,
+:root[data-look-marquee='off'] .anchored-panel__title,
+:root[data-look-marquee='off'] .hud__key,
+:root[data-look-marquee='off'] .hud__value,
+:root[data-look-marquee='off'] .cookie-cps {
+  font-weight: 400;
+  letter-spacing: normal;
+  text-transform: none;
+}
+
+/* ------------------------------------------------------------------- look.glow — THE OVEN
+ * Unbought: the background is one flat colour and the room has no atmosphere in it. The glow
+ * itself is a token; the embers, the crumbs, the golden ray-burst and the drifting console sheen
+ * are decorative elements, and every one of them is already `aria-hidden`, so removing them
+ * removes nothing but the picture.
+ * ---------------------------------------------------------------------------------------- */
+:root[data-look-glow='off'] {
+  --oven-glow: var(--surface);
+  --oven-lamp: transparent;
+  --sheen: transparent;
+}
+
+:root[data-look-glow='off'] .cabinet {
+  background: var(--surface);
+}
+
+:root[data-look-glow='off'] .cookie-embers,
+:root[data-look-glow='off'] .cookie-crumbs,
+:root[data-look-glow='off'] .golden-rays,
+/* The golden-cookie sparkle wash. Built from literal rgba spark colours rather than tokens, so
+   the palette layer cannot reach it — and it is the ONE decorative leak a plain save meets
+   immediately, because a golden cookie can spawn in the first minute. A soft orange halo around
+   a grey circle was the one thing in the plain state that read as a bug rather than as cheap. */
+:root[data-look-glow='off'] .golden-overlay-wrap::before,
+:root[data-look-glow='off'] .golden-overlay-wrap::after,
+:root[data-look-glow='off'] .console__button::after,
+:root[data-look-glow='off'] .title-bar__marquee::after,
+:root[data-look-glow='off'] .cookie-target-wrap::before {
+  display: none;
+}
+
+/* -------------------------------------------------------------------- look.art — THE DRAWINGS
+ * Unbought: no illustrated icon set and no drawn hero cookie.
+ *
+ * Every `Art()` in assets/icons.tsx emits a `.game-icon` svg AND a `.game-icon-plain` span, and
+ * this pair of rules is what picks between them. Both are `aria-hidden` in both states, and the
+ * accessible name has always come from the adjacent text or the parent's `aria-label`, so THE
+ * ACCESSIBILITY TREE IS IDENTICAL WHETHER OR NOT THIS RUNG IS OWNED. What is sold is a picture.
+ *
+ * The plain hero cookie is a circle with the word COOKIE printed on it. That is the joke and it
+ * is also the honest answer: a cheaply made cookie clicker would have typed the word.
+ * ---------------------------------------------------------------------------------------- */
+.game-icon-plain {
+  display: none;
+  width: 1em;
+  text-align: center;
+  color: var(--on-surface-variant);
+}
+
+.cookie-btn__plain {
+  display: none;
+}
+
+:root[data-look-art='off'] .game-icon,
+:root[data-look-art='off'] .hero-cookie,
+:root[data-look-art='off'] .emblem {
+  display: none;
+}
+
+:root[data-look-art='off'] .game-icon-plain {
+  display: inline-block;
+}
+
+:root[data-look-art='off'] .cookie-btn__plain {
+  display: block;
+  /* .cookie-btn sets font-size: 0 so a stock emoji glyph can never sit on the drawn cookie.
+     The plain word has to set its own size back. */
+  font-family: var(--font-en);
+  font-size: 26px;
+  font-weight: 400;
+  letter-spacing: 0.08em;
+  color: var(--on-primary-container);
+}
+
+/* The golden state's sparkle is drawn by a ::after on the button; with no art bought it would be
+   the only picture on the screen, so it goes and the press-count readout carries the state. */
+:root[data-look-art='off'] .cookie-target-wrap.golden .cookie-btn::after {
+  content: none;
+}
+
+/* --------------------------------------------------------------------- look.motion — MOTION
+ * Unbought: state changes are instant. Every transition and every animation in the application
+ * stops, including the ones on decorative pseudo-elements.
+ *
+ * THIS IS A SUPERSET OF THE REDUCED-MOTION RULES ABOVE, NOT A REPLACEMENT FOR THEM. The
+ * relationship in both directions:
+ *   • motion unbought  → still, whatever the operating system says;
+ *   • motion bought + prefers-reduced-motion → STILL, because the reduced-motion queries above
+ *     are untouched by this whole file and keep doing their job.
+ * There is no combination in which buying a rung overrides an accessibility preference, and
+ * tests/game/look-tiers.test.ts asserts that the rung cannot reach those queries.
+ *
+ * `--motion-scale` is set to 0 as well, for the several transitions above that are written as
+ * `calc(110ms * var(--motion-scale))` — belt and braces, and it is the token the shared
+ * surface-kernel already uses for exactly this.
+ * ---------------------------------------------------------------------------------------- */
+:root[data-look-motion='off'] {
+  --motion-scale: 0;
+}
+
+:root[data-look-motion='off'] *,
+:root[data-look-motion='off'] *::before,
+:root[data-look-motion='off'] *::after {
+  animation: none !important;
+  transition: none !important;
+}
+
+/* ----------------------------------------------------------------------- look.dark — THE NIGHT
+ * Unbought: the application stays light whatever the operating system asks for.
+ *
+ * The mechanism is a narrowed guard rather than a re-painted palette. Every dark block in this
+ * file is written `:root[data-look-dark='on']...`, so with the rung unbought none of them match
+ * and the light values on bare `:root` are simply what is left standing.
+ *
+ * ONE THING THAT GUARD CANNOT REACH: the shared surface-kernel (packages/surface-kernel) is
+ * imported at the top of this file and declares its own dark block at `:root:not([data-theme=
+ * "light"])`. It is a package with other consumers and its selectors are not this lane's to
+ * rewrite. That block outranks the game's bare `:root`, so on a system-dark machine with the
+ * dark rung unbought, the sixteen roles the KERNEL names would go dark while everything the game
+ * names stayed light — half a palette, which is the one genuinely broken-looking state this
+ * whole feature has to avoid.
+ *
+ * It is answered in the two states it can occur in, and no more than that:
+ *
+ *   • PALETTE UNBOUGHT. Already handled, with no rule of its own. The `look.palette` block far
+ *     above declares every one of those roles at the same specificity as the kernel's dark block
+ *     and later in the file, so it simply wins. Plain stays plain in system dark.
+ *   • PALETTE BOUGHT, DARK NOT YET. This is most of the ladder, and it needs the block below:
+ *     the game's own light values for exactly the roles the kernel names, at a weight that beats
+ *     the kernel's dark block. Twelve of them are restated from the top of this file — the only
+ *     duplication in this layer, and the entire cost of not editing a shared package — plus the
+ *     four error roles, which the game never redefines and which are kept at the kernel's own
+ *     light values because #ba1a1a on white is 5.9:1 and the plain state has to stay AA.
+ * ---------------------------------------------------------------------------------------- */
+:root[data-look-dark='off'] {
+  color-scheme: light;
+
+  --error: #ba1a1a;
+  --on-error: #ffffff;
+  --error-container: #ffdad6;
+  --on-error-container: #410002;
+}
+
+:root[data-look-dark='off'][data-look-palette='on'] {
+  --surface: #fff3e6;
+  --surface-low: #fff0de;
+  --surface-high: #f5dfc4;
+  --surface-highest: #eed5b4;
+  --on-surface: #1e1610;
+  --on-surface-variant: #4a3d2e;
+  --outline: #75634e;
+  --outline-variant: #d8c7b6;
+  --primary: #7a4a1d;
+  --on-primary: #ffffff;
+  --primary-container: #ffdcb8;
+  --on-primary-container: #3a2100;
+}
+
+/* ============================================================================================
+ * KNOWN GAPS — surfaces that were NOT audited for the plain state.
+ *
+ * The token re-mapping above reaches every rule in this file that reads a colour, a radius, a
+ * border width or an elevation through `var(...)`, which is nearly all of them: those surfaces
+ * are plain in the plain state without appearing in the structural list, and they are not gaps.
+ * A gap is a place that paints a LITERAL value, and those are the ones the token layer cannot
+ * see. The audit covered the surfaces a player meets in the first minutes — the title bar, the
+ * cabinet, the console, the panels, the HUD, the cookie and the icon set. The following were
+ * knowingly left alone, and each still shows some v2 detail while the relevant rung is unbought:
+ *
+ *   • THE PURCHASE-FX LAYER (purchase-fx.tsx and its rules above) flies a token-coloured chip
+ *     from a shop row to the HUD. Its motion stops with `look.motion`, but its literal
+ *     `rgba(...)` trail highlights stay warm-tinted until `look.palette` is bought — a few
+ *     pixels, for a few hundred milliseconds, on a surface that only appears after a purchase.
+ *   • THE DESTRUCTIVE GATE's two-key panel (`.gate__key`) carries its own literal colours. It is
+ *     reached only from the prestige panel's wipe flow.
+ *   • THE DIESEL FACTORY, HOME CONSTRUCTION AND REBORN TREE panels each carry a handful of
+ *     literal gradient stops in their own sections. All three are deep-game surfaces that a save
+ *     cannot reach anywhere near the prices in the `look` ladder.
+ *   • INSET BEVEL HIGHLIGHTS written as literal `rgba(255,255,255,...)` inside a `box-shadow`
+ *     on a few secondary panels. The four highest-traffic ones are overridden above; the rest
+ *     keep a one-pixel white line they do not need.
+ *
+ * Every one of these is a decorative leak on a surface a plain-state save has not reached yet.
+ * None of them touches a floor: no text contrast, no focus ring, no hit area and no motion
+ * preference depends on any of them.
+ * ========================================================================================== */

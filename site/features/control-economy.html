@@ -4,7 +4,7 @@
 <meta charset="utf-8" />
 <meta name="viewport" content="width=device-width, initial-scale=1" />
 <title>The control economy — Material Cookie Clicker</title>
-<meta name="description" content="Every setting, every button, dragging, minimize, maximize and resize are bought with cookies at a printed price — thirty-two rungs across twenty controls, the Settings panel among them." /><link rel="stylesheet" href="../assets/site.css" />
+<meta name="description" content="Every setting, every button, dragging, minimize, maximize and resize are bought with cookies at a printed price — forty-one rungs across twenty-two controls, the Settings panel and the application&#39;s own appearance among them." /><link rel="stylesheet" href="../assets/site.css" />
 </head>
 <body>
 <a class="skip-link" href="#main">Skip to main content</a>
@@ -23,7 +23,7 @@
 <main id="main" class="wrap">
   <article>
     <h1>The control economy</h1>
-    <p class="lede">Every setting, every button, dragging the window, minimizing it, maximizing it and resizing it: each one is bought with cookies at a printed price. Thirty-two rungs across twenty controls &mdash; and since the owner&rsquo;s latest decree, the Settings panel is one of them.</p>
+    <p class="lede">Every setting, every button, dragging the window, minimizing it, maximizing it and resizing it: each one is bought with cookies at a printed price. Forty-one rungs across twenty-two controls &mdash; the Settings panel is one of them, and since the owner&rsquo;s latest decree, so is what the application looks like.</p>
     <div class="inset" style="margin-bottom:18px">
       <span class="label">Current state</span>
       <p style="margin:0"><span class="tag">Shipped</span> the registry, the reducer purchase, the save subtree and every gated surface are in the build, and the locked title bar and the first purchase were photographed from the running application. One deliberate compromise is documented below: an already-played save is granted the whole table for free.</p>
@@ -81,10 +81,25 @@
         <tr><td>upgrade &mdash; the bulk toolbar</td><td>1,200</td></tr>
         <tr><th scope="row" rowspan="2">Feature switches</th><td>Tool progression switch</td><td>unlock</td><td>300</td></tr>
         <tr><td>Auto-ship switch</td><td>unlock</td><td>2,500</td></tr>
+        <tr><th scope="row" rowspan="7">The look of the thing <em>(one ladder; a fresh save owns none of it)</em></th><td rowspan="7">The whole application, all at once</td><td>unlock &mdash; colour, replacing the white-grey-and-black plain set</td><td>50</td></tr>
+        <tr><td>upgrade &mdash; the cabinet: wood frame, bevels, chunky borders, rounded corners</td><td>250</td></tr>
+        <tr><td>upgrade &mdash; display typography on the marquee, the panel titles and the HUD</td><td>750</td></tr>
+        <tr><td>upgrade &mdash; the oven glow, the drifting embers and the crumbs</td><td>1,800</td></tr>
+        <tr><td>upgrade &mdash; the illustrated art, including the drawn hero cookie</td><td>4,000</td></tr>
+        <tr><td>upgrade &mdash; motion: press travel and animation</td><td>8,000</td></tr>
+        <tr><td>upgrade &mdash; the dark theme</td><td>15,000</td></tr>
       </tbody>
     </table>
     </div>
     <p>The auto-ship switch is the one deliberate outlier at 2,500. It belongs to a refinery that costs millions of cookies to build, so pricing it like a drag handle would be pricing it like nothing.</p>
+
+    <h2>The app starts plain, and the look is earned</h2>
+    <p>The owner&rsquo;s decree, in their own words: <strong>&ldquo;the app should start with a purely super plain cheaply made app with just a cookie&rdquo;.</strong> So the entire arcade-bakery appearance this project spent its design phase building &mdash; the warm palette, the wooden cabinet, the display type on the marquee, the oven glow, the illustrated icon set, the press travel under every button, the dark theme &mdash; is now the top of a seven-rung ladder rather than the thing you see first.</p>
+    <p>A brand-new save is a white page. System font, black text, a 1px grey rule under the title bar, square corners, no shadows, and one flat grey circle in the middle with the word <strong>COOKIE</strong> printed on it. That is the game, and it is entirely playable: the counter counts, the shop opens, the coin-slot plates print their prices in perfectly legible black on white. It looks cheap because it is <em>supposed</em> to look cheap, not because something failed to load.</p>
+    <p>Fifty cookies buys colour. Two hundred and fifty buys the cabinet. Seven hundred and fifty buys the lettering. The whole transformation is about twenty-nine thousand cookies, or roughly the first hour, and each rung visibly changes the room you are sitting in.</p>
+    <p><strong>It is implemented by re-mapping design tokens, not by writing a second stylesheet.</strong> The finished look stays the single source of truth: about sixty CSS custom properties are re-declared for the plain state and every one of ten thousand lines of component styling repaints itself, because those rules already read their colours, radii, border widths and elevations through variables. Roughly a dozen structural overrides handle the places that paint a literal value a variable cannot reach &mdash; the wood-grain gradient, a few inset bevels, the decorative ember and crumb layers. The surfaces that were not audited are named as known gaps in the stylesheet rather than left to look however they happen to look.</p>
+    <p><strong>Five things are never sold, at any tier.</strong> Text contrast stays AA &mdash; plain is near-black on white, and even the error colour is kept red rather than greyed, because an error that reads as ordinary text is worse than an ugly one. The focus ring stays visible, because it is drawn with a token that survives into the plain set as a dark grey rather than being switched off. Hit areas stay at 44 pixels; not one rule in the plain layer touches a size or a padding. Reduced motion is honoured at every tier, in both directions: motion unbought is still, and motion bought plus a system reduced-motion preference is <em>also</em> still. And the coin-slot plates and their printed prices are never dimmed, because the economy has to be playable from the plain state &mdash; that is where it starts.</p>
+    <p>Every save that already exists is handed the whole ladder on the same thousand-lifetime-cookie evidence the other grants use. Those players have been looking at the finished cabinet since the day their save was written; waking them up as a white page would not read as the joke landing, it would read as the artwork having been deleted.</p>
 
     <h2>The regex builder: four ladders, then one</h2>
     <p>Search is sold per surface. The shop rail&rsquo;s search field, the upgrade shelf&rsquo;s, the Achievements panel&rsquo;s and the Tools panel&rsquo;s are four separate purchases at identical prices, because a search field is furniture: two fields in two rooms are two things, and buying one plainly should not furnish the other. Each of those ladders is three rungs &mdash; the field itself at 50, the gear and the popover behind it at 400, the flag toggles and the basic token palette at 1,500.</p>

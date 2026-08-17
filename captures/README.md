@@ -39,6 +39,34 @@ file is older evidence from earlier lanes, kept for the record.
 | `dialog-achievements.png` `dialog-tools.png` `dialog-statistics.png` `dialog-prestige.png` | Each of the four anchored dialogs, open over the dimmed game surface and pointed at the console emblem that opened it: 15 / 100 achievements, 9 / 20 tools, ten stat tiles, and the ascension projection below the trillion-cookie threshold. |
 | `diesel-mint.png` | **Superseded — see the diesel factory set below.** One frame of the Diesel Depot's mint animation, from the build where cookies bought litres outright: the can pouring, the nozzle sweeping in behind it, a ghosted `14` rolling up under the litres figure, and the printed slip carrying `ed2d41c7` — a voucher identifier that really is in `%APPDATA%\DingDingProjects\exchange\diesel-vouchers.json`. |
 
+### The plain start and the aesthetic ladder
+
+| File | What it shows |
+| --- | --- |
+| `plain-start.png` | A genuinely fresh profile on the build where the whole look is bought. A white page, the system font at normal weight, a 1px grey rule under the title bar, square corners, no shadows and no illustrated art anywhere — and in the middle of it, the game: a flat `#dddddd` circle with a 1px grey ring and the word `COOKIE` printed on it. The coin-slot plates in the title bar are perfectly legible in black on grey (`10` for dragging, `30` minimize, `45` maximize, `1` for the exit), the `Prices` catalogue button beside `SETTINGS` is free as always, and the Shop Sign discovery ticket's icon has fallen back to a plain `▪`. The small `10` overlapping the cookie is the golden-cookie redeem countdown: a golden spawned during the capture, and it is worth having in shot, because it shows the golden state in the plain look — no ray-burst, no sparkle wash, just the countdown. This is what the owner's decree looks like: deliberately cheap, entirely playable, and not broken. |
+| `plain-upgrading.png` | The same build a few hundred cookies later, with exactly two of the seven look rungs bought — `look.palette` (50) and `look.cabinet` (250) — and nothing else. The warm bakery palette is back and so is the wooden cabinet: the frame, the bevels, the chunky borders, the rounded corners and the console housing. Everything above those two rungs is still unbought and still visibly so: the title is the system font at normal weight rather than the letter-spaced display face, the cabinet interior is one flat cream rather than a radial oven glow, there are no embers and no crumbs, the Shop Sign ticket still carries the plain `▪`, and the hero cookie is a brown disc with the word `COOKIE` on it rather than the drawing. The counter reads 100 because 300 of the seeded 400 cookies were really spent. |
+
+**How these were taken.** From the built `dist/`, launched by the real
+`electron` binary onto an off-screen Windows desktop named `PlainStartCapture`,
+each on its own debugging port and its own throwaway `--user-data-dir`, with the
+page target's URL verified as this worktree's `dist/renderer/index.html` before
+anything else happened. `plain-start.png` is an untouched fresh profile — nothing
+was seeded and nothing was pressed. For `plain-upgrading.png` the save was seeded
+by `scripts/capture-seed-plain-look.test.ts` with 400 cookies and a lifetime total
+of 400, deliberately UNDER the 1,000-cookie grandfather threshold so that the look
+had to be bought rather than granted, and with no look rung pre-owned. Both
+purchases were then made inside the running application with real presses: a mouse
+press on the free `Prices` console button, a mouse press on the coin-slot plate in
+the catalogue, and a mouse press on the confirmation's own `Buy it` button, twice
+over. The balance falling 400 → 350 → 100 is the receipt. Scrolling the catalogue
+to bring each plate into view was done through the debugging protocol; every press
+that spent a cookie was a real Win32 click on the real control. Both images are
+Win32 `PrintWindow` captures of that one window, resolved by handle from the
+headless desktop's own window list, and both were opened and looked at afterwards
+— the first pass showed a soft orange halo around the plain grey cookie, which
+turned out to be the golden-cookie overlay's literal rgba wash leaking through the
+token layer, and the stylesheet was fixed and the capture retaken.
+
 ### The advanced regex builder
 
 | File | What it shows |

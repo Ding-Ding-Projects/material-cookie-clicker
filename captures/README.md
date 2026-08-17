@@ -473,3 +473,20 @@ still starts and still shows the right nothing.
   its empty state.
 
 These are gaps in evidence, not features known to be broken. Nobody has looked.
+
+## `sp-locked.png` / `sp-unlocked.png` — the Settings panel becomes a purchase
+
+Taken from the built application on an off-screen Windows desktop named
+`SettingsPurchaseCapture`, with a throwaway `--user-data-dir` and its own
+debugging port, and captured window-by-handle with `PrintWindow`. Both were
+opened and looked at afterwards.
+
+| File | What it shows |
+| --- | --- |
+| `sp-locked.png` | A genuinely fresh profile, cookie counter at 0. Where the Settings emblem used to sit on the console there is now a coin-slot plate reading `SETTINGS 🍪 25`, and beside it the new free `PRICES` button — the controls catalogue, moved out of Settings so the price list stays readable without paying. The title bar still carries its own unbought chrome plates at 10, 30 and 45, and the close cross is an ordinary button. |
+| `sp-unlocked.png` | The same run after the twenty-five cookies were earned by real presses on the cookie and spent by a real press on the plate and then on its confirmation (the balance falls 78 → 53, and the confirmation appears because the price is worth more than one percent of the balance). The plate has become the Settings emblem, the panel is open over the dimmed game, and the language row shows the switch still priced at 60 with the note that English is the free default and the other two modes are bought. |
+
+The panel behind the third capture in this lane — the free `PRICES` console
+button — was opened in the same session and read `1 OF 31 BOUGHT`, which is the
+whole registry counted live and agrees with the figure the documentation site
+publishes.

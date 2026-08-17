@@ -43,12 +43,43 @@ export interface AppSettings {
   readonly funnyLevelYue: FunnyLevel;
 }
 
+/**
+ * ENGLISH IS THE DEFAULT MODE, by the owner's instruction ("also english as default language").
+ * It used to be `both`.
+ *
+ * It is also the only mode that is free. Cantonese and Bilingual are bought controls
+ * (control-unlocks.ts#settings.language.yue / .both), which makes the default doubly
+ * load-bearing: a brand-new save must be readable end to end without spending anything, and
+ * English is what it is readable in.
+ */
 export const DEFAULT_APP_SETTINGS: AppSettings = {
   // English by owner decree (2026-08-17); Cantonese and Bilingual are bought like everything else.
   languageMode: "en",
   funnyLevelEn: 3,
   funnyLevelYue: 3,
 };
+
+/** Which non-English modes a save has bought. English is never in here — it is free. */
+export interface OwnedLanguageModes {
+  readonly yue: boolean;
+  readonly both: boolean;
+}
+
+/**
+ * The mode the application ACTUALLY renders in, given the stored preference and what is bought.
+ *
+ * Pure, and separate from the stored value on purpose. The preference is a preference: a player
+ * who bought Cantonese, chose it, then wiped their save back to zero should find their choice
+ * still written down rather than silently rewritten to English on disk. What they should not
+ * find is the application still rendering in a mode the save no longer owns. So the stored value
+ * is left alone and this function decides what is drawn — falling back to English, the free mode,
+ * whenever the chosen one is not paid for.
+ */
+export function effectiveLanguageMode(stored: LanguageMode, owned: OwnedLanguageModes): LanguageMode {
+  if (stored === "yue") return owned.yue ? "yue" : "en";
+  if (stored === "both") return owned.both ? "both" : "en";
+  return "en";
+}
 
 export const APP_SETTINGS_KEY = "material-cookie-clicker:settings:v1";
 

@@ -21,21 +21,38 @@ import type { GameState } from "./types.js";
  * ────────────────────────────────────────────────────────────────────────────────────────────
  * The floors below are asserted by `tests/game/control-unlocks.test.ts`:
  *
- *   1. CLOSE became a ONE-COOKIE purchase by owner decree (2026-08-17): the close button and
- *      Alt+F4 both wait on the `chrome.close` rung, priced at exactly 1 so a single click on the
- *      cookie always affords it. What remains a hard floor is that the app never fights the
- *      operating system: OS shutdown, session end, and Task Manager are never intercepted, the
- *      close event is only softly refused BEFORE the rung is bought (with the buy prompt shown),
- *      and nothing can ever re-lock it. The test asserts the price is exactly 1 and the rung is
- *      in the grandfather list, so no migrating save ever meets a locked exit.
- *   2. THE SETTINGS SURFACE. The Settings emblem and its dialog are free and always present.
- *      The settings INSIDE it are bought — that is the joke — but the room they live in is the
- *      one place a player can read the price list, so locking the door would make the whole
- *      economy undiscoverable.
- *   3. THE CONTROLS CATALOGUE AND ITS OWN SEARCH FIELD. The catalogue inside Settings lists
- *      every entry below with its price, and its search box filters that list. Charging for the
- *      ability to find out what things cost would be a circular lock.
+ *   1. THE EXIT costs exactly ONE cookie (owner decree, 2026-08-17): the close button and
+ *      Alt+F4 both wait on the `chrome.close` rung, priced at exactly 1 so a single click on
+ *      the cookie always affords it. The hard floor underneath: the app never fights the
+ *      operating system — OS shutdown, session end, and Task Manager are never intercepted,
+ *      the close event is only softly refused BEFORE the rung is bought, nothing can re-lock
+ *      it, and the rung is grandfathered so no migrating save ever meets a locked exit.
+ *   2. THE CONTROLS CATALOGUE AND ITS OWN SEARCH FIELD. The catalogue lists every entry below
+ *      with its price, and its search box filters that list. Charging for the ability to find
+ *      out what things cost would be a circular lock.
  *
+ * ────────────────────────────────────────────────────────────────────────────────────────────
+ * THE FLOOR THAT USED TO BE HERE AND IS NOT ANY MORE: THE SETTINGS SURFACE
+ * ────────────────────────────────────────────────────────────────────────────────────────────
+ * Until this build there was a third floor: the Settings emblem and its dialog were free,
+ * because the price list lived inside them and locking the door would have made the economy
+ * undiscoverable. The owner looked at the console, said of the Settings emblem "settings still
+ * appearing" and "needs to be purchased", and that boundary is theirs to move. It is moved: the
+ * emblem is `settings.open` below, priced at 25 cookies, and until it is bought the console
+ * shows a coin-slot plate carrying that figure exactly where the emblem was.
+ *
+ * The reason the old floor existed is NOT waved away, it is re-housed. The catalogue is no
+ * longer a section that only exists inside Settings: it is its own console plate — a free one,
+ * appended to the console unconditionally beside the Settings slot (renderer/game/console-
+ * panels.ts#CATALOGUE_PANEL_ID) — and it is still ALSO rendered at the bottom of the Settings
+ * panel for anyone who has bought their way in. So "you can always see what things cost" stays
+ * literally true on a brand-new save with zero cookies: the price list is one press away, free,
+ * and the 25-cookie Settings price is printed inside it like every other price.
+ *
+ * And the distinction that keeps the spirit: `settings.open` is PRICED, never PROGRESS-GATED.
+ * There is no condition, no milestone and no tech-tree rung in front of it. A save one second
+ * old can buy it as soon as it has clicked 25 cookies out of the cookie, which is under a
+ * minute. The joke is a till, not a grind. *
  * And one behavioural floor that is not a table entry at all: an unbought control does NOT
  * disappear. It renders in place as a coin-slot plate with its literal price on it and buys
  * itself when pressed. Discoverability is the entire point — a locked control that vanished
@@ -52,8 +69,11 @@ import type { GameState } from "./types.js";
  *   • 10 – 75      window chrome. The cheapest things in the game, because the first minute of
  *                  a fresh save is spent clicking a cookie in a window that cannot be moved,
  *                  and that minute has to end quickly.
- *   • 35 – 200     settings entries and the first rung of each search field. Reachable inside
- *                  the first few dozen clicks.
+ *   • 25 – 200     settings entries and the first rung of each search field. Reachable inside
+ *                  the first few dozen clicks. The cheapest of them is the Settings emblem
+ *                  itself at 25 — deliberately the second-cheapest thing in the whole table,
+ *                  under every entry it stands in front of, so paying the door charge is never
+ *                  the expensive part of reaching a setting.
  *   • 240 – 6,000  conveniences: the regex builder, the token palette, the ×100 and Max
  *                  steppers, the bulk toolbar, auto-ship. These are worth real cookies because
  *                  each one is a genuine multiplier on how fast the rest of the game goes.
@@ -68,7 +88,10 @@ import type { GameState } from "./types.js";
  *   chrome    Maximize / restore         unlock                            45
  *                                        upgrade: double-click the bar    320
  *   chrome    Resize the window          unlock                            75
- *   settings  Language mode              unlock                            60
+ *   settings  Open Settings              unlock (the console emblem)       25
+ *   settings  Language mode              unlock (the switch itself)        60
+ *   settings  Cantonese mode             unlock (English is free)          40
+ *   settings  Bilingual mode             unlock (bought separately)        90
  *   settings  English funny slider       unlock                            35
  *   settings  Cantonese funny slider     unlock                            35
  *   search    Generator search           unlock (plain text)               50
@@ -292,6 +315,28 @@ export const CONTROL_UNLOCKS: readonly ControlUnlockDefinition[] = [
     ],
   },
   {
+    // THE DOOR CHARGE. Bought from the console plate that stands where the emblem stands, or
+    // from the free catalogue like anything else. Priced under every entry behind it on purpose:
+    // 25 is the cheapest a fresh save can get to, and nothing about it is progress-gated.
+    id: "settings.open",
+    group: "settings",
+    nameEn: "Open Settings",
+    nameYue: "打開設定",
+    whereEn: "The cabinet console",
+    whereYue: "機櫃控制台",
+    rungs: [
+      {
+        id: "settings.open",
+        nameEn: "Settings emblem",
+        nameYue: "設定標誌",
+        detailEn:
+          "Turns the coin-slot plate on the console back into the Settings emblem, which opens the panel. The prices catalogue beside it is free either way.",
+        detailYue: "將控制台上面塊投幣板變返做設定標誌，㩒到就開到個面板。隔籬個價目表點都免費。",
+        price: 25,
+      },
+    ],
+  },
+  {
     id: "settings.language",
     group: "settings",
     nameEn: "Language mode switch",
@@ -306,6 +351,52 @@ export const CONTROL_UNLOCKS: readonly ControlUnlockDefinition[] = [
         detailEn: "The English / Cantonese / both segmented switch starts changing the app.",
         detailYue: "英文／粵語／兩者嘅切換掣開始真係改到成個程式。",
         price: 60,
+      },
+    ],
+  },
+  {
+    // TWO SEPARATE CONTROLS, NOT TWO RUNGS OF THE SWITCH'S LADDER. A ladder is bought bottom-up,
+    // and making Bilingual wait behind Cantonese would invent an order the feature does not have:
+    // these are two independent destinations, exactly like the two funny sliders. What they DO
+    // compose with is `settings.language`: that unlock is what puts the segmented switch on the
+    // panel at all, and these decide which of its three buttons actually change the app.
+    //
+    // ENGLISH IS NOT HERE, and never will be. It is the default mode and it is free — a player
+    // must always be able to read the application in at least one language without paying, and
+    // selling the only mode a fresh save has would be the same circular lock as selling the
+    // price list.
+    id: "settings.language.yue",
+    group: "settings",
+    nameEn: "Cantonese mode",
+    nameYue: "粵語模式",
+    whereEn: "Settings → Language",
+    whereYue: "設定 → 語言",
+    rungs: [
+      {
+        id: "settings.language.yue",
+        nameEn: "Cantonese mode",
+        nameYue: "粵語模式",
+        detailEn: "Unlocks the Cantonese-only mode on the language switch. English stays free.",
+        detailYue: "解鎖語言掣上面淨係粵語嗰個模式。英文一直免費。",
+        price: 40,
+      },
+    ],
+  },
+  {
+    id: "settings.language.both",
+    group: "settings",
+    nameEn: "Bilingual mode",
+    nameYue: "雙語模式",
+    whereEn: "Settings → Language",
+    whereYue: "設定 → 語言",
+    rungs: [
+      {
+        id: "settings.language.both",
+        nameEn: "Bilingual mode",
+        nameYue: "雙語模式",
+        detailEn: "Unlocks the both-at-once mode on the language switch. Bought separately from Cantonese.",
+        detailYue: "解鎖語言掣上面兩種語言一齊出嗰個模式。同粵語模式分開買。",
+        price: 90,
       },
     ],
   },
@@ -662,6 +753,35 @@ export const V6_GRANDFATHERED_RUNG_IDS: readonly string[] = [
   "toggle.toolProgression",
   "toggle.autoShip",
 ];
+
+/**
+ * The rungs a grandfathered save is granted when it crosses into schema version 7: the three
+ * things that were free in version 6 and are sold in version 7, and nothing else.
+ *
+ * Version 7 exists for two owner decrees, both of which take something that used to be free and
+ * put a price on it: the Settings emblem (`settings.open`) and the two non-English language
+ * modes (`settings.language.yue`, `settings.language.both`). A save that had been opening
+ * Settings, or reading the whole app in Cantonese, never chose to give either up — taking them
+ * away on update is the same "the patch broke my save" reading the version-6 grant exists to
+ * avoid. So the same threshold decides it, and the list is frozen at exactly these three ids.
+ *
+ * ENGLISH IS NOT IN THE LIST because English is not for sale: it is the default mode and it is
+ * free for everybody, granted and ungranted saves alike. A save under the threshold pays the
+ * 25 + 40 + 90 like a fresh save does, and reads English until it does.
+ */
+export const V7_GRANDFATHERED_RUNG_IDS: readonly string[] = [
+  "settings.open",
+  "settings.language.yue",
+  "settings.language.both",
+];
+
+/**
+ * What a version-6 save carrying `lifetimeCookies` is given as it crosses into version 7.
+ * Same threshold, same defensive reading of the value, one-id grant list — see above.
+ */
+export function grantedRungIdsForV7Migration(lifetimeCookies: number | BigNum): readonly string[] {
+  return grantedRungIdsForMigration(lifetimeCookies).length > 0 ? V7_GRANDFATHERED_RUNG_IDS : [];
+}
 
 /**
  * What a save carrying `lifetimeCookies` should be given when it crosses into schema version 6.

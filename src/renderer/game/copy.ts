@@ -366,6 +366,16 @@ export const TOOLS_SCREEN_COPY = {
     en: "This app feature is already available — this button opens it directly, whether or not the tool below is unlocked.",
     yue: "呢個應用程式功能一直都用得到——呢粒掣可以直接開啟,唔理下面隻工具有冇解鎖。",
   },
+  /**
+   * The one extra line the callout grows while the Settings panel is unbought, and the reason it
+   * is one line rather than a rewrite: the tech-tree contract is unchanged and still true. The
+   * feature is not gated by this tool or by any progress. It has a till in front of it, and
+   * saying so is the difference between an honest button and a button that quietly does nothing.
+   */
+  openItNowPriced: (price: string): Bilingual => ({
+    en: `Settings itself now costs ${price} cookies to open — a price, not a lock: nothing has to be earned first. This button takes you to its coin slot on the console instead of opening the panel.`,
+    yue: `而家打開設定要 ${price} 塊曲奇——係價錢，唔係鎖：唔使玩到邊度先得。呢粒掣會帶你去控制台嗰塊投幣板，唔會直接開個面板。`,
+  }),
   undiscoveredName: { en: "??? Tool", yue: "未發現嘅工具" },
   undiscoveredBody: {
     en: "Not discovered yet — keep playing and its name will reveal itself.",
@@ -406,7 +416,7 @@ export const TOOLS_SCREEN_COPY = {
     en: "Tool progression: off (previewing every tool as unlocked)",
     yue: "工具進度：熄咗（預覽晒全部工具當已解鎖）",
   },
-} as const satisfies Record<string, Bilingual>;
+} as const satisfies Record<string, Bilingual | ((...args: any[]) => Bilingual)>;
 
 export const STATS_SCREEN_COPY = {
   totalCookiesBaked: { en: "Total Cookies Baked", yue: "總共烤咗嘅曲奇" },
@@ -722,9 +732,26 @@ export const SETTINGS_COPY = {
     yue: "無論邊個程度，數字同事實都一樣準——買咗咩、幾多，全部照舊。淨係語氣會變。",
   },
   openSettings: { en: "Open Settings panel", yue: "打開設定面板" },
+  /**
+   * Said on the language row itself, because a switch with two price plates in it needs to
+   * explain them where they are rather than in a catalogue somewhere else.
+   */
+  languagePricedNote: {
+    en: "English is the default and is free forever — the whole app is readable without paying for anything. Cantonese and bilingual are separate purchases, bought at the prices shown here. Buying a mode does not switch to it; pressing it after that does.",
+    yue: "英文係預設，永遠免費——唔使畀一蚊都睇得晒成個程式。粵語同雙語係分開買嘅，價錢寫喺呢度。買咗個模式唔會即刻轉過去，買完再㩒佢先會轉。",
+  },
   featureOpened: (featureEn: string, featureYue: string): Bilingual => ({
     en: `${featureEn} is not gated — the Settings panel is open, with the closest matching row highlighted.`,
     yue: `${featureYue} 冇被鎖住——設定面板已經打開咗，最相關嗰行標示咗。`,
+  }),
+  /**
+   * What "Open it now" says when the Settings panel has not been bought yet. It states the
+   * price, states that nothing has to be earned first, and says where focus has just gone — the
+   * press is not silently doing nothing, it has moved the player to the till.
+   */
+  featureNeedsPurchase: (price: string): Bilingual => ({
+    en: `Opening Settings costs ${price} cookies and nothing else — no progress needed. The coin slot on the console is now focused; press it to buy, or open the free prices catalogue beside it first.`,
+    yue: `打開設定要 ${price} 塊曲奇，冇其他條件——唔使玩到邊度。而家焦點喺控制台嗰塊投幣板度，㩒佢就買到，或者可以先開隔籬免費嘅價目表。`,
   }),
   /**
    * Shown at the top of Settings when it was opened by a tool card's "Open it now".
@@ -863,13 +890,21 @@ export const CONTROL_COPY = {
     yue: `買咗${nameYue}。由而家開始用得。`,
   }),
   catalogueTitle: { en: "Controls catalogue", yue: "控制項目錄" },
+  /** The console button's own label. Short because a console cap is 96px wide and its label does
+   *  not wrap: "Controls catalogue" is clipped there, and a clipped word is not a label. */
+  catalogueConsole: { en: "Prices", yue: "價目表" },
   catalogueIntro: {
-    en: "Every control in this application is bought, one press at a time — the settings on this panel, the window's own buttons, the search fields, the stepper multiples, the bulk toolbar. Prices are flat and printed. Nothing here unlocks itself.",
-    yue: "呢個程式入面每一個掣都要買，一次㩒一個——呢版嘅設定、個窗自己嘅掣、搜尋欄、購買數量、批量工具列。價錢係固定嘅，寫晒出嚟。冇一樣會自動解鎖。",
+    en: "Every control in this application is bought, one press at a time — the Settings panel and everything on it, the window's own buttons, the search fields, the stepper multiples, the bulk toolbar. Prices are flat and printed, and nothing here is gated behind progress: a save one minute old can buy anything it can afford. Nothing unlocks itself either.",
+    yue: "呢個程式入面每一個掣都要買，一次㩒一個——設定面板本身同入面所有嘢、個窗自己嘅掣、搜尋欄、購買數量、批量工具列。價錢係固定嘅，寫晒出嚟，亦冇一樣要玩到某個進度先買得：啱啱開嘅存檔，夠錢就買得。冇一樣會自動解鎖。",
   },
+  /**
+   * The floors, as they stand after the owner's decree that Settings itself must be bought.
+   * This catalogue is why that decree is survivable: it is its own free console button now, not
+   * a section inside the panel it prices, so the list can still be read for nothing.
+   */
   catalogueFloors: {
-    en: "Three things are never for sale: the close button, this Settings panel, and this catalogue's own search field. You can always quit, you can always get in here, and you can always read the price list.",
-    yue: "有三樣嘢永遠唔賣：關閉掣、呢個設定面板，同呢個目錄自己嘅搜尋欄。你永遠走得，永遠入得嚟，永遠睇得到個價目表。",
+    en: "Two things are never for sale: the close button, and this catalogue with its own search field. You can always quit, and you can always read the price list — this page is its own free button on the console, so nothing on it has to be bought to be read. Everything else has a price, including the Settings panel itself.",
+    yue: "有兩樣嘢永遠唔賣：關閉掣，同埋呢個目錄連佢自己嘅搜尋欄。你永遠走得，亦永遠睇得到個價目表——呢版喺控制台有自己一粒免費掣，睇乜都唔使畀錢。其他全部有價，連設定面板本身都係。",
   },
   catalogueSearch: { en: "Search the catalogue…", yue: "搜尋目錄…" },
   catalogueSearchFree: { en: "This search field is free.", yue: "呢個搜尋欄免費。" },
@@ -893,8 +928,8 @@ export const CONTROL_COPY = {
     yue: `拖呢個窗要 ${price} 塊曲奇`,
   }),
   stepperLockedHint: {
-    en: "×1 is free. The rest are bought in Settings → Controls catalogue, or by pressing them here.",
-    yue: "×1 免費。其他喺「設定 → 控制項目錄」買，或者喺呢度㩒一下就買。",
+    en: "×1 is free. The rest are bought from the prices catalogue on the console, or by pressing them here.",
+    yue: "×1 免費。其他喺控制台嘅價目表買，或者喺呢度㩒一下就買。",
   },
 } as const satisfies Record<string, Bilingual | ((...args: any[]) => Bilingual)>;
 

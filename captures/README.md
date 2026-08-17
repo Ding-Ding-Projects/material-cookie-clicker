@@ -70,6 +70,34 @@ follows the operating system's colour scheme and this desktop is light. The file
 was restored from a backup immediately afterwards. Nothing else in this set was
 patched, retouched or composed.
 
+### The mechanics-expansion set
+
+Three images from the build that grew the ladder to twenty tiers, the upgrade
+catalogue to 179 and the achievement roster to 201, added milk and the kitten
+line, and replaced the horizontally-scrolling upgrade strip with a shelf.
+
+Taken the same way as everything else — an off-screen `MechanicsCapture`
+desktop, the window resolved by title and class, `PrintWindow` on that one
+window — with one addition worth stating plainly. The renderer persists to
+`localStorage` today (see `src/renderer/game/persistence.ts`), and a
+`localStorage` value cannot be written from outside the browser process, so the
+progressed save was pushed into the running app over the DevTools protocol by
+`scripts/capture-seed-localstorage.mjs`. The state in these pictures is a real
+save decoded by the real save codec and played by the real reducer; only the
+route it took into the app is unusual.
+
+| Image | What it shows |
+| --- | --- |
+| `mechanics-shelf.png` | The rebuilt upgrade shelf on a late save. `READY TO BUY` is a wrapping grid of 20 tickets sorted cheapest-first and capped at two rows; `NEARLY THERE` is 8 locked upgrades shown as requirement lines with progress tracks and counters (`90 / 100`, `78 / 90`); `ALREADY BOUGHT` is 64 owned upgrades collapsed into a single strip of stamps behind a count badge. The milk tide runs along the floor of the stage reading `Wong Tai Sin Milk — 312% milk`. |
+| `mechanics-milk.png` | A mid-game save, for the milk level rather than the shelf: `Malted Milk — 108% milk`, drawn as a shallow band because the tide is scaled against a 400% full glass. Synergy tickets (`Cursor × Grandma`, `Grandma × Cookie Farm`) and two greyed-out, unaffordable kitten tickets are on the shelf above it. |
+| `mechanics-reborn.png` | The Reborn tree inside the Prestige dialog, scrolled to the tree itself. Three branches — Inheritance 遺產, Power 力量, Memory 記憶 — with bought nodes struck green and labelled `BOUGHT · 已買`, affordable nodes lit, and locked ones dimmed and printing what they are waiting for. The header reads `42 ascension points unspent · 8 spent in this tree`. |
+
+All three were opened and looked at, and all three were re-taken after the first
+attempt: the shelf collapsed to a row of count badges the first time, because it
+was competing with the cookie panel for the same flex space, and the milk tide
+was invisible the first time, because it was rising behind opaque cabinet panels
+with nowhere to be seen.
+
 ### The manual-purchase set
 
 Three images from one run on a fresh profile, taken after the lane that made
@@ -186,6 +214,14 @@ never greyed out and never hidden behind the silhouette.
 - The prestige two-key confirmation gate. It ships, and it sits below the fold
   of `dialog-prestige.png`.
 - The generator ladder past Shipment. The seeded run never bought that deep, so
-  the last five tiers have never been on screen for a camera.
+  the deepest eleven tiers have never been on screen for a camera. The six new
+  late tiers (Chancemaker through the Wok of the Gods) are drawn and wired, and
+  their icons have never been photographed.
+- The dark theme on any of the new surfaces. The shelf, the milk tide and the
+  Reborn tree are all built from the same theme tokens as everything else and
+  should repaint, but nobody has looked at them in the dark set.
+- The permanent-pin shelf inside the Reborn tree with a slot actually bought.
+  The seeded save owns no slot node, so that panel was only ever photographed in
+  its empty state.
 
 These are gaps in evidence, not features known to be broken. Nobody has looked.

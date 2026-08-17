@@ -16,8 +16,8 @@ Its defining idea: **the application's own features are the game's tech tree.**
 The command palette, regex builder, authenticator, file converter, local model
 manager and the rest appear in-game as *tools* the player discovers and — as of
 the current design — **buys with cookies**, each granting a gameplay bonus,
-alongside a fourteen-tier generator ladder from Cursor and Grandma out to
-Portal, Time Machine and Prism.
+alongside a twenty-tier generator ladder from Cursor and Grandma out to
+Portal, the Time Machine, the Idleverse and the Wok of the Gods.
 
 ## The one rule a successor must not erode
 

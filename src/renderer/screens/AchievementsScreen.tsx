@@ -24,9 +24,21 @@ function medalFor(condition: AchievementCondition): MedalFamily {
     case 'totalClicks':
       return 'clicks';
     case 'generatorOwned':
+    case 'totalGeneratorsOwned':
+    case 'generatorTypesOwned':
       return 'buildings';
     case 'prestigeCount':
+    // A Reborn node is bought with ascension points and lives outside the run, so it wears the
+    // prestige face rather than a face of its own.
+    case 'rebornNodesOwned':
       return 'prestige';
+    // Badges for buying upgrades, for collecting badges, and for the Diesel Depot's counters all
+    // sit on the cookie face: they are all "you spent what the bakery made".
+    case 'upgradesOwned':
+    case 'achievementsUnlocked':
+    case 'dieselLitresMinted':
+    case 'dieselVouchersMinted':
+      return 'cookies';
   }
 }
 

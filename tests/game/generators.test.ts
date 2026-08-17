@@ -25,12 +25,12 @@ function addBn(a: BigNum, b: BigNum): BigNum {
 }
 
 describe("generator ladder", () => {
-  it("has 14 tiers with a real theme progression", () => {
-    expect(GENERATOR_DEFINITIONS).toHaveLength(14);
+  it("has 20 tiers with a real theme progression", () => {
+    expect(GENERATOR_DEFINITIONS).toHaveLength(20);
     const ids = GENERATOR_DEFINITIONS.map((g) => g.id);
-    expect(new Set(ids).size).toBe(14); // no duplicate ids
+    expect(new Set(ids).size).toBe(20); // no duplicate ids
     expect(ids[0]).toBe("cursor");
-    expect(ids[ids.length - 1]).toBe("prism");
+    expect(ids[ids.length - 1]).toBe("wokOfTheGods");
   });
 
   it("every tier costs roughly 10x more than the previous tier", () => {

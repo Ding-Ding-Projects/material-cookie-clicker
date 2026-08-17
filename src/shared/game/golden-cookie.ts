@@ -1,5 +1,6 @@
 import { bnFromNumber, bnMulScalar, type BigNum } from "./big-number.js";
 import { totalCps } from "./cps.js";
+import { goldenCookieBonuses } from "./upgrades.js";
 import type { GameState, GoldenCookieEffectState, GoldenCookieState, RngPort } from "./types.js";
 
 /**
@@ -140,8 +141,13 @@ export function collectGoldenCookie(
     return { goldenCookie, instantBonus: bnFromNumber(0) };
   }
 
+  // The golden-cookie upgrade line (upgrades.ts#goldenCookieBonuses) lands here and only here:
+  // it makes a CAUGHT cookie pay more, and it shortens the wait that a catch schedules. A
+  // cookie that despawns unclicked is deliberately not accelerated — the line rewards catching,
+  // not waiting.
+  const bonuses = goldenCookieBonuses(gameState);
   const effectKind = pickEffectKind(rng);
-  const nextEligibleAtEpochMs = nowEpochMs + rollDelayMs(rng, config);
+  const nextEligibleAtEpochMs = nowEpochMs + rollDelayMs(rng, config) * bonuses.frequencyMultiplier;
 
   let activeEffect: GoldenCookieEffectState;
   let instantBonus: BigNum = bnFromNumber(0);
@@ -163,7 +169,7 @@ export function collectGoldenCookie(
       break;
     case "windfall": {
       const cps = totalCps(gameState);
-      instantBonus = bnMulScalar(cps, config.windfallCpsSeconds);
+      instantBonus = bnMulScalar(cps, config.windfallCpsSeconds * bonuses.rewardMultiplier);
       activeEffect = { kind: "windfall" };
       break;
     }

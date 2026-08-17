@@ -1,0 +1,80 @@
+import { mkdirSync, writeFileSync } from "node:fs";
+import { join } from "node:path";
+import { it } from "vitest";
+
+import { bnFromNumber } from "../src/shared/game/big-number.js";
+import { evaluateAchievements } from "../src/shared/game/achievements.js";
+import { encodeSave } from "../src/shared/game/save-codec.js";
+import { createInitialGameState } from "../src/shared/game/reducer.js";
+import { UPGRADE_DEFINITIONS, isUpgradeUnlocked } from "../src/shared/game/upgrades.js";
+import type { GameState } from "../src/shared/game/types.js";
+
+/**
+ * CAPTURE HARNESS, not a test.
+ *
+ * Builds a progressed save and writes it out, so the built application can be launched against
+ * a real mid-to-late-game state for screenshots instead of a fresh one. It lives under
+ * `scripts/` rather than `tests/` deliberately: `npm test` runs `vitest run tests`, so this
+ * never executes as part of the suite and never writes a file during a normal check.
+ *
+ * Run it on purpose:
+ *   CAPTURE_USER_DATA=<dir> npx vitest run scripts/capture-seed-save.test.ts
+ *
+ * Then push the file it wrote into the running app with
+ * `scripts/capture-seed-localstorage.mjs`, because the renderer persists to localStorage today
+ * (see src/renderer/game/persistence.ts) rather than to the file the main process owns.
+ */
+it("seeds a progressed save", () => {
+  const now = new Date().toISOString();
+  let state: GameState = {
+    ...createInitialGameState(now),
+    cookies: bnFromNumber(4e19),
+    lifetimeCookies: bnFromNumber(9e19),
+    generators: [
+      { id: "cursor", count: 220 },
+      { id: "grandma", count: 160 },
+      { id: "farm", count: 120 },
+      { id: "mine", count: 90 },
+      { id: "factory", count: 60 },
+      { id: "bank", count: 40 },
+      { id: "temple", count: 28 },
+      { id: "wizardTower", count: 18 },
+      { id: "shipment", count: 12 },
+      { id: "alchemyLab", count: 8 },
+      { id: "portal", count: 5 },
+      { id: "timeMachine", count: 3 },
+      { id: "antimatterCondenser", count: 2 },
+      { id: "prism", count: 1 },
+    ],
+    stats: { totalClicks: 12_400, totalCookiesBaked: bnFromNumber(9e19), clockAnomalyCount: 0 },
+    dieselDepot: { litresMinted: 14, vouchersMinted: 3, cookiesSpent: bnFromNumber(5e4) },
+    prestige: {
+      ascensionPoints: 42,
+      totalPrestigeCount: 3,
+      permanentUnlockIds: [],
+      rebornNodeIds: ["reborn_lucky_pocket", "reborn_second_wind", "reborn_dog_eared_catalogue"],
+    },
+  };
+
+  // Own a realistic slice of the catalogue: everything unlocked and cheap enough that a player
+  // at this stage would obviously have bought it.
+  const owned = UPGRADE_DEFINITIONS.filter(
+    (def) => isUpgradeUnlocked(def.unlockCondition, state) && def.cost.exponent < 13,
+  ).map((def, i) => ({ id: def.id, purchasedAtTickCount: i }));
+  state = { ...state, upgrades: owned };
+
+  // Run achievements to a fixed point, twice, so the milk level is what this save really earned.
+  for (let pass = 0; pass < 3; pass += 1) {
+    const newly = evaluateAchievements(state);
+    if (newly.length === 0) break;
+    state = {
+      ...state,
+      achievements: [...state.achievements, ...newly.map((id) => ({ id, unlockedAtIso: now }))],
+    };
+  }
+
+  const dir = process.env.CAPTURE_USER_DATA ?? join(process.env.APPDATA ?? "", "Material Cookie Clicker");
+  mkdirSync(dir, { recursive: true });
+  writeFileSync(join(dir, "material-cookie-clicker-save.json"), JSON.stringify(encodeSave(state)));
+  console.log(`seeded ${state.upgrades.length} upgrades, ${state.achievements.length} achievements`);
+});

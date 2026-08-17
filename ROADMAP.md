@@ -12,9 +12,9 @@ built. Where it is unverified, that is said.
   UTC workflow timing. No workflow runs tests or lint, deliberately.
 - **`v0.1.5`** — first real release. 144 MB `Setup.exe`, `RELEASES`, full
   `.nupkg`, target commit verified.
-- **Game domain.** Fourteen generators, twenty tools, upgrades, achievements,
-  prestige, golden cookies, offline progress, save schema with forward-only
-  migrations. 109 tests.
+- **Game domain.** Twenty generators, twenty tools, 179 upgrades, 201
+  achievements, milk and the kitten line, the Reborn permanent tree, prestige,
+  golden cookies, offline progress, save schema with forward-only migrations.
 - **Vendored engines.** Regex builder, command palette, tabs, colour translator,
   notifications, local history, time-based codes and QR, locks, scheduling,
   exports, conversion registry, local model suite. 126 tests.

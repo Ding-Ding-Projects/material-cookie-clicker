@@ -15,7 +15,7 @@ no implementation exists anywhere in this repository.
 | Feature | Article | Status |
 | --- | --- | --- |
 | Cookie clicking / CPS loop | [gameplay/cookie-clicking.md](gameplay/cookie-clicking.md) | not built |
-| 14-tier generator ladder | [gameplay/generator-ladder.md](gameplay/generator-ladder.md) | not built |
+| 20-tier generator ladder | [gameplay/generator-ladder.md](gameplay/generator-ladder.md) | not built |
 | Golden-cookie random events | [gameplay/golden-cookie-events.md](gameplay/golden-cookie-events.md) | not built |
 | Achievements | [gameplay/achievements.md](gameplay/achievements.md) | not built |
 | Prestige (ascend) | [gameplay/prestige.md](gameplay/prestige.md) | not built |

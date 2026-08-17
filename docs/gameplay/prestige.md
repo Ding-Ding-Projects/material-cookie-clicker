@@ -50,6 +50,6 @@ reset logic to test.
 ## Suggested articles
 
 - [Achievements](achievements.md)
-- [The 14-tier generator ladder](generator-ladder.md)
+- [The 20-tier generator ladder](generator-ladder.md)
 - [Local history](../tools/local-history.md)
 - [Material Design 3 appearance](../interface/material-design-appearance.md)

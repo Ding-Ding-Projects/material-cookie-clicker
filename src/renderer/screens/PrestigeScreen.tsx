@@ -5,6 +5,7 @@ import { ascensionValue, canPrestige, prestigeMultiplierFor } from '../../shared
 import { getUpgradeDefinition } from '../../shared/game/upgrades.js';
 import { BilingualLines } from '../components/BilingualLines.js';
 import { DestructiveGate } from '../components/DestructiveGate.js';
+import { RebornTree } from './RebornTree.js';
 import { showsEnglish, showsCantonese, bilingualText, PRESTIGE_SCREEN_COPY, STATS_SCREEN_COPY, TAB_COPY, type Bilingual } from '../game/copy.js';
 import {
   useFastSnapshot,
@@ -123,6 +124,11 @@ export function PrestigeScreen() {
           </ul>
         )}
       </section>
+
+      {/* The Reborn tree sits between the standing tiles and the gate: it is the one thing a
+          player should read BEFORE deciding to ascend, because what it holds is exactly what
+          the ascension will and will not take. */}
+      <RebornTree />
 
       <div className="gate-triggers">
         <button

@@ -14,6 +14,7 @@ import { computeDisclosure } from "./disclosure.js";
 import { costOfBulk, costOfNext, getGeneratorDefinition, maxAffordable } from "./generators.js";
 import { computeOfflineProgressWithTools, type OfflineProgressOptions } from "./offline-progress.js";
 import { canPrestige, performPrestige } from "./prestige.js";
+import { canBuyRebornNode, getRebornNodeDefinition, rebornPermanentSlots } from "./reborn.js";
 import { toolPrice } from "./tool-shop.js";
 import { isToolBonusActive, isToolDiscovered, totalBuyMaxDiscount } from "./tools.js";
 import { computeMultipliers, getUpgradeDefinition, isUpgradeUnlocked } from "./upgrades.js";
@@ -44,6 +45,18 @@ export type GameAction =
   | { readonly type: "tick"; readonly elapsedMs: number }
   | { readonly type: "collectGoldenCookie" }
   | { readonly type: "prestige" }
+  /**
+   * Buys one node of the Reborn tree (reborn.ts) with ascension points. Additive, and shaped
+   * exactly like every other purchase in this reducer: it refuses silently when the node is
+   * already owned, when its prerequisite is not, or when the points are not there.
+   */
+  | { readonly type: "buyRebornNode"; readonly nodeId: string }
+  /**
+   * Pins or unpins one owned upgrade as permanent, within the slot budget the Reborn tree's
+   * memory branch has actually bought. Pinning is free — the point was already spent on the
+   * slot — and reversible, because a slot is a slot rather than a commitment.
+   */
+  | { readonly type: "setPermanentUpgrade"; readonly upgradeId: string; readonly pinned: boolean }
   | {
       readonly type: "importSave";
       readonly savedState: GameState;
@@ -240,6 +253,51 @@ function handlePrestige(state: GameState, ctx: ReducerCtx): GameState {
   return withAchievements(prestiged, nowIso(ctx));
 }
 
+function handleBuyRebornNode(state: GameState, ctx: ReducerCtx, nodeId: string): GameState {
+  const owned = state.prestige.rebornNodeIds ?? [];
+  if (!canBuyRebornNode(nodeId, owned, state.prestige.ascensionPoints)) return state;
+  const def = getRebornNodeDefinition(nodeId);
+
+  const nextState: GameState = {
+    ...state,
+    prestige: {
+      ...state.prestige,
+      ascensionPoints: state.prestige.ascensionPoints - def.cost,
+      rebornNodeIds: [...owned, nodeId],
+    },
+  };
+
+  return withAchievements(nextState, nowIso(ctx));
+}
+
+function handleSetPermanentUpgrade(state: GameState, upgradeId: string, pinned: boolean): GameState {
+  const already = state.prestige.permanentUnlockIds.includes(upgradeId);
+  if (pinned === already) return state;
+
+  if (!pinned) {
+    return {
+      ...state,
+      prestige: {
+        ...state.prestige,
+        permanentUnlockIds: state.prestige.permanentUnlockIds.filter((id) => id !== upgradeId),
+      },
+    };
+  }
+
+  // Only an upgrade you actually own can be pinned, and only into a slot you actually bought.
+  if (!state.upgrades.some((u) => u.id === upgradeId)) return state;
+  const slots = rebornPermanentSlots(state.prestige.rebornNodeIds ?? []);
+  if (state.prestige.permanentUnlockIds.length >= slots) return state;
+
+  return {
+    ...state,
+    prestige: {
+      ...state.prestige,
+      permanentUnlockIds: [...state.prestige.permanentUnlockIds, upgradeId],
+    },
+  };
+}
+
 function handleImportSave(action: Extract<GameAction, { type: "importSave" }>): GameState {
   // Note: deliberately ignores the reducer's current live `state` -- importing a save
   // wholesale replaces it with `action.savedState`, which is the whole point of import.
@@ -286,6 +344,10 @@ export function applyGameAction(state: GameState, action: GameAction, ctx: Reduc
       return handleCollectGoldenCookie(state, ctx);
     case "prestige":
       return handlePrestige(state, ctx);
+    case "buyRebornNode":
+      return handleBuyRebornNode(state, ctx, action.nodeId);
+    case "setPermanentUpgrade":
+      return handleSetPermanentUpgrade(state, action.upgradeId, action.pinned);
     case "importSave":
       return handleImportSave(action);
   }
@@ -304,7 +366,7 @@ export function createInitialGameState(nowIsoString: string): GameState {
     generators: [],
     upgrades: [],
     achievements: [],
-    prestige: { ascensionPoints: 0, totalPrestigeCount: 0, permanentUnlockIds: [] },
+    prestige: { ascensionPoints: 0, totalPrestigeCount: 0, permanentUnlockIds: [], rebornNodeIds: [] },
     goldenCookie: { isSpawned: false, rngStreamIndex: 0, nextEligibleAtEpochMs: 0 },
     stats: { totalClicks: 0, totalCookiesBaked: zero, clockAnomalyCount: 0 },
     dieselDepot: { litresMinted: 0, vouchersMinted: 0, cookiesSpent: zero },

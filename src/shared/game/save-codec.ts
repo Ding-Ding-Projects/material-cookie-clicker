@@ -61,6 +61,7 @@ export function encodeSave(state: GameState): SaveDataLatest {
       ascensionPoints: state.prestige.ascensionPoints,
       totalPrestigeCount: state.prestige.totalPrestigeCount,
       permanentUnlockIds: [...state.prestige.permanentUnlockIds],
+      rebornNodeIds: [...(state.prestige.rebornNodeIds ?? [])],
     },
     goldenCookie: { ...state.goldenCookie },
     stats: { ...state.stats },

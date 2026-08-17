@@ -1,6 +1,6 @@
 import { describe, expect, it } from "vitest";
 import { bnFromNumber } from "../../src/shared/game/big-number";
-import { formatBigNum } from "../../src/shared/game/format-number";
+import { formatBigNum, formatExact, formatExactDigits } from "../../src/shared/game/format-number";
 
 describe("English formatting (base-1000 grouping)", () => {
   it("shows small numbers plainly", () => {
@@ -63,5 +63,37 @@ describe("explicit scientific style", () => {
   it("always uses scientific notation regardless of locale", () => {
     expect(formatBigNum(bnFromNumber(12345), "en", "scientific")).toMatch(/^1\.23e4$/);
     expect(formatBigNum(bnFromNumber(12345), "yue", "scientific")).toMatch(/^1\.23e4$/);
+  });
+});
+
+describe("formatExact — prices show the literal figure", () => {
+  it("groups digits instead of rounding into a word", () => {
+    // The bug this exists for: a Buy button that read "1.1 thousand" for a price of 1,100.
+    expect(formatExact(bnFromNumber(1100), "en")).toBe("1,100");
+    expect(formatExact(bnFromNumber(26370), "en")).toBe("26,370");
+    expect(formatExact(bnFromNumber(1055), "en")).toBe("1,055");
+    expect(formatExact(bnFromNumber(42), "en")).toBe("42");
+  });
+
+  it("keeps the literal form all the way up to the 1e15 threshold", () => {
+    expect(formatExact(bnFromNumber(999_999_999_999), "en")).toBe("999,999,999,999");
+    expect(formatExact(bnFromNumber(1.5e14), "en")).toBe("150,000,000,000,000");
+  });
+
+  it("falls back to the compact form only past the threshold", () => {
+    expect(formatExact(bnFromNumber(2.5e15), "en")).toBe("2.5 quadrillion");
+    // ...and the exact figure is still available for the aria-label/title there.
+    expect(formatExactDigits(bnFromNumber(2.5e15))).toBe("2,500,000,000,000,000");
+  });
+
+  it("formatExactDigits never uses a suffix, at any magnitude", () => {
+    for (const value of [0, 7, 1100, 1e6, 1e15, 1e24]) {
+      expect(formatExactDigits(bnFromNumber(value))).not.toMatch(/[a-zA-Z]/);
+    }
+    expect(formatExactDigits(bnFromNumber(1e24))).toBe("1,000,000,000,000,000,000,000,000");
+  });
+
+  it("does not change the compact formatter that counters still use", () => {
+    expect(formatBigNum(bnFromNumber(1100), "en")).toBe("1.1 thousand");
   });
 });

@@ -15,6 +15,7 @@ import { TOOL_DEFINITIONS } from "../../src/shared/game/tools";
 import { REVEAL_UPGRADE_DEFINITIONS, UPGRADE_DEFINITIONS } from "../../src/shared/game/upgrades";
 import {
   createHoldToClickController,
+  defaultHoldToClickScheduler,
   type HoldToClickScheduler,
 } from "../../src/renderer/game/hold-to-click";
 import { fixedRng, freshState } from "./test-helpers";
@@ -160,6 +161,32 @@ describe("disclosure: hold-to-click is inert before Steady Hand", () => {
     expect(state.stats.totalClicks).toBe(0);
   });
 
+  it("repeats through the REAL setInterval scheduler once Steady Hand is owned", async () => {
+    // The fake-scheduler test below proves the wiring; this one proves the shipped timer path —
+    // defaultHoldToClickScheduler's own setInterval — actually drives the reducer while a hold
+    // is held, with no individual presses in between.
+    let state = freshState({ cookies: bnFromNumber(1000) });
+    for (const id of ["reveal_shop_sign", "reveal_upgrade_catalogue", "reveal_steady_hand"]) {
+      state = applyGameAction(state, { type: "buyUpgrade", upgradeId: id }, ctxAt());
+    }
+    expect(isHoldToClickEnabled(state)).toBe(true);
+
+    const controller = createHoldToClickController(
+      () => {
+        state = applyGameAction(state, { type: "click" }, ctxAt());
+      },
+      defaultHoldToClickScheduler,
+      20,
+      () => isHoldToClickEnabled(state),
+    );
+
+    controller.start(); // one press down, held...
+    await new Promise((resolve) => setTimeout(resolve, 250));
+    controller.stop(); // ...and released.
+
+    expect(state.stats.totalClicks).toBeGreaterThan(5);
+  });
+
   it("repeats through the real reducer once Steady Hand is owned", () => {
     let state = freshState({ cookies: bnFromNumber(1000) });
     for (const id of ["reveal_shop_sign", "reveal_upgrade_catalogue", "reveal_steady_hand"]) {
@@ -226,7 +253,7 @@ describe("disclosure: console emblems are earned by the progress their panel is 
     expect(computeDisclosure(near).consoles.prestige).toBe(true);
   });
 
-  it("an ascended player keeps every surface even though prestige wiped their upgrades", () => {
+  it("an ascended player keeps every VIEW surface even though prestige wiped their upgrades", () => {
     const ascended = freshState({
       upgrades: [],
       generators: [],
@@ -235,8 +262,19 @@ describe("disclosure: console emblems are earned by the progress their panel is 
     const disclosure = computeDisclosure(ascended);
     expect(disclosure.shop).toBe(true);
     expect(disclosure.upgradeStrip).toBe(true);
-    expect(disclosure.holdToClick).toBe(true);
     expect(disclosure.consoles.prestige).toBe(true);
+    // But NOT hold-to-click. It is not a view, it is what the input device does, and nothing in
+    // this game switches a behaviour on for a player who did not buy it — ascension included.
+    expect(disclosure.holdToClick).toBe(false);
+    expect(disclosure.perClickReadout).toBe(false);
+  });
+
+  it("an ascended player who re-buys Steady Hand has it back", () => {
+    const rebought = freshState({
+      upgrades: [{ id: "reveal_steady_hand", purchasedAtTickCount: 3 }],
+      prestige: { ascensionPoints: 3, totalPrestigeCount: 1, permanentUnlockIds: [] },
+    });
+    expect(computeDisclosure(rebought).holdToClick).toBe(true);
   });
 });
 
@@ -310,35 +348,43 @@ describe("disclosure: save compatibility", () => {
     };
   }
 
-  it("migrates a version-2 save to the current version and grants the three original reveals", () => {
+  it("migrates a version-2 save to the current version and grants NO reveal upgrade at all", () => {
     const decoded = decodeSave(v2Save());
     expect(decoded.ok).toBe(true);
     if (!decoded.ok) return;
 
     expect(decoded.state.schemaVersion).toBe(SAVE_SCHEMA_VERSION);
-    // The three surfaces a version-2 save could already see. The fourth reveal, Fuel Contract,
-    // is deliberately NOT granted: the Diesel Depot did not exist in that build, so nobody is
-    // losing anything by being asked to buy it.
-    for (const id of ["reveal_shop_sign", "reveal_upgrade_catalogue", "reveal_steady_hand"]) {
-      expect(decoded.state.upgrades.some((u) => u.id === id)).toBe(true);
+    // Not one of the four is handed out. A migration must never make a player own something
+    // they did not buy — the surfaces an old save genuinely used are kept by derivation from
+    // the progress already in the save (see the next test), which is the honest route.
+    for (const id of [
+      "reveal_shop_sign",
+      "reveal_upgrade_catalogue",
+      "reveal_steady_hand",
+      "reveal_fuel_contract",
+    ]) {
+      expect(decoded.state.upgrades.some((u) => u.id === id)).toBe(false);
     }
-    expect(decoded.state.upgrades.some((u) => u.id === "reveal_fuel_contract")).toBe(false);
     expect(computeDisclosure(decoded.state).dieselDepot).toBe(false);
     // The upgrade it actually bought is untouched.
     expect(decoded.state.upgrades.some((u) => u.id === "reinforced_finger" && u.purchasedAtTickCount === 12)).toBe(true);
   });
 
-  it("keeps every surface an old save could already see", () => {
+  it("keeps every surface an old save could already see, except hold-to-click", () => {
     const decoded = decodeSave(v2Save());
     expect(decoded.ok).toBe(true);
     if (!decoded.ok) return;
 
     const disclosure = computeDisclosure(decoded.state);
+    // Derived from what the save demonstrably contains: it owns generators, so the shop was
+    // open; it owns a non-reveal upgrade, so the ticket strip was.
     expect(disclosure.shop).toBe(true);
     expect(disclosure.upgradeStrip).toBe(true);
-    expect(disclosure.holdToClick).toBe(true);
     expect(disclosure.perSecondReadout).toBe(true);
-    expect(disclosure.perClickReadout).toBe(true);
+    // Steady Hand was never bought by this save and is never granted to it. The hold hint and
+    // the hold behaviour both stay off until the player buys the upgrade for real.
+    expect(disclosure.holdToClick).toBe(false);
+    expect(disclosure.perClickReadout).toBe(false);
     expect(disclosure.consoles.achievements).toBe(true);
     expect(disclosure.consoles.statistics).toBe(true);
     expect(disclosure.consoles.tools).toBe(true);

@@ -70,6 +70,18 @@ follows the operating system's colour scheme and this desktop is light. The file
 was restored from a backup immediately afterwards. Nothing else in this set was
 patched, retouched or composed.
 
+### The manual-purchase set
+
+Three images from one run on a fresh profile, taken after the lane that made
+every unlock a purchase. Every cookie in them was earned by real clicks posted
+to the window, and every purchase in them was a real press of a real button.
+
+| File | What it shows |
+| --- | --- |
+| `manual-hold-proof.png` | Hold-to-click actually working. The window received exactly ONE button-down, held for five seconds, and one button-up at the end; this frame is from the middle of that hold, and the `COOKIES` plate has gone from 77 to 100 with no individual presses in between. The toast beside it reads `Tool discovered: Command Palette · 發現工具：指令面板` — the honest new wording, because discovering a tool grants nothing. |
+| `manual-prices.png` | Literal prices. The Cursor row's buy button reads `Buy · 買 — 🍪 1,232`, not "1.2 thousand", and the HUD plate reads `992.45` rather than a rounded word that used to run past the bevel. |
+| `manual-tools-discovered.png` | The Tools panel on that same run, reading `0 / 20 TOOLS UNLOCKED` even though several tools have been discovered by play. Nothing in the tree switches itself on. |
+
 ### The settings set
 
 Four images from one session on the off-screen desktop `SettingsCapture`, each

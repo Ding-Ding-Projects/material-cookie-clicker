@@ -271,29 +271,48 @@ function isUnlockConditionMet(condition: ToolUnlockCondition, state: GameState):
 }
 
 /**
- * Whether a tool's GAMEPLAY BONUS is currently active. This is the only predicate this
- * module exposes, deliberately — there is no `isToolFeatureAvailable`-shaped export here,
- * because "is the real application feature reachable" is not a question the game domain is
- * allowed to answer. That answer is always yes, unconditionally, decided entirely outside
- * this module (see `gatesApplicationFeature` above).
+ * DISCOVERY IS NOT A PURCHASE.
  *
- * When `state.toolProgressionEnabled` is false, every bonus is treated as active regardless
- * of its unlock condition — the player has opted out of the grind and sees everything
- * unlocked, which still has no bearing on feature availability either way.
- *
- * A tool bought early through the Tools shop (see tool-shop.ts, `state.purchasedToolIds`) is
- * also active regardless of its unlock condition — buying it is exactly like meeting the
- * condition early. `state.purchasedToolIds` defaults to `[]` on a fresh game and is optional
- * chained here so a state object built before this field existed still reads safely.
+ * Meeting a tool's unlock condition means the player has FOUND it: the card stops being a
+ * "??? Tool", its name and flavour appear, and it becomes buyable in the Tools shop. It does
+ * not hand out the bonus. Nothing in this game activates itself while the player watches —
+ * every gameplay change is something the player chose and paid for (see `isToolBonusActive`).
  */
-export function isToolBonusActive(state: GameState, toolId: string): boolean {
+export function isToolDiscovered(state: GameState, toolId: string): boolean {
   if (!state.toolProgressionEnabled) return true;
   if ((state.purchasedToolIds ?? []).includes(toolId)) return true;
   const def = getToolDefinition(toolId);
   return isUnlockConditionMet(def.unlockCondition, state);
 }
 
-/** Ids of tools whose unlock condition is newly satisfied but not previously recorded. */
+/**
+ * Whether a tool's GAMEPLAY BONUS is currently active — which is to say, whether the player
+ * BOUGHT it (reducer.ts `buyTool` -> `state.purchasedToolIds`). There is no other way in. A
+ * met unlock condition only discovers the tool; discovery is what makes it purchasable, and
+ * the purchase is what makes it do anything.
+ *
+ * This is the only bonus predicate this module exposes, deliberately — there is no
+ * `isToolFeatureAvailable`-shaped export here, because "is the real application feature
+ * reachable" is not a question the game domain is allowed to answer. That answer is always
+ * yes, unconditionally, decided entirely outside this module (see `gatesApplicationFeature`).
+ *
+ * When `state.toolProgressionEnabled` is false the player has explicitly opted out of the
+ * grind, and the whole tree — display and bonuses alike — reads as unlocked. That toggle keeps
+ * its existing contract exactly: it is a deliberate, player-made choice in the Tools panel, so
+ * it is not an auto-unlock; it grants nothing permanent, owns no `purchasedToolIds` entry, and
+ * turning it back on returns every unbought tool to "discovered, not yet bought".
+ *
+ * `state.purchasedToolIds` defaults to `[]` on a fresh game and is optional chained here so a
+ * state object built before this field existed still reads safely.
+ */
+export function isToolBonusActive(state: GameState, toolId: string): boolean {
+  if (!state.toolProgressionEnabled) return true;
+  getToolDefinition(toolId); // Unknown ids throw here rather than quietly reading as inactive.
+  return (state.purchasedToolIds ?? []).includes(toolId);
+}
+
+/** Ids of tools whose unlock condition is newly satisfied but not previously recorded — i.e.
+ *  newly DISCOVERED, which is a toast and a purchasable row, never an applied bonus. */
 export function evaluateNewlyUnlockedTools(
   state: GameState,
   previouslyUnlockedIds: ReadonlySet<string>,

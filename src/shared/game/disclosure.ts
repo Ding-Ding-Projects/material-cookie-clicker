@@ -26,11 +26,16 @@ import type { GameState } from "./types.js";
  * Hiding the Tools console emblem hides a game panel; the Tools tech tree and its "Open it now"
  * button behave exactly as before once that panel is open, for every tool in every state.
  *
- * SAVE COMPATIBILITY. Every predicate ORs its bought condition against progress the player
- * already has, so a save written before disclosure existed never loses a surface it used to
- * show. The v2 -> v3 migration (migrations.ts) additionally grants the three reveal upgrades
- * outright to every pre-existing save, and the `prestige.totalPrestigeCount > 0` term below
- * keeps an ascended player's surfaces after prestige wipes their non-permanent upgrades.
+ * SAVE COMPATIBILITY, AND ITS ONE LIMIT. The two VIEW surfaces (shop rail, ticket strip) OR
+ * their bought condition against progress already in the save, so a save written before
+ * disclosure existed never loses a view it used to show: a generator in the save means the
+ * shop was open, a non-reveal upgrade means the strip was. Nothing is granted by migration any
+ * more (migrations.ts#migrateV2ToV3 hands out no upgrades at all).
+ *
+ * `holdToClick` is deliberately outside that arrangement, and outside the ascension term too.
+ * It is not a view: it changes what the input device DOES. A player who never bought Steady
+ * Hand must not find their save holding-and-repeating, and must not be shown a hint for a
+ * behaviour they did not buy. It reads one thing and one thing only — do you own the upgrade.
  */
 
 /**
@@ -86,7 +91,8 @@ function totalGeneratorsOwned(state: GameState): number {
   return state.generators.reduce((sum, g) => sum + g.count, 0);
 }
 
-/** True once at least one tool's own unlock condition is met, or one was bought in the shop.
+/** True once at least one tool's own unlock condition is met (DISCOVERED — see tools.ts, where
+ *  discovery is explicitly not the bonus), or one was bought in the shop.
  *  Deliberately does NOT consult `toolProgressionEnabled`: that toggle lives inside the Tools
  *  panel, and letting it decide whether the panel's own button exists would lock a player who
  *  turned it off out of ever turning it back on. */
@@ -112,7 +118,8 @@ export function computeDisclosure(state: GameState): Disclosure {
     // A pre-disclosure save could own any upgrade at all; if it owns one that is not itself a
     // reveal, the strip is where it came from and must still be there.
     state.upgrades.some((u) => !u.id.startsWith("reveal_"));
-  const holdToClick = ascended || ownsUpgrade(state, "reveal_steady_hand");
+  // No `ascended ||`, no progress-derived OR, no migration grant: bought, or not had.
+  const holdToClick = ownsUpgrade(state, "reveal_steady_hand");
 
   return {
     shop,

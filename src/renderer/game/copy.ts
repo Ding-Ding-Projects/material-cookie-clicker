@@ -238,6 +238,8 @@ export const TOOLS_SCREEN_COPY = {
   unlockNow: { en: "Unlock now", yue: "立即解鎖" },
   lockedChip: { en: "Locked", yue: "未解鎖" },
   readyChip: { en: "Ready to unlock", yue: "可以解鎖" },
+  /** Found, named and priced — and doing nothing until it is bought. */
+  discoveredChip: { en: "Discovered · not bought", yue: "已發現 · 未買" },
   unlockedChip: { en: "Unlocked", yue: "已解鎖" },
   undiscoveredChip: { en: "Undiscovered", yue: "未發現" },
   tier1: { en: "Bronze · early game", yue: "青銅 · 遊戲初期" },

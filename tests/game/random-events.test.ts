@@ -30,7 +30,9 @@ import {
   randomEventCpsMultiplier,
   randomEventRebateFraction,
   remainingFraction,
+  remainingMs,
   resolveRandomEventConfig,
+  rollRaidDelayMs,
   tickRandomEvents,
   type ActiveRandomEvent,
   type RandomEventConfig,
@@ -38,6 +40,7 @@ import {
   type RandomEventsState,
 } from "../../src/shared/game/random-events";
 import type { GameState, RngPort } from "../../src/shared/game/types";
+import { createEntropySeed, createSessionRng } from "../../src/renderer/game/rng";
 import { freshState, fixedRng } from "./test-helpers";
 
 /* ------------------------------------------------------------------------------ helpers */
@@ -540,11 +543,12 @@ function simulateRaids(
 }
 
 describe("mouse raid: the schedule", () => {
-  it("fires roughly hourly over a long seeded run", () => {
+  it("fires every thirty to sixty minutes over a long seeded run", () => {
     const log = simulateRaids(20_260, RAID_ONLY_CONFIG, 12 * 60 * 60 * 1000);
-    // Twelve hours of play at fifty-to-seventy-five-minute gaps: nine to fourteen raids.
-    expect(log.length).toBeGreaterThanOrEqual(9);
-    expect(log.length).toBeLessThanOrEqual(14);
+    // Twelve hours at a thirty-to-sixty-minute band: twelve to twenty-four raids, and the
+    // bounds are wide because the whole point is that the count is not a fixed cadence.
+    expect(log.length).toBeGreaterThanOrEqual(12);
+    expect(log.length).toBeLessThanOrEqual(24);
 
     for (let i = 1; i < log.length; i += 1) {
       const gap = log[i].spawnedAt - log[i - 1].resolvedAt;
@@ -554,9 +558,70 @@ describe("mouse raid: the schedule", () => {
     }
   });
 
+  it("spreads the gaps across the whole band instead of clustering on one interval", () => {
+    const log = simulateRaids(8_675_309, RAID_ONLY_CONFIG, 48 * 60 * 60 * 1000);
+    expect(log.length).toBeGreaterThan(40);
+    const gaps = log.slice(1).map((entry, i) => entry.spawnedAt - log[i].resolvedAt);
+    const minute = 60 * 1000;
+
+    // Both halves of the band are actually used, and no single five-minute slice holds more
+    // than half the raids — which is what "no mental clock works" has to mean concretely.
+    expect(Math.min(...gaps)).toBeLessThan(40 * minute);
+    expect(Math.max(...gaps)).toBeGreaterThan(50 * minute);
+    const buckets = new Map<number, number>();
+    for (const gap of gaps) {
+      const bucket = Math.floor(gap / (5 * minute));
+      buckets.set(bucket, (buckets.get(bucket) ?? 0) + 1);
+    }
+    expect(Math.max(...buckets.values())).toBeLessThan(gaps.length * 0.5);
+    expect(buckets.size).toBeGreaterThanOrEqual(4);
+  });
+
+  it("keeps every rolled delay inside the advertised band, jitter included", () => {
+    const rng = createSplitMix32Rng(4_242);
+    for (let i = 0; i < 20_000; i += 1) {
+      const delay = rollRaidDelayMs(rng, DEFAULT_RANDOM_EVENT_CONFIG);
+      expect(delay).toBeGreaterThanOrEqual(DEFAULT_RANDOM_EVENT_CONFIG.raidMinDelayMs);
+      expect(delay).toBeLessThanOrEqual(DEFAULT_RANDOM_EVENT_CONFIG.raidMaxDelayMs);
+    }
+  });
+
+  it("does not reduce a delay to one PRNG value: the jitter is a second, independent draw", () => {
+    const noJitter: RandomEventConfig = { ...DEFAULT_RANDOM_EVENT_CONFIG, raidJitterMs: 0 };
+    const a = rollRaidDelayMs(createSplitMix32Rng(77), noJitter);
+    const b = rollRaidDelayMs(createSplitMix32Rng(77), DEFAULT_RANDOM_EVENT_CONFIG);
+    expect(b).not.toBe(a);
+  });
+
+  it("gives two independently seeded sessions different raid timelines", () => {
+    // Real sessions differ by their entropy seed, so this is the property that matters most:
+    // no two installations share a schedule.
+    const seeds = [createEntropySeed(), createEntropySeed(), createEntropySeed()];
+    expect(new Set(seeds).size).toBeGreaterThan(1);
+
+    const timelines = seeds.map((seed) =>
+      simulateRaids(seed, RAID_ONLY_CONFIG, 6 * 60 * 60 * 1000).map((entry) => entry.spawnedAt).join(","),
+    );
+    expect(new Set(timelines).size).toBeGreaterThan(1);
+  });
+
+  it("seeds production sessions from entropy rather than a constant, and still lets tests inject", () => {
+    const first = createSessionRng(0);
+    const second = createSessionRng(0);
+    const firstDraws = [first.next(), first.next(), first.next()];
+    const secondDraws = [second.next(), second.next(), second.next()];
+    expect(secondDraws).not.toEqual(firstDraws);
+
+    // The injection seam is untouched: same seed, same stream.
+    expect([createSessionRng(0, 1234).next(), createSessionRng(0, 1234).next()]).toEqual([
+      createSplitMix32Rng(1234).next(),
+      createSplitMix32Rng(1234).next(),
+    ]);
+  });
+
   it("never raids a fresh save in its first ten minutes", () => {
     for (const seed of [1, 2, 3, 7, 99, 4242]) {
-      const log = simulateRaids(seed, RAID_ONLY_CONFIG, 3 * 60 * 60 * 1000);
+      const log = simulateRaids(seed, RAID_ONLY_CONFIG, 4 * 60 * 60 * 1000);
       expect(log.length).toBeGreaterThan(0);
       expect(log[0].spawnedAt).toBeGreaterThanOrEqual(DEFAULT_RANDOM_EVENT_CONFIG.raidFreshGraceMs);
       // Under the shipped window the real first raid is far later than the bare grace floor.
@@ -656,10 +721,27 @@ describe("mouse raid: the schedule", () => {
     expect(RAID_CAPTURE_EVENT_CONFIG.raidStealCeiling).toBe(0.8);
   });
 
-  it("keeps the shipped raid window at roughly an hour, measured in tens of minutes", () => {
-    expect(DEFAULT_RANDOM_EVENT_CONFIG.raidMinDelayMs).toBe(50 * 60 * 1000);
-    expect(DEFAULT_RANDOM_EVENT_CONFIG.raidMaxDelayMs).toBe(75 * 60 * 1000);
+  it("keeps the shipped raid window at thirty to sixty minutes", () => {
+    expect(DEFAULT_RANDOM_EVENT_CONFIG.raidMinDelayMs).toBe(30 * 60 * 1000);
+    expect(DEFAULT_RANDOM_EVENT_CONFIG.raidMaxDelayMs).toBe(60 * 60 * 1000);
+    expect(DEFAULT_RANDOM_EVENT_CONFIG.raidJitterMs).toBeGreaterThan(0);
     expect(DEFAULT_RANDOM_EVENT_CONFIG.raidFreshGraceMs).toBe(10 * 60 * 1000);
+  });
+
+  it("tells the player nothing about the next raid before it lands", () => {
+    // Nothing outside the ACTIVE event is readable by any view: the indicator, the stage and
+    // the aftermath all key off `active` / `lastRaid`, and there is no selector, no derived
+    // value and no narration for `raidNextEligibleAtEpochMs`. This test pins the domain half of
+    // that promise — the scheduled instant is never surfaced through a public reader.
+    const scheduled: RandomEventsState = {
+      ...createInitialRandomEventsState(),
+      raidNextEligibleAtEpochMs: 4_000_000,
+    };
+    expect(miceRemaining(scheduled)).toBe(0);
+    expect(remainingMs(scheduled, 0)).toBe(0);
+    expect(remainingFraction(scheduled, 0)).toBe(0);
+    expect(scheduled.active).toBeNull();
+    expect(scheduled.lastRaid).toBeNull();
   });
 });
 

@@ -303,11 +303,27 @@ export interface RandomEventConfig {
   /* ---------------------------------------------------------------- the raid's own clock */
   /**
    * The Mouse Raid's window, measured from the last raid (or from the first tick of a save) to
-   * the next. Fifty to seventy-five minutes averages a little over an hour, which is the
-   * "every hour" the owner asked for without being a metronome the player can set a watch by.
+   * the next: THIRTY TO SIXTY MINUTES, drawn uniformly across the whole band.
+   *
+   * The band is what makes the raid unpredictable, and it is doing real work. A raid drawn
+   * uniformly over a thirty-minute span means that at any moment during that span the player
+   * has no better guess than "some time in the next half hour"; there is no interval a mental
+   * clock can count down, and knowing exactly when the last raid ended tells you nothing
+   * useful about the next one beyond the band itself. Nothing narrower is ever exposed.
    */
   readonly raidMinDelayMs: number;
   readonly raidMaxDelayMs: number;
+  /**
+   * A small second draw applied on top of the band draw and clamped back inside the band.
+   *
+   * Being honest about what this is and is not: it does NOT widen the distribution and it is
+   * not where the unpredictability comes from — the band and the per-session entropy seed are.
+   * What it does is stop a delay from being one single PRNG value, so a schedule can never be
+   * pinned down from one observed gap plus a known seed, and it breaks any alignment between
+   * the rolled delay and the fixed quantities around it (the raid's own duration, the pool's
+   * cooldown, the tick period).
+   */
+  readonly raidJitterMs: number;
   /**
    * A floor under the FIRST raid of a save. A fresh save's opening minutes are the tutorial by
    * another name, and a raid there teaches the wrong lesson. The rolled window is already far
@@ -331,8 +347,9 @@ export const DEFAULT_RANDOM_EVENT_CONFIG: RandomEventConfig = {
   minDelayMs: 3 * 60 * 1000,
   maxDelayMs: 10 * 60 * 1000,
   cooldownMs: 60 * 1000,
-  raidMinDelayMs: 50 * 60 * 1000,
-  raidMaxDelayMs: 75 * 60 * 1000,
+  raidMinDelayMs: 30 * 60 * 1000,
+  raidMaxDelayMs: 60 * 60 * 1000,
+  raidJitterMs: 90 * 1000,
   raidFreshGraceMs: 10 * 60 * 1000,
   raidMinCookies: 1_000,
   raidStealCeiling: 0.8,
@@ -357,6 +374,7 @@ export const FAST_RANDOM_EVENT_CONFIG: RandomEventConfig = {
   // the raid asks for the raid explicitly, below.
   raidMinDelayMs: DEFAULT_RANDOM_EVENT_CONFIG.raidMinDelayMs,
   raidMaxDelayMs: DEFAULT_RANDOM_EVENT_CONFIG.raidMaxDelayMs,
+  raidJitterMs: DEFAULT_RANDOM_EVENT_CONFIG.raidJitterMs,
   raidFreshGraceMs: DEFAULT_RANDOM_EVENT_CONFIG.raidFreshGraceMs,
   raidMinCookies: DEFAULT_RANDOM_EVENT_CONFIG.raidMinCookies,
   raidStealCeiling: DEFAULT_RANDOM_EVENT_CONFIG.raidStealCeiling,
@@ -387,6 +405,7 @@ export const RAID_CAPTURE_EVENT_CONFIG: RandomEventConfig = {
   cooldownMs: 1_000,
   raidMinDelayMs: 3_000,
   raidMaxDelayMs: 6_000,
+  raidJitterMs: 500,
   raidFreshGraceMs: 0,
   raidMinCookies: DEFAULT_RANDOM_EVENT_CONFIG.raidMinCookies,
   raidStealCeiling: DEFAULT_RANDOM_EVENT_CONFIG.raidStealCeiling,
@@ -612,14 +631,26 @@ function scheduleNext(nowEpochMs: number, rng: RngPort, config: RandomEventConfi
 }
 
 /**
- * When the NEXT raid becomes eligible: one roll inside the raid window, floored by the
- * fresh-save grace. The floor is why the first raid of a save can never land in the opening ten
- * minutes, whatever the window is set to.
+ * The delay to the next raid: a uniform draw across the whole thirty-to-sixty-minute band, plus
+ * a small independent jitter, clamped back inside the band so the advertised bounds are the
+ * real bounds. Exported because a distribution nobody can test is a claim rather than a
+ * property.
+ */
+export function rollRaidDelayMs(rng: RngPort, config: RandomEventConfig): number {
+  const span = Math.max(0, config.raidMaxDelayMs - config.raidMinDelayMs);
+  const base = config.raidMinDelayMs + rng.next() * span;
+  const jitter = (rng.next() * 2 - 1) * config.raidJitterMs;
+  const clamped = Math.min(config.raidMaxDelayMs, Math.max(config.raidMinDelayMs, base + jitter));
+  return Math.round(clamped);
+}
+
+/**
+ * When the NEXT raid becomes eligible: one rolled delay, floored by the fresh-save grace. The
+ * floor is why the first raid of a save can never land in the opening ten minutes, whatever the
+ * window is set to.
  */
 function scheduleNextRaid(nowEpochMs: number, rng: RngPort, config: RandomEventConfig): number {
-  const span = Math.max(0, config.raidMaxDelayMs - config.raidMinDelayMs);
-  const rolled = config.raidMinDelayMs + Math.floor(rng.next() * span);
-  return nowEpochMs + Math.max(config.raidFreshGraceMs, rolled);
+  return nowEpochMs + Math.max(config.raidFreshGraceMs, rollRaidDelayMs(rng, config));
 }
 
 /** How many mice this raid brings: three to five, rolled when it fires. */

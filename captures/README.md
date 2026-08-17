@@ -70,6 +70,37 @@ follows the operating system's colour scheme and this desktop is light. The file
 was restored from a backup immediately afterwards. Nothing else in this set was
 patched, retouched or composed.
 
+### The random-events set (`events-rain.png`, `events-indicator.png`)
+
+Two images from one session on the off-screen desktop `EventsCapture`, both
+opened and looked at afterwards, of the random-event system described in
+`site/features/random-events.html`.
+
+| File | What it shows |
+| --- | --- |
+| `events-rain.png` | A Cookie Rain in progress: twelve real, clickable cookie buttons scattered across the game stage at different heights, a `Cookie Rain / 曲奇雨` plate in the HUD with its remaining-time bar reading 18s, and the marquee naming the event in both languages. |
+| `events-indicator.png` | An Oven Hiccup — the pool's one setback — with the HUD plate, the marquee and the thump-to-fix chip all rendered in the error role rather than the spark one, and the marquee carrying the extra red line saying production is down until it ends. |
+
+**How these were taken, and the one thing that was set.** Same route as every set
+above: the built `dist/`, the real `electron` binary, a throwaway
+`--user-data-dir`, `--remote-debugging-port` so the run could be driven, and
+Win32 `PrintWindow` on the window resolved by title and class. Two values were
+written into that throwaway profile's local storage before the game booted: a
+seeded save, so the surface shows real generators and a real per-second rate
+rather than zeroes; and the developer-only key
+`material-cookie-clicker:events:fast`, which is read once at startup and
+shortens the event window from three-to-ten minutes to a few seconds.
+
+That key is the only way to reach the fast schedule. There is no button, no
+settings row and no in-game control that summons an event, and a player who
+never sets it never leaves the shipped timing. Nothing in either photograph was
+forced to a particular event: the scheduler picked at random and each capture
+waited for the event it wanted to come round.
+
+The oven chip was also pressed, with a real background mouse click on that
+window, and the Oven Hiccup ended immediately as designed. That is not visible in
+either photograph; it is written down here because it was actually checked.
+
 ### The settings set
 
 Four images from one session on the off-screen desktop `SettingsCapture`, each

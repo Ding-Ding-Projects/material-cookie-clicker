@@ -9,6 +9,17 @@ import {
   type GoldenCookieConfig,
   DEFAULT_GOLDEN_COOKIE_CONFIG,
 } from "./golden-cookie.js";
+import {
+  clearLastResolved,
+  clickRandomEventTarget,
+  createInitialRandomEventsState,
+  randomEventClickMultiplier,
+  randomEventCpsMultiplier,
+  randomEventRebateFraction,
+  tickRandomEvents,
+  type RandomEventConfig,
+  DEFAULT_RANDOM_EVENT_CONFIG,
+} from "./random-events.js";
 import { costOfLitres } from "./diesel-exchange.js";
 import { computeDisclosure } from "./disclosure.js";
 import { costOfBulk, costOfNext, getGeneratorDefinition, maxAffordable } from "./generators.js";
@@ -23,6 +34,13 @@ export interface ReducerCtx {
   readonly now: () => number;
   readonly rng: RngPort;
   readonly goldenCookieConfig?: GoldenCookieConfig;
+  /**
+   * Spawn windows and payouts for the general random-event pool (random-events.ts). Optional,
+   * exactly like `goldenCookieConfig`: omit it and the shipped three-to-ten-minute schedule
+   * applies. The renderer passes a shortened one only when the developer-only fast-events flag
+   * is set, and tests pass their own so a scheduler assertion never has to wait ten minutes.
+   */
+  readonly randomEventConfig?: RandomEventConfig;
 }
 
 export type GameAction =
@@ -43,6 +61,16 @@ export type GameAction =
   | { readonly type: "setToolProgression"; readonly enabled: boolean }
   | { readonly type: "tick"; readonly elapsedMs: number }
   | { readonly type: "collectGoldenCookie" }
+  /**
+   * A click on one of the active random event's own targets -- a falling cookie during Cookie
+   * Rain, the oven during an Oven Hiccup. The target id comes from the state the UI is
+   * rendering, and a click on a target that is no longer really there is a no-op (see
+   * random-events.ts#clickRandomEventTarget), so a stale render or a double-fired pointer
+   * cannot pay twice.
+   */
+  | { readonly type: "randomEventClick"; readonly targetId: string }
+  /** Clears the finished-event record behind the "what just happened" toast. */
+  | { readonly type: "randomEventResolve" }
   | { readonly type: "prestige" }
   | {
       readonly type: "importSave";
@@ -84,6 +112,11 @@ function handleClick(state: GameState, ctx: ReducerCtx): GameState {
   if (effect?.kind === "clickFrenzy" && effect.multiplier !== undefined && isEffectActive(effect, ctx.now())) {
     clickValue = bnMulScalar(clickValue, effect.multiplier);
   }
+
+  // Sugar Rush multiplies the click on top of whatever a click frenzy is already doing. The two
+  // stack rather than overriding, because they came from two independent events and taking one
+  // away because the other landed would be a worse surprise than a big number.
+  clickValue = bnMulScalar(clickValue, randomEventClickMultiplier(state.randomEvents, ctx.now()));
 
   const withCookies = addCookies(state, clickValue);
   const nowIsoString = nowIso(ctx);
@@ -209,12 +242,27 @@ function handleTick(state: GameState, ctx: ReducerCtx, elapsedMs: number): GameS
       ? bnMulScalar(cps, effect.multiplier)
       : cps;
 
-  const gained = bnMulScalar(cpsWithEffect, elapsedMs / 1000);
+  // An Oven Hiccup is the one thing in the game that makes this number go DOWN, and it applies
+  // here, over the same elapsed slice everything else uses.
+  const cpsWithEvents = bnMulScalar(cpsWithEffect, randomEventCpsMultiplier(state.randomEvents, nowMs));
+
+  const gained = bnMulScalar(cpsWithEvents, elapsedMs / 1000);
   let nextState = addCookies(state, gained);
 
   let goldenCookie = despawnIfExpired(nextState.goldenCookie, nowMs, ctx.rng, config);
   goldenCookie = maybeSpawnGoldenCookie(goldenCookie, nowMs, ctx.rng, config);
   nextState = { ...nextState, goldenCookie, lastTickAtIso: nowIso(ctx) };
+
+  // The random-event scheduler advances on the SAME tick, off the same clock and the same
+  // RngPort, and is told whether a golden cookie is currently holding the stage.
+  const eventResult = tickRandomEvents(nextState.randomEvents, nextState, nowMs, ctx.rng, {
+    blocked: goldenCookie.isSpawned,
+    config: ctx.randomEventConfig ?? DEFAULT_RANDOM_EVENT_CONFIG,
+  });
+  nextState = { ...nextState, randomEvents: eventResult.randomEvents };
+  if (eventResult.instantBonus.mantissa !== 0) {
+    nextState = addCookies(nextState, eventResult.instantBonus);
+  }
 
   return withAchievements(nextState, nowIso(ctx));
 }
@@ -230,6 +278,46 @@ function handleCollectGoldenCookie(state: GameState, ctx: ReducerCtx): GameState
   }
 
   return withAchievements(nextState, nowIso(ctx));
+}
+
+function handleRandomEventClick(state: GameState, ctx: ReducerCtx, targetId: string): GameState {
+  const config = ctx.randomEventConfig ?? DEFAULT_RANDOM_EVENT_CONFIG;
+  const result = clickRandomEventTarget(state.randomEvents, state, targetId, ctx.now(), ctx.rng, config);
+  if (!result.claimed) return state;
+
+  let nextState: GameState = { ...state, randomEvents: result.randomEvents };
+  if (result.bonus.mantissa !== 0) nextState = addCookies(nextState, result.bonus);
+
+  return withAchievements(nextState, nowIso(ctx));
+}
+
+function handleRandomEventResolve(state: GameState): GameState {
+  const randomEvents = clearLastResolved(state.randomEvents);
+  if (randomEvents === state.randomEvents) return state;
+  return { ...state, randomEvents };
+}
+
+/**
+ * MARKET DAY'S REBATE.
+ *
+ * Applied here, around the purchase handlers, rather than inside them. Every price in the game
+ * is computed in exactly one place per item, and the Tools tech tree already applies a discount
+ * at that seam; a second, timed discount threaded through the same arithmetic would make the
+ * price on the card disagree with the price at the till for a minute at a time. So the player
+ * pays the printed price and this function hands part of it back -- a rebate, which is what the
+ * copy says it is. It reads what the purchase ACTUALLY cost (cookies before minus cookies
+ * after), so a purchase the reducer refused cost nothing and is refunded nothing.
+ */
+function withMarketDayRebate(previous: GameState, next: GameState, ctx: ReducerCtx): GameState {
+  if (next === previous) return next;
+  const fraction = randomEventRebateFraction(previous.randomEvents, ctx.now());
+  if (fraction <= 0) return next;
+
+  const spent = bnSub(previous.cookies, next.cookies);
+  if (spent.mantissa <= 0) return next;
+
+  const rebate = bnMulScalar(spent, fraction);
+  return { ...next, cookies: bnAdd(next.cookies, rebate) };
 }
 
 function handlePrestige(state: GameState, ctx: ReducerCtx): GameState {
@@ -267,13 +355,13 @@ export function applyGameAction(state: GameState, action: GameAction, ctx: Reduc
     case "click":
       return handleClick(state, ctx);
     case "buyGenerator":
-      return handleBuyGeneratorBulk(state, ctx, action.generatorId, 1);
+      return withMarketDayRebate(state, handleBuyGeneratorBulk(state, ctx, action.generatorId, 1), ctx);
     case "buyGeneratorBulk":
-      return handleBuyGeneratorBulk(state, ctx, action.generatorId, action.quantity);
+      return withMarketDayRebate(state, handleBuyGeneratorBulk(state, ctx, action.generatorId, action.quantity), ctx);
     case "buyUpgrade":
-      return handleBuyUpgrade(state, ctx, action.upgradeId);
+      return withMarketDayRebate(state, handleBuyUpgrade(state, ctx, action.upgradeId), ctx);
     case "buyTool":
-      return handleBuyTool(state, ctx, action.toolId);
+      return withMarketDayRebate(state, handleBuyTool(state, ctx, action.toolId), ctx);
     case "mintDiesel":
       return handleMintDiesel(state, ctx, action.litres);
     case "setToolProgression":
@@ -282,6 +370,10 @@ export function applyGameAction(state: GameState, action: GameAction, ctx: Reduc
       return handleTick(state, ctx, action.elapsedMs);
     case "collectGoldenCookie":
       return handleCollectGoldenCookie(state, ctx);
+    case "randomEventClick":
+      return handleRandomEventClick(state, ctx, action.targetId);
+    case "randomEventResolve":
+      return handleRandomEventResolve(state);
     case "prestige":
       return handlePrestige(state, ctx);
     case "importSave":
@@ -304,6 +396,7 @@ export function createInitialGameState(nowIsoString: string): GameState {
     achievements: [],
     prestige: { ascensionPoints: 0, totalPrestigeCount: 0, permanentUnlockIds: [] },
     goldenCookie: { isSpawned: false, rngStreamIndex: 0, nextEligibleAtEpochMs: 0 },
+    randomEvents: createInitialRandomEventsState(),
     stats: { totalClicks: 0, totalCookiesBaked: zero, clockAnomalyCount: 0 },
     dieselDepot: { litresMinted: 0, vouchersMinted: 0, cookiesSpent: zero },
     toolProgressionEnabled: true,

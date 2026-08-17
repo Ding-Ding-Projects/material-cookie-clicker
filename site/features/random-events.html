@@ -1,0 +1,102 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1" />
+<title>Random events — Material Cookie Clicker</title>
+<meta name="description" content="Six events on a bounded random schedule, one of them a setback, all of them photographed running." />
+<link rel="stylesheet" href="../assets/site.css" />
+</head>
+<body>
+<a class="skip-link" href="#main">Skip to main content</a>
+<header class="site-head">
+  <div class="wrap">
+    <a class="brand" href="../index.html"><span aria-hidden="true">&#127850;</span> Material Cookie Clicker</a>
+    <nav class="site-nav" aria-label="Primary">
+      <ul>
+        <li><a href="../index.html">Home</a></li>
+        <li><a href="../features/index.html">Features</a></li>
+        <li><a href="../index.html#download">Download</a></li>
+      </ul>
+    </nav>
+  </div>
+</header>
+<main id="main" class="wrap">
+  <article>
+    <h1>Random events</h1>
+    <p class="lede">Six events on a bounded random schedule, one of them a setback, all of them photographed running.</p>
+    <div class="inset" style="margin-bottom:18px">
+  <span class="label">Current state</span>
+  <p style="margin:0"><span class="tag">Shipped</span> the scheduler and all six events are in the build (<code>src/shared/game/random-events.ts</code>), and two of them were photographed on the running game surface.</p>
+</div>
+
+    <h2>From the running application</h2>
+    <figure class="capture">
+      <img src="../assets/captures/events-rain.png" alt="The game surface during a Cookie Rain. Twelve round cookie buttons, each a dough-coloured disc with dark chocolate chunks and a chunky brown outline, are scattered across the stage at different heights, falling over the hero cookie panel and across the shop rail. In the top right of the HUD a yellow plate reads Cookie Rain in English and Cantonese with a draining amber bar and the figure 18s. A marquee at the bottom centre reads Cookie Rain: Cookies are falling. Catch them before they hit the counter, with the Cantonese line beneath it and a Dismiss button." width="1557" height="1093" loading="lazy" />
+      <figcaption><strong>Cookie Rain.</strong> Twelve real buttons falling across the stage, each one worth cookies when caught. Captured from the built application running on an off-screen Windows desktop, photographed with the Win32 PrintWindow API, window maximised.</figcaption>
+    </figure>
+    <figure class="capture">
+      <img src="../assets/captures/events-indicator.png" alt="The same game surface during an Oven Hiccup. The HUD's fourth plate is now pink and outlined in red, reading Oven Hiccup in English and Cantonese with a draining dark red bar and the figure 27s. A pink chip sits at the top left of the stage over the hero panel, carrying an oven drawing with a warning bolt and the event's name in both languages. The marquee at the bottom reads Oven Hiccup: The oven is sulking and output is down. Thump it to fix it, with the Cantonese line and, in red, Production is down until this ends." width="1557" height="1093" loading="lazy" />
+      <figcaption><strong>Oven Hiccup, the one setback.</strong> The indicator, the marquee and the thump-to-fix button are all rendered in the error role rather than the spark one, so the event that takes something away never looks like the ones that give. Captured the same way.</figcaption>
+    </figure>
+
+    <h2>What it does</h2>
+    <p>Every few minutes, one event out of a pool of six interrupts an ordinary session. Some pay out, one costs you production, and two of them put real buttons on the game stage that you can press.</p>
+    <div class="scroller">
+    <table>
+      <caption>The event pool, with its shipped defaults</caption>
+      <thead><tr><th scope="col">Event</th><th scope="col">Shape</th><th scope="col">What it does</th><th scope="col">Duration</th></tr></thead>
+      <tbody>
+        <tr><td>Cookie Rain</td><td>Clickable</td><td>Twelve falling cookies; each one caught pays twenty seconds of production plus fifteen clicks&rsquo; worth</td><td>20 seconds</td></tr>
+        <tr><td>Grandma&rsquo;s Surprise Batch</td><td>Instant</td><td>Ten minutes of current production, paid at once</td><td>&mdash;</td></tr>
+        <tr><td>Oven Hiccup</td><td>Clickable setback</td><td>Production drops to 40%; one press of the oven ends it early</td><td>30 seconds</td></tr>
+        <tr><td>Sugar Rush</td><td>Timed</td><td>Click value &times;7</td><td>15 seconds</td></tr>
+        <tr><td>Lucky Crumb</td><td>Instant</td><td>Ninety seconds of production plus a flat 25 cookies</td><td>&mdash;</td></tr>
+        <tr><td>Market Day</td><td>Timed</td><td>15% of every purchase handed back</td><td>60 seconds</td></tr>
+      </tbody>
+    </table>
+    </div>
+    <p>The draw is weighted, not uniform. The two plain windfalls are the most likely, and the Oven Hiccup is the least &mdash; an interruption that takes something away should be the one you remember, not the one you resent.</p>
+
+    <h2>The scheduling rules, stated plainly</h2>
+    <ul>
+      <li><strong>One at a time, ever.</strong> While an event is running, no roll happens at all. There is no configuration under which two events share the stage.</li>
+      <li><strong>Never over a golden cookie.</strong> The <a href="golden-cookies.html">golden cookie</a> is a separate system with its own window, but it lands on the same surface, so the event scheduler declines to roll while one is waiting to be clicked.</li>
+      <li><strong>A cooldown, then a window.</strong> When an event resolves, a flat quiet minute starts, and only then does a rolled delay of three to ten minutes begin. Whatever the dice say, there is always at least a minute of ordinary play between two events.</li>
+      <li><strong>Ending it early ends it properly.</strong> Catching the last rain drop, or thumping the oven, resolves the event there and then and starts the same cooldown. The reward for answering an event is getting your session back, not a shorter wait for the next one.</li>
+    </ul>
+
+    <h2>Seeded, not random</h2>
+    <p>Like the golden cookie, this scheduler never calls <code>Math.random()</code>. Every roll &mdash; when the next event is eligible, which event it is &mdash; comes from an injected pseudo-random port whose stream position is saved with the game, so a save-and-reload resumes the same timeline instead of re-rolling your luck. Given the same seed, the whole sequence replays exactly, which is what makes the tests able to drive six hours of simulated play and assert that no two events ever overlapped and no gap was ever shorter than the cooldown.</p>
+    <p>Time is an argument too. No part of this module reads a clock; the elapsed milliseconds arrive from the same tick the cookies-per-second loop already runs on.</p>
+
+    <h2>Why Market Day is a rebate and not a discount</h2>
+    <p>Every price in the game is computed in exactly one place, and the <a href="tools-tech-tree.html">Tools tech tree</a> already applies a discount at that seam. Threading a second, timed discount through the same arithmetic would mean the price printed on a shop card and the price actually charged disagreed for sixty seconds at a time. So Market Day does not touch pricing at all: you pay the printed price, and the reducer hands fifteen per cent of it straight back afterwards. The shop stays honest and the effect stays real.</p>
+
+    <h2>Accessibility</h2>
+    <p>Every clickable event target is a real button with a real accessible name and a hit area comfortably over 44&nbsp;pixels &mdash; never a decorated container with a click handler on it. Each event is announced once, in both languages, through the same throttled status region that already announces achievements and purchases; the marquee on screen is a duplicate of that announcement and is hidden from assistive technology so nothing is said twice.</p>
+    <p>Under a reduced-motion preference the rain stops moving and becomes twelve still crumbs laid down the same stage, in the same columns, at the same size, worth exactly the same cookies, and the oven chip stops shaking. Nothing becomes unreachable and nothing becomes harder to hit; the only thing that goes away is the motion. No event gates anything: the worst one costs production for thirty seconds and hands you a button to end it sooner.</p>
+
+    <h2>How it is configured</h2>
+    <p>The spawn window, the cooldown and every payout are fields of one configuration object with a documented default set, not constants buried in the scheduler. A second, deliberately developer-only configuration exists for capture and smoke runs, which shortens the window to a few seconds; it is reached by setting a single local-storage key before the game starts and by nothing else. There is no button, no settings row and no in-game control that summons an event, because a random event you can summon is not a random event.</p>
+
+    <nav class="related plate" aria-labelledby="related-heading">
+      <h2 id="related-heading">Related articles</h2>
+      <ul>
+        <li><a href="golden-cookies.html">Golden-cookie events</a></li>
+        <li><a href="cookie-clicking.html">Cookie clicking and the CPS loop</a></li>
+        <li><a href="upgrades.html">Upgrades</a></li>
+        <li><a href="tools-tech-tree.html">The Tools tech tree</a></li>
+        <li><a href="index.html">All features &amp; search</a></li>
+      </ul>
+    </nav>
+  </article>
+</main>
+<footer class="site-foot">
+  <div class="wrap">
+    <p>Material Cookie Clicker is free, unsigned by permanent policy, and nobody ever pays anything to use it. This site is fully self-contained: no CDN, no remote font, no remote image, no analytics, no network request of any kind. Every graphic is either drawn in CSS or a screenshot of the application stored in this repository.</p>
+    <p><a href="https://github.com/Ding-Ding-Projects/material-cookie-clicker">Source code on GitHub</a> &middot; <a href="../features/index.html">All feature articles</a></p>
+  </div>
+</footer>
+</body>
+</html>

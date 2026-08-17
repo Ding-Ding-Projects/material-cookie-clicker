@@ -114,6 +114,23 @@ export const GAME_SURFACE_COPY = {
 } as const satisfies Record<string, Bilingual>;
 
 /**
+ * Chrome for the random-event system (src/shared/game/random-events.ts). Event NAMES and blurbs
+ * are not here — they live on the domain definitions beside the numbers they describe, exactly
+ * as generator and upgrade names do — so this covers only the wrapper: the indicator's label,
+ * the accessible names on the clickable targets, and the toast's dismiss.
+ */
+export const RANDOM_EVENT_COPY = {
+  indicatorLabel: { en: "Event in progress", yue: "事件進行中" },
+  timeRemaining: { en: "Time left", yue: "剩餘時間" },
+  stageLabel: { en: "Event targets", yue: "事件目標" },
+  catchDrop: { en: "Catch a falling cookie", yue: "接住跌緊嘅曲奇" },
+  fixOven: { en: "Thump the oven to fix it", yue: "拍一拍焗爐整返好" },
+  setbackNote: { en: "Production is down until this ends.", yue: "呢段時間產量會低咗。" },
+  dismissToast: { en: "Dismiss", yue: "收起" },
+  toastLabel: { en: "Latest event", yue: "最新事件" },
+} as const satisfies Record<string, Bilingual>;
+
+/**
  * The console cluster bolted to the cabinet frame and the anchored panels it opens. These are
  * NOT navigation: the game surface never goes away, so every string here talks about opening
  * and closing a panel rather than going to a page.

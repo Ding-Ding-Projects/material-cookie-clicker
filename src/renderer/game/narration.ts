@@ -2,6 +2,7 @@ import { getAchievementDefinition } from "../../shared/game/achievements.js";
 import { getGeneratorDefinition } from "../../shared/game/generators.js";
 import type { GameAction } from "../../shared/game/reducer.js";
 import { isToolBonusActive, TOOL_DEFINITIONS } from "../../shared/game/tools.js";
+import { getRandomEventDefinition, type RandomEventId } from "../../shared/game/random-events.js";
 import { getUpgradeDefinition } from "../../shared/game/upgrades.js";
 import type { GameState } from "../../shared/game/types.js";
 import type { Bilingual } from "./copy.js";
@@ -24,6 +25,19 @@ export type MilestoneEvent =
   | { readonly kind: "tool-unlocked"; readonly id: string }
   | { readonly kind: "golden-cookie-spawned" }
   | { readonly kind: "golden-cookie-collected" }
+  /**
+   * A random event (random-events.ts) starting and finishing. Both are milestones by the rule
+   * this module already applies: they are rare, they change what the numbers are doing, and a
+   * player who cannot see the stage has no other way to learn that production just halved or
+   * that there are cookies falling they could be catching.
+   */
+  | { readonly kind: "random-event-spawned"; readonly id: RandomEventId }
+  | {
+      readonly kind: "random-event-resolved";
+      readonly id: RandomEventId;
+      readonly claimedCount: number;
+      readonly endedEarly: boolean;
+    }
   | { readonly kind: "prestige-available" }
   | { readonly kind: "prestige"; readonly pointsEarned: number };
 
@@ -52,6 +66,23 @@ export function detectMilestones(previous: GameState, next: GameState, action: G
   }
   if (action.type === "collectGoldenCookie" && previous.goldenCookie.isSpawned) {
     events.push({ kind: "golden-cookie-collected" });
+  }
+
+  if (next.randomEvents.spawnCount > previous.randomEvents.spawnCount) {
+    // An instant event never occupies the active slot, so read the id from whichever place it
+    // landed: the active event for a timed/clickable one, the just-resolved record otherwise.
+    const id = next.randomEvents.active?.id ?? next.randomEvents.lastResolved?.id;
+    if (id) events.push({ kind: "random-event-spawned", id });
+  }
+
+  if (previous.randomEvents.active !== null && next.randomEvents.active === null && next.randomEvents.lastResolved) {
+    const resolved = next.randomEvents.lastResolved;
+    events.push({
+      kind: "random-event-resolved",
+      id: resolved.id,
+      claimedCount: resolved.claimedCount,
+      endedEarly: resolved.endedEarly,
+    });
   }
 
   if (action.type === "prestige") {
@@ -96,6 +127,26 @@ export function describeMilestone(event: MilestoneEvent): Bilingual {
       return { en: "A golden cookie appeared!", yue: "金曲奇出現喇！" };
     case "golden-cookie-collected":
       return { en: "Golden cookie collected.", yue: "金曲奇收到手。" };
+    case "random-event-spawned": {
+      const def = getRandomEventDefinition(event.id);
+      return {
+        en: `${def.nameEn}: ${def.blurbEn}`,
+        yue: `${def.nameYue}：${def.blurbYue}`,
+      };
+    }
+    case "random-event-resolved": {
+      const def = getRandomEventDefinition(event.id);
+      if (event.claimedCount > 0) {
+        return {
+          en: `${def.nameEn} over — ${event.claimedCount} caught.`,
+          yue: `${def.nameYue}完咗——接到 ${event.claimedCount} 個。`,
+        };
+      }
+      return {
+        en: `${def.nameEn} over.`,
+        yue: `${def.nameYue}完咗。`,
+      };
+    }
     case "prestige-available":
       return { en: "Prestige is ready.", yue: "可以轉生喇。" };
     case "prestige":

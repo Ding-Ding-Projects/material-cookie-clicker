@@ -1,4 +1,5 @@
 import type { BigNum } from "./big-number.js";
+import type { RandomEventsState } from "./random-events.js";
 
 /** Small discrete counters use plain `number` — see big-number.ts header comment for why. */
 
@@ -77,6 +78,17 @@ export interface GameState {
 
   readonly prestige: PrestigeState;
   readonly goldenCookie: GoldenCookieState;
+
+  /**
+   * The general random-event scheduler and whatever it currently has on screen — see
+   * random-events.ts. Separate from `goldenCookie` on purpose: the golden cookie is one
+   * specific overlay with its own window and its own three effects, and this is the pool of
+   * six events that interrupt play around it. The two share the reducer's RngPort and clock,
+   * and the scheduler declines to roll while a golden cookie is up, so the stage never has two
+   * random things on it at once.
+   */
+  readonly randomEvents: RandomEventsState;
+
   readonly stats: GameStats;
   readonly dieselDepot: DieselDepotState;
 

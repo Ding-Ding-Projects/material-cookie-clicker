@@ -12,6 +12,11 @@ import { bnSub, bnToNumber } from '../../shared/game/big-number.js';
 import { cookiesSpentString, summarizeLedger, type LedgerSummary } from '../../shared/game/diesel-exchange.js';
 import { formatBigNum } from '../../shared/game/format-number.js';
 import { createInitialGameState, type GameAction, type ReducerCtx } from '../../shared/game/reducer.js';
+import {
+  FAST_RANDOM_EVENTS_FLAG,
+  resolveRandomEventConfig,
+  type RandomEventConfig,
+} from '../../shared/game/random-events.js';
 import type { GameState } from '../../shared/game/types.js';
 import { DIESEL_COPY, OFFLINE_COPY, type Bilingual } from './copy.js';
 import { describeMilestone, detectMilestones } from './narration.js';
@@ -90,7 +95,37 @@ export function GameProvider({ children }: { children: ReactNode }) {
   const [dieselError, setDieselError] = useState<Bilingual | null>(null);
   const [lastVoucherId, setLastVoucherId] = useState<string | null>(null);
 
-  const nowCtx = (): ReducerCtx => ({ now: () => Date.now(), rng: rngRef.current });
+  /**
+   * THE DEVELOPER-ONLY FAST EVENT SCHEDULE.
+   *
+   * Random events fire every three to ten minutes, which is right for playing and impossible
+   * for photographing or for a smoke run. The window is therefore overridable by ONE
+   * localStorage key, read once here at startup:
+   *
+   *     localStorage.setItem('material-cookie-clicker:events:fast', '1')
+   *
+   * with the key's name and the resolver both living in the domain (random-events.ts) so the
+   * decision is tested rather than trusted. There is deliberately no button, no settings row and
+   * no "spawn now" control anywhere in the shipped UI: a random event you can summon is not a
+   * random event. A player who never sets the key can never reach this schedule, and the read is
+   * wrapped because storage can throw in a locked-down context.
+   */
+  const randomEventConfigRef = useRef<RandomEventConfig | null>(null);
+  if (randomEventConfigRef.current === null) {
+    let flag: string | null = null;
+    try {
+      flag = typeof window !== 'undefined' ? window.localStorage?.getItem(FAST_RANDOM_EVENTS_FLAG) ?? null : null;
+    } catch {
+      flag = null;
+    }
+    randomEventConfigRef.current = resolveRandomEventConfig(flag);
+  }
+
+  const nowCtx = (): ReducerCtx => ({
+    now: () => Date.now(),
+    rng: rngRef.current,
+    randomEventConfig: randomEventConfigRef.current ?? undefined,
+  });
 
   const dieselBridge = typeof window !== 'undefined' ? window.materialCookieClicker?.diesel : undefined;
 

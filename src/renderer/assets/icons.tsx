@@ -1078,3 +1078,122 @@ export function HeroCookieArt({ golden = false, extraClass }: { golden?: boolean
     </svg>
   );
 }
+
+/* ------------------------------------------------------------------------------------------
+ * Random-event art (src/shared/game/random-events.ts).
+ *
+ * Same rules as everything above: one 32x32 canvas, one stroke weight, theme custom properties
+ * for every colour, `aria-hidden` because the button or the chip beside them always carries the
+ * accessible name. The setback event is the only one drawn in the error role — a player should
+ * be able to tell at a glance that this one is taking something away.
+ * ---------------------------------------------------------------------------------------- */
+
+const ALARM = 'var(--error, #a33019)';
+const ALARM_LIGHT = 'var(--error-container, #ffdad3)';
+
+/** One falling cookie during Cookie Rain. Drawn small and round so twelve of them read as rain. */
+export function RainDropArt({ extraClass }: { extraClass?: string } = {}) {
+  return (
+    <Art extraClass={extraClass}>
+      {/* Chip placement is deliberately lopsided. Three evenly-spaced chips on a pale disc
+          read as a face at this size, which is the last thing a falling cookie should be. */}
+      <circle cx="16" cy="16" r="13" fill={DOUGH} stroke={CRUST} strokeWidth="2" />
+      <path d="M6 13a12 12 0 0 1 9-7" fill="none" stroke={HIGHLIGHT} strokeWidth="2.4" strokeLinecap="round" />
+      <circle cx="11.5" cy="12.5" r="2.6" fill={CHIP} stroke="none" />
+      <circle cx="19.5" cy="17.5" r="3" fill={CHIP} stroke="none" />
+      <circle cx="12" cy="21" r="2.2" fill={CHIP} stroke="none" />
+      <circle cx="21" cy="9.5" r="1.5" fill={CHIP} stroke="none" />
+      <circle cx="15.5" cy="16" r="1" fill={CRUST_DARK} stroke="none" opacity="0.5" />
+      <circle cx="24" cy="21" r="1.1" fill={CRUST_DARK} stroke="none" opacity="0.45" />
+    </Art>
+  );
+}
+
+/** The whole Cookie Rain, as one emblem: three cookies under a cloud. */
+function CookieRainArt() {
+  return (
+    <Art>
+      <path d="M8 11a5 5 0 0 1 9.4-2.4A4 4 0 0 1 24 11a3.5 3.5 0 0 1-.4 7H9.5A3.5 3.5 0 0 1 8 11Z" fill={PLATE_DIM} />
+      <circle cx="11" cy="24" r="3.2" fill={DOUGH} />
+      <circle cx="16" cy="28" r="3.2" fill={DOUGH} />
+      <circle cx="21" cy="24" r="3.2" fill={DOUGH} />
+      <circle cx="11" cy="24" r="0.9" fill={CHIP} stroke="none" />
+      <circle cx="16" cy="28" r="0.9" fill={CHIP} stroke="none" />
+      <circle cx="21" cy="24" r="0.9" fill={CHIP} stroke="none" />
+    </Art>
+  );
+}
+
+/** Grandma's Surprise Batch: a baking tray straight out of the oven. */
+function GrandmasBatchArt() {
+  return (
+    <Art>
+      <path d="M4 18h24v6a2 2 0 0 1-2 2H6a2 2 0 0 1-2-2Z" fill={METAL_LO} />
+      <path d="M4 18h24" stroke={METAL_HI} strokeWidth="2" />
+      <circle cx="10" cy="14" r="3.4" fill={DOUGH} />
+      <circle cx="16" cy="13" r="3.4" fill={DOUGH} />
+      <circle cx="22" cy="14" r="3.4" fill={DOUGH} />
+      <path d="M9 6q1.5 2 0 4M16 4q1.5 2 0 4M23 6q1.5 2 0 4" fill="none" stroke={GOLD_DEEP} strokeWidth="1.4" opacity="0.8" />
+    </Art>
+  );
+}
+
+/** Oven Hiccup: the oven door with a warning bolt across it. The one drawing in the error role. */
+export function OvenHiccupArt({ extraClass }: { extraClass?: string } = {}) {
+  return (
+    <Art extraClass={extraClass}>
+      <rect x="4" y="7" width="24" height="21" rx="3" fill={ALARM_LIGHT} />
+      <rect x="7.5" y="13" width="17" height="11" rx="2" fill={PLATE_DIM} />
+      <path d="M4 11h24" stroke={ALARM} strokeWidth="1.6" />
+      <circle cx="8.5" cy="9.2" r="1.1" fill={ALARM} stroke="none" />
+      <circle cx="12" cy="9.2" r="1.1" fill={ALARM} stroke="none" />
+      <path d="M17 13.5 12.5 19h4L14 24l6.5-6.5h-4L19 13.5Z" fill={GOLD} stroke={ALARM} strokeWidth="1.2" />
+    </Art>
+  );
+}
+
+/** Sugar Rush: a sugar cube going off like a firework. */
+function SugarRushArt() {
+  return (
+    <Art>
+      <rect x="10" y="12" width="12" height="11" rx="2" fill={PLATE} />
+      <path d="M10 16h12M16 12v11" stroke={PLATE_DIM} strokeWidth="1.4" />
+      <path d="M16 3v5M6 7l3 3.5M26 7l-3 3.5M3 17h4M25 17h4" stroke={GOLD_DEEP} strokeWidth="1.8" />
+      <circle cx="16" cy="17.5" r="2.2" fill={GOLD} stroke="none" />
+    </Art>
+  );
+}
+
+/** Lucky Crumb: one small crumb with a spark on it. */
+function LuckyCrumbArt() {
+  return (
+    <Art>
+      <path d="M11 22 8 15l7-3 6 4-2 7Z" fill={DOUGH} />
+      <circle cx="13.5" cy="17.5" r="1.5" fill={CHIP} stroke="none" />
+      <path d="M22 5.5 23.4 9l3.6 1.4-3.6 1.4L22 15.4l-1.4-3.6L17 10.4l3.6-1.4Z" fill={GOLD} stroke={GOLD_RING} />
+    </Art>
+  );
+}
+
+/** Market Day: a price tag with the rebate coming back off it. */
+function MarketDayArt() {
+  return (
+    <Art>
+      <path d="M16 4h10a2 2 0 0 1 2 2v10L15 29 3 17Z" fill={EMERALD_LIGHT} />
+      <circle cx="23" cy="9" r="2.2" fill={EMERALD} stroke="none" />
+      <path d="M9 15.5 15 21.5M15 15.5 9 21.5" stroke={EMERALD} strokeWidth="2" opacity="0.35" />
+      <path d="M18 22.5a5 5 0 1 0-1.4-4.2" fill="none" stroke={EMERALD} strokeWidth="2" />
+      <path d="M13 13.5h4v4" fill="none" stroke={EMERALD} strokeWidth="2" />
+    </Art>
+  );
+}
+
+/** The emblem for one event id, for the HUD indicator and the toast. */
+export const RANDOM_EVENT_ART: Record<string, () => ReactElement> = {
+  cookie_rain: CookieRainArt,
+  grandmas_batch: GrandmasBatchArt,
+  oven_hiccup: OvenHiccupArt,
+  sugar_rush: SugarRushArt,
+  lucky_crumb: LuckyCrumbArt,
+  market_day: MarketDayArt,
+};

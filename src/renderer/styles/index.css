@@ -6124,3 +6124,335 @@ ul.card-grid {
     transform: none;
   }
 }
+
+/* ==========================================================================================
+   RANDOM EVENTS (src/shared/game/random-events.ts)
+
+   Three surfaces, all in the v2 arcade language: the clickable targets that land on the game
+   stage, the HUD indicator with its draining bar, and the marquee that names the event.
+
+   The stage layer is an OVERLAY, not a member of the grid: `.stage` is the same two-column
+   layout it always was, and the event layer is absolutely positioned over it with pointer
+   events off, so only the buttons themselves are clickable and nothing an event does can shift
+   the cookie or the shop by a pixel.
+
+   Reduced motion is not a degraded version of this — it is an equivalent one. The falling
+   cookies stop falling and become twelve still crumbs scattered down the same stage, in the
+   same columns, at the same 44px size, worth exactly the same cookies. Nothing becomes
+   unreachable and nothing becomes harder to hit; the only thing that goes away is the motion.
+   ========================================================================================== */
+
+.stage {
+  position: relative;
+}
+
+.event-stage {
+  position: absolute;
+  inset: 0;
+  z-index: 6;
+  pointer-events: none;
+  overflow: hidden;
+}
+
+/* --- Cookie Rain: twelve falling, catchable cookies ------------------------------------- */
+
+.event-drop {
+  position: absolute;
+  left: var(--drop-x, 50%);
+  top: 0;
+  width: 48px;
+  height: 48px;
+  margin: 0 0 0 -24px;
+  padding: 0;
+  display: grid;
+  place-items: center;
+  pointer-events: auto;
+  cursor: pointer;
+  border: 3px solid var(--cabinet-frame-dark);
+  border-radius: 50%;
+  background: var(--primary-container);
+  box-shadow: 0 3px 0 0 var(--cabinet-frame-dark);
+  animation: event-drop-fall 3.4s linear var(--drop-delay, 0s) infinite;
+}
+
+.event-drop__art {
+  width: 34px;
+  height: 34px;
+}
+
+.event-drop:hover {
+  background: var(--spark);
+}
+
+.event-drop:active {
+  transform: translateY(3px) scale(0.94);
+  box-shadow: inset 0 3px 0 0 var(--bevel-hi);
+}
+
+.event-drop:focus-visible {
+  outline: 4px solid var(--spark-ring);
+  outline-offset: 3px;
+}
+
+@keyframes event-drop-fall {
+  0% {
+    transform: translateY(-15%) translateX(0) rotate(0deg);
+    opacity: 0;
+  }
+  8% {
+    opacity: 1;
+  }
+  92% {
+    opacity: 1;
+  }
+  100% {
+    transform: translateY(calc(100vh * 0.62)) translateX(var(--drop-drift, 0)) rotate(140deg);
+    opacity: 0;
+  }
+}
+
+/* --- Oven Hiccup: the one setback, and the button that ends it -------------------------- */
+
+.event-stage--oven {
+  display: grid;
+  /* Top-left of the stage, not bottom-centre: the marquee that names the event is fixed to the
+     bottom centre of the window, and the two were landing on top of each other. */
+  place-items: start start;
+  padding: 18px 0 0 18px;
+}
+
+.event-oven {
+  pointer-events: auto;
+  cursor: pointer;
+  min-height: 56px;
+  padding: 8px 18px 8px 12px;
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  border: 2px solid var(--error);
+  border-radius: 14px;
+  background: var(--error-container);
+  color: var(--on-error-container);
+  font-weight: 900;
+  letter-spacing: 0.04em;
+  box-shadow: 0 4px 0 0 var(--error-shadow), inset 0 2px 0 0 var(--bevel-hi);
+  animation: event-oven-shake 0.5s ease-in-out infinite;
+}
+
+.event-oven__art {
+  width: 34px;
+  height: 34px;
+}
+
+.event-oven__label {
+  display: flex;
+  flex-direction: column;
+  gap: 1px;
+  font-size: 13px;
+  text-align: left;
+}
+
+.event-oven:active {
+  transform: translateY(3px);
+  box-shadow: inset 0 4px 0 0 var(--bevel-hi);
+}
+
+.event-oven:focus-visible {
+  outline: 4px solid var(--spark-ring);
+  outline-offset: 3px;
+}
+
+@keyframes event-oven-shake {
+  0%,
+  100% {
+    transform: translateX(0) rotate(0deg);
+  }
+  25% {
+    transform: translateX(-3px) rotate(-1.2deg);
+  }
+  75% {
+    transform: translateX(3px) rotate(1.2deg);
+  }
+}
+
+/* --- The HUD indicator ------------------------------------------------------------------ */
+
+.event-indicator {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  min-height: 44px;
+  padding: 6px 12px;
+  border: 2px solid var(--spark-ring);
+  border-radius: 12px;
+  background: var(--tertiary-container);
+  color: var(--on-surface);
+  box-shadow: inset 0 3px 0 0 var(--bevel-hi);
+}
+
+.event-indicator--setback {
+  border-color: var(--error);
+  background: var(--error-container);
+  color: var(--on-error-container);
+}
+
+.event-indicator__emblem {
+  display: grid;
+  place-items: center;
+  width: 28px;
+  height: 28px;
+  font-size: 28px;
+  flex: none;
+}
+
+.event-indicator__body {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  min-width: 0;
+}
+
+.event-indicator__name {
+  display: flex;
+  flex-direction: column;
+  gap: 0;
+  font-size: 12px;
+  font-weight: 900;
+  letter-spacing: 0.05em;
+  white-space: nowrap;
+}
+
+.event-indicator__bar {
+  display: block;
+  width: 84px;
+  height: 10px;
+  border: 2px solid var(--cabinet-frame-dark);
+  border-radius: 999px;
+  background: var(--surface-lowest);
+  overflow: hidden;
+}
+
+/* Width is a plain style, recomputed five times a second from two fixed timestamps in the
+   domain — no CSS transition on it, so the bar cannot drift out of step with the real clock. */
+.event-indicator__fill {
+  display: block;
+  height: 100%;
+  width: calc(var(--event-remaining, 0) * 100%);
+  background: var(--spark);
+}
+
+.event-indicator--setback .event-indicator__fill {
+  background: var(--error);
+}
+
+.event-indicator__time {
+  font-size: 12px;
+  font-weight: 900;
+  font-variant-numeric: tabular-nums;
+}
+
+/* --- The marquee ------------------------------------------------------------------------ */
+
+.event-toast {
+  position: fixed;
+  left: 50%;
+  bottom: 96px;
+  transform: translateX(-50%);
+  z-index: 60;
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  max-width: min(560px, 84vw);
+  padding: 10px 14px;
+  border: 3px solid var(--cabinet-frame-dark);
+  border-radius: 16px;
+  background: var(--surface-container);
+  color: var(--on-surface);
+  box-shadow: 0 6px 0 0 var(--cabinet-frame-dark);
+  animation: event-toast-in 260ms cubic-bezier(0.2, 1.4, 0.4, 1);
+}
+
+.event-toast--setback {
+  border-color: var(--error);
+  box-shadow: 0 6px 0 0 var(--error-shadow);
+}
+
+.event-toast__emblem {
+  display: grid;
+  place-items: center;
+  width: 34px;
+  height: 34px;
+  font-size: 34px;
+  flex: none;
+}
+
+.event-toast__lines {
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+  min-width: 0;
+}
+
+.event-toast__en {
+  font-size: 13px;
+  font-weight: 900;
+  letter-spacing: 0.03em;
+}
+
+.event-toast__yue {
+  font-size: 13px;
+  color: var(--on-surface-variant);
+}
+
+.event-toast__warn {
+  font-size: 11px;
+  font-weight: 800;
+  color: var(--error);
+}
+
+.event-toast__dismiss {
+  flex: none;
+  min-height: 32px;
+  padding: 4px 10px;
+  border: 2px solid var(--outline);
+  border-radius: 10px;
+  background: var(--surface-lowest);
+  color: var(--on-surface);
+  font-size: 11px;
+  font-weight: 900;
+  cursor: pointer;
+}
+
+@keyframes event-toast-in {
+  from {
+    transform: translateX(-50%) translateY(14px);
+    opacity: 0;
+  }
+  to {
+    transform: translateX(-50%) translateY(0);
+    opacity: 1;
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  /* The rain stops raining and becomes still crumbs on the stage: same twelve targets, same
+     columns, same size, same payout — laid down the stage instead of moving through it. */
+  .event-drop {
+    animation: none;
+    top: var(--drop-y, 40%);
+    opacity: 1;
+    transform: none;
+  }
+  .event-drop:active {
+    transform: none;
+  }
+  .event-oven {
+    animation: none;
+  }
+  .event-oven:active {
+    transform: none;
+  }
+  .event-toast {
+    animation: none;
+  }
+}

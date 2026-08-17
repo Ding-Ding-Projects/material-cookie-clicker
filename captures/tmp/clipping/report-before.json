@@ -1,0 +1,2963 @@
+[
+  {
+    "state": "plain",
+    "size": "1440x900",
+    "view": "surface",
+    "findings": [
+      {
+        "kind": "flush-label",
+        "el": "span.title-bar__marquee «Material Cookie Clicker»",
+        "detail": "text inset L 0.0 R 0.0px in a 155px box",
+        "excluded": null
+      },
+      {
+        "kind": "flush-label",
+        "el": "span.coin-slot__price «🍪 10»",
+        "detail": "text inset L 0.0 R -0.0px in a 56px box",
+        "excluded": null
+      },
+      {
+        "kind": "flush-label",
+        "el": "span.coin-slot__price «🍪 30»",
+        "detail": "text inset L 0.0 R 0.0px in a 54px box",
+        "excluded": null
+      },
+      {
+        "kind": "flush-label",
+        "el": "span.coin-slot__price «🍪 45»",
+        "detail": "text inset L 0.0 R 0.0px in a 54px box",
+        "excluded": null
+      },
+      {
+        "kind": "flush-label",
+        "el": "span.coin-slot__price «🍪 1»",
+        "detail": "text inset L 0.0 R 0.0px in a 46px box",
+        "excluded": null
+      },
+      {
+        "kind": "flush-label",
+        "el": "span.coin-slot__price «🍪 25»",
+        "detail": "text inset L 0.0 R 0.0px in a 46px box",
+        "excluded": null
+      }
+    ]
+  },
+  {
+    "state": "plain",
+    "size": "1232x860",
+    "view": "surface",
+    "findings": [
+      {
+        "kind": "flush-label",
+        "el": "span.title-bar__marquee «Material Cookie Clicker»",
+        "detail": "text inset L 0.0 R 0.0px in a 155px box",
+        "excluded": null
+      },
+      {
+        "kind": "flush-label",
+        "el": "span.coin-slot__price «🍪 10»",
+        "detail": "text inset L 0.0 R -0.0px in a 56px box",
+        "excluded": null
+      },
+      {
+        "kind": "flush-label",
+        "el": "span.coin-slot__price «🍪 30»",
+        "detail": "text inset L 0.0 R 0.0px in a 54px box",
+        "excluded": null
+      },
+      {
+        "kind": "flush-label",
+        "el": "span.coin-slot__price «🍪 45»",
+        "detail": "text inset L 0.0 R 0.0px in a 54px box",
+        "excluded": null
+      },
+      {
+        "kind": "flush-label",
+        "el": "span.coin-slot__price «🍪 1»",
+        "detail": "text inset L 0.0 R 0.0px in a 46px box",
+        "excluded": null
+      },
+      {
+        "kind": "flush-label",
+        "el": "span.coin-slot__price «🍪 25»",
+        "detail": "text inset L 0.0 R 0.0px in a 46px box",
+        "excluded": null
+      }
+    ]
+  },
+  {
+    "state": "plain",
+    "size": "1000x720",
+    "view": "surface",
+    "findings": [
+      {
+        "kind": "flush-label",
+        "el": "span.title-bar__marquee «Material Cookie Clicker»",
+        "detail": "text inset L 0.0 R 0.0px in a 155px box",
+        "excluded": null
+      },
+      {
+        "kind": "flush-label",
+        "el": "span.coin-slot__price «🍪 10»",
+        "detail": "text inset L 0.0 R -0.0px in a 56px box",
+        "excluded": null
+      },
+      {
+        "kind": "flush-label",
+        "el": "span.coin-slot__price «🍪 30»",
+        "detail": "text inset L 0.0 R 0.0px in a 54px box",
+        "excluded": null
+      },
+      {
+        "kind": "flush-label",
+        "el": "span.coin-slot__price «🍪 45»",
+        "detail": "text inset L 0.0 R 0.0px in a 54px box",
+        "excluded": null
+      },
+      {
+        "kind": "flush-label",
+        "el": "span.coin-slot__price «🍪 1»",
+        "detail": "text inset L 0.0 R -0.0px in a 46px box",
+        "excluded": null
+      },
+      {
+        "kind": "flush-label",
+        "el": "span.coin-slot__price «🍪 25»",
+        "detail": "text inset L 0.0 R 0.0px in a 46px box",
+        "excluded": null
+      }
+    ]
+  },
+  {
+    "state": "mid",
+    "size": "1440x900",
+    "view": "surface",
+    "findings": [
+      {
+        "kind": "overflow-x",
+        "el": "button#console-factory.console__button «Diesel Factory»",
+        "detail": "content runs 3.2px past a 96px box",
+        "excluded": null
+      },
+      {
+        "kind": "escapes-clipper",
+        "el": "span.golden-rays",
+        "detail": "clipped by div.panel.cookie-hero «10COOKIE221.6 / secHold to click repeate»",
+        "excluded": "hero decoration drawn to spill past the cookie on purpose"
+      },
+      {
+        "kind": "escapes-clipper",
+        "el": "span.cookie-embers",
+        "detail": "clipped by div.panel.cookie-hero «10COOKIE221.6 / secHold to click repeate»",
+        "excluded": "hero decoration drawn to spill past the cookie on purpose"
+      },
+      {
+        "kind": "escapes-clipper",
+        "el": "p.cookie-hero__hint «Hold to click repeatedly»",
+        "detail": "clipped by div.panel.cookie-hero «10COOKIE221.6 / secHold to click repeate»",
+        "excluded": null
+      },
+      {
+        "kind": "escapes-clipper",
+        "el": "div.milk-tide__surface",
+        "detail": "clipped by div.stage «10COOKIE221.6 / secHold to click repeate»",
+        "excluded": "the milk tide is a decorative band drawn behind the hero"
+      },
+      {
+        "kind": "overflow-x",
+        "el": "span.milk-tide__sr «Malted Milk — 84% milk, poured by your a»",
+        "detail": "content runs 286.6px past a 1px box",
+        "excluded": "the milk tide is a decorative band drawn behind the hero"
+      },
+      {
+        "kind": "clipped-text",
+        "el": "span.milk-tide__sr «Malted Milk — 84% milk, poured by your a»",
+        "detail": "text cut at 1px, no ellipsis",
+        "excluded": "the milk tide is a decorative band drawn behind the hero"
+      },
+      {
+        "kind": "flush-label",
+        "el": "span.title-bar__marquee «Material Cookie Clicker»",
+        "detail": "text inset L 0.0 R 0.0px in a 305px box",
+        "excluded": null
+      }
+    ]
+  },
+  {
+    "state": "mid",
+    "size": "1440x900",
+    "view": "dialog:factory",
+    "findings": [
+      {
+        "kind": "overflow-x",
+        "el": "button#console-factory.console__button «Diesel Factory»",
+        "detail": "content runs 3.2px past a 96px box",
+        "excluded": null
+      },
+      {
+        "kind": "escapes-clipper",
+        "el": "span.golden-rays",
+        "detail": "clipped by div.panel.cookie-hero «10COOKIE221.6 / secHold to click repeate»",
+        "excluded": "hero decoration drawn to spill past the cookie on purpose"
+      },
+      {
+        "kind": "escapes-clipper",
+        "el": "span.cookie-embers",
+        "detail": "clipped by div.panel.cookie-hero «10COOKIE221.6 / secHold to click repeate»",
+        "excluded": "hero decoration drawn to spill past the cookie on purpose"
+      },
+      {
+        "kind": "escapes-clipper",
+        "el": "p.cookie-hero__hint «Hold to click repeatedly»",
+        "detail": "clipped by div.panel.cookie-hero «10COOKIE221.6 / secHold to click repeate»",
+        "excluded": null
+      },
+      {
+        "kind": "escapes-clipper",
+        "el": "div.milk-tide__surface",
+        "detail": "clipped by div.stage «10COOKIE221.6 / secHold to click repeate»",
+        "excluded": "the milk tide is a decorative band drawn behind the hero"
+      },
+      {
+        "kind": "overflow-x",
+        "el": "span.milk-tide__sr «Malted Milk — 84% milk, poured by your a»",
+        "detail": "content runs 286.6px past a 1px box",
+        "excluded": "the milk tide is a decorative band drawn behind the hero"
+      },
+      {
+        "kind": "clipped-text",
+        "el": "span.milk-tide__sr «Malted Milk — 84% milk, poured by your a»",
+        "detail": "text cut at 1px, no ellipsis",
+        "excluded": "the milk tide is a decorative band drawn behind the hero"
+      },
+      {
+        "kind": "flush-label",
+        "el": "span.title-bar__marquee «Material Cookie Clicker»",
+        "detail": "text inset L 0.0 R 0.0px in a 305px box",
+        "excluded": null
+      },
+      {
+        "kind": "flush-label",
+        "el": "button.buy-btn «Buy — 🍪 2,000»",
+        "detail": "text inset L 0.0 R 0.0px in a 153px box",
+        "excluded": null
+      },
+      {
+        "kind": "flush-label",
+        "el": "button.buy-btn «Buy — 🍪 24,000»",
+        "detail": "text inset L 0.0 R 0.0px in a 162px box",
+        "excluded": null
+      },
+      {
+        "kind": "flush-label",
+        "el": "button.buy-btn «Buy — 🍪 8,000»",
+        "detail": "text inset L 0.0 R 0.0px in a 153px box",
+        "excluded": null
+      },
+      {
+        "kind": "flush-label",
+        "el": "button.buy-btn «Buy — 🍪 120,000»",
+        "detail": "text inset L 0.0 R 0.0px in a 169px box",
+        "excluded": null
+      },
+      {
+        "kind": "flush-label",
+        "el": "button.buy-btn «Buy — 🍪 5,000»",
+        "detail": "text inset L 0.0 R 0.0px in a 153px box",
+        "excluded": null
+      },
+      {
+        "kind": "flush-label",
+        "el": "button.buy-btn «Buy — 🍪 40,000»",
+        "detail": "text inset L 0.0 R 0.0px in a 162px box",
+        "excluded": null
+      }
+    ]
+  },
+  {
+    "state": "mid",
+    "size": "1440x900",
+    "view": "dialog:home",
+    "findings": [
+      {
+        "kind": "overflow-x",
+        "el": "button#console-factory.console__button «Diesel Factory»",
+        "detail": "content runs 3.2px past a 96px box",
+        "excluded": null
+      },
+      {
+        "kind": "escapes-clipper",
+        "el": "span.golden-rays",
+        "detail": "clipped by div.panel.cookie-hero «10COOKIE221.6 / secHold to click repeate»",
+        "excluded": "hero decoration drawn to spill past the cookie on purpose"
+      },
+      {
+        "kind": "escapes-clipper",
+        "el": "span.cookie-embers",
+        "detail": "clipped by div.panel.cookie-hero «10COOKIE221.6 / secHold to click repeate»",
+        "excluded": "hero decoration drawn to spill past the cookie on purpose"
+      },
+      {
+        "kind": "escapes-clipper",
+        "el": "p.cookie-hero__hint «Hold to click repeatedly»",
+        "detail": "clipped by div.panel.cookie-hero «10COOKIE221.6 / secHold to click repeate»",
+        "excluded": null
+      },
+      {
+        "kind": "escapes-clipper",
+        "el": "div.milk-tide__surface",
+        "detail": "clipped by div.stage «10COOKIE221.6 / secHold to click repeate»",
+        "excluded": "the milk tide is a decorative band drawn behind the hero"
+      },
+      {
+        "kind": "overflow-x",
+        "el": "span.milk-tide__sr «Malted Milk — 84% milk, poured by your a»",
+        "detail": "content runs 286.6px past a 1px box",
+        "excluded": "the milk tide is a decorative band drawn behind the hero"
+      },
+      {
+        "kind": "clipped-text",
+        "el": "span.milk-tide__sr «Malted Milk — 84% milk, poured by your a»",
+        "detail": "text cut at 1px, no ellipsis",
+        "excluded": "the milk tide is a decorative band drawn behind the hero"
+      },
+      {
+        "kind": "cut-mid-row",
+        "el": "section.home-cutaway «The houseKitchenFor saleWhere the whole »",
+        "detail": "card cut 249px with only 276px of scroll left",
+        "excluded": null
+      },
+      {
+        "kind": "cut-mid-row",
+        "el": "div.home-cutaway__grid «KitchenFor saleWhere the whole business »",
+        "detail": "card cut 231px with only 276px of scroll left",
+        "excluded": null
+      },
+      {
+        "kind": "cut-mid-row",
+        "el": "article.home-room «KitchenFor saleWhere the whole business »",
+        "detail": "card cut 231px with only 276px of scroll left",
+        "excluded": null
+      },
+      {
+        "kind": "flush-label",
+        "el": "span.title-bar__marquee «Material Cookie Clicker»",
+        "detail": "text inset L 0.0 R 0.0px in a 305px box",
+        "excluded": null
+      }
+    ]
+  },
+  {
+    "state": "mid",
+    "size": "1440x900",
+    "view": "dialog:achievements",
+    "findings": [
+      {
+        "kind": "overflow-x",
+        "el": "button#console-factory.console__button «Diesel Factory»",
+        "detail": "content runs 3.2px past a 96px box",
+        "excluded": null
+      },
+      {
+        "kind": "escapes-clipper",
+        "el": "span.golden-rays",
+        "detail": "clipped by div.panel.cookie-hero «10COOKIE221.6 / secHold to click repeate»",
+        "excluded": "hero decoration drawn to spill past the cookie on purpose"
+      },
+      {
+        "kind": "escapes-clipper",
+        "el": "span.cookie-embers",
+        "detail": "clipped by div.panel.cookie-hero «10COOKIE221.6 / secHold to click repeate»",
+        "excluded": "hero decoration drawn to spill past the cookie on purpose"
+      },
+      {
+        "kind": "escapes-clipper",
+        "el": "p.cookie-hero__hint «Hold to click repeatedly»",
+        "detail": "clipped by div.panel.cookie-hero «10COOKIE221.6 / secHold to click repeate»",
+        "excluded": null
+      },
+      {
+        "kind": "escapes-clipper",
+        "el": "div.milk-tide__surface",
+        "detail": "clipped by div.stage «10COOKIE221.6 / secHold to click repeate»",
+        "excluded": "the milk tide is a decorative band drawn behind the hero"
+      },
+      {
+        "kind": "overflow-x",
+        "el": "span.milk-tide__sr «Malted Milk — 84% milk, poured by your a»",
+        "detail": "content runs 286.6px past a 1px box",
+        "excluded": "the milk tide is a decorative band drawn behind the hero"
+      },
+      {
+        "kind": "clipped-text",
+        "el": "span.milk-tide__sr «Malted Milk — 84% milk, poured by your a»",
+        "detail": "text cut at 1px, no ellipsis",
+        "excluded": "the milk tide is a decorative band drawn behind the hero"
+      },
+      {
+        "kind": "flush-label",
+        "el": "span.title-bar__marquee «Material Cookie Clicker»",
+        "detail": "text inset L 0.0 R 0.0px in a 305px box",
+        "excluded": null
+      }
+    ]
+  },
+  {
+    "state": "mid",
+    "size": "1440x900",
+    "view": "dialog:tools",
+    "findings": [
+      {
+        "kind": "overflow-x",
+        "el": "button#console-factory.console__button «Diesel Factory»",
+        "detail": "content runs 3.2px past a 96px box",
+        "excluded": null
+      },
+      {
+        "kind": "escapes-clipper",
+        "el": "span.golden-rays",
+        "detail": "clipped by div.panel.cookie-hero «10COOKIE221.6 / secHold to click repeate»",
+        "excluded": "hero decoration drawn to spill past the cookie on purpose"
+      },
+      {
+        "kind": "escapes-clipper",
+        "el": "span.cookie-embers",
+        "detail": "clipped by div.panel.cookie-hero «10COOKIE221.6 / secHold to click repeate»",
+        "excluded": "hero decoration drawn to spill past the cookie on purpose"
+      },
+      {
+        "kind": "escapes-clipper",
+        "el": "p.cookie-hero__hint «Hold to click repeatedly»",
+        "detail": "clipped by div.panel.cookie-hero «10COOKIE221.6 / secHold to click repeate»",
+        "excluded": null
+      },
+      {
+        "kind": "escapes-clipper",
+        "el": "div.milk-tide__surface",
+        "detail": "clipped by div.stage «10COOKIE221.6 / secHold to click repeate»",
+        "excluded": "the milk tide is a decorative band drawn behind the hero"
+      },
+      {
+        "kind": "overflow-x",
+        "el": "span.milk-tide__sr «Malted Milk — 84% milk, poured by your a»",
+        "detail": "content runs 286.6px past a 1px box",
+        "excluded": "the milk tide is a decorative band drawn behind the hero"
+      },
+      {
+        "kind": "clipped-text",
+        "el": "span.milk-tide__sr «Malted Milk — 84% milk, poured by your a»",
+        "detail": "text cut at 1px, no ellipsis",
+        "excluded": "the milk tide is a decorative band drawn behind the hero"
+      },
+      {
+        "kind": "overflow-x",
+        "el": "span.hud-strip__more-text «What this toggle changes»",
+        "detail": "content runs 123.9px past a 1px box",
+        "excluded": null
+      },
+      {
+        "kind": "clipped-text",
+        "el": "span.hud-strip__more-text «What this toggle changes»",
+        "detail": "text cut at 1px, no ellipsis",
+        "excluded": null
+      },
+      {
+        "kind": "flush-label",
+        "el": "span.title-bar__marquee «Material Cookie Clicker»",
+        "detail": "text inset L 0.0 R 0.0px in a 305px box",
+        "excluded": null
+      },
+      {
+        "kind": "flush-label",
+        "el": "button.open-real-feature__button «Open it now»",
+        "detail": "text inset L 0.0 R -0.0px in a 97px box",
+        "excluded": null
+      },
+      {
+        "kind": "flush-label",
+        "el": "button.open-real-feature__button «Open it now»",
+        "detail": "text inset L -0.0 R -0.0px in a 97px box",
+        "excluded": null
+      },
+      {
+        "kind": "flush-label",
+        "el": "button.open-real-feature__button «Open it now»",
+        "detail": "text inset L 0.0 R -0.0px in a 97px box",
+        "excluded": null
+      },
+      {
+        "kind": "flush-label",
+        "el": "button.open-real-feature__button «Open it now»",
+        "detail": "text inset L -0.0 R -0.0px in a 97px box",
+        "excluded": null
+      },
+      {
+        "kind": "flush-label",
+        "el": "button.open-real-feature__button «Open it now»",
+        "detail": "text inset L 0.0 R -0.0px in a 97px box",
+        "excluded": null
+      },
+      {
+        "kind": "flush-label",
+        "el": "button.open-real-feature__button «Open it now»",
+        "detail": "text inset L -0.0 R -0.0px in a 97px box",
+        "excluded": null
+      },
+      {
+        "kind": "flush-label",
+        "el": "button.open-real-feature__button «Open it now»",
+        "detail": "text inset L 0.0 R -0.0px in a 97px box",
+        "excluded": null
+      },
+      {
+        "kind": "flush-label",
+        "el": "button.open-real-feature__button «Open it now»",
+        "detail": "text inset L -0.0 R -0.0px in a 97px box",
+        "excluded": null
+      },
+      {
+        "kind": "flush-label",
+        "el": "button.open-real-feature__button «Open it now»",
+        "detail": "text inset L 0.0 R -0.0px in a 97px box",
+        "excluded": null
+      },
+      {
+        "kind": "flush-label",
+        "el": "button.open-real-feature__button «Open it now»",
+        "detail": "text inset L -0.0 R -0.0px in a 97px box",
+        "excluded": null
+      },
+      {
+        "kind": "flush-label",
+        "el": "button.open-real-feature__button «Open it now»",
+        "detail": "text inset L 0.0 R -0.0px in a 97px box",
+        "excluded": null
+      },
+      {
+        "kind": "flush-label",
+        "el": "button.open-real-feature__button «Open it now»",
+        "detail": "text inset L -0.0 R -0.0px in a 97px box",
+        "excluded": null
+      },
+      {
+        "kind": "flush-label",
+        "el": "button.open-real-feature__button «Open it now»",
+        "detail": "text inset L 0.0 R -0.0px in a 97px box",
+        "excluded": null
+      },
+      {
+        "kind": "flush-label",
+        "el": "button.open-real-feature__button «Open it now»",
+        "detail": "text inset L -0.0 R -0.0px in a 97px box",
+        "excluded": null
+      },
+      {
+        "kind": "flush-label",
+        "el": "button.open-real-feature__button «Open it now»",
+        "detail": "text inset L 0.0 R -0.0px in a 97px box",
+        "excluded": null
+      },
+      {
+        "kind": "flush-label",
+        "el": "button.open-real-feature__button «Open it now»",
+        "detail": "text inset L -0.0 R -0.0px in a 97px box",
+        "excluded": null
+      },
+      {
+        "kind": "flush-label",
+        "el": "button.open-real-feature__button «Open it now»",
+        "detail": "text inset L 0.0 R -0.0px in a 97px box",
+        "excluded": null
+      },
+      {
+        "kind": "flush-label",
+        "el": "button.open-real-feature__button «Open it now»",
+        "detail": "text inset L -0.0 R -0.0px in a 97px box",
+        "excluded": null
+      },
+      {
+        "kind": "flush-label",
+        "el": "button.open-real-feature__button «Open it now»",
+        "detail": "text inset L 0.0 R -0.0px in a 97px box",
+        "excluded": null
+      },
+      {
+        "kind": "flush-label",
+        "el": "button.open-real-feature__button «Open it now»",
+        "detail": "text inset L -0.0 R -0.0px in a 97px box",
+        "excluded": null
+      }
+    ]
+  },
+  {
+    "state": "mid",
+    "size": "1440x900",
+    "view": "dialog:statistics",
+    "findings": [
+      {
+        "kind": "overflow-x",
+        "el": "button#console-factory.console__button «Diesel Factory»",
+        "detail": "content runs 3.2px past a 96px box",
+        "excluded": null
+      },
+      {
+        "kind": "escapes-clipper",
+        "el": "span.golden-rays",
+        "detail": "clipped by div.panel.cookie-hero «10COOKIE221.6 / secHold to click repeate»",
+        "excluded": "hero decoration drawn to spill past the cookie on purpose"
+      },
+      {
+        "kind": "escapes-clipper",
+        "el": "span.cookie-embers",
+        "detail": "clipped by div.panel.cookie-hero «10COOKIE221.6 / secHold to click repeate»",
+        "excluded": "hero decoration drawn to spill past the cookie on purpose"
+      },
+      {
+        "kind": "escapes-clipper",
+        "el": "p.cookie-hero__hint «Hold to click repeatedly»",
+        "detail": "clipped by div.panel.cookie-hero «10COOKIE221.6 / secHold to click repeate»",
+        "excluded": null
+      },
+      {
+        "kind": "escapes-clipper",
+        "el": "div.milk-tide__surface",
+        "detail": "clipped by div.stage «10COOKIE221.6 / secHold to click repeate»",
+        "excluded": "the milk tide is a decorative band drawn behind the hero"
+      },
+      {
+        "kind": "overflow-x",
+        "el": "span.milk-tide__sr «Malted Milk — 84% milk, poured by your a»",
+        "detail": "content runs 286.6px past a 1px box",
+        "excluded": "the milk tide is a decorative band drawn behind the hero"
+      },
+      {
+        "kind": "clipped-text",
+        "el": "span.milk-tide__sr «Malted Milk — 84% milk, poured by your a»",
+        "detail": "text cut at 1px, no ellipsis",
+        "excluded": "the milk tide is a decorative band drawn behind the hero"
+      },
+      {
+        "kind": "flush-label",
+        "el": "span.title-bar__marquee «Material Cookie Clicker»",
+        "detail": "text inset L 0.0 R 0.0px in a 305px box",
+        "excluded": null
+      }
+    ]
+  },
+  {
+    "state": "mid",
+    "size": "1440x900",
+    "view": "dialog:prestige",
+    "findings": [],
+    "note": "button not present in this state"
+  },
+  {
+    "state": "mid",
+    "size": "1440x900",
+    "view": "dialog:catalogue",
+    "findings": [
+      {
+        "kind": "overflow-x",
+        "el": "button#console-factory.console__button «Diesel Factory»",
+        "detail": "content runs 3.2px past a 96px box",
+        "excluded": null
+      },
+      {
+        "kind": "escapes-clipper",
+        "el": "span.golden-rays",
+        "detail": "clipped by div.panel.cookie-hero «10COOKIE221.6 / secHold to click repeate»",
+        "excluded": "hero decoration drawn to spill past the cookie on purpose"
+      },
+      {
+        "kind": "escapes-clipper",
+        "el": "span.cookie-embers",
+        "detail": "clipped by div.panel.cookie-hero «10COOKIE221.6 / secHold to click repeate»",
+        "excluded": "hero decoration drawn to spill past the cookie on purpose"
+      },
+      {
+        "kind": "escapes-clipper",
+        "el": "p.cookie-hero__hint «Hold to click repeatedly»",
+        "detail": "clipped by div.panel.cookie-hero «10COOKIE221.6 / secHold to click repeate»",
+        "excluded": null
+      },
+      {
+        "kind": "escapes-clipper",
+        "el": "div.milk-tide__surface",
+        "detail": "clipped by div.stage «10COOKIE221.6 / secHold to click repeate»",
+        "excluded": "the milk tide is a decorative band drawn behind the hero"
+      },
+      {
+        "kind": "overflow-x",
+        "el": "span.milk-tide__sr «Malted Milk — 84% milk, poured by your a»",
+        "detail": "content runs 286.6px past a 1px box",
+        "excluded": "the milk tide is a decorative band drawn behind the hero"
+      },
+      {
+        "kind": "clipped-text",
+        "el": "span.milk-tide__sr «Malted Milk — 84% milk, poured by your a»",
+        "detail": "text cut at 1px, no ellipsis",
+        "excluded": "the milk tide is a decorative band drawn behind the hero"
+      },
+      {
+        "kind": "flush-label",
+        "el": "span.title-bar__marquee «Material Cookie Clicker»",
+        "detail": "text inset L 0.0 R 0.0px in a 305px box",
+        "excluded": null
+      }
+    ]
+  },
+  {
+    "state": "mid",
+    "size": "1440x900",
+    "view": "dialog:settings",
+    "findings": [
+      {
+        "kind": "overflow-x",
+        "el": "button#console-factory.console__button «Diesel Factory»",
+        "detail": "content runs 3.2px past a 96px box",
+        "excluded": null
+      },
+      {
+        "kind": "escapes-clipper",
+        "el": "span.golden-rays",
+        "detail": "clipped by div.panel.cookie-hero «10COOKIE221.6 / secHold to click repeate»",
+        "excluded": "hero decoration drawn to spill past the cookie on purpose"
+      },
+      {
+        "kind": "escapes-clipper",
+        "el": "span.cookie-embers",
+        "detail": "clipped by div.panel.cookie-hero «10COOKIE221.6 / secHold to click repeate»",
+        "excluded": "hero decoration drawn to spill past the cookie on purpose"
+      },
+      {
+        "kind": "escapes-clipper",
+        "el": "p.cookie-hero__hint «Hold to click repeatedly»",
+        "detail": "clipped by div.panel.cookie-hero «10COOKIE221.6 / secHold to click repeate»",
+        "excluded": null
+      },
+      {
+        "kind": "escapes-clipper",
+        "el": "div.milk-tide__surface",
+        "detail": "clipped by div.stage «10COOKIE221.6 / secHold to click repeate»",
+        "excluded": "the milk tide is a decorative band drawn behind the hero"
+      },
+      {
+        "kind": "overflow-x",
+        "el": "span.milk-tide__sr «Malted Milk — 84% milk, poured by your a»",
+        "detail": "content runs 286.6px past a 1px box",
+        "excluded": "the milk tide is a decorative band drawn behind the hero"
+      },
+      {
+        "kind": "clipped-text",
+        "el": "span.milk-tide__sr «Malted Milk — 84% milk, poured by your a»",
+        "detail": "text cut at 1px, no ellipsis",
+        "excluded": "the milk tide is a decorative band drawn behind the hero"
+      },
+      {
+        "kind": "flush-label",
+        "el": "span.title-bar__marquee «Material Cookie Clicker»",
+        "detail": "text inset L 0.0 R 0.0px in a 305px box",
+        "excluded": null
+      }
+    ]
+  },
+  {
+    "state": "mid",
+    "size": "1232x860",
+    "view": "surface",
+    "findings": [
+      {
+        "kind": "overflow-x",
+        "el": "button#console-factory.console__button «Diesel Factory»",
+        "detail": "content runs 3.2px past a 96px box",
+        "excluded": null
+      },
+      {
+        "kind": "escapes-clipper",
+        "el": "span.golden-rays",
+        "detail": "clipped by div.panel.cookie-hero «10COOKIE221.6 / secHold to click repeate»",
+        "excluded": "hero decoration drawn to spill past the cookie on purpose"
+      },
+      {
+        "kind": "escapes-clipper",
+        "el": "span.cookie-embers",
+        "detail": "clipped by div.panel.cookie-hero «10COOKIE221.6 / secHold to click repeate»",
+        "excluded": "hero decoration drawn to spill past the cookie on purpose"
+      },
+      {
+        "kind": "escapes-clipper",
+        "el": "p.cookie-hero__hint «Hold to click repeatedly»",
+        "detail": "clipped by div.panel.cookie-hero «10COOKIE221.6 / secHold to click repeate»",
+        "excluded": null
+      },
+      {
+        "kind": "escapes-clipper",
+        "el": "div.milk-tide__surface",
+        "detail": "clipped by div.stage «10COOKIE221.6 / secHold to click repeate»",
+        "excluded": "the milk tide is a decorative band drawn behind the hero"
+      },
+      {
+        "kind": "overflow-x",
+        "el": "span.milk-tide__sr «Malted Milk — 84% milk, poured by your a»",
+        "detail": "content runs 286.6px past a 1px box",
+        "excluded": "the milk tide is a decorative band drawn behind the hero"
+      },
+      {
+        "kind": "clipped-text",
+        "el": "span.milk-tide__sr «Malted Milk — 84% milk, poured by your a»",
+        "detail": "text cut at 1px, no ellipsis",
+        "excluded": "the milk tide is a decorative band drawn behind the hero"
+      },
+      {
+        "kind": "flush-label",
+        "el": "span.title-bar__marquee «Material Cookie Clicker»",
+        "detail": "text inset L 0.0 R 0.0px in a 305px box",
+        "excluded": null
+      }
+    ]
+  },
+  {
+    "state": "mid",
+    "size": "1232x860",
+    "view": "dialog:factory",
+    "findings": [
+      {
+        "kind": "overflow-x",
+        "el": "button#console-factory.console__button «Diesel Factory»",
+        "detail": "content runs 3.2px past a 96px box",
+        "excluded": null
+      },
+      {
+        "kind": "escapes-clipper",
+        "el": "span.golden-rays",
+        "detail": "clipped by div.panel.cookie-hero «10COOKIE221.6 / secHold to click repeate»",
+        "excluded": "hero decoration drawn to spill past the cookie on purpose"
+      },
+      {
+        "kind": "escapes-clipper",
+        "el": "span.cookie-embers",
+        "detail": "clipped by div.panel.cookie-hero «10COOKIE221.6 / secHold to click repeate»",
+        "excluded": "hero decoration drawn to spill past the cookie on purpose"
+      },
+      {
+        "kind": "escapes-clipper",
+        "el": "p.cookie-hero__hint «Hold to click repeatedly»",
+        "detail": "clipped by div.panel.cookie-hero «10COOKIE221.6 / secHold to click repeate»",
+        "excluded": null
+      },
+      {
+        "kind": "escapes-clipper",
+        "el": "div.milk-tide__surface",
+        "detail": "clipped by div.stage «10COOKIE221.6 / secHold to click repeate»",
+        "excluded": "the milk tide is a decorative band drawn behind the hero"
+      },
+      {
+        "kind": "overflow-x",
+        "el": "span.milk-tide__sr «Malted Milk — 84% milk, poured by your a»",
+        "detail": "content runs 286.6px past a 1px box",
+        "excluded": "the milk tide is a decorative band drawn behind the hero"
+      },
+      {
+        "kind": "clipped-text",
+        "el": "span.milk-tide__sr «Malted Milk — 84% milk, poured by your a»",
+        "detail": "text cut at 1px, no ellipsis",
+        "excluded": "the milk tide is a decorative band drawn behind the hero"
+      },
+      {
+        "kind": "flush-label",
+        "el": "span.title-bar__marquee «Material Cookie Clicker»",
+        "detail": "text inset L 0.0 R 0.0px in a 305px box",
+        "excluded": null
+      },
+      {
+        "kind": "flush-label",
+        "el": "button.buy-btn «Buy — 🍪 2,000»",
+        "detail": "text inset L 0.0 R 0.0px in a 153px box",
+        "excluded": null
+      },
+      {
+        "kind": "flush-label",
+        "el": "button.buy-btn «Buy — 🍪 24,000»",
+        "detail": "text inset L 0.0 R 0.0px in a 162px box",
+        "excluded": null
+      },
+      {
+        "kind": "flush-label",
+        "el": "button.buy-btn «Buy — 🍪 8,000»",
+        "detail": "text inset L 0.0 R 0.0px in a 153px box",
+        "excluded": null
+      },
+      {
+        "kind": "flush-label",
+        "el": "button.buy-btn «Buy — 🍪 120,000»",
+        "detail": "text inset L 0.0 R 0.0px in a 169px box",
+        "excluded": null
+      },
+      {
+        "kind": "flush-label",
+        "el": "button.buy-btn «Buy — 🍪 5,000»",
+        "detail": "text inset L 0.0 R 0.0px in a 153px box",
+        "excluded": null
+      },
+      {
+        "kind": "flush-label",
+        "el": "button.buy-btn «Buy — 🍪 40,000»",
+        "detail": "text inset L 0.0 R 0.0px in a 162px box",
+        "excluded": null
+      }
+    ]
+  },
+  {
+    "state": "mid",
+    "size": "1232x860",
+    "view": "dialog:home",
+    "findings": [
+      {
+        "kind": "overflow-x",
+        "el": "button#console-factory.console__button «Diesel Factory»",
+        "detail": "content runs 3.2px past a 96px box",
+        "excluded": null
+      },
+      {
+        "kind": "escapes-clipper",
+        "el": "span.golden-rays",
+        "detail": "clipped by div.panel.cookie-hero «10COOKIE221.6 / secHold to click repeate»",
+        "excluded": "hero decoration drawn to spill past the cookie on purpose"
+      },
+      {
+        "kind": "escapes-clipper",
+        "el": "span.cookie-embers",
+        "detail": "clipped by div.panel.cookie-hero «10COOKIE221.6 / secHold to click repeate»",
+        "excluded": "hero decoration drawn to spill past the cookie on purpose"
+      },
+      {
+        "kind": "escapes-clipper",
+        "el": "p.cookie-hero__hint «Hold to click repeatedly»",
+        "detail": "clipped by div.panel.cookie-hero «10COOKIE221.6 / secHold to click repeate»",
+        "excluded": null
+      },
+      {
+        "kind": "escapes-clipper",
+        "el": "div.milk-tide__surface",
+        "detail": "clipped by div.stage «10COOKIE221.6 / secHold to click repeate»",
+        "excluded": "the milk tide is a decorative band drawn behind the hero"
+      },
+      {
+        "kind": "overflow-x",
+        "el": "span.milk-tide__sr «Malted Milk — 84% milk, poured by your a»",
+        "detail": "content runs 286.6px past a 1px box",
+        "excluded": "the milk tide is a decorative band drawn behind the hero"
+      },
+      {
+        "kind": "clipped-text",
+        "el": "span.milk-tide__sr «Malted Milk — 84% milk, poured by your a»",
+        "detail": "text cut at 1px, no ellipsis",
+        "excluded": "the milk tide is a decorative band drawn behind the hero"
+      },
+      {
+        "kind": "cut-mid-row",
+        "el": "section.home-cutaway «The houseKitchenFor saleWhere the whole »",
+        "detail": "card cut 289px with only 316px of scroll left",
+        "excluded": null
+      },
+      {
+        "kind": "flush-label",
+        "el": "span.title-bar__marquee «Material Cookie Clicker»",
+        "detail": "text inset L 0.0 R 0.0px in a 305px box",
+        "excluded": null
+      }
+    ]
+  },
+  {
+    "state": "mid",
+    "size": "1232x860",
+    "view": "dialog:achievements",
+    "findings": [
+      {
+        "kind": "overflow-x",
+        "el": "button#console-factory.console__button «Diesel Factory»",
+        "detail": "content runs 3.2px past a 96px box",
+        "excluded": null
+      },
+      {
+        "kind": "escapes-clipper",
+        "el": "span.golden-rays",
+        "detail": "clipped by div.panel.cookie-hero «10COOKIE221.6 / secHold to click repeate»",
+        "excluded": "hero decoration drawn to spill past the cookie on purpose"
+      },
+      {
+        "kind": "escapes-clipper",
+        "el": "span.cookie-embers",
+        "detail": "clipped by div.panel.cookie-hero «10COOKIE221.6 / secHold to click repeate»",
+        "excluded": "hero decoration drawn to spill past the cookie on purpose"
+      },
+      {
+        "kind": "escapes-clipper",
+        "el": "p.cookie-hero__hint «Hold to click repeatedly»",
+        "detail": "clipped by div.panel.cookie-hero «10COOKIE221.6 / secHold to click repeate»",
+        "excluded": null
+      },
+      {
+        "kind": "escapes-clipper",
+        "el": "div.milk-tide__surface",
+        "detail": "clipped by div.stage «10COOKIE221.6 / secHold to click repeate»",
+        "excluded": "the milk tide is a decorative band drawn behind the hero"
+      },
+      {
+        "kind": "overflow-x",
+        "el": "span.milk-tide__sr «Malted Milk — 84% milk, poured by your a»",
+        "detail": "content runs 286.6px past a 1px box",
+        "excluded": "the milk tide is a decorative band drawn behind the hero"
+      },
+      {
+        "kind": "clipped-text",
+        "el": "span.milk-tide__sr «Malted Milk — 84% milk, poured by your a»",
+        "detail": "text cut at 1px, no ellipsis",
+        "excluded": "the milk tide is a decorative band drawn behind the hero"
+      },
+      {
+        "kind": "flush-label",
+        "el": "span.title-bar__marquee «Material Cookie Clicker»",
+        "detail": "text inset L 0.0 R 0.0px in a 305px box",
+        "excluded": null
+      }
+    ]
+  },
+  {
+    "state": "mid",
+    "size": "1232x860",
+    "view": "dialog:tools",
+    "findings": [
+      {
+        "kind": "overflow-x",
+        "el": "button#console-factory.console__button «Diesel Factory»",
+        "detail": "content runs 3.2px past a 96px box",
+        "excluded": null
+      },
+      {
+        "kind": "escapes-clipper",
+        "el": "span.golden-rays",
+        "detail": "clipped by div.panel.cookie-hero «10COOKIE221.6 / secHold to click repeate»",
+        "excluded": "hero decoration drawn to spill past the cookie on purpose"
+      },
+      {
+        "kind": "escapes-clipper",
+        "el": "span.cookie-embers",
+        "detail": "clipped by div.panel.cookie-hero «10COOKIE221.6 / secHold to click repeate»",
+        "excluded": "hero decoration drawn to spill past the cookie on purpose"
+      },
+      {
+        "kind": "escapes-clipper",
+        "el": "p.cookie-hero__hint «Hold to click repeatedly»",
+        "detail": "clipped by div.panel.cookie-hero «10COOKIE221.6 / secHold to click repeate»",
+        "excluded": null
+      },
+      {
+        "kind": "escapes-clipper",
+        "el": "div.milk-tide__surface",
+        "detail": "clipped by div.stage «10COOKIE221.6 / secHold to click repeate»",
+        "excluded": "the milk tide is a decorative band drawn behind the hero"
+      },
+      {
+        "kind": "overflow-x",
+        "el": "span.milk-tide__sr «Malted Milk — 84% milk, poured by your a»",
+        "detail": "content runs 286.6px past a 1px box",
+        "excluded": "the milk tide is a decorative band drawn behind the hero"
+      },
+      {
+        "kind": "clipped-text",
+        "el": "span.milk-tide__sr «Malted Milk — 84% milk, poured by your a»",
+        "detail": "text cut at 1px, no ellipsis",
+        "excluded": "the milk tide is a decorative band drawn behind the hero"
+      },
+      {
+        "kind": "overflow-x",
+        "el": "span.hud-strip__more-text «What this toggle changes»",
+        "detail": "content runs 123.9px past a 1px box",
+        "excluded": null
+      },
+      {
+        "kind": "clipped-text",
+        "el": "span.hud-strip__more-text «What this toggle changes»",
+        "detail": "text cut at 1px, no ellipsis",
+        "excluded": null
+      },
+      {
+        "kind": "flush-label",
+        "el": "span.title-bar__marquee «Material Cookie Clicker»",
+        "detail": "text inset L 0.0 R 0.0px in a 305px box",
+        "excluded": null
+      },
+      {
+        "kind": "flush-label",
+        "el": "button.open-real-feature__button «Open it now»",
+        "detail": "text inset L 0.0 R -0.0px in a 97px box",
+        "excluded": null
+      },
+      {
+        "kind": "flush-label",
+        "el": "button.open-real-feature__button «Open it now»",
+        "detail": "text inset L -0.0 R 0.0px in a 97px box",
+        "excluded": null
+      },
+      {
+        "kind": "flush-label",
+        "el": "button.open-real-feature__button «Open it now»",
+        "detail": "text inset L 0.0 R -0.0px in a 97px box",
+        "excluded": null
+      },
+      {
+        "kind": "flush-label",
+        "el": "button.open-real-feature__button «Open it now»",
+        "detail": "text inset L -0.0 R 0.0px in a 97px box",
+        "excluded": null
+      },
+      {
+        "kind": "flush-label",
+        "el": "button.open-real-feature__button «Open it now»",
+        "detail": "text inset L 0.0 R -0.0px in a 97px box",
+        "excluded": null
+      },
+      {
+        "kind": "flush-label",
+        "el": "button.open-real-feature__button «Open it now»",
+        "detail": "text inset L -0.0 R 0.0px in a 97px box",
+        "excluded": null
+      },
+      {
+        "kind": "flush-label",
+        "el": "button.open-real-feature__button «Open it now»",
+        "detail": "text inset L 0.0 R -0.0px in a 97px box",
+        "excluded": null
+      },
+      {
+        "kind": "flush-label",
+        "el": "button.open-real-feature__button «Open it now»",
+        "detail": "text inset L -0.0 R 0.0px in a 97px box",
+        "excluded": null
+      },
+      {
+        "kind": "flush-label",
+        "el": "button.open-real-feature__button «Open it now»",
+        "detail": "text inset L 0.0 R -0.0px in a 97px box",
+        "excluded": null
+      },
+      {
+        "kind": "flush-label",
+        "el": "button.open-real-feature__button «Open it now»",
+        "detail": "text inset L -0.0 R 0.0px in a 97px box",
+        "excluded": null
+      },
+      {
+        "kind": "flush-label",
+        "el": "button.open-real-feature__button «Open it now»",
+        "detail": "text inset L 0.0 R -0.0px in a 97px box",
+        "excluded": null
+      },
+      {
+        "kind": "flush-label",
+        "el": "button.open-real-feature__button «Open it now»",
+        "detail": "text inset L -0.0 R 0.0px in a 97px box",
+        "excluded": null
+      },
+      {
+        "kind": "flush-label",
+        "el": "button.open-real-feature__button «Open it now»",
+        "detail": "text inset L 0.0 R -0.0px in a 97px box",
+        "excluded": null
+      },
+      {
+        "kind": "flush-label",
+        "el": "button.open-real-feature__button «Open it now»",
+        "detail": "text inset L -0.0 R 0.0px in a 97px box",
+        "excluded": null
+      },
+      {
+        "kind": "flush-label",
+        "el": "button.open-real-feature__button «Open it now»",
+        "detail": "text inset L 0.0 R -0.0px in a 97px box",
+        "excluded": null
+      },
+      {
+        "kind": "flush-label",
+        "el": "button.open-real-feature__button «Open it now»",
+        "detail": "text inset L -0.0 R 0.0px in a 97px box",
+        "excluded": null
+      },
+      {
+        "kind": "flush-label",
+        "el": "button.open-real-feature__button «Open it now»",
+        "detail": "text inset L 0.0 R -0.0px in a 97px box",
+        "excluded": null
+      },
+      {
+        "kind": "flush-label",
+        "el": "button.open-real-feature__button «Open it now»",
+        "detail": "text inset L -0.0 R 0.0px in a 97px box",
+        "excluded": null
+      },
+      {
+        "kind": "flush-label",
+        "el": "button.open-real-feature__button «Open it now»",
+        "detail": "text inset L 0.0 R -0.0px in a 97px box",
+        "excluded": null
+      },
+      {
+        "kind": "flush-label",
+        "el": "button.open-real-feature__button «Open it now»",
+        "detail": "text inset L -0.0 R 0.0px in a 97px box",
+        "excluded": null
+      }
+    ]
+  },
+  {
+    "state": "mid",
+    "size": "1232x860",
+    "view": "dialog:statistics",
+    "findings": [
+      {
+        "kind": "overflow-x",
+        "el": "button#console-factory.console__button «Diesel Factory»",
+        "detail": "content runs 3.2px past a 96px box",
+        "excluded": null
+      },
+      {
+        "kind": "escapes-clipper",
+        "el": "span.cookie-embers",
+        "detail": "clipped by div.panel.cookie-hero «COOKIE88.64 / secHold to click repeatedl»",
+        "excluded": "hero decoration drawn to spill past the cookie on purpose"
+      },
+      {
+        "kind": "escapes-clipper",
+        "el": "p.cookie-hero__hint «Hold to click repeatedly»",
+        "detail": "clipped by div.panel.cookie-hero «COOKIE88.64 / secHold to click repeatedl»",
+        "excluded": null
+      },
+      {
+        "kind": "escapes-clipper",
+        "el": "div.milk-tide__surface",
+        "detail": "clipped by div.stage «▪Oven HiccupCOOKIE88.64 / secHold to cli»",
+        "excluded": "the milk tide is a decorative band drawn behind the hero"
+      },
+      {
+        "kind": "overflow-x",
+        "el": "span.milk-tide__sr «Malted Milk — 84% milk, poured by your a»",
+        "detail": "content runs 286.6px past a 1px box",
+        "excluded": "the milk tide is a decorative band drawn behind the hero"
+      },
+      {
+        "kind": "clipped-text",
+        "el": "span.milk-tide__sr «Malted Milk — 84% milk, poured by your a»",
+        "detail": "text cut at 1px, no ellipsis",
+        "excluded": "the milk tide is a decorative band drawn behind the hero"
+      },
+      {
+        "kind": "flush-label",
+        "el": "span.title-bar__marquee «Material Cookie Clicker»",
+        "detail": "text inset L 0.0 R 0.0px in a 305px box",
+        "excluded": null
+      }
+    ]
+  },
+  {
+    "state": "mid",
+    "size": "1232x860",
+    "view": "dialog:prestige",
+    "findings": [],
+    "note": "button not present in this state"
+  },
+  {
+    "state": "mid",
+    "size": "1232x860",
+    "view": "dialog:catalogue",
+    "findings": [
+      {
+        "kind": "overflow-x",
+        "el": "button#console-factory.console__button «Diesel Factory»",
+        "detail": "content runs 3.2px past a 96px box",
+        "excluded": null
+      },
+      {
+        "kind": "escapes-clipper",
+        "el": "span.cookie-embers",
+        "detail": "clipped by div.panel.cookie-hero «COOKIE88.64 / secHold to click repeatedl»",
+        "excluded": "hero decoration drawn to spill past the cookie on purpose"
+      },
+      {
+        "kind": "escapes-clipper",
+        "el": "p.cookie-hero__hint «Hold to click repeatedly»",
+        "detail": "clipped by div.panel.cookie-hero «COOKIE88.64 / secHold to click repeatedl»",
+        "excluded": null
+      },
+      {
+        "kind": "escapes-clipper",
+        "el": "div.milk-tide__surface",
+        "detail": "clipped by div.stage «▪Oven HiccupCOOKIE88.64 / secHold to cli»",
+        "excluded": "the milk tide is a decorative band drawn behind the hero"
+      },
+      {
+        "kind": "overflow-x",
+        "el": "span.milk-tide__sr «Malted Milk — 84% milk, poured by your a»",
+        "detail": "content runs 286.6px past a 1px box",
+        "excluded": "the milk tide is a decorative band drawn behind the hero"
+      },
+      {
+        "kind": "clipped-text",
+        "el": "span.milk-tide__sr «Malted Milk — 84% milk, poured by your a»",
+        "detail": "text cut at 1px, no ellipsis",
+        "excluded": "the milk tide is a decorative band drawn behind the hero"
+      },
+      {
+        "kind": "flush-label",
+        "el": "span.title-bar__marquee «Material Cookie Clicker»",
+        "detail": "text inset L 0.0 R 0.0px in a 305px box",
+        "excluded": null
+      }
+    ]
+  },
+  {
+    "state": "mid",
+    "size": "1232x860",
+    "view": "dialog:settings",
+    "findings": [
+      {
+        "kind": "overflow-x",
+        "el": "button#console-factory.console__button «Diesel Factory»",
+        "detail": "content runs 3.2px past a 96px box",
+        "excluded": null
+      },
+      {
+        "kind": "escapes-clipper",
+        "el": "span.cookie-embers",
+        "detail": "clipped by div.panel.cookie-hero «COOKIE88.64 / secHold to click repeatedl»",
+        "excluded": "hero decoration drawn to spill past the cookie on purpose"
+      },
+      {
+        "kind": "escapes-clipper",
+        "el": "p.cookie-hero__hint «Hold to click repeatedly»",
+        "detail": "clipped by div.panel.cookie-hero «COOKIE88.64 / secHold to click repeatedl»",
+        "excluded": null
+      },
+      {
+        "kind": "escapes-clipper",
+        "el": "div.milk-tide__surface",
+        "detail": "clipped by div.stage «▪Oven HiccupCOOKIE88.64 / secHold to cli»",
+        "excluded": "the milk tide is a decorative band drawn behind the hero"
+      },
+      {
+        "kind": "overflow-x",
+        "el": "span.milk-tide__sr «Malted Milk — 84% milk, poured by your a»",
+        "detail": "content runs 286.6px past a 1px box",
+        "excluded": "the milk tide is a decorative band drawn behind the hero"
+      },
+      {
+        "kind": "clipped-text",
+        "el": "span.milk-tide__sr «Malted Milk — 84% milk, poured by your a»",
+        "detail": "text cut at 1px, no ellipsis",
+        "excluded": "the milk tide is a decorative band drawn behind the hero"
+      },
+      {
+        "kind": "flush-label",
+        "el": "span.title-bar__marquee «Material Cookie Clicker»",
+        "detail": "text inset L 0.0 R 0.0px in a 305px box",
+        "excluded": null
+      }
+    ]
+  },
+  {
+    "state": "mid",
+    "size": "1000x720",
+    "view": "surface",
+    "findings": [
+      {
+        "kind": "overflow-x",
+        "el": "div.cabinet-head «Cookies141,466Per second88.64Per click1▪»",
+        "detail": "content runs 72.8px past a 939px box",
+        "excluded": null
+      },
+      {
+        "kind": "escapes-viewport",
+        "el": "div.hud «Cookies141,466Per second88.64Per click1▪»",
+        "detail": "{\"l\":31,\"t\":75,\"r\":1042,\"b\":170,\"vw\":1000,\"vh\":720}",
+        "excluded": null
+      },
+      {
+        "kind": "escapes-clipper",
+        "el": "div.hud «Cookies141,466Per second88.64Per click1▪»",
+        "detail": "clipped by div.cabinet «Cookies141,466Per second88.64Per click1▪»",
+        "excluded": null
+      },
+      {
+        "kind": "overflow-x",
+        "el": "span.hud__key «Per second»",
+        "detail": "content runs 3.2px past a 83px box",
+        "excluded": null
+      },
+      {
+        "kind": "overflow-x",
+        "el": "div.event-indicator.event-indicator--clot.event-indicator--setback «▪Oven Hiccup26s»",
+        "detail": "content runs 25.1px past a 214px box",
+        "excluded": null
+      },
+      {
+        "kind": "escapes-clipper",
+        "el": "div.raid-supplies «Raid suppliesWhack Pass2 / 316,000,000Bi»",
+        "detail": "clipped by div.cabinet «Cookies141,466Per second88.64Per click1▪»",
+        "excluded": null
+      },
+      {
+        "kind": "escapes-clipper",
+        "el": "span.raid-supplies__title «Raid supplies»",
+        "detail": "clipped by div.cabinet «Cookies141,466Per second88.64Per click1▪»",
+        "excluded": null
+      },
+      {
+        "kind": "overflow-x",
+        "el": "ul.raid-supplies__list «Whack Pass2 / 316,000,000Bigger Whack1 /»",
+        "detail": "content runs 51.0px past a 255px box",
+        "excluded": null
+      },
+      {
+        "kind": "escapes-clipper",
+        "el": "ul.raid-supplies__list «Whack Pass2 / 316,000,000Bigger Whack1 /»",
+        "detail": "clipped by div.cabinet «Cookies141,466Per second88.64Per click1▪»",
+        "excluded": null
+      },
+      {
+        "kind": "escapes-clipper",
+        "el": "li «Half-HP Whack1 / 310,000,000»",
+        "detail": "clipped by div.cabinet «Cookies141,466Per second88.64Per click1▪»",
+        "excluded": null
+      },
+      {
+        "kind": "escapes-clipper",
+        "el": "button.raid-supplies__buy «Half-HP Whack1 / 310,000,000»",
+        "detail": "clipped by div.cabinet «Cookies141,466Per second88.64Per click1▪»",
+        "excluded": null
+      },
+      {
+        "kind": "escapes-clipper",
+        "el": "span.raid-supplies__name «Half-HP Whack»",
+        "detail": "clipped by div.cabinet «Cookies141,466Per second88.64Per click1▪»",
+        "excluded": null
+      },
+      {
+        "kind": "escapes-clipper",
+        "el": "span.raid-supplies__stock «1 / 3»",
+        "detail": "clipped by div.cabinet «Cookies141,466Per second88.64Per click1▪»",
+        "excluded": null
+      },
+      {
+        "kind": "escapes-clipper",
+        "el": "span.raid-supplies__price «10,000,000»",
+        "detail": "clipped by div.cabinet «Cookies141,466Per second88.64Per click1▪»",
+        "excluded": null
+      },
+      {
+        "kind": "overflow-x",
+        "el": "button#console-factory.console__button «Diesel Factory»",
+        "detail": "content runs 3.2px past a 96px box",
+        "excluded": null
+      },
+      {
+        "kind": "escapes-clipper",
+        "el": "span.cookie-embers",
+        "detail": "clipped by div.panel.cookie-hero «COOKIE88.64 / secHold to click repeatedl»",
+        "excluded": "hero decoration drawn to spill past the cookie on purpose"
+      },
+      {
+        "kind": "escapes-clipper",
+        "el": "p.cookie-hero__hint «Hold to click repeatedly»",
+        "detail": "clipped by div.panel.cookie-hero «COOKIE88.64 / secHold to click repeatedl»",
+        "excluded": null
+      },
+      {
+        "kind": "escapes-clipper",
+        "el": "section.diesel-depot.diesel-depot--status «▪Diesel DepotDiesel in the tanks0 LLitre»",
+        "detail": "clipped by section.panel.shop-rail «Shop商店🔍⚙▪Cursor+0.1/sec each · 每個 +0.12»",
+        "excluded": null
+      },
+      {
+        "kind": "escapes-clipper",
+        "el": "div.milk-tide__surface",
+        "detail": "clipped by div.stage «▪Oven HiccupCOOKIE88.64 / secHold to cli»",
+        "excluded": "the milk tide is a decorative band drawn behind the hero"
+      },
+      {
+        "kind": "overflow-x",
+        "el": "span.milk-tide__sr «Malted Milk — 84% milk, poured by your a»",
+        "detail": "content runs 261.3px past a 1px box",
+        "excluded": "the milk tide is a decorative band drawn behind the hero"
+      },
+      {
+        "kind": "clipped-text",
+        "el": "span.milk-tide__sr «Malted Milk — 84% milk, poured by your a»",
+        "detail": "text cut at 1px, no ellipsis",
+        "excluded": "the milk tide is a decorative band drawn behind the hero"
+      },
+      {
+        "kind": "flush-label",
+        "el": "span.title-bar__marquee «Material Cookie Clicker»",
+        "detail": "text inset L 0.0 R 0.0px in a 305px box",
+        "excluded": null
+      }
+    ]
+  },
+  {
+    "state": "mid",
+    "size": "1000x720",
+    "view": "dialog:factory",
+    "findings": [
+      {
+        "kind": "overflow-x",
+        "el": "div.cabinet-head «Cookies141,520Per second88.64Per click1▪»",
+        "detail": "content runs 72.8px past a 939px box",
+        "excluded": null
+      },
+      {
+        "kind": "escapes-viewport",
+        "el": "div.hud «Cookies141,520Per second88.64Per click1▪»",
+        "detail": "{\"l\":31,\"t\":75,\"r\":1042,\"b\":170,\"vw\":1000,\"vh\":720}",
+        "excluded": null
+      },
+      {
+        "kind": "escapes-clipper",
+        "el": "div.hud «Cookies141,520Per second88.64Per click1▪»",
+        "detail": "clipped by div.cabinet «Cookies141,520Per second88.64Per click1▪»",
+        "excluded": null
+      },
+      {
+        "kind": "overflow-x",
+        "el": "span.hud__key «Per second»",
+        "detail": "content runs 3.2px past a 83px box",
+        "excluded": null
+      },
+      {
+        "kind": "overflow-x",
+        "el": "div.event-indicator.event-indicator--clot.event-indicator--setback «▪Oven Hiccup25s»",
+        "detail": "content runs 25.1px past a 214px box",
+        "excluded": null
+      },
+      {
+        "kind": "escapes-clipper",
+        "el": "div.raid-supplies «Raid suppliesWhack Pass2 / 316,000,000Bi»",
+        "detail": "clipped by div.cabinet «Cookies141,520Per second88.64Per click1▪»",
+        "excluded": null
+      },
+      {
+        "kind": "escapes-clipper",
+        "el": "span.raid-supplies__title «Raid supplies»",
+        "detail": "clipped by div.cabinet «Cookies141,520Per second88.64Per click1▪»",
+        "excluded": null
+      },
+      {
+        "kind": "overflow-x",
+        "el": "ul.raid-supplies__list «Whack Pass2 / 316,000,000Bigger Whack1 /»",
+        "detail": "content runs 51.0px past a 255px box",
+        "excluded": null
+      },
+      {
+        "kind": "escapes-clipper",
+        "el": "ul.raid-supplies__list «Whack Pass2 / 316,000,000Bigger Whack1 /»",
+        "detail": "clipped by div.cabinet «Cookies141,520Per second88.64Per click1▪»",
+        "excluded": null
+      },
+      {
+        "kind": "escapes-clipper",
+        "el": "li «Half-HP Whack1 / 310,000,000»",
+        "detail": "clipped by div.cabinet «Cookies141,520Per second88.64Per click1▪»",
+        "excluded": null
+      },
+      {
+        "kind": "escapes-clipper",
+        "el": "button.raid-supplies__buy «Half-HP Whack1 / 310,000,000»",
+        "detail": "clipped by div.cabinet «Cookies141,520Per second88.64Per click1▪»",
+        "excluded": null
+      },
+      {
+        "kind": "escapes-clipper",
+        "el": "span.raid-supplies__name «Half-HP Whack»",
+        "detail": "clipped by div.cabinet «Cookies141,520Per second88.64Per click1▪»",
+        "excluded": null
+      },
+      {
+        "kind": "escapes-clipper",
+        "el": "span.raid-supplies__stock «1 / 3»",
+        "detail": "clipped by div.cabinet «Cookies141,520Per second88.64Per click1▪»",
+        "excluded": null
+      },
+      {
+        "kind": "escapes-clipper",
+        "el": "span.raid-supplies__price «10,000,000»",
+        "detail": "clipped by div.cabinet «Cookies141,520Per second88.64Per click1▪»",
+        "excluded": null
+      },
+      {
+        "kind": "overflow-x",
+        "el": "button#console-factory.console__button «Diesel Factory»",
+        "detail": "content runs 3.2px past a 96px box",
+        "excluded": null
+      },
+      {
+        "kind": "escapes-clipper",
+        "el": "span.cookie-embers",
+        "detail": "clipped by div.panel.cookie-hero «COOKIE88.64 / secHold to click repeatedl»",
+        "excluded": "hero decoration drawn to spill past the cookie on purpose"
+      },
+      {
+        "kind": "escapes-clipper",
+        "el": "p.cookie-hero__hint «Hold to click repeatedly»",
+        "detail": "clipped by div.panel.cookie-hero «COOKIE88.64 / secHold to click repeatedl»",
+        "excluded": null
+      },
+      {
+        "kind": "escapes-clipper",
+        "el": "section.diesel-depot.diesel-depot--status «▪Diesel DepotDiesel in the tanks0 LLitre»",
+        "detail": "clipped by section.panel.shop-rail «Shop商店🔍⚙▪Cursor+0.1/sec each · 每個 +0.12»",
+        "excluded": null
+      },
+      {
+        "kind": "escapes-clipper",
+        "el": "div.milk-tide__surface",
+        "detail": "clipped by div.stage «▪Oven HiccupCOOKIE88.64 / secHold to cli»",
+        "excluded": "the milk tide is a decorative band drawn behind the hero"
+      },
+      {
+        "kind": "overflow-x",
+        "el": "span.milk-tide__sr «Malted Milk — 84% milk, poured by your a»",
+        "detail": "content runs 261.3px past a 1px box",
+        "excluded": "the milk tide is a decorative band drawn behind the hero"
+      },
+      {
+        "kind": "clipped-text",
+        "el": "span.milk-tide__sr «Malted Milk — 84% milk, poured by your a»",
+        "detail": "text cut at 1px, no ellipsis",
+        "excluded": "the milk tide is a decorative band drawn behind the hero"
+      },
+      {
+        "kind": "flush-label",
+        "el": "span.title-bar__marquee «Material Cookie Clicker»",
+        "detail": "text inset L 0.0 R 0.0px in a 305px box",
+        "excluded": null
+      },
+      {
+        "kind": "flush-label",
+        "el": "button.buy-btn «Buy — 🍪 2,000»",
+        "detail": "text inset L 0.0 R 0.0px in a 153px box",
+        "excluded": null
+      },
+      {
+        "kind": "flush-label",
+        "el": "button.buy-btn «Buy — 🍪 24,000»",
+        "detail": "text inset L 0.0 R 0.0px in a 162px box",
+        "excluded": null
+      },
+      {
+        "kind": "flush-label",
+        "el": "button.buy-btn «Buy — 🍪 8,000»",
+        "detail": "text inset L 0.0 R 0.0px in a 153px box",
+        "excluded": null
+      },
+      {
+        "kind": "flush-label",
+        "el": "button.buy-btn «Buy — 🍪 120,000»",
+        "detail": "text inset L 0.0 R 0.0px in a 169px box",
+        "excluded": null
+      },
+      {
+        "kind": "flush-label",
+        "el": "button.buy-btn «Buy — 🍪 5,000»",
+        "detail": "text inset L 0.0 R 0.0px in a 153px box",
+        "excluded": null
+      },
+      {
+        "kind": "flush-label",
+        "el": "button.buy-btn «Buy — 🍪 40,000»",
+        "detail": "text inset L 0.0 R 0.0px in a 162px box",
+        "excluded": null
+      }
+    ]
+  },
+  {
+    "state": "mid",
+    "size": "1000x720",
+    "view": "dialog:home",
+    "findings": [
+      {
+        "kind": "overflow-x",
+        "el": "div.cabinet-head «Cookies141,608Per second88.64Per click1▪»",
+        "detail": "content runs 73.1px past a 939px box",
+        "excluded": null
+      },
+      {
+        "kind": "escapes-viewport",
+        "el": "div.hud «Cookies141,608Per second88.64Per click1▪»",
+        "detail": "{\"l\":31,\"t\":75,\"r\":1042,\"b\":170,\"vw\":1000,\"vh\":720}",
+        "excluded": null
+      },
+      {
+        "kind": "escapes-clipper",
+        "el": "div.hud «Cookies141,608Per second88.64Per click1▪»",
+        "detail": "clipped by div.cabinet «Cookies141,608Per second88.64Per click1▪»",
+        "excluded": null
+      },
+      {
+        "kind": "overflow-x",
+        "el": "span.hud__key «Per second»",
+        "detail": "content runs 3.2px past a 83px box",
+        "excluded": null
+      },
+      {
+        "kind": "overflow-x",
+        "el": "div.event-indicator.event-indicator--clot.event-indicator--setback «▪Oven Hiccup24s»",
+        "detail": "content runs 25.1px past a 214px box",
+        "excluded": null
+      },
+      {
+        "kind": "escapes-clipper",
+        "el": "div.raid-supplies «Raid suppliesWhack Pass2 / 316,000,000Bi»",
+        "detail": "clipped by div.cabinet «Cookies141,608Per second88.64Per click1▪»",
+        "excluded": null
+      },
+      {
+        "kind": "escapes-clipper",
+        "el": "span.raid-supplies__title «Raid supplies»",
+        "detail": "clipped by div.cabinet «Cookies141,608Per second88.64Per click1▪»",
+        "excluded": null
+      },
+      {
+        "kind": "overflow-x",
+        "el": "ul.raid-supplies__list «Whack Pass2 / 316,000,000Bigger Whack1 /»",
+        "detail": "content runs 51.0px past a 255px box",
+        "excluded": null
+      },
+      {
+        "kind": "escapes-clipper",
+        "el": "ul.raid-supplies__list «Whack Pass2 / 316,000,000Bigger Whack1 /»",
+        "detail": "clipped by div.cabinet «Cookies141,608Per second88.64Per click1▪»",
+        "excluded": null
+      },
+      {
+        "kind": "escapes-clipper",
+        "el": "li «Half-HP Whack1 / 310,000,000»",
+        "detail": "clipped by div.cabinet «Cookies141,608Per second88.64Per click1▪»",
+        "excluded": null
+      },
+      {
+        "kind": "escapes-clipper",
+        "el": "button.raid-supplies__buy «Half-HP Whack1 / 310,000,000»",
+        "detail": "clipped by div.cabinet «Cookies141,608Per second88.64Per click1▪»",
+        "excluded": null
+      },
+      {
+        "kind": "escapes-clipper",
+        "el": "span.raid-supplies__name «Half-HP Whack»",
+        "detail": "clipped by div.cabinet «Cookies141,608Per second88.64Per click1▪»",
+        "excluded": null
+      },
+      {
+        "kind": "escapes-clipper",
+        "el": "span.raid-supplies__stock «1 / 3»",
+        "detail": "clipped by div.cabinet «Cookies141,608Per second88.64Per click1▪»",
+        "excluded": null
+      },
+      {
+        "kind": "escapes-clipper",
+        "el": "span.raid-supplies__price «10,000,000»",
+        "detail": "clipped by div.cabinet «Cookies141,608Per second88.64Per click1▪»",
+        "excluded": null
+      },
+      {
+        "kind": "overflow-x",
+        "el": "button#console-factory.console__button «Diesel Factory»",
+        "detail": "content runs 3.2px past a 96px box",
+        "excluded": null
+      },
+      {
+        "kind": "escapes-clipper",
+        "el": "span.cookie-embers",
+        "detail": "clipped by div.panel.cookie-hero «COOKIE88.64 / secHold to click repeatedl»",
+        "excluded": "hero decoration drawn to spill past the cookie on purpose"
+      },
+      {
+        "kind": "escapes-clipper",
+        "el": "p.cookie-hero__hint «Hold to click repeatedly»",
+        "detail": "clipped by div.panel.cookie-hero «COOKIE88.64 / secHold to click repeatedl»",
+        "excluded": null
+      },
+      {
+        "kind": "escapes-clipper",
+        "el": "section.diesel-depot.diesel-depot--status «▪Diesel DepotDiesel in the tanks0 LLitre»",
+        "detail": "clipped by section.panel.shop-rail «Shop商店🔍⚙▪Cursor+0.1/sec each · 每個 +0.12»",
+        "excluded": null
+      },
+      {
+        "kind": "escapes-clipper",
+        "el": "div.milk-tide__surface",
+        "detail": "clipped by div.stage «▪Oven HiccupCOOKIE88.64 / secHold to cli»",
+        "excluded": "the milk tide is a decorative band drawn behind the hero"
+      },
+      {
+        "kind": "overflow-x",
+        "el": "span.milk-tide__sr «Malted Milk — 84% milk, poured by your a»",
+        "detail": "content runs 261.3px past a 1px box",
+        "excluded": "the milk tide is a decorative band drawn behind the hero"
+      },
+      {
+        "kind": "clipped-text",
+        "el": "span.milk-tide__sr «Malted Milk — 84% milk, poured by your a»",
+        "detail": "text cut at 1px, no ellipsis",
+        "excluded": "the milk tide is a decorative band drawn behind the hero"
+      },
+      {
+        "kind": "flush-label",
+        "el": "span.title-bar__marquee «Material Cookie Clicker»",
+        "detail": "text inset L 0.0 R 0.0px in a 305px box",
+        "excluded": null
+      }
+    ]
+  },
+  {
+    "state": "mid",
+    "size": "1000x720",
+    "view": "dialog:achievements",
+    "findings": [
+      {
+        "kind": "overflow-x",
+        "el": "div.cabinet-head «Cookies141,679Per second88.64Per click1▪»",
+        "detail": "content runs 72.8px past a 939px box",
+        "excluded": null
+      },
+      {
+        "kind": "escapes-viewport",
+        "el": "div.hud «Cookies141,679Per second88.64Per click1▪»",
+        "detail": "{\"l\":31,\"t\":75,\"r\":1042,\"b\":170,\"vw\":1000,\"vh\":720}",
+        "excluded": null
+      },
+      {
+        "kind": "escapes-clipper",
+        "el": "div.hud «Cookies141,679Per second88.64Per click1▪»",
+        "detail": "clipped by div.cabinet «Cookies141,679Per second88.64Per click1▪»",
+        "excluded": null
+      },
+      {
+        "kind": "overflow-x",
+        "el": "span.hud__key «Per second»",
+        "detail": "content runs 3.2px past a 83px box",
+        "excluded": null
+      },
+      {
+        "kind": "overflow-x",
+        "el": "div.event-indicator.event-indicator--clot.event-indicator--setback «▪Oven Hiccup23s»",
+        "detail": "content runs 25.1px past a 214px box",
+        "excluded": null
+      },
+      {
+        "kind": "escapes-clipper",
+        "el": "div.raid-supplies «Raid suppliesWhack Pass2 / 316,000,000Bi»",
+        "detail": "clipped by div.cabinet «Cookies141,679Per second88.64Per click1▪»",
+        "excluded": null
+      },
+      {
+        "kind": "escapes-clipper",
+        "el": "span.raid-supplies__title «Raid supplies»",
+        "detail": "clipped by div.cabinet «Cookies141,679Per second88.64Per click1▪»",
+        "excluded": null
+      },
+      {
+        "kind": "overflow-x",
+        "el": "ul.raid-supplies__list «Whack Pass2 / 316,000,000Bigger Whack1 /»",
+        "detail": "content runs 51.0px past a 255px box",
+        "excluded": null
+      },
+      {
+        "kind": "escapes-clipper",
+        "el": "ul.raid-supplies__list «Whack Pass2 / 316,000,000Bigger Whack1 /»",
+        "detail": "clipped by div.cabinet «Cookies141,679Per second88.64Per click1▪»",
+        "excluded": null
+      },
+      {
+        "kind": "escapes-clipper",
+        "el": "li «Half-HP Whack1 / 310,000,000»",
+        "detail": "clipped by div.cabinet «Cookies141,679Per second88.64Per click1▪»",
+        "excluded": null
+      },
+      {
+        "kind": "escapes-clipper",
+        "el": "button.raid-supplies__buy «Half-HP Whack1 / 310,000,000»",
+        "detail": "clipped by div.cabinet «Cookies141,679Per second88.64Per click1▪»",
+        "excluded": null
+      },
+      {
+        "kind": "escapes-clipper",
+        "el": "span.raid-supplies__name «Half-HP Whack»",
+        "detail": "clipped by div.cabinet «Cookies141,679Per second88.64Per click1▪»",
+        "excluded": null
+      },
+      {
+        "kind": "escapes-clipper",
+        "el": "span.raid-supplies__stock «1 / 3»",
+        "detail": "clipped by div.cabinet «Cookies141,679Per second88.64Per click1▪»",
+        "excluded": null
+      },
+      {
+        "kind": "escapes-clipper",
+        "el": "span.raid-supplies__price «10,000,000»",
+        "detail": "clipped by div.cabinet «Cookies141,679Per second88.64Per click1▪»",
+        "excluded": null
+      },
+      {
+        "kind": "overflow-x",
+        "el": "button#console-factory.console__button «Diesel Factory»",
+        "detail": "content runs 3.2px past a 96px box",
+        "excluded": null
+      },
+      {
+        "kind": "escapes-clipper",
+        "el": "span.cookie-embers",
+        "detail": "clipped by div.panel.cookie-hero «COOKIE88.64 / secHold to click repeatedl»",
+        "excluded": "hero decoration drawn to spill past the cookie on purpose"
+      },
+      {
+        "kind": "escapes-clipper",
+        "el": "p.cookie-hero__hint «Hold to click repeatedly»",
+        "detail": "clipped by div.panel.cookie-hero «COOKIE88.64 / secHold to click repeatedl»",
+        "excluded": null
+      },
+      {
+        "kind": "escapes-clipper",
+        "el": "section.diesel-depot.diesel-depot--status «▪Diesel DepotDiesel in the tanks0 LLitre»",
+        "detail": "clipped by section.panel.shop-rail «Shop商店🔍⚙▪Cursor+0.1/sec each · 每個 +0.12»",
+        "excluded": null
+      },
+      {
+        "kind": "escapes-clipper",
+        "el": "div.milk-tide__surface",
+        "detail": "clipped by div.stage «▪Oven HiccupCOOKIE88.64 / secHold to cli»",
+        "excluded": "the milk tide is a decorative band drawn behind the hero"
+      },
+      {
+        "kind": "overflow-x",
+        "el": "span.milk-tide__sr «Malted Milk — 84% milk, poured by your a»",
+        "detail": "content runs 261.3px past a 1px box",
+        "excluded": "the milk tide is a decorative band drawn behind the hero"
+      },
+      {
+        "kind": "clipped-text",
+        "el": "span.milk-tide__sr «Malted Milk — 84% milk, poured by your a»",
+        "detail": "text cut at 1px, no ellipsis",
+        "excluded": "the milk tide is a decorative band drawn behind the hero"
+      },
+      {
+        "kind": "flush-label",
+        "el": "span.title-bar__marquee «Material Cookie Clicker»",
+        "detail": "text inset L 0.0 R 0.0px in a 305px box",
+        "excluded": null
+      }
+    ]
+  },
+  {
+    "state": "mid",
+    "size": "1000x720",
+    "view": "dialog:tools",
+    "findings": [
+      {
+        "kind": "overflow-x",
+        "el": "div.cabinet-head «Cookies141,768Per second88.64Per click1▪»",
+        "detail": "content runs 72.8px past a 939px box",
+        "excluded": null
+      },
+      {
+        "kind": "escapes-viewport",
+        "el": "div.hud «Cookies141,768Per second88.64Per click1▪»",
+        "detail": "{\"l\":31,\"t\":75,\"r\":1042,\"b\":170,\"vw\":1000,\"vh\":720}",
+        "excluded": null
+      },
+      {
+        "kind": "escapes-clipper",
+        "el": "div.hud «Cookies141,768Per second88.64Per click1▪»",
+        "detail": "clipped by div.cabinet «Cookies141,768Per second88.64Per click1▪»",
+        "excluded": null
+      },
+      {
+        "kind": "overflow-x",
+        "el": "span.hud__key «Per second»",
+        "detail": "content runs 3.2px past a 83px box",
+        "excluded": null
+      },
+      {
+        "kind": "overflow-x",
+        "el": "div.event-indicator.event-indicator--clot.event-indicator--setback «▪Oven Hiccup22s»",
+        "detail": "content runs 25.1px past a 214px box",
+        "excluded": null
+      },
+      {
+        "kind": "escapes-clipper",
+        "el": "div.raid-supplies «Raid suppliesWhack Pass2 / 316,000,000Bi»",
+        "detail": "clipped by div.cabinet «Cookies141,768Per second88.64Per click1▪»",
+        "excluded": null
+      },
+      {
+        "kind": "escapes-clipper",
+        "el": "span.raid-supplies__title «Raid supplies»",
+        "detail": "clipped by div.cabinet «Cookies141,768Per second88.64Per click1▪»",
+        "excluded": null
+      },
+      {
+        "kind": "overflow-x",
+        "el": "ul.raid-supplies__list «Whack Pass2 / 316,000,000Bigger Whack1 /»",
+        "detail": "content runs 51.0px past a 255px box",
+        "excluded": null
+      },
+      {
+        "kind": "escapes-clipper",
+        "el": "ul.raid-supplies__list «Whack Pass2 / 316,000,000Bigger Whack1 /»",
+        "detail": "clipped by div.cabinet «Cookies141,768Per second88.64Per click1▪»",
+        "excluded": null
+      },
+      {
+        "kind": "escapes-clipper",
+        "el": "li «Half-HP Whack1 / 310,000,000»",
+        "detail": "clipped by div.cabinet «Cookies141,768Per second88.64Per click1▪»",
+        "excluded": null
+      },
+      {
+        "kind": "escapes-clipper",
+        "el": "button.raid-supplies__buy «Half-HP Whack1 / 310,000,000»",
+        "detail": "clipped by div.cabinet «Cookies141,768Per second88.64Per click1▪»",
+        "excluded": null
+      },
+      {
+        "kind": "escapes-clipper",
+        "el": "span.raid-supplies__name «Half-HP Whack»",
+        "detail": "clipped by div.cabinet «Cookies141,768Per second88.64Per click1▪»",
+        "excluded": null
+      },
+      {
+        "kind": "escapes-clipper",
+        "el": "span.raid-supplies__stock «1 / 3»",
+        "detail": "clipped by div.cabinet «Cookies141,768Per second88.64Per click1▪»",
+        "excluded": null
+      },
+      {
+        "kind": "escapes-clipper",
+        "el": "span.raid-supplies__price «10,000,000»",
+        "detail": "clipped by div.cabinet «Cookies141,768Per second88.64Per click1▪»",
+        "excluded": null
+      },
+      {
+        "kind": "overflow-x",
+        "el": "button#console-factory.console__button «Diesel Factory»",
+        "detail": "content runs 3.2px past a 96px box",
+        "excluded": null
+      },
+      {
+        "kind": "escapes-clipper",
+        "el": "span.cookie-embers",
+        "detail": "clipped by div.panel.cookie-hero «COOKIE88.64 / secHold to click repeatedl»",
+        "excluded": "hero decoration drawn to spill past the cookie on purpose"
+      },
+      {
+        "kind": "escapes-clipper",
+        "el": "p.cookie-hero__hint «Hold to click repeatedly»",
+        "detail": "clipped by div.panel.cookie-hero «COOKIE88.64 / secHold to click repeatedl»",
+        "excluded": null
+      },
+      {
+        "kind": "escapes-clipper",
+        "el": "section.diesel-depot.diesel-depot--status «▪Diesel DepotDiesel in the tanks0 LLitre»",
+        "detail": "clipped by section.panel.shop-rail «Shop商店🔍⚙▪Cursor+0.1/sec each · 每個 +0.12»",
+        "excluded": null
+      },
+      {
+        "kind": "escapes-clipper",
+        "el": "div.milk-tide__surface",
+        "detail": "clipped by div.stage «▪Oven HiccupCOOKIE88.64 / secHold to cli»",
+        "excluded": "the milk tide is a decorative band drawn behind the hero"
+      },
+      {
+        "kind": "overflow-x",
+        "el": "span.milk-tide__sr «Malted Milk — 84% milk, poured by your a»",
+        "detail": "content runs 261.3px past a 1px box",
+        "excluded": "the milk tide is a decorative band drawn behind the hero"
+      },
+      {
+        "kind": "clipped-text",
+        "el": "span.milk-tide__sr «Malted Milk — 84% milk, poured by your a»",
+        "detail": "text cut at 1px, no ellipsis",
+        "excluded": "the milk tide is a decorative band drawn behind the hero"
+      },
+      {
+        "kind": "overflow-x",
+        "el": "span.hud-strip__more-text «What this toggle changes»",
+        "detail": "content runs 123.9px past a 1px box",
+        "excluded": null
+      },
+      {
+        "kind": "clipped-text",
+        "el": "span.hud-strip__more-text «What this toggle changes»",
+        "detail": "text cut at 1px, no ellipsis",
+        "excluded": null
+      },
+      {
+        "kind": "flush-label",
+        "el": "span.title-bar__marquee «Material Cookie Clicker»",
+        "detail": "text inset L 0.0 R 0.0px in a 305px box",
+        "excluded": null
+      },
+      {
+        "kind": "flush-label",
+        "el": "button.open-real-feature__button «Open it now»",
+        "detail": "text inset L 0.0 R -0.0px in a 97px box",
+        "excluded": null
+      },
+      {
+        "kind": "flush-label",
+        "el": "button.open-real-feature__button «Open it now»",
+        "detail": "text inset L -0.0 R 0.0px in a 97px box",
+        "excluded": null
+      },
+      {
+        "kind": "flush-label",
+        "el": "button.open-real-feature__button «Open it now»",
+        "detail": "text inset L 0.0 R -0.0px in a 97px box",
+        "excluded": null
+      },
+      {
+        "kind": "flush-label",
+        "el": "button.open-real-feature__button «Open it now»",
+        "detail": "text inset L -0.0 R 0.0px in a 97px box",
+        "excluded": null
+      },
+      {
+        "kind": "flush-label",
+        "el": "button.open-real-feature__button «Open it now»",
+        "detail": "text inset L 0.0 R -0.0px in a 97px box",
+        "excluded": null
+      },
+      {
+        "kind": "flush-label",
+        "el": "button.open-real-feature__button «Open it now»",
+        "detail": "text inset L -0.0 R 0.0px in a 97px box",
+        "excluded": null
+      },
+      {
+        "kind": "flush-label",
+        "el": "button.open-real-feature__button «Open it now»",
+        "detail": "text inset L 0.0 R -0.0px in a 97px box",
+        "excluded": null
+      },
+      {
+        "kind": "flush-label",
+        "el": "button.open-real-feature__button «Open it now»",
+        "detail": "text inset L -0.0 R 0.0px in a 97px box",
+        "excluded": null
+      },
+      {
+        "kind": "flush-label",
+        "el": "button.open-real-feature__button «Open it now»",
+        "detail": "text inset L 0.0 R -0.0px in a 97px box",
+        "excluded": null
+      },
+      {
+        "kind": "flush-label",
+        "el": "button.open-real-feature__button «Open it now»",
+        "detail": "text inset L -0.0 R 0.0px in a 97px box",
+        "excluded": null
+      },
+      {
+        "kind": "flush-label",
+        "el": "button.open-real-feature__button «Open it now»",
+        "detail": "text inset L 0.0 R -0.0px in a 97px box",
+        "excluded": null
+      },
+      {
+        "kind": "flush-label",
+        "el": "button.open-real-feature__button «Open it now»",
+        "detail": "text inset L -0.0 R 0.0px in a 97px box",
+        "excluded": null
+      },
+      {
+        "kind": "flush-label",
+        "el": "button.open-real-feature__button «Open it now»",
+        "detail": "text inset L 0.0 R -0.0px in a 97px box",
+        "excluded": null
+      },
+      {
+        "kind": "flush-label",
+        "el": "button.open-real-feature__button «Open it now»",
+        "detail": "text inset L -0.0 R 0.0px in a 97px box",
+        "excluded": null
+      },
+      {
+        "kind": "flush-label",
+        "el": "button.open-real-feature__button «Open it now»",
+        "detail": "text inset L 0.0 R -0.0px in a 97px box",
+        "excluded": null
+      },
+      {
+        "kind": "flush-label",
+        "el": "button.open-real-feature__button «Open it now»",
+        "detail": "text inset L -0.0 R 0.0px in a 97px box",
+        "excluded": null
+      },
+      {
+        "kind": "flush-label",
+        "el": "button.open-real-feature__button «Open it now»",
+        "detail": "text inset L 0.0 R -0.0px in a 97px box",
+        "excluded": null
+      },
+      {
+        "kind": "flush-label",
+        "el": "button.open-real-feature__button «Open it now»",
+        "detail": "text inset L -0.0 R 0.0px in a 97px box",
+        "excluded": null
+      },
+      {
+        "kind": "flush-label",
+        "el": "button.open-real-feature__button «Open it now»",
+        "detail": "text inset L 0.0 R -0.0px in a 97px box",
+        "excluded": null
+      },
+      {
+        "kind": "flush-label",
+        "el": "button.open-real-feature__button «Open it now»",
+        "detail": "text inset L -0.0 R 0.0px in a 97px box",
+        "excluded": null
+      }
+    ]
+  },
+  {
+    "state": "mid",
+    "size": "1000x720",
+    "view": "dialog:statistics",
+    "findings": [
+      {
+        "kind": "overflow-x",
+        "el": "div.cabinet-head «Cookies141,856Per second88.64Per click1▪»",
+        "detail": "content runs 71.4px past a 939px box",
+        "excluded": null
+      },
+      {
+        "kind": "escapes-viewport",
+        "el": "div.hud «Cookies141,856Per second88.64Per click1▪»",
+        "detail": "{\"l\":31,\"t\":75,\"r\":1041,\"b\":170,\"vw\":1000,\"vh\":720}",
+        "excluded": null
+      },
+      {
+        "kind": "escapes-clipper",
+        "el": "div.hud «Cookies141,856Per second88.64Per click1▪»",
+        "detail": "clipped by div.cabinet «Cookies141,856Per second88.64Per click1▪»",
+        "excluded": null
+      },
+      {
+        "kind": "overflow-x",
+        "el": "span.hud__key «Per second»",
+        "detail": "content runs 3.2px past a 83px box",
+        "excluded": null
+      },
+      {
+        "kind": "overflow-x",
+        "el": "div.event-indicator.event-indicator--clot.event-indicator--setback «▪Oven Hiccup21s»",
+        "detail": "content runs 24.9px past a 213px box",
+        "excluded": null
+      },
+      {
+        "kind": "escapes-clipper",
+        "el": "div.raid-supplies «Raid suppliesWhack Pass2 / 316,000,000Bi»",
+        "detail": "clipped by div.cabinet «Cookies141,856Per second88.64Per click1▪»",
+        "excluded": null
+      },
+      {
+        "kind": "escapes-clipper",
+        "el": "span.raid-supplies__title «Raid supplies»",
+        "detail": "clipped by div.cabinet «Cookies141,856Per second88.64Per click1▪»",
+        "excluded": null
+      },
+      {
+        "kind": "overflow-x",
+        "el": "ul.raid-supplies__list «Whack Pass2 / 316,000,000Bigger Whack1 /»",
+        "detail": "content runs 51.1px past a 255px box",
+        "excluded": null
+      },
+      {
+        "kind": "escapes-clipper",
+        "el": "ul.raid-supplies__list «Whack Pass2 / 316,000,000Bigger Whack1 /»",
+        "detail": "clipped by div.cabinet «Cookies141,856Per second88.64Per click1▪»",
+        "excluded": null
+      },
+      {
+        "kind": "escapes-clipper",
+        "el": "li «Half-HP Whack1 / 310,000,000»",
+        "detail": "clipped by div.cabinet «Cookies141,856Per second88.64Per click1▪»",
+        "excluded": null
+      },
+      {
+        "kind": "escapes-clipper",
+        "el": "button.raid-supplies__buy «Half-HP Whack1 / 310,000,000»",
+        "detail": "clipped by div.cabinet «Cookies141,856Per second88.64Per click1▪»",
+        "excluded": null
+      },
+      {
+        "kind": "escapes-clipper",
+        "el": "span.raid-supplies__name «Half-HP Whack»",
+        "detail": "clipped by div.cabinet «Cookies141,856Per second88.64Per click1▪»",
+        "excluded": null
+      },
+      {
+        "kind": "escapes-clipper",
+        "el": "span.raid-supplies__stock «1 / 3»",
+        "detail": "clipped by div.cabinet «Cookies141,856Per second88.64Per click1▪»",
+        "excluded": null
+      },
+      {
+        "kind": "escapes-clipper",
+        "el": "span.raid-supplies__price «10,000,000»",
+        "detail": "clipped by div.cabinet «Cookies141,856Per second88.64Per click1▪»",
+        "excluded": null
+      },
+      {
+        "kind": "overflow-x",
+        "el": "button#console-factory.console__button «Diesel Factory»",
+        "detail": "content runs 3.2px past a 96px box",
+        "excluded": null
+      },
+      {
+        "kind": "escapes-clipper",
+        "el": "span.cookie-embers",
+        "detail": "clipped by div.panel.cookie-hero «COOKIE88.64 / secHold to click repeatedl»",
+        "excluded": "hero decoration drawn to spill past the cookie on purpose"
+      },
+      {
+        "kind": "escapes-clipper",
+        "el": "p.cookie-hero__hint «Hold to click repeatedly»",
+        "detail": "clipped by div.panel.cookie-hero «COOKIE88.64 / secHold to click repeatedl»",
+        "excluded": null
+      },
+      {
+        "kind": "escapes-clipper",
+        "el": "section.diesel-depot.diesel-depot--status «▪Diesel DepotDiesel in the tanks0 LLitre»",
+        "detail": "clipped by section.panel.shop-rail «Shop商店🔍⚙▪Cursor+0.1/sec each · 每個 +0.12»",
+        "excluded": null
+      },
+      {
+        "kind": "escapes-clipper",
+        "el": "div.milk-tide__surface",
+        "detail": "clipped by div.stage «▪Oven HiccupCOOKIE88.64 / secHold to cli»",
+        "excluded": "the milk tide is a decorative band drawn behind the hero"
+      },
+      {
+        "kind": "overflow-x",
+        "el": "span.milk-tide__sr «Malted Milk — 84% milk, poured by your a»",
+        "detail": "content runs 261.3px past a 1px box",
+        "excluded": "the milk tide is a decorative band drawn behind the hero"
+      },
+      {
+        "kind": "clipped-text",
+        "el": "span.milk-tide__sr «Malted Milk — 84% milk, poured by your a»",
+        "detail": "text cut at 1px, no ellipsis",
+        "excluded": "the milk tide is a decorative band drawn behind the hero"
+      },
+      {
+        "kind": "flush-label",
+        "el": "span.title-bar__marquee «Material Cookie Clicker»",
+        "detail": "text inset L 0.0 R 0.0px in a 305px box",
+        "excluded": null
+      }
+    ]
+  },
+  {
+    "state": "mid",
+    "size": "1000x720",
+    "view": "dialog:prestige",
+    "findings": [],
+    "note": "button not present in this state"
+  },
+  {
+    "state": "mid",
+    "size": "1000x720",
+    "view": "dialog:catalogue",
+    "findings": [
+      {
+        "kind": "overflow-x",
+        "el": "div.cabinet-head «Cookies142,034Per second88.64Per click1▪»",
+        "detail": "content runs 71.4px past a 939px box",
+        "excluded": null
+      },
+      {
+        "kind": "escapes-viewport",
+        "el": "div.hud «Cookies142,034Per second88.64Per click1▪»",
+        "detail": "{\"l\":31,\"t\":75,\"r\":1041,\"b\":170,\"vw\":1000,\"vh\":720}",
+        "excluded": null
+      },
+      {
+        "kind": "escapes-clipper",
+        "el": "div.hud «Cookies142,034Per second88.64Per click1▪»",
+        "detail": "clipped by div.cabinet «Cookies142,034Per second88.64Per click1▪»",
+        "excluded": null
+      },
+      {
+        "kind": "overflow-x",
+        "el": "span.hud__key «Per second»",
+        "detail": "content runs 3.2px past a 83px box",
+        "excluded": null
+      },
+      {
+        "kind": "overflow-x",
+        "el": "div.event-indicator.event-indicator--clot.event-indicator--setback «▪Oven Hiccup19s»",
+        "detail": "content runs 24.9px past a 213px box",
+        "excluded": null
+      },
+      {
+        "kind": "escapes-clipper",
+        "el": "div.raid-supplies «Raid suppliesWhack Pass2 / 316,000,000Bi»",
+        "detail": "clipped by div.cabinet «Cookies142,034Per second88.64Per click1▪»",
+        "excluded": null
+      },
+      {
+        "kind": "escapes-clipper",
+        "el": "span.raid-supplies__title «Raid supplies»",
+        "detail": "clipped by div.cabinet «Cookies142,034Per second88.64Per click1▪»",
+        "excluded": null
+      },
+      {
+        "kind": "overflow-x",
+        "el": "ul.raid-supplies__list «Whack Pass2 / 316,000,000Bigger Whack1 /»",
+        "detail": "content runs 51.1px past a 255px box",
+        "excluded": null
+      },
+      {
+        "kind": "escapes-clipper",
+        "el": "ul.raid-supplies__list «Whack Pass2 / 316,000,000Bigger Whack1 /»",
+        "detail": "clipped by div.cabinet «Cookies142,034Per second88.64Per click1▪»",
+        "excluded": null
+      },
+      {
+        "kind": "escapes-clipper",
+        "el": "li «Half-HP Whack1 / 310,000,000»",
+        "detail": "clipped by div.cabinet «Cookies142,034Per second88.64Per click1▪»",
+        "excluded": null
+      },
+      {
+        "kind": "escapes-clipper",
+        "el": "button.raid-supplies__buy «Half-HP Whack1 / 310,000,000»",
+        "detail": "clipped by div.cabinet «Cookies142,034Per second88.64Per click1▪»",
+        "excluded": null
+      },
+      {
+        "kind": "escapes-clipper",
+        "el": "span.raid-supplies__name «Half-HP Whack»",
+        "detail": "clipped by div.cabinet «Cookies142,034Per second88.64Per click1▪»",
+        "excluded": null
+      },
+      {
+        "kind": "escapes-clipper",
+        "el": "span.raid-supplies__stock «1 / 3»",
+        "detail": "clipped by div.cabinet «Cookies142,034Per second88.64Per click1▪»",
+        "excluded": null
+      },
+      {
+        "kind": "escapes-clipper",
+        "el": "span.raid-supplies__price «10,000,000»",
+        "detail": "clipped by div.cabinet «Cookies142,034Per second88.64Per click1▪»",
+        "excluded": null
+      },
+      {
+        "kind": "overflow-x",
+        "el": "button#console-factory.console__button «Diesel Factory»",
+        "detail": "content runs 3.2px past a 96px box",
+        "excluded": null
+      },
+      {
+        "kind": "escapes-clipper",
+        "el": "span.cookie-embers",
+        "detail": "clipped by div.panel.cookie-hero «COOKIE88.64 / secHold to click repeatedl»",
+        "excluded": "hero decoration drawn to spill past the cookie on purpose"
+      },
+      {
+        "kind": "escapes-clipper",
+        "el": "p.cookie-hero__hint «Hold to click repeatedly»",
+        "detail": "clipped by div.panel.cookie-hero «COOKIE88.64 / secHold to click repeatedl»",
+        "excluded": null
+      },
+      {
+        "kind": "escapes-clipper",
+        "el": "section.diesel-depot.diesel-depot--status «▪Diesel DepotDiesel in the tanks0 LLitre»",
+        "detail": "clipped by section.panel.shop-rail «Shop商店🔍⚙▪Cursor+0.1/sec each · 每個 +0.12»",
+        "excluded": null
+      },
+      {
+        "kind": "escapes-clipper",
+        "el": "div.milk-tide__surface",
+        "detail": "clipped by div.stage «▪Oven HiccupCOOKIE88.64 / secHold to cli»",
+        "excluded": "the milk tide is a decorative band drawn behind the hero"
+      },
+      {
+        "kind": "overflow-x",
+        "el": "span.milk-tide__sr «Malted Milk — 84% milk, poured by your a»",
+        "detail": "content runs 261.3px past a 1px box",
+        "excluded": "the milk tide is a decorative band drawn behind the hero"
+      },
+      {
+        "kind": "clipped-text",
+        "el": "span.milk-tide__sr «Malted Milk — 84% milk, poured by your a»",
+        "detail": "text cut at 1px, no ellipsis",
+        "excluded": "the milk tide is a decorative band drawn behind the hero"
+      },
+      {
+        "kind": "flush-label",
+        "el": "span.title-bar__marquee «Material Cookie Clicker»",
+        "detail": "text inset L 0.0 R 0.0px in a 305px box",
+        "excluded": null
+      }
+    ]
+  },
+  {
+    "state": "mid",
+    "size": "1000x720",
+    "view": "dialog:settings",
+    "findings": [
+      {
+        "kind": "overflow-x",
+        "el": "div.cabinet-head «Cookies142,104Per second88.64Per click1▪»",
+        "detail": "content runs 71.4px past a 939px box",
+        "excluded": null
+      },
+      {
+        "kind": "escapes-viewport",
+        "el": "div.hud «Cookies142,104Per second88.64Per click1▪»",
+        "detail": "{\"l\":31,\"t\":75,\"r\":1041,\"b\":170,\"vw\":1000,\"vh\":720}",
+        "excluded": null
+      },
+      {
+        "kind": "escapes-clipper",
+        "el": "div.hud «Cookies142,104Per second88.64Per click1▪»",
+        "detail": "clipped by div.cabinet «Cookies142,104Per second88.64Per click1▪»",
+        "excluded": null
+      },
+      {
+        "kind": "overflow-x",
+        "el": "span.hud__key «Per second»",
+        "detail": "content runs 3.2px past a 83px box",
+        "excluded": null
+      },
+      {
+        "kind": "overflow-x",
+        "el": "div.event-indicator.event-indicator--clot.event-indicator--setback «▪Oven Hiccup18s»",
+        "detail": "content runs 24.9px past a 213px box",
+        "excluded": null
+      },
+      {
+        "kind": "escapes-clipper",
+        "el": "div.raid-supplies «Raid suppliesWhack Pass2 / 316,000,000Bi»",
+        "detail": "clipped by div.cabinet «Cookies142,104Per second88.64Per click1▪»",
+        "excluded": null
+      },
+      {
+        "kind": "escapes-clipper",
+        "el": "span.raid-supplies__title «Raid supplies»",
+        "detail": "clipped by div.cabinet «Cookies142,104Per second88.64Per click1▪»",
+        "excluded": null
+      },
+      {
+        "kind": "overflow-x",
+        "el": "ul.raid-supplies__list «Whack Pass2 / 316,000,000Bigger Whack1 /»",
+        "detail": "content runs 51.1px past a 255px box",
+        "excluded": null
+      },
+      {
+        "kind": "escapes-clipper",
+        "el": "ul.raid-supplies__list «Whack Pass2 / 316,000,000Bigger Whack1 /»",
+        "detail": "clipped by div.cabinet «Cookies142,104Per second88.64Per click1▪»",
+        "excluded": null
+      },
+      {
+        "kind": "escapes-clipper",
+        "el": "li «Half-HP Whack1 / 310,000,000»",
+        "detail": "clipped by div.cabinet «Cookies142,104Per second88.64Per click1▪»",
+        "excluded": null
+      },
+      {
+        "kind": "escapes-clipper",
+        "el": "button.raid-supplies__buy «Half-HP Whack1 / 310,000,000»",
+        "detail": "clipped by div.cabinet «Cookies142,104Per second88.64Per click1▪»",
+        "excluded": null
+      },
+      {
+        "kind": "escapes-clipper",
+        "el": "span.raid-supplies__name «Half-HP Whack»",
+        "detail": "clipped by div.cabinet «Cookies142,104Per second88.64Per click1▪»",
+        "excluded": null
+      },
+      {
+        "kind": "escapes-clipper",
+        "el": "span.raid-supplies__stock «1 / 3»",
+        "detail": "clipped by div.cabinet «Cookies142,104Per second88.64Per click1▪»",
+        "excluded": null
+      },
+      {
+        "kind": "escapes-clipper",
+        "el": "span.raid-supplies__price «10,000,000»",
+        "detail": "clipped by div.cabinet «Cookies142,104Per second88.64Per click1▪»",
+        "excluded": null
+      },
+      {
+        "kind": "overflow-x",
+        "el": "button#console-factory.console__button «Diesel Factory»",
+        "detail": "content runs 3.2px past a 96px box",
+        "excluded": null
+      },
+      {
+        "kind": "escapes-clipper",
+        "el": "span.cookie-embers",
+        "detail": "clipped by div.panel.cookie-hero «COOKIE88.64 / secHold to click repeatedl»",
+        "excluded": "hero decoration drawn to spill past the cookie on purpose"
+      },
+      {
+        "kind": "escapes-clipper",
+        "el": "p.cookie-hero__hint «Hold to click repeatedly»",
+        "detail": "clipped by div.panel.cookie-hero «COOKIE88.64 / secHold to click repeatedl»",
+        "excluded": null
+      },
+      {
+        "kind": "escapes-clipper",
+        "el": "section.diesel-depot.diesel-depot--status «▪Diesel DepotDiesel in the tanks0 LLitre»",
+        "detail": "clipped by section.panel.shop-rail «Shop商店🔍⚙▪Cursor+0.1/sec each · 每個 +0.12»",
+        "excluded": null
+      },
+      {
+        "kind": "escapes-clipper",
+        "el": "div.milk-tide__surface",
+        "detail": "clipped by div.stage «▪Oven HiccupCOOKIE88.64 / secHold to cli»",
+        "excluded": "the milk tide is a decorative band drawn behind the hero"
+      },
+      {
+        "kind": "overflow-x",
+        "el": "span.milk-tide__sr «Malted Milk — 84% milk, poured by your a»",
+        "detail": "content runs 261.3px past a 1px box",
+        "excluded": "the milk tide is a decorative band drawn behind the hero"
+      },
+      {
+        "kind": "clipped-text",
+        "el": "span.milk-tide__sr «Malted Milk — 84% milk, poured by your a»",
+        "detail": "text cut at 1px, no ellipsis",
+        "excluded": "the milk tide is a decorative band drawn behind the hero"
+      },
+      {
+        "kind": "flush-label",
+        "el": "span.title-bar__marquee «Material Cookie Clicker»",
+        "detail": "text inset L 0.0 R 0.0px in a 305px box",
+        "excluded": null
+      }
+    ]
+  },
+  {
+    "state": "late",
+    "size": "1440x900",
+    "view": "surface",
+    "findings": [
+      {
+        "kind": "overflow-x",
+        "el": "button#console-factory.console__button «Diesel Factory»",
+        "detail": "content runs 3.2px past a 96px box",
+        "excluded": null
+      },
+      {
+        "kind": "escapes-clipper",
+        "el": "span.golden-rays",
+        "detail": "clipped by div.panel.cookie-hero «10COOKIE15.85 trillion / secHold to clic»",
+        "excluded": "hero decoration drawn to spill past the cookie on purpose"
+      },
+      {
+        "kind": "escapes-clipper",
+        "el": "span.cookie-embers",
+        "detail": "clipped by div.panel.cookie-hero «10COOKIE15.85 trillion / secHold to clic»",
+        "excluded": "hero decoration drawn to spill past the cookie on purpose"
+      },
+      {
+        "kind": "escapes-clipper",
+        "el": "p.cookie-hero__hint «Hold to click repeatedly»",
+        "detail": "clipped by div.panel.cookie-hero «10COOKIE15.85 trillion / secHold to clic»",
+        "excluded": null
+      },
+      {
+        "kind": "overflow-x",
+        "el": "span.milk-tide__sr «Milk That Should Not Exist — 496% milk, »",
+        "detail": "content runs 368.9px past a 1px box",
+        "excluded": "the milk tide is a decorative band drawn behind the hero"
+      },
+      {
+        "kind": "clipped-text",
+        "el": "span.milk-tide__sr «Milk That Should Not Exist — 496% milk, »",
+        "detail": "text cut at 1px, no ellipsis",
+        "excluded": "the milk tide is a decorative band drawn behind the hero"
+      },
+      {
+        "kind": "flush-label",
+        "el": "span.title-bar__marquee «Material Cookie Clicker»",
+        "detail": "text inset L 0.0 R 0.0px in a 305px box",
+        "excluded": null
+      }
+    ]
+  },
+  {
+    "state": "late",
+    "size": "1232x860",
+    "view": "surface",
+    "findings": [
+      {
+        "kind": "overflow-x",
+        "el": "button#console-factory.console__button «Diesel Factory»",
+        "detail": "content runs 3.2px past a 96px box",
+        "excluded": null
+      },
+      {
+        "kind": "escapes-clipper",
+        "el": "span.golden-rays",
+        "detail": "clipped by div.panel.cookie-hero «10COOKIE15.85 trillion / secHold to clic»",
+        "excluded": "hero decoration drawn to spill past the cookie on purpose"
+      },
+      {
+        "kind": "escapes-clipper",
+        "el": "span.cookie-embers",
+        "detail": "clipped by div.panel.cookie-hero «10COOKIE15.85 trillion / secHold to clic»",
+        "excluded": "hero decoration drawn to spill past the cookie on purpose"
+      },
+      {
+        "kind": "escapes-clipper",
+        "el": "p.cookie-hero__hint «Hold to click repeatedly»",
+        "detail": "clipped by div.panel.cookie-hero «10COOKIE15.85 trillion / secHold to clic»",
+        "excluded": null
+      },
+      {
+        "kind": "overflow-x",
+        "el": "span.milk-tide__sr «Milk That Should Not Exist — 496% milk, »",
+        "detail": "content runs 368.9px past a 1px box",
+        "excluded": "the milk tide is a decorative band drawn behind the hero"
+      },
+      {
+        "kind": "clipped-text",
+        "el": "span.milk-tide__sr «Milk That Should Not Exist — 496% milk, »",
+        "detail": "text cut at 1px, no ellipsis",
+        "excluded": "the milk tide is a decorative band drawn behind the hero"
+      },
+      {
+        "kind": "flush-label",
+        "el": "span.title-bar__marquee «Material Cookie Clicker»",
+        "detail": "text inset L 0.0 R 0.0px in a 305px box",
+        "excluded": null
+      }
+    ]
+  },
+  {
+    "state": "late",
+    "size": "1000x720",
+    "view": "surface",
+    "findings": [
+      {
+        "kind": "overflow-x",
+        "el": "button#console-factory.console__button «Diesel Factory»",
+        "detail": "content runs 3.2px past a 96px box",
+        "excluded": null
+      },
+      {
+        "kind": "escapes-clipper",
+        "el": "span.golden-rays",
+        "detail": "clipped by div.panel.cookie-hero «10COOKIE15.85 trillion / secHold to clic»",
+        "excluded": "hero decoration drawn to spill past the cookie on purpose"
+      },
+      {
+        "kind": "escapes-clipper",
+        "el": "span.cookie-embers",
+        "detail": "clipped by div.panel.cookie-hero «10COOKIE15.85 trillion / secHold to clic»",
+        "excluded": "hero decoration drawn to spill past the cookie on purpose"
+      },
+      {
+        "kind": "escapes-clipper",
+        "el": "p.cookie-hero__hint «Hold to click repeatedly»",
+        "detail": "clipped by div.panel.cookie-hero «10COOKIE15.85 trillion / secHold to clic»",
+        "excluded": null
+      },
+      {
+        "kind": "escapes-clipper",
+        "el": "section.diesel-depot.diesel-depot--status «▪Diesel DepotDiesel in the tanks1,010 LL»",
+        "detail": "clipped by section.panel.shop-rail «Shop商店🔍⚙▪Cursor+0.1/sec each · 每個 +0.18»",
+        "excluded": null
+      },
+      {
+        "kind": "overflow-x",
+        "el": "span.milk-tide__sr «Milk That Should Not Exist — 496% milk, »",
+        "detail": "content runs 336.3px past a 1px box",
+        "excluded": "the milk tide is a decorative band drawn behind the hero"
+      },
+      {
+        "kind": "clipped-text",
+        "el": "span.milk-tide__sr «Milk That Should Not Exist — 496% milk, »",
+        "detail": "text cut at 1px, no ellipsis",
+        "excluded": "the milk tide is a decorative band drawn behind the hero"
+      },
+      {
+        "kind": "flush-label",
+        "el": "span.title-bar__marquee «Material Cookie Clicker»",
+        "detail": "text inset L 0.0 R 0.0px in a 305px box",
+        "excluded": null
+      }
+    ]
+  },
+  {
+    "state": "mid",
+    "size": "1000x720 rail@400",
+    "view": "narrow-rail",
+    "findings": [
+      {
+        "kind": "overflow-x",
+        "el": "button#console-factory.console__button «Diesel Factory»",
+        "detail": "content runs 3.2px past a 96px box",
+        "excluded": null
+      },
+      {
+        "kind": "overflow-x",
+        "el": "div.stage «10COOKIE221.6 / secHold to click repeate»",
+        "detail": "content runs 40.0px past a 939px box",
+        "excluded": null
+      },
+      {
+        "kind": "escapes-clipper",
+        "el": "span.golden-rays",
+        "detail": "clipped by div.panel.cookie-hero «10COOKIE221.6 / secHold to click repeate»",
+        "excluded": "hero decoration drawn to spill past the cookie on purpose"
+      },
+      {
+        "kind": "escapes-clipper",
+        "el": "span.cookie-embers",
+        "detail": "clipped by div.panel.cookie-hero «10COOKIE221.6 / secHold to click repeate»",
+        "excluded": "hero decoration drawn to spill past the cookie on purpose"
+      },
+      {
+        "kind": "escapes-clipper",
+        "el": "p.cookie-hero__hint «Hold to click repeatedly»",
+        "detail": "clipped by div.panel.cookie-hero «10COOKIE221.6 / secHold to click repeate»",
+        "excluded": null
+      },
+      {
+        "kind": "escapes-viewport",
+        "el": "section.panel.shop-rail «Shop商店🔍⚙▪Cursor+0.1/sec each · 每個 +0.12»",
+        "detail": "{\"l\":609,\"t\":277,\"r\":1009,\"b\":663,\"vw\":1000,\"vh\":720}",
+        "excluded": null
+      },
+      {
+        "kind": "escapes-clipper",
+        "el": "section.panel.shop-rail «Shop商店🔍⚙▪Cursor+0.1/sec each · 每個 +0.12»",
+        "detail": "clipped by div.stage «10COOKIE221.6 / secHold to click repeate»",
+        "excluded": null
+      },
+      {
+        "kind": "escapes-clipper",
+        "el": "section.diesel-depot.diesel-depot--status «▪Diesel DepotDiesel in the tanks0 LLitre»",
+        "detail": "clipped by section.panel.shop-rail «Shop商店🔍⚙▪Cursor+0.1/sec each · 每個 +0.12»",
+        "excluded": null
+      },
+      {
+        "kind": "escapes-clipper",
+        "el": "div.milk-tide__surface",
+        "detail": "clipped by div.stage «10COOKIE221.6 / secHold to click repeate»",
+        "excluded": "the milk tide is a decorative band drawn behind the hero"
+      },
+      {
+        "kind": "overflow-x",
+        "el": "span.milk-tide__sr «Malted Milk — 84% milk, poured by your a»",
+        "detail": "content runs 261.3px past a 1px box",
+        "excluded": "the milk tide is a decorative band drawn behind the hero"
+      },
+      {
+        "kind": "clipped-text",
+        "el": "span.milk-tide__sr «Malted Milk — 84% milk, poured by your a»",
+        "detail": "text cut at 1px, no ellipsis",
+        "excluded": "the milk tide is a decorative band drawn behind the hero"
+      },
+      {
+        "kind": "flush-label",
+        "el": "span.title-bar__marquee «Material Cookie Clicker»",
+        "detail": "text inset L 0.0 R 0.0px in a 305px box",
+        "excluded": null
+      }
+    ],
+    "buyButton": {
+      "row": true,
+      "buy": true,
+      "inside": true,
+      "rowH": 175,
+      "buyBottom": 540,
+      "rowBottom": 552
+    }
+  },
+  {
+    "state": "mid",
+    "size": "1000x720 rail@360",
+    "view": "narrow-rail",
+    "findings": [
+      {
+        "kind": "overflow-x",
+        "el": "button#console-factory.console__button «Diesel Factory»",
+        "detail": "content runs 3.2px past a 96px box",
+        "excluded": null
+      },
+      {
+        "kind": "escapes-clipper",
+        "el": "span.golden-rays",
+        "detail": "clipped by div.panel.cookie-hero «10COOKIE221.6 / secHold to click repeate»",
+        "excluded": "hero decoration drawn to spill past the cookie on purpose"
+      },
+      {
+        "kind": "escapes-clipper",
+        "el": "span.cookie-embers",
+        "detail": "clipped by div.panel.cookie-hero «10COOKIE221.6 / secHold to click repeate»",
+        "excluded": "hero decoration drawn to spill past the cookie on purpose"
+      },
+      {
+        "kind": "escapes-clipper",
+        "el": "p.cookie-hero__hint «Hold to click repeatedly»",
+        "detail": "clipped by div.panel.cookie-hero «10COOKIE221.6 / secHold to click repeate»",
+        "excluded": null
+      },
+      {
+        "kind": "escapes-clipper",
+        "el": "section.diesel-depot.diesel-depot--status «▪Diesel DepotDiesel in the tanks0 LLitre»",
+        "detail": "clipped by section.panel.shop-rail «Shop商店🔍⚙▪Cursor+0.1/sec each · 每個 +0.12»",
+        "excluded": null
+      },
+      {
+        "kind": "escapes-clipper",
+        "el": "div.milk-tide__surface",
+        "detail": "clipped by div.stage «10COOKIE221.6 / secHold to click repeate»",
+        "excluded": "the milk tide is a decorative band drawn behind the hero"
+      },
+      {
+        "kind": "overflow-x",
+        "el": "span.milk-tide__sr «Malted Milk — 84% milk, poured by your a»",
+        "detail": "content runs 261.3px past a 1px box",
+        "excluded": "the milk tide is a decorative band drawn behind the hero"
+      },
+      {
+        "kind": "clipped-text",
+        "el": "span.milk-tide__sr «Malted Milk — 84% milk, poured by your a»",
+        "detail": "text cut at 1px, no ellipsis",
+        "excluded": "the milk tide is a decorative band drawn behind the hero"
+      },
+      {
+        "kind": "flush-label",
+        "el": "span.title-bar__marquee «Material Cookie Clicker»",
+        "detail": "text inset L 0.0 R 0.0px in a 305px box",
+        "excluded": null
+      }
+    ],
+    "buyButton": {
+      "row": true,
+      "buy": true,
+      "inside": true,
+      "rowH": 175,
+      "buyBottom": 540,
+      "rowBottom": 552
+    }
+  }
+]

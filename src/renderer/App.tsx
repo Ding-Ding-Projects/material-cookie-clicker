@@ -67,6 +67,7 @@ import {
   RandomEventStage,
   RandomEventToast,
 } from './screens/RandomEventStage';
+import { GoldenCookieStage } from './screens/GoldenCookieStage';
 import { StatisticsScreen } from './screens/StatisticsScreen';
 import { ToolsScreen, type OpenApplicationFeature } from './screens/ToolsScreen';
 import { UpgradeStrip } from './screens/UpgradeStrip';
@@ -216,6 +217,10 @@ function GameSurface({ onOpenFactory }: { onOpenFactory: (button: HTMLButtonElem
           where the falling cookies are falling. It returns null whenever no clickable event is
           running, so it never takes part in layout. */}
       <RandomEventStage />
+      {/* The golden cookie's own layer: a sprite somewhere random on this stage, and the Odd
+          Cookie Out card it opens when caught. Null whenever no golden cookie is out, so like
+          the event layer it never takes part in layout. */}
+      <GoldenCookieStage />
       <div className="stage__hero-column">
         <CookieHero />
         <DiscoveryTicket />

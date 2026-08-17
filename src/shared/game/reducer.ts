@@ -1,9 +1,12 @@
 import { bnAdd, bnClampNonNegative, bnCompare, bnFromNumber, bnMulScalar, bnSub, type BigNum } from "./big-number.js";
 import { evaluateAchievements } from "./achievements.js";
 import {
+  catchGoldenCookie,
   collectGoldenCookie as collectGoldenCookiePure,
   despawnIfExpired,
+  fleeGoldenCookie,
   maybeSpawnGoldenCookie,
+  pickGoldenPuzzleTile,
   isEffectActive,
   type GoldenCookieConfig,
   DEFAULT_GOLDEN_COOKIE_CONFIG,
@@ -149,7 +152,16 @@ export type GameAction =
    */
   | { readonly type: "buyControlUnlock"; readonly rungId: string }
   | { readonly type: "tick"; readonly elapsedMs: number }
-  | { readonly type: "collectGoldenCookie" }
+  /**
+   * CATCHING the golden-cookie sprite where it spawned on the stage. Opens the Odd Cookie Out
+   * puzzle; it does NOT redeem anything by itself. Replaces the old `collectGoldenCookie` action
+   * and its ten-press countdown.
+   */
+  | { readonly type: "goldenCatch" }
+  /** One tile press in the open puzzle. Three correct picks in a row redeem the cookie. */
+  | { readonly type: "goldenPuzzlePick"; readonly tileIndex: number }
+  /** Escape from the puzzle card, or a deliberate walk-away: the cookie flees, normal cooldown. */
+  | { readonly type: "goldenFlee" }
   /**
    * A click on one of the active random event's own targets -- a falling cookie during Cookie
    * Rain, the oven during an Oven Hiccup. The target id comes from the state the UI is
@@ -649,26 +661,49 @@ function handleTick(state: GameState, ctx: ReducerCtx, elapsedMs: number): GameS
   return withAchievements(nextState, nowIso(ctx));
 }
 
-export const GOLDEN_COOKIE_REDEEM_CLICKS = 10;
+/**
+ * CATCH, THEN PUZZLE — how a golden cookie is redeemed now.
+ *
+ * The old mechanism was a ten-press countdown on the hero cookie (`GOLDEN_COOKIE_REDEEM_CLICKS`,
+ * deleted along with `GoldenCookieState.redeemClicks`). It has been replaced by: catch the
+ * sprite where it spawned, then find the odd cookie out three times. The owner's standing decree
+ * — "the user must press it 10 times to redeem, not auto redeem" — is kept in SPIRIT: the catch
+ * plus three rounds of a sixteen-tile grid is about ten deliberate presses, and nothing about it
+ * is automatic. A save written mid-spawn under the old scheme simply loses its press count and
+ * gets a fresh spawn (see save-schema.ts).
+ */
+function handleGoldenCatch(state: GameState, ctx: ReducerCtx): GameState {
+  const goldenCookie = catchGoldenCookie(state.goldenCookie, ctx.rng);
+  if (goldenCookie === state.goldenCookie) return state;
+  return { ...state, goldenCookie };
+}
 
-function handleCollectGoldenCookie(state: GameState, ctx: ReducerCtx): GameState {
-  if (!state.goldenCookie.isSpawned) return state;
-  // Ten presses to redeem, by owner decree — "the user must press it 10 times to redeem, not
-  // auto redeem". The first nine chip it; only the tenth runs the real collection below.
-  const pressed = (state.goldenCookie.redeemClicks ?? 0) + 1;
-  if (pressed < GOLDEN_COOKIE_REDEEM_CLICKS) {
-    return { ...state, goldenCookie: { ...state.goldenCookie, redeemClicks: pressed } };
+function handleGoldenPuzzlePick(state: GameState, ctx: ReducerCtx, tileIndex: number): GameState {
+  const result = pickGoldenPuzzleTile(state.goldenCookie, tileIndex, ctx.rng);
+  if (!result.solved) {
+    if (result.goldenCookie === state.goldenCookie) return state;
+    return { ...state, goldenCookie: result.goldenCookie };
   }
+
+  // Solved all three rounds: the real redemption, through the same pure collect the game has
+  // always used, so the effect roll and the golden-upgrade bonuses are unchanged.
   const config = ctx.goldenCookieConfig ?? DEFAULT_GOLDEN_COOKIE_CONFIG;
   const nowMs = ctx.now();
-  const result = collectGoldenCookiePure(state.goldenCookie, state, nowMs, ctx.rng, config);
+  const collected = collectGoldenCookiePure(result.goldenCookie, state, nowMs, ctx.rng, config);
 
-  let nextState: GameState = { ...state, goldenCookie: result.goldenCookie };
-  if (result.instantBonus.mantissa !== 0) {
-    nextState = addCookies(nextState, result.instantBonus);
+  let nextState: GameState = { ...state, goldenCookie: collected.goldenCookie };
+  if (collected.instantBonus.mantissa !== 0) {
+    nextState = addCookies(nextState, collected.instantBonus);
   }
 
   return withAchievements(nextState, nowIso(ctx));
+}
+
+function handleGoldenFlee(state: GameState, ctx: ReducerCtx): GameState {
+  const config = ctx.goldenCookieConfig ?? DEFAULT_GOLDEN_COOKIE_CONFIG;
+  const goldenCookie = fleeGoldenCookie(state.goldenCookie, ctx.now(), ctx.rng, config);
+  if (goldenCookie === state.goldenCookie) return state;
+  return { ...state, goldenCookie };
 }
 
 function handleRandomEventClick(state: GameState, ctx: ReducerCtx, targetId: string): GameState {
@@ -951,8 +986,12 @@ export function applyGameAction(state: GameState, action: GameAction, ctx: Reduc
       return withMarketDayRebate(state, handleBuyControlUnlock(state, ctx, action.rungId), ctx);
     case "tick":
       return handleTick(state, ctx, action.elapsedMs);
-    case "collectGoldenCookie":
-      return handleCollectGoldenCookie(state, ctx);
+    case "goldenCatch":
+      return handleGoldenCatch(state, ctx);
+    case "goldenPuzzlePick":
+      return handleGoldenPuzzlePick(state, ctx, action.tileIndex);
+    case "goldenFlee":
+      return handleGoldenFlee(state, ctx);
     case "randomEventClick":
       return handleRandomEventClick(state, ctx, action.targetId);
     case "randomEventWhack":

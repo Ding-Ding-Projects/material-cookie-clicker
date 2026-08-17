@@ -7,3 +7,6 @@ coverage/
 .env*
 !.env.example
 packages/*/dist/
+
+# Throwaway capture profile + seeded save, written by the capture harness. Never committed.
+.capture-golden/

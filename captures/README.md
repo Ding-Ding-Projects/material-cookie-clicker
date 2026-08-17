@@ -87,6 +87,44 @@ lands. The pattern and the sample text were typed in as real key events. The
 image is a Win32 `PrintWindow` capture of that one window, resolved by title and
 class, and it was opened and looked at afterwards.
 
+### The golden cookie: the random spawn and its puzzle
+
+| File | What it shows |
+| --- | --- |
+| `golden-spawn.png` | A golden cookie spawned as its own sprite low on the left of the stage, standing in its ray-burst and straddling the boundary between the hero panel and the upgrades shelf. Note what is NOT gold: the hero cookie in the middle of its panel is the ordinary baked one, because the hero cookie no longer collects golden cookies at all. |
+| `golden-puzzle.png` | The Odd Cookie Out card that catching it opens, on `Round 1 of 3`, over a fully dimmed window. Sixteen cookie tiles in a four-by-four grid; the odd one this round is the extra-chip variant, third row, third column. |
+
+**How these were taken, and the one key that was set.** From the built `dist/`,
+launched by the real `electron` binary onto an off-screen Windows desktop named
+`GoldenPuzzleCapture`, on its own debugging port (9347) and its own throwaway
+`--user-data-dir`. The window was maximised through the application's own
+title-bar API and both images are Win32 `PrintWindow` captures of that one
+window, resolved by handle from the headless desktop's own window list. Both
+were opened and looked at afterwards, and the first version of the spawn capture
+was thrown away because looking at it is what revealed that the sprite was
+invisible at the plain look tier.
+
+Two values went into that throwaway profile's local storage before the game
+booted: a seeded save from `scripts/capture-seed-save.test.ts` (with the `look`
+ladder bought, so the surface is the finished cabinet rather than the plain
+start), and the developer-only key `material-cookie-clicker:golden:fast`, which
+is read once at startup and shortens the five-to-fifteen-minute spawn schedule to
+a few seconds while lengthening the window enough to photograph. That key is the
+only way to reach the fast schedule; there is no button and no settings row, and
+a player who never sets it never leaves the shipped timing. NOTHING about the
+capture was otherwise arranged: the scheduler chose both spawn positions itself
+(they differ between the two runs behind these images), and the odd tile in the
+puzzle capture is the one the seeded PRNG picked.
+
+The catch in `golden-puzzle.png` was a real background Win32 press on the
+sprite's real coordinates, not a scripted `click()`. The rest of the loop was
+driven the same way afterwards and watched rather than assumed: a deliberate
+wrong pick produced the shake and the line `Not that one — two seconds off the
+clock.`, three correct picks closed the card and left a `windfall` effect on the
+save with focus restored to the hero cookie, and an Escape produced `The golden
+cookie got away.` No capture was taken of those states; they are recorded here
+as observations, not as photographs.
+
 ### The raid supplies shelf
 
 | File | What it shows |
@@ -542,23 +580,11 @@ still starts and still shows the right nothing.
 - The command palette and the appearance editor — neither exists in the
   application yet. The settings surface DOES exist now and is captured; see
   the settings set below.
-- A golden-cookie spawn. The window is five to fifteen minutes wide and no
-  capture run has sat still long enough to catch one.
-- Narrow widths and high display scales. Every image in the current set is one
-  maximised window on one desktop, so the shop rail's bottom-sheet drawer
-  breakpoint is still only verified by forcing it, never by a real resize.
-- The prestige two-key confirmation gate. It ships, and it sits below the fold
-  of `dialog-prestige.png`.
-- The generator ladder past Shipment. The seeded run never bought that deep, so
-  the deepest eleven tiers have never been on screen for a camera. The six new
-  late tiers (Chancemaker through the Wok of the Gods) are drawn and wired, and
-  their icons have never been photographed.
-- The dark theme on any of the new surfaces. The shelf, the milk tide and the
-  Reborn tree are all built from the same theme tokens as everything else and
-  should repaint, but nobody has looked at them in the dark set.
-- The permanent-pin shelf inside the Reborn tree with a slot actually bought.
-  The seeded save owns no slot node, so that panel was only ever photographed in
-  its empty state.
+- The golden cookie under **reduced motion**, where the sprite stops scurrying
+  and its ray-burst stops turning, and under the **plain look tier**, where the
+  sprite deliberately keeps its drawing while the hero cookie loses its own.
+  Both are declared in CSS and asserted nowhere else. The spawn itself and its
+  puzzle ARE captured now — see the golden-cookie set above.
 
 These are gaps in evidence, not features known to be broken. Nobody has looked.
 

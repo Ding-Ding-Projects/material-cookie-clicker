@@ -28,15 +28,39 @@ export interface GoldenCookieEffectState {
   readonly multiplier?: number;
 }
 
+/**
+ * The Odd Cookie Out puzzle a CAUGHT golden cookie opens: a 4x4 grid of drawn cookie tiles with
+ * exactly one visually different tile. Three rounds solved in a row redeem the cookie.
+ *
+ * This replaced the old ten-press countdown (`redeemClicks`, deleted). The owner's standing
+ * decree — "the user must press it 10 times to redeem, not auto redeem" — is honoured in spirit
+ * rather than by literal press count: one press to CATCH the sprite plus three rounds of the
+ * puzzle costs roughly ten deliberate interactions (more if picks go wrong), and none of them is
+ * automatic. Nothing about a golden cookie is ever redeemed by a single click.
+ */
+export interface GoldenPuzzleState {
+  /** Rounds solved so far: 0, 1 or 2 while the puzzle is open; 3 redeems and closes it. */
+  readonly roundsSolved: number;
+  /** Which tile of the 4x4 grid is the odd one this round. Drawn from the seeded rng. */
+  readonly oddIndex: number;
+  /** Which visual variant the odd tile wears this round (rotation/chip-count). Also seeded. */
+  readonly variant: number;
+  /** Wrong picks in the CURRENT puzzle, across all its rounds. Each one burned window seconds. */
+  readonly wrongPicks: number;
+}
+
 export interface GoldenCookieState {
   /** Whether a golden cookie is currently spawned and waiting to be clicked. */
   readonly isSpawned: boolean;
   /**
-   * Presses landed on the spawned golden cookie so far. Redemption takes TEN presses by owner
-   * decree ("the user must press it 10 times to redeem, not auto redeem") — each press chips it,
-   * the tenth collects. Absent/0 on saves from before the decree.
+   * Where the spawned sprite sits on the game stage, as percentages of the stage box. Drawn from
+   * the seeded rng at spawn and persisted, so the cookie does not teleport across a re-render or
+   * a save/load. Absent while nothing is spawned.
    */
-  readonly redeemClicks?: number;
+  readonly spawnXPct?: number;
+  readonly spawnYPct?: number;
+  /** The open puzzle, if the sprite has been caught. Absent while it is still on the loose. */
+  readonly puzzle?: GoldenPuzzleState;
   readonly spawnedAtEpochMs?: number;
   /** PRNG stream position, so the seeded schedule survives save/load without re-seeding. */
   readonly rngStreamIndex: number;

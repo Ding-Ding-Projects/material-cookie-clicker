@@ -316,6 +316,51 @@ export const COOKIE_SCREEN_COPY = {
 } as const satisfies Record<string, Bilingual>;
 
 /**
+ * THE GOLDEN CATCH AND THE ODD COOKIE OUT PUZZLE (GoldenCookieStage.tsx).
+ *
+ * Both languages carry the whole mechanic — the round count, what a wrong pick costs, and what
+ * happens if the cookie gets away — because a player who reads only one of them should never be
+ * the one who has to guess at the rules.
+ */
+export const GOLDEN_PUZZLE_COPY = {
+  /** The accessible name of the spawned sprite on the stage. */
+  spriteLabel: { en: "Catch the golden cookie", yue: "捉住金曲奇" },
+  title: { en: "Odd Cookie Out", yue: "搵出唔同嗰塊" },
+  instruction: {
+    en: "One cookie is not like the others. Press it.",
+    yue: "有一塊曲奇同其他唔同。撳佢。",
+  },
+  round: (current: number, total: number): Bilingual => ({
+    en: `Round ${current} of ${total}`,
+    yue: `第 ${current} 關，共 ${total} 關`,
+  }),
+  /** The one accessible name every tile shares — see the AT note in GoldenCookieStage.tsx. */
+  tileLabel: (index: number): Bilingual => ({
+    en: `Cookie tile ${index}`,
+    yue: `曲奇格 ${index}`,
+  }),
+  wrongPick: {
+    en: "Not that one — two seconds off the clock.",
+    yue: "唔係嗰塊——扣兩秒。",
+  },
+  hintOffered: {
+    en: "A ring has been drawn around the odd cookie.",
+    yue: "已經喺唔同嗰塊曲奇周圍畫咗個圈。",
+  },
+  fled: { en: "The golden cookie got away.", yue: "金曲奇走甩咗。" },
+  redeemed: (effectEn: string, effectYue: string): Bilingual => ({
+    en: `Golden cookie redeemed: ${effectEn}`,
+    yue: `金曲奇兌換到手：${effectYue}`,
+  }),
+  effectNames: {
+    frenzy: { en: "Frenzy", yue: "狂熱" },
+    clickFrenzy: { en: "Click Frenzy", yue: "撳擊狂熱" },
+    windfall: { en: "Windfall", yue: "橫財" },
+  },
+  close: { en: "Let it go", yue: "放佢走" },
+} as const;
+
+/**
  * Progressive disclosure (see src/shared/game/disclosure.ts): the discovery ticket that carries
  * the next reveal upgrade before the shop and the upgrade strip exist, and the unnamed rung at
  * the bottom of the generator ladder.

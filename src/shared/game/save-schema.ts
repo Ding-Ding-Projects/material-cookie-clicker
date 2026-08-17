@@ -32,8 +32,27 @@ const GoldenCookieEffectSchema = z.object({
   multiplier: z.number().optional(),
 });
 
+/**
+ * The open Odd Cookie Out puzzle. Optional on purpose: a save written while no golden cookie is
+ * caught simply has no puzzle, and a save written from BEFORE the catch-then-puzzle redesign has
+ * neither this nor a spawn position. Such a save carried a `redeemClicks` press count instead;
+ * that field no longer exists, zod drops it on read, and the loaded cookie is then a spawn with
+ * no position — which the renderer treats as nothing spawned, so the schedule simply hands out a
+ * fresh spawn on the next tick. No migration step: a golden cookie in flight is worth seconds,
+ * and inventing a position for a cookie the player never saw would be the dishonest option.
+ */
+const GoldenPuzzleSchema = z.object({
+  roundsSolved: z.number().int().nonnegative(),
+  oddIndex: z.number().int().nonnegative(),
+  variant: z.number().int().nonnegative(),
+  wrongPicks: z.number().int().nonnegative(),
+});
+
 const GoldenCookieStateSchema = z.object({
   isSpawned: z.boolean(),
+  spawnXPct: z.number().optional(),
+  spawnYPct: z.number().optional(),
+  puzzle: GoldenPuzzleSchema.optional(),
   spawnedAtEpochMs: z.number().optional(),
   rngStreamIndex: z.number().int().nonnegative(),
   activeEffect: GoldenCookieEffectSchema.optional(),

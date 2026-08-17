@@ -17,6 +17,11 @@ import {
   resolveRandomEventConfig,
   type RandomEventConfig,
 } from '../../shared/game/random-events.js';
+import {
+  FAST_GOLDEN_COOKIE_FLAG,
+  resolveGoldenCookieConfig,
+  type GoldenCookieConfig,
+} from '../../shared/game/golden-cookie.js';
 import type { GameState } from '../../shared/game/types.js';
 import { DIESEL_COPY, OFFLINE_COPY, type Bilingual } from './copy.js';
 import { describeMilestone, detectMilestones } from './narration.js';
@@ -75,6 +80,19 @@ interface GameContextValue {
 
 const GameContext = createContext<GameContextValue | null>(null);
 
+/**
+ * Reads one developer-only localStorage flag. Wrapped because storage can throw outright in a
+ * locked-down context, and a game that refused to start because a private-mode browser said no
+ * to a debug key would be a worse game than one with a slow event schedule.
+ */
+function readDevFlag(key: string): string | null {
+  try {
+    return typeof window !== 'undefined' ? window.localStorage?.getItem(key) ?? null : null;
+  } catch {
+    return null;
+  }
+}
+
 export function GameProvider({ children }: { children: ReactNode }) {
   const storeRef = useRef<GameStore | null>(null);
   if (!storeRef.current) {
@@ -112,19 +130,28 @@ export function GameProvider({ children }: { children: ReactNode }) {
    */
   const randomEventConfigRef = useRef<RandomEventConfig | null>(null);
   if (randomEventConfigRef.current === null) {
-    let flag: string | null = null;
-    try {
-      flag = typeof window !== 'undefined' ? window.localStorage?.getItem(FAST_RANDOM_EVENTS_FLAG) ?? null : null;
-    } catch {
-      flag = null;
-    }
-    randomEventConfigRef.current = resolveRandomEventConfig(flag);
+    randomEventConfigRef.current = resolveRandomEventConfig(readDevFlag(FAST_RANDOM_EVENTS_FLAG));
+  }
+
+  /**
+   * The same seam for GOLDEN cookies, read from its own key:
+   *
+   *     localStorage.setItem('material-cookie-clicker:golden:fast', '1')
+   *
+   * Five to fifteen minutes is right for playing and impossible to photograph, and the golden
+   * cookie now has a puzzle behind it that has to be looked at to be checked. Resolver in the
+   * domain (golden-cookie.ts#resolveGoldenCookieConfig), tested, and with no UI anywhere.
+   */
+  const goldenCookieConfigRef = useRef<GoldenCookieConfig | null>(null);
+  if (goldenCookieConfigRef.current === null) {
+    goldenCookieConfigRef.current = resolveGoldenCookieConfig(readDevFlag(FAST_GOLDEN_COOKIE_FLAG));
   }
 
   const nowCtx = (): ReducerCtx => ({
     now: () => Date.now(),
     rng: rngRef.current,
     randomEventConfig: randomEventConfigRef.current ?? undefined,
+    goldenCookieConfig: goldenCookieConfigRef.current ?? undefined,
     // Read fresh on every dispatch rather than stored in state: it is an input to one decision
     // (whether a Mouse Raid may START — see random-events.ts#tickRandomEvents) and nothing
     // renders from it, so subscribing to visibilitychange would only re-render the tree for a

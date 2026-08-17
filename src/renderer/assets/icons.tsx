@@ -528,6 +528,63 @@ export function CookieIcon({ extraClass }: { extraClass?: string } = {}) {
   );
 }
 
+/**
+ * ONE TILE of the Odd Cookie Out puzzle (GoldenCookieStage.tsx).
+ *
+ * Sixteen of these are drawn per round and exactly one is `odd`. The difference is deliberately
+ * SUBTLE but never invisible, and it is always a difference in the drawing itself rather than in
+ * colour alone — a colour-only tell would be unfindable for a colour-blind player:
+ *
+ *   variant 0 — the whole cookie is rotated a few degrees
+ *   variant 1 — one chip is missing
+ *   variant 2 — one extra chip, low and left
+ *   variant 3 — the chips are mirrored left-to-right
+ *
+ * `hint` draws a faint ring on the odd tile. It is set only after two wrong picks in a round,
+ * as the merciful step described in GoldenCookieStage.tsx.
+ */
+export function PuzzleCookieTileArt({
+  odd = false,
+  variant = 0,
+  hint = false,
+}: { odd?: boolean; variant?: number; hint?: boolean } = {}) {
+  const rotate = odd && variant === 0 ? 7 : 0;
+  const mirror = odd && variant === 3;
+  const chips: readonly (readonly [number, number, number])[] = [
+    [11.4, 11.6, 2],
+    [19.6, 10.6, 1.7],
+    [21.4, 18.6, 2.1],
+    [12.4, 20.4, 1.8],
+    [16, 15.4, 1.3],
+  ];
+  const drawn = odd && variant === 1 ? chips.slice(0, 4) : chips;
+
+  return (
+    <svg
+      className="golden-puzzle__tile-art"
+      viewBox="0 0 32 32"
+      aria-hidden="true"
+      focusable="false"
+      stroke={INK}
+      strokeWidth={1.4}
+      strokeLinejoin="round"
+      strokeLinecap="round"
+      fill="none"
+    >
+      <g transform={`rotate(${rotate} 16 16)${mirror ? ' translate(32 0) scale(-1 1)' : ''}`}>
+        <circle cx="16" cy="16" r="13" fill={DOUGH} stroke={CRUST_DARK} strokeWidth={1.6} />
+        <path d="M16 3a13 13 0 0 1 0 26z" fill={CRUST} stroke="none" opacity={0.28} />
+        {drawn.map(([cx, cy, r], index) => (
+          <circle key={index} cx={cx} cy={cy} r={r} fill={CHIP} stroke="none" />
+        ))}
+        {odd && variant === 2 ? <circle cx="9.6" cy="16.6" r="1.6" fill={CHIP} stroke="none" /> : null}
+        <path d="M7.6 9.6a11 11 0 0 1 5-4.4" stroke={HIGHLIGHT} strokeWidth={1.6} />
+      </g>
+      {hint ? <circle cx="16" cy="16" r="14.4" stroke={CRUST_DARK} strokeWidth={1.2} opacity={0.55} /> : null}
+    </svg>
+  );
+}
+
 const UPGRADE_ART: Readonly<Record<UpgradeFamily, () => ReactElement>> = {
   click: ClickPowerArt,
   generator: GeneratorUpgradeArt,

@@ -3,7 +3,6 @@ import { useEffect, useMemo, useRef, useState, type CSSProperties } from 'react'
 import { bnMulScalar } from '../../shared/game/big-number.js';
 import { formatBigNum } from '../../shared/game/format-number.js';
 import { isEffectActive } from '../../shared/game/golden-cookie.js';
-import { GOLDEN_COOKIE_REDEEM_CLICKS } from '../../shared/game/reducer.js';
 import { computeMultipliers } from '../../shared/game/upgrades.js';
 import { computeDisclosure } from '../../shared/game/disclosure.js';
 import { HeroCookieArt } from '../assets/icons.js';
@@ -14,7 +13,6 @@ import { createHoldToClickController } from '../game/hold-to-click.js';
 interface Popup {
   readonly id: number;
   readonly text: string;
-  readonly golden: boolean;
   /** Where the popup spawns, as a percentage of the wrap's width/height. */
   readonly x: number;
   readonly y: number;
@@ -43,8 +41,6 @@ export function CookieHero() {
    *  around the centre instead — either way, no two popups land exactly on top of each other. */
   const lastPointRef = useRef<{ x: number; y: number } | null>(null);
 
-  const goldenActive = structure.goldenCookie.isSpawned;
-  const goldenPresses = structure.goldenCookie.redeemClicks ?? 0;
   // Progressive disclosure (src/shared/game/disclosure.ts): a fresh save is the cookie alone.
   // The per-second line arrives with the first generator, and press-and-hold — plus the hint
   // that teaches it — only after the Steady Hand reveal upgrade is bought.
@@ -61,7 +57,7 @@ export function CookieHero() {
     return value;
   }, [structure]);
 
-  function spawnPopup(text: string, golden: boolean): void {
+  function spawnPopup(text: string): void {
     const id = ++popupIdSeq;
     const point = lastPointRef.current;
     // Fixed-point spawning made rapid clicking read as one strobing pill, because up to six
@@ -69,7 +65,7 @@ export function CookieHero() {
     const x = point ? point.x : 50 + (Math.random() * 30 - 15);
     const y = point ? point.y : 34 + (Math.random() * 16 - 8);
     lastPointRef.current = null;
-    setPopups((prev) => [...prev.slice(-5), { id, text, golden, x, y }]);
+    setPopups((prev) => [...prev.slice(-5), { id, text, x, y }]);
     setTimeout(() => setPopups((prev) => prev.filter((p) => p.id !== id)), 750);
   }
 
@@ -83,11 +79,14 @@ export function CookieHero() {
     };
   }
 
+  /**
+   * The hero cookie no longer has anything to do with golden cookies. A spawned golden is its
+   * own sprite somewhere on the stage (GoldenCookieStage.tsx) and is caught there; this button
+   * is the plain click target it always was, in every state.
+   */
   function performClick(): void {
-    const wasGolden = goldenActive;
-    if (wasGolden) dispatch({ type: 'collectGoldenCookie' });
     dispatch({ type: 'click' });
-    spawnPopup(`+${formatBigNum(currentClickValue, 'en')}`, wasGolden);
+    spawnPopup(`+${formatBigNum(currentClickValue, 'en')}`);
   }
 
   // The enabled predicate is read at press time rather than captured, so buying Steady Hand
@@ -99,15 +98,16 @@ export function CookieHero() {
    * WHY THE CONTROLLER IS BUILT EXACTLY ONCE, AND WHY HOLDING USED TO STOP DEAD.
    *
    * This component previously rebuilt the controller in an effect keyed on `currentClickValue`
-   * and `goldenActive`, cancelling the old one in the cleanup. `currentClickValue` is derived
+   * (and, back then, on whether a golden cookie was up), cancelling the old one in the
+   * cleanup. `currentClickValue` is derived
    * from the structure snapshot, and the FIRST repeat of a hold changes game state — so the
    * next render handed the effect a fresh value, the cleanup ran, and the interval that was
    * driving the hold was cancelled about a tick after the press began. Holding the cookie
    * produced one click and then silence, which is exactly what it looked like.
    *
    * The controller is now built once and never replaced. Everything that legitimately changes
-   * between presses (the click value baked into the popup, whether a golden cookie is up,
-   * whether Steady Hand has been bought) is read through refs at fire time instead, so a hold
+   * between presses (the click value baked into the popup, whether Steady Hand has been bought)
+   * is read through refs at fire time instead, so a hold
    * that is still held keeps firing across any number of re-renders.
    */
   const performClickRef = useRef(performClick);
@@ -130,20 +130,11 @@ export function CookieHero() {
     <div className="panel cookie-hero">
       <div
         ref={wrapRef}
-        className={`cookie-target-wrap${goldenActive ? ' golden' : ''}${goldenActive ? ' golden-overlay-wrap' : ''}`}
+        className="cookie-target-wrap"
       >
-        {/* The spinning ray-burst the golden moment is built around (design/cookie-surface.html).
-            Pure CSS: a repeating conic gradient behind a ring mask. Under reduced motion it stays
-            fully visible but stops rotating, exactly as the spec calls for. */}
-        {goldenActive ? <span className="golden-rays" aria-hidden="true" /> : null}
-        {/* Ten presses to redeem (reducer.ts GOLDEN_COOKIE_REDEEM_CLICKS): the countdown is on
-            the surface so nobody wonders why one press did nothing. aria-hidden — the same
-            figure is appended to the button's accessible name below via the wrap's label. */}
-        {goldenActive ? (
-          <span className="golden-press-count" role="status">
-            {GOLDEN_COOKIE_REDEEM_CLICKS - goldenPresses}
-          </span>
-        ) : null}
+        {/* The golden wash and the spinning ray-burst used to live here, over the hero cookie.
+            They moved to the golden SPRITE (GoldenCookieStage.tsx), which is where the golden
+            cookie now actually is. This wrap is the plain hero cookie in every state. */}
         {/* Oven embers drifting up behind the cookie. Decorative, and still under reduced motion.
             Six motes now rather than three, in two depth bands: the three carrying
             `--far` are smaller, dimmer, slightly blurred and drift slower, so the air in front
@@ -164,7 +155,7 @@ export function CookieHero() {
           ref={buttonRef}
           type="button"
           className="cookie-btn cookie-btn--art cookie-btn--lift"
-          aria-label={goldenActive ? `${bilingualText(COOKIE_SCREEN_COPY.goldenAvailable)}` : `${bilingualText(COOKIE_SCREEN_COPY.clickTarget)}`}
+          aria-label={bilingualText(COOKIE_SCREEN_COPY.clickTarget)}
           onClick={(event) => {
             // A keyboard-activated click reports 0,0 detail; only a real pointer has a position.
             if (event.detail > 0) recordPoint(event.clientX, event.clientY);
@@ -202,12 +193,12 @@ export function CookieHero() {
           <span className="cookie-btn__plain" aria-hidden="true">
             COOKIE
           </span>
-          <HeroCookieArt golden={goldenActive} extraClass="cookie-btn__art" />
+          <HeroCookieArt extraClass="cookie-btn__art" />
         </button>
         {popups.map((popup) => (
           <span
             key={popup.id}
-            className={`click-popup click-popup--at-point${popup.golden ? ' golden' : ''}`}
+            className="click-popup click-popup--at-point"
             style={{ '--popup-x': `${popup.x}%`, '--popup-y': `${popup.y}%` } as CSSProperties}
             aria-hidden="true"
           >

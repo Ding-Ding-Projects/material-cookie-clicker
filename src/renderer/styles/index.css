@@ -9793,29 +9793,10 @@ ul.card-grid {
   opacity: 0.62;
 }
 
-/* ── GOLDEN PRESS COUNTDOWN ──────────────────────────────────────────────────────────────────
-   Ten presses to redeem; the remaining count sits on the golden cookie as a stamped counter so
-   the first press reading as "nothing happened" is impossible. Static under reduced motion. */
-.golden-press-count {
-  position: absolute;
-  top: 8%;
-  right: 12%;
-  min-width: 44px;
-  min-height: 44px;
-  display: inline-flex;
-  align-items: center;
-  justify-content: center;
-  border: var(--border-chunky) solid var(--spark-ring);
-  border-radius: var(--shape-full);
-  background: var(--tertiary-container);
-  color: var(--on-tertiary-container);
-  font-family: var(--font-display);
-  font-size: 22px;
-  font-variant-numeric: tabular-nums;
-  box-shadow: 0 4px 0 0 var(--tertiary-shadow);
-  pointer-events: none;
-  z-index: 3;
-}
+/* The GOLDEN PRESS COUNTDOWN chip that used to stand here is gone, with its markup. Golden
+   cookies are no longer redeemed by counting ten presses on the hero cookie: they spawn as their
+   own sprite somewhere on the stage and open the Odd Cookie Out puzzle when caught. See THE
+   GOLDEN COOKIE ON THE STAGE at the end of this file. */
 
 /* ─────────────────────────────────────────────────────────────────────────────────────────────
    THE PRICED SETTINGS EMBLEM, AND THE PRICED LANGUAGE MODES.
@@ -10520,6 +10501,291 @@ ul.card-grid {
 /* narrow drawer (~400px rail): the rail escaped the stage clip; keep it inside. */
 .stage {
   overflow-x: clip;
+}
+
+/* ==============================================================================================
+   THE GOLDEN COOKIE ON THE STAGE — the sprite, and the Odd Cookie Out card it opens.
+   (src/renderer/screens/GoldenCookieStage.tsx)
+
+   Appended at the end of the file on purpose, and touching no existing block: the golden cookie
+   used to be a wash over the hero cookie, and it is now its own object at a random point on the
+   stage. Everything it needs is new.
+   ============================================================================================ */
+
+.golden-stage {
+  position: absolute;
+  inset: 0;
+  z-index: 7;
+  pointer-events: none;
+}
+
+/* --- The sprite: 64px of drawn cookie inside a 72px hit area, centred on its random point --- */
+.golden-sprite {
+  position: absolute;
+  left: var(--golden-x, 50%);
+  top: var(--golden-y, 40%);
+  width: 72px;
+  height: 72px;
+  margin: -36px 0 0 -36px;
+  padding: 0;
+  border: 0;
+  background: none;
+  cursor: pointer;
+  pointer-events: auto;
+  display: grid;
+  place-items: center;
+  /* A gentle scurry: a few pixels of drift, not a chase across the stage. The cookie stays where
+     the domain put it — this only nudges it, so the hit area is never anywhere the player did
+     not see it. */
+  animation: golden-scurry calc(4.2s * var(--motion-scale, 1)) ease-in-out infinite;
+}
+
+.golden-sprite__art {
+  width: 64px;
+  height: 64px;
+  position: relative;
+  z-index: 1;
+  filter: drop-shadow(0 3px 6px rgba(0, 0, 0, 0.35));
+}
+
+/* THE ONE PLACE THE PLAIN TIER IS OVERRULED, AND WHY. (Phrased without the marker string that
+   the look-tiers test uses to find the start of the plain-layer section further down.)
+   `look.art` is a purchase, and at the plain tier `:root[data-look-art='off'] .hero-cookie` hides
+   every drawn cookie in the app. The golden SPRITE is not decoration on top of a control — it IS
+   the control, a 72px hit area at a random point with nothing else marking the spot. Hidden, it
+   would be an invisible button, and a hit area is a floor nobody buys back. So the sprite keeps
+   its drawing at every tier. (Higher specificity than the plain-layer rule, so file order does
+   not matter.) The same reasoning is why the puzzle tiles carry their own class rather than the
+   shared icon ones: a grid of blank squares is not a plainer puzzle, it is an unplayable one. */
+:root[data-look-art='off'] .golden-sprite .hero-cookie {
+  display: block;
+}
+
+/* The wash and the ray-burst, moved here from the hero cookie: same idea, sized to the sprite. */
+.golden-sprite__rays {
+  position: absolute;
+  inset: -26px;
+  border-radius: var(--shape-full);
+  background: repeating-conic-gradient(
+    from 0deg,
+    transparent 0deg,
+    color-mix(in srgb, var(--gold-centre) 85%, transparent) 3deg,
+    color-mix(in srgb, var(--gold-centre) 85%, transparent) 5deg,
+    transparent 8deg,
+    transparent 17deg,
+    color-mix(in srgb, var(--gold-mid) 70%, transparent) 19deg,
+    transparent 21deg,
+    transparent 32deg
+  );
+  opacity: 0.62;
+  mask: radial-gradient(circle, transparent 40%, black 52%, transparent 96%);
+  -webkit-mask: radial-gradient(circle, transparent 40%, black 52%, transparent 96%);
+  animation: spin-rays calc(9s * var(--motion-scale, 1)) linear infinite;
+  pointer-events: none;
+}
+
+.golden-sprite:focus-visible {
+  outline: var(--border-chunky, 3px) solid var(--spark-ring, #ffd54a);
+  outline-offset: 4px;
+  border-radius: var(--shape-full);
+}
+
+@keyframes golden-scurry {
+  0%,
+  100% {
+    transform: translate(0, 0);
+  }
+  25% {
+    transform: translate(6px, -4px);
+  }
+  50% {
+    transform: translate(-2px, 5px);
+  }
+  75% {
+    transform: translate(-6px, -2px);
+  }
+}
+
+/* --- The puzzle card, grown from the sprite ------------------------------------------------ */
+/* FIXED, not absolute, and covering the whole window rather than just the stage. The card says
+   aria-modal="true", and a scrim that only covered the stage would have left the HUD plates and
+   the console buttons behind it live — a modal that is not modal. Same dim as .overlay-scrim so
+   the golden card and the console panels read as the same kind of interruption, and the same
+   promise: the game is dimmed but still there and still ticking behind it. */
+.golden-puzzle-scrim {
+  position: fixed;
+  inset: 0;
+  z-index: 40;
+  pointer-events: auto;
+  background: rgba(20, 11, 4, 0.58);
+  display: grid;
+  place-items: center;
+}
+
+.golden-puzzle {
+  position: relative;
+  width: min(340px, 92vw);
+  padding: 16px 18px 14px;
+  border: var(--border-chunky, 3px) solid var(--outline, #75634e);
+  border-radius: var(--shape-lg, 28px);
+  background: var(--surface-container, #fbe8d2);
+  color: var(--on-surface, #1e1610);
+  box-shadow: 0 12px 28px rgba(0, 0, 0, 0.4);
+  /* Grown from the sprite, the same gesture AnchoredPanel makes from its console button. The
+     transform-origin points back at where on the stage the cookie was caught. */
+  transform-origin: var(--golden-x, 50%) var(--golden-y, 40%);
+  animation: golden-puzzle-grow calc(0.18s * var(--motion-scale, 1)) ease-out;
+}
+
+@keyframes golden-puzzle-grow {
+  from {
+    transform: scale(0.6);
+    opacity: 0;
+  }
+  to {
+    transform: scale(1);
+    opacity: 1;
+  }
+}
+
+.golden-puzzle__title {
+  margin: 0;
+  font-family: var(--font-display);
+  font-size: 20px;
+  display: flex;
+  gap: 8px;
+  flex-wrap: wrap;
+  align-items: baseline;
+}
+
+.golden-puzzle__title-zh {
+  font-size: 16px;
+  opacity: 0.85;
+}
+
+.golden-puzzle__round {
+  margin: 2px 0 0;
+  font-variant-numeric: tabular-nums;
+  font-weight: 700;
+}
+
+.golden-puzzle__instruction {
+  margin: 2px 0 10px;
+  font-size: 13px;
+  opacity: 0.86;
+}
+
+.golden-puzzle__grid {
+  display: grid;
+  grid-template-columns: repeat(4, 1fr);
+  gap: 6px;
+}
+
+/* 44px minimum per tile, every one of them, at every width the card is allowed to be. */
+.golden-puzzle__tile {
+  min-width: 44px;
+  min-height: 44px;
+  padding: 3px;
+  display: grid;
+  place-items: center;
+  border: 2px solid var(--outline, #75634e);
+  border-radius: var(--shape-sm, 10px);
+  background: var(--surface-low, #fff0de);
+  cursor: pointer;
+}
+
+.golden-puzzle__tile:hover {
+  background: var(--surface-high, #f5dfc4);
+}
+
+.golden-puzzle__tile:focus-visible {
+  outline: 3px solid var(--spark-ring, #ffd54a);
+  outline-offset: 2px;
+}
+
+.golden-puzzle__tile-art {
+  width: 100%;
+  height: auto;
+  max-width: 40px;
+  display: block;
+}
+
+.golden-puzzle__status {
+  margin: 8px 0 0;
+  min-height: 1.2em;
+  font-size: 13px;
+  font-weight: 700;
+}
+
+.golden-puzzle__close {
+  margin-top: 8px;
+  min-height: 44px;
+  width: 100%;
+  border: 2px solid var(--outline, #75634e);
+  border-radius: var(--shape-full);
+  background: var(--surface-low, #fff0de);
+  color: var(--on-surface, #1e1610);
+  cursor: pointer;
+  font: inherit;
+}
+
+.golden-puzzle__close:focus-visible {
+  outline: 3px solid var(--spark-ring, #ffd54a);
+  outline-offset: 2px;
+}
+
+/* A wrong pick shakes the card. The card is re-keyed on each wrong pick so the animation
+   restarts rather than being ignored as already-running. */
+.golden-puzzle[data-shake]:not([data-shake='0']) {
+  animation:
+    golden-puzzle-grow calc(0.18s * var(--motion-scale, 1)) ease-out,
+    golden-puzzle-shake calc(0.32s * var(--motion-scale, 1)) ease-in-out;
+}
+
+@keyframes golden-puzzle-shake {
+  0%,
+  100% {
+    translate: 0 0;
+  }
+  20% {
+    translate: -8px 0;
+  }
+  45% {
+    translate: 7px 0;
+  }
+  70% {
+    translate: -4px 0;
+  }
+}
+
+/* What happened to the cookie, said once and then gone. */
+.golden-outcome {
+  position: absolute;
+  left: 50%;
+  top: 12%;
+  transform: translateX(-50%);
+  margin: 0;
+  padding: 8px 14px;
+  border: var(--border-chunky, 3px) solid var(--spark-ring, #ffd54a);
+  border-radius: var(--shape-full);
+  background: var(--tertiary-container, #ffe1a8);
+  color: var(--on-tertiary-container, #2a1c00);
+  font-weight: 700;
+  text-align: center;
+  max-width: 80%;
+  pointer-events: none;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  /* Reduced motion: the cookie is STILL. It keeps its full gilding, its rays stay lit but stop
+     turning, the card simply appears, and a wrong pick does not shake anything — the wrong-pick
+     line in the status region says what happened, which is what the shake was ever for. */
+  .golden-sprite,
+  .golden-sprite__rays,
+  .golden-puzzle,
+  .golden-puzzle[data-shake]:not([data-shake='0']) {
+    animation: none;
+  }
 }
 
 /* ============================================================================================

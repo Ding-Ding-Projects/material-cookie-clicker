@@ -1,5 +1,4 @@
 import { bnAdd, bnClampNonNegative, bnCompare, bnFromNumber, bnMulScalar, bnSub, type BigNum } from "./big-number.js";
-import { totalCps } from "./cps.js";
 import { evaluateAchievements } from "./achievements.js";
 import {
   collectGoldenCookie as collectGoldenCookiePure,
@@ -11,7 +10,9 @@ import {
 } from "./golden-cookie.js";
 import { costOfBulk, costOfNext, getGeneratorDefinition, maxAffordable } from "./generators.js";
 import { computeOfflineProgressWithTools, type OfflineProgressOptions } from "./offline-progress.js";
+import { previewBuyAllAffordableUpgrades, sellRefund, type GeneratorSellMode } from "./purchasing.js";
 import { canPrestige, performPrestige } from "./prestige.js";
+import { correctedTotalCps, previewBuyAllAffordableTools, purchaseTool, toolOwnershipCorrection } from "./tool-shop.js";
 import { totalBuyMaxDiscount } from "./tools.js";
 import { computeMultipliers, getUpgradeDefinition, isUpgradeUnlocked } from "./upgrades.js";
 import type { GameState, RngPort } from "./types.js";
@@ -26,7 +27,11 @@ export type GameAction =
   | { readonly type: "click" }
   | { readonly type: "buyGenerator"; readonly generatorId: string }
   | { readonly type: "buyGeneratorBulk"; readonly generatorId: string; readonly quantity: number | "max" }
+  | { readonly type: "sellGeneratorBulk"; readonly generatorId: string; readonly quantity: GeneratorSellMode }
   | { readonly type: "buyUpgrade"; readonly upgradeId: string }
+  | { readonly type: "buyAllAffordableUpgrades" }
+  | { readonly type: "buyTool"; readonly toolId: string }
+  | { readonly type: "buyAllAffordableTools" }
   | { readonly type: "tick"; readonly elapsedMs: number }
   | { readonly type: "collectGoldenCookie" }
   | { readonly type: "prestige" }
@@ -64,7 +69,12 @@ function addCookies(state: GameState, amount: BigNum): GameState {
 
 function handleClick(state: GameState, ctx: ReducerCtx): GameState {
   const multipliers = computeMultipliers(state);
-  let clickValue = bnMulScalar(state.baseClickValue, multipliers.clickMultiplier);
+  // Tool Shop correction: computeMultipliers() bakes in every CONDITION-met tool's bonus
+  // (tools.ts's own contract, unchanged). Multiplying by toolOwnershipCorrection() rescales
+  // that down to only the OWNED subset -- see tool-shop.ts's header comment for the full
+  // reasoning and why this is exact rather than approximate.
+  const toolCorrection = toolOwnershipCorrection(state);
+  let clickValue = bnMulScalar(state.baseClickValue, multipliers.clickMultiplier * toolCorrection.clickMultiplier);
 
   const effect = state.goldenCookie.activeEffect;
   if (effect?.kind === "clickFrenzy" && effect.multiplier !== undefined && isEffectActive(effect, ctx.now())) {
@@ -115,6 +125,42 @@ function handleBuyGeneratorBulk(state: GameState, ctx: ReducerCtx, generatorId: 
   return withAchievements(nextState, nowIso(ctx));
 }
 
+/**
+ * Sells `quantityRequested` units of `generatorId` back for a fraction of what they actually
+ * cost to buy (see purchasing.ts#sellRefund). Unlike buying, selling CLAMPS to what's owned
+ * rather than being all-or-nothing: asking to sell more than owned honestly sells everything
+ * owned, never refuses the whole action.
+ */
+function handleSellGeneratorBulk(
+  state: GameState,
+  ctx: ReducerCtx,
+  generatorId: string,
+  quantityRequested: GeneratorSellMode,
+): GameState {
+  const def = getGeneratorDefinition(generatorId);
+  const ownedCount = state.generators.find((g) => g.id === generatorId)?.count ?? 0;
+  const requested = quantityRequested === "all" ? ownedCount : quantityRequested;
+  const quantity = Math.max(0, Math.min(ownedCount, Math.floor(requested)));
+
+  if (quantity <= 0) return state;
+
+  const refund = sellRefund(def, ownedCount, quantity);
+
+  const nextGenerators = state.generators.map((g) =>
+    g.id === generatorId ? { ...g, count: g.count - quantity } : g,
+  );
+
+  // A sell refund is returned currency, not newly baked production -- it must NOT bump
+  // lifetimeCookies or stats.totalCookiesBaked the way addCookies() does for genuine income.
+  const nextState: GameState = {
+    ...state,
+    cookies: bnAdd(state.cookies, refund),
+    generators: nextGenerators,
+  };
+
+  return withAchievements(nextState, nowIso(ctx));
+}
+
 function handleBuyUpgrade(state: GameState, ctx: ReducerCtx, upgradeId: string): GameState {
   const def = getUpgradeDefinition(upgradeId);
 
@@ -131,13 +177,57 @@ function handleBuyUpgrade(state: GameState, ctx: ReducerCtx, upgradeId: string):
   return withAchievements(nextState, nowIso(ctx));
 }
 
+/**
+ * Buys EXACTLY the list purchasing.ts#previewBuyAllAffordableUpgrades computes (same
+ * cheapest-first simulation), by folding each id through the existing single-upgrade
+ * handleBuyUpgrade -- reusing that one seam rather than re-deriving purchase rules here. This
+ * guarantees the preview a UI shows and what this action actually buys can never disagree.
+ */
+function handleBuyAllAffordableUpgrades(state: GameState, ctx: ReducerCtx): GameState {
+  const { upgradeIds } = previewBuyAllAffordableUpgrades(state);
+  let next = state;
+  for (const upgradeId of upgradeIds) {
+    next = handleBuyUpgrade(next, ctx, upgradeId);
+  }
+  return next;
+}
+
+/** Buys a single tool from the Tool Shop -- see tool-shop.ts#purchaseTool for the eligibility
+ * rule (must be discovered, not already owned, and affordable) this defers to. */
+function handleBuyTool(state: GameState, ctx: ReducerCtx, toolId: string): GameState {
+  const result = purchaseTool(state, toolId, state.stats.totalClicks);
+  if (!result.ok) return state;
+
+  const nextState: GameState = {
+    ...state,
+    cookies: result.nextCookies,
+    ownedTools: result.nextOwnedTools,
+  };
+
+  return withAchievements(nextState, nowIso(ctx));
+}
+
+/** Buys EXACTLY the list tool-shop.ts#previewBuyAllAffordableTools computes, folding each id
+ * through handleBuyTool for the same "preview and reality can never disagree" guarantee as
+ * handleBuyAllAffordableUpgrades above. */
+function handleBuyAllAffordableTools(state: GameState, ctx: ReducerCtx): GameState {
+  const { toolIds } = previewBuyAllAffordableTools(state);
+  let next = state;
+  for (const toolId of toolIds) {
+    next = handleBuyTool(next, ctx, toolId);
+  }
+  return next;
+}
+
 function handleTick(state: GameState, ctx: ReducerCtx, elapsedMs: number): GameState {
   if (elapsedMs <= 0) return state;
 
   const config = ctx.goldenCookieConfig ?? DEFAULT_GOLDEN_COOKIE_CONFIG;
   const nowMs = ctx.now();
 
-  const cps = totalCps(state);
+  // Tool Shop correction applied the same way as handleClick -- see there and tool-shop.ts for
+  // why this can't be done inside cps.ts#totalCps itself.
+  const cps = correctedTotalCps(state);
   const effect = state.goldenCookie.activeEffect;
   const cpsWithEffect =
     effect?.kind === "frenzy" && effect.multiplier !== undefined && isEffectActive(effect, nowMs)
@@ -205,8 +295,16 @@ export function applyGameAction(state: GameState, action: GameAction, ctx: Reduc
       return handleBuyGeneratorBulk(state, ctx, action.generatorId, 1);
     case "buyGeneratorBulk":
       return handleBuyGeneratorBulk(state, ctx, action.generatorId, action.quantity);
+    case "sellGeneratorBulk":
+      return handleSellGeneratorBulk(state, ctx, action.generatorId, action.quantity);
     case "buyUpgrade":
       return handleBuyUpgrade(state, ctx, action.upgradeId);
+    case "buyAllAffordableUpgrades":
+      return handleBuyAllAffordableUpgrades(state, ctx);
+    case "buyTool":
+      return handleBuyTool(state, ctx, action.toolId);
+    case "buyAllAffordableTools":
+      return handleBuyAllAffordableTools(state, ctx);
     case "tick":
       return handleTick(state, ctx, action.elapsedMs);
     case "collectGoldenCookie":
@@ -231,6 +329,7 @@ export function createInitialGameState(nowIsoString: string): GameState {
     generators: [],
     upgrades: [],
     achievements: [],
+    ownedTools: [],
     prestige: { ascensionPoints: 0, totalPrestigeCount: 0, permanentUnlockIds: [] },
     goldenCookie: { isSpawned: false, rngStreamIndex: 0, nextEligibleAtEpochMs: 0 },
     stats: { totalClicks: 0, totalCookiesBaked: zero, clockAnomalyCount: 0 },

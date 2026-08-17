@@ -128,7 +128,7 @@
     <p>A fat mouse is drawn larger and carries a row of pips showing how many hits it has left, and its accessible name says the same thing in words.</p>
 
     <h3>Raid supplies</h3>
-    <p>Three consumables, bought with cookies, by hand, one at a time, from a stock that is capped at three each. They are insurance, not immunity, and a save that never buys one plays exactly the game that shipped before them. Each is priced from a base that multiplies by four for every one you have <em>ever</em> bought, so spending your stock does not reset the price.</p>
+    <p>Three consumables, bought with cookies, by hand, one at a time, from a stock that is capped &mdash; three of each to begin with, and more once you have paid for the shelf space. They are insurance, not immunity, and a save that never buys one plays exactly the game that shipped before them. Each is priced from a base that multiplies by four for every one you have <em>ever</em> bought, so spending your stock does not reset the price.</p>
     <div class="scroller">
     <table>
       <caption>The three raid consumables</caption>
@@ -142,6 +142,24 @@
     </div>
     <p><strong>A pass is not a defence, and the game does not pretend it is.</strong> Whacking every mouse yourself pays the defended bonus and spends no pass &mdash; a pass in the drawer is never wasted on a raid you were going to win. When a pass <em>is</em> spent, the aftermath card says so in as many words (&ldquo;A Whack Pass was spent&rdquo;) and the announcement says it too, rather than congratulating you on mice you never touched.</p>
     <p>The two whack consumables arm themselves at the start of a raid if you have them in stock. That is deliberate: an &ldquo;arm this now?&rdquo; prompt in the middle of a twenty-second window would be a worse game and a much worse experience for anyone who needs a moment to read it. They are spent by that raid whatever happens, because what they buy is a raid that is easier to fight, and you got one. Stock is a plain count rather than a list of individual items, so there is no oldest pass to spend first &mdash; there is nothing to sort.</p>
+    <p>The shelf itself is the shop. Each of the three plates in the HUD is a real buy control in the same coin-press idiom as the rest of the cabinet: one press buys one, the printed price steps up immediately, a handful of coins flies to the cookie counter when the purchase actually lands, and a press the game refuses &mdash; at the cap or short of the price &mdash; is announced as a refusal rather than silently ignored. Nothing there is ever hidden or greyed out of the layout: a plate you cannot afford yet still prints its literal price, because a price is information.</p>
+
+    <h3>Whack Storage</h3>
+    <p>The three-item cap is not a wall, it is the first rung of a ladder. <strong>Whack Storage</strong> is a small chip on the supplies shelf reading &ldquo;Storage 3&rdquo;, and the chip is itself the buy control &mdash; a number you want to raise and the button that raises it are the same object, which is one control instead of two and one place to look.</p>
+    <div class="scroller">
+    <table>
+      <caption>The Whack Storage ladder</caption>
+      <thead><tr><th scope="col">Rung</th><th scope="col">You may hold</th><th scope="col">Cost</th></tr></thead>
+      <tbody>
+        <tr><td>Where every save starts</td><td>3 of each supply</td><td>Free</td></tr>
+        <tr><td>First upgrade</td><td>5 of each supply</td><td>5,000,000 cookies</td></tr>
+        <tr><td>Second upgrade</td><td>8 of each supply</td><td>25,000,000 cookies</td></tr>
+      </tbody>
+    </table>
+    </div>
+    <p><strong>One ladder, not three.</strong> Every rung raises the cap on all three consumables at once. Three separate storage tracks would have meant three prices, three progress chips and three things to remember about a mechanic whose entire content is a single number you are trying to raise; one shared shelf says the true thing in one sentence &mdash; you can hold three of anything, pay to hold five, pay again to hold eight.</p>
+    <p>It is stored and priced beside the consumables themselves rather than in the interface-unlock ladder that buys the game&rsquo;s controls, and the distinction is real: buying a control reveals chrome and leaves the game underneath unchanged, while buying storage changes how much insurance you may carry into a raid. That is a game rule, so it lives with the game rules and it is bought with its own action. The level is a rung index that defaults to zero on read, so a save written before the ladder existed loads as a save at the cap the game always had &mdash; nothing to migrate, nothing lost.</p>
+
     <p>Where the reach of a Bigger Whack ends is arithmetic, and it lives in the domain with the rest of the arithmetic: the interface measures where the mice actually are (they are animated, so the layout is the only honest source for that) and a tested pure function decides which of them one swing caught. The domain then checks independently that the raid had a Bigger Whack armed at all, so a swing can never clear a stage it did not pay for.</p>
 
     <h3>Rarity, and the rails around it</h3>

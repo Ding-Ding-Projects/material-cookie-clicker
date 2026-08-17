@@ -1012,8 +1012,9 @@ export interface RaidConsumableDefinition {
   readonly baseCost: number;
   /** What each one already bought multiplies the next one's price by. */
   readonly costRatio: number;
-  /** The most a player may hold at once. */
-  readonly stockCap: number;
+  /* There is deliberately no per-consumable `stockCap` here. How many of ANY kind a player may
+     hold is one shared number that the Whack Storage ladder below owns — see its comment for
+     why one shelf beats three. */
   /** True when the raid arms it at spawn rather than spending it on the theft. */
   readonly armedAtSpawn: boolean;
 }
@@ -1027,7 +1028,6 @@ export const RAID_CONSUMABLE_DEFINITIONS: readonly RaidConsumableDefinition[] = 
     blurbYue: "老鼠真係要攞走曲奇嗰陣自動用一張，佢哋咪空手走囉。",
     baseCost: 1_000_000,
     costRatio: 4,
-    stockCap: 3,
     armedAtSpawn: false,
   },
   {
@@ -1038,7 +1038,6 @@ export const RAID_CONSUMABLE_DEFINITIONS: readonly RaidConsumableDefinition[] = 
     blurbYue: "下次打劫自動用：一拍就掃到附近嘅老鼠。",
     baseCost: 2_500_000,
     costRatio: 4,
-    stockCap: 3,
     armedAtSpawn: true,
   },
   {
@@ -1049,7 +1048,6 @@ export const RAID_CONSUMABLE_DEFINITIONS: readonly RaidConsumableDefinition[] = 
     blurbYue: "下次打劫自動用：每隻老鼠要嘅拍數減半，唔夠一下就當一下。",
     baseCost: 2_500_000,
     costRatio: 4,
-    stockCap: 3,
     armedAtSpawn: true,
   },
 ];
@@ -1086,9 +1084,88 @@ export function raidConsumablePrice(id: RaidConsumableId, consumables: RaidConsu
   return bnMulScalar(bnFromNumber(def.baseCost), Math.pow(def.costRatio, consumables[id].purchased));
 }
 
+/* ---------------------------------------------------------------- the storage ladder */
+
+/**
+ * WHACK STORAGE: one shared shelf, bought in rungs, that raises how many of EACH consumable a
+ * player may hold at once.
+ *
+ * ONE LADDER, NOT THREE. Three separate storage tracks would be three prices, three progress
+ * chips and three mental models for a mechanic whose whole content is a single number the
+ * player is trying to raise. One ladder says the true thing in one place: "you can hold three
+ * of anything; pay to hold five; pay again to hold eight." Every rung applies to all three
+ * consumables at once, so there is never a state where a player has to remember which drawer
+ * they upgraded.
+ *
+ * IT LIVES IN THE DOMAIN, not in control-unlocks.ts, and that is a deliberate reading of the
+ * two registries this codebase already has. control-unlocks.ts buys INTERFACE — a rung there
+ * reveals a control that was hidden, and the game underneath is unchanged. This ladder changes
+ * the rules of a raid: how much insurance the player may carry into one. That is a game
+ * mechanic in exactly the sense the consumable prices above are, so it is stored, priced and
+ * enforced beside them, and it is bought with its own reducer action rather than by pretending
+ * to be a piece of chrome.
+ *
+ * The level is an INDEX into this array, and the array's first rung is the free one every save
+ * starts on. That is what makes the field safe to default to zero on read: a save written
+ * before this ladder existed is a save at rung zero, which is the cap the game always had.
+ */
+export interface WhackStorageTier {
+  /** How many of each consumable this rung lets the player hold. */
+  readonly cap: number;
+  /** Cookies this rung costs. Zero for the rung every save starts on. */
+  readonly cost: number;
+}
+
+export const WHACK_STORAGE_TIERS: readonly WhackStorageTier[] = [
+  { cap: 3, cost: 0 },
+  { cap: 5, cost: 5_000_000 },
+  { cap: 8, cost: 25_000_000 },
+];
+
+/** The highest rung index. A save at this level has nothing left to buy. */
+export const MAX_WHACK_STORAGE_LEVEL = WHACK_STORAGE_TIERS.length - 1;
+
+function clampStorageLevel(level: number): number {
+  if (!Number.isFinite(level)) return 0;
+  return Math.min(MAX_WHACK_STORAGE_LEVEL, Math.max(0, Math.floor(level)));
+}
+
+/** How many of each consumable a save at this rung may hold. */
+export function whackStorageCap(level: number): number {
+  return WHACK_STORAGE_TIERS[clampStorageLevel(level)].cap;
+}
+
+/**
+ * The price of the NEXT rung, or null at the top. Null is the honest answer for "there is no
+ * next one" and it keeps the view from having to invent a sentinel price.
+ */
+export function nextWhackStoragePrice(level: number): BigNum | null {
+  const next = clampStorageLevel(level) + 1;
+  if (next > MAX_WHACK_STORAGE_LEVEL) return null;
+  return bnFromNumber(WHACK_STORAGE_TIERS[next].cost);
+}
+
+/**
+ * Buys the next rung. Pure, and refuses in the same shape as every other purchase here: at the
+ * top of the ladder, or short of the price, the level comes back unchanged.
+ */
+export function buyWhackStorage(
+  level: number,
+  cookies: BigNum,
+): { readonly level: number; readonly price: BigNum | null; readonly bought: boolean } {
+  const current = clampStorageLevel(level);
+  const price = nextWhackStoragePrice(current);
+  if (price === null || bnCompare(cookies, price) < 0) return { level: current, price, bought: false };
+  return { level: current + 1, price, bought: true };
+}
+
 /** True when the stock is full. A capped consumable is insurance; an uncapped one is immunity. */
-export function isRaidConsumableAtCap(id: RaidConsumableId, consumables: RaidConsumablesState): boolean {
-  return consumables[id].stock >= getRaidConsumableDefinition(id).stockCap;
+export function isRaidConsumableAtCap(
+  id: RaidConsumableId,
+  consumables: RaidConsumablesState,
+  storageLevel = 0,
+): boolean {
+  return consumables[id].stock >= whackStorageCap(storageLevel);
 }
 
 /**
@@ -1099,9 +1176,10 @@ export function buyRaidConsumable(
   consumables: RaidConsumablesState,
   id: RaidConsumableId,
   cookies: BigNum,
+  storageLevel = 0,
 ): { readonly consumables: RaidConsumablesState; readonly price: BigNum; readonly bought: boolean } {
   const price = raidConsumablePrice(id, consumables);
-  if (isRaidConsumableAtCap(id, consumables) || bnCompare(cookies, price) < 0) {
+  if (isRaidConsumableAtCap(id, consumables, storageLevel) || bnCompare(cookies, price) < 0) {
     return { consumables, price, bought: false };
   }
   const current = consumables[id];
@@ -1263,6 +1341,8 @@ export interface RandomEventsState {
   readonly raidCount: number;
   /** What the player has bought to fight raids with, and how much they have ever bought. */
   readonly consumables: RaidConsumablesState;
+  /** Which rung of WHACK_STORAGE_TIERS is owned. Zero is the free rung every save starts on. */
+  readonly whackStorageLevel: number;
 }
 
 export function createInitialRandomEventsState(): RandomEventsState {
@@ -1276,6 +1356,7 @@ export function createInitialRandomEventsState(): RandomEventsState {
     lastRaid: null,
     raidCount: 0,
     consumables: createInitialRaidConsumables(),
+    whackStorageLevel: 0,
   };
 }
 
@@ -1357,6 +1438,8 @@ const RaidConsumablesSchema = z
   })
   .default(createInitialRaidConsumables);
 
+const WhackStorageLevelSchema = z.number().int().nonnegative().max(MAX_WHACK_STORAGE_LEVEL);
+
 const ActiveRandomEventSchema = z.object({
   id: RandomEventIdSchema,
   startedAtEpochMs: z.number(),
@@ -1409,6 +1492,11 @@ export const RandomEventsStateSchema = z.object({
     .default(null),
   raidCount: z.number().int().nonnegative().default(0),
   consumables: RaidConsumablesSchema,
+  /* Same optional-with-a-default treatment as the raid fields above, and for the same reason: a
+     save written before the storage ladder existed is not corrupt, it is a save that never
+     bought a rung — which reads exactly as level zero, the cap the game always had. No schema
+     version bump is needed for a field whose absence has one honest reading. */
+  whackStorageLevel: WhackStorageLevelSchema.default(0),
 });
 
 /** JSON-safe form of the state. Structurally identical; typed separately so it can diverge. */
@@ -1446,6 +1534,7 @@ export function encodeRandomEvents(state: RandomEventsState): RandomEventsSaveDa
       bigger_whack: { ...state.consumables.bigger_whack },
       half_hp_whack: { ...state.consumables.half_hp_whack },
     },
+    whackStorageLevel: state.whackStorageLevel,
   };
 }
 
@@ -1505,9 +1594,16 @@ export function decodeRandomEvents(raw: unknown): RandomEventsState {
       if (retried.success) return withoutSidecarVersion(retried.data);
     }
 
+    // The last-ditch salvage pulls out everything the player PAID for: the stock, and the
+    // storage rungs that raised its cap. Both cost cookies; a schedule does not.
     const consumables = RaidConsumablesSchema.safeParse(record.consumables);
+    const storage = WhackStorageLevelSchema.safeParse(record.whackStorageLevel);
     if (consumables.success) {
-      return { ...createInitialRandomEventsState(), consumables: consumables.data };
+      return {
+        ...createInitialRandomEventsState(),
+        consumables: consumables.data,
+        whackStorageLevel: storage.success ? storage.data : 0,
+      };
     }
   }
 

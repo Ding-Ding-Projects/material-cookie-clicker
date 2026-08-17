@@ -237,6 +237,17 @@ export const MOUSE_RAID_COPY = {
     yue: `庫存 ${stock} / ${cap}`,
   }),
   suppliesFull: { en: "Stock full", yue: "庫存滿咗" },
+  /* The storage chip. One shared cap for all three supplies, so its line names the cap itself
+     rather than any one consumable, and the price is literal like every other price here. */
+  storageChip: (cap: number): Bilingual => ({ en: `Storage ${cap}`, yue: `倉 ${cap}` }),
+  storageBuy: (cap: number, price: string): Bilingual => ({
+    en: `Whack Storage — hold ${cap} of each supply. Upgrade for ${price} cookies`,
+    yue: `裝備倉——每樣可以擺 ${cap} 件。用 ${price} 粒曲奇升級`,
+  }),
+  storageMax: (cap: number): Bilingual => ({
+    en: `Whack Storage — ${cap} of each supply, fully upgraded`,
+    yue: `裝備倉——每樣 ${cap} 件，已經升到最盡`,
+  }),
   passSpent: (mice: number): Bilingual => ({
     en: `A Whack Pass was spent — ${mice} ${mice === 1 ? "mouse" : "mice"} got away with nothing.`,
     yue: `用咗一張打鼠券——走甩咗嘅 ${mice} 隻乜都攞唔到。`,

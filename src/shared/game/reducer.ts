@@ -10,6 +10,7 @@ import {
 } from "./golden-cookie.js";
 import {
   buyRaidConsumable as buyRaidConsumablePure,
+  buyWhackStorage as buyWhackStoragePure,
   clearLastRaid,
   clearLastResolved,
   chooseRandomEventOption,
@@ -173,6 +174,14 @@ export type GameAction =
    * bought with cookies.
    */
   | { readonly type: "buyRaidConsumable"; readonly consumableId: RaidConsumableId }
+  /**
+   * Buys the next rung of the Whack Storage ladder (random-events.ts): one shared stock cap
+   * that applies to all three consumables at once. Its own action rather than a
+   * `buyControlUnlock` rung, because control-unlocks.ts buys INTERFACE — chrome that was
+   * hidden — while this changes what a raid may be fought with. It refuses silently at the top
+   * of the ladder or short of the price, like every other manual purchase here.
+   */
+  | { readonly type: "buyWhackStorage" }
   /** Clears the finished-event record behind the "what just happened" toast. */
   /**
    * Answering a CHOICE event (the Taste Test's two buttons). Its own action rather than a
@@ -699,12 +708,28 @@ function handleRandomEventWhack(state: GameState, ctx: ReducerCtx, mouseIds: rea
  * owns nothing but moving the cookies, which is the same division every purchase here uses.
  */
 function handleBuyRaidConsumable(state: GameState, id: RaidConsumableId): GameState {
-  const result = buyRaidConsumablePure(state.randomEvents.consumables, id, state.cookies);
+  const result = buyRaidConsumablePure(
+    state.randomEvents.consumables,
+    id,
+    state.cookies,
+    state.randomEvents.whackStorageLevel,
+  );
   if (!result.bought) return state;
   return {
     ...state,
     cookies: bnClampNonNegative(bnSub(state.cookies, result.price)),
     randomEvents: { ...state.randomEvents, consumables: result.consumables },
+  };
+}
+
+/** Buys one rung of the shared stock-cap ladder. Same division of labour as the handler above. */
+function handleBuyWhackStorage(state: GameState): GameState {
+  const result = buyWhackStoragePure(state.randomEvents.whackStorageLevel, state.cookies);
+  if (!result.bought || result.price === null) return state;
+  return {
+    ...state,
+    cookies: bnClampNonNegative(bnSub(state.cookies, result.price)),
+    randomEvents: { ...state.randomEvents, whackStorageLevel: result.level },
   };
 }
 
@@ -934,6 +959,8 @@ export function applyGameAction(state: GameState, action: GameAction, ctx: Reduc
       return handleRandomEventWhack(state, ctx, action.mouseIds);
     case "buyRaidConsumable":
       return withMarketDayRebate(state, handleBuyRaidConsumable(state, action.consumableId), ctx);
+    case "buyWhackStorage":
+      return withMarketDayRebate(state, handleBuyWhackStorage(state), ctx);
     case "randomEventChoose":
       return handleRandomEventChoose(state, ctx, action.choiceId);
     case "randomEventResolve":

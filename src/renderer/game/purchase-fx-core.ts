@@ -42,6 +42,10 @@ export function upgradeTargetKey(id: string): string {
 export function controlTargetKey(rungId: string): string {
   return `control:${rungId}`;
 }
+/** One plate on the raid supplies shelf: a consumable, or the storage chip ("supplies:storage"). */
+export function suppliesTargetKey(id: string): string {
+  return `supplies:${id}`;
+}
 export const DIESEL_TARGET_KEY = "diesel:depot";
 export const HUD_COOKIES_TARGET_KEY = "hud:cookies";
 
@@ -73,6 +77,19 @@ export function detectPurchase(previous: GameState, next: GameState, action: Gam
       const after = next.controlUnlocks?.purchasedRungIds ?? [];
       if (after.length <= before.length) return null;
       return { kind: "control", targetKey: controlTargetKey(action.rungId), quantity: 1 };
+    }
+    // The raid supplies shelf is a buying surface like any other, so a pass and a storage rung
+    // both throw the same handful of coins — and both prove they landed by the diff, so a press
+    // refused at the cap or short of the price animates nothing.
+    case "buyRaidConsumable": {
+      const before = previous.randomEvents.consumables[action.consumableId].stock;
+      const after = next.randomEvents.consumables[action.consumableId].stock;
+      if (after <= before) return null;
+      return { kind: "control", targetKey: suppliesTargetKey(action.consumableId), quantity: 1 };
+    }
+    case "buyWhackStorage": {
+      if (next.randomEvents.whackStorageLevel <= previous.randomEvents.whackStorageLevel) return null;
+      return { kind: "control", targetKey: suppliesTargetKey("storage"), quantity: 1 };
     }
     case "mintDiesel": {
       const litres = next.dieselDepot.litresMinted - previous.dieselDepot.litresMinted;

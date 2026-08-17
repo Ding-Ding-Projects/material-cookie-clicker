@@ -9,6 +9,7 @@ import {
   detectPurchase,
   generatorTargetKey,
   planCoinFlight,
+  suppliesTargetKey,
   upgradeTargetKey,
   type PurchaseIntent,
 } from "../../src/renderer/game/purchase-fx-core.js";
@@ -95,6 +96,29 @@ describe("detectPurchase — gating on what the reducer actually did", () => {
 function intent(partial: Partial<PurchaseIntent> & Pick<PurchaseIntent, "kind" | "targetKey">): PurchaseIntent {
   return { quantity: 1, ...partial };
 }
+
+describe("detectPurchase — the raid supplies shelf", () => {
+  it("throws coins for a pass the reducer actually stocked, and none for one it refused", () => {
+    const rich = withCookies(freshState(), 1e12);
+    const { next, intent } = detectThrough(rich, { type: "buyRaidConsumable", consumableId: "whack_pass" });
+    expect(next.randomEvents.consumables.whack_pass.stock).toBe(1);
+    expect(intent?.kind).toBe("control");
+    expect(intent?.targetKey).toBe(suppliesTargetKey("whack_pass"));
+
+    const poor = withCookies(freshState(), 10);
+    expect(detectThrough(poor, { type: "buyRaidConsumable", consumableId: "whack_pass" }).intent).toBeNull();
+  });
+
+  it("throws coins for a storage rung that was bought, and none at the top of the ladder", () => {
+    const rich = withCookies(freshState(), 1e12);
+    const { next, intent } = detectThrough(rich, { type: "buyWhackStorage" });
+    expect(next.randomEvents.whackStorageLevel).toBe(1);
+    expect(intent?.targetKey).toBe(suppliesTargetKey("storage"));
+
+    const maxed = { ...rich, randomEvents: { ...rich.randomEvents, whackStorageLevel: 2 } };
+    expect(detectThrough(maxed, { type: "buyWhackStorage" }).intent).toBeNull();
+  });
+});
 
 describe("PurchaseFxQueue — grouping", () => {
   it("collapses repeated buys of the same row inside the group window into one effect", () => {

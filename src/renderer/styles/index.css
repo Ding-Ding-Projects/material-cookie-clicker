@@ -6316,6 +6316,9 @@ ul.card-grid {
 .event-indicator__body {
   display: flex;
   align-items: center;
+}
+
+/* ==========================================================================================
  * THE UPGRADE SHELF, THE MILK TIDE AND THE REBORN TREE.
  *
  * Appended at the end of the sheet, after every base rule it builds on, so the shelf's own
@@ -6665,6 +6668,8 @@ ul.card-grid {
   .event-toast {
     animation: none;
   }
+}
+
 .shelf-locked__name,
 .shelf-locked__requirement {
   overflow: hidden;

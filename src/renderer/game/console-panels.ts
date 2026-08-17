@@ -14,6 +14,10 @@ import type { ConsoleSurfaceId, Disclosure } from "../../shared/game/disclosure.
  */
 export const GAME_SURFACE_IDS: readonly ConsoleSurfaceId[] = [
   "factory",
+  // The Home sits next to the Factory for the same reason the Factory sits first: it is a game
+  // in its own right rather than a report on the game, and it is bought outright (with the
+  // Property Deed) rather than reached.
+  "home",
   "achievements",
   "tools",
   "statistics",

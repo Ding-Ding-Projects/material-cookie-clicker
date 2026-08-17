@@ -51,7 +51,7 @@ import type { GameState } from "./types.js";
  */
 export const PRESTIGE_CONSOLE_ACHIEVEMENT_ID = "lifetime_1000000000";
 
-export type ConsoleSurfaceId = "achievements" | "tools" | "statistics" | "prestige" | "factory";
+export type ConsoleSurfaceId = "achievements" | "tools" | "statistics" | "prestige" | "factory" | "home";
 
 export interface Disclosure {
   /** The generator shop rail. Bought with Shop Sign. */
@@ -73,6 +73,13 @@ export interface Disclosure {
    * card that links to it. There is no separate second reveal to buy.
    */
   readonly dieselFactory: boolean;
+  /**
+   * The home construction panel — the bakery-home subgame (home-construction.ts). Bought with
+   * the Property Deed, on exactly the same terms as the factory above: no "or ascended", no
+   * progress-derived OR, no migration grant. The house is new, so there is no older save whose
+   * surface this could take away.
+   */
+  readonly homeConstruction: boolean;
   /** The per-second HUD readout and the hero's CPS line. Reached with the first generator. */
   readonly perSecondReadout: boolean;
   /** The per-click HUD readout. Reached with Steady Hand, which is when a click gains nuance. */
@@ -138,6 +145,7 @@ export function computeDisclosure(state: GameState): Disclosure {
     // a player who never chose it.
     dieselDepot: ownsUpgrade(state, "reveal_fuel_contract"),
     dieselFactory: ownsUpgrade(state, "reveal_fuel_contract"),
+    homeConstruction: ownsUpgrade(state, "reveal_property_deed"),
     perSecondReadout: generatorsOwned > 0 || ascended,
     perClickReadout: holdToClick,
     consoles: {
@@ -149,6 +157,9 @@ export function computeDisclosure(state: GameState): Disclosure {
       // The factory emblem is the one console button that is BOUGHT rather than reached: it
       // arrives with the Fuel Contract, exactly like the depot card it replaces the guts of.
       factory: ownsUpgrade(state, "reveal_fuel_contract"),
+      // The second bought emblem, on the same terms: the Property Deed puts the house on the
+      // cabinet, and nothing else ever does.
+      home: ownsUpgrade(state, "reveal_property_deed"),
     },
   };
 }

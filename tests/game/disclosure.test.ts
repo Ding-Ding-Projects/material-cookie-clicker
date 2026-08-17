@@ -53,15 +53,23 @@ describe("disclosure: a fresh save shows nothing but the cookie", () => {
       holdToClick: false,
       dieselDepot: false,
       dieselFactory: false,
+      homeConstruction: false,
       perSecondReadout: false,
       perClickReadout: false,
-      consoles: { achievements: false, tools: false, statistics: false, prestige: false, factory: false },
+      consoles: {
+        achievements: false,
+        tools: false,
+        statistics: false,
+        prestige: false,
+        factory: false,
+        home: false,
+      },
     });
   });
 
-  it("owns none of the four reveal upgrades", () => {
+  it("owns none of the five reveal upgrades", () => {
     expect(freshState().upgrades).toEqual([]);
-    expect(REVEAL_UPGRADE_DEFINITIONS).toHaveLength(4);
+    expect(REVEAL_UPGRADE_DEFINITIONS).toHaveLength(5);
   });
 
   it("still lets the player click the cookie — clicking is never gated", () => {
@@ -90,6 +98,7 @@ describe("disclosure: each reveal upgrade flips exactly its own surface", () => 
       statistics: false,
       prestige: false,
       factory: false,
+      home: false,
     });
     expect(bnToNumber(after.cookies)).toBeCloseTo(0, 6);
   });
@@ -461,8 +470,10 @@ describe("disclosure: the reveal upgrades are ordinary upgrades", () => {
     }
   });
 
-  it("form a ladder whose costs rise 10 / 50 / 100 / 500", () => {
-    expect(REVEAL_UPGRADE_DEFINITIONS.map((d) => bnToNumber(d.cost))).toEqual([10, 50, 100, 500]);
+  // The Property Deed (home-construction.ts) is the fifth rung and the dearest: it opens a whole
+  // second subgame with its own clock rather than a view or a shelf.
+  it("form a ladder whose costs rise 10 / 50 / 100 / 500 / 2,000", () => {
+    expect(REVEAL_UPGRADE_DEFINITIONS.map((d) => bnToNumber(d.cost))).toEqual([10, 50, 100, 500, 2_000]);
   });
 
   it("declare no multiplier at all", () => {

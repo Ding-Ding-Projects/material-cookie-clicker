@@ -75,6 +75,7 @@ export class GameStore {
 
   readonly #fastListeners = new Set<Listener>();
   readonly #factoryListeners = new Set<Listener>();
+  readonly #homeListeners = new Set<Listener>();
   readonly #statsListeners = new Set<Listener>();
   readonly #structureListeners = new Set<Listener>();
   readonly #dispatchListeners = new Set<DispatchListener>();
@@ -89,6 +90,7 @@ export class GameStore {
   getStatsSnapshot = (): GameState["stats"] => this.#state.stats;
   getStructureSnapshot = (): GameState => this.#state;
   getFactorySnapshot = (): GameState["dieselFactory"] => this.#state.dieselFactory;
+  getHomeSnapshot = (): GameState["homeConstruction"] => this.#state.homeConstruction;
 
   subscribeFast = (listener: Listener): (() => void) => {
     this.#fastListeners.add(listener);
@@ -107,6 +109,17 @@ export class GameStore {
   subscribeFactory = (listener: Listener): (() => void) => {
     this.#factoryListeners.add(listener);
     return () => this.#factoryListeners.delete(listener);
+  };
+  /**
+   * The home construction subtree's own slice (home-construction.ts), for exactly the reasons
+   * the factory has one. A build in progress advances on every tick while `cookies` may not
+   * move at all, and a progress bar that only redraws when the player earns a cookie is a
+   * progress bar that lies. `tickHome` returns the SAME object when the site is quiet, so a
+   * house with nothing under construction never re-renders for this.
+   */
+  subscribeHome = (listener: Listener): (() => void) => {
+    this.#homeListeners.add(listener);
+    return () => this.#homeListeners.delete(listener);
   };
   subscribeStats = (listener: Listener): (() => void) => {
     this.#statsListeners.add(listener);
@@ -138,6 +151,9 @@ export class GameStore {
     if (next.dieselFactory !== previous.dieselFactory) {
       this.#factoryListeners.forEach((listener) => listener());
     }
+    if (next.homeConstruction !== previous.homeConstruction) {
+      this.#homeListeners.forEach((listener) => listener());
+    }
     if (next.stats !== previous.stats) {
       this.#statsListeners.forEach((listener) => listener());
     }
@@ -157,6 +173,7 @@ export class GameStore {
     this.#fastSnapshot = computeFastSnapshot(next);
     this.#fastListeners.forEach((listener) => listener());
     this.#factoryListeners.forEach((listener) => listener());
+    this.#homeListeners.forEach((listener) => listener());
     this.#statsListeners.forEach((listener) => listener());
     this.#structureListeners.forEach((listener) => listener());
     this.#dispatchListeners.forEach((listener) => listener(previous, next, { type: "tick", elapsedMs: 0 }));

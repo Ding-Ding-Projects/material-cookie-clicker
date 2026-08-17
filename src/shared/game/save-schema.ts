@@ -152,9 +152,42 @@ export const SaveDataV5Schema = SaveDataV4Schema.omit({ schemaVersion: true }).e
 
 export type SaveDataV5 = z.infer<typeof SaveDataV5Schema>;
 
+/**
+ * `homeConstruction` (the bakery-home — see home-construction.ts) is a DEFAULTED field rather
+ * than a sixth schema version, following exactly the precedent `rebornNodeIds` set above.
+ *
+ * The reasoning is the same and it is worth restating. A version bump exists to carry a save
+ * across a change a reader cannot work out for itself. This is not one of those: a save written
+ * before the house existed has no house, and "no blueprints, no rooms, nothing being built,
+ * nothing invested" is the complete and honest reading of it. A migration step could add
+ * nothing that this default does not already say correctly, and inventing a version number for
+ * it would be ceremony rather than safety.
+ *
+ * Note what the default does NOT do: it does not hand anybody the Property Deed. An older save
+ * buys that reveal upgrade like everyone else, and until it does there is no house to have.
+ */
+const HomeConstructionSchema = z
+  .object({
+    blueprintIds: z.array(z.string()),
+    rooms: z.array(z.object({ roomId: z.string(), furnitureIds: z.array(z.string()) })),
+    build: z
+      .object({
+        roomId: z.string(),
+        elapsedMs: z.number().nonnegative(),
+        requiredMs: z.number().nonnegative(),
+      })
+      .nullable(),
+    cookiesInvested: BigNumSchema,
+  })
+  .default({ blueprintIds: [], rooms: [], build: null, cookiesInvested: { mantissa: 0, exponent: 0 } });
+
+export const SaveDataV5WithHomeSchema = SaveDataV5Schema.extend({
+  homeConstruction: HomeConstructionSchema,
+});
+
 /** The schema alias that always points at the current (latest) version's shape. */
-export const SaveDataLatestSchema = SaveDataV5Schema;
-export type SaveDataLatest = SaveDataV5;
+export const SaveDataLatestSchema = SaveDataV5WithHomeSchema;
+export type SaveDataLatest = z.infer<typeof SaveDataV5WithHomeSchema>;
 
 /** Minimal shape used only to read `schemaVersion` off of otherwise-unvalidated input. */
 export const SaveVersionProbeSchema = z.object({

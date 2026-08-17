@@ -13,14 +13,20 @@ import {
   buyRaidConsumable as buyRaidConsumablePure,
   clearLastRaid,
   clearLastResolved,
+  chooseRandomEventOption,
   clickRandomEventTarget,
   createInitialRandomEventsState,
+  extendComboWindow,
+  stackEventMultipliers,
+  EVENT_CLICK_STACK_CAP,
+  EVENT_CPS_STACK_CAP,
   randomEventClickMultiplier,
   randomEventCpsMultiplier,
   randomEventRebateFraction,
   tickRandomEvents,
   whackMice,
   type RaidConsumableId,
+  type RandomEventChoiceId,
   type RandomEventConfig,
   DEFAULT_RANDOM_EVENT_CONFIG,
 } from "./random-events.js";
@@ -125,6 +131,13 @@ export type GameAction =
    */
   | { readonly type: "buyRaidConsumable"; readonly consumableId: RaidConsumableId }
   /** Clears the finished-event record behind the "what just happened" toast. */
+  /**
+   * Answering a CHOICE event (the Taste Test's two buttons). Its own action rather than a
+   * `randomEventClick` with a special id, because it is a decision rather than a target: the
+   * domain refuses a second answer, an answer after the window closed, and an id that is not one
+   * of the two, so a double-fired pointer can never both serve the tray and send it back.
+   */
+  | { readonly type: "randomEventChoose"; readonly choiceId: RandomEventChoiceId }
   | { readonly type: "randomEventResolve" }
   /** Clears the finished-raid record behind the aftermath toast. Separate from the above
    *  because the two toasts are separate surfaces saying different things. */
@@ -178,20 +191,35 @@ function handleClick(state: GameState, ctx: ReducerCtx): GameState {
   const multipliers = computeMultipliers(state);
   let clickValue = bnMulScalar(state.baseClickValue, multipliers.clickMultiplier);
 
+  const nowMs = ctx.now();
   const effect = state.goldenCookie.activeEffect;
-  if (effect?.kind === "clickFrenzy" && effect.multiplier !== undefined && isEffectActive(effect, ctx.now())) {
-    clickValue = bnMulScalar(clickValue, effect.multiplier);
-  }
+  const goldenClick =
+    effect?.kind === "clickFrenzy" && effect.multiplier !== undefined && isEffectActive(effect, nowMs)
+      ? effect.multiplier
+      : 1;
 
-  // Sugar Rush multiplies the click on top of whatever a click frenzy is already doing. The two
-  // stack rather than overriding, because they came from two independent events and taking one
-  // away because the other landed would be a worse surprise than a big number.
-  clickValue = bnMulScalar(clickValue, randomEventClickMultiplier(state.randomEvents, ctx.now()));
+  // THE CLICK STACK. A golden cookie's click frenzy and whatever the pool is doing to clicks
+  // (Sugar Rush, Click Frenzy, the Combo Window, or Night Shift's quarter-value penalty) both
+  // apply, multiplicatively, under one stated ceiling. The rules and the reason for the ceiling
+  // live on `stackEventMultipliers` in random-events.ts; this line is the only place clicks
+  // consult them.
+  clickValue = bnMulScalar(
+    clickValue,
+    stackEventMultipliers(goldenClick, randomEventClickMultiplier(state.randomEvents, nowMs), EVENT_CLICK_STACK_CAP),
+  );
 
   const withCookies = addCookies(state, clickValue);
   const nowIsoString = nowIso(ctx);
+  // A Combo Window is the one event a click changes rather than merely benefits from: every
+  // click during it buys a little more window, up to a hard ceiling the domain enforces. This is
+  // a no-op returning the same object on every click that is not during one.
+  const randomEvents = extendComboWindow(withCookies.randomEvents, nowMs);
   return withAchievements(
-    { ...withCookies, stats: { ...withCookies.stats, totalClicks: withCookies.stats.totalClicks + 1 } },
+    {
+      ...withCookies,
+      randomEvents,
+      stats: { ...withCookies.stats, totalClicks: withCookies.stats.totalClicks + 1 },
+    },
     nowIsoString,
   );
 }
@@ -374,14 +402,22 @@ function handleTick(state: GameState, ctx: ReducerCtx, elapsedMs: number): GameS
 
   const cps = totalCps(state);
   const effect = state.goldenCookie.activeEffect;
-  const cpsWithEffect =
+  const goldenCps =
     effect?.kind === "frenzy" && effect.multiplier !== undefined && isEffectActive(effect, nowMs)
-      ? bnMulScalar(cps, effect.multiplier)
-      : cps;
+      ? effect.multiplier
+      : 1;
 
-  // An Oven Hiccup is the one thing in the game that makes this number go DOWN, and it applies
-  // here, over the same elapsed slice everything else uses.
-  const cpsWithEvents = bnMulScalar(cpsWithEffect, randomEventCpsMultiplier(state.randomEvents, nowMs));
+  // THE PRODUCTION STACK, in one line and by one rule.
+  //
+  // A golden cookie's frenzy and whatever the pool is currently doing to production multiply
+  // together under a stated ceiling (`stackEventMultipliers`). That covers the whole matrix: a
+  // Production Frenzy inside a golden frenzy, a Clot or an Oven Hiccup dragging one down, a
+  // Burnt Batch Frenzy hitting the cap, and the ordinary case where both are 1. Only one pool
+  // event can ever be live, so this really is the entire stack.
+  const cpsWithEvents = bnMulScalar(
+    cps,
+    stackEventMultipliers(goldenCps, randomEventCpsMultiplier(state.randomEvents, nowMs), EVENT_CPS_STACK_CAP),
+  );
 
   const gained = bnMulScalar(cpsWithEvents, elapsedMs / 1000);
   let nextState = addCookies(state, gained);
@@ -488,6 +524,16 @@ function handleBuyRaidConsumable(state: GameState, id: RaidConsumableId): GameSt
     cookies: bnClampNonNegative(bnSub(state.cookies, result.price)),
     randomEvents: { ...state.randomEvents, consumables: result.consumables },
   };
+}
+
+function handleRandomEventChoose(state: GameState, ctx: ReducerCtx, choiceId: RandomEventChoiceId): GameState {
+  const config = ctx.randomEventConfig ?? DEFAULT_RANDOM_EVENT_CONFIG;
+  const result = chooseRandomEventOption(state.randomEvents, state, choiceId, ctx.now(), ctx.rng, config);
+  if (!result.claimed) return state;
+
+  let nextState: GameState = { ...state, randomEvents: result.randomEvents };
+  if (result.bonus.mantissa !== 0) nextState = addCookies(nextState, result.bonus);
+  return withAchievements(nextState, nowIso(ctx));
 }
 
 function handleRandomEventRaidDismiss(state: GameState): GameState {
@@ -640,6 +686,8 @@ export function applyGameAction(state: GameState, action: GameAction, ctx: Reduc
       return handleRandomEventWhack(state, ctx, action.mouseIds);
     case "buyRaidConsumable":
       return withMarketDayRebate(state, handleBuyRaidConsumable(state, action.consumableId), ctx);
+    case "randomEventChoose":
+      return handleRandomEventChoose(state, ctx, action.choiceId);
     case "randomEventResolve":
       return handleRandomEventResolve(state);
     case "randomEventRaidDismiss":

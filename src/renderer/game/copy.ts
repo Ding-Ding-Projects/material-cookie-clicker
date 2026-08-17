@@ -132,6 +132,59 @@ export const RANDOM_EVENT_COPY = {
 } as const satisfies Record<string, Bilingual>;
 
 /**
+ * Strings for the events this lane added.
+ *
+ * Kept in their own object rather than swelling RANDOM_EVENT_COPY, because several of them are
+ * FUNCTIONS of a real quantity — which parcel is next, how many sprinkles are left — and the
+ * shape of that object is a flat record of plain bilingual pairs.
+ *
+ * The rule every line here follows is the one the raid's copy already set: say the actual thing.
+ * The Clot's note says production is halved and that there is no button; the Flour Shortage's
+ * says the rebound is coming and is worth more than the dip, because a player who does not know
+ * that is being asked to sit through a punishment; and the Taste Test's two buttons say what
+ * each one pays rather than "yes" and "no".
+ */
+export const EVENT_EXTRA_COPY = {
+  catchSprinkle: (index: number, total: number): Bilingual => ({
+    en: `Catch a sprinkle (${index} of ${total} left)`,
+    yue: `接住粒糖針（仲有 ${index} / ${total}）`,
+  }),
+  sendParcel: (position: number, total: number): Bilingual => ({
+    en: `Send order ${position} of ${total}`,
+    yue: `出第 ${position} 張單（共 ${total} 張）`,
+  }),
+  parcelWaiting: (position: number): Bilingual => ({
+    en: `Order ${position} — not this one yet`,
+    yue: `第 ${position} 張單——仲未到佢`,
+  }),
+  chooseLabel: { en: "Taste test — pick one", yue: "試味——揀一樣" },
+  chooseServe: (amount: string): Bilingual => ({
+    en: `Serve it now — ${amount} cookies straight away`,
+    yue: `即刻賣咗佢——即時攞 ${amount} 粒曲奇`,
+  }),
+  chooseSendBack: { en: "Send it back — production ×5 for a minute", yue: "退返轉頭——一分鐘產量 ×5" },
+  chooseNote: {
+    en: "Worth about the same either way. Let the clock run out and you get neither.",
+    yue: "兩邊價值差唔多。等到時間過晒就兩樣都冇。",
+  },
+  buffRunning: { en: "The better tray is out — production ×5.", yue: "好嗰盤出爐喇——產量 ×5。" },
+  comboNote: { en: "Every click keeps the window open longer.", yue: "每撳一下，個窗口就開耐啲。" },
+  clotNote: {
+    en: "Production is halved until it clears. There is no button for this one — wait it out.",
+    yue: "通咗之前產量減半。今次冇掣可以撳——等佢過。",
+  },
+  reboundNote: {
+    en: "Half rate while it lasts — then the late delivery lands in one lump, worth more than the dip cost.",
+    yue: "呢段時間產量得一半——之後遲到嗰批一次過到，補返嘅仲多過蝕嘅。",
+  },
+  nightShiftNote: {
+    en: "Great if you put the mouse down; clicks are worth a quarter until morning.",
+    yue: "唔撳嘅話好抵；不過天光之前，撳一下淨係值四分一。",
+  },
+  frenzyNote: { en: "This is the good weather. Spend it.", yue: "難得順風。好好用佢。" },
+} as const;
+
+/**
  * The Mouse Raid's own strings.
  *
  * Every one of them says what actually happened with a real figure in it. "Some cookies were

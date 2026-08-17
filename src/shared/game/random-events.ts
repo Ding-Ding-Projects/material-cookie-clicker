@@ -55,6 +55,32 @@ export type RandomEventId =
   | "sugar_rush"
   | "lucky_crumb"
   | "market_day"
+  /* ------------------------------------------------------------------ the frenzy class */
+  /**
+   * THE FRENZIES, and why a second frenzy exists when golden-cookie.ts already has one.
+   *
+   * A golden cookie's frenzy is a REWARD FOR LOOKING: it only ever happens because the player
+   * saw a cookie and clicked it. These four are a reward for BEING THERE — they land on the
+   * pool's own clock whether anyone is watching or not, and what they change is how the next
+   * minute of an ordinary session feels. The two systems stack, on purpose, and the ceiling
+   * that stops that stack running away is stated once and tested (`stackEventMultipliers`).
+   *
+   * The class is deliberately not all upside. `clot` is in it, halving production for over a
+   * minute, because a game where the only weather is good weather has no weather at all: the
+   * frenzies are worth waiting for exactly to the extent that the pool can also cost you
+   * something.
+   */
+  | "production_frenzy"
+  | "click_frenzy"
+  | "burnt_batch_frenzy"
+  | "clot"
+  | "combo_window"
+  /* ------------------------------------------------------- events designed for this pool */
+  | "delivery_rush"
+  | "taste_test"
+  | "flour_shortage"
+  | "night_shift"
+  | "sprinkle_storm"
   /**
    * THE MOUSE RAID — the one event that is not in the common pool.
    *
@@ -83,7 +109,23 @@ export type RandomEventId =
  *                  drops are worth cookies; Oven Hiccup's single button is worth ending the
  *                  penalty early. Both still resolve on expiry if the player ignores them.
  */
-export type RandomEventShape = "instant" | "timed" | "clickable";
+export type RandomEventShape = "instant" | "timed" | "clickable" | "choice";
+
+/**
+ * What KIND of weather an event is, for styling and for reading the pool at a glance.
+ *
+ *   - `boon`     — pure upside. The pool's bread and butter.
+ *   - `frenzy`   — a big multiplier for a short window. Warm accent.
+ *   - `clot`     — pure downside for a while. Cold accent. There is exactly one, on purpose.
+ *   - `chain`    — a sequence of targets that has to be worked through in order.
+ *   - `choice`   — two buttons, one decision, a real tradeoff between them.
+ *   - `tradeoff` — a timed effect that gives with one hand and takes with the other.
+ *
+ * `isSetback` stays a separate boolean because it answers a different question: "does this cost
+ * the player something?" A `tradeoff` costs them something and is not a setback overall, and the
+ * warning copy keys off the boolean rather than off the class.
+ */
+export type RandomEventClass = "boon" | "frenzy" | "clot" | "chain" | "choice" | "tradeoff";
 
 export interface RandomEventDefinition {
   readonly id: RandomEventId;
@@ -110,7 +152,38 @@ export interface RandomEventDefinition {
   readonly rebateFraction: number;
   /** True when the event costs the player something. Drives the warning styling and copy. */
   readonly isSetback: boolean;
+  /** Which family this belongs to. Drives the accent, and nothing else. */
+  readonly eventClass: RandomEventClass;
 }
+
+/**
+ * THE WEIGHTS, AND THE PACING THEY BUY.
+ *
+ * Every weight in the pool below is out of a total of exactly one hundred (`POOL_WEIGHT_TOTAL`,
+ * pinned by a test), so a weight reads as a percentage of draws without any arithmetic. That is
+ * the only reason the numbers are what they are — nothing in the draw needs them to sum to
+ * anything in particular.
+ *
+ * WHAT THE PACING WAS, AND WHAT IT IS NOW. The gap between two pool events is
+ * `cooldownMs + uniform(minDelayMs, maxDelayMs)`, so the mean gap is the cooldown plus the
+ * midpoint of the band:
+ *
+ *   before this lane — 60s + mean(180s, 600s) = 450s  →  8.0 pool events an hour, from 6 kinds
+ *   after  this lane — 60s + mean(240s, 720s) = 540s  →  6.7 pool events an hour, from 16 kinds
+ *
+ * The pool got nearly three times as many faces and FEWER interruptions an hour, which is the
+ * whole point: variety is supposed to make each event rarer, not the session busier. The Mouse
+ * Raid's own hourly clock is untouched by all of this, and so is the one-active-slot rule — a
+ * bigger bag does not mean two events on screen.
+ *
+ * What the rarest things now cost in real time, at 6.7 draws an hour:
+ *
+ *   Burnt Batch Frenzy   1%  →  about one every 15 hours of play
+ *   Production Frenzy    4%  →  about one every 3.7 hours
+ *   Click Frenzy         3%  →  about one every 5 hours
+ *   anything that costs you something (Oven Hiccup, Flour Shortage, Clot) 13% → 0.87 an hour
+ */
+export const POOL_WEIGHT_TOTAL = 100;
 
 export const RANDOM_EVENT_DEFINITIONS: readonly RandomEventDefinition[] = [
   {
@@ -121,12 +194,13 @@ export const RANDOM_EVENT_DEFINITIONS: readonly RandomEventDefinition[] = [
     blurbYue: "有曲奇跌緊落嚟，落到枱面之前接住佢。",
     shape: "clickable",
     durationMs: 20_000,
-    weight: 3,
+    weight: 10,
     targetCount: 12,
     cpsMultiplier: 1,
     clickMultiplier: 1,
     rebateFraction: 0,
     isSetback: false,
+    eventClass: "boon",
   },
   {
     id: "grandmas_batch",
@@ -136,12 +210,13 @@ export const RANDOM_EVENT_DEFINITIONS: readonly RandomEventDefinition[] = [
     blurbYue: "無啦啦送咗成盤過嚟。",
     shape: "instant",
     durationMs: 0,
-    weight: 3,
+    weight: 10,
     targetCount: 0,
     cpsMultiplier: 1,
     clickMultiplier: 1,
     rebateFraction: 0,
     isSetback: false,
+    eventClass: "boon",
   },
   {
     id: "oven_hiccup",
@@ -151,12 +226,13 @@ export const RANDOM_EVENT_DEFINITIONS: readonly RandomEventDefinition[] = [
     blurbYue: "焗爐鬧脾氣，產量跌咗。拍佢一下就得。",
     shape: "clickable",
     durationMs: 30_000,
-    weight: 2,
+    weight: 6,
     targetCount: 1,
     cpsMultiplier: 0.4,
     clickMultiplier: 1,
     rebateFraction: 0,
     isSetback: true,
+    eventClass: "clot",
   },
   {
     id: "sugar_rush",
@@ -166,12 +242,13 @@ export const RANDOM_EVENT_DEFINITIONS: readonly RandomEventDefinition[] = [
     blurbYue: "每一下撳都重七倍。",
     shape: "timed",
     durationMs: 15_000,
-    weight: 3,
+    weight: 8,
     targetCount: 0,
     cpsMultiplier: 1,
     clickMultiplier: 7,
     rebateFraction: 0,
     isSetback: false,
+    eventClass: "frenzy",
   },
   {
     id: "lucky_crumb",
@@ -181,12 +258,13 @@ export const RANDOM_EVENT_DEFINITIONS: readonly RandomEventDefinition[] = [
     blurbYue: "喺枱底執到少少嘢。",
     shape: "instant",
     durationMs: 0,
-    weight: 4,
+    weight: 12,
     targetCount: 0,
     cpsMultiplier: 1,
     clickMultiplier: 1,
     rebateFraction: 0,
     isSetback: false,
+    eventClass: "boon",
   },
   {
     id: "market_day",
@@ -196,14 +274,333 @@ export const RANDOM_EVENT_DEFINITIONS: readonly RandomEventDefinition[] = [
     blurbYue: "供應商今日心情好，買嘢有錢回。",
     shape: "timed",
     durationMs: 60_000,
-    weight: 3,
+    weight: 10,
     targetCount: 0,
     cpsMultiplier: 1,
     clickMultiplier: 1,
     rebateFraction: 0.15,
     isSetback: false,
+    eventClass: "boon",
+  },
+
+  /* ============================================================ THE FRENZY CLASS ========= */
+
+  /**
+   * PRODUCTION FRENZY — the classic, ×7 for seventy-seven seconds.
+   *
+   * Intent: the pool's headline. Seventy-seven seconds is long enough that a player changes what
+   * they are doing — they stop buying and let it run, or they buy the thing they were two
+   * seconds short of — which is what separates a frenzy from a bigger Lucky Crumb.
+   *
+   * The numbers are deliberately the SAME numbers as the golden cookie's frenzy, because they
+   * are the same idea arriving by a different door, and giving the pool's version its own
+   * slightly-different multiplier would only invite the question of which one this is.
+   */
+  {
+    id: "production_frenzy",
+    nameEn: "Production Frenzy",
+    nameYue: "生產狂熱",
+    blurbEn: "Every oven in the place is going flat out. Production ×7.",
+    blurbYue: "成間舖啲焗爐開到盡。產量 ×7。",
+    shape: "timed",
+    durationMs: 77_000,
+    weight: 4,
+    targetCount: 0,
+    cpsMultiplier: 7,
+    clickMultiplier: 1,
+    rebateFraction: 0,
+    isSetback: false,
+    eventClass: "frenzy",
+  },
+  /**
+   * CLICK FRENZY — ×777 on the click, for thirteen seconds.
+   *
+   * Intent: the one event that pays for putting your hand on the mouse. A number this size only
+   * works because the window is tiny and the draw is rare (3%, about one every five hours): what
+   * it is worth is bounded by how fast a human can click, not by how big the multiplier looks.
+   * It is the counterweight to Production Frenzy, which pays for doing nothing at all.
+   */
+  {
+    id: "click_frenzy",
+    nameEn: "Click Frenzy",
+    nameYue: "狂撳",
+    blurbEn: "Thirteen seconds where every click is worth seven hundred and seventy-seven.",
+    blurbYue: "十三秒之內，每一下撳都值七百七十七下。",
+    shape: "timed",
+    durationMs: 13_000,
+    weight: 3,
+    targetCount: 0,
+    cpsMultiplier: 1,
+    clickMultiplier: 777,
+    rebateFraction: 0,
+    isSetback: false,
+    eventClass: "frenzy",
+  },
+  /**
+   * BURNT BATCH FRENZY — ×666 for six seconds. The rarest thing in the pool by a factor of four.
+   *
+   * Intent: the event you tell someone about. A whole tray has caught, the kitchen panics, and
+   * for six seconds the place produces at a rate it has no business producing at. Six seconds of
+   * ×666 is about sixty-six minutes of ordinary production, which is a lot — and it lands roughly
+   * once every fifteen hours, which is what makes that acceptable rather than a balance hole.
+   *
+   * It is drawn as a frenzy rather than a setback because nothing is taken: the batch is ruined
+   * in the fiction and the arithmetic only ever goes up. Calling it a setback would be styling
+   * the player's best moment in the alarm colour.
+   */
+  {
+    id: "burnt_batch_frenzy",
+    nameEn: "Burnt Batch Frenzy",
+    nameYue: "燶批狂熱",
+    blurbEn: "A tray has caught and the whole kitchen is panicking. Six seconds at ×666.",
+    blurbYue: "有盤嘢燶咗，成個廚房亂晒。六秒 ×666。",
+    shape: "timed",
+    durationMs: 6_000,
+    weight: 1,
+    targetCount: 0,
+    cpsMultiplier: 666,
+    clickMultiplier: 1,
+    rebateFraction: 0,
+    isSetback: false,
+    eventClass: "frenzy",
+  },
+  /**
+   * CLOT — production halved for sixty-six seconds, and nothing you can do about it.
+   *
+   * Intent: this is what makes a frenzy worth anything. A pool whose every face is a present is
+   * not weather, it is a drip feed, and the player stops reading the marquee. The Clot is the
+   * mirror of Production Frenzy — same shape, same order of duration, opposite sign — so the two
+   * teach each other: after you have sat through sixty-six seconds at half rate, seventy-seven
+   * seconds at seven times is a thing you notice.
+   *
+   * There is no button to end it early, unlike the Oven Hiccup. That is the difference between
+   * the two setbacks: the hiccup is a chore you can clear, the clot is weather you wait out. It
+   * halves production and touches NOTHING else — not the balance, not clicks, not the shop.
+   */
+  {
+    id: "clot",
+    nameEn: "Clot",
+    nameYue: "撞板",
+    blurbEn: "The dough has seized in the mixers. Production at half rate until it clears.",
+    blurbYue: "啲麵糰喺攪拌機度結咗塊。通咗之前產量得一半。",
+    shape: "timed",
+    durationMs: 66_000,
+    weight: 3,
+    targetCount: 0,
+    cpsMultiplier: 0.5,
+    clickMultiplier: 1,
+    rebateFraction: 0,
+    isSetback: true,
+    eventClass: "clot",
+  },
+  /**
+   * COMBO WINDOW — eight seconds at ×5 on the click, and every click buys more window.
+   *
+   * Intent: the only event in the pool whose VALUE depends on the player rather than on the
+   * dice. Each click during it pushes the end time out by `COMBO_EXTEND_MS`, capped at
+   * `COMBO_MAX_DURATION_MS` from the moment it started, so a player who keeps the rhythm turns
+   * eight seconds into thirty and a player who wanders off gets eight seconds.
+   *
+   * The cap is what stops it being a lever rather than an event: no amount of clicking makes it
+   * permanent, and the extension is per click rather than per second so there is no way to hold
+   * it open without actually playing. The multiplier is small (×5, against Sugar Rush's ×7)
+   * precisely because the duration is the reward here.
+   */
+  {
+    id: "combo_window",
+    nameEn: "Combo Window",
+    nameYue: "連撳窗口",
+    blurbEn: "Clicks are worth ×5, and every click you land keeps the window open longer.",
+    blurbYue: "撳一下值 ×5，而且每撳一下個窗口就開耐啲。",
+    shape: "timed",
+    durationMs: 8_000,
+    weight: 3,
+    targetCount: 0,
+    cpsMultiplier: 1,
+    clickMultiplier: 5,
+    rebateFraction: 0,
+    isSetback: false,
+    eventClass: "frenzy",
+  },
+
+  /* ================================================= EVENTS DESIGNED FOR THIS POOL ======= */
+
+  /**
+   * DELIVERY RUSH — three parcels, in order, against the clock.
+   *
+   * Intent: a chain event, which the pool had none of. Cookie Rain scatters twelve identical
+   * targets and rewards spraying clicks at the stage; the Delivery Rush puts THREE down and
+   * only the next one in the sequence counts, so the gesture is "find the one that is live and
+   * hit it" rather than "hit everything". Each parcel pays, and getting all three inside the
+   * window pays a completion bonus on top that is worth more than the three parcels together —
+   * a chain the player abandons half way should be worth what they actually did, and finishing
+   * it should be worth having tried.
+   *
+   * Clicking out of order is refused rather than punished. A wrong click costing something would
+   * make a twelve-second timer into a stress test, and the refusal already carries the lesson.
+   */
+  {
+    id: "delivery_rush",
+    nameEn: "Delivery Rush",
+    nameYue: "趕單",
+    blurbEn: "Three orders are out the door in sequence. Send them in order before the van goes.",
+    blurbYue: "三張單要順住次序出。喺架車走之前逐張搞掂。",
+    shape: "clickable",
+    durationMs: 14_000,
+    weight: 6,
+    targetCount: 3,
+    cpsMultiplier: 1,
+    clickMultiplier: 1,
+    rebateFraction: 0,
+    isSetback: false,
+    eventClass: "chain",
+  },
+  /**
+   * TASTE TEST — two buttons, one decision, and no right answer.
+   *
+   * Intent: the pool's only event that asks the player something. A tray comes out of the oven
+   * and is either good enough to sell or not, and the player decides which:
+   *
+   *   - SERVE IT NOW  — a lump sum, right now, `tasteTestServeCpsSeconds` of production.
+   *   - SEND IT BACK  — nothing now, and `TASTE_TEST_BUFF_MS` at ×`TASTE_TEST_BUFF_MULTIPLIER`.
+   *
+   * The two are tuned to be worth roughly the same in a vacuum (five minutes of production
+   * either way), so the choice is genuinely about circumstance rather than about which button is
+   * secretly correct: the lump is better if you are about to buy something, the buff is better if
+   * you are about to sit and watch, and it is strictly better if a frenzy is already running,
+   * because it multiplies into that stack and a lump sum does not.
+   *
+   * Letting the window run out chooses neither and pays nothing. That is stated in the copy and
+   * on the site rather than being a trap: an event that made indecision the best option would
+   * teach players to ignore it.
+   */
+  {
+    id: "taste_test",
+    nameEn: "Taste Test",
+    nameYue: "試味",
+    blurbEn: "A tray is out and it is borderline. Serve it now, or send it back for a better one?",
+    blurbYue: "有盤嘢出爐，好唔好食就好爭議。即刻賣咗佢，定係退返轉頭焗過？",
+    shape: "choice",
+    durationMs: 15_000,
+    weight: 5,
+    targetCount: 0,
+    cpsMultiplier: 1,
+    clickMultiplier: 1,
+    rebateFraction: 0,
+    isSetback: false,
+    eventClass: "choice",
+  },
+  /**
+   * FLOUR SHORTAGE — a dip, then the delayed lorry arrives all at once.
+   *
+   * Intent: a setback that is honest about being temporary, and the only event in the pool with
+   * a payout ON EXPIRY. Production runs at half rate for thirty seconds while the bins are
+   * empty; when it ends, `flourShortageReboundCpsSeconds` of production lands in one lump —
+   * more than the dip cost, so a player who sat through it is slightly ahead.
+   *
+   * It is still drawn as a setback, and the marquee still warns, because for thirty seconds the
+   * counter really is climbing more slowly and pretending otherwise would be the sort of
+   * flattering copy this game does not write. The rebound is stated on the site, in the toast
+   * and in the aftermath, so nobody has to discover it by waiting.
+   *
+   * (The owner's sketch was "discounts nothing but doubles the next purchase's effect". That
+   * was tried and rejected: a purchase whose effect is doubled means a generator whose count is
+   * not what the shop said it would be, which breaks the one promise every price in this game
+   * makes. The rebound keeps the shape of the idea — you lose now, you gain later — without
+   * making any printed number a lie.)
+   */
+  {
+    id: "flour_shortage",
+    nameEn: "Flour Shortage",
+    nameYue: "冇麵粉",
+    blurbEn: "The bins are empty and the lorry is late. Half rate until it arrives — then it all lands at once.",
+    blurbYue: "麵粉用晒，架貨車又遲到。到貨之前產量得一半——到咗之後一次過補返。",
+    shape: "timed",
+    durationMs: 30_000,
+    weight: 4,
+    targetCount: 0,
+    cpsMultiplier: 0.5,
+    clickMultiplier: 1,
+    rebateFraction: 0,
+    isSetback: true,
+    eventClass: "tradeoff",
+  },
+  /**
+   * NIGHT SHIFT — production ×3, clicks ×0.25, for forty-five seconds.
+   *
+   * Intent: an event that is worth a different amount to different players, which nothing else
+   * in the pool is. The ovens run all night and there is nobody at the counter: an idle save
+   * gains a great deal and an active clicker gains almost nothing, so it is the one draw where
+   * the correct play is to put the mouse down.
+   *
+   * The click penalty is real (a quarter, not a token 0.9) because a tradeoff nobody can feel is
+   * just a boon with extra words. It is NOT flagged as a setback: the production gain dominates
+   * for every playstyle the game actually has, and painting it in the alarm colour would send a
+   * player scrambling to end something that is helping them.
+   */
+  {
+    id: "night_shift",
+    nameEn: "Night Shift",
+    nameYue: "通宵更",
+    blurbEn: "The ovens run all night with nobody at the counter. Production ×3, clicks ×0.25.",
+    blurbYue: "啲焗爐通宵開，但係冇人睇住個櫃檯。產量 ×3，撳嘅價值 ×0.25。",
+    shape: "timed",
+    durationMs: 45_000,
+    weight: 7,
+    targetCount: 0,
+    cpsMultiplier: 3,
+    clickMultiplier: 0.25,
+    rebateFraction: 0,
+    isSetback: false,
+    eventClass: "tradeoff",
+  },
+  /**
+   * SPRINKLE STORM — ten targets whose value climbs as you clear them.
+   *
+   * Intent: Cookie Rain rewards catching ANY drop; the Sprinkle Storm rewards catching them ALL.
+   * Each sprinkle is worth the base amount times one plus `sprinkleEscalation` per sprinkle
+   * already caught, so the tenth is worth nearly four times the first and the last few are where
+   * the event actually lives. A player who catches three has had a small Cookie Rain; a player
+   * who clears the stage has had something worth chasing.
+   *
+   * The escalation is stated in the copy and on the site, because an escalating reward the
+   * player cannot see is indistinguishable from a flat one they misremembered.
+   */
+  {
+    id: "sprinkle_storm",
+    nameEn: "Sprinkle Storm",
+    nameYue: "糖針暴",
+    blurbEn: "Sprinkles everywhere. Each one you catch makes the next one worth more.",
+    blurbYue: "周圍都係糖針。接得一粒，下一粒就值多啲。",
+    shape: "clickable",
+    durationMs: 18_000,
+    weight: 8,
+    targetCount: 10,
+    cpsMultiplier: 1,
+    clickMultiplier: 1,
+    rebateFraction: 0,
+    isSetback: false,
+    eventClass: "boon",
   },
 ];
+
+/* ------------------------------------------------------- tuning owned by the new events */
+
+/** How much one click during a Combo Window pushes its end time out. */
+export const COMBO_EXTEND_MS = 400;
+/** The most a Combo Window can ever last, measured from the instant it spawned. */
+export const COMBO_MAX_DURATION_MS = 30_000;
+
+/** How long the Taste Test's "send it back" buff runs, and what it multiplies production by. */
+export const TASTE_TEST_BUFF_MS = 60_000;
+export const TASTE_TEST_BUFF_MULTIPLIER = 5;
+
+/** The Taste Test's two answers. Anything else is refused by the domain. */
+export type RandomEventChoiceId = "serve" | "send_back";
+export const RANDOM_EVENT_CHOICE_IDS: readonly RandomEventChoiceId[] = ["serve", "send_back"];
+
+/** The Delivery Rush's parcels, in the order they must be sent. */
+export const DELIVERY_RUSH_PARCELS = 3;
 
 /**
  * The Mouse Raid's definition, deliberately NOT a member of `RANDOM_EVENT_DEFINITIONS`.
@@ -232,6 +629,7 @@ export const MOUSE_RAID_DEFINITION: RandomEventDefinition = {
   clickMultiplier: 1,
   rebateFraction: 0,
   isSetback: true,
+  eventClass: "clot",
 };
 
 /** Fewest and most mice one raid can bring. */
@@ -276,6 +674,29 @@ export interface RandomEventPayoutConfig {
   readonly raidDefendedCpsSeconds: number;
   /** Flat cookies a fully-defended raid pays on top, so early saves get something real. */
   readonly raidDefendedFlatCookies: number;
+
+  /* ------------------------------------------------------ the events added by this lane */
+  /** Seconds of production one Delivery Rush parcel pays when it is sent in turn. */
+  readonly deliveryParcelCpsSeconds: number;
+  /** Seconds of production paid ON TOP for getting all three parcels out inside the window. */
+  readonly deliveryCompletionCpsSeconds: number;
+  /** Seconds of production the Taste Test's "serve it now" answer pays at once. */
+  readonly tasteTestServeCpsSeconds: number;
+  /**
+   * Seconds of production the Flour Shortage pays when it ENDS.
+   *
+   * Sized deliberately larger than the dip costs. Thirty seconds at half rate loses fifteen
+   * seconds' worth of production; the rebound pays forty-five, so sitting through the shortage
+   * is worth thirty seconds of production rather than being a wash. A setback whose compensation
+   * exactly cancelled it would be a thirty-second animation with no consequence either way.
+   */
+  readonly flourShortageReboundCpsSeconds: number;
+  /** Seconds of production the FIRST sprinkle of a storm is worth. */
+  readonly sprinkleBaseCpsSeconds: number;
+  /** Clicks' worth the first sprinkle is ALSO worth, so a storm pays on a save with no ovens. */
+  readonly sprinkleBaseClicks: number;
+  /** How much each sprinkle already caught adds to the value of the next, as a fraction. */
+  readonly sprinkleEscalation: number;
 }
 
 export const DEFAULT_RANDOM_EVENT_PAYOUTS: RandomEventPayoutConfig = {
@@ -286,6 +707,13 @@ export const DEFAULT_RANDOM_EVENT_PAYOUTS: RandomEventPayoutConfig = {
   luckyCrumbFlatCookies: 25,
   raidDefendedCpsSeconds: 120,
   raidDefendedFlatCookies: 250,
+  deliveryParcelCpsSeconds: 45,
+  deliveryCompletionCpsSeconds: 180,
+  tasteTestServeCpsSeconds: 300,
+  flourShortageReboundCpsSeconds: 45,
+  sprinkleBaseCpsSeconds: 12,
+  sprinkleBaseClicks: 8,
+  sprinkleEscalation: 0.3,
 };
 
 /* ---------------------------------------------------------------- scheduler config */
@@ -340,12 +768,25 @@ export interface RandomEventConfig {
   /** The most a raid can ever take, as a fraction of the CURRENT balance. Reached only when
    *  every mouse escapes. */
   readonly raidStealCeiling: number;
+  /**
+   * Forces every pool draw to one specific event. Developer-only and undefined in every shipped
+   * config, exactly like the fast schedule it travels with.
+   *
+   * It exists for one reason: photographing a 1%-weight event honestly. The alternative — sitting
+   * on a capture desktop for fifteen hours waiting for a Burnt Batch Frenzy — is not a capture
+   * process, and faking the screenshot is not an option. What it does NOT do is relax any rule
+   * the player is subject to: the event that fires is the real event, with the real duration,
+   * the real arithmetic and the real one-active-slot behaviour. Only WHICH one is decided here.
+   */
+  readonly forcedPoolEventId?: RandomEventId;
   readonly payouts: RandomEventPayoutConfig;
 }
 
 export const DEFAULT_RANDOM_EVENT_CONFIG: RandomEventConfig = {
-  minDelayMs: 3 * 60 * 1000,
-  maxDelayMs: 10 * 60 * 1000,
+  // Four to twelve minutes, widened from three-to-ten when the pool grew from six events to
+  // sixteen. See POOL_WEIGHT_TOTAL's note: more faces, fewer interruptions.
+  minDelayMs: 4 * 60 * 1000,
+  maxDelayMs: 12 * 60 * 1000,
   cooldownMs: 60 * 1000,
   raidMinDelayMs: 30 * 60 * 1000,
   raidMaxDelayMs: 60 * 60 * 1000,
@@ -423,6 +864,14 @@ export const FAST_RANDOM_EVENTS_FLAG = "material-cookie-clicker:events:fast";
 export function resolveRandomEventConfig(flagValue: string | null | undefined): RandomEventConfig {
   if (flagValue === "raid") return RAID_CAPTURE_EVENT_CONFIG;
   if (flagValue === "1" || flagValue === "true") return FAST_RANDOM_EVENT_CONFIG;
+  // `event:<id>` — the fast pool, pinned to one event. Anything that is not the id of a real
+  // POOL event (the raid included, since it is not drawn from the pool) falls through to the
+  // shipped schedule rather than to a broken one.
+  if (typeof flagValue === "string" && flagValue.startsWith("event:")) {
+    const id = flagValue.slice("event:".length);
+    const def = RANDOM_EVENT_DEFINITIONS.find((d) => d.id === id);
+    if (def) return { ...FAST_RANDOM_EVENT_CONFIG, forcedPoolEventId: def.id };
+  }
   return DEFAULT_RANDOM_EVENT_CONFIG;
 }
 
@@ -694,6 +1143,16 @@ export interface ActiveRandomEvent {
   readonly startingShare?: number;
   /** Consumables this raid armed at spawn. Already deducted from stock; spent either way. */
   readonly armed?: readonly RaidConsumableId[];
+  /**
+   * Which way a CHOICE event was answered. Absent while the question is still on screen, and
+   * absent forever on every event that never asked one.
+   *
+   * A choice event does not end when it is answered: answering "send it back" turns the same
+   * active slot into the buff it bought, and this field is what the multiplier lookup reads to
+   * know that. Keeping it on the active event rather than in a second state field means the buff
+   * cannot outlive the slot, cannot stack with itself, and is saved and restored for free.
+   */
+  readonly choiceTaken?: RandomEventChoiceId;
 }
 
 export interface ResolvedRandomEvent {
@@ -790,6 +1249,16 @@ const RandomEventIdSchema = z.enum([
   "sugar_rush",
   "lucky_crumb",
   "market_day",
+  "production_frenzy",
+  "click_frenzy",
+  "burnt_batch_frenzy",
+  "clot",
+  "combo_window",
+  "delivery_rush",
+  "taste_test",
+  "flour_shortage",
+  "night_shift",
+  "sprinkle_storm",
   "mouse_raid",
 ]);
 
@@ -829,6 +1298,7 @@ const ActiveRandomEventSchema = z.object({
   mice: z.array(RaidMouseSchema).optional(),
   startingShare: z.number().optional(),
   armed: z.array(RaidConsumableIdSchema).optional(),
+  choiceTaken: z.enum(["serve", "send_back"]).optional(),
 });
 
 export const RandomEventsStateSchema = z.object({
@@ -879,6 +1349,7 @@ export function encodeRandomEvents(state: RandomEventsState): RandomEventsSaveDa
           pendingTargetIds: [...state.active.pendingTargetIds],
           mice: state.active.mice ? state.active.mice.map((mouse) => ({ ...mouse })) : undefined,
           armed: state.active.armed ? [...state.active.armed] : undefined,
+          choiceTaken: state.active.choiceTaken,
         }
       : null,
     nextEligibleAtEpochMs: state.nextEligibleAtEpochMs,
@@ -936,6 +1407,14 @@ export function pickRandomEventId(rng: RngPort): RandomEventId {
 function targetIdsFor(def: RandomEventDefinition): readonly string[] {
   if (def.id === "cookie_rain") {
     return Array.from({ length: def.targetCount }, (_, index) => `rain:${index}`);
+  }
+  if (def.id === "sprinkle_storm") {
+    return Array.from({ length: def.targetCount }, (_, index) => `sprinkle:${index}`);
+  }
+  // The parcels are in the array in the order they must be sent, and `clickRandomEventTarget`
+  // only ever accepts the head of it, which is what makes the chain a chain.
+  if (def.id === "delivery_rush") {
+    return Array.from({ length: def.targetCount }, (_, index) => `parcel:${index}`);
   }
   if (def.id === "oven_hiccup") return ["oven:fix"];
   return [];
@@ -1139,7 +1618,10 @@ export function tickRandomEvents(
         rngStreamIndex: rng.getStreamIndex(),
         lastResolved: resolved,
       },
-      instantBonus: zero,
+      // The Flour Shortage is the one event that PAYS on expiry: the late lorry arrives the
+      // moment the window closes. Everything else expires paying nothing, and `expiryPayout`
+      // returns zero for them.
+      instantBonus: expiryPayout(expired.id, gameState, config.payouts),
       raidTheft: null,
     };
   }
@@ -1210,7 +1692,10 @@ export function tickRandomEvents(
   // 5 — the pool's window.
   if (nowEpochMs < state.nextEligibleAtEpochMs) return quiet;
 
-  const id = pickRandomEventId(rng);
+  // A forced id (developer capture flag only) still draws, so the stream advances identically
+  // whether or not the flag is set and a forced run is not a differently-shaped run.
+  const drawn = pickRandomEventId(rng);
+  const id = config.forcedPoolEventId ?? drawn;
   const def = getRandomEventDefinition(id);
 
   if (def.shape === "instant") {
@@ -1271,6 +1756,109 @@ export function instantPayout(
 }
 
 /**
+ * What an event pays when its window CLOSES, rather than when it opens.
+ *
+ * Only the Flour Shortage has one. It is a separate function from `instantPayout` because the
+ * two are asked at opposite ends of an event's life and folding them together would make it
+ * possible for one event to accidentally get both.
+ */
+export function expiryPayout(
+  id: RandomEventId,
+  gameState: GameState,
+  payouts: RandomEventPayoutConfig = DEFAULT_RANDOM_EVENT_PAYOUTS,
+): BigNum {
+  if (id !== "flour_shortage") return bnFromNumber(0);
+  return bnMulScalar(totalCps(gameState), payouts.flourShortageReboundCpsSeconds);
+}
+
+/** What the Taste Test's "serve it now" answer pays, at the instant it is pressed. */
+export function tasteTestServePayout(
+  gameState: GameState,
+  payouts: RandomEventPayoutConfig = DEFAULT_RANDOM_EVENT_PAYOUTS,
+): BigNum {
+  return bnMulScalar(totalCps(gameState), payouts.tasteTestServeCpsSeconds);
+}
+
+/**
+ * What one Delivery Rush parcel is worth. `completion` is true for the last one of the three,
+ * which also carries the bonus for finishing the chain inside the window.
+ */
+export function deliveryParcelPayout(
+  gameState: GameState,
+  completion: boolean,
+  payouts: RandomEventPayoutConfig = DEFAULT_RANDOM_EVENT_PAYOUTS,
+): BigNum {
+  const cps = totalCps(gameState);
+  const parcel = bnMulScalar(cps, payouts.deliveryParcelCpsSeconds);
+  if (!completion) return parcel;
+  return bnAdd(parcel, bnMulScalar(cps, payouts.deliveryCompletionCpsSeconds));
+}
+
+/**
+ * What the NEXT sprinkle is worth, given how many have already been caught.
+ *
+ *   value = (base production slice + base clicks) × (1 + escalation × alreadyCaught)
+ *
+ * so with the shipped 0.3, the tenth sprinkle of a storm is worth 3.7 times the first, and
+ * clearing all ten pays 23.5 times one sprinkle rather than ten times it. That multiplier is the
+ * event: catching a few is a footnote, clearing the stage is the reward.
+ */
+export function sprinklePayout(
+  gameState: GameState,
+  alreadyCaught: number,
+  payouts: RandomEventPayoutConfig = DEFAULT_RANDOM_EVENT_PAYOUTS,
+): BigNum {
+  const base = bnAdd(
+    bnMulScalar(totalCps(gameState), payouts.sprinkleBaseCpsSeconds),
+    bnMulScalar(baseClickValue(gameState), payouts.sprinkleBaseClicks),
+  );
+  return bnMulScalar(base, 1 + payouts.sprinkleEscalation * Math.max(0, alreadyCaught));
+}
+
+/* ---------------------------------------------------------------------- STACKING RULES */
+
+/**
+ * THE STACKING RULES, decided once and enforced in one function.
+ *
+ * There are exactly two sources of a live multiplier in this game and they are independent:
+ *
+ *   1. THE GOLDEN COOKIE (golden-cookie.ts) — frenzy ×7 for 77s, click frenzy ×3 for 13s.
+ *   2. THE RANDOM-EVENT POOL (this file) — at most ONE at a time, because of the active slot.
+ *
+ * There is no third, and two pool events can never overlap, so the worst case is always exactly
+ * one golden effect times one pool effect. The rules:
+ *
+ *   MULTIPLICATIVE, NOT MAXIMUM. Two effects that arrived independently both apply. Taking one
+ *   away because the other landed would punish the player for good luck, and "which of my two
+ *   buffs is silently doing nothing" is not a question a counter can answer.
+ *
+ *   NEGATIVE MULTIPLIERS MULTIPLY TOO, and they are never capped. A Clot during a golden frenzy
+ *   is ×7 × 0.5 = ×3.5 — still a good minute, and visibly a worse one than it would have been.
+ *   Anything below 1 is left exactly as the arithmetic gives it: capping a penalty would be
+ *   capping it in the player's favour and would make the setbacks unreadable.
+ *
+ *   THE UPSIDE IS CAPPED, and the caps are stated. `EVENT_CPS_STACK_CAP` (×1000) and
+ *   `EVENT_CLICK_STACK_CAP` (×10000) are the ceilings on the COMBINED figure. They exist for one
+ *   case each and both are real: a Burnt Batch Frenzy (×666) inside a golden frenzy (×7) would
+ *   otherwise be ×4662, and a Click Frenzy (×777) inside Sugar Rush is impossible (one slot) but
+ *   a Click Frenzy (×777) inside a golden click frenzy (×3) is ×2331 and the same event stacked
+ *   with a future third source would not be. The caps are far above anything a single event can
+ *   reach on its own, so a capped moment is always a moment two rare things coincided — the cap
+ *   never quietly eats an ordinary buff.
+ *
+ * Sugar Rush is not special-cased anywhere: it is a pool event like the others and goes through
+ * this same function, which is what the owner's "vs Sugar Rush" question resolves to.
+ */
+export const EVENT_CPS_STACK_CAP = 1000;
+export const EVENT_CLICK_STACK_CAP = 10_000;
+
+export function stackEventMultipliers(a: number, b: number, cap: number): number {
+  const product = a * b;
+  if (!Number.isFinite(product) || product < 0) return 0;
+  return Math.min(product, cap);
+}
+
+/**
  * What one caught rain drop is worth: a fixed slice of production PLUS a fixed number of
  * clicks. The click half is what makes the event mean something on a save with no generators
  * yet, where a share of production would be a share of zero.
@@ -1293,9 +1881,21 @@ function activeDefinition(state: RandomEventsState, nowEpochMs: number): RandomE
   return getRandomEventDefinition(state.active.id);
 }
 
-/** Production multiplier from the active event: 1 when nothing is running. */
+/**
+ * Production multiplier from the active event: 1 when nothing is running.
+ *
+ * The one thing this is not a plain table lookup for is the Taste Test, which multiplies nothing
+ * while the question is on screen and ×`TASTE_TEST_BUFF_MULTIPLIER` once "send it back" has been
+ * pressed. Reading that off the active event rather than off a second state field is what keeps
+ * the buff unable to outlive its own slot.
+ */
 export function randomEventCpsMultiplier(state: RandomEventsState, nowEpochMs: number): number {
-  return activeDefinition(state, nowEpochMs)?.cpsMultiplier ?? 1;
+  const def = activeDefinition(state, nowEpochMs);
+  if (!def) return 1;
+  if (def.id === "taste_test") {
+    return state.active?.choiceTaken === "send_back" ? TASTE_TEST_BUFF_MULTIPLIER : 1;
+  }
+  return def.cpsMultiplier;
 }
 
 /** Click-value multiplier from the active event: 1 when nothing is running. */
@@ -1367,6 +1967,13 @@ export function clickRandomEventTarget(
     return whackMice(state, gameState, [targetId], nowEpochMs, rng, config);
   }
   if (!active.pendingTargetIds.includes(targetId)) return { randomEvents: state, bonus: zero, claimed: false };
+  // THE CHAIN'S ONE RULE: a Delivery Rush parcel only counts if it is the NEXT one. An
+  // out-of-order press is refused exactly like a stale one — nothing is taken, nothing is paid,
+  // and the parcel is still there to press. The refusal is the whole lesson; a penalty on top of
+  // it would turn a fourteen-second window into a punishment for reading slowly.
+  if (active.id === "delivery_rush" && targetId !== active.pendingTargetIds[0]) {
+    return { randomEvents: state, bonus: zero, claimed: false };
+  }
 
   const pendingTargetIds = active.pendingTargetIds.filter((id) => id !== targetId);
   const claimedCount = active.claimedCount + 1;
@@ -1389,7 +1996,15 @@ export function clickRandomEventTarget(
     };
   }
 
-  const bonus = rainDropPayout(gameState, config.payouts);
+  // What this particular target was worth. Three clickable events, three different answers:
+  // a rain drop is flat, a sprinkle escalates with how many are already caught, and a parcel
+  // pays its own rate plus the completion bonus when it is the last of the three.
+  const bonus =
+    active.id === "sprinkle_storm"
+      ? sprinklePayout(gameState, active.claimedCount, config.payouts)
+      : active.id === "delivery_rush"
+        ? deliveryParcelPayout(gameState, pendingTargetIds.length === 0, config.payouts)
+        : rainDropPayout(gameState, config.payouts);
 
   // Catching the last drop finishes the rain early rather than leaving an empty sky up for the
   // rest of the window.
@@ -1503,6 +2118,99 @@ export function whackMice(
     bonus: reward,
     claimed: true,
   };
+}
+
+/* ------------------------------------------------------------------- answering a choice */
+
+/**
+ * THE TASTE TEST, ANSWERED.
+ *
+ * Two legal answers and one slot, and the two do completely different things with it:
+ *
+ *   - `serve`     — pays `tasteTestServePayout` at once and CLOSES the slot. The pool's ordinary
+ *                   cooldown-plus-delay starts from this instant, exactly as if the event had
+ *                   run its course, so answering early never buys the player a faster next event.
+ *   - `send_back` — pays nothing and KEEPS the slot, rewriting the window to
+ *                   `TASTE_TEST_BUFF_MS` from now. The event is still `taste_test`; what changed
+ *                   is `choiceTaken`, which is what the multiplier lookup reads.
+ *
+ * Refuses in the same shape as every other click in this file: a second press, a press after the
+ * window closed, a press on something that is not a choice event, or an id that is not one of the
+ * two returns the state unchanged and `claimed: false`. That is what stops a double-fired pointer
+ * from serving the tray and then sending it back.
+ */
+export function chooseRandomEventOption(
+  state: RandomEventsState,
+  gameState: GameState,
+  choiceId: RandomEventChoiceId,
+  nowEpochMs: number,
+  rng: RngPort,
+  config: RandomEventConfig = DEFAULT_RANDOM_EVENT_CONFIG,
+): RandomEventClickResult {
+  const zero = bnFromNumber(0);
+  const active = state.active;
+  const refused = { randomEvents: state, bonus: zero, claimed: false };
+  if (!active) return refused;
+  if (nowEpochMs >= active.endsAtEpochMs) return refused;
+  if (getRandomEventDefinition(active.id).shape !== "choice") return refused;
+  if (active.choiceTaken !== undefined) return refused;
+  if (!RANDOM_EVENT_CHOICE_IDS.includes(choiceId)) return refused;
+
+  if (choiceId === "serve") {
+    return {
+      randomEvents: {
+        ...state,
+        active: null,
+        nextEligibleAtEpochMs: scheduleNext(nowEpochMs, rng, config),
+        rngStreamIndex: rng.getStreamIndex(),
+        lastResolved: { id: active.id, resolvedAtEpochMs: nowEpochMs, claimedCount: 1, endedEarly: true },
+      },
+      bonus: tasteTestServePayout(gameState, config.payouts),
+      claimed: true,
+    };
+  }
+
+  return {
+    randomEvents: {
+      ...state,
+      active: {
+        ...active,
+        // The buff's clock starts when the button was pressed, not when the tray came out, so
+        // deliberating over the question never costs any of the minute it buys.
+        startedAtEpochMs: nowEpochMs,
+        endsAtEpochMs: nowEpochMs + TASTE_TEST_BUFF_MS,
+        claimedCount: 1,
+        choiceTaken: "send_back",
+      },
+    },
+    bonus: zero,
+    claimed: true,
+  };
+}
+
+/* --------------------------------------------------------------------- the combo window */
+
+/**
+ * ONE CLICK'S WORTH OF COMBO WINDOW.
+ *
+ * Called from the reducer's click handler on every click, and a no-op on every click that is not
+ * during a live Combo Window — which is almost all of them, so it returns the SAME state object
+ * rather than a copy and the store's structural comparison sees nothing changed.
+ *
+ * The window is pushed out by `COMBO_EXTEND_MS` per click and clamped to
+ * `COMBO_MAX_DURATION_MS` measured from the spawn instant, never from the last extension, so the
+ * ceiling is a real ceiling: at the shipped numbers seventy-five well-placed clicks reach it and
+ * the seventy-sixth buys nothing. Extending is deliberately not worth anything by itself — what
+ * the player is buying is more seconds of ×5, which they then have to spend by clicking.
+ */
+export function extendComboWindow(state: RandomEventsState, nowEpochMs: number): RandomEventsState {
+  const active = state.active;
+  if (!active || active.id !== "combo_window") return state;
+  if (nowEpochMs >= active.endsAtEpochMs) return state;
+  const ceiling = active.startedAtEpochMs + COMBO_MAX_DURATION_MS;
+  const extended = Math.min(ceiling, active.endsAtEpochMs + COMBO_EXTEND_MS);
+  if (extended === active.endsAtEpochMs) return state;
+  return { ...state, active: { ...active, endsAtEpochMs: extended, claimedCount: active.claimedCount + 1 } };
 }
 
 /** Clears the finished-raid record, so the aftermath toast can be dismissed.

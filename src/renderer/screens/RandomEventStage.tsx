@@ -12,14 +12,23 @@ import {
   RAID_CONSUMABLE_DEFINITIONS,
   remainingFraction,
   remainingMs,
+  tasteTestServePayout,
   type ActiveRandomEvent,
   type MousePoint,
   type RaidMouse,
   type RandomEventId,
 } from '../../shared/game/random-events.js';
-import { RainDropArt, MouseArt, OvenHiccupArt, RANDOM_EVENT_ART } from '../assets/icons.js';
+import {
+  RainDropArt,
+  MouseArt,
+  OvenHiccupArt,
+  ParcelArt,
+  SprinkleArt,
+  RANDOM_EVENT_ART,
+} from '../assets/icons.js';
 import {
   bilingualText,
+  EVENT_EXTRA_COPY,
   MOUSE_RAID_COPY,
   RANDOM_EVENT_COPY,
   showsCantonese,
@@ -107,11 +116,18 @@ export function RandomEventStage() {
   const dispatch = useGameDispatch();
   const active = structure.randomEvents.active;
 
-  if (!active || active.pendingTargetIds.length === 0) return null;
+  if (!active) return null;
   const def = getRandomEventDefinition(active.id);
+
+  // A choice event has no targets at all — it has a question, and the question is the stage.
+  if (def.shape === 'choice') return <TasteTestStage active={active} />;
+
+  if (active.pendingTargetIds.length === 0) return null;
   if (def.shape !== 'clickable') return null;
 
   if (active.id === 'mouse_raid') return <MouseRaidStage active={active} />;
+  if (active.id === 'sprinkle_storm') return <SprinkleStormStage active={active} />;
+  if (active.id === 'delivery_rush') return <DeliveryRushStage active={active} />;
 
   if (active.id === 'oven_hiccup') {
     return (
@@ -154,6 +170,188 @@ export function RandomEventStage() {
   );
 }
 
+
+/* --------------------------------------------------------------------- the sprinkle storm */
+
+/**
+ * THE SPRINKLE STORM: ten targets whose value climbs as the stage clears.
+ *
+ * Laid out by the same golden-ratio arithmetic the rain uses, for the same reason — a target
+ * that moved when a sibling was claimed would be unhittable — but scattered across the WHOLE
+ * stage rather than falling down it, because sprinkles land everywhere and the difference in
+ * motion is what tells the two events apart at a glance.
+ *
+ * The accessible name counts down how many are left, which is the fact that actually matters
+ * here: because each sprinkle is worth more than the last, "three left" is a much more useful
+ * thing to know than "this is sprinkle number seven".
+ */
+function SprinkleStormStage({ active }: { active: ActiveRandomEvent }) {
+  const dispatch = useGameDispatch();
+  const def = getRandomEventDefinition('sprinkle_storm');
+  const left = active.pendingTargetIds.length;
+
+  return (
+    <div
+      className="event-stage event-stage--sprinkles"
+      role="group"
+      aria-label={`${def.nameEn} · ${def.nameYue} — ${bilingualText(RANDOM_EVENT_COPY.stageLabel)}`}
+    >
+      {active.pendingTargetIds.map((targetId, index) => {
+        const seed = Number(targetId.split(':')[1] ?? index);
+        const across = ((seed * 0.6180339887) % 1) * 80 + 10;
+        const down = ((seed * 0.7548776662) % 1) * 70 + 12;
+        const spin = ((seed * 0.4142135624) % 1) * 180 - 90;
+        return (
+          <button
+            key={targetId}
+            type="button"
+            className="event-sprinkle"
+            style={
+              {
+                '--sprinkle-x': `${across.toFixed(2)}%`,
+                '--sprinkle-y': `${down.toFixed(2)}%`,
+                '--sprinkle-spin': `${spin.toFixed(1)}deg`,
+                '--sprinkle-delay': `${((seed * 0.31) % 1).toFixed(2)}s`,
+              } as CSSProperties
+            }
+            aria-label={bilingualText(EVENT_EXTRA_COPY.catchSprinkle(left, def.targetCount))}
+            onClick={() => dispatch({ type: 'randomEventClick', targetId })}
+          >
+            <SprinkleArt extraClass="event-sprinkle__art" />
+          </button>
+        );
+      })}
+    </div>
+  );
+}
+
+/* ---------------------------------------------------------------------- the delivery rush */
+
+/**
+ * THE DELIVERY RUSH: three parcels, and only one of them live.
+ *
+ * The chain rule is enforced in the domain, not here — an out-of-order press is refused by
+ * `clickRandomEventTarget` — but the view has to make it VISIBLE, or a refused click reads as a
+ * broken button. So the next parcel is the only one that is enabled: the other two are real
+ * `<button>`s carrying `disabled`, dimmed, and their accessible names say "not this one yet".
+ * A disabled control that explains itself is a much better answer than an enabled one that
+ * silently does nothing.
+ */
+function DeliveryRushStage({ active }: { active: ActiveRandomEvent }) {
+  const dispatch = useGameDispatch();
+  const def = getRandomEventDefinition('delivery_rush');
+  const nextId = active.pendingTargetIds[0];
+
+  return (
+    <div
+      className="event-stage event-stage--delivery"
+      role="group"
+      aria-label={`${def.nameEn} · ${def.nameYue} — ${bilingualText(RANDOM_EVENT_COPY.stageLabel)}`}
+    >
+      <ul className="event-parcels">
+        {active.pendingTargetIds.map((targetId) => {
+          const index = Number(targetId.split(':')[1] ?? 0);
+          const isNext = targetId === nextId;
+          return (
+            <li key={targetId}>
+              <button
+                type="button"
+                className={`event-parcel${isNext ? ' event-parcel--next' : ''}`}
+                disabled={!isNext}
+                aria-label={bilingualText(
+                  isNext
+                    ? EVENT_EXTRA_COPY.sendParcel(index + 1, def.targetCount)
+                    : EVENT_EXTRA_COPY.parcelWaiting(index + 1),
+                )}
+                onClick={() => dispatch({ type: 'randomEventClick', targetId })}
+              >
+                <ParcelArt extraClass="event-parcel__art" />
+                <span className="event-parcel__index" aria-hidden="true">
+                  {index + 1}
+                </span>
+              </button>
+            </li>
+          );
+        })}
+      </ul>
+    </div>
+  );
+}
+
+/* -------------------------------------------------------------------------- the taste test */
+
+/**
+ * THE TASTE TEST: two buttons, and the numbers on both of them.
+ *
+ * The accessibility story is the reason this is a plain card of two real buttons rather than
+ * anything cleverer. It is a `role="group"` with a name, the two answers are ordinary focusable
+ * `<button>`s in DOM order, each one's accessible name states what it pays, and the note under
+ * them says outright that letting the clock run out gives you neither — so a player using a
+ * screen reader has exactly the same information a sighted player reads off the card, including
+ * the part that is easy to leave out.
+ *
+ * Once "send it back" is pressed the card becomes a one-line statement that the buff is running,
+ * with no buttons at all: there is nothing left to decide, and leaving a dead control on screen
+ * would be inviting a click that the domain would refuse.
+ */
+function TasteTestStage({ active }: { active: ActiveRandomEvent }) {
+  const dispatch = useGameDispatch();
+  const structure = useStructureSnapshot();
+  const def = getRandomEventDefinition('taste_test');
+
+  if (active.choiceTaken !== undefined) {
+    return (
+      <div className="event-stage event-stage--choice">
+        <p className="event-choice__running">{bilingualText(EVENT_EXTRA_COPY.buffRunning)}</p>
+      </div>
+    );
+  }
+
+  // The serve button prints the literal figure it pays, like every other amount in this game,
+  // computed from the same domain function the reducer will use when the button is pressed.
+  const servePayout = tasteTestServePayout(structure);
+
+  return (
+    <div
+      className="event-stage event-stage--choice"
+      role="group"
+      aria-label={`${def.nameEn} · ${def.nameYue} — ${bilingualText(EVENT_EXTRA_COPY.chooseLabel)}`}
+    >
+      <div className="event-choice">
+        <p className="event-choice__prompt">
+          {showsEnglish() ? <span>{def.blurbEn}</span> : null}
+          {showsCantonese() ? <span lang="zh-HK">{def.blurbYue}</span> : null}
+        </p>
+        <div className="event-choice__options">
+          <button
+            type="button"
+            className="event-choice__option event-choice__option--now"
+            title={formatExactDigits(servePayout)}
+            aria-label={bilingualText(EVENT_EXTRA_COPY.chooseServe(formatExact(servePayout, 'en')))}
+            onClick={() => dispatch({ type: 'randomEventChoose', choiceId: 'serve' })}
+          >
+            {showsEnglish() ? (
+              <span>{EVENT_EXTRA_COPY.chooseServe(formatExact(servePayout, 'en')).en}</span>
+            ) : null}
+            {showsCantonese() ? (
+              <span lang="zh-HK">{EVENT_EXTRA_COPY.chooseServe(formatExact(servePayout, 'yue')).yue}</span>
+            ) : null}
+          </button>
+          <button
+            type="button"
+            className="event-choice__option event-choice__option--later"
+            aria-label={bilingualText(EVENT_EXTRA_COPY.chooseSendBack)}
+            onClick={() => dispatch({ type: 'randomEventChoose', choiceId: 'send_back' })}
+          >
+            {showsEnglish() ? <span>{EVENT_EXTRA_COPY.chooseSendBack.en}</span> : null}
+            {showsCantonese() ? <span lang="zh-HK">{EVENT_EXTRA_COPY.chooseSendBack.yue}</span> : null}
+          </button>
+        </div>
+        <p className="event-choice__note">{bilingualText(EVENT_EXTRA_COPY.chooseNote)}</p>
+      </div>
+    </div>
+  );
+}
 
 /* ------------------------------------------------------------------------- the mouse raid */
 
@@ -390,9 +588,12 @@ export function RandomEventIndicator() {
 
   return (
     <div
-      className={`event-indicator${def.isSetback ? ' event-indicator--setback' : ''}${
-        isRaid ? ' event-indicator--raid' : ''
-      }`}
+      // The class accent is data-driven rather than a chain of id checks: `event-indicator--frenzy`,
+      // `--clot`, `--chain`, `--choice`, `--tradeoff` or `--boon`, straight off the definition. A
+      // new event gets its warm or cold plate by declaring what it is.
+      className={`event-indicator event-indicator--${def.eventClass}${
+        def.isSetback ? ' event-indicator--setback' : ''
+      }${isRaid ? ' event-indicator--raid' : ''}`}
       aria-live="off"
       aria-label={`${bilingualText(RANDOM_EVENT_COPY.indicatorLabel)}: ${def.nameEn} · ${def.nameYue}${
         miceLine ? ` — ${bilingualText(miceLine)}` : ''
@@ -505,6 +706,31 @@ export function MouseRaidAftermathToast() {
   );
 }
 
+/**
+ * The one-line note the marquee prints under an event's name, or null when the name and the
+ * blurb already said everything there is to say.
+ */
+function eventNote(id: RandomEventId, isSetback: boolean): Bilingual | null {
+  switch (id) {
+    case 'mouse_raid':
+      return MOUSE_RAID_COPY.warning;
+    case 'clot':
+      return EVENT_EXTRA_COPY.clotNote;
+    case 'flour_shortage':
+      return EVENT_EXTRA_COPY.reboundNote;
+    case 'night_shift':
+      return EVENT_EXTRA_COPY.nightShiftNote;
+    case 'combo_window':
+      return EVENT_EXTRA_COPY.comboNote;
+    case 'production_frenzy':
+    case 'click_frenzy':
+    case 'burnt_batch_frenzy':
+      return EVENT_EXTRA_COPY.frenzyNote;
+    default:
+      return isSetback ? RANDOM_EVENT_COPY.setbackNote : null;
+  }
+}
+
 interface EventToast {
   readonly key: number;
   readonly id: RandomEventId;
@@ -563,7 +789,9 @@ export function RandomEventToast() {
   return (
     <div
       key={toast.key}
-      className={`event-toast${toast.isSetback ? ' event-toast--setback' : ''}`}
+      className={`event-toast event-toast--${def.eventClass}${
+        toast.isSetback ? ' event-toast--setback' : ''
+      }`}
       aria-hidden="true"
       onMouseEnter={() => setPaused(true)}
       onMouseLeave={() => setPaused(false)}
@@ -579,9 +807,13 @@ export function RandomEventToast() {
         {/* The warning line has to say what THIS setback actually does. An Oven Hiccup cuts
             production; a Mouse Raid does not touch production at all, it threatens the balance,
             so it gets its own line rather than inheriting a sentence that would be untrue. */}
-        {def.isSetback ? (
-          <span className="event-toast__warn">
-            {bilingualText(def.id === 'mouse_raid' ? MOUSE_RAID_COPY.warning : RANDOM_EVENT_COPY.setbackNote)}
+        {/* The note under the name says what THIS event actually does. A generic "production is
+            down" line would be wrong about a Mouse Raid (which does not touch production), wrong
+            about a Flour Shortage (which pays it all back), and useless on a Clot (whose whole
+            point is that there is no button). So each one carries its own sentence. */}
+        {eventNote(def.id, def.isSetback) ? (
+          <span className={`event-toast__warn${def.isSetback ? '' : ' event-toast__warn--good'}`}>
+            {bilingualText(eventNote(def.id, def.isSetback)!)}
           </span>
         ) : null}
       </span>

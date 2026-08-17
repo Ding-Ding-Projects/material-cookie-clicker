@@ -4,7 +4,7 @@ import { z } from "zod";
  * Current on-disk save schema version. Bump this whenever `SaveDataLatest`'s shape changes,
  * and add a forward-only migration entry in migrations.ts keyed by the *previous* version.
  */
-export const SAVE_SCHEMA_VERSION = 7;
+export const SAVE_SCHEMA_VERSION = 8;
 
 const BigNumSchema = z.object({
   mantissa: z.number(),
@@ -229,9 +229,27 @@ export const SaveDataV7Schema = SaveDataV6Schema.omit({ schemaVersion: true }).e
 
 export type SaveDataV7 = z.infer<typeof SaveDataV7Schema>;
 
+/**
+ * Schema for save-format version 8. AGAIN IDENTICAL IN SHAPE — only the version literal moves.
+ *
+ * Same reason as version 7, one decree later. The owner asked for the regex builder to be "more
+ * advanced and purchased, upgradable", which added a shared `regex` control ladder rather than a
+ * new save field. A save written before that ladder existed has to be handed its first rung if it
+ * had already bought the token palette that used to be the top of the builder, and a grant is
+ * something only a migration step can do — so the version moves so that a step can run once and
+ * be recorded, rather than a rule running silently on every load forever.
+ *
+ * `migrations.ts#migrateV7ToV8` is the whole of it, and it grants exactly one id.
+ */
+export const SaveDataV8Schema = SaveDataV7Schema.omit({ schemaVersion: true }).extend({
+  schemaVersion: z.literal(8),
+});
+
+export type SaveDataV8 = z.infer<typeof SaveDataV8Schema>;
+
 /** The schema alias that always points at the current (latest) version's shape. */
-export const SaveDataLatestSchema = SaveDataV7Schema;
-export type SaveDataLatest = SaveDataV7;
+export const SaveDataLatestSchema = SaveDataV8Schema;
+export type SaveDataLatest = SaveDataV8;
 
 /** Minimal shape used only to read `schemaVersion` off of otherwise-unvalidated input. */
 export const SaveVersionProbeSchema = z.object({

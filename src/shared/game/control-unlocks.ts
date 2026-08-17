@@ -119,7 +119,7 @@ import type { GameState } from "./types.js";
  */
 
 /** The coarse grouping the Settings catalogue renders as sections. */
-export type ControlGroup = "chrome" | "settings" | "search" | "stepper" | "bulk" | "toggle";
+export type ControlGroup = "chrome" | "settings" | "search" | "regex" | "stepper" | "bulk" | "toggle";
 
 /** One rung of one control's ladder. Rung index 0 is the unlock; anything above it is an upgrade. */
 export interface ControlRungDefinition {
@@ -495,6 +495,59 @@ export const CONTROL_UNLOCKS: readonly ControlUnlockDefinition[] = [
     rungs: searchRungs("tools", "tool", "工具"),
   },
   {
+    // ────────────────────────────────────────────────────────────────────────────────────────
+    // THE ADVANCED REGEX BUILDER IS ONE SHARED LADDER, NOT FOUR.
+    //
+    // Every other search capability is sold per surface, because a search field on the shop
+    // rail and a search field on the Tools panel are two separate pieces of furniture in two
+    // separate rooms: buying one plainly should not furnish the other. That reasoning stops
+    // holding at the top of the ladder. "Capture groups", "lookarounds" and "a test-string
+    // lab" are not furniture in a room — they are the BUILDER'S OWN capability, and the
+    // builder is one component rendered four times.
+    //
+    // Selling them per surface would have meant eight near-identical rungs, 32,000 cookies to
+    // own a feature once, and a catalogue in which the same two lines appear four times each.
+    // Worse, it would have meant a player who bought the lab on the shop rail opening the
+    // Tools search and finding the lab gone, with no story for why the same popover forgot how
+    // to do something. So the advanced tiers are ONE control with ONE price, read by every
+    // surface's popover, and the per-surface ladder keeps its own three rungs unchanged.
+    //
+    // The two ladders compose rather than replace: a surface still buys its own field (50),
+    // its own gear (400) and its own palette (1,500) before its popover can show anything —
+    // and what the shared rungs then add is shown inside THAT popover, on that surface. An
+    // advanced rung bought while no surface has a palette buys a capability with nowhere to
+    // appear yet, which is the same shape as buying `stepper.x100` before opening a shop.
+    // ────────────────────────────────────────────────────────────────────────────────────────
+    id: "regex",
+    group: "regex",
+    nameEn: "The advanced regex builder",
+    nameYue: "進階規則運算式產生器",
+    whereEn: "Inside every search popover, on every surface at once",
+    whereYue: "每個搜尋彈出面板入面，一次過喺所有介面",
+    rungs: [
+      {
+        id: "regex.groups",
+        nameEn: "Groups and lookarounds",
+        nameYue: "群組同前後顧",
+        detailEn:
+          "Adds the named-capture builder, the alternation builder and the lookahead/lookbehind tokens, each with a plain-language line saying what it does. Bought once, appears in every search popover.",
+        detailYue:
+          "加返具名擷取產生器、二選一產生器同前後顧符號，每個都有一句白話解釋佢做乜。買一次，每個搜尋彈出面板都有。",
+        price: 4_000,
+      },
+      {
+        id: "regex.lab",
+        nameEn: "The live lab",
+        nameYue: "即時試驗場",
+        detailEn:
+          "Adds a test-string lab inside the popover: type sample text and watch the matches highlight as you type, with a per-group capture table and one plain-language sentence explaining the pattern. All of it local and bounded.",
+        detailYue:
+          "喺彈出面板入面加返個試驗場：打樣本文字，一路打一路睇住啲配對着色，仲有逐個群組嘅擷取表同一句白話解釋。全部喺本機做，有上限。",
+        price: 12_000,
+      },
+    ],
+  },
+  {
     id: "stepper",
     group: "stepper",
     nameEn: "Buy-quantity stepper",
@@ -797,6 +850,38 @@ export const V7_GRANDFATHERED_RUNG_IDS: readonly string[] = [
   "settings.language.yue",
   "settings.language.both",
 ];
+
+/**
+ * The rungs a grandfathered save is granted when it crosses into schema version 8: exactly one.
+ *
+ * Version 8 exists for the owner's decree that the regex builder be "more advanced and
+ * purchased, upgradable" — the shared `regex` ladder above. Both of its rungs are NEW
+ * capabilities that no older build ever shipped, and the rule this file already states is that
+ * a control invented after a migration was written must not be granted, because nobody lost it.
+ *
+ * `regex.groups` is the one honest exception, and it is an exception on a specific argument
+ * rather than on generosity. A save that had bought `search.<surface>.tokens` for 1,500 owned
+ * what was, at the time, THE WHOLE BUILDER — the top of that ladder was "you have the complete
+ * token palette". This release moves the top of that ladder without refunding anything: the
+ * same 1,500 now buys a palette that is explicitly the basic half of a larger one. Handing the
+ * first advanced rung to a save that is demonstrably past the same 1,000-cookie threshold keeps
+ * the promise that purchase made, and it is the same instrument, the same threshold and the
+ * same frozen-list shape as versions 6 and 7.
+ *
+ * `regex.lab` is NOT in the list, deliberately. The live lab is not the top of a ladder anybody
+ * already bought — it is a workbench that never existed in any build, at a price of its own.
+ * Granting it would be granting a brand-new twelve-thousand-cookie feature to every played save,
+ * which is not grandfathering, it is a giveaway. Every save buys the lab.
+ */
+export const V8_GRANDFATHERED_RUNG_IDS: readonly string[] = ["regex.groups"];
+
+/**
+ * What a version-7 save carrying `lifetimeCookies` is given as it crosses into version 8.
+ * Same threshold, same defensive reading of the value, one-id grant list — see above.
+ */
+export function grantedRungIdsForV8Migration(lifetimeCookies: number | BigNum): readonly string[] {
+  return grantedRungIdsForMigration(lifetimeCookies).length > 0 ? V8_GRANDFATHERED_RUNG_IDS : [];
+}
 
 /**
  * What a version-6 save carrying `lifetimeCookies` is given as it crosses into version 7.

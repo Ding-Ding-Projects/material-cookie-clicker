@@ -49,7 +49,7 @@
     <p><a href="../index.html#captures">See the full capture matrix</a>.</p>
 
     <h2>The price table</h2>
-    <p>Prices are flat &mdash; a control is bought once, so there is no second unit for a cost curve to price &mdash; and they fall into three bands. Window chrome is the cheapest thing in the whole game, because the first minute of a fresh save is spent clicking a cookie in a window that will not move, and that minute has to end quickly. Settings entries and the first rung of a search field sit just above it. Everything that genuinely multiplies how fast the rest of the game goes costs real cookies.</p>
+    <p>Prices are flat &mdash; a control is bought once, so there is no second unit for a cost curve to price &mdash; and they fall into three bands. Window chrome is the cheapest thing in the whole game, because the first minute of a fresh save is spent clicking a cookie in a window that will not move, and that minute has to end quickly. Settings entries and the first rung of a search field sit just above it. Everything that genuinely multiplies how fast the rest of the game goes costs real cookies. Above all three sits the shared advanced regex builder, which is bought once for the whole application rather than once per surface &mdash; the reasoning isbelow, and its two rungs are the most expensive things in the table.</p>
     <div class="scroller">
     <table>
       <caption>Every purchasable control, in catalogue order. Within a ladder the prices strictly increase, which a test enforces.</caption>
@@ -71,7 +71,9 @@
         <tr><td>Cantonese funny slider</td><td>unlock</td><td>35</td></tr>
         <tr><th scope="row" rowspan="3">Search fields</th><td rowspan="3">Generators, upgrades, achievements and tools &mdash; four separate purchases, one per surface, at identical prices</td><td>unlock &mdash; the field, plain-text matching</td><td>50</td></tr>
         <tr><td>upgrade &mdash; the regex builder gear and its popover</td><td>400</td></tr>
-        <tr><td>upgrade &mdash; the flag toggles and the token palette</td><td>1,500</td></tr>
+        <tr><td>upgrade &mdash; the flag toggles and the basic token palette</td><td>1,500</td></tr>
+        <tr><th scope="row" rowspan="2">The advanced regex builder <em>(one shared ladder, not one per surface)</em></th><td rowspan="2">Bought once; appears inside every search popover in the application</td><td>unlock &mdash; groups and lookarounds</td><td>4,000</td></tr>
+        <tr><td>upgrade &mdash; the live lab</td><td>12,000</td></tr>
         <tr><th scope="row" rowspan="3">Buy quantity</th><td rowspan="3">The stepper on every shop row. <strong>&times;1 is free and always was</strong></td><td>unlock &mdash; &times;10</td><td>120</td></tr>
         <tr><td>upgrade &mdash; &times;100</td><td>900</td></tr>
         <tr><td>upgrade &mdash; Max</td><td>6,000</td></tr>
@@ -83,6 +85,17 @@
     </table>
     </div>
     <p>The auto-ship switch is the one deliberate outlier at 2,500. It belongs to a refinery that costs millions of cookies to build, so pricing it like a drag handle would be pricing it like nothing.</p>
+
+    <h2>The regex builder: four ladders, then one</h2>
+    <p>Search is sold per surface. The shop rail&rsquo;s search field, the upgrade shelf&rsquo;s, the Achievements panel&rsquo;s and the Tools panel&rsquo;s are four separate purchases at identical prices, because a search field is furniture: two fields in two rooms are two things, and buying one plainly should not furnish the other. Each of those ladders is three rungs &mdash; the field itself at 50, the gear and the popover behind it at 400, the flag toggles and the basic token palette at 1,500.</p>
+    <p>The owner then asked for the builder to be &ldquo;more advanced and purchased, upgradable&rdquo;, and that argument stopped holding at the top. <strong>Capture groups, lookarounds and a test-string lab are not furniture in a room &mdash; they are the builder&rsquo;s own capability, and the builder is one component rendered four times.</strong> Selling them per surface would have meant eight near-identical rungs, thirty-two thousand cookies to own one feature, and a popover that forgot how to do something the moment you opened it on a different panel. So the advanced tiers are <em>one</em> control with <em>one</em> price, read by every popover in the application.</p>
+    <p>The two ladders compose rather than replace. A surface still buys its own field, its own gear and its own palette before its popover can show anything at all; what the shared rungs add then appears inside that popover, on that surface, and inside every other one at the same time.</p>
+    <ul>
+      <li><strong>Groups and lookarounds, 4,000.</strong> A named-capture builder (type a name, the builder writes the syntax), an alternation builder that takes plain alternatives and escapes every one of them so a dot means a dot, and the four lookaround composers &mdash; followed by, not followed by, preceded by, not preceded by. Every one of them carries a plain-language line in both languages, because the whole case for selling a lookbehind button is that the button explains what the syntax refuses to.</li>
+      <li><strong>The live lab, 12,000.</strong> A test-text box inside the popover. Type a sample and the matches highlight as you type, a capture table lists every group by number and by name with the text each one took, and one sentence underneath says what the pattern does in words &mdash; &ldquo;matches the very start, then the text &lsquo;cat&rsquo;, then any digit.&rdquo;</li>
+    </ul>
+    <p>All of it is evaluated locally and stays bounded: a pattern is capped at 256 characters, a sample at 2,000, the match list at 50, and a zero-width match advances the cursor rather than looping forever. The popover also remembers the last ten patterns it saw as one-press chips &mdash; in memory only, never written to the save and never transmitted, because a search history that survived a reload would be a record of what somebody went looking for.</p>
+    <p>Unbought tiers behave like every other control: a coin-slot plate sits inside the popover exactly where the capability would be, with the price stamped on it, and pressing it is how you buy it.</p>
 
     <h2>Two things that are never for sale</h2>
     <p>The joke has floors, and each one is held in place by a test that fails if the thing ever appears in the price table.</p>
@@ -108,6 +121,7 @@
     <div class="note">
       <strong class="note-title">This is the one decision in the feature that a reviewer needs to agree with</strong>
       <p>Applied literally, &ldquo;everything is bought&rdquo; would mean a returning player with a built-out factory opening this build to find they can no longer move their own window, no longer reach the &times;100 stepper they had been buying generator tiers with, and no longer search a hundred and eighty upgrades. That does not read as the joke landing. It reads as the update having broken a save, and the player would be right.</p>
+      <p>The same compromise answered the advanced builder, and it answered it only half way. A save that had bought a surface&rsquo;s token palette owned what was then the <em>whole</em> builder, and this release moved the top of that ladder without refunding anything &mdash; so a save past the same one-thousand-cookie threshold is handed the 4,000-cookie groups tier outright. It is <em>not</em> handed the live lab. The lab is a workbench no earlier build ever shipped, nobody lost it, and granting a brand-new twelve-thousand-cookie feature to every played save would not be grandfathering, it would be a giveaway. Everybody buys the lab.</p>
       <p>So the migration grants, and the grant is bounded by evidence rather than generosity: <strong>a save with more than one thousand lifetime cookies keeps every control it was already using, for free.</strong> That threshold is a few minutes of play, comfortably past the point where the chrome prices above would have been pocket change anyway. A fresh save, and any save that never got past a thousand lifetime cookies, buys the lot.</p>
       <p>The honest cost: a grandfathered player never meets the coin-slot plates at all until they start a new save. If the owner would rather have the joke than the compatibility, one constant in the domain flips it, and the migration, the granted set and the tests all key off that same constant.</p>
     </div>

@@ -19,6 +19,7 @@ import {
   nextControlRung,
   V6_GRANDFATHERED_RUNG_IDS,
   V7_GRANDFATHERED_RUNG_IDS,
+  V8_GRANDFATHERED_RUNG_IDS,
 } from "../../src/shared/game/control-unlocks";
 import { migrateToLatest } from "../../src/shared/game/migrations";
 import { applyGameAction, createInitialGameState } from "../../src/shared/game/reducer";
@@ -87,12 +88,19 @@ describe("control-unlocks: registry integrity", () => {
     for (const control of CONTROL_UNLOCKS.filter((c) => c.group === "settings" || c.group === "search")) {
       expect(control.rungs[0].price).toBeLessThanOrEqual(100);
     }
-    // Everything else is a convenience, and the ONE deliberate outlier is the auto-ship switch:
-    // it belongs to a factory that costs millions to build, so pricing it like a drag handle
-    // would be pricing it like nothing.
+    // Everything else is a convenience, and there are exactly TWO deliberate outliers, both of
+    // which are things bought late against something expensive:
+    //
+    //   toggle.autoShip  belongs to a factory that costs millions to build, so pricing it like
+    //                    a drag handle would be pricing it like nothing;
+    //   regex           is the shared advanced builder — one ladder for the whole application
+    //                    rather than one per surface, so its prices are the price of the
+    //                    capability everywhere at once, not of a control in one room.
     const autoShip = getControlUnlock("toggle.autoShip");
     expect(autoShip.rungs[0].price).toBe(2_500);
-    for (const control of CONTROL_UNLOCKS.filter((c) => c.id !== "toggle.autoShip")) {
+    const advancedRegex = getControlUnlock("regex");
+    expect(advancedRegex.rungs.map((r) => r.price)).toEqual([4_000, 12_000]);
+    for (const control of CONTROL_UNLOCKS.filter((c) => c.id !== "toggle.autoShip" && c.id !== "regex")) {
       expect(control.rungs[0].price).toBeLessThanOrEqual(300);
     }
   });
@@ -443,11 +451,14 @@ describe("control-unlocks: the migration policy", () => {
       5,
     );
     expect(migrated.finalVersion).toBeGreaterThanOrEqual(6);
-    // Walking all the way to the latest schema runs the v6 → v7 step too, which grants the three
-    // controls that used to be free and are now sold. A maxed save keeps every one of them.
+    // Walking all the way to the latest schema runs every later step too: v6 → v7 grants the
+    // three controls that used to be free and are now sold, and v7 → v8 grants the first rung of
+    // the shared advanced regex ladder, whose predecessor (a surface's token palette) used to be
+    // the whole builder. A maxed save keeps every one of them.
     expect((migrated.data.controlUnlocks as { purchasedRungIds: string[] }).purchasedRungIds).toEqual([
       ...V6_GRANDFATHERED_RUNG_IDS,
       ...V7_GRANDFATHERED_RUNG_IDS,
+      ...V8_GRANDFATHERED_RUNG_IDS,
     ]);
   });
 
@@ -479,6 +490,7 @@ describe("control-unlocks: the migration policy", () => {
     expect((played.data.controlUnlocks as { purchasedRungIds: string[] }).purchasedRungIds).toEqual([
       ...V6_GRANDFATHERED_RUNG_IDS,
       ...V7_GRANDFATHERED_RUNG_IDS,
+      ...V8_GRANDFATHERED_RUNG_IDS,
     ]);
 
     const barely = migrateToLatest({ schemaVersion: 5, lifetimeCookies: { mantissa: 4, exponent: 2 } }, 5);
@@ -498,9 +510,11 @@ describe("control-unlocks: the migration policy", () => {
       6,
     );
     expect(played.finalVersion).toBe(SAVE_SCHEMA_VERSION);
+    // Walking to the latest schema also runs v7 → v8, which appends its own one-id grant.
     expect((played.data.controlUnlocks as { purchasedRungIds: string[] }).purchasedRungIds).toEqual([
       "chrome.drag",
       ...V7_GRANDFATHERED_RUNG_IDS,
+      ...V8_GRANDFATHERED_RUNG_IDS,
     ]);
     // It chains nothing: the rest of the v6 table is NOT re-granted by this step.
     expect((played.data.controlUnlocks as { purchasedRungIds: string[] }).purchasedRungIds).not.toContain(

@@ -39,6 +39,26 @@ file is older evidence from earlier lanes, kept for the record.
 | `dialog-achievements.png` `dialog-tools.png` `dialog-statistics.png` `dialog-prestige.png` | Each of the four anchored dialogs, open over the dimmed game surface and pointed at the console emblem that opened it: 15 / 100 achievements, 9 / 20 tools, ten stat tiles, and the ascension projection below the trillion-cookie threshold. |
 | `diesel-mint.png` | **Superseded — see the diesel factory set below.** One frame of the Diesel Depot's mint animation, from the build where cookies bought litres outright: the can pouring, the nozzle sweeping in behind it, a ghosted `14` rolling up under the litres figure, and the printed slip carrying `ed2d41c7` — a voucher identifier that really is in `%APPDATA%\DingDingProjects\exchange\diesel-vouchers.json`. |
 
+### The advanced regex builder
+
+| File | What it shows |
+| --- | --- |
+| `regex-lab.png` | The shop rail's search popover with both shared advanced tiers bought, in one shot: the live lab holding the sample `cursor-12 grandma-7 farm-350`, the three matches highlighted, the capture table naming group 1 `name` on every match, the plain-language sentence reading the pattern back in words, the one-press history chips underneath, and the standing line saying the whole thing is evaluated locally and never transmitted. |
+
+**How this one was taken.** From the built `dist/`, launched by the real
+`electron` binary onto an off-screen Windows desktop named `RegexProCapture`, on
+its own debugging port (9727 — the first port checked, 9411, was already answering
+for a different worktree's build, which is why the URL of the page target is
+verified before anything else happens) and its own throwaway `--user-data-dir`.
+The save was seeded by `scripts/capture-seed-regex-lab.test.ts` with 250,000
+cookies and the shop rail's own three search rungs bought, and with the two shared
+`regex` rungs deliberately unbought. Both advanced tiers were then bought inside
+the running application with real presses: a mouse press on the coin-slot plate,
+then Enter on the confirmation's own Buy button, which is where the keyboard
+lands. The pattern and the sample text were typed in as real key events. The
+image is a Win32 `PrintWindow` capture of that one window, resolved by title and
+class, and it was opened and looked at afterwards.
+
 ### The frenzy-class events
 
 | File | What it shows |

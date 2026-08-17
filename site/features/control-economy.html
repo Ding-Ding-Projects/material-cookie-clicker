@@ -4,7 +4,7 @@
 <meta charset="utf-8" />
 <meta name="viewport" content="width=device-width, initial-scale=1" />
 <title>The control economy — Material Cookie Clicker</title>
-<meta name="description" content="Every setting, every button, dragging, minimize, maximize and resize are bought with cookies at a printed price — twenty-eight rungs across fifteen controls." />
+<meta name="description" content="Every setting, every button, dragging, minimize, maximize and resize are bought with cookies at a printed price — thirty-one rungs across eighteen controls, the Settings panel among them." />
 <link rel="stylesheet" href="../assets/site.css" />
 </head>
 <body>
@@ -24,7 +24,7 @@
 <main id="main" class="wrap">
   <article>
     <h1>The control economy</h1>
-    <p class="lede">Every setting, every button, dragging the window, minimizing it, maximizing it and resizing it: each one is bought with cookies at a printed price. Twenty-eight rungs across fifteen controls.</p>
+    <p class="lede">Every setting, every button, dragging the window, minimizing it, maximizing it and resizing it: each one is bought with cookies at a printed price. Thirty-one rungs across eighteen controls &mdash; and since the owner&rsquo;s latest decree, the Settings panel is one of them.</p>
     <div class="inset" style="margin-bottom:18px">
       <span class="label">Current state</span>
       <p style="margin:0"><span class="tag">Shipped</span> the registry, the reducer purchase, the save subtree and every gated surface are in the build, and the locked title bar and the first purchase were photographed from the running application. One deliberate compromise is documented below: an already-played save is granted the whole table for free.</p>
@@ -44,8 +44,8 @@
       <figcaption><strong>Ten cookies later.</strong> The plate is gone and the marquee is the drag handle. Windows itself confirms it: asking the window where the marquee is now answers HTCAPTION, the answer that makes a press start a window drag, while the rest of the bar still answers HTCLIENT. Both the cookies and the purchase were real presses on the real controls. The window itself was not physically dragged &mdash; synthesising a cursor drag on an off-screen desktop is not possible &mdash; so the hit-test contrast is the evidence, and it is the same question Windows asks.</figcaption>
     </figure>
     <figure class="capture">
-      <img src="../assets/captures/controls-catalogue.png" alt="The Settings panel open as an anchored dialog over the dimmed game surface, scrolled down to the controls catalogue. A highlighted panel states that three things are never for sale: the close button, this Settings panel, and this catalogue's own search field, and that you can always quit, always get in here and always read the price list. Under it sits a search field placeholdered Search the catalogue, with a caption saying this search field is free, then a heading reading THE WINDOW ITSELF and the first catalogue row, Drag the window, located at the title bar, with its first ladder rung Drag handle beginning below." width="1557" height="1093" loading="lazy" />
-      <figcaption><strong>The price list, inside Settings.</strong> Every control, every rung and every price on one screen, with the three floors written on the surface rather than left to be inferred. This one search field is free, and says so. Captured from the built application running on an off-screen Windows desktop.</figcaption>
+      <img src="../assets/captures/controls-catalogue.png" alt="The Settings panel open as an anchored dialog over the dimmed game surface, scrolled down to the controls catalogue. A highlighted panel states the floors the build held at the time of the capture: that the close button, the Settings panel and this catalogue's own search field are never for sale. The Settings panel has since been priced by owner decree and the catalogue has moved to its own free console button, so that middle clause no longer describes the shipped build. Under it sits a search field placeholdered Search the catalogue, with a caption saying this search field is free, then a heading reading THE WINDOW ITSELF and the first catalogue row, Drag the window, located at the title bar, with its first ladder rung Drag handle beginning below." width="1557" height="1093" loading="lazy" />
+      <figcaption><strong>The price list.</strong> Every control, every rung and every price on one screen, with the floors written on the surface rather than left to be inferred. This capture is from the build in which the catalogue was a section inside Settings and Settings was free; it now has its own free console button, and the surface copy names two floors rather than three. This one search field is free, and says so. Captured from the built application running on an off-screen Windows desktop.</figcaption>
     </figure>
     <p><a href="../index.html#captures">See the full capture matrix</a>.</p>
 
@@ -64,7 +64,10 @@
         <tr><td rowspan="2">Maximize and restore</td><td>unlock</td><td>45</td></tr>
         <tr><td>upgrade &mdash; double-click the bar to toggle</td><td>320</td></tr>
         <tr><td>Resize the window</td><td>unlock &mdash; the edges become live</td><td>75</td></tr>
-        <tr><th scope="row" rowspan="3">Settings entries</th><td>Language mode switch</td><td>unlock</td><td>60</td></tr>
+        <tr><th scope="row" rowspan="6">Settings entries</th><td>Open Settings</td><td>unlock &mdash; the console emblem itself</td><td>25</td></tr>
+        <tr><td>Language mode switch</td><td>unlock &mdash; the switch appears on the panel</td><td>60</td></tr>
+        <tr><td>Cantonese mode</td><td>unlock &mdash; English is free and is the default</td><td>40</td></tr>
+        <tr><td>Bilingual mode</td><td>unlock &mdash; bought separately from Cantonese</td><td>90</td></tr>
         <tr><td>English funny slider</td><td>unlock</td><td>35</td></tr>
         <tr><td>Cantonese funny slider</td><td>unlock</td><td>35</td></tr>
         <tr><th scope="row" rowspan="3">Search fields</th><td rowspan="3">Generators, upgrades, achievements and tools &mdash; four separate purchases, one per surface, at identical prices</td><td>unlock &mdash; the field, plain-text matching</td><td>50</td></tr>
@@ -82,14 +85,20 @@
     </div>
     <p>The auto-ship switch is the one deliberate outlier at 2,500. It belongs to a refinery that costs millions of cookies to build, so pricing it like a drag handle would be pricing it like nothing.</p>
 
-    <h2>Three things that are never for sale</h2>
+    <h2>Two things that are never for sale</h2>
     <p>The joke has floors, and each one is held in place by a test that fails if the thing ever appears in the price table.</p>
     <ul>
       <li><strong>Close.</strong> The window&rsquo;s close button always works, in the renderer and in the main process alike. Nobody should ever have to earn the right to quit an application, and a build that could trap somebody inside itself is not a joke, it is a defect.</li>
-      <li><strong>The Settings panel.</strong> The gear emblem and the dialog behind it are free and always present. The settings <em>inside</em> are bought &mdash; that is the gag &mdash; but the room they live in is where the price list is kept, so locking the door would make the whole economy undiscoverable.</li>
-      <li><strong>The controls catalogue and its own search box.</strong> The catalogue inside Settings lists every control, every rung, every price and one line saying what buying it does. Charging for the ability to find out what things cost would be a circular lock, so that one search field is free and says so on the surface.</li>
+      <li><strong>The controls catalogue and its own search box.</strong> The catalogue lists every control, every rung, every price and one line saying what buying it does. Charging for the ability to find out what things cost would be a circular lock, so that one search field is free and says so on the surface.</li>
     </ul>
-    <p>There is a fourth floor that is a behaviour rather than a table entry: <strong>an unbought control does not disappear.</strong> It stays exactly where the real control would be, drawn as a coin slot with the literal price stamped on it, and pressing it is how you buy it. A locked control that vanished would just look like a feature the build forgot to write. And every control that <em>is</em> bought keeps precisely the keyboard access and screen-reader semantics it always had &mdash; buying something never makes it worse than it was.</p>
+
+    <h2>The floor that moved: the Settings panel</h2>
+    <p>There used to be a third floor. The Settings panel was free, on the argument that the settings <em>inside</em> it are the gag while the room they live in is where the price list is kept &mdash; lock that door and the whole economy becomes undiscoverable. The owner looked at the console, said of the Settings emblem &ldquo;settings still appearing&rdquo; and &ldquo;needs to be purchased&rdquo;, and that boundary was theirs to move. It moved: opening Settings costs 25 cookies.</p>
+    <p>The old argument was answered rather than waved away. <strong>The controls catalogue is now its own console button, free, standing beside the Settings slot and appended to the console unconditionally.</strong> The whole price list &mdash; including the 25 cookies that Settings itself costs &mdash; is one press away on a save that has never earned a cookie. It is still rendered at the bottom of the Settings panel too, for a player who has already bought in. One page, two doors, and the one that is always open never costs anything.</p>
+    <p>The other thing that keeps the spirit intact is the difference between a price and a gate. <strong>Nothing here is progress-gated.</strong> There is no milestone, no tool and no unlock in front of the Settings emblem: a save one minute old can buy it the moment it has clicked twenty-five cookies, which is the point of the price being the second-cheapest thing in the table. It is a till, not a grind.</p>
+    <p>The same decree reached the languages: <strong>English is now the default mode and is free forever</strong>, so a brand-new save is readable end to end without spending anything, while Cantonese (40) and bilingual (90) are separate purchases shown as price plates inside the language switch. The app never renders in a mode that has not been paid for &mdash; but it never rewrites the stored preference either, so a choice made once stays written down.</p>
+    <p>&ldquo;Open it now&rdquo; on a tool card follows the same honesty rule. The tech tree still gates no application feature and never will. But its destination now has a price on the door, so while Settings is unbought the button surfaces the <em>purchase</em> &mdash; announcing the control and the figure, and moving the keyboard to the coin slot that sells it &mdash; instead of quietly failing to open a panel nobody has bought. The callout says so in one extra line, with the price in it.</p>
+    <p>There is one more floor that is a behaviour rather than a table entry: <strong>an unbought control does not disappear.</strong> It stays exactly where the real control would be, drawn as a coin slot with the literal price stamped on it, and pressing it is how you buy it. A locked control that vanished would just look like a feature the build forgot to write. And every control that <em>is</em> bought keeps precisely the keyboard access and screen-reader semantics it always had &mdash; buying something never makes it worse than it was.</p>
     <p>The coin-slot plate is a real button, never a disabled one. A disabled button drops out of the tab order, and a player who cannot yet afford a control still deserves to land on it and hear what it costs. Pressing one you cannot afford opens the same confirmation, which prints the exact shortfall in figures instead of doing nothing.</p>
 
     <h2>How the window chrome is really enforced</h2>
@@ -103,7 +112,7 @@
       <p>So the migration grants, and the grant is bounded by evidence rather than generosity: <strong>a save with more than one thousand lifetime cookies keeps every control it was already using, for free.</strong> That threshold is a few minutes of play, comfortably past the point where the chrome prices above would have been pocket change anyway. A fresh save, and any save that never got past a thousand lifetime cookies, buys the lot.</p>
       <p>The honest cost: a grandfathered player never meets the coin-slot plates at all until they start a new save. If the owner would rather have the joke than the compatibility, one constant in the domain flips it, and the migration, the granted set and the tests all key off that same constant.</p>
     </div>
-    <p>What is granted is a frozen list of the rungs that exist at this save version, not the live registry. A control invented after the migration was written was never usable by an older save, so it must never appear in an older save&rsquo;s grant.</p>
+    <p>What is granted is a frozen list of the rungs that exist at this save version, not the live registry. A control invented after the migration was written was never usable by an older save, so it must never appear in an older save&rsquo;s grant. The newest save version is a case in point: it exists only because the Settings emblem and the two extra language modes stopped being free, and it grants exactly those three things to a save above the same threshold &mdash; not a fourth, and never English, because English is not for sale.</p>
 
     <h2>Where it lives in the code</h2>
     <p>One registry module holds every control, every rung, every price and both languages of every label; the catalogue, the coin-slot plates, the reducer&rsquo;s purchase arithmetic and the integrity tests all read that one table and nothing else. Buying goes through the same single reducer seam every other purchase in the game uses, refuses silently in the same shape &mdash; unknown rung, already owned, ladder order wrong, cookies short &mdash; and takes Market Day&rsquo;s rebate exactly like a generator does. A ladder can only be climbed in order: a hand-built dispatch cannot skip to Max without paying for &times;10 and &times;100 on the way.</p>

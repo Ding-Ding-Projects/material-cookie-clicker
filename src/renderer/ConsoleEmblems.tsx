@@ -250,6 +250,37 @@ export function HouseEmblem({ className }: EmblemProps) {
   );
 }
 
+/** THE PRICES CATALOGUE — a swing tag on a string with a cookie stamped on it and two ruled
+ *  lines under it: a price list, hanging off the shelf. Deliberately not a gear and not a coin
+ *  slot, because this is the one console button that is never for sale and it should not look
+ *  like the one beside it that is. */
+export function PriceTagEmblem({ className }: EmblemProps) {
+  return (
+    <svg {...frame(className)}>
+      {/* the string it hangs from */}
+      <path d="M4.6 4.6l5.6 5.6" fill="none" stroke="var(--metal-hi)" strokeWidth="1.6" strokeLinecap="round" opacity="0.7" />
+      {/* the tag body, corner-cut toward the eyelet */}
+      <path
+        d="M11.4 7.6h14.2a2 2 0 0 1 2 2v14.2a2 2 0 0 1-2 2H13.8a2 2 0 0 1-1.42-.59L6.2 19a2 2 0 0 1 0-2.83l4.2-4.2z"
+        fill="var(--surface-highest)"
+        stroke="var(--spark-ring)"
+        strokeWidth="1.4"
+        strokeLinejoin="round"
+      />
+      {/* the eyelet */}
+      <circle cx="11.6" cy="12.4" r="1.9" fill="var(--surface-lowest)" stroke="var(--metal-hi)" strokeWidth="1.2" />
+      {/* the cookie stamped on it */}
+      <circle cx="20.4" cy="13.4" r="3.4" fill="var(--tier1)" stroke="var(--spark-ring)" strokeWidth="1.1" />
+      <circle cx="19.2" cy="12.6" r="0.65" fill="var(--outline)" />
+      <circle cx="21.6" cy="14.4" r="0.65" fill="var(--outline)" />
+      {/* the two ruled price lines */}
+      <path d="M13.6 20.2h11.4" stroke="var(--outline)" strokeWidth="1.5" strokeLinecap="round" />
+      <path d="M15.4 23.4h9.6" stroke="var(--outline)" strokeWidth="1.5" strokeLinecap="round" opacity="0.7" />
+      <path d="M13.2 10.2a3 3 0 0 1 2.4-1.2" fill="none" stroke="#fff" strokeWidth="1.4" strokeLinecap="round" opacity="0.5" />
+    </svg>
+  );
+}
+
 /** Decorative rivets/brackets for the panel header plate — chrome, never content. */
 export function PanelCorner({ className }: EmblemProps) {
   return (
@@ -267,5 +298,6 @@ export const CONSOLE_EMBLEMS = {
   tools: GemWrenchEmblem,
   statistics: GaugeEmblem,
   prestige: AscensionEmblem,
+  catalogue: PriceTagEmblem,
   settings: GearEmblem,
 } as const;

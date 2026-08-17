@@ -18,6 +18,7 @@ import {
   needsPurchaseConfirmation,
   nextControlRung,
   V6_GRANDFATHERED_RUNG_IDS,
+  V7_GRANDFATHERED_RUNG_IDS,
 } from "../../src/shared/game/control-unlocks";
 import { migrateToLatest } from "../../src/shared/game/migrations";
 import { applyGameAction, createInitialGameState } from "../../src/shared/game/reducer";
@@ -25,6 +26,8 @@ import { decodeSave, encodeSave } from "../../src/shared/game/save-codec";
 import { SAVE_SCHEMA_VERSION } from "../../src/shared/game/save-schema";
 import { GameStore } from "../../src/renderer/game/store";
 import type { GameState } from "../../src/shared/game/types";
+import { computeDisclosure } from "../../src/shared/game/disclosure";
+import { CATALOGUE_PANEL_ID, consolePanelIds, SETTINGS_PANEL_ID } from "../../src/renderer/game/console-panels";
 import { fixedRng, freshState } from "./test-helpers";
 
 const ctx = { now: () => Date.parse("2026-06-01T00:00:00.000Z"), rng: fixedRng() };
@@ -141,23 +144,69 @@ describe("control-unlocks: the floors are never for sale", () => {
     expect(haystack).not.toContain("quit");
   });
 
-  it("never sells the Settings surface itself", () => {
-    // "settings.language" and the two funny sliders are entries INSIDE the panel and are fine.
-    // A control whose id is the panel, or the emblem that opens it, is not.
-    expect(ALL_CONTROL_RUNG_IDS).not.toContain("settings");
-    expect(ALL_CONTROL_RUNG_IDS).not.toContain("settings.panel");
-    expect(ALL_CONTROL_RUNG_IDS).not.toContain("settings.emblem");
-    expect(ALL_CONTROL_RUNG_IDS).not.toContain("console.settings");
-    for (const id of ALL_CONTROL_RUNG_IDS) {
-      expect(id.startsWith("console.")).toBe(false);
-      expect(id.startsWith("panel.")).toBe(false);
+  it("DOES sell the Settings surface now, by the owner's decree, and cheaply", () => {
+    // This test used to assert the opposite. The owner looked at the console and said "settings
+    // still appearing" / "needs to be purchased", and that boundary was theirs to move, so it
+    // moved — see the header of control-unlocks.ts. What survives is the SHAPE of the promise:
+    // the price is small, printed, and payable by a save that has done nothing but click.
+    expect(ALL_CONTROL_RUNG_IDS).toContain("settings.open");
+    expect(bnToNumber(controlRungPrice("settings.open"))).toBe(25);
+    // Cheaper than every entry it now stands in front of, so the door is never the expensive part.
+    for (const control of CONTROL_UNLOCKS.filter((c) => c.group === "settings" && c.id !== "settings.open")) {
+      expect(control.rungs[0].price).toBeGreaterThan(25);
     }
+  });
+
+  it("keeps it PRICED and never progress-gated: one rung, no prerequisite, buyable at 25 cookies from a fresh save", () => {
+    // The distinction the brief turns on. A fresh save with exactly the price in hand can buy it
+    // outright — no milestone, no tool, no other rung in front of it.
+    const control = getControlUnlock("settings.open");
+    expect(control.rungs).toHaveLength(1);
+    const fresh = withCookies(25);
+    expect(isControlUnlocked(fresh, "settings.open")).toBe(false);
+    expect(canBuyControlRung(fresh, "settings.open")).toBe(true);
+    const bought = buy(fresh, "settings.open");
+    expect(isControlUnlocked(bought, "settings.open")).toBe(true);
+    expect(bnToNumber(bought.cookies)).toBeCloseTo(0, 6);
   });
 
   it("never sells the controls catalogue or its own search field", () => {
     expect(ALL_CONTROL_RUNG_IDS.some((id) => id.includes("catalogue"))).toBe(false);
     expect(ALL_CONTROL_RUNG_IDS).not.toContain("search.catalogue");
     expect(ALL_CONTROL_RUNG_IDS).not.toContain("search.controls");
+  });
+
+  it("keeps the catalogue reachable OUTSIDE Settings, which is what makes selling Settings honest", () => {
+    // The floor is no longer "the room is free"; it is "the price list is free". So the
+    // catalogue has its own console button, appended unconditionally, and no rung sells it.
+    const fresh = freshState();
+    expect(isControlUnlocked(fresh, "settings.open")).toBe(false);
+    const ids = consolePanelIds(computeDisclosure(fresh));
+    expect(ids).toContain(CATALOGUE_PANEL_ID);
+    // And it is not behind the thing it prices.
+    expect(ids.indexOf(CATALOGUE_PANEL_ID)).toBeLessThan(ids.indexOf(SETTINGS_PANEL_ID));
+    for (const id of ALL_CONTROL_RUNG_IDS) {
+      expect(id.startsWith("console.")).toBe(false);
+      expect(id.startsWith("panel.")).toBe(false);
+    }
+  });
+
+  it("sells the two non-English language modes and never English", () => {
+    // "unlock more languages by buying" — with the floor that the app stays readable for free.
+    expect(ALL_CONTROL_RUNG_IDS).toContain("settings.language.yue");
+    expect(ALL_CONTROL_RUNG_IDS).toContain("settings.language.both");
+    expect(ALL_CONTROL_RUNG_IDS).not.toContain("settings.language.en");
+    expect(ALL_CONTROL_RUNG_IDS.some((id) => id.toLowerCase().includes("english"))).toBe(false);
+  });
+
+  it("keeps the two modes independent of each other rather than a ladder", () => {
+    // Buying bilingual must not require buying Cantonese first: they are two destinations, not
+    // two rungs, and a ladder would invent an order the feature does not have.
+    const rich = withCookies(1_000);
+    expect(canBuyControlRung(rich, "settings.language.both")).toBe(true);
+    const both = buy(rich, "settings.language.both");
+    expect(hasControlRung(both, "settings.language.both")).toBe(true);
+    expect(hasControlRung(both, "settings.language.yue")).toBe(false);
   });
 
   it("keeps ×1 free by never giving the stepper ladder a ×1 rung", () => {
@@ -390,8 +439,11 @@ describe("control-unlocks: the migration policy", () => {
       5,
     );
     expect(migrated.finalVersion).toBeGreaterThanOrEqual(6);
+    // Walking all the way to the latest schema runs the v6 → v7 step too, which grants the three
+    // controls that used to be free and are now sold. A maxed save keeps every one of them.
     expect((migrated.data.controlUnlocks as { purchasedRungIds: string[] }).purchasedRungIds).toEqual([
       ...V6_GRANDFATHERED_RUNG_IDS,
+      ...V7_GRANDFATHERED_RUNG_IDS,
     ]);
   });
 
@@ -420,12 +472,70 @@ describe("control-unlocks: the migration policy", () => {
     };
     const played = migrateToLatest({ ...base }, 5);
     expect(played.finalVersion).toBe(SAVE_SCHEMA_VERSION);
-    expect((played.data.controlUnlocks as { purchasedRungIds: string[] }).purchasedRungIds).toEqual(
-      V6_GRANDFATHERED_RUNG_IDS,
-    );
+    expect((played.data.controlUnlocks as { purchasedRungIds: string[] }).purchasedRungIds).toEqual([
+      ...V6_GRANDFATHERED_RUNG_IDS,
+      ...V7_GRANDFATHERED_RUNG_IDS,
+    ]);
 
     const barely = migrateToLatest({ schemaVersion: 5, lifetimeCookies: { mantissa: 4, exponent: 2 } }, 5);
     expect((barely.data.controlUnlocks as { purchasedRungIds: string[] }).purchasedRungIds).toEqual([]);
+  });
+
+  it("v6 → v7: hands a played save the three controls that used to be free, and nothing else", () => {
+    // The version-7 step exists only because the owner's two decrees put a price on things that
+    // were free in version 6: the Settings emblem and the two non-English language modes. A save
+    // that had been using them keeps them, on the same evidence and the same threshold as v6.
+    const played = migrateToLatest(
+      {
+        schemaVersion: 6,
+        lifetimeCookies: { mantissa: 5, exponent: 3 },
+        controlUnlocks: { purchasedRungIds: ["chrome.drag"] },
+      },
+      6,
+    );
+    expect(played.finalVersion).toBe(SAVE_SCHEMA_VERSION);
+    expect((played.data.controlUnlocks as { purchasedRungIds: string[] }).purchasedRungIds).toEqual([
+      "chrome.drag",
+      ...V7_GRANDFATHERED_RUNG_IDS,
+    ]);
+    // It chains nothing: the rest of the v6 table is NOT re-granted by this step.
+    expect((played.data.controlUnlocks as { purchasedRungIds: string[] }).purchasedRungIds).not.toContain(
+      "stepper.max",
+    );
+  });
+
+  it("v6 → v7: a save under the threshold pays for the door and the languages like a fresh one", () => {
+    const barely = migrateToLatest(
+      {
+        schemaVersion: 6,
+        lifetimeCookies: { mantissa: 4, exponent: 2 },
+        controlUnlocks: { purchasedRungIds: [] },
+      },
+      6,
+    );
+    expect((barely.data.controlUnlocks as { purchasedRungIds: string[] }).purchasedRungIds).toEqual([]);
+  });
+
+  it("v6 → v7: never duplicates an id a hand-edited save already carries", () => {
+    const odd = migrateToLatest(
+      {
+        schemaVersion: 6,
+        lifetimeCookies: { mantissa: 9, exponent: 9 },
+        controlUnlocks: { purchasedRungIds: ["settings.open"] },
+      },
+      6,
+    );
+    const ids = (odd.data.controlUnlocks as { purchasedRungIds: string[] }).purchasedRungIds;
+    expect(ids.filter((id) => id === "settings.open")).toHaveLength(1);
+    expect(new Set(ids).size).toBe(ids.length);
+  });
+
+  it("keeps the v7 frozen list a real subset of the live registry", () => {
+    for (const id of V7_GRANDFATHERED_RUNG_IDS) {
+      expect(findControlRung(id)).not.toBeNull();
+    }
+    // English is never granted because English is never sold.
+    expect(V7_GRANDFATHERED_RUNG_IDS).not.toContain("settings.language.en");
   });
 
   it("grants nothing when the lifetime figure on disk is missing or malformed", () => {

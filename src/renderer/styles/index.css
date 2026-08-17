@@ -9428,3 +9428,66 @@ ul.card-grid {
     transition: none;
   }
 }
+
+/* ─────────────────────────────────────────────────────────────────────────────────────────────
+   THE PRICED SETTINGS EMBLEM, AND THE PRICED LANGUAGE MODES.
+
+   Both are the ordinary coin-slot plate (components/CoinSlot.tsx) standing exactly where the
+   control it sells would stand, so these rules only size it to the hole it is filling. Nothing
+   here changes the plate's colours, its focus ring or its 44px target — the plate is the same
+   object everywhere in the app on purpose, and a player who has learned what one looks like on
+   the title bar should recognise this one on the console without being told.
+   ───────────────────────────────────────────────────────────────────────────────────────────── */
+.console__coin-slot {
+  /* Matches .console__button's footprint so the console row does not change shape when the
+     emblem is bought — the buttons beside it must not shuffle sideways at the moment of sale. */
+  width: 96px;
+  align-items: stretch;
+}
+
+.console__coin-slot .coin-slot {
+  width: 100%;
+  min-height: 44px;
+  flex-direction: column;
+  gap: 3px;
+  padding: 6px 4px;
+  justify-content: center;
+  text-align: center;
+}
+
+.console__coin-slot .coin-slot__name {
+  font-family: var(--font-display);
+  font-size: 8px;
+  font-weight: 900;
+  letter-spacing: 0.06em;
+  text-transform: uppercase;
+  line-height: 1.1;
+}
+
+.console__coin-slot .coin-slot__price {
+  font-size: 10px;
+}
+
+/* In the language switch the plate takes the same share of the row as the mode button it
+   replaces, so the segmented switch keeps its three equal columns whatever is bought. */
+.settings-modes__slot {
+  flex: 1 1 0;
+  align-items: stretch;
+}
+
+.settings-modes__slot .coin-slot {
+  width: 100%;
+  min-height: 48px;
+  flex-direction: column;
+  gap: 3px;
+  justify-content: center;
+  text-align: center;
+}
+
+/* The one extra line the Tools callout grows while Settings is unbought. Marked as the honest
+   aside it is rather than as a warning: nothing is broken, there is simply a price. */
+.open-real-feature__note--priced {
+  border-top: var(--border-thin) dashed var(--outline);
+  padding-top: 6px;
+  opacity: 0.95;
+}

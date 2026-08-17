@@ -4,7 +4,7 @@ import { z } from "zod";
  * Current on-disk save schema version. Bump this whenever `SaveDataLatest`'s shape changes,
  * and add a forward-only migration entry in migrations.ts keyed by the *previous* version.
  */
-export const SAVE_SCHEMA_VERSION = 6;
+export const SAVE_SCHEMA_VERSION = 7;
 
 const BigNumSchema = z.object({
   mantissa: z.number(),
@@ -209,9 +209,29 @@ export const SaveDataV6Schema = SaveDataV5Schema.omit({ schemaVersion: true }).e
 
 export type SaveDataV6 = z.infer<typeof SaveDataV6Schema>;
 
+/**
+ * Schema for save-format version 7. THE SHAPE IS IDENTICAL TO VERSION 6 — same fields, same
+ * types, only the version literal moves.
+ *
+ * That is deliberate and worth stating, because the rule at the top of this file is "bump when
+ * the shape changes" and the shape did not. What changed is the CONTENT of an existing field:
+ * the Settings emblem became a purchasable control (`settings.open`), and a save written before
+ * it existed has to be handed it if that save had already been using Settings. A grant is
+ * something only a migration step can do, and a migration step only runs when the version moves,
+ * so the version moves. The alternative — silently granting on load, outside the chain — would
+ * be a rule that runs on every load forever with nothing recording that it ran.
+ *
+ * `migrations.ts#migrateV6ToV7` is the whole of it, and it grants exactly one id.
+ */
+export const SaveDataV7Schema = SaveDataV6Schema.omit({ schemaVersion: true }).extend({
+  schemaVersion: z.literal(7),
+});
+
+export type SaveDataV7 = z.infer<typeof SaveDataV7Schema>;
+
 /** The schema alias that always points at the current (latest) version's shape. */
-export const SaveDataLatestSchema = SaveDataV6Schema;
-export type SaveDataLatest = SaveDataV6;
+export const SaveDataLatestSchema = SaveDataV7Schema;
+export type SaveDataLatest = SaveDataV7;
 
 /** Minimal shape used only to read `schemaVersion` off of otherwise-unvalidated input. */
 export const SaveVersionProbeSchema = z.object({

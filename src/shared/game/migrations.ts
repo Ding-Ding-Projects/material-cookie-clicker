@@ -1,5 +1,9 @@
 import type { BigNum } from "./big-number.js";
-import { grantedRungIdsForMigration, MIGRATION_GRANT_LIFETIME_THRESHOLD } from "./control-unlocks.js";
+import {
+  grantedRungIdsForMigration,
+  grantedRungIdsForV7Migration,
+  MIGRATION_GRANT_LIFETIME_THRESHOLD,
+} from "./control-unlocks.js";
 import { SAVE_SCHEMA_VERSION } from "./save-schema.js";
 
 /**
@@ -157,6 +161,55 @@ function migrateV5ToV6(input: Record<string, unknown>): Record<string, unknown> 
   };
 }
 
+/**
+ * Version 6 -> 7: grants the three controls that used to be free, and nothing else, on the same
+ * evidence as the step above.
+ *
+ * Two owner decrees moved boundaries this codebase had written down: the Settings emblem, free in
+ * every build up to and including version 6, is now a 25-cookie control, and the Cantonese and
+ * Bilingual language modes, free in every build up to and including version 6, are now 40- and
+ * 90-cookie controls (control-unlocks.ts). English is free and is the default.
+ * A version-6 save that had been using Settings, or reading in Cantonese, never chose to give it up,
+ * and taking it away on update is the same "the patch broke my save" reading the version-6 step
+ * exists to avoid — so the same threshold answers it: more than
+ * `MIGRATION_GRANT_LIFETIME_THRESHOLD` lifetime cookies keeps the door open for free.
+ *
+ * The grant list is `V7_GRANDFATHERED_RUNG_IDS`, frozen at exactly those three ids. It deliberately does
+ * NOT re-run the version-6 grant: a save arriving here from version 5 has already been through
+ * that step this same load, and a save that was under the threshold then is under it now. This
+ * step chains nothing and appends to whatever list is already there, filtering out any id the
+ * save somehow already carries so a hand-edited file cannot end up with a duplicate.
+ *
+ * The lifetime figure is read exactly as the step above reads it, for exactly the same reason:
+ * as a BigNum pair, because the deepest saves overflow a double and those are the saves the
+ * grandfather clause exists for.
+ */
+function migrateV6ToV7(input: Record<string, unknown>): Record<string, unknown> {
+  const raw = input.lifetimeCookies;
+  let lifetime: BigNum = { mantissa: 0, exponent: 0 };
+  if (raw && typeof raw === "object") {
+    const pair = raw as { mantissa?: unknown; exponent?: unknown };
+    if (typeof pair.mantissa === "number" && typeof pair.exponent === "number") {
+      lifetime = { mantissa: pair.mantissa, exponent: pair.exponent };
+    }
+  }
+
+  const existing = input.controlUnlocks;
+  let owned: string[] = [];
+  if (existing && typeof existing === "object") {
+    const list = (existing as { purchasedRungIds?: unknown }).purchasedRungIds;
+    if (Array.isArray(list)) owned = list.filter((id): id is string => typeof id === "string");
+  }
+
+  const granted = grantedRungIdsForV7Migration(lifetime).filter((id) => !owned.includes(id));
+
+  return {
+    ...input,
+    schemaVersion: 7,
+    controlUnlocks: { purchasedRungIds: [...owned, ...granted] },
+  };
+}
+
 /** Ordered forward-only migrations, indexed by the version they migrate FROM. */
 export const MIGRATIONS: Readonly<Record<number, MigrationStep>> = {
   1: migrateV1ToV2,
@@ -164,6 +217,7 @@ export const MIGRATIONS: Readonly<Record<number, MigrationStep>> = {
   3: migrateV3ToV4,
   4: migrateV4ToV5,
   5: migrateV5ToV6,
+  6: migrateV6ToV7,
 };
 
 export { MIGRATION_GRANT_LIFETIME_THRESHOLD };

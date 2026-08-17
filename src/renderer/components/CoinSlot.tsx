@@ -1,4 +1,5 @@
 import { useRef, useState } from 'react';
+import type React from 'react';
 
 import { bnCompare, bnFromNumber, bnSub } from '../../shared/game/big-number.js';
 import { formatExact, formatExactDigits } from '../../shared/game/format-number.js';
@@ -59,11 +60,18 @@ export interface CoinSlotProps {
    */
   readonly glyph?: string;
   readonly className?: string;
+  /**
+   * Handed the plate's own button, so a caller that has to send the KEYBOARD here can. The one
+   * caller today is the shell's "Open it now" handler: pressing it while the Settings panel is
+   * unbought surfaces this purchase instead of opening, and "surfaces" has to mean focus lands
+   * on the plate, not merely that a status message mentioned it.
+   */
+  readonly focusRef?: React.MutableRefObject<HTMLButtonElement | null>;
   /** Fired after the reducer actually applied the purchase. Never fired on a refusal. */
   readonly onBought?: () => void;
 }
 
-export function CoinSlot({ rungId, variant = 'plate', labelEn, labelYue, glyph, className, onBought }: CoinSlotProps) {
+export function CoinSlot({ rungId, variant = 'plate', labelEn, labelYue, glyph, className, focusRef, onBought }: CoinSlotProps) {
   const dispatch = useGameDispatch();
   const fast = useFastSnapshot();
   const structure = useStructureSnapshot();
@@ -122,7 +130,10 @@ export function CoinSlot({ rungId, variant = 'plate', labelEn, labelYue, glyph, 
       }}
     >
       <button
-        ref={buttonRef}
+        ref={(node) => {
+          buttonRef.current = node;
+          if (focusRef) focusRef.current = node;
+        }}
         type="button"
         className={`coin-slot coin-slot--${variant}${affordable ? '' : ' coin-slot--short'}`}
         aria-label={bilingualText(CONTROL_COPY.slotLabel(nameEn, nameYue, priceText))}

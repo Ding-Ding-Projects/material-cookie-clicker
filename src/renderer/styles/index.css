@@ -10063,6 +10063,7 @@ ul.card-grid {
 .toast-stack > .achievement-toast,
 .toast-stack > .event-toast,
 .toast-stack > .raid-aftermath,
+.toast-stack > .update-notice,
 .toast-stack > .milestone-region {
   position: static;
   inset: auto;

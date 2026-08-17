@@ -139,7 +139,9 @@ function CatalogueRow({ control, level }: { control: ControlUnlockDefinition; le
                 {showsCantonese() ? <span lang="zh-HK">{rung.detailYue}</span> : null}
               </span>
               {owned ? (
-                <span className="controls-catalogue__rung-state">{bilingualText(CONTROL_COPY.rungOwned)}</span>
+                <span className="controls-catalogue__rung-state controls-catalogue__rung-state--owned">
+                  <span aria-hidden="true">✓</span> {bilingualText(CONTROL_COPY.rungOwned)}
+                </span>
               ) : next ? (
                 <CoinSlot rungId={rung.id} variant="inline" />
               ) : (

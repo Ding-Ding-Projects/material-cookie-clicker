@@ -38,8 +38,9 @@ if (!hasSingleInstanceLock) {
 
 function createWindow(): BrowserWindow {
   const window = new BrowserWindow({
-    width: 1024,
-    height: 720,
+    // 1440×900 by owner decree — 1024×720 squeezed the rail into one-word-per-line wrapping.
+    width: 1440,
+    height: 900,
     minWidth: 480,
     minHeight: 420,
     // RESIZING IS A PURCHASE (src/shared/game/control-unlocks.ts, "chrome.resize").
@@ -95,9 +96,20 @@ void app.whenReady().then(() => {
 
   ipcMain.on('window:minimize', () => mainWindow?.minimize());
   ipcMain.on('window:toggle-maximize', () => {
-    if (mainWindow?.isMaximized()) mainWindow.unmaximize(); else mainWindow?.maximize();
+    if (!mainWindow) return;
+    // Herng-Ha-App quirk: maximize() on a non-resizable window does not maximize — on Windows it
+    // just moves the window to the top-left corner at its old size (the resize purchase keeps the
+    // window non-resizable until bought, so this is the common case). Lift the flag for the
+    // operation and put it back, so a bought maximize behaves like a real one without quietly
+    // granting the resize purchase.
+    const wasResizable = mainWindow.isResizable();
+    if (!wasResizable) mainWindow.setResizable(true);
+    if (mainWindow.isMaximized()) mainWindow.unmaximize(); else mainWindow.maximize();
+    if (!wasResizable) mainWindow.setResizable(false);
   });
-  // Close is NOT gated and never will be. A player must never have to earn the right to quit.
+  // The close CHANNEL always closes — by the time the renderer sends it, the one-cookie exit
+  // rung is bought (the locked button is a price plate that does not send). The gate lives on
+  // the window's own close event below, covering Alt+F4 and the OS close message.
   ipcMain.on('window:close', () => mainWindow?.close());
 
   // The renderer half of the resize purchase. It sends the current answer on startup and again
@@ -106,6 +118,21 @@ void app.whenReady().then(() => {
   // reachable from the renderer and a truthy string should not be able to buy anything.
   ipcMain.on('window:set-resizable', (_event, resizable: unknown) => {
     mainWindow?.setResizable(resizable === true);
+  });
+
+  // The one-cookie exit (chrome.close). Before it is bought, a close request — the (locked)
+  // button would not send one, but Alt+F4 and the OS close message do — is softly refused and
+  // the renderer is told so it can flash the price plate. OS shutdown/session end are never
+  // fought: Electron cannot veto session-end on Windows, and we do not try.
+  let closeAllowed = false;
+  ipcMain.on('window:set-close-allowed', (_event, allowed: unknown) => {
+    closeAllowed = allowed === true;
+  });
+  mainWindow.on('close', (event) => {
+    if (!closeAllowed) {
+      event.preventDefault();
+      mainWindow?.webContents.send('window:close-refused');
+    }
   });
 
   // The diesel voucher exchange with WinForge. `app.getPath('appData')` is the OS roaming

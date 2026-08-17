@@ -132,13 +132,17 @@ describe("control-unlocks: registry integrity", () => {
 describe("control-unlocks: the floors are never for sale", () => {
   const haystack = JSON.stringify(CONTROL_UNLOCKS).toLowerCase();
 
-  it("never sells the close button", () => {
-    // Both the ids and the prose. If anybody ever adds a rung about closing the window, this
-    // fails, and it should: a build that can trap somebody inside itself is a defect.
-    expect(ALL_CONTROL_RUNG_IDS.some((id) => id.toLowerCase().includes("close"))).toBe(false);
-    expect(CONTROL_UNLOCKS.some((c) => c.id.toLowerCase().includes("close"))).toBe(false);
-    expect(haystack).not.toContain("close the window");
-    expect(haystack).not.toContain("quit");
+  it("sells the exit for exactly one cookie, grandfathers it, and never fights the OS", () => {
+    // The owner's decree (2026-08-17) turned close into a purchase. The floor moved with it:
+    // the price must be EXACTLY 1 (a single click on the cookie always affords it), the rung
+    // must be in the grandfather list (no migrating save ever meets a locked exit), and the
+    // main process never intercepts OS shutdown — that last part lives in main.ts and is
+    // asserted here only as far as the registry can see it (one rung, no ladder above it).
+    const close = CONTROL_UNLOCKS.find((c) => c.id === "chrome.close");
+    expect(close).toBeDefined();
+    expect(close?.rungs).toHaveLength(1);
+    expect(close?.rungs[0]?.price).toBe(1);
+    expect(V6_GRANDFATHERED_RUNG_IDS).toContain("chrome.close");
   });
 
   it("never sells the Settings surface itself", () => {

@@ -19,12 +19,15 @@ import type { GameState } from "./types.js";
  * ────────────────────────────────────────────────────────────────────────────────────────────
  * WHAT IS DELIBERATELY *NOT* IN THIS REGISTRY (the floors)
  * ────────────────────────────────────────────────────────────────────────────────────────────
- * Three things are never sold, and `tests/game/control-unlocks.test.ts` asserts each one by
- * looking for it in this table and failing if it appears:
+ * The floors below are asserted by `tests/game/control-unlocks.test.ts`:
  *
- *   1. CLOSE. The window's close button always works. A player must never have to earn the
- *      right to quit an application, and a build that could trap someone inside itself is not a
- *      joke, it is a defect.
+ *   1. CLOSE became a ONE-COOKIE purchase by owner decree (2026-08-17): the close button and
+ *      Alt+F4 both wait on the `chrome.close` rung, priced at exactly 1 so a single click on the
+ *      cookie always affords it. What remains a hard floor is that the app never fights the
+ *      operating system: OS shutdown, session end, and Task Manager are never intercepted, the
+ *      close event is only softly refused BEFORE the rung is bought (with the buy prompt shown),
+ *      and nothing can ever re-lock it. The test asserts the price is exactly 1 and the rung is
+ *      in the grandfather list, so no migrating save ever meets a locked exit.
  *   2. THE SETTINGS SURFACE. The Settings emblem and its dialog are free and always present.
  *      The settings INSIDE it are bought — that is the joke — but the room they live in is the
  *      one place a player can read the price list, so locking the door would make the whole
@@ -182,6 +185,27 @@ function searchRungs(surfaceId: string, surfaceEn: string, surfaceYue: string): 
  */
 export const CONTROL_UNLOCKS: readonly ControlUnlockDefinition[] = [
   {
+    id: "chrome.close",
+    group: "chrome",
+    nameEn: "Close the window",
+    nameYue: "閂窗",
+    whereEn: "The title bar",
+    whereYue: "標題列",
+    rungs: [
+      {
+        // Exactly 1 by decree, and it must stay 1: a single click on the cookie affords it, which
+        // is the whole difference between a joke and a trap. OS shutdown and Task Manager are
+        // never intercepted regardless of this rung (main.ts).
+        id: "chrome.close",
+        nameEn: "The exit",
+        nameYue: "出口",
+        detailEn: "The close button and Alt+F4 start working. Costs one cookie. One.",
+        detailYue: "閂窗掣同 Alt+F4 開始有效。收一粒曲奇。一粒。",
+        price: 1,
+      },
+    ],
+  },
+  {
     id: "chrome.drag",
     group: "chrome",
     nameEn: "Drag the window",
@@ -190,20 +214,17 @@ export const CONTROL_UNLOCKS: readonly ControlUnlockDefinition[] = [
     whereYue: "標題列",
     rungs: [
       {
+        // One rung, whole bar. This was briefly two rungs (plate first, whole bar at ×24) and a
+        // real player read the plate-only state as "I bought dragging and it doesn't drag" — a
+        // purchase that still needs aiming is indistinguishable from a broken one. The old
+        // `chrome.drag.full` rung id may still appear in saves that bought or were granted it;
+        // it is accepted and inert.
         id: "chrome.drag",
-        nameEn: "Drag handle",
-        nameYue: "拖曳手柄",
-        detailEn: "The marquee plate in the middle of the title bar becomes a drag handle.",
-        detailYue: "標題列中間嗰塊招牌變成拖曳手柄。",
+        nameEn: "Drag the window",
+        nameYue: "拖窗",
+        detailEn: "The whole title bar drags the window, except its buttons.",
+        detailYue: "成條標題列都可以拖窗，除咗啲掣。",
         price: 10,
-      },
-      {
-        id: "chrome.drag.full",
-        nameEn: "Drag anywhere on the bar",
-        nameYue: "成條標題列都可以拖",
-        detailEn: "The whole title bar drags, not just the plate — no aiming required.",
-        detailYue: "成條標題列都拖得，唔使再瞄住塊招牌。",
-        price: 240,
       },
     ],
   },
@@ -610,8 +631,10 @@ export const MIGRATION_GRANT_LIFETIME_THRESHOLD = 1_000;
  * not `ALL_CONTROL_RUNG_IDS` computed live from a table that will keep growing.
  */
 export const V6_GRANDFATHERED_RUNG_IDS: readonly string[] = [
+  "chrome.close",
   "chrome.drag",
-  "chrome.drag.full",
+  // "chrome.drag.full" was retired when one purchase became the whole bar; saves that carry the
+  // old id keep it harmlessly, and granting it to new migrations would grant nothing.
   "chrome.minimize",
   "chrome.maximize",
   "chrome.maximize.doubleClick",

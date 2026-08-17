@@ -25,15 +25,16 @@ export interface BuyStepperProps {
  * The ×1 / ×10 / ×100 / Max buy-quantity stepper (design/building-row.html), now with its own
  * upgrade ladder.
  *
- * The multiples that are not bought yet do not disappear from the group — exactly ONE of them
- * shows, as a coin-slot plate with its price on it, so the ladder is visible from the first shop
- * row a player ever sees and the next rung always has a door. The ones above that are absent,
- * because three stacked price plates on a shop row would swamp the row it belongs to.
+ * Every multiple that is not bought yet shows as a coin-slot plate with its price — the whole
+ * ladder, not only the next rung. This was briefly next-rung-only to keep the row slim, and the
+ * owner asked where Max was ("add a max buy"): a rung whose plate is hidden reads as a missing
+ * feature, which is exactly what the control economy's floors forbid. The ladder still buys in
+ * order; pressing a later plate first gets the honest out-of-order refusal.
  */
 export function BuyStepper({ value, onChange, disabled = false, ariaLabelId }: BuyStepperProps) {
   const level = useControlLevel('stepper');
   const available = OPTIONS.filter((option) => RUNGS_REQUIRED[String(option)] <= level);
-  const nextRung = ['stepper.x10', 'stepper.x100', 'stepper.max'][level] ?? null;
+  const lockedRungs = ['stepper.x10', 'stepper.x100', 'stepper.max'].slice(level);
 
   return (
     <div className="stepper" role="group" aria-labelledby={ariaLabelId} aria-disabled={disabled}>
@@ -66,9 +67,9 @@ export function BuyStepper({ value, onChange, disabled = false, ariaLabelId }: B
           )}
         </button>
       ))}
-      {nextRung ? (
-        <CoinSlot rungId={nextRung} variant="inline" className="stepper__slot" />
-      ) : null}
+      {lockedRungs.map((rungId) => (
+        <CoinSlot key={rungId} rungId={rungId} variant="inline" className="stepper__slot" />
+      ))}
       {level === 0 ? (
         <span className="stepper__hint" hidden>
           {bilingualText(CONTROL_COPY.stepperLockedHint)}

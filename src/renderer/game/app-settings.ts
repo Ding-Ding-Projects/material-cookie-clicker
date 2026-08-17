@@ -44,7 +44,8 @@ export interface AppSettings {
 }
 
 export const DEFAULT_APP_SETTINGS: AppSettings = {
-  languageMode: "both",
+  // English by owner decree (2026-08-17); Cantonese and Bilingual are bought like everything else.
+  languageMode: "en",
   funnyLevelEn: 3,
   funnyLevelYue: 3,
 };

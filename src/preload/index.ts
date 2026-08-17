@@ -23,6 +23,7 @@ export interface MaterialCookieClickerWindowApi {
    * so a renderer that never calls this can never make the edges live.
    */
   setResizable: (resizable: boolean) => void;
+  setCloseAllowed: (allowed: boolean) => void;
 }
 
 export interface MaterialCookieClickerApi {
@@ -41,6 +42,7 @@ const api: MaterialCookieClickerApi = {
     toggleMaximize: () => ipcRenderer.send('window:toggle-maximize'),
     close: () => ipcRenderer.send('window:close'),
     setResizable: (resizable: boolean) => ipcRenderer.send('window:set-resizable', resizable === true),
+    setCloseAllowed: (allowed: boolean) => ipcRenderer.send('window:set-close-allowed', allowed === true),
   },
   diesel: {
     mint: (request: DieselMintRequest): Promise<DieselMintResponse> =>

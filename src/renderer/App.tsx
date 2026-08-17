@@ -428,8 +428,13 @@ function AnchoredPanel({
  */
 function TitleBar() {
   const dragBought = useControlRung('chrome.drag');
-  const dragFull = useControlRung('chrome.drag.full');
+  const closeBought = useControlRung('chrome.close');
   const minimizeBought = useControlRung('chrome.minimize');
+  // Tell the main process whether the exit is paid for, so its close handler (Alt+F4, the OS
+  // close message) can softly refuse before purchase. Runs on mount so a reload re-asserts it.
+  useEffect(() => {
+    window.materialCookieClicker?.window.setCloseAllowed?.(closeBought);
+  }, [closeBought]);
   const maximizeBought = useControlRung('chrome.maximize');
   const maximizeDoubleClick = useControlRung('chrome.maximize.doubleClick');
   const resizeBought = useControlRung('chrome.resize');
@@ -450,8 +455,9 @@ function TitleBar() {
     window.materialCookieClicker?.window.setResizable?.(resizeBought);
   }, [resizeBought]);
 
-  // Three states, not two: nothing drags, the marquee plate drags, or the whole bar drags.
-  const dragState = !dragBought ? 'locked' : dragFull ? 'full' : 'marquee';
+  // Two states. There was briefly a middle "only the plate drags" rung, and a real player read
+  // it as dragging being broken after they had paid for it — one purchase now buys the bar.
+  const dragState = dragBought ? 'full' : 'locked';
 
   return (
     <header
@@ -501,15 +507,20 @@ function TitleBar() {
         ) : (
           <CoinSlot rungId="chrome.maximize" variant="chrome" glyph="&#x25A1;" labelEn="Maximize" labelYue="放到最大" />
         )}
-        {/* Never gated. Never will be. */}
-        <button
-          type="button"
-          className="title-bar__button title-bar__button--close"
-          aria-label={bilingualText(TITLE_BAR_COPY.close)}
-          onClick={close}
-        >
-          <span className="title-bar__glyph" aria-hidden="true">&#x2715;</span>
-        </button>
+        {/* One cookie, by decree. The app never fights the OS (shutdown/Task Manager always
+            work); only this button and the soft Alt+F4 refusal wait on the rung. */}
+        {closeBought ? (
+          <button
+            type="button"
+            className="title-bar__button title-bar__button--close"
+            aria-label={bilingualText(TITLE_BAR_COPY.close)}
+            onClick={close}
+          >
+            <span className="title-bar__glyph" aria-hidden="true">&#x2715;</span>
+          </button>
+        ) : (
+          <CoinSlot rungId="chrome.close" variant="chrome" glyph="&#x2715;" labelEn="Close" labelYue="閂窗" />
+        )}
       </div>
     </header>
   );

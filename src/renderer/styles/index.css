@@ -8696,14 +8696,6 @@ ul.card-grid {
   -webkit-app-region: no-drag;
 }
 
-.title-bar[data-drag='marquee'] {
-  -webkit-app-region: no-drag;
-}
-
-.title-bar[data-drag='marquee'] .title-bar__marquee {
-  -webkit-app-region: drag;
-}
-
 .title-bar[data-drag='full'] {
   -webkit-app-region: drag;
 }
@@ -9427,4 +9419,27 @@ ul.card-grid {
   .home-progress__fill {
     transition: none;
   }
+}
+
+/* ── CATALOGUE BOUGHT STAMP ──────────────────────────────────────────────────────────────────
+   "Bought" was a plain grey line and the owner asked for it to be obvious. It is now a stamped
+   chip: tier-2 green fill, thick border, tick mark — unmissable at a glance, and the whole row
+   dims slightly so unbought rungs are the loud ones. */
+.controls-catalogue__rung-state--owned {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  padding: 4px 12px;
+  border: var(--border-thick) solid var(--tier2);
+  border-radius: var(--shape-full);
+  background: var(--tier2-container);
+  color: var(--on-tier2-container);
+  font-weight: 900;
+  letter-spacing: 0.04em;
+  box-shadow: 0 3px 0 0 var(--tier2);
+}
+
+.controls-catalogue__rung[data-state='owned'] .controls-catalogue__rung-name,
+.controls-catalogue__rung[data-state='owned'] .controls-catalogue__rung-detail {
+  opacity: 0.62;
 }

@@ -10,6 +10,7 @@ import {
   DEFAULT_GOLDEN_COOKIE_CONFIG,
 } from "./golden-cookie.js";
 import {
+  buyRaidConsumable as buyRaidConsumablePure,
   clearLastRaid,
   clearLastResolved,
   clickRandomEventTarget,
@@ -18,6 +19,8 @@ import {
   randomEventCpsMultiplier,
   randomEventRebateFraction,
   tickRandomEvents,
+  whackMice,
+  type RaidConsumableId,
   type RandomEventConfig,
   DEFAULT_RANDOM_EVENT_CONFIG,
 } from "./random-events.js";
@@ -89,7 +92,14 @@ export type GameAction =
    * it separate also means a stray `mouse:` id cannot reach the rain/oven path, and the
    * transcript of a session says plainly which gesture happened.
    */
-  | { readonly type: "randomEventWhack"; readonly mouseId: string }
+  | { readonly type: "randomEventWhack"; readonly mouseIds: readonly string[] }
+  /**
+   * Buys one raid consumable (random-events.ts): a Whack Pass, a Bigger Whack or a Half-HP
+   * Whack. An ordinary manual purchase, shaped like every other one here — it refuses silently
+   * at the stock cap or short of the price, and it takes Market Day's rebate like anything else
+   * bought with cookies.
+   */
+  | { readonly type: "buyRaidConsumable"; readonly consumableId: RaidConsumableId }
   /** Clears the finished-event record behind the "what just happened" toast. */
   | { readonly type: "randomEventResolve" }
   /** Clears the finished-raid record behind the aftermath toast. Separate from the above
@@ -346,13 +356,38 @@ function handleRandomEventClick(state: GameState, ctx: ReducerCtx, targetId: str
 }
 
 /**
- * One whack. Routed through the same pure `clickRandomEventTarget` seam as every other event
- * target — one place decides whether a target was really there — but gated on the id shape, so
- * this action can only ever hit a mouse.
+ * One swing, at one or more mice.
+ *
+ * More than one id is only legal when the raid armed a Bigger Whack, and the DOMAIN decides
+ * that (random-events.ts#whackMice) rather than this handler trusting the action: a hand-built
+ * dispatch cannot clear a stage it was not entitled to clear. The ids are gated on shape here
+ * too, so this action can only ever reach mice.
  */
-function handleRandomEventWhack(state: GameState, ctx: ReducerCtx, mouseId: string): GameState {
-  if (!mouseId.startsWith("mouse:")) return state;
-  return handleRandomEventClick(state, ctx, mouseId);
+function handleRandomEventWhack(state: GameState, ctx: ReducerCtx, mouseIds: readonly string[]): GameState {
+  if (mouseIds.length === 0) return state;
+  if (!mouseIds.every((id) => id.startsWith("mouse:"))) return state;
+
+  const config = ctx.randomEventConfig ?? DEFAULT_RANDOM_EVENT_CONFIG;
+  const result = whackMice(state.randomEvents, state, mouseIds, ctx.now(), ctx.rng, config);
+  if (!result.claimed) return state;
+
+  let nextState: GameState = { ...state, randomEvents: result.randomEvents };
+  if (result.bonus.mantissa !== 0) nextState = addCookies(nextState, result.bonus);
+  return withAchievements(nextState, nowIso(ctx));
+}
+
+/**
+ * Buys one raid consumable. The domain owns the price, the cap and the refusal; this handler
+ * owns nothing but moving the cookies, which is the same division every purchase here uses.
+ */
+function handleBuyRaidConsumable(state: GameState, id: RaidConsumableId): GameState {
+  const result = buyRaidConsumablePure(state.randomEvents.consumables, id, state.cookies);
+  if (!result.bought) return state;
+  return {
+    ...state,
+    cookies: bnClampNonNegative(bnSub(state.cookies, result.price)),
+    randomEvents: { ...state.randomEvents, consumables: result.consumables },
+  };
 }
 
 function handleRandomEventRaidDismiss(state: GameState): GameState {
@@ -488,7 +523,9 @@ export function applyGameAction(state: GameState, action: GameAction, ctx: Reduc
     case "randomEventClick":
       return handleRandomEventClick(state, ctx, action.targetId);
     case "randomEventWhack":
-      return handleRandomEventWhack(state, ctx, action.mouseId);
+      return handleRandomEventWhack(state, ctx, action.mouseIds);
+    case "buyRaidConsumable":
+      return withMarketDayRebate(state, handleBuyRaidConsumable(state, action.consumableId), ctx);
     case "randomEventResolve":
       return handleRandomEventResolve(state);
     case "randomEventRaidDismiss":

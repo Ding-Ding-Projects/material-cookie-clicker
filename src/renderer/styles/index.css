@@ -7282,3 +7282,157 @@ ul.card-grid {
     animation: none;
   }
 }
+
+
+/* ==========================================================================================
+   RAID SUPPLIES, AND THE FAT MOUSE
+   ------------------------------------------------------------------------------------------
+   Appended at the end of the sheet, additive only.
+
+   The supplies shelf is three ordinary buttons with a price and a stock count on each. It is
+   styled off the cabinet's own plate idiom rather than the shop rail's, because it belongs to
+   the HUD corner where the raid plate appears, and a disabled card stays visible and readable
+   rather than vanishing — a price you cannot afford yet is information.
+   ========================================================================================== */
+
+.raid-supplies {
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+  padding: 6px 10px;
+  border: 2px solid var(--cabinet-frame-dark);
+  border-radius: 12px;
+  background: var(--surface-highest);
+  color: var(--on-surface);
+}
+
+.raid-supplies__title {
+  display: flex;
+  gap: 6px;
+  font-size: 10px;
+  font-weight: 900;
+  letter-spacing: 0.09em;
+  text-transform: uppercase;
+  opacity: 0.75;
+}
+
+.raid-supplies__list {
+  display: flex;
+  gap: 6px;
+  margin: 0;
+  padding: 0;
+  list-style: none;
+}
+
+.raid-supplies__buy {
+  min-height: 44px;
+  padding: 4px 10px;
+  display: flex;
+  flex-direction: column;
+  gap: 1px;
+  align-items: flex-start;
+  cursor: pointer;
+  border: 2px solid var(--cabinet-frame-dark);
+  border-radius: 10px;
+  background: var(--surface-lowest);
+  color: var(--on-surface);
+  font: inherit;
+  text-align: left;
+  box-shadow: 0 3px 0 0 var(--cabinet-frame-dark);
+}
+
+.raid-supplies__buy:hover:not(:disabled) {
+  background: var(--spark);
+}
+
+.raid-supplies__buy:active:not(:disabled) {
+  transform: translateY(3px);
+  box-shadow: inset 0 3px 0 0 var(--bevel-hi);
+}
+
+.raid-supplies__buy:disabled {
+  opacity: 0.55;
+  cursor: default;
+}
+
+.raid-supplies__buy:focus-visible {
+  outline: 4px solid var(--spark-ring);
+  outline-offset: 2px;
+}
+
+.raid-supplies__name {
+  display: flex;
+  flex-direction: column;
+  font-size: 11px;
+  font-weight: 900;
+}
+
+.raid-supplies__stock {
+  font-size: 11px;
+  font-weight: 800;
+  opacity: 0.8;
+}
+
+.raid-supplies__price {
+  font-size: 11px;
+  font-weight: 700;
+  font-variant-numeric: tabular-nums;
+}
+
+/* --- The fat mouse ---------------------------------------------------------------------- */
+
+/* Bigger, and outlined more heavily, because it is worth double in the theft split and takes
+   more than one hit. The size difference is the honest signal, not a label. */
+.event-mouse--fat {
+  width: 70px;
+  height: 70px;
+  margin: -35px 0 0 -35px;
+  border-width: 4px;
+  background: var(--error);
+}
+
+.event-mouse--fat .event-mouse__art {
+  width: 46px;
+  height: 46px;
+}
+
+.event-mouse__pips {
+  position: absolute;
+  bottom: 2px;
+  left: 50%;
+  transform: translateX(-50%);
+  display: flex;
+  gap: 2px;
+}
+
+.event-mouse__pips span {
+  width: 6px;
+  height: 6px;
+  border-radius: 50%;
+  border: 1px solid var(--cabinet-frame-dark);
+}
+
+.event-mouse__pips .is-full {
+  /* The spark colour rather than the error role's ink: a filled pip has to read as FILLED at
+     6px against a pink button in both themes, and the dark theme's on-error ink is close
+     enough to the button that three full pips looked like three empty ones. */
+  background: var(--spark);
+  border-color: var(--cabinet-frame-dark);
+}
+
+.event-mouse__pips .is-spent {
+  background: transparent;
+  opacity: 0.65;
+}
+
+/* A raid with a Bigger Whack armed says so on the stage: the swing reaches further than the
+   button, so the button shows a ring the size of the reach. */
+.event-stage--wide .event-mouse::after {
+  content: '';
+  position: absolute;
+  inset: -32px;
+  border: 2px dashed var(--spark-ring);
+  border-radius: 50%;
+  opacity: 0.35;
+  pointer-events: none;
+}

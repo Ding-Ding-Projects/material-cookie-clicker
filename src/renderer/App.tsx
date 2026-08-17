@@ -51,6 +51,7 @@ import { ShopRail } from './screens/ShopRail';
 import { PrestigeScreen } from './screens/PrestigeScreen';
 import {
   MouseRaidAftermathToast,
+  RaidSuppliesShelf,
   RandomEventIndicator,
   RandomEventStage,
   RandomEventToast,
@@ -127,6 +128,11 @@ function Hud() {
           it is not behind progressive disclosure: an event that halves production has to be
           visible on the save it happens to, including a brand-new one. */}
       <RandomEventIndicator />
+
+      {/* What the player is holding against the next raid. In the HUD beside the raid's own
+          plate, because that is where a player looks for it — not in the generator shop, which
+          sells production. */}
+      <RaidSuppliesShelf />
     </div>
   );
 }

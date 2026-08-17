@@ -7,6 +7,7 @@ import { applyGameAction, type ReducerCtx } from "../../src/shared/game/reducer"
 import {
   clearLastRaid,
   clickRandomEventTarget,
+  createInitialRaidConsumables,
   createInitialRandomEventsState,
   decodeRandomEvents,
   DEFAULT_RANDOM_EVENT_CONFIG,
@@ -381,6 +382,7 @@ describe("random events: configuration and persistence", () => {
       raidNextEligibleAtEpochMs: 3_600_000,
       lastRaid: null,
       raidCount: 0,
+      consumables: createInitialRaidConsumables(),
     };
     expect(decodeRandomEvents(encodeRandomEvents(state))).toEqual(state);
   });
@@ -885,6 +887,8 @@ describe("mouse raid: whacking", () => {
         stolen: bnFromNumber(10),
         reward: bnFromNumber(0),
         defended: false,
+        passSpent: false,
+        consumablesSpent: [],
       },
     };
     expect(clearLastRaid(withRaid).lastRaid).toBeNull();
@@ -905,6 +909,8 @@ describe("mouse raid: whacking", () => {
         stolen: bnFromNumber(1.234e12),
         reward: bnFromNumber(0),
         defended: false,
+        passSpent: false,
+        consumablesSpent: ["bigger_whack"],
       },
     };
     expect(decodeRandomEvents(encodeRandomEvents(state))).toEqual(state);
@@ -981,7 +987,7 @@ describe("mouse raid: through the reducer", () => {
     let state = stateWithRaid(3, 1_000_000);
     const reward = bnToNumber(mouseRaidDefenceReward(state));
     for (const mouseId of ["mouse:0", "mouse:1", "mouse:2"]) {
-      state = applyGameAction(state, { type: "randomEventWhack", mouseId }, ctxAt(1_000));
+      state = applyGameAction(state, { type: "randomEventWhack", mouseIds: [mouseId] }, ctxAt(1_000));
     }
     expect(bnToNumber(state.cookies)).toBeCloseTo(1_000_000 + reward, 2);
     expect(state.randomEvents.lastRaid?.defended).toBe(true);
@@ -990,8 +996,13 @@ describe("mouse raid: through the reducer", () => {
 
   it("is a no-op for a whack that is not aimed at a mouse that is there", () => {
     const state = stateWithRaid(3, 1_000_000);
-    expect(applyGameAction(state, { type: "randomEventWhack", mouseId: "rain:0" }, ctxAt(1_000))).toBe(state);
-    expect(applyGameAction(state, { type: "randomEventWhack", mouseId: "mouse:9" }, ctxAt(1_000))).toBe(state);
+    expect(applyGameAction(state, { type: "randomEventWhack", mouseIds: ["rain:0"] }, ctxAt(1_000))).toBe(state);
+    expect(applyGameAction(state, { type: "randomEventWhack", mouseIds: ["mouse:9"] }, ctxAt(1_000))).toBe(state);
+    expect(applyGameAction(state, { type: "randomEventWhack", mouseIds: [] }, ctxAt(1_000))).toBe(state);
+    // Two ids at once without a Bigger Whack armed is refused by the domain, not trusted.
+    expect(
+      applyGameAction(state, { type: "randomEventWhack", mouseIds: ["mouse:0", "mouse:1"] }, ctxAt(1_000)),
+    ).toBe(state);
   });
 
   it("clears the aftermath record on randomEventRaidDismiss, and is a no-op when there is none", () => {
@@ -1011,7 +1022,7 @@ describe("mouse raid: through the reducer", () => {
   it("stays pure: no raid action mutates the state handed to it", () => {
     const before = stateWithRaid(3, 1_000_000);
     const snapshot = JSON.parse(JSON.stringify(before));
-    applyGameAction(before, { type: "randomEventWhack", mouseId: "mouse:0" }, ctxAt(1_000));
+    applyGameAction(before, { type: "randomEventWhack", mouseIds: ["mouse:0"] }, ctxAt(1_000));
     applyGameAction(before, { type: "randomEventRaidDismiss" }, ctxAt(1_000));
     applyGameAction(before, { type: "tick", elapsedMs: 25_000 }, ctxAt(25_000));
     expect(JSON.parse(JSON.stringify(before))).toEqual(snapshot);

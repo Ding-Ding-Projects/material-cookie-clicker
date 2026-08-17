@@ -426,6 +426,253 @@ export function resolveRandomEventConfig(flagValue: string | null | undefined): 
   return DEFAULT_RANDOM_EVENT_CONFIG;
 }
 
+/* ------------------------------------------------------------ mice, and what they carry */
+
+/**
+ * ONE MOUSE, with hit points.
+ *
+ * Ordinary mice die to a single whack, which is what makes the raid readable the first time you
+ * meet it. The FAT MOUSE is the exception and it exists so that the two whack consumables have
+ * something to be good against: it takes two or three hits, and it carries double an ordinary
+ * mouse's share of the theft, so ignoring it is expensive and swinging at it once is not enough.
+ *
+ * `share` — not a count of mice — is what the theft is apportioned by. A raid of four ordinary
+ * mice plus one fat one has six shares, so the fat one alone getting away costs two sixths of
+ * the ceiling rather than one fifth of it. The number a player sees ("2 of 5 mice got away")
+ * still counts heads, because that is what they watched happen; the arithmetic underneath is
+ * stated on the site rather than hidden.
+ */
+export interface RaidMouse {
+  readonly id: string;
+  /** Hits still needed to see it off. Always at least one while it is on the stage. */
+  readonly hp: number;
+  /** What it started with, so the UI can draw two pips out of three rather than a bare number. */
+  readonly maxHp: number;
+  /** Weight in the theft split. Ordinary mice 1, the fat mouse 2. */
+  readonly share: number;
+  readonly fat: boolean;
+}
+
+/** Hit points a fat mouse can bring. Rolled per raid. */
+const FAT_MOUSE_MIN_HP = 2;
+const FAT_MOUSE_MAX_HP = 3;
+/** The mouse count at which a raid is big enough to include a fat one. */
+const FAT_MOUSE_MIN_RAID_SIZE = 4;
+
+/** Builds the mice of one raid: ordinary ones, plus a fat one on the larger raids. */
+export function rollRaidMice(count: number, rng: RngPort, halved: boolean): readonly RaidMouse[] {
+  const fatIndex = count >= FAT_MOUSE_MIN_RAID_SIZE ? count - 1 : -1;
+  const fatHp = FAT_MOUSE_MIN_HP + Math.min(
+    FAT_MOUSE_MAX_HP - FAT_MOUSE_MIN_HP,
+    Math.floor(rng.next() * (FAT_MOUSE_MAX_HP - FAT_MOUSE_MIN_HP + 1)),
+  );
+  return Array.from({ length: count }, (_, index) => {
+    const fat = index === fatIndex;
+    const maxHp = fat ? fatHp : 1;
+    return {
+      id: `mouse:${index}`,
+      hp: halved ? halveHp(maxHp) : maxHp,
+      maxHp,
+      share: fat ? 2 : 1,
+      fat,
+    };
+  });
+}
+
+/**
+ * Half-HP, rounded UP. Rounding up is the honest reading of "halve it": a one-hit mouse still
+ * takes one hit, because a mouse that died to no hits at all would not be a mouse.
+ */
+export function halveHp(hp: number): number {
+  return Math.max(1, Math.ceil(hp / 2));
+}
+
+/** Total theft weight of a set of mice. */
+export function totalShare(mice: readonly RaidMouse[]): number {
+  return mice.reduce((sum, mouse) => sum + mouse.share, 0);
+}
+
+/* ------------------------------------------------------------------------- consumables */
+
+/**
+ * THE THREE RAID CONSUMABLES.
+ *
+ * All three are bought with cookies, by hand, one at a time, from a stock that is capped — they
+ * are insurance, not immunity. Nothing here is a subscription, a timer or a reward for waiting;
+ * a player who never buys one plays exactly the game that shipped before them.
+ *
+ * They differ in WHEN they are spent, and the difference is the whole design:
+ *
+ *   - `whack_pass` is spent only at the moment a raid would actually take cookies. A raid you
+ *     defended by hand spends nothing, so a pass in the drawer is never wasted on a raid you
+ *     were going to win anyway.
+ *   - `bigger_whack` and `half_hp_whack` are ARMED when a raid starts and are spent by that
+ *     raid whatever happens, because what they buy is that raid being easier to fight. Arming
+ *     is automatic when the stock is there: an "arm now?" prompt in the middle of a
+ *     twenty-second window would be a worse game and a worse accessibility story.
+ *
+ * Stock is a COUNT, not a list of individual items, so there is no such thing as the oldest
+ * pass; "oldest first" has nothing to sort. Saying so plainly beats inventing per-item
+ * timestamps that would never be looked at.
+ */
+export type RaidConsumableId = "whack_pass" | "bigger_whack" | "half_hp_whack";
+
+export interface RaidConsumableDefinition {
+  readonly id: RaidConsumableId;
+  readonly nameEn: string;
+  readonly nameYue: string;
+  readonly blurbEn: string;
+  readonly blurbYue: string;
+  /** Cookies the first one costs. */
+  readonly baseCost: number;
+  /** What each one already bought multiplies the next one's price by. */
+  readonly costRatio: number;
+  /** The most a player may hold at once. */
+  readonly stockCap: number;
+  /** True when the raid arms it at spawn rather than spending it on the theft. */
+  readonly armedAtSpawn: boolean;
+}
+
+export const RAID_CONSUMABLE_DEFINITIONS: readonly RaidConsumableDefinition[] = [
+  {
+    id: "whack_pass",
+    nameEn: "Whack Pass",
+    nameYue: "打鼠券",
+    blurbEn: "Spent automatically when a raid would take cookies. The mice flee empty-handed.",
+    blurbYue: "老鼠真係要攞走曲奇嗰陣自動用一張，佢哋咪空手走囉。",
+    baseCost: 1_000_000,
+    costRatio: 4,
+    stockCap: 3,
+    armedAtSpawn: false,
+  },
+  {
+    id: "bigger_whack",
+    nameEn: "Bigger Whack",
+    nameYue: "大力拍",
+    blurbEn: "Armed at the next raid: one press swats every mouse it lands near.",
+    blurbYue: "下次打劫自動用：一拍就掃到附近嘅老鼠。",
+    baseCost: 2_500_000,
+    costRatio: 4,
+    stockCap: 3,
+    armedAtSpawn: true,
+  },
+  {
+    id: "half_hp_whack",
+    nameEn: "Half-HP Whack",
+    nameYue: "半血拍",
+    blurbEn: "Armed at the next raid: every mouse needs half as many hits, rounded up.",
+    blurbYue: "下次打劫自動用：每隻老鼠要嘅拍數減半，唔夠一下就當一下。",
+    baseCost: 2_500_000,
+    costRatio: 4,
+    stockCap: 3,
+    armedAtSpawn: true,
+  },
+];
+
+const CONSUMABLES_BY_ID = new Map(RAID_CONSUMABLE_DEFINITIONS.map((d) => [d.id, d]));
+
+export function getRaidConsumableDefinition(id: RaidConsumableId): RaidConsumableDefinition {
+  const def = CONSUMABLES_BY_ID.get(id);
+  if (!def) throw new Error(`Unknown raid consumable id: ${id}`);
+  return def;
+}
+
+export interface RaidConsumableStock {
+  /** How many are in hand right now. Never above the definition's cap. */
+  readonly stock: number;
+  /** How many have EVER been bought. This is what the price escalates on, so selling the idea
+   *  of "buy three, spend them, buy three cheap ones again" is not on offer. */
+  readonly purchased: number;
+}
+
+export type RaidConsumablesState = Readonly<Record<RaidConsumableId, RaidConsumableStock>>;
+
+export function createInitialRaidConsumables(): RaidConsumablesState {
+  return {
+    whack_pass: { stock: 0, purchased: 0 },
+    bigger_whack: { stock: 0, purchased: 0 },
+    half_hp_whack: { stock: 0, purchased: 0 },
+  };
+}
+
+/** The price of the NEXT one of a kind: base × ratio^(how many have ever been bought). */
+export function raidConsumablePrice(id: RaidConsumableId, consumables: RaidConsumablesState): BigNum {
+  const def = getRaidConsumableDefinition(id);
+  return bnMulScalar(bnFromNumber(def.baseCost), Math.pow(def.costRatio, consumables[id].purchased));
+}
+
+/** True when the stock is full. A capped consumable is insurance; an uncapped one is immunity. */
+export function isRaidConsumableAtCap(id: RaidConsumableId, consumables: RaidConsumablesState): boolean {
+  return consumables[id].stock >= getRaidConsumableDefinition(id).stockCap;
+}
+
+/**
+ * Buys one. Pure, and refuses silently in exactly the same shape as every other purchase in
+ * this game: at the cap, or short of the price, the state comes back unchanged.
+ */
+export function buyRaidConsumable(
+  consumables: RaidConsumablesState,
+  id: RaidConsumableId,
+  cookies: BigNum,
+): { readonly consumables: RaidConsumablesState; readonly price: BigNum; readonly bought: boolean } {
+  const price = raidConsumablePrice(id, consumables);
+  if (isRaidConsumableAtCap(id, consumables) || bnCompare(cookies, price) < 0) {
+    return { consumables, price, bought: false };
+  }
+  const current = consumables[id];
+  return {
+    consumables: { ...consumables, [id]: { stock: current.stock + 1, purchased: current.purchased + 1 } },
+    price,
+    bought: true,
+  };
+}
+
+function spendOne(consumables: RaidConsumablesState, id: RaidConsumableId): RaidConsumablesState {
+  const current = consumables[id];
+  if (current.stock <= 0) return consumables;
+  return { ...consumables, [id]: { ...current, stock: current.stock - 1 } };
+}
+
+/* --------------------------------------------------------- the bigger whack's geometry */
+
+/** How far a Bigger Whack reaches from where the press landed, in CSS pixels. */
+export const BIGGER_WHACK_RADIUS_PX = 120;
+
+/** One mouse's position on screen, as measured from its own button. */
+export interface MousePoint {
+  readonly id: string;
+  readonly x: number;
+  readonly y: number;
+}
+
+/**
+ * Which mice a single press catches.
+ *
+ * The geometry lives here, in the domain, rather than in the click handler, because "did that
+ * swing reach the second mouse" is arithmetic and arithmetic belongs where it can be tested.
+ * The POSITIONS come from the view — the mice are animated by the browser, so their real
+ * coordinates are whatever the layout says they are, and measuring the actual buttons is the
+ * only honest source for that. Overlapping mice are caught together, which is the point.
+ *
+ * The origin is always included, even if the radius is zero, so an ordinary whack is just this
+ * function with a radius of nothing.
+ */
+export function miceWithinWhackRadius(
+  points: readonly MousePoint[],
+  originId: string,
+  radiusPx: number,
+): readonly string[] {
+  const origin = points.find((point) => point.id === originId);
+  if (!origin) return [];
+  const caught = points.filter((point) => {
+    if (point.id === originId) return true;
+    const dx = point.x - origin.x;
+    const dy = point.y - origin.y;
+    return Math.sqrt(dx * dx + dy * dy) <= radiusPx;
+  });
+  return caught.map((point) => point.id);
+}
+
 /* ------------------------------------------------------------------------- the state */
 
 export interface ActiveRandomEvent {
@@ -436,6 +683,17 @@ export interface ActiveRandomEvent {
   readonly pendingTargetIds: readonly string[];
   /** How many targets the player has taken so far. */
   readonly claimedCount: number;
+  /**
+   * The mice of an active Mouse Raid, with their hit points. Raid-only and absent for every
+   * other event. `pendingTargetIds` stays the authoritative list of what is still on the stage
+   * and these are kept in step with it: same ids, same order, always.
+   */
+  readonly mice?: readonly RaidMouse[];
+  /** Total theft weight the raid started with, kept so the split still divides by what was
+   *  there rather than by what is left. */
+  readonly startingShare?: number;
+  /** Consumables this raid armed at spawn. Already deducted from stock; spent either way. */
+  readonly armed?: readonly RaidConsumableId[];
 }
 
 export interface ResolvedRandomEvent {
@@ -463,6 +721,15 @@ export interface MouseRaidOutcome {
   readonly reward: BigNum;
   /** True when every mouse was whacked: nothing was taken and the bonus was paid. */
   readonly defended: boolean;
+  /**
+   * True when a Whack Pass was spent to stop the theft. Deliberately its own flag rather than
+   * being folded into `defended`: the aftermath card has to say a pass was spent, because
+   * telling a player they whacked mice they did not whack would be a lie in the one place they
+   * are looking for a straight answer.
+   */
+  readonly passSpent: boolean;
+  /** Every consumable this raid spent, armed ones included. */
+  readonly consumablesSpent: readonly RaidConsumableId[];
 }
 
 export interface RandomEventsState {
@@ -485,6 +752,8 @@ export interface RandomEventsState {
   readonly lastRaid: MouseRaidOutcome | null;
   /** Lifetime count of raids that have fired. A statistic; nothing depends on it. */
   readonly raidCount: number;
+  /** What the player has bought to fight raids with, and how much they have ever bought. */
+  readonly consumables: RaidConsumablesState;
 }
 
 export function createInitialRandomEventsState(): RandomEventsState {
@@ -497,6 +766,7 @@ export function createInitialRandomEventsState(): RandomEventsState {
     raidNextEligibleAtEpochMs: 0,
     lastRaid: null,
     raidCount: 0,
+    consumables: createInitialRaidConsumables(),
   };
 }
 
@@ -525,12 +795,40 @@ const RandomEventIdSchema = z.enum([
 
 const RaidBigNumSchema = z.object({ mantissa: z.number(), exponent: z.number() });
 
+const RaidConsumableIdSchema = z.enum(["whack_pass", "bigger_whack", "half_hp_whack"]);
+
+const RaidMouseSchema = z.object({
+  id: z.string(),
+  hp: z.number().int().positive(),
+  maxHp: z.number().int().positive(),
+  share: z.number().positive(),
+  fat: z.boolean(),
+});
+
+const RaidConsumableStockSchema = z.object({
+  stock: z.number().int().nonnegative(),
+  purchased: z.number().int().nonnegative(),
+});
+
+const RaidConsumablesSchema = z
+  .object({
+    whack_pass: RaidConsumableStockSchema,
+    bigger_whack: RaidConsumableStockSchema,
+    half_hp_whack: RaidConsumableStockSchema,
+  })
+  .default(createInitialRaidConsumables);
+
 const ActiveRandomEventSchema = z.object({
   id: RandomEventIdSchema,
   startedAtEpochMs: z.number(),
   endsAtEpochMs: z.number(),
   pendingTargetIds: z.array(z.string()),
   claimedCount: z.number().int().nonnegative(),
+  // Raid-only, and optional so a raid saved by an older build reloads as a raid of ordinary
+  // one-hit mice — which is exactly what it was.
+  mice: z.array(RaidMouseSchema).optional(),
+  startingShare: z.number().optional(),
+  armed: z.array(RaidConsumableIdSchema).optional(),
 });
 
 export const RandomEventsStateSchema = z.object({
@@ -561,10 +859,13 @@ export const RandomEventsStateSchema = z.object({
       stolen: RaidBigNumSchema,
       reward: RaidBigNumSchema,
       defended: z.boolean(),
+      passSpent: z.boolean().default(false),
+      consumablesSpent: z.array(RaidConsumableIdSchema).default([]),
     })
     .nullable()
     .default(null),
   raidCount: z.number().int().nonnegative().default(0),
+  consumables: RaidConsumablesSchema,
 });
 
 /** JSON-safe form of the state. Structurally identical; typed separately so it can diverge. */
@@ -573,7 +874,12 @@ export type RandomEventsSaveData = z.infer<typeof RandomEventsStateSchema>;
 export function encodeRandomEvents(state: RandomEventsState): RandomEventsSaveData {
   return {
     active: state.active
-      ? { ...state.active, pendingTargetIds: [...state.active.pendingTargetIds] }
+      ? {
+          ...state.active,
+          pendingTargetIds: [...state.active.pendingTargetIds],
+          mice: state.active.mice ? state.active.mice.map((mouse) => ({ ...mouse })) : undefined,
+          armed: state.active.armed ? [...state.active.armed] : undefined,
+        }
       : null,
     nextEligibleAtEpochMs: state.nextEligibleAtEpochMs,
     rngStreamIndex: state.rngStreamIndex,
@@ -581,9 +887,19 @@ export function encodeRandomEvents(state: RandomEventsState): RandomEventsSaveDa
     spawnCount: state.spawnCount,
     raidNextEligibleAtEpochMs: state.raidNextEligibleAtEpochMs,
     lastRaid: state.lastRaid
-      ? { ...state.lastRaid, stolen: { ...state.lastRaid.stolen }, reward: { ...state.lastRaid.reward } }
+      ? {
+          ...state.lastRaid,
+          stolen: { ...state.lastRaid.stolen },
+          reward: { ...state.lastRaid.reward },
+          consumablesSpent: [...state.lastRaid.consumablesSpent],
+        }
       : null,
     raidCount: state.raidCount,
+    consumables: {
+      whack_pass: { ...state.consumables.whack_pass },
+      bigger_whack: { ...state.consumables.bigger_whack },
+      half_hp_whack: { ...state.consumables.half_hp_whack },
+    },
   };
 }
 
@@ -774,19 +1090,36 @@ export function tickRandomEvents(
     if (expired.id === "mouse_raid") {
       const miceEscaped = expired.pendingTargetIds.length;
       const miceTotal = miceEscaped + expired.claimedCount;
+      // The split is by SHARE, not by head: a fat mouse getting away costs what a fat mouse
+      // was carrying. Older saves (and any raid without a mouse list) fall back to heads, which
+      // is the same number when every mouse weighs one.
+      const escapedShare = expired.mice ? totalShare(expired.mice) : miceEscaped;
+      const startingShare = expired.startingShare ?? miceTotal;
+
+      // THE WHACK PASS. Spent only here, at the one moment cookies would actually leave, so a
+      // raid the player fought off by hand never costs them a pass.
+      const hasPass = state.consumables.whack_pass.stock > 0;
+      const consumables = hasPass ? spendOne(state.consumables, "whack_pass") : state.consumables;
+      const spent = [...(expired.armed ?? []), ...(hasPass ? (["whack_pass"] as const) : [])];
+
       const outcome: MouseRaidOutcome = {
         resolvedAtEpochMs: nowEpochMs,
         miceTotal,
         miceWhacked: expired.claimedCount,
         miceEscaped,
-        stolen: mouseRaidTheft(gameState.cookies, miceEscaped, miceTotal, config.raidStealCeiling),
+        stolen: hasPass
+          ? zero
+          : mouseRaidTheft(gameState.cookies, escapedShare, startingShare, config.raidStealCeiling),
         reward: zero,
         defended: false,
+        passSpent: hasPass,
+        consumablesSpent: spent,
       };
       return {
         randomEvents: {
           ...state,
           active: null,
+          consumables,
           nextEligibleAtEpochMs: Math.max(state.nextEligibleAtEpochMs, nowEpochMs + config.cooldownMs),
           rngStreamIndex: rng.getStreamIndex(),
           lastResolved: resolved,
@@ -838,6 +1171,18 @@ export function tickRandomEvents(
     // where the window is visible and the counter is worth raiding.
     if (!options.hidden && richEnough) {
       const count = rollMouseCount(rng);
+      // Arm what the player has stocked. Both armed consumables are spent HERE, by this raid,
+      // whatever the raid then does — what they bought is a raid that is easier to fight, and
+      // they got one.
+      let consumables = state.consumables;
+      const armed: RaidConsumableId[] = [];
+      for (const def of RAID_CONSUMABLE_DEFINITIONS) {
+        if (!def.armedAtSpawn) continue;
+        if (consumables[def.id].stock <= 0) continue;
+        consumables = spendOne(consumables, def.id);
+        armed.push(def.id);
+      }
+      const mice = rollRaidMice(count, rng, armed.includes("half_hp_whack"));
       return {
         randomEvents: {
           ...state,
@@ -845,9 +1190,13 @@ export function tickRandomEvents(
             id: "mouse_raid",
             startedAtEpochMs: nowEpochMs,
             endsAtEpochMs: nowEpochMs + MOUSE_RAID_DEFINITION.durationMs,
-            pendingTargetIds: mouseTargetIds(count),
+            pendingTargetIds: mice.map((mouse) => mouse.id),
             claimedCount: 0,
+            mice,
+            startingShare: totalShare(mice),
+            armed,
           },
+          consumables,
           rngStreamIndex: rng.getStreamIndex(),
           spawnCount: state.spawnCount + 1,
           raidCount: state.raidCount + 1,
@@ -1012,47 +1361,15 @@ export function clickRandomEventTarget(
   const active = state.active;
   if (!active) return { randomEvents: state, bonus: zero, claimed: false };
   if (nowEpochMs >= active.endsAtEpochMs) return { randomEvents: state, bonus: zero, claimed: false };
+  // A mouse is not a rain drop: it has hit points, and a swing can catch several of them. That
+  // lives in `whackMice`, and this function forwards rather than growing a second copy of it.
+  if (active.id === "mouse_raid") {
+    return whackMice(state, gameState, [targetId], nowEpochMs, rng, config);
+  }
   if (!active.pendingTargetIds.includes(targetId)) return { randomEvents: state, bonus: zero, claimed: false };
 
   const pendingTargetIds = active.pendingTargetIds.filter((id) => id !== targetId);
   const claimedCount = active.claimedCount + 1;
-
-  // A MOUSE. Whacking one pays nothing on its own — what it buys is the share of the balance
-  // that mouse was going to carry off, which is a number the player never sees leave. Whacking
-  // the LAST one ends the raid early, banks a defended outcome for the aftermath toast, and
-  // pays the defence bonus.
-  if (active.id === "mouse_raid") {
-    const miceTotal = active.pendingTargetIds.length + active.claimedCount;
-    if (pendingTargetIds.length > 0) {
-      return {
-        randomEvents: { ...state, active: { ...active, pendingTargetIds, claimedCount } },
-        bonus: zero,
-        claimed: true,
-      };
-    }
-    const reward = mouseRaidDefenceReward(gameState, config.payouts);
-    return {
-      randomEvents: {
-        ...state,
-        active: null,
-        nextEligibleAtEpochMs: Math.max(state.nextEligibleAtEpochMs, nowEpochMs + config.cooldownMs),
-        rngStreamIndex: rng.getStreamIndex(),
-        lastResolved: { id: active.id, resolvedAtEpochMs: nowEpochMs, claimedCount, endedEarly: true },
-        raidNextEligibleAtEpochMs: scheduleNextRaid(nowEpochMs, rng, config),
-        lastRaid: {
-          resolvedAtEpochMs: nowEpochMs,
-          miceTotal,
-          miceWhacked: claimedCount,
-          miceEscaped: 0,
-          stolen: zero,
-          reward,
-          defended: true,
-        },
-      },
-      bonus: reward,
-      claimed: true,
-    };
-  }
 
   // Oven Hiccup's one button ENDS the event: that is the whole point of it being a risk the
   // player can answer rather than a penalty they sit through. It pays nothing — getting the
@@ -1101,8 +1418,94 @@ export function clickRandomEventTarget(
   };
 }
 
+
 /**
- * Clears the finished-raid record, so the aftermath toast can be dismissed.
+ * ONE SWING, at one or more mice.
+ *
+ * Several ids at once is only legal when the raid armed a Bigger Whack — the domain enforces
+ * that rather than trusting the caller, so a hand-built action cannot swat five mice with a
+ * bare press. WHICH mice a Bigger Whack reaches is geometry the view measures (the mice are
+ * animated, so their real positions are whatever the layout says) and `miceWithinWhackRadius`
+ * decides; this function only asks whether the player was entitled to a wide swing at all.
+ *
+ * Each id in the swing costs its mouse ONE hit point. A mouse at zero leaves the stage and
+ * counts as whacked; a fat mouse that is still standing stays, one pip down. Clearing the stage
+ * ends the raid early, banks a defended outcome, and pays the defence bonus — and it does NOT
+ * spend a Whack Pass, because there was no theft for a pass to stop.
+ */
+export function whackMice(
+  state: RandomEventsState,
+  gameState: GameState,
+  mouseIds: readonly string[],
+  nowEpochMs: number,
+  rng: RngPort,
+  config: RandomEventConfig = DEFAULT_RANDOM_EVENT_CONFIG,
+): RandomEventClickResult {
+  const zero = bnFromNumber(0);
+  const active = state.active;
+  const refused = { randomEvents: state, bonus: zero, claimed: false };
+  if (!active || active.id !== "mouse_raid") return refused;
+  if (nowEpochMs >= active.endsAtEpochMs) return refused;
+
+  const wide = (active.armed ?? []).includes("bigger_whack");
+  const unique = [...new Set(mouseIds)];
+  if (unique.length === 0) return refused;
+  if (unique.length > 1 && !wide) return refused;
+
+  const mice = active.mice ?? active.pendingTargetIds.map((id) => ({ id, hp: 1, maxHp: 1, share: 1, fat: false }));
+  const hit = new Set(unique.filter((id) => mice.some((mouse) => mouse.id === id)));
+  if (hit.size === 0) return refused;
+
+  const survivors = mice
+    .map((mouse) => (hit.has(mouse.id) ? { ...mouse, hp: mouse.hp - 1 } : mouse))
+    .filter((mouse) => mouse.hp > 0);
+  const seenOff = mice.length - survivors.length;
+  const claimedCount = active.claimedCount + seenOff;
+
+  if (survivors.length > 0) {
+    return {
+      randomEvents: {
+        ...state,
+        active: {
+          ...active,
+          mice: survivors,
+          pendingTargetIds: survivors.map((mouse) => mouse.id),
+          claimedCount,
+        },
+      },
+      bonus: zero,
+      claimed: true,
+    };
+  }
+
+  const reward = mouseRaidDefenceReward(gameState, config.payouts);
+  return {
+    randomEvents: {
+      ...state,
+      active: null,
+      nextEligibleAtEpochMs: Math.max(state.nextEligibleAtEpochMs, nowEpochMs + config.cooldownMs),
+      rngStreamIndex: rng.getStreamIndex(),
+      lastResolved: { id: "mouse_raid", resolvedAtEpochMs: nowEpochMs, claimedCount, endedEarly: true },
+      raidNextEligibleAtEpochMs: scheduleNextRaid(nowEpochMs, rng, config),
+      lastRaid: {
+        resolvedAtEpochMs: nowEpochMs,
+        miceTotal: claimedCount,
+        miceWhacked: claimedCount,
+        miceEscaped: 0,
+        stolen: zero,
+        reward,
+        defended: true,
+        // A Whack Pass is NOT spent here. The raid was beaten by hand.
+        passSpent: false,
+        consumablesSpent: [...(active.armed ?? [])],
+      },
+    },
+    bonus: reward,
+    claimed: true,
+  };
+}
+
+/** Clears the finished-raid record, so the aftermath toast can be dismissed.
  *
  * Separate from `clearLastResolved` because the two toasts are separate: the marquee names an
  * event as it lands, and the aftermath states what a raid cost or saved. Dismissing one should

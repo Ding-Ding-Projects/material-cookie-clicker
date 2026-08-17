@@ -189,6 +189,14 @@ export function describeMilestone(event: MilestoneEvent): Bilingual {
           yue: `老鼠打劫擋住咗——${outcome.miceTotal} 隻全部拍走，冇損失。`,
         };
       }
+      // A pass is not a defence and the announcement says so. The player did not whack them;
+      // they paid for the mice to leave empty-handed, which is a different sentence.
+      if (outcome.passSpent) {
+        return {
+          en: `Mouse Raid over — a Whack Pass was spent, so the ${outcome.miceEscaped} mice that got away took nothing.`,
+          yue: `老鼠打劫完咗——用咗一張打鼠券，走甩嘅 ${outcome.miceEscaped} 隻乜都攞唔到。`,
+        };
+      }
       const stolenEn = formatExact(outcome.stolen, "en");
       const stolenYue = formatExact(outcome.stolen, "yue");
       return {

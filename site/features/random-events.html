@@ -62,7 +62,7 @@
     <p>Roughly once an hour, mice get onto the counter. Three to five of them scurry across the game stage for twenty seconds, each one a real button you can whack. Every mouse still loose when the twenty seconds are up carries cookies away with it, and if all of them get away the raid takes <strong>eighty per cent of your current balance</strong>. Whack every one and it takes nothing at all, and pays you a small bonus for the trouble.</p>
     <figure class="capture">
       <img src="../assets/captures/mice-raid.png" alt="The game surface during a Mouse Raid. Five round pink buttons, each carrying a small grey mouse with a red ear, a red nose, whiskers and a cookie crumb under its belly, are scattered across the lower half of the stage, running over the upgrade shelf and the shop rail. The fourth HUD plate is pink and outlined in red, reading Mouse Raid in English and Cantonese with a draining dark red bar, the figure 10s, and the line 5 of 5 mice left with its Cantonese equivalent. The cookies plate reads 320 quadrillion." width="1557" height="1093" loading="lazy" />
-      <figcaption><strong>Five mice, mid-raid.</strong> Each one is a real button with its own accessible name and a 56-pixel hit area around a 36-pixel drawing &mdash; deliberately larger than the sprite, because a minimum target size measured against a stationary control is not the same promise when the control is crossing the stage. The HUD plate counts down and counts the mice still loose. Captured from the built application running on an off-screen Windows desktop, photographed with the Win32 PrintWindow API.</figcaption>
+      <figcaption><strong>Five mice, mid-raid.</strong> Taken before hit points and the supplies shelf existed, so every mouse here is a one-hit mouse and there is no supplies plate in the HUD. Each one is a real button with its own accessible name and a 56-pixel hit area around a 36-pixel drawing &mdash; deliberately larger than the sprite, because a minimum target size measured against a stationary control is not the same promise when the control is crossing the stage. The HUD plate counts down and counts the mice still loose. Captured from the built application running on an off-screen Windows desktop, photographed with the Win32 PrintWindow API.</figcaption>
     </figure>
     <figure class="capture">
       <img src="../assets/captures/mice-aftermath.png" alt="The same surface just after a raid ended. A wide pink card sits over the lower half of the stage reading: 2 of 4 mice got away with 16 quintillion cookies, the same sentence in Cantonese below it, and in smaller type, Your lifetime total is untouched — they took cookies, not history, again in both languages. A Dismiss button sits at its right. The cookies plate above now reads 24 quintillion." width="1557" height="1093" loading="lazy" />
@@ -86,6 +86,27 @@
     </table>
     </div>
     <p><strong>It takes cookies, not history.</strong> The theft comes off your balance and never off your lifetime total or your baked-cookies statistic. Those two are the record of what this save has ever produced; they gate achievements and the prestige projection, and a mouse eating a biscuit does not un-bake it. Letting a raid rewind them would make it quietly retroactive &mdash; revoking achievements and ascension points hours after the fact &mdash; which is a far worse punishment than the one you agreed to. So a raid is expensive and it is survivable, and nothing it does can move a number that only ever goes up.</p>
+
+    <h3>Fat mice, and hit points</h3>
+    <p>Most mice go down to a single whack. Raids of four or five bring one <strong>fat mouse</strong>, which takes two or three hits and carries double an ordinary mouse&rsquo;s share of the theft &mdash; so a raid of four ordinary mice plus a fat one splits into six shares, and the fat one getting away on its own costs a third of the ceiling rather than a fifth of it. The head count you see in the aftermath card still counts heads, because that is what you watched happen; the split underneath is by share, and this is where that is written down.</p>
+    <p>A fat mouse is drawn larger and carries a row of pips showing how many hits it has left, and its accessible name says the same thing in words.</p>
+
+    <h3>Raid supplies</h3>
+    <p>Three consumables, bought with cookies, by hand, one at a time, from a stock that is capped at three each. They are insurance, not immunity, and a save that never buys one plays exactly the game that shipped before them. Each is priced from a base that multiplies by four for every one you have <em>ever</em> bought, so spending your stock does not reset the price.</p>
+    <div class="scroller">
+    <table>
+      <caption>The three raid consumables</caption>
+      <thead><tr><th scope="col">Item</th><th scope="col">What it does</th><th scope="col">When it is spent</th></tr></thead>
+      <tbody>
+        <tr><td>Whack Pass &middot; <span lang="zh-HK">打鼠券</span></td><td>The raid takes nothing. The mice that got away leave empty-handed.</td><td>Only at the moment a raid would actually take cookies</td></tr>
+        <tr><td>Bigger Whack &middot; <span lang="zh-HK">大力拍</span></td><td>One press swats every mouse within reach of it, overlapping mice included</td><td>Armed when a raid starts; spent by that raid</td></tr>
+        <tr><td>Half-HP Whack &middot; <span lang="zh-HK">半血拍</span></td><td>Every mouse in that raid needs half as many hits, rounded up</td><td>Armed when a raid starts; spent by that raid</td></tr>
+      </tbody>
+    </table>
+    </div>
+    <p><strong>A pass is not a defence, and the game does not pretend it is.</strong> Whacking every mouse yourself pays the defended bonus and spends no pass &mdash; a pass in the drawer is never wasted on a raid you were going to win. When a pass <em>is</em> spent, the aftermath card says so in as many words (&ldquo;A Whack Pass was spent&rdquo;) and the announcement says it too, rather than congratulating you on mice you never touched.</p>
+    <p>The two whack consumables arm themselves at the start of a raid if you have them in stock. That is deliberate: an &ldquo;arm this now?&rdquo; prompt in the middle of a twenty-second window would be a worse game and a much worse experience for anyone who needs a moment to read it. They are spent by that raid whatever happens, because what they buy is a raid that is easier to fight, and you got one. Stock is a plain count rather than a list of individual items, so there is no oldest pass to spend first &mdash; there is nothing to sort.</p>
+    <p>Where the reach of a Bigger Whack ends is arithmetic, and it lives in the domain with the rest of the arithmetic: the interface measures where the mice actually are (they are animated, so the layout is the only honest source for that) and a tested pure function decides which of them one swing caught. The domain then checks independently that the raid had a Bigger Whack armed at all, so a swing can never clear a stage it did not pay for.</p>
 
     <h3>Rarity, and the rails around it</h3>
     <ul>

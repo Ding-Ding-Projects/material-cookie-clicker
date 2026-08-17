@@ -1,11 +1,20 @@
 import { useEffect, useRef, useState, type CSSProperties } from 'react';
 
+import { bnCompare, bnFromNumber } from '../../shared/game/big-number.js';
 import { formatExact, formatExactDigits } from '../../shared/game/format-number.js';
 import {
+  BIGGER_WHACK_RADIUS_PX,
   getRandomEventDefinition,
+  getRaidConsumableDefinition,
+  isRaidConsumableAtCap,
+  miceWithinWhackRadius,
+  raidConsumablePrice,
+  RAID_CONSUMABLE_DEFINITIONS,
   remainingFraction,
   remainingMs,
   type ActiveRandomEvent,
+  type MousePoint,
+  type RaidMouse,
   type RandomEventId,
 } from '../../shared/game/random-events.js';
 import { RainDropArt, MouseArt, OvenHiccupArt, RANDOM_EVENT_ART } from '../assets/icons.js';
@@ -199,7 +208,28 @@ function MouseRaidStage({ active }: { active: ActiveRandomEvent }) {
   const dispatch = useGameDispatch();
   const stageRef = useRef<HTMLDivElement | null>(null);
   const [puffs, setPuffs] = useState<readonly SqueakPuff[]>([]);
-  const total = active.pendingTargetIds.length + active.claimedCount;
+  const mice: readonly RaidMouse[] =
+    active.mice ?? active.pendingTargetIds.map((id) => ({ id, hp: 1, maxHp: 1, share: 1, fat: false }));
+  const total = mice.length + active.claimedCount;
+  const wide = (active.armed ?? []).includes('bigger_whack');
+
+  /**
+   * Where the mice REALLY are, measured off their own buttons.
+   *
+   * A Bigger Whack reaches a radius around the press, and the mice are animated by the browser,
+   * so the only honest answer to "what was within reach" is the one the layout gives. The view
+   * measures; `miceWithinWhackRadius` (domain, tested) decides which of those are caught; and
+   * the domain independently checks the player was entitled to a wide swing at all before
+   * applying it, so a hand-built dispatch cannot clear a stage it did not pay for.
+   */
+  function measure(): readonly MousePoint[] {
+    const root = stageRef.current;
+    if (!root) return [];
+    return [...root.querySelectorAll<HTMLElement>('.event-mouse')].map((button) => {
+      const rect = button.getBoundingClientRect();
+      return { id: button.dataset.mouseId ?? '', x: rect.x + rect.width / 2, y: rect.y + rect.height / 2 };
+    });
+  }
 
   function whack(targetId: string, event: { clientX: number; clientY: number }): void {
     const box = stageRef.current?.getBoundingClientRect();
@@ -208,26 +238,42 @@ function MouseRaidStage({ active }: { active: ActiveRandomEvent }) {
       setPuffs((current) => [...current, puff]);
       setTimeout(() => setPuffs((current) => current.filter((p) => p.key !== puff.key)), 700);
     }
-    dispatch({ type: 'randomEventWhack', mouseId: targetId });
+    const caught = wide ? miceWithinWhackRadius(measure(), targetId, BIGGER_WHACK_RADIUS_PX) : [targetId];
+    dispatch({ type: 'randomEventWhack', mouseIds: caught.length > 0 ? caught : [targetId] });
   }
 
   return (
     <div
-      className="event-stage event-stage--raid"
+      className={`event-stage event-stage--raid${wide ? ' event-stage--wide' : ''}`}
       ref={stageRef}
       role="group"
       aria-label={`${MOUSE_RAID_DEFINITION_NAME} — ${bilingualText(MOUSE_RAID_COPY.stageLabel)}`}
     >
-      {active.pendingTargetIds.map((targetId, index) => (
+      {mice.map((mouse, index) => (
         <button
-          key={targetId}
+          key={mouse.id}
           type="button"
-          className="event-mouse"
+          className={`event-mouse${mouse.fat ? ' event-mouse--fat' : ''}`}
+          data-mouse-id={mouse.id}
           style={mouseLayout(index, total)}
-          aria-label={`${bilingualText(MOUSE_RAID_COPY.whack)} (${index + 1}/${active.pendingTargetIds.length})`}
-          onClick={(event) => whack(targetId, event)}
+          aria-label={
+            mouse.maxHp > 1
+              ? `${bilingualText(MOUSE_RAID_COPY.whackFat(mouse.hp))} (${index + 1}/${mice.length})`
+              : `${bilingualText(MOUSE_RAID_COPY.whack)} (${index + 1}/${mice.length})`
+          }
+          onClick={(event) => whack(mouse.id, event)}
         >
           <MouseArt extraClass="event-mouse__art" />
+          {/* A fat mouse shows how many more hits it needs, as pips rather than a number, so the
+              information survives at 36px and does not have to be read. The count is in the
+              accessible name as well, where it is words. */}
+          {mouse.maxHp > 1 ? (
+            <span className="event-mouse__pips" aria-hidden="true">
+              {Array.from({ length: mouse.maxHp }, (_, pip) => (
+                <span key={pip} className={pip < mouse.hp ? 'is-full' : 'is-spent'} />
+              ))}
+            </span>
+          ) : null}
         </button>
       ))}
       {puffs.map((puff) => (
@@ -240,6 +286,76 @@ function MouseRaidStage({ active }: { active: ActiveRandomEvent }) {
           {showsEnglish() ? 'squeak!' : '吱!'}
         </span>
       ))}
+    </div>
+  );
+}
+
+/**
+ * THE RAID SUPPLIES SHELF: the three consumables, their prices, and what is in stock.
+ *
+ * It sits in the HUD beside the event indicator rather than in the generator shop, because these
+ * are not production — they are what you are holding against the next raid, and the raid's own
+ * corner of the cabinet is where a player will look for them. Prices are printed literally, like
+ * every other price in this game, with the full digits on the control's title. A card that
+ * cannot be bought is disabled and says why, rather than disappearing.
+ *
+ * There is nothing automatic here: no auto-buy, no subscription, no "restock" button. Each pass
+ * is one deliberate purchase, exactly like a generator.
+ */
+export function RaidSuppliesShelf() {
+  const structure = useStructureSnapshot();
+  const dispatch = useGameDispatch();
+  const consumables = structure.randomEvents.consumables;
+
+  // The shelf appears once a save is rich enough to be raided at all (the same thousand-cookie
+  // floor the raid itself uses) or once one raid has happened, so a fresh game is never shown a
+  // shop for a mechanic it has not met.
+  const met = structure.randomEvents.raidCount > 0 || bnCompare(structure.cookies, bnFromNumber(1_000)) >= 0;
+  if (!met) return null;
+
+  return (
+    <div className="raid-supplies" role="group" aria-label={bilingualText(MOUSE_RAID_COPY.suppliesLabel)}>
+      <span className="raid-supplies__title">
+        {showsEnglish() ? <span>{MOUSE_RAID_COPY.suppliesLabel.en}</span> : null}
+        {showsCantonese() ? (
+          <span lang="zh-HK">{MOUSE_RAID_COPY.suppliesLabel.yue}</span>
+        ) : null}
+      </span>
+      <ul className="raid-supplies__list">
+        {RAID_CONSUMABLE_DEFINITIONS.map((def) => {
+          const price = raidConsumablePrice(def.id, consumables);
+          const atCap = isRaidConsumableAtCap(def.id, consumables);
+          const affordable = bnCompare(structure.cookies, price) >= 0;
+          const stock = consumables[def.id].stock;
+          const priceText = formatExact(price, 'en');
+          const definition = getRaidConsumableDefinition(def.id);
+          return (
+            <li key={def.id}>
+              <button
+                type="button"
+                className="raid-supplies__buy"
+                disabled={atCap || !affordable}
+                title={`${definition.blurbEn} · ${definition.blurbYue} — ${formatExactDigits(price)}`}
+                aria-label={`${def.nameEn} · ${def.nameYue} — ${bilingualText(
+                  atCap ? MOUSE_RAID_COPY.suppliesFull : MOUSE_RAID_COPY.suppliesBuy(priceText),
+                )} · ${bilingualText(MOUSE_RAID_COPY.suppliesStock(stock, def.stockCap))}`}
+                onClick={() => dispatch({ type: 'buyRaidConsumable', consumableId: def.id })}
+              >
+                <span className="raid-supplies__name">
+                  {showsEnglish() ? <span>{def.nameEn}</span> : null}
+                  {showsCantonese() ? <span lang="zh-HK">{def.nameYue}</span> : null}
+                </span>
+                <span className="raid-supplies__stock">
+                  {stock} / {def.stockCap}
+                </span>
+                <span className="raid-supplies__price">
+                  {atCap ? bilingualText(MOUSE_RAID_COPY.suppliesFull) : priceText}
+                </span>
+              </button>
+            </li>
+          );
+        })}
+      </ul>
     </div>
   );
 }
@@ -332,17 +448,23 @@ export function MouseRaidAftermathToast() {
   }, [raid, dispatch]);
 
   if (!raid) return null;
-  const line = raid.defended
-    ? MOUSE_RAID_COPY.defended(formatExact(raid.reward, 'en'))
-    : MOUSE_RAID_COPY.stolen(formatExact(raid.stolen, 'en'), raid.miceEscaped, raid.miceTotal);
-  const lineYue = raid.defended
-    ? MOUSE_RAID_COPY.defended(formatExact(raid.reward, 'yue'))
-    : MOUSE_RAID_COPY.stolen(formatExact(raid.stolen, 'yue'), raid.miceEscaped, raid.miceTotal);
+  // Three outcomes, three sentences, and the middle one is the reason this is not a boolean:
+  // a raid stopped by a Whack Pass was NOT defended, and saying so is the difference between a
+  // receipt and a flattering story. The pass line says a pass was spent, in as many words.
+  function outcomeLine(locale: 'en' | 'yue') {
+    if (raid!.defended) return MOUSE_RAID_COPY.defended(formatExact(raid!.reward, locale));
+    if (raid!.passSpent) return MOUSE_RAID_COPY.passSpent(raid!.miceEscaped);
+    return MOUSE_RAID_COPY.stolen(formatExact(raid!.stolen, locale), raid!.miceEscaped, raid!.miceTotal);
+  }
+  const line = outcomeLine('en');
+  const lineYue = outcomeLine('yue');
+  const spentEn = raid.consumablesSpent.map((id) => getRaidConsumableDefinition(id).nameEn).join(', ');
+  const spentYue = raid.consumablesSpent.map((id) => getRaidConsumableDefinition(id).nameYue).join('、');
   const Emblem = RANDOM_EVENT_ART.mouse_raid;
 
   return (
     <div
-      className={`raid-aftermath${raid.defended ? ' raid-aftermath--defended' : ''}`}
+      className={`raid-aftermath${raid.defended || raid.passSpent ? ' raid-aftermath--defended' : ''}`}
       role="group"
       aria-label={bilingualText(MOUSE_RAID_COPY.aftermathLabel)}
     >
@@ -360,9 +482,17 @@ export function MouseRaidAftermathToast() {
             {lineYue.yue}
           </span>
         ) : null}
-        {raid.defended ? null : (
+        {raid.defended || raid.passSpent ? null : (
           <span className="raid-aftermath__note">{bilingualText(MOUSE_RAID_COPY.historyNote)}</span>
         )}
+        {raid.consumablesSpent.length > 0 ? (
+          <span className="raid-aftermath__note">
+            {showsEnglish() ? <span>{MOUSE_RAID_COPY.armedNote(spentEn).en}</span> : null}
+            {showsCantonese() ? (
+              <span lang="zh-HK">{MOUSE_RAID_COPY.armedNote(spentYue).yue}</span>
+            ) : null}
+          </span>
+        ) : null}
       </span>
       <button
         type="button"

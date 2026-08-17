@@ -168,6 +168,28 @@ export const MOUSE_RAID_COPY = {
   },
   aftermathLabel: { en: "Raid aftermath", yue: "打劫之後" },
   dismiss: { en: "Dismiss", yue: "收起" },
+  /* The fat mouse and the three consumables. Every line here names a real quantity — hits left,
+     stock out of a cap, a literal price — because "a big one" and "some left" are exactly the
+     things a player cannot act on. */
+  whackFat: (hitsLeft: number): Bilingual => ({
+    en: `Whack the fat mouse — ${hitsLeft} more ${hitsLeft === 1 ? "hit" : "hits"}`,
+    yue: `拍走隻肥老鼠——仲要 ${hitsLeft} 下`,
+  }),
+  suppliesLabel: { en: "Raid supplies", yue: "防鼠裝備" },
+  suppliesBuy: (price: string): Bilingual => ({ en: `Buy for ${price} cookies`, yue: `用 ${price} 粒曲奇買` }),
+  suppliesStock: (stock: number, cap: number): Bilingual => ({
+    en: `${stock} of ${cap} in stock`,
+    yue: `庫存 ${stock} / ${cap}`,
+  }),
+  suppliesFull: { en: "Stock full", yue: "庫存滿咗" },
+  passSpent: (mice: number): Bilingual => ({
+    en: `A Whack Pass was spent — ${mice} ${mice === 1 ? "mouse" : "mice"} got away with nothing.`,
+    yue: `用咗一張打鼠券——走甩咗嘅 ${mice} 隻乜都攞唔到。`,
+  }),
+  armedNote: (names: string): Bilingual => ({
+    en: `Spent on this raid: ${names}.`,
+    yue: `呢次打劫用咗：${names}。`,
+  }),
 } as const satisfies Record<string, Bilingual | ((...args: any[]) => Bilingual)>;
 
 /**

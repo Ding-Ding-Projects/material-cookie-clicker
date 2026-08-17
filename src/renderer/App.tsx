@@ -787,7 +787,11 @@ function GameShell() {
           {openSurface === 'tools' && <ToolsScreen onOpenApplicationFeature={openApplicationFeature} />}
           {openSurface === 'statistics' && <StatisticsScreen />}
           {openSurface === 'prestige' && <PrestigeScreen />}
-          {openSurface === CATALOGUE_PANEL_ID && <ControlsCatalogue />}
+          {openSurface === CATALOGUE_PANEL_ID && (
+            <div className="screen">
+              <ControlsCatalogue />
+            </div>
+          )}
           {openSurface === 'settings' && (
             <SettingsScreen
               highlightRow={settingsEntry?.row ?? null}

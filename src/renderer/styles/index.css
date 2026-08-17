@@ -8903,6 +8903,12 @@ ul.card-grid {
   display: flex;
   flex-direction: column;
   gap: 14px;
+  /* The internal-scroll recipe every dialog screen needs (owner: "almost all dialogs not
+     scrollable"). The anchored panel clips overflow, so the screen root must scroll itself. */
+  flex: 1;
+  min-height: 0;
+  overflow-y: auto;
+  padding: 18px 22px 28px;
 }
 
 .home-lede {

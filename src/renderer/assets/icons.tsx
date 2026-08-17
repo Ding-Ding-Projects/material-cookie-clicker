@@ -1,7 +1,7 @@
 /* ------------------------------------------------------------------------------------------
  * The illustrated art set.
  *
- * Every entity the player can see on a shelf — the fourteen generators, the upgrade families,
+ * Every entity the player can see on a shelf — the twenty generators, the upgrade families,
  * the achievement medals, the tool tiers and their tools, the golden cookie — gets a real
  * little drawing here instead of a stock emoji. The rendering language is the v2 arcade-bakery
  * one used by design/tokens-color.html and design/achievement-badge.html: warm browns and
@@ -41,8 +41,8 @@ const AMETHYST = 'var(--tier3, #533593)';
 const AMETHYST_LIGHT = 'var(--tier3-container, #e6d9ff)';
 const HIGHLIGHT = 'rgba(255, 255, 255, 0.7)';
 
-/** Every drawing shares one canvas and one stroke weight, which is what makes fourteen
- *  separately-drawn machines read as one set rather than fourteen clip-art finds. */
+/** Every drawing shares one canvas and one stroke weight, which is what makes twenty
+ *  separately-drawn machines read as one set rather than twenty clip-art finds. */
 function Art({ children, extraClass }: { children: ReactNode; extraClass?: string }) {
   return (
     <svg
@@ -67,7 +67,7 @@ function Base({ d, fill = INK }: { d: string; fill?: string }) {
 }
 
 /* ==========================================================================================
- * Generators — one distinct little illustration per rung of the real fourteen-tier ladder in
+ * Generators — one distinct little illustration per rung of the real twenty-tier ladder in
  * src/shared/game/generators.ts.
  * ======================================================================================== */
 
@@ -268,6 +268,106 @@ function PrismArt() {
   );
 }
 
+/* --- the six late-game rungs. Same canvas, same stroke, same paint box: they have to read as
+ *     the top of the SAME ladder, not as a second set bolted on. --- */
+
+function ChanceMakerArt() {
+  return (
+    <Art>
+      <Base d="M6 26h20v3H6z" />
+      {/* a mahjong tile and a pair of dice: the back room of the bakery, which is where the
+          money in this tier actually comes from */}
+      <rect x="4" y="9" width="11" height="16" rx="2" fill={PLATE} />
+      <circle cx="9.5" cy="14" r="1.6" fill={GOLD_DEEP} stroke="none" />
+      <circle cx="9.5" cy="19.4" r="1.6" fill={EMERALD} stroke="none" />
+      <rect x="17" y="6" width="10" height="10" rx="2" fill={DOUGH} transform="rotate(12 22 11)" />
+      <circle cx="20.4" cy="9.4" r="0.9" fill={CHIP} stroke="none" />
+      <circle cx="24" cy="12.6" r="0.9" fill={CHIP} stroke="none" />
+      <rect x="18" y="18" width="10" height="10" rx="2" fill={CRUST} transform="rotate(-8 23 23)" />
+      <circle cx="21" cy="21.6" r="0.9" fill={METAL_HI} stroke="none" />
+      <circle cx="25" cy="25" r="0.9" fill={METAL_HI} stroke="none" />
+      <circle cx="23" cy="23.3" r="0.9" fill={METAL_HI} stroke="none" />
+    </Art>
+  );
+}
+
+function FractalEngineArt() {
+  return (
+    <Art>
+      <Base d="M6 27h20v2H6z" />
+      {/* the same triangle three times at a third the size each turn — the shape IS the idea */}
+      <path d="M16 3 29 26H3z" fill={DOUGH} />
+      <path d="M16 12 22.5 24h-13z" fill={CRUST} />
+      <path d="M16 17.4 19.2 24h-6.4z" fill={GOLD} />
+      <path d="M9.5 14.6 13 21H6z" fill={AMETHYST_LIGHT} />
+      <path d="M22.5 14.6 26 21h-7z" fill={EMERALD_LIGHT} />
+    </Art>
+  );
+}
+
+function ScriptConsoleArt() {
+  return (
+    <Art>
+      <Base d="M5 25h22v4H5z" />
+      <rect x="3" y="6" width="26" height="17" rx="2.4" fill={PLATE} />
+      <rect x="3" y="6" width="26" height="4" rx="2" fill={CRUST} />
+      <circle cx="6.2" cy="8" r="0.8" fill={GOLD_DEEP} stroke="none" />
+      <circle cx="8.8" cy="8" r="0.8" fill={EMERALD} stroke="none" />
+      {/* a prompt caret and a line of output, which is the whole of what a console promises */}
+      <path d="M7 14.4l3 2.4-3 2.4" stroke={EMERALD} strokeWidth={1.6} />
+      <path d="M13 19.6h9" stroke={CHIP} strokeWidth={1.6} />
+      <path d="M13 14h6" stroke={PLATE_DIM} strokeWidth={1.6} />
+      <path d="M11 27h10" strokeWidth={1.8} />
+    </Art>
+  );
+}
+
+function IdleverseArt() {
+  return (
+    <Art>
+      <Base d="M7 27h18v2H7z" />
+      {/* bubbles inside bubbles: other bakeries, all of them baking without you */}
+      <circle cx="16" cy="16" r="13" fill={AMETHYST} />
+      <circle cx="11.4" cy="12.4" r="4.4" fill={AMETHYST_LIGHT} />
+      <circle cx="21.4" cy="19.6" r="5.4" fill={PLATE_DIM} />
+      <circle cx="20.4" cy="9.6" r="2.4" fill={GOLD} />
+      <circle cx="10" cy="22.4" r="2.8" fill={EMERALD_LIGHT} />
+      <circle cx="11.4" cy="12.4" r="1.4" fill={CHIP} stroke="none" />
+      <circle cx="21.4" cy="19.6" r="1.8" fill={CRUST} stroke="none" />
+    </Art>
+  );
+}
+
+function CortexBakerArt() {
+  return (
+    <Art>
+      <Base d="M6 26h20v3H6z" />
+      {/* a brain wearing an oven door — the joke is that the oven is now the thinking part */}
+      <path d="M6 14a6 6 0 0 1 6-6h8a6 6 0 0 1 6 6v5a7 7 0 0 1-7 7h-6a7 7 0 0 1-7-7z" fill={DOUGH} />
+      <path d="M11 9.4c-1.6 2.4-1.6 4.6 0 7s1.6 4.6 0 7" stroke={CRUST} strokeWidth={1.3} />
+      <path d="M16 8.4c-1.8 2.6-1.8 5 0 7.6s1.8 5 0 7.6" stroke={CRUST} strokeWidth={1.3} />
+      <path d="M21 9.4c1.6 2.4 1.6 4.6 0 7s-1.6 4.6 0 7" stroke={CRUST} strokeWidth={1.3} />
+      <rect x="11" y="18.6" width="10" height="7" rx="1.6" fill={INK} />
+      <path d="M12.6 22.2h6.8" stroke={GOLD_DEEP} strokeWidth={1.6} />
+    </Art>
+  );
+}
+
+function WokOfTheGodsArt() {
+  return (
+    <Art>
+      <Base d="M4 24h24v4H4z" />
+      {/* the flame first, so the wok sits IN it rather than above it */}
+      <path d="M9 20c-1-4 1.4-6 2.6-8.4.6 2 2 2.6 3 1.4.6 3 3 3.4 4.6 1.6.4 2.6 2.4 3.4 3.8 5.4z" fill={GOLD_DEEP} stroke="none" opacity={0.85} />
+      <path d="M4 15h24a12 12 0 0 1-12 10A12 12 0 0 1 4 15z" fill={CRUST_DARK} />
+      <path d="M6.4 16.6h19.2A10 10 0 0 1 16 23.4a10 10 0 0 1-9.6-6.8z" fill={CRUST} />
+      <path d="M27 15h4.4" strokeWidth={1.8} />
+      <circle cx="16" cy="8.4" r="2.6" fill={GOLD} stroke={GOLD_RING} />
+      <path d="M12.6 11.4c1-2 1-4 0-6M19.4 11.4c-1-2-1-4 0-6" stroke={METAL_LO} strokeWidth={1.2} />
+    </Art>
+  );
+}
+
 const GENERATOR_ART: Readonly<Record<string, () => ReactElement>> = {
   cursor: CursorArt,
   grandma: GrandmaArt,
@@ -283,6 +383,12 @@ const GENERATOR_ART: Readonly<Record<string, () => ReactElement>> = {
   timeMachine: TimeMachineArt,
   antimatterCondenser: AntimatterArt,
   prism: PrismArt,
+  chanceMaker: ChanceMakerArt,
+  fractalEngine: FractalEngineArt,
+  scriptConsole: ScriptConsoleArt,
+  idleverse: IdleverseArt,
+  cortexBaker: CortexBakerArt,
+  wokOfTheGods: WokOfTheGodsArt,
 };
 
 /** The shop rail's per-generator illustration. Unknown ids fall back to the factory, exactly

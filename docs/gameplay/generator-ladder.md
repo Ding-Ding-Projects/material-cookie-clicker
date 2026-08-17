@@ -1,13 +1,13 @@
-# The 14-tier generator ladder
+# The 20-tier generator ladder
 
 > **Status: not built.** No generator data, purchase logic, or list rendering exists in this
 > repository. This article documents the specified ladder and row behaviour from
-> `design/building-row.html` so the fourteen tiers and their ordering are recorded in one place
+> `design/building-row.html` so the twenty tiers and their ordering are recorded in one place
 > before implementation starts.
 
 ## What it does
 
-Fourteen generator tiers, each baking cookies automatically once owned, in escalating cost and
+Twenty generator tiers, each baking cookies automatically once owned, in escalating cost and
 output order:
 
 1. Cursor
@@ -24,6 +24,12 @@ output order:
 12. Time Machine
 13. Antimatter Condenser
 14. Prism
+15. Chancemaker
+16. Fractal Engine
+17. Script Console
+18. Idleverse
+19. Cortex Baker
+20. Wok of the Gods
 
 Each tier is presented as a list row (`design/building-row.html`) with an icon, a bilingual name,
 the owned count, the current cost, its per-unit and total CPS contribution, and a buy-quantity

@@ -43,7 +43,7 @@ unlock-condition evaluator to test.
 
 ## Suggested articles
 
-- [The 14-tier generator ladder](generator-ladder.md)
+- [The 20-tier generator ladder](generator-ladder.md)
 - [Prestige](prestige.md)
 - [Notification centre](../tools/notification-centre.md)
 - [The tools tech tree](../tools/tools-tech-tree.md)

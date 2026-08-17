@@ -40,10 +40,18 @@ const GoldenCookieStateSchema = z.object({
   nextEligibleAtEpochMs: z.number(),
 });
 
+/**
+ * `rebornNodeIds` (the Reborn tree — see reborn.ts) is a DEFAULTED field rather than a new
+ * schema version. A save written before the tree existed simply has none, zod supplies the
+ * empty list on read, and a save written after it round-trips unchanged. There is nothing a
+ * migration step could add here that the default does not already say correctly, and the
+ * version number is reserved for changes that genuinely need one.
+ */
 const PrestigeStateSchema = z.object({
   ascensionPoints: z.number().int().nonnegative(),
   totalPrestigeCount: z.number().int().nonnegative(),
   permanentUnlockIds: z.array(z.string()),
+  rebornNodeIds: z.array(z.string()).default([]),
 });
 
 const GameStatsSchema = z.object({

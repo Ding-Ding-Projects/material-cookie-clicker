@@ -38,7 +38,18 @@ export interface GoldenCookieState {
 export interface PrestigeState {
   readonly ascensionPoints: number;
   readonly totalPrestigeCount: number;
+  /**
+   * Upgrade ids the player has PINNED as permanent, so a reset cannot take them. The number of
+   * pins allowed is itself bought in the Reborn tree (reborn.ts#rebornPermanentSlots); an empty
+   * list is the honest default, and always was.
+   */
   readonly permanentUnlockIds: readonly string[];
+  /**
+   * Reborn tree nodes bought with ascension points (reborn.ts). Outside the run entirely: never
+   * reset, never refunded. Optional on the type because a save written before the tree existed
+   * simply has none, and every reader defaults it to an empty list rather than inventing one.
+   */
+  readonly rebornNodeIds?: readonly string[];
 }
 
 export interface GameStats {

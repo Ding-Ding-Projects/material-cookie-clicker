@@ -22,7 +22,7 @@ export interface GeneratorDefinition {
 }
 
 /**
- * The full 14-tier generator ladder. Each tier's baseCost and baseCps are roughly 10x the
+ * The full 20-tier generator ladder. Each tier's baseCost and baseCps are roughly 10x the
  * previous tier's, so the "next tier is worth it" moment recurs at a predictable cadence
  * throughout the run — from a single flicking finger up to something that bends physics.
  * Bilingual names lean into Hong Kong in-jokes rather than literal translation (a Bank earns
@@ -90,6 +90,54 @@ export const GENERATOR_DEFINITIONS: readonly GeneratorDefinition[] = [
     nameYue: "稜鏡",
     baseCost: 2100000000000000,
     baseCps: 2900000000,
+    costRatio: 1.15,
+  },
+  {
+    id: "chanceMaker",
+    nameEn: "Chancemaker",
+    nameYue: "賭檔",
+    baseCost: 2.6e16,
+    baseCps: 2.6e10,
+    costRatio: 1.15,
+  },
+  {
+    id: "fractalEngine",
+    nameEn: "Fractal Engine",
+    nameYue: "分形引擎",
+    baseCost: 3.1e17,
+    baseCps: 2.4e11,
+    costRatio: 1.15,
+  },
+  {
+    id: "scriptConsole",
+    nameEn: "Script Console",
+    nameYue: "程式主控台",
+    baseCost: 3.7e18,
+    baseCps: 2.2e12,
+    costRatio: 1.15,
+  },
+  {
+    id: "idleverse",
+    nameEn: "Idleverse",
+    nameYue: "掛機宇宙",
+    baseCost: 4.4e19,
+    baseCps: 2.0e13,
+    costRatio: 1.15,
+  },
+  {
+    id: "cortexBaker",
+    nameEn: "Cortex Baker",
+    nameYue: "腦皮層焗爐",
+    baseCost: 4.6e20,
+    baseCps: 1.8e14,
+    costRatio: 1.15,
+  },
+  {
+    id: "wokOfTheGods",
+    nameEn: "Wok of the Gods",
+    nameYue: "神級鑊氣",
+    baseCost: 4.2e21,
+    baseCps: 1.6e15,
     costRatio: 1.15,
   },
 ];

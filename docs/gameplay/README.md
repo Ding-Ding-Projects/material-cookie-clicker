@@ -13,7 +13,7 @@ trade progress for a permanent multiplier.
 ## Articles
 
 - [Cookie clicking](cookie-clicking.md) — the primary click target and the cookies-per-second loop.
-- [The 14-tier generator ladder](generator-ladder.md) — Cursor through Prism, and the buy-quantity
+- [The 20-tier generator ladder](generator-ladder.md) — Cursor up to the Wok of the Gods, and the buy-quantity
   stepper.
 - [Golden-cookie events](golden-cookie-events.md) — the random bonus overlay.
 - [Achievements](achievements.md) — unlock conditions and the locked/unlocked badge states.

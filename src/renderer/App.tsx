@@ -46,6 +46,7 @@ import { SettingsScreen } from './screens/SettingsScreen';
 import { AchievementsScreen, AchievementUnlockToast } from './screens/AchievementsScreen';
 import { CookieHero } from './screens/CookieHero';
 import { DiscoveryTicket } from './screens/DiscoveryTicket';
+import { MilkTide } from './screens/MilkTide';
 import { ShopRail } from './screens/ShopRail';
 import { PrestigeScreen } from './screens/PrestigeScreen';
 import { RandomEventIndicator, RandomEventStage, RandomEventToast } from './screens/RandomEventStage';
@@ -196,6 +197,9 @@ function GameSurface() {
         {disclosure.upgradeStrip ? <UpgradeStrip /> : null}
       </div>
       {disclosure.shop ? <ShopRail /> : null}
+      {/* The tide is the LAST child of the stage and is positioned over it, so it rises behind
+          the cookie and the shelf rather than pushing either of them anywhere. */}
+      <MilkTide />
     </div>
   );
 }

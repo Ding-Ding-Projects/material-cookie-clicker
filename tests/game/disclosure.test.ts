@@ -80,8 +80,11 @@ describe("disclosure: each reveal upgrade flips exactly its own surface", () => 
     expect(disclosure.holdToClick).toBe(false);
     expect(disclosure.perSecondReadout).toBe(false);
     expect(disclosure.perClickReadout).toBe(false);
+    // The Achievements emblem now appears here, and that is not the reveal leaking: buying any
+    // upgrade at all satisfies the "1 Upgrade Bought" badge (achievements.ts), so the player
+    // genuinely has an achievement to look at. Every other console stays bolted down.
     expect(disclosure.consoles).toEqual({
-      achievements: false,
+      achievements: true,
       tools: false,
       statistics: false,
       prestige: false,

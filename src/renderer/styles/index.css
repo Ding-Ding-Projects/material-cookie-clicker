@@ -6316,7 +6316,209 @@ ul.card-grid {
 .event-indicator__body {
   display: flex;
   align-items: center;
+ * THE UPGRADE SHELF, THE MILK TIDE AND THE REBORN TREE.
+ *
+ * Appended at the end of the sheet, after every base rule it builds on, so the shelf's own
+ * layout wins over the horizontal strip it replaced without a single !important.
+ * ======================================================================================== */
+
+/* ---------------------------------------------------------------------- the upgrade shelf */
+
+/* The shelf is a COLUMN of three differently-shaped sections, not one scrolling row. It still
+   fits in exactly the space the old strip had — it just spends it on the handful of tickets the
+   player can act on instead of on the hundred and fifty they cannot. */
+.upgrade-shelf {
+  display: flex;
+  flex-direction: column;
   gap: 8px;
+  /* The shelf claims its own height rather than absorbing whatever the cookie leaves over.
+     As a flex CHILD that shrank to nothing, all three sections collapsed to their headings and
+     the shelf became a row of count badges with no shelf under them. */
+  flex: 0 0 auto;
+  overflow: hidden;
+}
+
+.shelf-section {
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+  flex: 0 0 auto;
+}
+
+.shelf-section__heading {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  margin: 0;
+  font-size: 0.72rem;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+  color: var(--on-surface-variant);
+}
+
+/* The count badge: the whole reason the stamp wall can drop its names and prices is that this
+   number keeps saying, exactly, how many are behind it. */
+.shelf-section__badge {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  min-width: 22px;
+  height: 18px;
+  padding: 0 6px;
+  border-radius: var(--shape-full);
+  border: var(--border-thin) solid var(--outline);
+  background: var(--surface-high);
+  font-size: 0.68rem;
+  font-variant-numeric: tabular-nums;
+  color: var(--on-surface);
+}
+
+/* AT MOST TWO ROWS VISIBLE, then the grid scrolls inside itself. The cap is expressed in the
+   ticket's own height so it stays two rows whatever the ticket grows into. */
+.shelf-grid {
+  --shelf-ticket-height: 68px;
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(168px, 1fr));
+  gap: 6px;
+  /* Exactly two rows tall, always: a fixed height rather than a max, so the grid can neither
+     collapse under flex pressure nor grow into the cookie above it. Anything past two rows
+     scrolls inside this box. */
+  height: calc(var(--shelf-ticket-height) * 2 + 6px);
+  overflow-y: auto;
+  overflow-x: hidden;
+  padding-right: 4px;
+}
+
+.shelf-ticket {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  min-height: var(--shelf-ticket-height, 68px);
+  padding: 6px 8px;
+  border-radius: var(--shape-sm);
+  border: var(--border-chunky) solid var(--outline);
+  background: linear-gradient(180deg, var(--surface-low), var(--surface-highest));
+  box-shadow: var(--press-1), inset 0 3px 0 0 var(--bevel-hi);
+  color: var(--on-surface);
+  font: inherit;
+  text-align: left;
+  cursor: pointer;
+  transition: transform 80ms ease, box-shadow 80ms ease;
+}
+
+/* Affordability is never colour-only: an unaffordable ticket is also disabled, so it cannot be
+   pressed and announces itself as unavailable. The tint is the fast confirmation, not the fact. */
+.shelf-ticket--affordable {
+  border-color: var(--spark-ring, var(--outline));
+  background: linear-gradient(180deg, var(--surface-lowest), var(--primary-container));
+}
+
+.shelf-ticket:disabled {
+  cursor: default;
+  opacity: 0.55;
+  box-shadow: none;
+}
+
+.shelf-ticket:not(:disabled):active {
+  transform: translateY(var(--drop-1));
+  box-shadow: none;
+}
+
+.shelf-ticket__glyph {
+  flex: 0 0 auto;
+  display: inline-flex;
+  width: 1.65em;
+  font-size: 1.05rem;
+}
+
+.shelf-ticket__body {
+  display: flex;
+  flex-direction: column;
+  gap: 1px;
+  min-width: 0;
+}
+
+.shelf-ticket__name,
+.shelf-ticket__name-zh {
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+  font-size: 0.78rem;
+  line-height: 1.15;
+}
+
+.shelf-ticket__name-zh {
+  color: var(--on-surface-variant);
+}
+
+.shelf-ticket__cost {
+  font-size: 0.72rem;
+  font-variant-numeric: tabular-nums;
+  color: var(--on-surface-variant);
+}
+
+/* THE STAMP WALL. An owned upgrade is history: countable at a glance, identifiable on hover or
+   by its accessible name, and taking none of the shelf a decision could be using. */
+.shelf-stamp-wall {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 3px;
+  height: 34px;
+  overflow-y: auto;
+  padding: 4px;
+  border-radius: var(--shape-sm);
+  border: var(--border-thin) solid var(--outline-variant);
+  background: var(--surface-container);
+}
+
+.shelf-stamp {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 22px;
+  height: 22px;
+  font-size: 0.86rem;
+  border-radius: 4px;
+  border: var(--border-thin) solid var(--outline-variant);
+  background: var(--surface-high);
+  opacity: 0.85;
+}
+
+/* THE NEAR FUTURE. Requirement lines, not prices, because a price you cannot pay yet is not
+   the information the player is missing. */
+.shelf-locked-list {
+  list-style: none;
+  margin: 0;
+  padding: 0;
+  display: flex;
+  flex-direction: column;
+  gap: 3px;
+  height: 56px;
+  overflow-y: auto;
+}
+
+.shelf-locked {
+  display: grid;
+  grid-template-columns: auto minmax(0, 1fr) 72px auto;
+  align-items: center;
+  gap: 8px;
+  padding: 3px 6px;
+  border-radius: 4px;
+  background: var(--surface-container);
+}
+
+.shelf-locked__glyph {
+  display: inline-flex;
+  width: 1.2em;
+  font-size: 0.9rem;
+  opacity: 0.7;
+}
+
+.shelf-locked__text {
+  /* Name and requirement share ONE line. A locked row is a sentence, not a card, and at two
+     lines each the list could only ever show one and a half of them. */
+  display: flex;
+  align-items: baseline;  gap: 8px;
   min-width: 0;
 }
 
@@ -6463,4 +6665,376 @@ ul.card-grid {
   .event-toast {
     animation: none;
   }
+.shelf-locked__name,
+.shelf-locked__requirement {
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+  font-size: 0.72rem;
 }
+
+.shelf-locked__requirement {
+  color: var(--on-surface-variant);
+}
+
+.shelf-locked__track {
+  display: block;
+  height: 6px;
+  border-radius: var(--shape-full);
+  border: var(--border-thin) solid var(--outline-variant);
+  background: var(--surface-high);
+  overflow: hidden;
+}
+
+.shelf-locked__fill {
+  display: block;
+  height: 100%;
+  background: var(--spark, #ffc94d);
+}
+
+.shelf-locked__counter {
+  font-size: 0.68rem;
+  font-variant-numeric: tabular-nums;
+  color: var(--on-surface-variant);
+}
+
+/* -------------------------------------------------------------------------- the milk tide */
+
+/* The tide is painted OVER the stage, never inside its layout: it must not move the cookie, the
+   shelf or the rail by a single pixel as it rises. */
+.stage {
+  position: relative;
+}
+
+/* The stage keeps a strip of floor free at the bottom for the tide. Without it the liquid would
+   rise behind the opaque cabinet panels and never be seen at all — a milk level nobody can look
+   at is not a readout, it is a variable. */
+.stage {
+  padding-bottom: 56px;
+}
+
+.milk-tide {
+  position: absolute;
+  /* A band across the floor of the stage, not the whole stage: milk is something the cabinet
+     stands in, and a full-height wash would tint the cookie itself. The liquid height is a
+     percentage OF THIS BAND, so a full glass fills the band and stops. */
+  inset: auto 0 0 0;
+  height: 52px;
+  pointer-events: none;
+  z-index: 0;
+  display: flex;
+  flex-direction: column;
+  justify-content: flex-end;
+}
+
+/* Everything the player actually touches sits above the liquid. */
+.stage__hero-column,
+.stage > .shop-rail {
+  position: relative;
+  z-index: 1;
+}
+
+/* The liquid itself: a v2 gradient body, lighter at the surface where the light gets in and
+   deeper at the bottom of the glass, tinted by whichever flavour band is pouring. */
+.milk-tide__liquid {
+  position: relative;
+  height: var(--milk-height, 0%);
+  border-radius: 0 0 var(--shape-sm) var(--shape-sm);
+  background: linear-gradient(
+    180deg,
+    color-mix(in srgb, var(--milk-tint, #f6f1e4) 78%, white) 0%,
+    var(--milk-tint, #f6f1e4) 42%,
+    color-mix(in srgb, var(--milk-tint, #f6f1e4) 82%, black) 100%
+  );
+  opacity: 0.62;
+  border-top: var(--border-thin) solid color-mix(in srgb, var(--milk-tint, #f6f1e4) 60%, white);
+  transition: height 700ms cubic-bezier(0.2, 0.8, 0.2, 1);
+}
+
+/* The meniscus. Purely a highlight band at the top of the liquid — it is the only part of the
+   tide that ever moves on its own. */
+.milk-tide__surface {
+  position: absolute;
+  inset: 0 0 auto 0;
+  height: 10px;
+  background: linear-gradient(180deg, rgba(255, 255, 255, 0.75), rgba(255, 255, 255, 0));
+  animation: milk-sway 6s ease-in-out infinite;
+}
+
+@keyframes milk-sway {
+  0%,
+  100% {
+    transform: translateY(0);
+  }
+  50% {
+    transform: translateY(3px);
+  }
+}
+
+.milk-tide__caption {
+  position: absolute;
+  left: 14px;
+  bottom: 8px;
+  margin: 0;
+  display: flex;
+  flex-direction: column;
+  font-size: 0.68rem;
+  letter-spacing: 0.04em;
+  color: var(--on-surface-variant);
+  text-shadow: 0 1px 0 var(--surface-lowest);
+}
+
+.milk-tide__sr {
+  position: absolute;
+  width: 1px;
+  height: 1px;
+  overflow: hidden;
+  clip-path: inset(50%);
+  white-space: nowrap;
+}
+
+/* Reduced motion keeps the LEVEL — which is data — and drops the sway and the rise, which are
+   decoration. The tide simply is where it is, immediately. */
+@media (prefers-reduced-motion: reduce) {
+  .milk-tide__liquid {
+    transition: none;
+  }
+
+  .milk-tide__surface {
+    animation: none;
+  }
+}
+
+/* ------------------------------------------------------------------------ the Reborn tree */
+
+.reborn-tree {
+  margin-top: 16px;
+  padding: 12px;
+  border-radius: var(--shape-md, 12px);
+  border: var(--border-fat) solid var(--outline);
+  background: var(--surface-container);
+}
+
+.reborn-tree__title {
+  display: flex;
+  align-items: baseline;
+  gap: 8px;
+  margin: 0 0 4px;
+  font-size: 1.05rem;
+}
+
+.reborn-tree__title-zh {
+  color: var(--on-surface-variant);
+  font-size: 0.9rem;
+}
+
+.reborn-tree__intro {
+  margin: 0 0 8px;
+  font-size: 0.78rem;
+  color: var(--on-surface-variant);
+}
+
+.reborn-tree__points {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 12px;
+  margin: 0 0 10px;
+  font-size: 0.8rem;
+  font-variant-numeric: tabular-nums;
+}
+
+.reborn-tree__branches {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+  gap: 10px;
+}
+
+.reborn-branch__heading {
+  margin: 0 0 6px;
+  font-size: 0.72rem;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+  color: var(--on-surface-variant);
+}
+
+/* A branch is a straight chain drawn top to bottom, so the prerequisite is always the node
+   directly above the one that needs it. No arrows are needed to say so. */
+.reborn-branch__list {
+  list-style: none;
+  margin: 0;
+  padding: 0;
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+}
+
+.reborn-node__button {
+  width: 100%;
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+  padding: 7px 9px;
+  border-radius: var(--shape-sm);
+  border: var(--border-chunky) solid var(--outline);
+  background: var(--surface-high);
+  color: var(--on-surface);
+  font: inherit;
+  text-align: left;
+  cursor: pointer;
+}
+
+.reborn-node--affordable .reborn-node__button {
+  border-color: var(--spark-ring, var(--outline));
+  background: linear-gradient(180deg, var(--surface-lowest), var(--primary-container));
+  box-shadow: var(--press-1);
+}
+
+.reborn-node--owned .reborn-node__button {
+  background: var(--tier2-container, var(--surface-highest));
+  cursor: default;
+}
+
+.reborn-node--locked .reborn-node__button,
+.reborn-node--unaffordable .reborn-node__button {
+  opacity: 0.62;
+  cursor: default;
+}
+
+.reborn-node__head {
+  display: flex;
+  align-items: baseline;
+  flex-wrap: wrap;
+  gap: 6px;
+}
+
+.reborn-node__name {
+  font-size: 0.82rem;
+  font-weight: 600;
+}
+
+.reborn-node__name-zh {
+  font-size: 0.76rem;
+  color: var(--on-surface-variant);
+}
+
+.reborn-node__cost {
+  margin-left: auto;
+  font-size: 0.72rem;
+  font-variant-numeric: tabular-nums;
+}
+
+.reborn-node__effect {
+  font-size: 0.72rem;
+  color: var(--on-surface-variant);
+}
+
+/* The state word, always printed: "Bought", the cost, or what it is waiting for. Nothing about
+   a node's state is carried by its fill alone. */
+.reborn-node__state {
+  font-size: 0.68rem;
+  letter-spacing: 0.04em;
+  text-transform: uppercase;
+  color: var(--on-surface-variant);
+}
+
+.reborn-pins {
+  margin-top: 12px;
+  padding-top: 10px;
+  border-top: var(--border-thin) solid var(--outline-variant);
+}
+
+.reborn-pins h3 {
+  margin: 0 0 6px;
+  font-size: 0.78rem;
+}
+
+.reborn-pins__empty,
+.reborn-pins__usage {
+  margin: 0 0 6px;
+  font-size: 0.74rem;
+  color: var(--on-surface-variant);
+}
+
+.reborn-pins__list {
+  list-style: none;
+  margin: 0;
+  padding: 0;
+  display: flex;
+  flex-direction: column;
+  gap: 3px;
+  max-height: 160px;
+  overflow-y: auto;
+}
+
+.reborn-pins__row {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  padding: 3px 6px;
+  border-radius: 4px;
+  background: var(--surface-high);
+  font-size: 0.74rem;
+}
+
+.reborn-pins__row.is-pinned {
+  background: var(--tier2-container, var(--surface-highest));
+}
+
+.reborn-pins__name {
+  flex: 1;
+  min-width: 0;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.reborn-pins__toggle {
+  flex: 0 0 auto;
+  padding: 2px 8px;
+  border-radius: var(--shape-full);
+  border: var(--border-thin) solid var(--outline);
+  background: var(--surface-lowest);
+  color: var(--on-surface);
+  font: inherit;
+  font-size: 0.7rem;
+  cursor: pointer;
+}
+
+.reborn-pins__toggle:disabled {
+  opacity: 0.5;
+  cursor: default;
+}
+
+/* The cookie gives way to the shelf, not the other way round. The hero is the flexible child of
+   the hero column and the shelf is the fixed one, so a taller shelf takes room from the cookie
+   panel instead of pushing itself off the bottom of the stage and being clipped. Both selectors
+   are child-of-column selectors because a bare `.panel { flex: 1 }` earlier in this sheet
+   otherwise makes every panel in the column fight for the same space. */
+.stage__hero-column > .panel.cookie-hero {
+  flex: 1 1 40%;
+  min-height: 120px;
+}
+
+.stage__hero-column > .panel.upgrade-shelf {
+  flex: 1 1 60%;
+  min-height: 0;
+}
+
+/* Inside the shelf, the BUYABLE grid is the elastic part. The stamp wall and the requirement
+   list are small fixed strips, so when the cabinet is short it is the choices that lose a row
+   rather than the history disappearing entirely. */
+.upgrade-shelf .shelf-section--buyable {
+  flex: 1 1 auto;
+  min-height: 0;
+}
+
+.upgrade-shelf .shelf-grid {
+  height: auto;
+  flex: 1 1 auto;
+  min-height: 58px;
+  max-height: calc(var(--shelf-ticket-height) * 2 + 6px);
+}
+
+.upgrade-shelf .shelf-section--locked,
+.upgrade-shelf .shelf-section--owned {
+  flex: 0 0 auto;}

@@ -37,27 +37,26 @@
   <div class="bilingual">
     <div class="inset">
       <span class="label">English</span>
-      <p>Click a cookie. Buy fourteen tiers of increasingly unreasonable machinery, from a Cursor up to a Prism. Spend seventy-five upgrades, chase a hundred achievements, catch golden cookies, unlock the application's own twenty features as in-game tools, then ascend and throw it all away for a permanent multiplier. It runs with the network unplugged, it costs nothing, and it never asks you for an account.</p>
+      <p>Click a cookie. Buy twenty tiers of increasingly unreasonable machinery, from a Cursor up to a Prism. Spend a hundred and seventy-nine upgrades, chase two hundred and one achievements, catch golden cookies, unlock the application's own twenty features as in-game tools, then ascend and throw it all away for a permanent multiplier. It runs with the network unplugged, it costs nothing, and it never asks you for an account.</p>
     </div>
     <div class="inset" lang="zh-HK">
       <span class="label">香港廣東話</span>
-      <p>撳曲奇。由「掂手指」買到「稜鏡」，十四級越嚟越荒謬嘅機器。用七十五個升級、追一百個成就、執金曲奇、將個應用程式自己二十個功能解鎖做遊戲道具，然後飛昇，全部清晒換返個永久倍數。冇網都玩得，唔使畀錢，唔使開戶口。</p>
+      <p>撳曲奇。由「掂手指」買到「稜鏡」，二十級越嚟越荒謬嘅機器。用一百七十九個升級、追二百零一個成就、執金曲奇、將個應用程式自己二十個功能解鎖做遊戲道具，然後飛昇，全部清晒換返個永久倍數。冇網都玩得，唔使畀錢，唔使開戶口。</p>
     </div>
   </div>
 
   <h2>Where the project actually is</h2>
   <div class="note">
   <strong class="note-title">Where the project actually is</strong>
-  <p>The game is playable. This release ships the single game surface &mdash; HUD readouts, the cookie hero, the docked shop rail and the upgrade ticket strip, all on one screen &mdash; plus the Achievements, Tools, Statistics and Prestige tabs. All 235 tests pass, the application builds, and the surface, its four anchored panels, its dark theme and the Diesel Depot mint were all photographed from the real running build. You can see the photographs <a href="index.html#captures">in the capture matrix</a>.</p>
-  <p>Two things are still honestly unverified, and they stay listed here until someone has actually seen them: the <strong>narrow-width shop drawer</strong> was verified by forcing its breakpoint rather than by really resizing the window, since every capture is one maximised window; and <strong>no golden-cookie spawn</strong> has been photographed, though the separate <a href="features/random-events.html">random-event pool</a> now has been.</p>
-</div>
+  <p>The game is playable. This release ships the single game surface &mdash; HUD readouts, the cookie hero, the docked shop rail and the upgrade ticket strip, all on one screen &mdash; plus the Achievements, Tools, Statistics and Prestige tabs. All TESTCOUNT tests pass, the application builds, and the surface, its four anchored panels, its dark theme and the Diesel Depot mint were all photographed from the real running build. You can see the photographs <a href="index.html#captures">in the capture matrix</a>.</p>
+  <p>Two things are still honestly unverified, and they stay listed here until someone has actually seen them: the <strong>narrow-width shop drawer</strong> was verified by forcing its breakpoint rather than by really resizing the window, since every capture is one maximised window; and <strong>no golden-cookie spawn</strong> has been photographed, though the separate <a href="features/random-events.html">random-event pool</a> now has been.</p></div>
   <ul class="stats">
-    <li class="stat"><span class="v">14</span><span class="k">Generator tiers</span></li>
-    <li class="stat"><span class="v">79</span><span class="k">Upgrades</span></li>
-    <li class="stat"><span class="v">100</span><span class="k">Achievements</span></li>
+    <li class="stat"><span class="v">20</span><span class="k">Generator tiers</span></li>
+    <li class="stat"><span class="v">179</span><span class="k">Upgrades</span></li>
+    <li class="stat"><span class="v">201</span><span class="k">Achievements</span></li>
     <li class="stat"><span class="v">20</span><span class="k">Tools in the tree</span></li>
   </ul>
-  <p>Those four numbers are counted from the definition lists in the source tree, not from a wish list, and all four are now on screen in the running application: the shop rail lists the generators, the ticket strip counts the upgrades, the Achievements tab counts the badges and the Tools tab counts the tools.</p>
+  <p>Those four numbers are counted from the definition lists in the source tree, not from a wish list, and all four are now on screen in the running application: the shop rail lists the generators, the upgrade shelf counts the upgrades, the Achievements tab counts the badges and the Tools tab counts the tools.</p>
 
   <h2 id="captures">Capture matrix</h2>
   <p>Nine photographs of the real thing. Every image below was <strong>captured from the built application</strong> &mdash; not a mock-up, not a design spec &mdash; running maximised on an off-screen Windows desktop and photographed with the Win32 <code>PrintWindow</code> API. Two of them start from a save written into the running application&rsquo;s own storage to skip the grind; everything bought in them was bought by pressing the real controls. The dark-theme capture is the one exception to &ldquo;nothing was touched&rdquo;: it needed <code>data-theme="dark"</code> set on the built renderer&rsquo;s root element, because the application otherwise follows the operating system&rsquo;s colour scheme.</p>
@@ -130,18 +129,18 @@
         <a class="ticket-link" href="features/cookie-clicking.html">Read more</a>
       </li>
       <li class="ticket">
-        <h3>The 14-tier generator ladder</h3>
-        <p>Cursor through Prism: fourteen generator tiers, a constant 1.15 cost curve, and the buy-quantity stepper.</p>
+        <h3>The 20-tier generator ladder</h3>
+        <p>Cursor up to the Wok of the Gods: twenty generator tiers, a constant 1.15 cost curve, and the buy-quantity stepper.</p>
         <a class="ticket-link" href="features/generator-ladder.html">Read more</a>
       </li>
       <li class="ticket">
         <h3>Upgrades</h3>
-        <p>Seventy-five upgrades: five global ones plus five stacking tiers for each of the fourteen generators.</p>
+        <p>A hundred and seventy-nine upgrades: click lines, global lines, a golden-cookie line, the kitten line that drinks your milk, five stacking tiers per generator, and a synergy in both directions for every neighbouring pair.</p>
         <a class="ticket-link" href="features/upgrades.html">Read more</a>
       </li>
       <li class="ticket">
         <h3>Achievements</h3>
-        <p>One hundred achievements, generated from four milestone families, with a permanent unlock and a marquee toast.</p>
+        <p>Two hundred and one achievements, generated from eleven milestone families, each one pouring another 4% of milk.</p>
         <a class="ticket-link" href="features/achievements.html">Read more</a>
       </li>
       <li class="ticket">

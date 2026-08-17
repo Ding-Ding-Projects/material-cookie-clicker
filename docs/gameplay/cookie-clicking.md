@@ -49,7 +49,7 @@ verification currently possible.
 
 ## Suggested articles
 
-- [The 14-tier generator ladder](generator-ladder.md)
+- [The 20-tier generator ladder](generator-ladder.md)
 - [Golden-cookie events](golden-cookie-events.md)
 - [Material Design 3 appearance](../interface/material-design-appearance.md)
 - [Contrast and reduced motion](../accessibility/contrast-and-reduced-motion.md)

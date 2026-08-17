@@ -329,8 +329,8 @@ export const PRESTIGE_SCREEN_COPY = {
   },
   permanentShopTitle: { en: "Permanent upgrades", yue: "永久升級" },
   permanentShopEmpty: {
-    en: "No upgrades are marked permanent yet, so a prestige currently resets every upgrade. Permanent unlocks survive prestige once earned.",
-    yue: "而家未有升級被標記做永久，所以轉生會重設晒所有升級。永久解鎖之後就唔會被轉生洗走。",
+    en: "No upgrades are pinned as permanent yet. Pin one in the Reborn tree below, once its Memory branch has bought you a slot — and note that the Memory branch also carries a share of your unpinned upgrades across a reset even with nothing pinned at all.",
+    yue: "而家未有升級被釘做永久。喺下面轉生樹嘅「記憶」枝買到位之後就可以釘——就算一個都未釘，「記憶」枝本身都已經幫你帶一部分未釘嘅升級過去。",
   },
   gatePrestigeTitle: { en: "Prestige now?", yue: "而家轉生？" },
   gatePrestigeResets: {
@@ -338,8 +338,8 @@ export const PRESTIGE_SCREEN_COPY = {
     yue: "呢個會清空：所有建築物、升級同埋而家嘅曲奇數量會歸零。",
   },
   gatePrestigeKeeps: (points: number): Bilingual => ({
-    en: `This carries forward: ${points} ascension point${points === 1 ? "" : "s"} (a permanent production bonus), all unlocked achievements, and every permanent upgrade.`,
-    yue: `呢個會保留：${points} 粒飛升點（永久產量加成）、全部已解鎖成就，同埋所有永久升級。`,
+    en: `This carries forward: ${points} ascension point${points === 1 ? "" : "s"} (a permanent production bonus), every node you have bought in the Reborn tree, all unlocked achievements and the milk they pour, every pinned permanent upgrade, and whatever share of the rest the Reborn tree's Memory branch has bought you.`,
+    yue: `呢個會保留：${points} 粒飛升點（永久產量加成）、轉生樹入面買咗嘅所有節點、全部已解鎖成就同佢哋倒出嚟嘅奶、所有釘咗做永久嘅升級，同埋轉生樹「記憶」枝幫你帶得走嗰部分。`,
   }),
   gateWipeTitle: { en: "Delete all save data?", yue: "刪除全部存檔？" },
   gateWipeBody: {
@@ -500,4 +500,96 @@ export const SETTINGS_COPY = {
     en: `Opened from the Tools tech tree: ${featureEn}. Settings is the application surface this build ships, so you land on the row closest to it — highlighted below. The tree never gated any of this; it only decides whether the card is on screen.`,
     yue: `由工具科技樹打開：${featureYue}。呢個版本嘅應用程式介面就係設定面板，所以會帶你去最相關嗰行（下面標示咗）。科技樹從來冇鎖過任何功能，佢淨係決定張卡出唔出現。`,
   }),
+} as const satisfies Record<string, Bilingual | ((...args: any[]) => Bilingual)>;
+
+/**
+ * THE UPGRADE SHELF (screens/UpgradeStrip.tsx). Three headings, because the shelf says three
+ * different kinds of thing: what you can buy, what you nearly can, and what you already did.
+ */
+export const SHELF_COPY = {
+  buyableHeading: { en: "Ready to buy", yue: "可以買" },
+  lockedHeading: { en: "Nearly there", yue: "就快到" },
+  ownedHeading: { en: "Already bought", yue: "已經買咗" },
+} as const satisfies Record<string, Bilingual>;
+
+/**
+ * MILK (src/shared/game/milk.ts). The tide's own label. The percentage is printed as a real
+ * figure rather than a mood, and the flavour name is the band the milk has actually reached —
+ * never one it is close to.
+ */
+export const MILK_COPY = {
+  label: { en: "Milk", yue: "牛奶" },
+  tideLabel: (nameEn: string, nameYue: string, percent: number): Bilingual => ({
+    en: `${nameEn} — ${percent}% milk, poured by your achievements`,
+    yue: `${nameYue}——${percent}% 奶，係你啲成就倒出嚟嘅`,
+  }),
+  noKittens: {
+    en: "Milk multiplies nothing on its own. Buy a kitten upgrade and it starts paying.",
+    yue: "淨係得奶係唔會加產量嘅。買隻貓仔升級佢就開始有用。",
+  },
+} as const satisfies Record<string, Bilingual | ((...args: any[]) => Bilingual)>;
+
+/**
+ * REBORN — 轉生 (src/shared/game/reborn.ts). The permanent tree bought with ascension points,
+ * surfaced inside the Prestige panel. Every line here is careful to say that a node is bought
+ * by hand and never refunded, because both of those are true and both matter before spending.
+ */
+export const REBORN_COPY = {
+  title: { en: "Reborn", yue: "轉生樹" },
+  intro: {
+    en: "Ascension points buy permanent nodes here. Nothing in this tree is ever reset, and nothing is ever refunded — a node is bought by hand, once, and kept.",
+    yue: "飛升點喺呢度買永久節點。呢棵樹入面冇嘢會被重設，亦都冇得退錢——一個節點係你親手買一次，然後永遠留住。",
+  },
+  pointsAvailable: (points: number): Bilingual => ({
+    en: `${points} ascension point${points === 1 ? "" : "s"} unspent`,
+    yue: `仲有 ${points} 粒飛升點未使`,
+  }),
+  pointsSpent: (points: number): Bilingual => ({
+    en: `${points} spent in this tree`,
+    yue: `已經喺呢棵樹使咗 ${points} 粒`,
+  }),
+  branchInheritance: { en: "Inheritance", yue: "遺產" },
+  branchPower: { en: "Power", yue: "力量" },
+  branchMemory: { en: "Memory", yue: "記憶" },
+  cost: (points: number): Bilingual => ({
+    en: `${points} point${points === 1 ? "" : "s"}`,
+    yue: `${points} 粒飛升點`,
+  }),
+  requires: (nameEn: string, nameYue: string): Bilingual => ({
+    en: `Requires ${nameEn}.`,
+    yue: `需要先買${nameYue}。`,
+  }),
+  bought: { en: "Bought", yue: "已買" },
+  buy: { en: "Buy node", yue: "買節點" },
+  effectStartWith: (amount: string): Bilingual => ({
+    en: `Every new run starts with ${amount} cookies.`,
+    yue: `每次新開局都有 ${amount} 舊曲奇喺手。`,
+  }),
+  effectRetain: (percent: number): Bilingual => ({
+    en: `Carry ${percent}% more of your bought upgrades across a reset, newest first.`,
+    yue: `轉生時多帶 ${percent}% 已買升級過去，由最新嗰批開始。`,
+  }),
+  effectGlobal: (multiplier: number): Bilingual => ({
+    en: `All production ×${multiplier}, permanently.`,
+    yue: `全局產量永久 ×${multiplier}。`,
+  }),
+  effectClick: (multiplier: number): Bilingual => ({
+    en: `Click power ×${multiplier}, permanently.`,
+    yue: `每擊力量永久 ×${multiplier}。`,
+  }),
+  effectSlots: (slots: number): Bilingual => ({
+    en: `Pin ${slots} more upgrade${slots === 1 ? "" : "s"} as permanent, immune to every reset.`,
+    yue: `可以再釘 ${slots} 個升級做永久，任何重設都拎唔走。`,
+  }),
+  pinTitle: { en: "Pinned permanents", yue: "釘住嘅永久升級" },
+  pinUsage: (used: number, total: number): Bilingual => ({
+    en: `${used} of ${total} slot${total === 1 ? "" : "s"} used`,
+    yue: `用咗 ${used} / ${total} 個位`,
+  }),
+  pinNoSlots: {
+    en: "No permanent slots yet. Buy one in the Memory branch above and any upgrade you own can be pinned here.",
+    yue: "而家未有永久位。喺上面「記憶」枝買一個，之後你擁有嘅升級就可以釘喺呢度。",
+  },
+  pin: { en: "Pin", yue: "釘住" },
+  unpin: { en: "Unpin", yue: "解開" },
 } as const satisfies Record<string, Bilingual | ((...args: any[]) => Bilingual)>;

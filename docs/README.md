@@ -24,7 +24,7 @@ palette at all times, whether or not its matching in-game tool has been discover
 
 ## Categories
 
-- [Gameplay](gameplay/README.md) — clicking, the fourteen-generator ladder, golden-cookie events,
+- [Gameplay](gameplay/README.md) — clicking, the twenty-generator ladder, golden-cookie events,
   achievements, prestige.
 - [Tools](tools/README.md) — the twelve application features that double as in-game tools, plus
   the tech tree that unlocks their gameplay bonus.

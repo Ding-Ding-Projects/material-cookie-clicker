@@ -4,7 +4,7 @@
 <meta charset="utf-8" />
 <meta name="viewport" content="width=device-width, initial-scale=1" />
 <title>Achievements — Material Cookie Clicker</title>
-<meta name="description" content="One hundred achievements, generated from four milestone families, with a permanent unlock and a marquee toast." />
+<meta name="description" content="Two hundred and one achievements, generated from eleven milestone families, each one pouring another 4% of milk." />
 <link rel="stylesheet" href="../assets/site.css" />
 </head>
 <body>
@@ -24,10 +24,10 @@
 <main id="main" class="wrap">
   <article>
     <h1>Achievements</h1>
-    <p class="lede">One hundred achievements, generated from four milestone families, with a permanent unlock and a marquee toast.</p>
+    <p class="lede">Two hundred and one achievements, generated from eleven milestone families, each one pouring another 4% of milk.</p>
     <div class="inset" style="margin-bottom:18px">
   <span class="label">Current state</span>
-  <p style="margin:0"><span class="tag">Shipped</span> the Achievements tab is in this release; 100 definitions in <code>src/shared/game/achievements.ts</code>.</p>
+  <p style="margin:0"><span class="tag">Shipped</span> the Achievements tab is in this release; 201 definitions in <code>src/shared/game/achievements.ts</code>.</p>
 </div>
     <h2>From the running application</h2>
     <figure class="capture">
@@ -37,14 +37,20 @@
     <p><a href="../index.html#captures">See all nine captures in the capture matrix</a>.</p>
     
 <h2>What it does</h2>
-<p>An achievement is a named milestone that unlocks permanently the first time its condition is met, and records the moment it was unlocked. There are <strong>100</strong> definitions, built from four families:</p>
+<p>An achievement is a named milestone that unlocks permanently the first time its condition is met, and records the moment it was unlocked. There are <strong>201</strong> definitions, built from eleven families:</p>
 <ul>
-  <li><strong>84 ownership milestones</strong> &mdash; 1, 10, 25, 50, 100 and 200 owned, for each of the fourteen generators.</li>
-  <li><strong>7 lifetime-cookie milestones</strong> &mdash; from your first cookie up to a quadrillion.</li>
-  <li><strong>4 click milestones</strong> &mdash; 100, 1,000, 10,000 and 100,000 clicks.</li>
-  <li><strong>5 named and prestige milestones</strong>, including the ascension counts at 1, 5, 10 and 25.</li>
+  <li><strong>120 ownership milestones</strong> &mdash; 1, 10, 25, 50, 100 and 200 owned, for each of the twenty generators.</li>
+  <li><strong>15 lifetime-cookie milestones</strong> &mdash; your first cookie, then thresholds up to 10<sup>36</sup>, plus the named First Bite.</li>
+  <li><strong>9 click milestones</strong> &mdash; from 100 clicks up to ten million.</li>
+  <li><strong>7 prestige milestones</strong> &mdash; ascension counts from 1 up to 250.</li>
+  <li><strong>9 total-machine milestones</strong> &mdash; every machine on every rung added together, from 10 up to 10,000.</li>
+  <li><strong>6 ladder-breadth milestones</strong> &mdash; distinct rungs occupied, up to all twenty.</li>
+  <li><strong>9 upgrades-bought milestones</strong> &mdash; from your first upgrade up to 150.</li>
+  <li><strong>10 milk-ladder milestones</strong> &mdash; badges for collecting badges, one per milk flavour band. Each one also pours another 4% of milk, which is exactly as circular as it sounds.</li>
+  <li><strong>5 Reborn milestones</strong> &mdash; nodes bought in the permanent tree.</li>
+  <li><strong>11 Diesel Depot milestones</strong> &mdash; litres minted and vouchers printed, counted separately, because a hundred one-litre mints and one hundred-litre mint are not the same story about a player.</li>
 </ul>
-<p>Every achievement has both an English and a Cantonese name. Conditions are evaluated against game state, which means a milestone crossed by passive production counts exactly like one crossed by clicking &mdash; achievements are not checked only at purchase time.</p>
+<p>Achievements are also the milk supply: each unlocked badge pours 4% more milk into the cabinet, which the kitten upgrade line converts into production. Every achievement has both an English and a Cantonese name. Conditions are evaluated against game state, which means a milestone crossed by passive production counts exactly like one crossed by clicking &mdash; achievements are not checked only at purchase time.</p>
 
 <h2>How it is configured</h2>
 <p>The milestone thresholds are arrays at the top of one file, and the definitions are generated from them, so the count moves with the data instead of being hand-maintained. <code>design/achievement-badge.html</code> fixes the presentation: a locked silhouette, an unlocked struck medal with a domed face and a rotating conic metal rim, and a distinct unlock toast that is corner-anchored, auto-dismissing, and never a blocking dialog.</p>
@@ -57,7 +63,7 @@
     <nav class="related plate" aria-labelledby="related-heading">
       <h2 id="related-heading">Related articles</h2>
       <ul>
-      <li><a href="generator-ladder.html">The 14-tier generator ladder</a></li>
+      <li><a href="generator-ladder.html">The 20-tier generator ladder</a></li>
       <li><a href="prestige.html">Prestige (ascend)</a></li>
       <li><a href="statistics.html">Statistics</a></li>
       <li><a href="tools-tech-tree.html">The Tools tech tree</a></li>

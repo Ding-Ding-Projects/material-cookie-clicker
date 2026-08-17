@@ -23,9 +23,13 @@ import type { GameState } from "./types.js";
  *      first is up is refused — not queued behind it, not silently dropped in its place.
  *      "Queue" here means a queue of ONE, and the panel says so in words.
  *   3. TIME IS REAL AND HONEST. Construction advances only on the elapsed milliseconds the
- *      reducer hands it, exactly as `tickFactory` does. There is no timestamp stored and
- *      compared, so a save that sat closed advances by whatever offline progress credits it and
- *      not one second more. The panel prints the time genuinely remaining, never an estimate.
+ *      reducer hands it during a live tick, exactly as `tickFactory` does. No start timestamp is
+ *      stored and no clock is consulted, so the countdown cannot be shortened by moving the
+ *      system clock — and, for the same reason, a build does NOT advance while the application
+ *      is closed: `offline-progress.ts` credits cookies and touches neither this subgame nor the
+ *      factory. That is a deliberate match to the factory's behaviour rather than an oversight;
+ *      the builders keep the same hours the refinery does. The panel prints the time genuinely
+ *      remaining from the elapsed milliseconds actually served, never an estimate.
  *
  * COOKIES TOUCH THIS IN EXACTLY THREE PLACES: buying a blueprint, starting a construction, and
  * buying a piece of furniture. Nothing here ever pays cookies back out.
@@ -543,8 +547,9 @@ export const MAX_COZINESS: number =
  *
  *     coziness curve  x1.1187   *   furniture production bonuses  x1.3505   =   x1.5108
  *
- * Half again on production, for six rooms, twenty-six purchases and something over three hundred
- * million cookies. That is deliberately of the same order as ONE of the cookie side's own global
+ * Half again on production (and x1.1922 on a click, from the four pieces that pay one), for six
+ * rooms, thirty-eight purchases (six blueprints, six constructions and twenty-six pieces of furniture), 405,780,000 cookies and sixty-eight minutes of construction served
+ * in real time. That is deliberately of the same order as ONE of the cookie side's own global
  * upgrades (Sturdier Ovens is x1.1, MTR Freight After Midnight is x1.5, and there are a dozen of
  * them), which is the whole point: finishing the house is worth about as much as one good
  * upgrade, spread over the entire mid-game. The main economy stays primary and stays primary by

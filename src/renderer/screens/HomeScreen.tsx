@@ -244,9 +244,31 @@ function Scaffold() {
   );
 }
 
+/**
+ * What a room that is not built yet looks like: the DRAWING of it. Dashed walls, a door swing
+ * and a dimension line — a floor plan rather than a room, because that is honestly all the
+ * player has of this room, whether the blueprint is still on sale or already in the drawer.
+ *
+ * It replaced an empty box. The box was not wrong, but "nothing at all" and "a room with the
+ * lights off" looked identical in it, and the card is the only place the difference is visible.
+ */
+function PlanSketch() {
+  return (
+    <svg className="home-room__plan" viewBox="0 0 60 40" xmlns="http://www.w3.org/2000/svg" aria-hidden="true" focusable="false">
+      <g stroke="var(--outline)" strokeWidth="1.4" fill="none" strokeLinecap="round">
+        <path d="M6 8h48v24H6z" strokeDasharray="4 3" />
+        {/* the door, drawn the way a plan draws one: a gap in the wall and its swing */}
+        <path d="M6 32h10M28 32h26" />
+        <path d="M16 32a12 12 0 0 1 12-12" strokeWidth="1" opacity="0.6" />
+        {/* a dimension line across the top, with its end ticks */}
+        <path d="M10 14h40M10 11.5v5M50 11.5v5" strokeWidth="0.9" opacity="0.5" />
+      </g>
+    </svg>
+  );
+}
+
 /** The three states of one room card, drawn as a card in the cutaway. */
 function RoomCard({ home, def }: { home: HomeConstructionState; def: RoomDefinition }) {
-  const dispatch = useGameDispatch();
   const built = builtRoom(home, def.id);
   const building = home.build?.roomId === def.id ? home.build : null;
   const offered = isBlueprintOffered(home, def.id);
@@ -278,6 +300,7 @@ function RoomCard({ home, def }: { home: HomeConstructionState; def: RoomDefinit
 
       <div className="home-room__cutaway" data-state={state}>
         {building ? <Scaffold /> : null}
+        {!built && !building ? <PlanSketch /> : null}
         {built ? (
           <div className="home-room__floor">
             {built.furnitureIds.length === 0 ? (

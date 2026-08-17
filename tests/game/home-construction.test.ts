@@ -218,13 +218,46 @@ describe("home construction: the timing is real elapsed milliseconds", () => {
       blueprintIds: ["kitchen", "pantry"],
       build: { roomId: "kitchen", elapsedMs: 0, requiredMs: 60_000 },
     };
-    // An hour of offline progress against a one-minute build finishes the Kitchen and stops.
+    // An hour handed to the site in one slice against a one-minute build finishes the Kitchen
+    // and stops there.
     const result = tickHome(state, 3_600);
     expect(result.completedRoomId).toBe("kitchen");
     expect(result.state.build).toBeNull();
     expect(result.state.rooms).toEqual([{ roomId: "kitchen", furnitureIds: [] }]);
     // The 59 spare minutes are gone, not credited against the Pantry that was never started.
     expect(tickHome(result.state, 0).state).toBe(result.state);
+  });
+
+  it("does NOT build while the application is closed, and says so by doing nothing", () => {
+    // The builders keep the refinery's hours. `offline-progress.ts` credits cookies and touches
+    // neither subgame, so a save loaded after a day away comes back with its build exactly where
+    // it was left. This is asserted rather than assumed because the opposite — a house that
+    // finishes itself overnight — is precisely the "nothing unlocks itself" rule being eroded by
+    // a mechanism nobody looked at.
+    const saved = deedState(1e6, {
+      lastTickAtIso: "2026-01-01T00:00:00.000Z",
+      homeConstruction: {
+        ...createInitialHomeState(),
+        blueprintIds: ["kitchen"],
+        build: { roomId: "kitchen", elapsedMs: 12_000, requiredMs: 60_000 },
+      },
+    });
+
+    const loaded = applyGameAction(
+      saved,
+      {
+        type: "importSave",
+        savedState: saved,
+        nowIso: "2026-01-02T00:00:00.000Z", // a whole day later
+        offlineOptions: { maxOfflineMs: 60 * 60 * 1000, offlineCpsFactor: 1 },
+      },
+      ctxAt(0),
+    );
+
+    expect(loaded.homeConstruction.build).toEqual({ roomId: "kitchen", elapsedMs: 12_000, requiredMs: 60_000 });
+    expect(isRoomBuilt(loaded.homeConstruction, "kitchen")).toBe(false);
+    // And the live clock picks it up from exactly there.
+    expect(remainingBuildMs(runTicks(loaded, 1).homeConstruction)).toBeCloseTo(47_000, 6);
   });
 
   it("returns the same object for a quiet site, so nothing re-renders for nothing", () => {

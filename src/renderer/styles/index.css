@@ -8383,7 +8383,8 @@ ul.card-grid {
   opacity: 0.55;
 }
 
-.home-room__scaffold {
+.home-room__scaffold,
+.home-room__plan {
   position: absolute;
   inset: 6px;
   width: calc(100% - 12px);

@@ -16,6 +16,7 @@ import {
 export {
   DIESEL_TARGET_KEY,
   HUD_COOKIES_TARGET_KEY,
+  controlTargetKey,
   generatorTargetKey,
   upgradeTargetKey,
 } from './purchase-fx-core.js';
@@ -67,6 +68,7 @@ const TARGET_CLASS: Readonly<Record<FxEffect['kind'], string>> = {
   generator: 'fx-row-buy',
   upgrade: 'fx-ticket-tear',
   diesel: 'fx-depot-mint',
+  control: 'fx-slot-accept',
 };
 
 interface CoinBurst {

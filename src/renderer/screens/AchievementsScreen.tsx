@@ -181,6 +181,7 @@ export function AchievementsScreen() {
         onChange={setSearch}
         placeholder={LIST_COPY.searchPlaceholderAchievements}
         ariaLabel={LIST_COPY.searchPlaceholderAchievements}
+        controlId="search.achievements"
       />
       {visible.length === 0 ? (
         <p>

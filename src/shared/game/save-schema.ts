@@ -4,7 +4,7 @@ import { z } from "zod";
  * Current on-disk save schema version. Bump this whenever `SaveDataLatest`'s shape changes,
  * and add a forward-only migration entry in migrations.ts keyed by the *previous* version.
  */
-export const SAVE_SCHEMA_VERSION = 5;
+export const SAVE_SCHEMA_VERSION = 6;
 
 const BigNumSchema = z.object({
   mantissa: z.number(),
@@ -152,9 +152,33 @@ export const SaveDataV5Schema = SaveDataV4Schema.omit({ schemaVersion: true }).e
 
 export type SaveDataV5 = z.infer<typeof SaveDataV5Schema>;
 
+/**
+ * Schema for save-format version 6. Adds `controlUnlocks` — the control economy
+ * (control-unlocks.ts): which of the application's OWN controls the player has bought.
+ *
+ * One flat list of rung ids, and nothing else. Not a per-control record with levels in it,
+ * because a level is derived (control-unlocks.ts#controlRungLevel) and storing a derived number
+ * beside the facts it comes from is how the two end up disagreeing. Unknown ids are tolerated on
+ * read rather than rejected: a save written by a build that sold one more control than this one
+ * knows about should still load, and every reader looks a rung up in the registry before
+ * believing it means anything.
+ *
+ * `migrations.ts#migrateV5ToV6` is where the one genuinely debatable decision in this feature
+ * lives — an already-played save is handed the whole table for free. It is argued out in full
+ * there and in control-unlocks.ts#MIGRATION_GRANT_LIFETIME_THRESHOLD.
+ */
+export const SaveDataV6Schema = SaveDataV5Schema.omit({ schemaVersion: true }).extend({
+  schemaVersion: z.literal(6),
+  controlUnlocks: z.object({
+    purchasedRungIds: z.array(z.string()),
+  }),
+});
+
+export type SaveDataV6 = z.infer<typeof SaveDataV6Schema>;
+
 /** The schema alias that always points at the current (latest) version's shape. */
-export const SaveDataLatestSchema = SaveDataV5Schema;
-export type SaveDataLatest = SaveDataV5;
+export const SaveDataLatestSchema = SaveDataV6Schema;
+export type SaveDataLatest = SaveDataV6;
 
 /** Minimal shape used only to read `schemaVersion` off of otherwise-unvalidated input. */
 export const SaveVersionProbeSchema = z.object({

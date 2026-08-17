@@ -378,6 +378,7 @@ export function UpgradeStrip() {
             onChange={setSearch}
             placeholder={LIST_COPY.searchPlaceholderUpgrades}
             ariaLabel={LIST_COPY.searchPlaceholderUpgrades}
+            controlId="search.upgrades"
           />
         </div>
       </div>

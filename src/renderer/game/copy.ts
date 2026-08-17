@@ -825,3 +825,70 @@ export const REBORN_COPY = {
   pin: { en: "Pin", yue: "釘住" },
   unpin: { en: "Unpin", yue: "解開" },
 } as const satisfies Record<string, Bilingual | ((...args: any[]) => Bilingual)>;
+
+/**
+ * THE CONTROL ECONOMY (src/shared/game/control-unlocks.ts).
+ *
+ * Names and prices of individual controls come from the registry itself, which carries its own
+ * bilingual `nameEn`/`nameYue` and `detailEn`/`detailYue` on every entry — exactly as generators
+ * and upgrades do. This block is only the chrome around them: what a coin-slot plate says, what
+ * the confirmation asks, and the headings of the catalogue inside Settings.
+ */
+export const CONTROL_COPY = {
+  lockedPrefix: { en: "Locked", yue: "未買" },
+  /** The accessible name of a coin-slot plate: what it is, and what it costs, in one string. */
+  slotLabel: (nameEn: string, nameYue: string, price: string): Bilingual => ({
+    en: `${nameEn} — locked. Press to buy it for ${price} cookies.`,
+    yue: `${nameYue}——未買。㩒一下用 ${price} 塊曲奇買。`,
+  }),
+  price: (price: string): Bilingual => ({ en: `🍪 ${price}`, yue: `🍪 ${price}` }),
+  confirmTitle: { en: "Buy this control?", yue: "買唔買呢個掣？" },
+  confirmBody: (nameEn: string, nameYue: string, price: string, balance: string): Bilingual => ({
+    en: `${nameEn} costs ${price} cookies. You have ${balance}.`,
+    yue: `${nameYue}要 ${price} 塊曲奇。你而家有 ${balance} 塊。`,
+  }),
+  confirmBuy: { en: "Buy it", yue: "買" },
+  confirmCancel: { en: "Not now", yue: "唔買住" },
+  cannotAfford: (short: string): Bilingual => ({
+    en: `Not enough cookies — ${short} short.`,
+    yue: `曲奇唔夠——爭 ${short} 塊。`,
+  }),
+  bought: (nameEn: string, nameYue: string): Bilingual => ({
+    en: `${nameEn} bought. It works from now on.`,
+    yue: `買咗${nameYue}。由而家開始用得。`,
+  }),
+  catalogueTitle: { en: "Controls catalogue", yue: "控制項目錄" },
+  catalogueIntro: {
+    en: "Every control in this application is bought, one press at a time — the settings on this panel, the window's own buttons, the search fields, the stepper multiples, the bulk toolbar. Prices are flat and printed. Nothing here unlocks itself.",
+    yue: "呢個程式入面每一個掣都要買，一次㩒一個——呢版嘅設定、個窗自己嘅掣、搜尋欄、購買數量、批量工具列。價錢係固定嘅，寫晒出嚟。冇一樣會自動解鎖。",
+  },
+  catalogueFloors: {
+    en: "Three things are never for sale: the close button, this Settings panel, and this catalogue's own search field. You can always quit, you can always get in here, and you can always read the price list.",
+    yue: "有三樣嘢永遠唔賣：關閉掣、呢個設定面板，同呢個目錄自己嘅搜尋欄。你永遠走得，永遠入得嚟，永遠睇得到個價目表。",
+  },
+  catalogueSearch: { en: "Search the catalogue…", yue: "搜尋目錄…" },
+  catalogueSearchFree: { en: "This search field is free.", yue: "呢個搜尋欄免費。" },
+  catalogueOwned: (owned: number, total: number): Bilingual => ({
+    en: `${owned} of ${total} bought`,
+    yue: `買咗 ${owned} / ${total}`,
+  }),
+  catalogueNoResults: { en: "No control matches that.", yue: "冇控制項符合。" },
+  rungOwned: { en: "Bought", yue: "買咗" },
+  rungNext: { en: "Next rung", yue: "下一級" },
+  rungWaiting: { en: "Buy the rung below first", yue: "要先買下面嗰級" },
+  groupChrome: { en: "The window itself", yue: "個窗本身" },
+  groupSettings: { en: "Settings entries", yue: "設定項目" },
+  groupSearch: { en: "Search fields", yue: "搜尋欄" },
+  groupStepper: { en: "Buy quantity", yue: "購買數量" },
+  groupBulk: { en: "Bulk actions", yue: "批量操作" },
+  groupToggle: { en: "Feature switches", yue: "功能開關" },
+  /** The plate that replaces the drag region on the title bar until dragging is bought. */
+  dragPlate: (price: string): Bilingual => ({
+    en: `Dragging this window costs ${price} cookies`,
+    yue: `拖呢個窗要 ${price} 塊曲奇`,
+  }),
+  stepperLockedHint: {
+    en: "×1 is free. The rest are bought in Settings → Controls catalogue, or by pressing them here.",
+    yue: "×1 免費。其他喺「設定 → 控制項目錄」買，或者喺呢度㩒一下就買。",
+  },
+} as const satisfies Record<string, Bilingual | ((...args: any[]) => Bilingual)>;

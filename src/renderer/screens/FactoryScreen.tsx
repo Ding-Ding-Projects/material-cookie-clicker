@@ -19,6 +19,7 @@ import {
 import { DIESEL_LEDGER_DISPLAY_PATH } from '../../shared/game/diesel-exchange.js';
 import { formatExact, formatExactDigits } from '../../shared/game/format-number.js';
 import { BuyStepper, type BuyQuantity } from '../components/BuyStepper.js';
+import { CoinSlot, useControlRung } from '../components/CoinSlot.js';
 import { bilingualText, showsCantonese, showsEnglish, DIESEL_COPY, FACTORY_COPY, LIST_COPY } from '../game/copy.js';
 import {
   useDieselExchange,
@@ -393,6 +394,7 @@ function ShippingStation({ factory }: { factory: DieselFactoryState }) {
   const ratings = computeRatings(factory);
   const available = shippableLitres(factory);
   const automationOwned = hasAutomation(factory);
+  const autoShipSwitchBought = useControlRung('toggle.autoShip');
 
   const consumedText =
     exchange.summary && exchange.summary.consumedCount > 0
@@ -417,6 +419,12 @@ function ShippingStation({ factory }: { factory: DieselFactoryState }) {
       <p className="factory-note">{bilingualText(FACTORY_COPY.shipNote)}</p>
 
       <div className="factory-auto">
+        {/* TWO independent gates, and they are not the same question. The factory's own
+            automation upgrade decides whether auto-shipping is possible at all; the control
+            unlock (control-unlocks.ts, "toggle.autoShip") decides whether the SWITCH is yours.
+            Buying the switch without the upgrade gets you a tickable box that still does
+            nothing, and the note underneath has always said so. */}
+        {autoShipSwitchBought ? (
         <label className="factory-auto__switch">
           <input
             type="checkbox"
@@ -426,6 +434,9 @@ function ShippingStation({ factory }: { factory: DieselFactoryState }) {
           />
           <span>{bilingualText(FACTORY_COPY.autoShipLabel)}</span>
         </label>
+        ) : (
+          <CoinSlot rungId="toggle.autoShip" variant="inline" />
+        )}
         <p className="factory-note">
           {automationOwned
             ? bilingualText(FACTORY_COPY.autoShipAt(percent(ratings.autoShipAtFraction ?? autoFractionIfOff(factory))))

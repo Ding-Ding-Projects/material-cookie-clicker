@@ -1,5 +1,4 @@
 import { bnAdd, bnClampNonNegative, bnCompare, bnFromNumber, bnMulScalar, bnSub, type BigNum } from "./big-number.js";
-import { totalCps } from "./cps.js";
 import { evaluateAchievements } from "./achievements.js";
 import {
   collectGoldenCookie as collectGoldenCookiePure,
@@ -19,9 +18,7 @@ import {
   extendComboWindow,
   stackEventMultipliers,
   EVENT_CLICK_STACK_CAP,
-  EVENT_CPS_STACK_CAP,
   randomEventClickMultiplier,
-  randomEventCpsMultiplier,
   randomEventRebateFraction,
   tickRandomEvents,
   whackMice,
@@ -43,7 +40,13 @@ import {
   shippableLitres,
   tickFactory,
 } from "./diesel-factory.js";
+import {
+  createInitialControlUnlocksState,
+  findControlRung,
+  hasControlRung,
+} from "./control-unlocks.js";
 import { computeDisclosure } from "./disclosure.js";
+import { effectiveCps } from "./effective-cps.js";
 import { costOfBulk, costOfNext, getGeneratorDefinition, maxAffordable } from "./generators.js";
 import { computeOfflineProgressWithTools, type OfflineProgressOptions } from "./offline-progress.js";
 import { canPrestige, performPrestige } from "./prestige.js";
@@ -104,6 +107,18 @@ export type GameAction =
   /** Player switch for automatic shipping. Does nothing until an automation upgrade is bought. */
   | { readonly type: "setFactoryAutoShip"; readonly enabled: boolean }
   | { readonly type: "setToolProgression"; readonly enabled: boolean }
+  /**
+   * Buys ONE rung of ONE control's ladder (control-unlocks.ts) — a settings entry, a piece of
+   * window chrome, a search field, a stepper multiple, the bulk toolbar, a feature toggle.
+   *
+   * A purchase like every other purchase in this reducer, refusing silently in the same shape:
+   * an unknown rung id, a rung already owned, a rung whose predecessor in its own ladder is not
+   * owned, or a balance short of the price all return the state unchanged. Nothing in the game
+   * dispatches this on the player's behalf — there is no condition that grants a control, and
+   * there is no code path that unlocks one as a reward. It happens because somebody pressed the
+   * plate with the price on it.
+   */
+  | { readonly type: "buyControlUnlock"; readonly rungId: string }
   | { readonly type: "tick"; readonly elapsedMs: number }
   | { readonly type: "collectGoldenCookie" }
   /**
@@ -389,6 +404,33 @@ function handleSetFactoryAutoShip(state: GameState, enabled: boolean): GameState
   return { ...state, dieselFactory: { ...state.dieselFactory, autoShipEnabled: enabled } };
 }
 
+/**
+ * Buys one control rung. The domain (control-unlocks.ts) owns the table, the price and the
+ * ladder order; this handler owns nothing but the four refusals and moving the cookies, which
+ * is the same division `handleBuyTool` and `handleBuyRaidConsumable` already use.
+ *
+ * The ladder-order check is the one worth naming: rung N is refused unless rung N-1 is owned, so
+ * a hand-built dispatch cannot skip straight to Max without paying for ×10 and ×100 on the way.
+ */
+function handleBuyControlUnlock(state: GameState, ctx: ReducerCtx, rungId: string): GameState {
+  const found = findControlRung(rungId);
+  if (!found) return state;
+  if (hasControlRung(state, rungId)) return state;
+  if (found.index > 0 && !hasControlRung(state, found.control.rungs[found.index - 1].id)) return state;
+
+  const price = bnFromNumber(found.rung.price);
+  if (bnCompare(state.cookies, price) < 0) return state;
+
+  const current = state.controlUnlocks ?? createInitialControlUnlocksState();
+  const nextState: GameState = {
+    ...state,
+    cookies: bnClampNonNegative(bnSub(state.cookies, price)),
+    controlUnlocks: { purchasedRungIds: [...current.purchasedRungIds, rungId] },
+  };
+
+  return withAchievements(nextState, nowIso(ctx));
+}
+
 function handleSetToolProgression(state: GameState, enabled: boolean): GameState {
   if (state.toolProgressionEnabled === enabled) return state;
   return { ...state, toolProgressionEnabled: enabled };
@@ -400,26 +442,18 @@ function handleTick(state: GameState, ctx: ReducerCtx, elapsedMs: number): GameS
   const config = ctx.goldenCookieConfig ?? DEFAULT_GOLDEN_COOKIE_CONFIG;
   const nowMs = ctx.now();
 
-  const cps = totalCps(state);
-  const effect = state.goldenCookie.activeEffect;
-  const goldenCps =
-    effect?.kind === "frenzy" && effect.multiplier !== undefined && isEffectActive(effect, nowMs)
-      ? effect.multiplier
-      : 1;
-
-  // THE PRODUCTION STACK, in one line and by one rule.
+  // THE PRODUCTION STACK, in one line and by one rule — but the rule and the line both live
+  // elsewhere now. `effectiveCps` composes the standing rate with the golden cookie's Frenzy and
+  // whatever the pool is currently doing to production, and it composes them through
+  // `stackEventMultipliers` under the stated ×1000 ceiling: a Production Frenzy inside a golden
+  // frenzy, a Clot or an Oven Hiccup dragging one down, a Burnt Batch Frenzy hitting the cap,
+  // and the ordinary case where both are 1. Only one pool event can ever be live, so that really
+  // is the entire stack.
   //
-  // A golden cookie's frenzy and whatever the pool is currently doing to production multiply
-  // together under a stated ceiling (`stackEventMultipliers`). That covers the whole matrix: a
-  // Production Frenzy inside a golden frenzy, a Clot or an Oven Hiccup dragging one down, a
-  // Burnt Batch Frenzy hitting the cap, and the ordinary case where both are 1. Only one pool
-  // event can ever be live, so this really is the entire stack.
-  const cpsWithEvents = bnMulScalar(
-    cps,
-    stackEventMultipliers(goldenCps, randomEventCpsMultiplier(state.randomEvents, nowMs), EVENT_CPS_STACK_CAP),
-  );
-
-  const gained = bnMulScalar(cpsWithEvents, elapsedMs / 1000);
+  // This line accrues through that function rather than repeating it because the HUD's PER
+  // SECOND plate prints the same call: the readout and the accrual are the same arithmetic, not
+  // two copies of it that drift.
+  const gained = bnMulScalar(effectiveCps(state, nowMs), elapsedMs / 1000);
   let nextState = addCookies(state, gained);
 
   let goldenCookie = despawnIfExpired(nextState.goldenCookie, nowMs, ctx.rng, config);
@@ -676,6 +710,11 @@ export function applyGameAction(state: GameState, action: GameAction, ctx: Reduc
       return handleSetFactoryAutoShip(state, action.enabled);
     case "setToolProgression":
       return handleSetToolProgression(state, action.enabled);
+    // A control is bought with cookies at a printed price from a shelf, so Market Day's rebate
+    // applies to it exactly as it applies to a generator. It reads the cookie delta the handler
+    // actually produced, so a refused purchase is refunded nothing.
+    case "buyControlUnlock":
+      return withMarketDayRebate(state, handleBuyControlUnlock(state, ctx, action.rungId), ctx);
     case "tick":
       return handleTick(state, ctx, action.elapsedMs);
     case "collectGoldenCookie":
@@ -709,7 +748,7 @@ export { costOfNext };
 export function createInitialGameState(nowIsoString: string): GameState {
   const zero = bnFromNumber(0);
   return {
-    schemaVersion: 5,
+    schemaVersion: 6,
     cookies: zero,
     lifetimeCookies: zero,
     baseClickValue: bnFromNumber(1),
@@ -724,6 +763,9 @@ export function createInitialGameState(nowIsoString: string): GameState {
     dieselFactory: createInitialFactoryState(),
     toolProgressionEnabled: true,
     purchasedToolIds: [],
+    // A fresh save owns NO control. The window will not move, the sliders will not slide and
+    // the stepper offers ×1 alone, until each is bought (control-unlocks.ts).
+    controlUnlocks: createInitialControlUnlocksState(),
     lastTickAtIso: nowIsoString,
     lastSavedAtIso: nowIsoString,
   };

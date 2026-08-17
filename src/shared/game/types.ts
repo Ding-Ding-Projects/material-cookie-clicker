@@ -1,5 +1,6 @@
 import type { BigNum } from "./big-number.js";
 import type { RandomEventsState } from "./random-events.js";
+import type { ControlUnlocksState } from "./control-unlocks.js";
 import type { DieselFactoryState } from "./diesel-factory.js";
 
 /** Small discrete counters use plain `number` — see big-number.ts header comment for why. */
@@ -135,6 +136,18 @@ export interface GameState {
    * real application feature, which tools.ts#ToolDefinition.gatesApplicationFeature keeps false.
    */
   readonly purchasedToolIds: readonly string[];
+
+  /**
+   * THE CONTROL ECONOMY (control-unlocks.ts): which of the application's own controls — the
+   * settings entries, the window chrome, the search fields, the stepper rungs, the bulk toolbar,
+   * the two feature toggles — have actually been bought with cookies.
+   *
+   * Optional on the type for exactly one reason: a state object built by a test helper or an
+   * older code path may not carry it, and every reader in the codebase goes through
+   * control-unlocks.ts, which defaults a missing subtree to "nothing bought". A save on disk
+   * always has it — save-schema.ts v6 requires it.
+   */
+  readonly controlUnlocks?: ControlUnlocksState;
 
   /** ISO-8601 timestamp of the last tick that was actually applied. */
   readonly lastTickAtIso: string;

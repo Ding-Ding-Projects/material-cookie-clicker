@@ -8399,3 +8399,460 @@ ul.card-grid {
     transform: none;
   }
 }
+/* ══════════════════════════════════════════════════════════════════════════════════════════════
+   THE CONTROL ECONOMY — the coin-slot idiom
+   (src/shared/game/control-unlocks.ts, src/renderer/components/CoinSlot.tsx)
+
+   One shape for every unbought control in the application, so a price looks the same whether it
+   is standing in for a title-bar cap, a search field, a stepper rung or a settings switch: a
+   bevelled plate with a slot cut in it, a coin sitting in the slot, and the literal price beside
+   it. Same v2 language as the rest of the cabinet — solid offset shadows, no blur, fat borders,
+   tokens only. Never a colour-only signal: the slot's shape, its coin and its printed figure all
+   say the same thing.
+   ══════════════════════════════════════════════════════════════════════════════════════════════ */
+
+.coin-slot-wrap {
+  display: inline-flex;
+  flex-direction: column;
+  align-items: flex-start;
+  gap: 4px;
+  position: relative;
+  max-width: 100%;
+}
+
+.coin-slot {
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  padding: 6px 12px;
+  font: inherit;
+  font-weight: 700;
+  color: var(--on-surface-variant);
+  background: linear-gradient(180deg, var(--surface-high) 0%, var(--surface) 100%);
+  border: var(--border-thick) solid var(--outline);
+  border-radius: var(--shape-sm);
+  box-shadow: 0 3px 0 0 var(--outline);
+  cursor: pointer;
+  max-width: 100%;
+}
+
+.coin-slot:hover {
+  border-color: var(--primary);
+}
+
+.coin-slot:focus-visible {
+  outline: var(--border-thick) solid var(--primary);
+  outline-offset: 2px;
+}
+
+.coin-slot:active {
+  transform: translateY(2px);
+  box-shadow: none;
+}
+
+/* The slot itself: a dark recessed mouth with a coin resting in it. Drawn, not an emoji, so it
+   keeps its shape at every type size and in both themes. */
+.coin-slot__mouth {
+  position: relative;
+  flex: 0 0 auto;
+  width: 16px;
+  height: 20px;
+  border-radius: 3px;
+  background: var(--cabinet-frame-dark);
+  box-shadow: inset 0 2px 0 0 rgba(0, 0, 0, 0.55);
+}
+
+.coin-slot__coin {
+  position: absolute;
+  left: 50%;
+  top: 3px;
+  width: 12px;
+  height: 12px;
+  margin-left: -6px;
+  border-radius: 50%;
+  background: var(--spark);
+  border: 2px solid var(--cabinet-frame-dark);
+}
+
+.coin-slot__name {
+  display: flex;
+  flex-direction: column;
+  line-height: 1.15;
+  text-align: start;
+  min-width: 0;
+}
+
+.coin-slot__name-zh {
+  font-family: var(--font-zh);
+  font-size: 0.85em;
+  opacity: 0.85;
+}
+
+.coin-slot__price {
+  margin-inline-start: auto;
+  padding: 1px 7px;
+  font-variant-numeric: tabular-nums;
+  color: var(--on-primary);
+  background: var(--primary);
+  border-radius: var(--shape-full);
+  white-space: nowrap;
+}
+
+/* Cannot be afforded yet. The plate stays a real, focusable button — it is dimmed and its price
+   tag is hollowed out, and pressing it opens the confirmation where the shortfall is printed in
+   figures. It is NEVER `disabled`: a disabled button leaves the tab order, and a player who
+   cannot afford a control still deserves to land on it and hear what it costs. */
+.coin-slot--short {
+  opacity: 0.72;
+}
+
+.coin-slot--short .coin-slot__price {
+  color: var(--on-surface-variant);
+  background: transparent;
+  border: 2px dashed var(--outline);
+}
+
+/* The compact form that stands in for a small control inside a row. */
+.coin-slot--inline {
+  padding: 3px 8px;
+  font-size: 0.85em;
+  border-width: var(--border-thin);
+  border-radius: var(--shape-xs);
+}
+
+.coin-slot--inline .coin-slot__mouth {
+  width: 11px;
+  height: 14px;
+}
+
+.coin-slot--inline .coin-slot__coin {
+  width: 8px;
+  height: 8px;
+  margin-left: -4px;
+  top: 2px;
+  border-width: 1px;
+}
+
+/* The flat form that fits a title-bar cap or sits beside a search input. */
+.coin-slot--chrome {
+  padding: 2px 8px;
+  font-size: 0.8em;
+  color: var(--on-cabinet);
+  background: rgba(0, 0, 0, 0.18);
+  border-width: var(--border-thin);
+  border-color: var(--cabinet-frame-dark);
+  border-radius: var(--shape-xs);
+  box-shadow: none;
+  /* A title bar is a drag region; its buttons must not be. */
+  -webkit-app-region: no-drag;
+}
+
+.coin-slot--chrome .coin-slot__price {
+  background: var(--spark);
+  color: #2b1b06;
+}
+
+/* The confirmation. Not a modal — it opens under the plate that owns it, keeps focus inside the
+   two buttons, and closing it puts focus back on the plate. Anything above one percent of the
+   balance asks (control-unlocks.ts#CONTROL_CONFIRM_BALANCE_FRACTION), and so does anything the
+   player cannot yet afford, which is where the shortfall gets printed. */
+.coin-slot__confirm {
+  position: absolute;
+  top: calc(100% + 6px);
+  inset-inline-start: 0;
+  z-index: 40;
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+  min-width: 240px;
+  max-width: 320px;
+  padding: 12px;
+  color: var(--on-surface);
+  background: var(--surface-high);
+  border: var(--border-thick) solid var(--outline);
+  border-radius: var(--shape-sm);
+  box-shadow: 0 6px 0 0 var(--outline);
+}
+
+.coin-slot__confirm-body {
+  font-size: 0.9em;
+  line-height: 1.35;
+}
+
+.coin-slot__confirm-short {
+  font-size: 0.9em;
+  font-weight: 700;
+  padding: 4px 8px;
+  border: var(--border-thin) dashed var(--outline);
+  border-radius: var(--shape-xs);
+}
+
+.coin-slot__confirm-actions {
+  display: flex;
+  gap: 8px;
+  flex-wrap: wrap;
+}
+
+.coin-slot__confirm-buy,
+.coin-slot__confirm-cancel {
+  font: inherit;
+  font-weight: 700;
+  padding: 6px 12px;
+  border-radius: var(--shape-xs);
+  border: var(--border-thin) solid var(--outline);
+  cursor: pointer;
+}
+
+.coin-slot__confirm-buy {
+  color: var(--on-primary);
+  background: var(--primary);
+  border-color: var(--primary);
+}
+
+.coin-slot__confirm-cancel {
+  color: var(--on-surface-variant);
+  background: transparent;
+}
+
+.coin-slot__confirm-buy:focus-visible,
+.coin-slot__confirm-cancel:focus-visible {
+  outline: var(--border-thick) solid var(--primary);
+  outline-offset: 2px;
+}
+
+/* The purchase announcement. Visually hidden, never silent: buying a control by keyboard has to
+   say so, and the plate it replaces has already gone by the time the coins land. */
+.coin-slot__status {
+  position: absolute;
+  width: 1px;
+  height: 1px;
+  margin: -1px;
+  padding: 0;
+  overflow: hidden;
+  clip-path: inset(50%);
+  white-space: nowrap;
+}
+
+/* The coin the purchase-fx layer flies its handful of coins INTO (purchase-fx-core.ts, kind
+   "control"): the slot swallows it and the plate settles. Collapses to nothing under
+   prefers-reduced-motion, like every other effect in this file. */
+.fx-slot-accept {
+  animation: fx-slot-accept 620ms ease-out;
+}
+
+@keyframes fx-slot-accept {
+  0% {
+    transform: translateY(-10px) scale(1.25);
+  }
+  55% {
+    transform: translateY(0) scale(1);
+  }
+  70% {
+    transform: translateY(1px) scale(0.9);
+  }
+  100% {
+    transform: translateY(0) scale(1);
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .fx-slot-accept {
+    animation: none;
+  }
+}
+
+/* ── WINDOW CHROME ────────────────────────────────────────────────────────────────────────────
+   The drag region is a purchase, and it has three states rather than two. Until it is bought the
+   bar is app-region: no-drag, which is the only thing that actually stops an Electron frameless
+   window being dragged — the OS does the dragging, so nothing a script does could refuse it. */
+
+.title-bar[data-drag='locked'] {
+  -webkit-app-region: no-drag;
+}
+
+.title-bar[data-drag='marquee'] {
+  -webkit-app-region: no-drag;
+}
+
+.title-bar[data-drag='marquee'] .title-bar__marquee {
+  -webkit-app-region: drag;
+}
+
+.title-bar[data-drag='full'] {
+  -webkit-app-region: drag;
+}
+
+/* The price plate that stands in the drag region's place. It sits between the marquee and the
+   caps and is the first control a brand-new save ever meets. */
+.title-bar__drag-plate {
+  display: inline-flex;
+  align-items: center;
+  margin-inline: 12px;
+  -webkit-app-region: no-drag;
+}
+
+.title-bar__controls .coin-slot--chrome {
+  align-self: center;
+  margin-inline-end: 4px;
+}
+
+/* ── THE GATED SURFACES ───────────────────────────────────────────────────────────────────── */
+
+.search-field-wrap--locked {
+  display: flex;
+  padding: 4px 0;
+}
+
+.search-field__slot {
+  margin-inline-start: 4px;
+}
+
+.regex-popover__slot {
+  align-self: flex-start;
+}
+
+.stepper__slot {
+  margin-inline-start: 4px;
+}
+
+.shop-rail__bulk-slot {
+  margin: 6px 0;
+}
+
+.settings-slider--locked {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+}
+
+/* ── THE CONTROLS CATALOGUE (screens/ControlsCatalogue.tsx) ──────────────────────────────────
+   The price list, inside Settings. Every control, every rung, bought or not — a rung above an
+   unbought one is shown rather than hidden, because seeing that Max costs six thousand is the
+   whole reason to buy the hundred. */
+
+.controls-catalogue__count {
+  margin-inline-start: 10px;
+  padding: 2px 9px;
+  font-size: 0.8em;
+  font-weight: 700;
+  font-variant-numeric: tabular-nums;
+  color: var(--on-primary);
+  background: var(--primary);
+  border-radius: var(--shape-full);
+}
+
+.controls-catalogue__group {
+  margin-top: 16px;
+}
+
+.controls-catalogue__group-title {
+  margin: 0 0 8px;
+  font-size: 0.95em;
+  letter-spacing: 0.04em;
+  text-transform: uppercase;
+  color: var(--on-surface-variant);
+}
+
+.controls-catalogue__row {
+  display: grid;
+  gap: 8px;
+  padding: 10px 12px;
+  margin-bottom: 10px;
+  background: var(--surface-high);
+  border: var(--border-thin) solid var(--outline);
+  border-radius: var(--shape-sm);
+}
+
+.controls-catalogue__names {
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+}
+
+.controls-catalogue__name {
+  font-weight: 800;
+}
+
+.controls-catalogue__name-zh {
+  font-family: var(--font-zh);
+  font-weight: 700;
+}
+
+.controls-catalogue__where {
+  font-size: 0.82em;
+  opacity: 0.8;
+}
+
+.controls-catalogue__rungs {
+  list-style: none;
+  margin: 0;
+  padding: 0;
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+}
+
+.controls-catalogue__rung {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr) auto;
+  align-items: start;
+  gap: 4px 10px;
+  padding-inline-start: 10px;
+  border-inline-start: var(--border-thick) solid var(--outline);
+}
+
+/* Three states, told apart by the rail's colour AND by what each row actually contains — a
+   "Bought" word, a coin-slot plate, or a price with "buy the rung below first" beside it. */
+.controls-catalogue__rung[data-state='owned'] {
+  border-inline-start-color: var(--tertiary);
+  opacity: 0.78;
+}
+
+.controls-catalogue__rung[data-state='next'] {
+  border-inline-start-color: var(--primary);
+}
+
+.controls-catalogue__rung[data-state='later'] {
+  border-inline-start-style: dashed;
+  opacity: 0.72;
+}
+
+.controls-catalogue__rung-name {
+  font-weight: 700;
+}
+
+.controls-catalogue__rung-detail {
+  grid-column: 1 / -1;
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+  font-size: 0.85em;
+  line-height: 1.35;
+}
+
+.controls-catalogue__rung-state {
+  font-size: 0.82em;
+  font-weight: 700;
+  white-space: nowrap;
+}
+
+@media (max-width: 640px) {
+  .controls-catalogue__rung {
+    grid-template-columns: minmax(0, 1fr);
+  }
+}
+
+/* The chrome variant's single decorative glyph — the shape of the cap the plate stands in for,
+   so a locked minimize still looks like a minimize. Decorative: the accessible name carries the
+   words, and the price carries the offer. */
+.coin-slot__glyph {
+  font-size: 1.05em;
+  line-height: 1;
+}
+
+/* The drag plate is inside a title bar, which is a drag region. Belt and braces with the
+   wrapper's own rule: nothing in this plate may ever start a window drag. */
+.title-bar__drag-plate .coin-slot,
+.title-bar__drag-plate .coin-slot__confirm {
+  -webkit-app-region: no-drag;
+}

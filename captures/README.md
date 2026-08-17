@@ -274,6 +274,42 @@ photographed as a pair: the application was closed through its own title-bar
 control and relaunched against the same profile, and came back up in
 Cantonese-only mode.
 
+### The control-economy set
+
+Three images from one session on the off-screen desktop `CommodifyCapture`, each
+opened and looked at afterwards, taken from the built `dist/` launched by the
+real `electron` binary on its own CDP port against a throwaway
+`--user-data-dir`, so the save really was empty. Every cookie in them was earned
+by a real press on the cookie, and the purchase was a real press on the plate and
+then on its confirmation.
+
+| File | What it shows |
+| --- | --- |
+| `commodify-locked-chrome.png` | A fresh save that cannot move its own window. The title bar carries a bilingual price plate reading "Drag the window — 10" where the drag region would be, and the minimize and maximize caps are replaced by their own plates at 30 and 45. The close cross is an ordinary button with no price on it. The confirmation is open under the drag plate, because the purchase is worth more than one percent of the balance. |
+| `commodify-unlocked.png` | The same window after the ten cookies were spent. The drag plate is gone and the marquee is the drag handle; minimize and maximize are still priced; close is unchanged. |
+| `commodify-controls-catalogue.png` | The controls catalogue inside the Settings panel: the statement that the close button, the Settings panel and the catalogue's own search field are never for sale, that free search field, and the first group of the price list. |
+
+The drag purchase was verified at the operating-system level as well as in the
+pixels, because pixels cannot show whether a window is draggable. A script run on
+the same off-screen desktop asked the window itself `WM_NCHITTEST` over the
+marquee, which is the question Windows uses to decide whether a press begins a
+window drag. Before the purchase the answer was `HTCLIENT` (1) at that point and
+everywhere else on the bar. After the purchase, at the identical point on the
+identical window, it was `HTCAPTION` (2), while the rest of the bar and the
+cabinet body still answered `HTCLIENT`.
+
+Not shown by this set, and stated plainly rather than glossed: **the window was
+never physically dragged.** Synthesising a real cursor drag needs `SetCursorPos`,
+and on an off-screen desktop that call is inert — the attempt reported a cursor
+position of `0,0` and the window did not move, which is a fact about the headless
+desktop rather than about the application. The hit-test contrast above is the
+strongest evidence that could be gathered without putting a window on the user's
+visible screen.
+
+Also not shown: buying minimize, maximize or resize; the stepper, search and bulk
+ladders being climbed; and the light theme, since the capture desktop follows the
+operating system's colour scheme and it was dark.
+
 ### Earlier lanes
 
 | File | What it shows | Commit |

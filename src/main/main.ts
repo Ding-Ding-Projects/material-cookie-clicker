@@ -42,6 +42,14 @@ function createWindow(): BrowserWindow {
     height: 720,
     minWidth: 480,
     minHeight: 420,
+    // RESIZING IS A PURCHASE (src/shared/game/control-unlocks.ts, "chrome.resize").
+    //
+    // Enforced here rather than in CSS, because on a frameless window the resize grips are drawn
+    // and handled by the operating system: there is no renderer-side element to disable, and a
+    // renderer that merely pretended would still leave the real edges live. The window therefore
+    // STARTS not resizable and the renderer asks for it to be made resizable once the unlock is
+    // actually in the save — see the 'window:set-resizable' handler below.
+    resizable: false,
     show: false,
     title: PRODUCT_NAME,
     icon: path.join(dirname, '..', '..', 'assets', 'material-cookie-clicker.ico'),
@@ -89,7 +97,16 @@ void app.whenReady().then(() => {
   ipcMain.on('window:toggle-maximize', () => {
     if (mainWindow?.isMaximized()) mainWindow.unmaximize(); else mainWindow?.maximize();
   });
+  // Close is NOT gated and never will be. A player must never have to earn the right to quit.
   ipcMain.on('window:close', () => mainWindow?.close());
+
+  // The renderer half of the resize purchase. It sends the current answer on startup and again
+  // whenever the unlock is bought; the main process is the only thing that can actually move the
+  // flag. `Boolean(...)` rather than trusting the payload's type, because this channel is
+  // reachable from the renderer and a truthy string should not be able to buy anything.
+  ipcMain.on('window:set-resizable', (_event, resizable: unknown) => {
+    mainWindow?.setResizable(resizable === true);
+  });
 
   // The diesel voucher exchange with WinForge. `app.getPath('appData')` is the OS roaming
   // application-data directory (%APPDATA% on Windows); the service puts the shared ledger at

@@ -446,6 +446,11 @@ describe("disclosure: save compatibility", () => {
         autoShipEnabled: false,
         stalledSeconds: 0,
       },
+      // Version 6 (control-unlocks.ts) requires this subtree on a save written by this build.
+      // An empty list is what a save that has bought no control looks like, and it is what
+      // keeps this test asserting what it was written to assert: that a save ALREADY at the
+      // current version runs no migration step and is therefore granted nothing.
+      controlUnlocks: { purchasedRungIds: [] },
     });
     expect(decoded.ok).toBe(true);
     if (!decoded.ok) return;

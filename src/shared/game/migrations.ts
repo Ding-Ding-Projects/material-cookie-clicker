@@ -1,3 +1,5 @@
+import { bnToNumber } from "./big-number.js";
+import { grantedRungIdsForMigration, MIGRATION_GRANT_LIFETIME_THRESHOLD } from "./control-unlocks.js";
 import { SAVE_SCHEMA_VERSION } from "./save-schema.js";
 
 /**
@@ -101,13 +103,66 @@ function migrateV4ToV5(input: Record<string, unknown>): Record<string, unknown> 
   };
 }
 
+/**
+ * Version 5 -> 6: adds `controlUnlocks`, the control economy (control-unlocks.ts) — and GRANTS,
+ * which no migration in this file has done since the version-2 step was corrected to stop.
+ *
+ * ─────────────────────────────────────────────────────────────────────────────────────────────
+ * THIS IS THE ONE DECISION IN THIS FEATURE THAT NEEDS A REVIEWER TO AGREE WITH IT.
+ * ─────────────────────────────────────────────────────────────────────────────────────────────
+ *
+ * The owner's rule for the whole feature is that every control is bought — settings, buttons,
+ * dragging, minimize, maximize, resize, the lot. Applied literally HERE, a returning player with
+ * a built-out factory would open this build and find they could no longer move their own window,
+ * no longer reach the ×100 stepper they had been buying generator tiers with, and no longer
+ * search a hundred and seventy-nine upgrades. That is not the joke landing; that is the update
+ * appearing to have broken a save, and the player would be right to read it that way.
+ *
+ * So this step grants, and the grant is bounded by evidence rather than by generosity. A save
+ * with more than `MIGRATION_GRANT_LIFETIME_THRESHOLD` (1,000) lifetime cookies has demonstrably
+ * been PLAYED — that is a few minutes in, and comfortably past the point where the chrome prices
+ * in the table would have been pocket change anyway — so it keeps every control it was already
+ * using. A save under that line never really got going, has nothing to be taken away from it,
+ * and starts the new game the way a fresh save does: paying for all of it.
+ *
+ * What is granted is `control-unlocks.ts#V6_GRANDFATHERED_RUNG_IDS`, a FROZEN list of the rungs
+ * that exist at schema version 6, not the live registry. A control invented after this migration
+ * was written was never usable by an older save and must never appear in an older save's grant.
+ *
+ * The honest cost of the compromise: a grandfathered player never meets the coin-slot plates at
+ * all until they start a new save. If the owner would rather have the joke than the
+ * compatibility, `MIGRATION_GRANT_LIFETIME_THRESHOLD` is the single constant to change.
+ *
+ * The lifetime figure is read defensively — a big-number pair off disk that is missing or
+ * malformed reads as zero, and zero grants nothing, which is the safe direction to fail in.
+ */
+function migrateV5ToV6(input: Record<string, unknown>): Record<string, unknown> {
+  const raw = input.lifetimeCookies;
+  let lifetime = 0;
+  if (raw && typeof raw === "object") {
+    const pair = raw as { mantissa?: unknown; exponent?: unknown };
+    if (typeof pair.mantissa === "number" && typeof pair.exponent === "number") {
+      lifetime = bnToNumber({ mantissa: pair.mantissa, exponent: pair.exponent });
+    }
+  }
+
+  return {
+    ...input,
+    schemaVersion: 6,
+    controlUnlocks: { purchasedRungIds: [...grantedRungIdsForMigration(lifetime)] },
+  };
+}
+
 /** Ordered forward-only migrations, indexed by the version they migrate FROM. */
 export const MIGRATIONS: Readonly<Record<number, MigrationStep>> = {
   1: migrateV1ToV2,
   2: migrateV2ToV3,
   3: migrateV3ToV4,
   4: migrateV4ToV5,
+  5: migrateV5ToV6,
 };
+
+export { MIGRATION_GRANT_LIFETIME_THRESHOLD };
 
 export interface MigrationResult {
   readonly data: Record<string, unknown>;

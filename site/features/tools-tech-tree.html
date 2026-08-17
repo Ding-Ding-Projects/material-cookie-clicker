@@ -47,10 +47,11 @@
 
 <h2>What a tool is made of</h2>
 <p>Each tool has an English and a Cantonese name, a joke in both languages, one unlock condition and one gameplay effect. Unlock conditions are lifetime cookies, total clicks, an owned count of a named generator, a prestige count, a named achievement, or always. Effects are a click multiplier, a global CPS multiplier, a multiplier on one generator, a discount on a buy-max purchase, an extension to the offline-progress cap, or a bonus to the offline CPS fraction.</p>
-<p>For example, the Command Palette tool becomes available at 50 total clicks and grants +5% click power; the Regex Builder tool arrives at 10 Cursors and makes Cursors 10% better; Tab Groups does the same for Grandmas.</p>
+<p>The condition <em>discovers</em> the tool; it does not switch the bonus on. Meeting it turns a &ldquo;??? Tool&rdquo; card into a named, priced one and posts a <em>Tool discovered</em> notice &mdash; and that is all that happens. The bonus applies only once you buy the tool with cookies, like everything else in this game. Nothing here unlocks itself while you watch.</p>
+<p>For example, the Command Palette tool is discovered at 50 total clicks and grants +5% click power once bought; the Regex Builder tool is discovered at 10 Cursors and makes Cursors 10% better once bought; Tab Groups does the same for Grandmas.</p>
 
 <h2>How it is configured</h2>
-<p>A player-facing switch, <code>toolProgressionEnabled</code>, decides whether a tool's bonus applies only once its condition is met (the default) or whether every bonus counts regardless. It changes the game display and the bonus. It never changes whether a feature is reachable &mdash; the same contract, restated as a setting.</p>
+<p>A player-facing switch, <code>toolProgressionEnabled</code>, decides whether the tree runs normally &mdash; discover, then buy (the default) &mdash; or whether the whole tree is previewed as unlocked with every bonus counting. It grants nothing and owns nothing: switch it back and every unbought tool is inert again. It changes the game display and the bonus. It never changes whether a feature is reachable &mdash; the same contract, restated as a setting.</p>
 <p><code>design/tool-card.html</code> gives every state, including undiscovered, a persistent &ldquo;Open it now&rdquo; callout in its own recessed bezel with a solid spark-ring border and an &ldquo;always available&rdquo; badge, deliberately unlike the dashed lock chrome around it &mdash; precisely because a chunky padlock could otherwise make the escape hatch read as part of the lock. <code>design/tools-tree.html</code> groups nodes into three jewel tiers, bronze through emerald to amethyst.</p>
 
 <h2>In the shipped build</h2>

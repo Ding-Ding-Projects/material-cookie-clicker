@@ -1,7 +1,7 @@
 import { memo, useMemo, useState } from 'react';
 
 import { bnCompare, bnToNumber } from '../../shared/game/big-number.js';
-import { formatBigNum } from '../../shared/game/format-number.js';
+import { formatExact, formatExactDigits } from '../../shared/game/format-number.js';
 import { GENERATOR_DEFINITIONS } from '../../shared/game/generators.js';
 import { toolPrice } from '../../shared/game/tool-shop.js';
 import { TOOL_DEFINITIONS, type ToolDefinition, type ToolUnlockCondition } from '../../shared/game/tools.js';
@@ -79,6 +79,13 @@ const TIER_META: Record<ToolTier, { label: Bilingual; prereq: Bilingual }> = {
   3: { label: TOOLS_SCREEN_COPY.tier3, prereq: TOOLS_SCREEN_COPY.tier3Prereq },
 };
 
+/**
+ * 'undiscovered' — no progress at all, name hidden.
+ * 'locked'       — some progress toward the unlock condition, not there yet.
+ * 'ready'        — DISCOVERED and affordable: the buy button is live.
+ * 'unlocked'     — bought. This is the only state in which the bonus applies.
+ * A discovered tool the player cannot yet afford stays 'locked' chrome with a real price on it.
+ */
 type NodeState = 'undiscovered' | 'locked' | 'ready' | 'unlocked';
 
 /**
@@ -111,6 +118,7 @@ const ToolNode = memo(function ToolNode({
   tier,
   nodeState,
   priceText,
+  priceExact,
   affordable,
   onBuy,
   onOpen,
@@ -119,6 +127,7 @@ const ToolNode = memo(function ToolNode({
   tier: ToolTier;
   nodeState: NodeState;
   priceText: string;
+  priceExact: string;
   affordable: boolean;
   onBuy: () => void;
   onOpen: OpenApplicationFeature;
@@ -131,7 +140,9 @@ const ToolNode = memo(function ToolNode({
       : nodeState === 'ready'
         ? TOOLS_SCREEN_COPY.readyChip
         : nodeState === 'locked'
-          ? TOOLS_SCREEN_COPY.lockedChip
+          ? vm.state === 'discovered'
+            ? TOOLS_SCREEN_COPY.discoveredChip
+            : TOOLS_SCREEN_COPY.lockedChip
           : TOOLS_SCREEN_COPY.undiscoveredChip;
 
   return (
@@ -175,7 +186,14 @@ const ToolNode = memo(function ToolNode({
           >
             <div className="item-card__progress-fill" style={{ width: `${vm.progressRatio * 100}%` }} />
           </div>
-          <button type="button" className="item-card__buy" disabled={!affordable} onClick={onBuy}>
+          <button
+            type="button"
+            className="item-card__buy"
+            disabled={!affordable}
+            onClick={onBuy}
+            title={`${def.nameEn} · ${def.nameYue} — 🍪 ${priceExact}`}
+            aria-label={`${bilingualText(TOOLS_SCREEN_COPY.unlockNow)} — ${def.nameEn} · ${def.nameYue} — 🍪 ${priceExact}`}
+          >
             {affordable
               ? `${bilingualText(TOOLS_SCREEN_COPY.unlockNow)} — 🍪 ${priceText}`
               : `${bilingualText(TOOLS_SCREEN_COPY.cannotAfford)} — 🍪 ${priceText}`}
@@ -350,16 +368,28 @@ export function ToolsScreen({ onOpenApplicationFeature }: ToolsScreenProps = {})
               <ul className="card-grid">
                 {tierRows.map(({ vm, price }) => {
                   const affordable = bnCompare(fast.cookies, price) >= 0;
+                  // Only a DISCOVERED tool can be bought (tool-shop.ts#canBuyTool), so 'ready'
+                  // requires discovery as well as cookies — a half-progressed tool with a full
+                  // wallet is still just 'locked'.
+                  const discovered = vm.state === 'discovered' || vm.state === 'unlocked';
+                  const buyable = discovered && affordable && vm.state !== 'unlocked';
                   const nodeState: NodeState =
-                    vm.state === 'unlocked' ? 'unlocked' : vm.state === 'undiscovered' ? 'undiscovered' : affordable ? 'ready' : 'locked';
+                    vm.state === 'unlocked'
+                      ? 'unlocked'
+                      : vm.state === 'undiscovered'
+                        ? 'undiscovered'
+                        : buyable
+                          ? 'ready'
+                          : 'locked';
                   return (
                     <ToolNode
                       key={vm.id}
                       vm={vm}
                       tier={tier}
                       nodeState={nodeState}
-                      priceText={formatBigNum(price, 'en')}
-                      affordable={affordable}
+                      priceText={formatExact(price, 'en')}
+                      priceExact={formatExactDigits(price)}
+                      affordable={buyable}
                       onBuy={() => dispatch({ type: 'buyTool', toolId: vm.id })}
                       onOpen={onOpen}
                     />

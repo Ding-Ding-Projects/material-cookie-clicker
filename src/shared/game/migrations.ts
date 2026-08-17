@@ -35,28 +35,25 @@ function migrateV1ToV2(input: Record<string, unknown>): Record<string, unknown> 
 }
 
 /**
- * Version 2 -> 3: grants the three reveal upgrades (upgrades.ts#REVEAL_UPGRADE_DEFINITIONS).
+ * Version 2 -> 3: grants NOTHING.
  *
- * Progressive disclosure (disclosure.ts) hides the shop rail, the upgrade strip and
- * hold-to-click until the matching reveal upgrade is bought. A version-2 save was written by a
- * build where all three were simply always on and there was nothing to buy, so migrating one
- * without granting them would silently TAKE surfaces away from a player who had been using
- * them for weeks. Every older save is therefore handed all three outright, free, as though it
- * had bought them long ago; a save created by this build starts at version 3 with none of them
- * and earns each one properly.
+ * An earlier build of this migration handed every older save the three reveal upgrades (Shop
+ * Sign, Upgrade Catalogue, Steady Hand) outright, reasoning that progressive disclosure must
+ * not take away a surface a player had been using. The reasoning was half right and the fix
+ * was wrong: it made a player's save show a hold-to-click hint for an upgrade they had never
+ * bought, and gameplay they had never chosen. Nothing in this game switches itself on.
  *
- * Ids are written literally rather than imported from upgrades.ts on purpose: a migration
- * describes what a PAST format meant, and must keep meaning that even if the definition list
- * is later reshuffled or renamed.
+ * The surfaces an older save demonstrably USED are kept the honest way instead — by derivation
+ * from the progress that is already in the save (disclosure.ts#computeDisclosure): owning a
+ * generator keeps the shop rail visible, owning any non-reveal upgrade keeps the ticket strip
+ * visible. Steady Hand has no such footprint, because press-and-hold leaves no trace in a save,
+ * and it is a behaviour change rather than a view — so it is bought, by everyone, or not had.
+ *
+ * The step is kept (rather than deleted) so the version chain stays continuous and a version-2
+ * save still walks forward to the latest schema.
  */
 function migrateV2ToV3(input: Record<string, unknown>): Record<string, unknown> {
-  const granted = ["reveal_shop_sign", "reveal_upgrade_catalogue", "reveal_steady_hand"];
-  const existing = Array.isArray(input.upgrades) ? (input.upgrades as { id?: unknown }[]) : [];
-  const alreadyOwned = new Set(existing.map((u) => u?.id));
-  const additions = granted
-    .filter((id) => !alreadyOwned.has(id))
-    .map((id) => ({ id, purchasedAtTickCount: 0 }));
-  return { ...input, schemaVersion: 3, upgrades: [...existing, ...additions] };
+  return { ...input, schemaVersion: 3 };
 }
 
 /**

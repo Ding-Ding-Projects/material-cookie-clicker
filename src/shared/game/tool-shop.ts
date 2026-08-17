@@ -1,13 +1,12 @@
 import { bnCompare, bnFromNumber, type BigNum } from "./big-number.js";
-import { isToolBonusActive, TOOL_DEFINITIONS } from "./tools.js";
+import { isToolBonusActive, isToolDiscovered, TOOL_DEFINITIONS } from "./tools.js";
 import type { GameState } from "./types.js";
 
 /**
- * The Tools shop: a pay-to-skip-the-grind purchase path laid ALONGSIDE each tool's natural
- * unlock condition (tools.ts), never instead of it. A tool's bonus activates automatically the
- * moment its condition is met, exactly as before this module existed; buying it here just lets
- * a player with enough cookies claim that same bonus early, at a cookie price rather than a
- * play-time cost. This is a "sibling lane" (`tool-shop.ts` / `purchasing.ts` / `automation.ts`)
+ * The Tools shop: THE ONLY way a tool's bonus is ever switched on. A tool's unlock condition
+ * (tools.ts) decides when the tool is DISCOVERED — when it stops being a "??? Tool" and becomes
+ * a row with a name, a flavour line and a price on it. Nothing about meeting that condition
+ * applies the bonus; the player buys it here, with cookies, deliberately, or it never happens. This is a "sibling lane" (`tool-shop.ts` / `purchasing.ts` / `automation.ts`)
  * that never landed on `main` as of this lane's work — see HANDOFF.md — so this file defines the
  * shape this lane needs against the tools contract directly, rather than importing one that
  * does not exist yet. A later merge of the real sibling lane should reconcile against this.
@@ -34,12 +33,13 @@ export function isToolPurchased(state: GameState, toolId: string): boolean {
 }
 
 /**
- * Whether the tool can still be bought right now: there is nothing to buy once its bonus is
- * already active (purchased or naturally unlocked), and otherwise the player needs enough
- * cookies for the price.
+ * Whether the tool can still be bought right now: it has to have been discovered (its unlock
+ * condition met — you cannot buy a tool you have not found), it must not already be active,
+ * and the player needs enough cookies for the price.
  */
 export function canBuyTool(state: GameState, toolId: string): boolean {
   if (isToolBonusActive(state, toolId)) return false;
+  if (!isToolDiscovered(state, toolId)) return false;
   return bnCompare(state.cookies, toolPrice(toolId)) >= 0;
 }
 
@@ -47,7 +47,9 @@ export interface ToolShopEntry {
   readonly id: string;
   readonly price: BigNum;
   readonly purchased: boolean;
-  /** The bonus is active AND it was not bought early — i.e. play alone unlocked it. */
+  /** Found by play but not yet bought: nameable, priced, and doing nothing at all. */
+  readonly discovered: boolean;
+  /** The bonus is active without a purchase — only ever true with tool progression turned off. */
   readonly unlockedByPlay: boolean;
   readonly active: boolean;
   readonly affordable: boolean;
@@ -58,14 +60,16 @@ export function toolShopEntries(state: GameState): readonly ToolShopEntry[] {
   return TOOL_DEFINITIONS.map((def) => {
     const purchased = isToolPurchased(state, def.id);
     const active = isToolBonusActive(state, def.id);
+    const discovered = isToolDiscovered(state, def.id);
     const price = toolPrice(def.id);
     return {
       id: def.id,
       price,
       purchased,
+      discovered,
       unlockedByPlay: active && !purchased,
       active,
-      affordable: !active && bnCompare(state.cookies, price) >= 0,
+      affordable: !active && discovered && bnCompare(state.cookies, price) >= 0,
     };
   });
 }

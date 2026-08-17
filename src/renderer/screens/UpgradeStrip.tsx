@@ -1,7 +1,7 @@
 import { memo, useMemo, useState } from 'react';
 
 import { bnCompare, bnToNumber } from '../../shared/game/big-number.js';
-import { formatBigNum } from '../../shared/game/format-number.js';
+import { formatBigNum, formatExact, formatExactDigits } from '../../shared/game/format-number.js';
 import { getGeneratorDefinition } from '../../shared/game/generators.js';
 import {
   isUpgradeUnlocked,
@@ -159,8 +159,8 @@ const UpgradeTicket = memo(function UpgradeTicket({
     state === 'owned'
       ? `${bilingualText(LIST_COPY.alreadyOwned)}`
       : state === 'locked'
-        ? `🔒 🍪 ${formatBigNum(def.cost, 'en')}`
-        : `🍪 ${formatBigNum(def.cost, 'en')}`;
+        ? `🔒 🍪 ${formatExact(def.cost, 'en')}`
+        : `🍪 ${formatExact(def.cost, 'en')}`;
 
   return (
     <button
@@ -168,8 +168,8 @@ const UpgradeTicket = memo(function UpgradeTicket({
       type="button"
       className={`mini-ticket ${state}`}
       disabled={!affordable}
-      title={bilingualText(effect)}
-      aria-label={`${def.nameEn} · ${def.nameYue} — ${bilingualText(effect)} — ${bilingualText(stateLabel)} — 🍪 ${formatBigNum(def.cost, 'en')}${
+      title={`${bilingualText(effect)} — 🍪 ${formatExactDigits(def.cost)}`}
+      aria-label={`${def.nameEn} · ${def.nameYue} — ${bilingualText(effect)} — ${bilingualText(stateLabel)} — 🍪 ${formatExactDigits(def.cost)}${
         state === 'locked' && progress ? ` — ${bilingualText(progress.requirement)}` : ''
       }`}
       onClick={() => dispatch({ type: 'buyUpgrade', upgradeId: def.id })}

@@ -1,7 +1,7 @@
 import { bnCompare } from '../../shared/game/big-number.js';
 import { costOfLitres, DIESEL_LEDGER_DISPLAY_PATH } from '../../shared/game/diesel-exchange.js';
 import { computeDisclosure } from '../../shared/game/disclosure.js';
-import { formatBigNum } from '../../shared/game/format-number.js';
+import { formatExact, formatExactDigits } from '../../shared/game/format-number.js';
 import { DieselCanisterIcon } from '../assets/icons.js';
 import { showsEnglish, showsCantonese, bilingualText, DIESEL_COPY } from '../game/copy.js';
 import { useDieselExchange, useFastSnapshot, useGameDispatch, useStructureSnapshot } from '../game/GameProvider.js';
@@ -42,7 +42,8 @@ export function DieselDepot() {
   const depot = structure.dieselDepot;
   const price = costOfLitres(depot.litresMinted, MINT_LITRES);
   const affordable = bnCompare(fast.cookies, price) >= 0;
-  const priceText = formatBigNum(price, 'en');
+  const priceText = formatExact(price, 'en');
+  const priceExact = formatExactDigits(price);
   const mintLabel = DIESEL_COPY.mintButton(MINT_LITRES, priceText);
 
   // The consumed line reads from the LEDGER, not from game state: game state cannot know what
@@ -101,7 +102,8 @@ export function DieselDepot() {
         type="button"
         className="diesel-depot__mint"
         disabled={!affordable}
-        aria-label={bilingualText(mintLabel)}
+        title={`🍪 ${priceExact}`}
+        aria-label={`${bilingualText(DIESEL_COPY.mintButton(MINT_LITRES, priceExact))}`}
         onClick={() => dispatch({ type: 'mintDiesel', litres: MINT_LITRES })}
       >
         {bilingualText(mintLabel)}

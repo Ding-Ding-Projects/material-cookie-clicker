@@ -93,19 +93,36 @@ export function CookieHero() {
   const holdEnabledRef = useRef(holdEnabled);
   holdEnabledRef.current = holdEnabled;
 
+  /**
+   * WHY THE CONTROLLER IS BUILT EXACTLY ONCE, AND WHY HOLDING USED TO STOP DEAD.
+   *
+   * This component previously rebuilt the controller in an effect keyed on `currentClickValue`
+   * and `goldenActive`, cancelling the old one in the cleanup. `currentClickValue` is derived
+   * from the structure snapshot, and the FIRST repeat of a hold changes game state — so the
+   * next render handed the effect a fresh value, the cleanup ran, and the interval that was
+   * driving the hold was cancelled about a tick after the press began. Holding the cookie
+   * produced one click and then silence, which is exactly what it looked like.
+   *
+   * The controller is now built once and never replaced. Everything that legitimately changes
+   * between presses (the click value baked into the popup, whether a golden cookie is up,
+   * whether Steady Hand has been bought) is read through refs at fire time instead, so a hold
+   * that is still held keeps firing across any number of re-renders.
+   */
+  const performClickRef = useRef(performClick);
+  performClickRef.current = performClick;
+
   const controllerRef = useRef(
-    createHoldToClickController(performClick, undefined, undefined, () => holdEnabledRef.current),
-  );
-  useEffect(() => {
-    controllerRef.current = createHoldToClickController(
-      performClick,
+    createHoldToClickController(
+      () => performClickRef.current(),
       undefined,
       undefined,
       () => holdEnabledRef.current,
-    );
-    return () => controllerRef.current.stop();
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [currentClickValue, goldenActive]);
+    ),
+  );
+  useEffect(() => {
+    const controller = controllerRef.current;
+    return () => controller.stop();
+  }, []);
 
   return (
     <div className="panel cookie-hero">
@@ -146,6 +163,13 @@ export function CookieHero() {
           onPointerDown={(event) => {
             event.preventDefault();
             recordPoint(event.clientX, event.clientY);
+            // Capture the pointer so a hand that drifts a pixel — or a re-render that moves the
+            // art under the cursor — cannot silently end the hold by way of pointerleave.
+            try {
+              event.currentTarget.setPointerCapture(event.pointerId);
+            } catch {
+              // Older/synthetic pointers may refuse capture; holding still works without it.
+            }
             controllerRef.current.start();
           }}
           onPointerUp={() => controllerRef.current.stop()}

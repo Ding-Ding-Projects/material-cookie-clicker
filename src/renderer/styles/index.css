@@ -583,11 +583,19 @@ body {
   font-family: var(--font-display);
   font-weight: 900;
   font-variant-numeric: tabular-nums;
-  font-size: clamp(24px, 3.6vw, 40px);
+  /* Shrink-to-fit, never wrap and never clip. The bezel is an engraved plate: a value that
+     outgrows it has to get smaller, the way a real readout would, rather than spilling over the
+     bevel or breaking onto a second line the plate has no room for. The container-relative unit
+     does the shrinking; `nowrap` + `hidden` are the belt and braces behind it. */
+  font-size: max(13px, calc(clamp(24px, 3.6vw, 40px) * 6 / var(--hud-value-chars, 6)));
   line-height: 1.05;
   letter-spacing: -0.02em;
   color: var(--on-surface);
   display: block;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: clip;
+  max-width: 100%;
 }
 
 .hud__value-zh {

@@ -1,7 +1,7 @@
-import { useCallback, useEffect, useLayoutEffect, useRef, useState, type ReactNode } from 'react';
+import { useCallback, useEffect, useLayoutEffect, useRef, useState, type CSSProperties, type ReactNode } from 'react';
 
 import { bnMulScalar } from '../shared/game/big-number.js';
-import { formatBigNum } from '../shared/game/format-number.js';
+import { formatExact, formatExactDigits } from '../shared/game/format-number.js';
 import { isEffectActive } from '../shared/game/golden-cookie.js';
 import { computeMultipliers } from '../shared/game/upgrades.js';
 import { computeDisclosure, type ConsoleSurfaceId } from '../shared/game/disclosure.js';
@@ -128,16 +128,21 @@ function HudReadout({
   fxKey,
 }: {
   label: Bilingual;
-  value: Parameters<typeof formatBigNum>[0];
+  value: Parameters<typeof formatExact>[0];
   /** Set on the cookies readout only: it is where a purchase's coins fly FROM, and the bezel
    *  that dips and settles when the reducer takes the cookies. */
   fxKey?: string;
 }) {
-  const en = formatBigNum(value, 'en');
-  const yue = formatBigNum(value, 'yue');
+  // LITERAL FIGURES IN THE BEZEL. "1.055 thousand" is both harder to read than "1,055" and
+  // wider than the plate it sits in — the word ran past the bevel and clipped. Below the literal
+  // threshold both formatters produce the same grouped digits, so the second line correctly
+  // disappears; above it they diverge again and the compact forms are shown, shrink-to-fit by
+  // the CSS (.hud__value), with the full figure always in the plate's title.
+  const en = formatExact(value, 'en');
+  const yue = formatExact(value, 'yue');
   const fxRef = usePurchaseFxTarget<HTMLDivElement>(fxKey ?? 'hud:unused');
   return (
-    <div className="hud__readout" ref={fxKey ? fxRef : undefined}>
+    <div className="hud__readout" ref={fxKey ? fxRef : undefined} title={`${bilingualText(label)}: ${formatExactDigits(value)}`}>
       <span className="hud__key">
         {bilingualText(label)}
       </span>
@@ -146,7 +151,14 @@ function HudReadout({
           small values, so in bilingual mode the second line still only appears when it actually
           reads differently — printing "4.06" twice looks like a rendering bug, not a
           translation. */}
-      {showsEnglish() || yue === en ? <span className="hud__value">{en}</span> : null}
+      {showsEnglish() || yue === en ? (
+        // The plate is a fixed-width engraving, so the VALUE shrinks to fit it rather than
+        // wrapping or spilling past the bevel. Six characters is full size ("1,055" and every
+        // early figure); a longer string scales the type down proportionally, with a floor.
+        <span className="hud__value" style={{ '--hud-value-chars': Math.max(6, en.length) } as CSSProperties}>
+          {en}
+        </span>
+      ) : null}
       {showsCantonese() && yue !== en ? <span className="hud__value-zh">{yue}</span> : null}
     </div>
   );

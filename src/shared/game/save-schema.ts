@@ -86,10 +86,10 @@ export type SaveDataV2 = z.infer<typeof SaveDataV2Schema>;
 /**
  * Schema for save-format version 3. Structurally identical to version 2 — progressive
  * disclosure (disclosure.ts) is DERIVED from owned upgrades and lifetime progress rather than
- * stored, so it needs no field of its own. The version exists purely so `migrations.ts#
- * migrateV2ToV3` runs once over every older save and grants it the three reveal upgrades it
- * could never have bought, which is what keeps a pre-disclosure save from losing surfaces it
- * always had.
+ * stored, so it needs no field of its own. The version marks the format boundary at which
+ * disclosure began; `migrations.ts#migrateV2ToV3` walks a save across it and deliberately
+ * grants NOTHING, because an older save's surfaces are recovered by derivation from the
+ * progress it already contains rather than by handing it upgrades it never bought.
  */
 export const SaveDataV3Schema = SaveDataV2Schema.omit({ schemaVersion: true }).extend({
   schemaVersion: z.literal(3),

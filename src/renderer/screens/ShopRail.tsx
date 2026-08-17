@@ -1,7 +1,7 @@
 import { memo, useMemo, useState, type ReactNode } from 'react';
 
 import { bnCompare, bnMulScalar } from '../../shared/game/big-number.js';
-import { formatBigNum } from '../../shared/game/format-number.js';
+import { formatBigNum, formatExact, formatExactDigits } from '../../shared/game/format-number.js';
 import { costOfBulk, generatorCps, getGeneratorDefinition, maxAffordable, type GeneratorDefinition } from '../../shared/game/generators.js';
 import { visibleGeneratorLadder } from '../../shared/game/disclosure.js';
 import { totalBuyMaxDiscount } from '../../shared/game/tools.js';
@@ -42,14 +42,19 @@ const GeneratorBuyButton = memo(function GeneratorBuyButton({
   // There is no locked-tier branch here any more. A tier the player cannot buy yet is not
   // dimmed on this list — it is not on this list at all (see disclosure.ts#
   // visibleGeneratorLadder and MysteryRow below), so every row that renders is a real buy.
+  // A price is the exact number of cookies that will leave the account, so it is printed
+  // exactly — grouped digits, never "1.1 thousand". The full figure is in the title too, for
+  // the rare value past the literal threshold where the face falls back to the compact form.
   return (
     <button
       type="button"
       className="buy-btn"
       disabled={!affordable || requestedQuantity <= 0}
       onClick={() => dispatch({ type: 'buyGeneratorBulk', generatorId: def.id, quantity })}
+      title={`${def.nameEn} · ${def.nameYue} — 🍪 ${formatExactDigits(finalCost)}`}
+      aria-label={`${LIST_COPY.buy.en} ${def.nameEn} · ${LIST_COPY.buy.yue}${def.nameYue} — 🍪 ${formatExactDigits(finalCost)}`}
     >
-      {bilingualText(LIST_COPY.buy)} — 🍪 {formatBigNum(finalCost, 'en')}
+      {bilingualText(LIST_COPY.buy)} — 🍪 {formatExact(finalCost, 'en')}
       {quantity === 'max' && requestedQuantity > 0 ? ` (×${requestedQuantity})` : ''}
     </button>
   );

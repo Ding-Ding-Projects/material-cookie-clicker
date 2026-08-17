@@ -15,7 +15,7 @@ import { costOfBulk, costOfNext, getGeneratorDefinition, maxAffordable } from ".
 import { computeOfflineProgressWithTools, type OfflineProgressOptions } from "./offline-progress.js";
 import { canPrestige, performPrestige } from "./prestige.js";
 import { toolPrice } from "./tool-shop.js";
-import { isToolBonusActive, totalBuyMaxDiscount } from "./tools.js";
+import { isToolBonusActive, isToolDiscovered, totalBuyMaxDiscount } from "./tools.js";
 import { computeMultipliers, getUpgradeDefinition, isUpgradeUnlocked } from "./upgrades.js";
 import type { GameState, RngPort } from "./types.js";
 
@@ -146,12 +146,14 @@ function handleBuyUpgrade(state: GameState, ctx: ReducerCtx, upgradeId: string):
 }
 
 /**
- * Buys a tool's bonus early with cookies, skipping its unlock condition (tool-shop.ts). A
- * no-op when the bonus is already active (purchased or naturally unlocked) or unaffordable —
- * mirrors handleBuyUpgrade's refuse-silently shape rather than throwing.
+ * Buys a tool's bonus with cookies — the ONLY transition that ever switches a tool bonus on
+ * (tool-shop.ts). A no-op when the bonus is already active, when the tool has not been
+ * discovered yet, or when the cookies are not there — mirrors handleBuyUpgrade's
+ * refuse-silently shape rather than throwing.
  */
 function handleBuyTool(state: GameState, ctx: ReducerCtx, toolId: string): GameState {
   if (isToolBonusActive(state, toolId)) return state;
+  if (!isToolDiscovered(state, toolId)) return state;
   const price = toolPrice(toolId);
   if (bnCompare(state.cookies, price) < 0) return state;
 

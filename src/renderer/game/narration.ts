@@ -1,7 +1,7 @@
 import { getAchievementDefinition } from "../../shared/game/achievements.js";
 import { getGeneratorDefinition } from "../../shared/game/generators.js";
 import type { GameAction } from "../../shared/game/reducer.js";
-import { isToolBonusActive, TOOL_DEFINITIONS } from "../../shared/game/tools.js";
+import { isToolDiscovered, TOOL_DEFINITIONS } from "../../shared/game/tools.js";
 import { getUpgradeDefinition } from "../../shared/game/upgrades.js";
 import type { GameState } from "../../shared/game/types.js";
 import type { Bilingual } from "./copy.js";
@@ -21,7 +21,10 @@ export type MilestoneEvent =
   | { readonly kind: "achievement"; readonly id: string }
   | { readonly kind: "purchase-generator"; readonly id: string; readonly quantity: number }
   | { readonly kind: "purchase-upgrade"; readonly id: string }
-  | { readonly kind: "tool-unlocked"; readonly id: string }
+  /** A tool's unlock condition just became true. That makes it FINDABLE and BUYABLE, not
+   *  active — the toast says "discovered" because that is all that happened. */
+  | { readonly kind: "tool-discovered"; readonly id: string }
+  | { readonly kind: "tool-bought"; readonly id: string }
   | { readonly kind: "golden-cookie-spawned" }
   | { readonly kind: "golden-cookie-collected" }
   | { readonly kind: "prestige-available" }
@@ -60,10 +63,14 @@ export function detectMilestones(previous: GameState, next: GameState, action: G
     }
   }
 
+  if (action.type === "buyTool" && next.purchasedToolIds.length > previous.purchasedToolIds.length) {
+    events.push({ kind: "tool-bought", id: action.toolId });
+  }
+
   for (const def of TOOL_DEFINITIONS) {
-    const wasActive = isToolBonusActive(previous, def.id);
-    const isActive = isToolBonusActive(next, def.id);
-    if (!wasActive && isActive) events.push({ kind: "tool-unlocked", id: def.id });
+    const was = isToolDiscovered(previous, def.id);
+    const now = isToolDiscovered(next, def.id);
+    if (!was && now) events.push({ kind: "tool-discovered", id: def.id });
   }
 
   return events;
@@ -86,7 +93,15 @@ export function describeMilestone(event: MilestoneEvent): Bilingual {
       const def = getUpgradeDefinition(event.id);
       return { en: `Upgrade bought: ${def.nameEn}`, yue: `升級買咗：${def.nameYue}` };
     }
-    case "tool-unlocked": {
+    case "tool-discovered": {
+      const def = TOOL_DEFINITIONS.find((t) => t.id === event.id);
+      const nameEn = def?.nameEn ?? event.id;
+      const nameYue = def?.nameYue ?? event.id;
+      // "Discovered", not "unlocked": nothing was granted. The tool is now on the shelf with a
+      // price on it, and the bonus starts the moment the player buys it and not before.
+      return { en: `Tool discovered: ${nameEn}`, yue: `發現工具：${nameYue}` };
+    }
+    case "tool-bought": {
       const def = TOOL_DEFINITIONS.find((t) => t.id === event.id);
       const nameEn = def?.nameEn ?? event.id;
       const nameYue = def?.nameYue ?? event.id;

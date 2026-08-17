@@ -1,23 +1,25 @@
 import { bnCompare, bnToNumber, type BigNum } from "../../shared/game/big-number.js";
 import { getGeneratorDefinition } from "../../shared/game/generators.js";
-import { isToolBonusActive, TOOL_DEFINITIONS, type ToolDefinition, type ToolEffect, type ToolUnlockCondition } from "../../shared/game/tools.js";
+import { isToolBonusActive, isToolDiscovered, TOOL_DEFINITIONS, type ToolDefinition, type ToolEffect, type ToolUnlockCondition } from "../../shared/game/tools.js";
 import type { GameState } from "../../shared/game/types.js";
 import type { Bilingual } from "./copy.js";
 
 /**
  * Every tool row's view state, derived purely from `GameState` — no separate "discovery" flag
- * exists in the domain (see tools.ts: the only predicate it exposes is
- * `isToolBonusActive`, which folds in the unlock condition AND the progression toggle). This
- * module adds one presentational classification on top, using each condition's own current/
- * target numbers: a tool with genuinely ZERO progress toward its condition renders as
- * "undiscovered" (name/flavour hidden, matching design/tool-card.html's mystery-card state);
- * once any progress exists it renders as "locked" with a progress readout; once the bonus is
- * active it renders as "unlocked". This is a display classification only — `isToolBonusActive`
- * remains the one and only authority for whether the gameplay bonus applies, and the
+ * exists in the domain beyond the two predicates tools.ts exposes (`isToolDiscovered` — the
+ * unlock condition is met — and `isToolBonusActive` — the player bought it). This module adds
+ * the presentational grading between them, using each condition's own current/target numbers:
+ * a tool with genuinely ZERO progress toward its condition renders as "undiscovered"
+ * (name/flavour hidden, matching design/tool-card.html's mystery-card state); once some
+ * progress exists it renders as "locked" with a progress readout; once the condition is fully
+ * met it renders as "discovered" — named, priced, and doing nothing yet; and once BOUGHT it
+ * renders as "unlocked". "discovered" and "unlocked" are deliberately distinct states, because
+ * finding a tool and owning it are different things. `isToolBonusActive` remains the one and
+ * only authority for whether the gameplay bonus applies, and the
  * "open the real feature now" action (see ToolsScreen.tsx) is present and identical in every
  * one of these three states, per the tools contract.
  */
-export type ToolRowState = "undiscovered" | "locked" | "unlocked";
+export type ToolRowState = "undiscovered" | "locked" | "discovered" | "unlocked";
 
 export interface ToolRowViewModel {
   readonly id: string;
@@ -120,6 +122,7 @@ export function buildToolRowViewModel(def: ToolDefinition, state: GameState): To
 
   let rowState: ToolRowState;
   if (active) rowState = "unlocked";
+  else if (isToolDiscovered(state, def.id)) rowState = "discovered";
   else if (current <= 0) rowState = "undiscovered";
   else rowState = "locked";
 

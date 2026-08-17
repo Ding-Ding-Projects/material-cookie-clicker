@@ -1,6 +1,6 @@
 import { bnCompare, bnMulScalar, bnToNumber } from '../../shared/game/big-number.js';
 import { computeDisclosure } from '../../shared/game/disclosure.js';
-import { formatBigNum } from '../../shared/game/format-number.js';
+import { formatExact, formatExactDigits } from '../../shared/game/format-number.js';
 import { isUpgradeUnlocked, REVEAL_UPGRADE_DEFINITIONS, type UpgradeDefinition } from '../../shared/game/upgrades.js';
 import { UpgradeIcon } from '../assets/icons.js';
 import { showsEnglish, showsCantonese, bilingualText, DISCLOSURE_COPY, type Bilingual } from '../game/copy.js';
@@ -64,7 +64,8 @@ export function DiscoveryTicket() {
   if (bnCompare(fast.cookies, threshold) < 0) return null;
 
   const affordable = bnCompare(fast.cookies, next.cost) >= 0;
-  const priceText = `🍪 ${formatBigNum(next.cost, 'en')}`;
+  const priceText = `🍪 ${formatExact(next.cost, 'en')}`;
+  const priceExact = `🍪 ${formatExactDigits(next.cost)}`;
   const description = REVEAL_DESCRIPTIONS[next.id] ?? DISCLOSURE_COPY.discoveryMystery;
   const progressPercent = Math.min(
     100,
@@ -95,7 +96,7 @@ export function DiscoveryTicket() {
           aria-valuemin={0}
           aria-valuemax={100}
           aria-valuenow={progressPercent}
-          aria-label={`${DISCLOSURE_COPY.discoveryHint.en} ${priceText} · ${DISCLOSURE_COPY.discoveryHint.yue} ${priceText}`}
+          aria-label={`${DISCLOSURE_COPY.discoveryHint.en} ${priceExact} · ${DISCLOSURE_COPY.discoveryHint.yue} ${priceExact}`}
         >
           <span className="discovery-ticket__fill" style={{ width: `${progressPercent}%` }} />
         </span>
@@ -122,7 +123,8 @@ export function DiscoveryTicket() {
       <button
         type="button"
         className="discovery-ticket__stub discovery-ticket__stub--buy"
-        aria-label={`${DISCLOSURE_COPY.discoveryBuy.en} ${next.nameEn} — ${description.en} — ${priceText} · ${DISCLOSURE_COPY.discoveryBuy.yue}${next.nameYue} — ${description.yue} — ${priceText}`}
+        title={`${next.nameEn} · ${next.nameYue} — ${priceExact}`}
+        aria-label={`${DISCLOSURE_COPY.discoveryBuy.en} ${next.nameEn} — ${description.en} — ${priceExact} · ${DISCLOSURE_COPY.discoveryBuy.yue}${next.nameYue} — ${description.yue} — ${priceExact}`}
         onClick={() => dispatch({ type: 'buyUpgrade', upgradeId: next.id })}
       >
         {bilingualText(DISCLOSURE_COPY.discoveryBuy)} — {priceText}

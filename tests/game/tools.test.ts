@@ -1,11 +1,18 @@
 import { describe, expect, it } from "vitest";
 import * as ToolsModule from "../../src/shared/game/tools";
 import { bnFromNumber } from "../../src/shared/game/big-number";
+import { applyGameAction, type ReducerCtx } from "../../src/shared/game/reducer";
+import { toolPrice } from "../../src/shared/game/tool-shop";
 import { computeMultipliers } from "../../src/shared/game/upgrades";
 import { ACHIEVEMENT_DEFINITIONS } from "../../src/shared/game/achievements";
-import { freshState } from "./test-helpers";
+import { freshState, fixedRng } from "./test-helpers";
 
-const { TOOL_DEFINITIONS, isToolBonusActive, totalBuyMaxDiscount, totalOfflineBonuses } = ToolsModule;
+const { TOOL_DEFINITIONS, isFeatureAvailable, isToolBonusActive, totalBuyMaxDiscount, totalOfflineBonuses } =
+  ToolsModule;
+
+function ctxAt(epochMs: number, rngValue = 0.99): ReducerCtx {
+  return { now: () => epochMs, rng: fixedRng(rngValue) };
+}
 
 describe("Tools tech tree — 20-tool roster", () => {
   it("models at least the 20 required application features as tools", () => {
@@ -24,18 +31,52 @@ describe("Tools tech tree — 20-tool roster", () => {
   });
 });
 
-describe("LOAD-BEARING: no tool definition can express a feature gate", () => {
-  it("every tool's gatesApplicationFeature is structurally false", () => {
+describe("LOAD-BEARING: every tool definition gates its application feature", () => {
+  it("every tool's gatesApplicationFeature is structurally true", () => {
     for (const def of TOOL_DEFINITIONS) {
-      expect(def.gatesApplicationFeature).toBe(false);
+      expect(def.gatesApplicationFeature).toBe(true);
     }
   });
 
-  it("the module exposes no isFeatureAvailable-shaped predicate for tools", () => {
-    const anyModule = ToolsModule as unknown as Record<string, unknown>;
-    expect(anyModule.isFeatureAvailable).toBeUndefined();
-    expect(anyModule.isToolFeatureAvailable).toBeUndefined();
-    expect(anyModule.isApplicationFeatureGated).toBeUndefined();
+  it("the module exposes isFeatureAvailable as the one availability predicate", () => {
+    expect(typeof isFeatureAvailable).toBe("function");
+  });
+
+  it("a feature whose tool's condition is unmet is unavailable on a fresh game", () => {
+    // commandPalette unlocks at totalClicks >= 50 (see tools.ts) — a fresh game has none.
+    const brandNew = freshState({ toolProgressionEnabled: true });
+    expect(isFeatureAvailable(brandNew, "commandPalette")).toBe(false);
+  });
+
+  it("buying the tool through the reducer makes its feature available", () => {
+    const price = toolPrice("commandPalette");
+    const state = freshState({ toolProgressionEnabled: true, cookies: price });
+    expect(isFeatureAvailable(state, "commandPalette")).toBe(false);
+
+    const next = applyGameAction(state, { type: "buyTool", toolId: "commandPalette" }, ctxAt(0));
+
+    expect(next.purchasedToolIds).toContain("commandPalette");
+    expect(isFeatureAvailable(next, "commandPalette")).toBe(true);
+  });
+
+  it("meeting the unlock condition naturally makes its feature available", () => {
+    const played = freshState({
+      toolProgressionEnabled: true,
+      stats: { totalClicks: 50, totalCookiesBaked: bnFromNumber(0), clockAnomalyCount: 0 },
+    });
+    expect(played.purchasedToolIds).not.toContain("commandPalette");
+    expect(isFeatureAvailable(played, "commandPalette")).toBe(true);
+  });
+
+  it("feature availability is exactly the tool bonus predicate, for every tool", () => {
+    const partiallyPlayed = freshState({
+      toolProgressionEnabled: true,
+      stats: { totalClicks: 1000, totalCookiesBaked: bnFromNumber(0), clockAnomalyCount: 0 },
+      lifetimeCookies: bnFromNumber(10000),
+    });
+    for (const def of TOOL_DEFINITIONS) {
+      expect(isFeatureAvailable(partiallyPlayed, def.id)).toBe(isToolBonusActive(partiallyPlayed, def.id));
+    }
   });
 });
 
@@ -104,11 +145,13 @@ describe("toolProgressionEnabled toggle", () => {
     expect(activeCount).toBeLessThan(TOOL_DEFINITIONS.length);
   });
 
-  it("does not affect feature availability in any way -- there is nothing in this module to check, by design", () => {
-    // This test exists to document the contract: flipping the toggle only ever changes what
-    // isToolBonusActive returns. There is no other exported predicate this toggle feeds into.
-    const anyModule = ToolsModule as unknown as Record<string, unknown>;
-    expect(anyModule.isFeatureAvailable).toBeUndefined();
+  it("when false, every application feature is available too", () => {
+    // Under the new contract isFeatureAvailable is isToolBonusActive, so a player who opts out
+    // of the grind opts every feature on as well. Intended -- no special-casing anywhere.
+    const nothingUnlockedYet = freshState({ toolProgressionEnabled: false });
+    for (const def of TOOL_DEFINITIONS) {
+      expect(isFeatureAvailable(nothingUnlockedYet, def.id)).toBe(true);
+    }
   });
 });
 

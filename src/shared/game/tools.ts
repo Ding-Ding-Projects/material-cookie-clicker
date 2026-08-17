@@ -4,9 +4,10 @@ import type { GameState } from "./types.js";
 /**
  * The Tools tech tree turns the application's OWN canonical features (Command Palette,
  * Regex Builder, Local History, and so on) into in-game unlockables the player discovers by
- * playing. This is flavour and a mechanical bonus layered on top of features that already
- * exist and are already fully available — see the `gatesApplicationFeature` contract below,
- * which is the load-bearing safety property of this whole module.
+ * playing. As of the owner's decision on 2026-08-16 a tool is no longer just flavour plus a
+ * bonus: it also gates the real application feature behind it — see the
+ * `gatesApplicationFeature` contract below and `isFeatureAvailable`, the single authority
+ * screens consult before opening or enabling a feature.
  */
 
 export type ToolUnlockCondition =
@@ -37,17 +38,18 @@ export interface ToolDefinition {
   readonly unlockCondition: ToolUnlockCondition;
   readonly effect: ToolEffect;
   /**
-   * ALWAYS `false`, structurally. A tool's unlock condition and effect govern only in-game
-   * surfacing (does the player see a "discovered!" toast, does the bonus apply) and a
-   * gameplay bonus — they NEVER gate whether the real application feature is reachable.
-   * The application's own completeness contract requires every canonical feature (Command
-   * Palette, Regex Builder, Local History, ...) to be fully available from settings and the
-   * command palette at all times, unlocked or not, grinding or no grinding. This field exists
-   * so that fact is encoded in the domain's types rather than trusted to a comment alone —
-   * see `isToolBonusActive` below for the one place this state is legitimately read, and note
-   * there is deliberately no `isFeatureAvailable`-shaped counterpart anywhere in this module.
+   * ALWAYS `true`, structurally. A tool gate governs the REAL application feature behind it:
+   * the canonical feature a tool is named for (Command Palette, Regex Builder, Local History,
+   * ...) is not reachable until that tool's bonus is active — either bought early through the
+   * Tools shop (tool-shop.ts) or naturally unlocked by meeting its condition. Feature
+   * availability is exactly `isFeatureAvailable` below, which is exactly `isToolBonusActive`;
+   * there is no second, looser notion of "available" anywhere.
+   *
+   * This REVERSES the earlier contract, under which this field was structurally `false` and
+   * every feature was unconditionally available regardless of play. That reversal is an
+   * explicit owner decision made on 2026-08-16, not an accident or a drifted comment.
    */
-  readonly gatesApplicationFeature: false;
+  readonly gatesApplicationFeature: true;
 }
 
 function tool(
@@ -59,7 +61,7 @@ function tool(
   unlockCondition: ToolUnlockCondition,
   effect: ToolEffect,
 ): ToolDefinition {
-  return { id, nameEn, nameYue, flavourEn, flavourYue, unlockCondition, effect, gatesApplicationFeature: false };
+  return { id, nameEn, nameYue, flavourEn, flavourYue, unlockCondition, effect, gatesApplicationFeature: true };
 }
 
 export const TOOL_DEFINITIONS: readonly ToolDefinition[] = [
@@ -271,15 +273,15 @@ function isUnlockConditionMet(condition: ToolUnlockCondition, state: GameState):
 }
 
 /**
- * Whether a tool's GAMEPLAY BONUS is currently active. This is the only predicate this
- * module exposes, deliberately — there is no `isToolFeatureAvailable`-shaped export here,
- * because "is the real application feature reachable" is not a question the game domain is
- * allowed to answer. That answer is always yes, unconditionally, decided entirely outside
- * this module (see `gatesApplicationFeature` above).
+ * Whether a tool's GAMEPLAY BONUS is currently active. This is the single authority for that
+ * question, and — since the 2026-08-16 owner decision recorded on `gatesApplicationFeature`
+ * above — for whether the real application feature behind the tool is reachable too. See
+ * `isFeatureAvailable` below, which is defined as exactly this predicate so the two answers
+ * can never drift apart.
  *
  * When `state.toolProgressionEnabled` is false, every bonus is treated as active regardless
  * of its unlock condition — the player has opted out of the grind and sees everything
- * unlocked, which still has no bearing on feature availability either way.
+ * unlocked, which under the new contract also makes every feature available.
  *
  * A tool bought early through the Tools shop (see tool-shop.ts, `state.purchasedToolIds`) is
  * also active regardless of its unlock condition — buying it is exactly like meeting the
@@ -291,6 +293,22 @@ export function isToolBonusActive(state: GameState, toolId: string): boolean {
   if ((state.purchasedToolIds ?? []).includes(toolId)) return true;
   const def = getToolDefinition(toolId);
   return isUnlockConditionMet(def.unlockCondition, state);
+}
+
+/**
+ * Whether the REAL application feature behind `toolId` is available right now. This is the one
+ * authority screens use to decide whether to open or enable a feature — no screen may reach a
+ * feature by any other test, and there is no looser fallback.
+ *
+ * By the owner's 2026-08-16 decision, feature availability is defined as exactly
+ * `isToolBonusActive`: a feature is reachable once its tool's bonus is active, whether that
+ * came from buying the tool early in the Tools shop or from meeting its unlock condition
+ * naturally. It follows that `state.toolProgressionEnabled === false` — the player setting
+ * that treats every tool bonus as active — makes every feature available as well. That is
+ * intended, and needs no special-casing here because `isToolBonusActive` already folds it in.
+ */
+export function isFeatureAvailable(state: GameState, toolId: string): boolean {
+  return isToolBonusActive(state, toolId);
 }
 
 /** Ids of tools whose unlock condition is newly satisfied but not previously recorded. */

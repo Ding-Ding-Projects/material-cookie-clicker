@@ -10,6 +10,7 @@ import { createSearchState, SearchWithRegexBuilder } from '../components/SearchW
 import { useSelection } from '../components/useSelection.js';
 import { matchesSearch } from '../game/local-regex-search.js';
 import { BULK_COPY, LIST_COPY } from '../game/copy.js';
+import { generatorEmoji } from '../game/emoji.js';
 import { useFastSnapshot, useGameDispatch, useStructureSnapshot } from '../game/GameProvider.js';
 
 /** The tiny leaf that actually depends on live cookies: cost text + the buy button's
@@ -86,7 +87,7 @@ const GeneratorRow = memo(function GeneratorRow({
         aria-label={`Select ${def.nameEn} · 選取${def.nameYue}`}
       />
       <div className="building-row__icon" aria-hidden="true">
-        🏭
+        {generatorEmoji(def.id)}
       </div>
       <div className="building-row__names">
         <span className="building-row__name-en">{def.nameEn}</span>

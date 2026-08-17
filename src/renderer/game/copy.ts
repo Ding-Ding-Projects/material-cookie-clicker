@@ -5,7 +5,7 @@
  * `nameEn`/`nameYue` fields on their domain definitions — see generators.ts, upgrades.ts,
  * achievements.ts and tools.ts — and are read directly from there rather than duplicated here.
  * This module only covers the surrounding UI chrome: tab labels, button labels, empty states,
- * and the fixed contract copy (destructive gates, the tools "open it now" note).
+ * and the fixed contract copy (destructive gates, the tools feature-gate notes).
  *
  * Every string is an `{ en, yue }` pair. Numbers/costs/rates are interpolated as plain values
  * and never themselves translated or altered — only the surrounding prose differs by language.
@@ -70,13 +70,14 @@ export const BULK_COPY = {
 
 export const TOOLS_SCREEN_COPY = {
   principle: {
-    en: "Unlocking a tool here only turns on its game bonus and its tech-tree display. The real application feature has always been available.",
-    yue: "喺呢度解鎖工具淨係開返個遊戲加成同科技樹顯示，真正嘅應用程式功能一直都用得到。",
+    en: "Every app feature here is part of the game: buy or unlock its tool to switch the real feature on. Until then it stays off.",
+    yue: "呢度每個應用程式功能都係遊戲一部分：買咗或者解鎖返隻工具，真正嘅功能先會著。未解鎖之前係熄咗嘅。",
   },
-  openItNow: { en: "Open it now", yue: "而家開啟" },
-  openItNowNote: {
-    en: "This app feature is already available — this button opens it directly, whether or not the tool below is unlocked.",
-    yue: "呢個應用程式功能一直都用得到——呢粒掣可以直接開啟,唔理下面隻工具有冇解鎖。",
+  openFeature: { en: "Open feature", yue: "開啟功能" },
+  featureLocked: { en: "Locked", yue: "未解鎖" },
+  featureGateNote: {
+    en: "This feature is switched off until you buy or unlock this tool.",
+    yue: "買咗或者解鎖咗呢隻工具之前，呢個功能係熄咗嘅。",
   },
   undiscoveredName: { en: "??? Tool", yue: "未發現嘅工具" },
   undiscoveredBody: {
@@ -95,8 +96,8 @@ export const TOOLS_SCREEN_COPY = {
     yue: "已開啟——呢個畫面自己嘅搜尋欄上面就係真正嘅正則表達式產生器。",
   },
   openedGeneric: {
-    en: "This build of Material Cookie Clicker has not wired this feature into its own screen yet — but as the note above says, it was never gated by this tool card either way.",
-    yue: "呢個版本嘅曲奇餅乾點擊器仲未將呢個功能接返自己嘅畫面——不過好似上面講，呢張工具卡從來都冇鎖住呢個功能。",
+    en: "Feature switched on — you own this tool. This build of Material Cookie Clicker has not wired it into a screen of its own yet.",
+    yue: "功能已經著咗——呢隻工具你已經有。不過呢個版本嘅曲奇餅乾點擊器仲未將佢接返自己嘅畫面。",
   },
 } as const satisfies Record<string, Bilingual>;
 

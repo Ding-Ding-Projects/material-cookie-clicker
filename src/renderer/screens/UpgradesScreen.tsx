@@ -9,6 +9,7 @@ import { createSearchState, SearchWithRegexBuilder } from '../components/SearchW
 import { matchesSearch } from '../game/local-regex-search.js';
 import { useSelection } from '../components/useSelection.js';
 import { BULK_COPY, LIST_COPY, type Bilingual } from '../game/copy.js';
+import { upgradeEmoji } from '../game/emoji.js';
 import { useFastSnapshot, useGameDispatch, useStructureSnapshot } from '../game/GameProvider.js';
 
 /** A short, honest one-line effect description — the same shape tool-view-model.ts uses for tools. */
@@ -109,7 +110,7 @@ const UpgradeCard = memo(function UpgradeCard({
         )}
       </div>
       <div className="item-card__icon" aria-hidden="true">
-        ⭐
+        {upgradeEmoji(def)}
       </div>
       <div className="item-card__name-en">{def.nameEn}</div>
       <div className="item-card__name-zh">{def.nameYue}</div>

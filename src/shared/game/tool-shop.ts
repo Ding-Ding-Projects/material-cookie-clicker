@@ -3,11 +3,18 @@ import { isToolBonusActive, TOOL_DEFINITIONS } from "./tools.js";
 import type { GameState } from "./types.js";
 
 /**
- * The Tools shop: a pay-to-skip-the-grind purchase path laid ALONGSIDE each tool's natural
- * unlock condition (tools.ts), never instead of it. A tool's bonus activates automatically the
- * moment its condition is met, exactly as before this module existed; buying it here just lets
- * a player with enough cookies claim that same bonus early, at a cookie price rather than a
- * play-time cost. This is a "sibling lane" (`tool-shop.ts` / `purchasing.ts` / `automation.ts`)
+ * The Tools shop: a purchase path laid ALONGSIDE each tool's natural unlock condition
+ * (tools.ts). A tool's bonus activates automatically the moment its condition is met; buying
+ * it here just lets a player with enough cookies claim that same bonus early, at a cookie
+ * price rather than a play-time cost — either route reaches the identical end state.
+ *
+ * Since the owner's 2026-08-16 decision (see `gatesApplicationFeature` in tools.ts), that end
+ * state is worth more than a multiplier: activating a tool also switches on the REAL
+ * application feature named after it. So a purchase here is not merely skipping the grind for
+ * a bonus, it is the cookie-priced way to turn a feature on, and it is exactly equivalent to
+ * unlocking that feature by play. `isFeatureAvailable(state, toolId)` in tools.ts is the one
+ * authority for whether that feature is reachable, and it reads the same activation state this
+ * module writes. This is a "sibling lane" (`tool-shop.ts` / `purchasing.ts` / `automation.ts`)
  * that never landed on `main` as of this lane's work — see HANDOFF.md — so this file defines the
  * shape this lane needs against the tools contract directly, rather than importing one that
  * does not exist yet. A later merge of the real sibling lane should reconcile against this.

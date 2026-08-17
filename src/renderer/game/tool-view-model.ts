@@ -13,9 +13,11 @@ import type { Bilingual } from "./copy.js";
  * "undiscovered" (name/flavour hidden, matching design/tool-card.html's mystery-card state);
  * once any progress exists it renders as "locked" with a progress readout; once the bonus is
  * active it renders as "unlocked". This is a display classification only — `isToolBonusActive`
- * remains the one and only authority for whether the gameplay bonus applies, and the
- * "open the real feature now" action (see ToolsScreen.tsx) is present and identical in every
- * one of these three states, per the tools contract.
+ * remains the one and only authority for whether the gameplay bonus applies, and its alias
+ * `isFeatureAvailable` is the one and only authority for whether the real application feature
+ * is switched on. The tech tree is real: a tool that is not bought or unlocked leaves BOTH its
+ * gameplay bonus and its application feature off, so ToolsScreen.tsx's "open feature" action is
+ * enabled only on an unlocked card and disabled everywhere else.
  */
 export type ToolRowState = "undiscovered" | "locked" | "unlocked";
 
@@ -31,7 +33,7 @@ export interface ToolRowViewModel {
 function conditionProgress(condition: ToolUnlockCondition, state: GameState): { current: number; target: number; label: Bilingual } {
   switch (condition.kind) {
     case "always":
-      return { current: 1, target: 1, label: { en: "Always available", yue: "一直都用得到" } };
+      return { current: 1, target: 1, label: { en: "Available from the start", yue: "一開始就有" } };
     case "lifetimeCookies": {
       const target = bnToNumber(condition.atLeast);
       const current = Math.min(target, bnToNumber(state.lifetimeCookies));

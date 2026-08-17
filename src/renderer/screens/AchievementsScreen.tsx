@@ -5,22 +5,9 @@ import { bnToNumber } from '../../shared/game/big-number.js';
 import { getGeneratorDefinition } from '../../shared/game/generators.js';
 import { createSearchState, SearchWithRegexBuilder } from '../components/SearchWithRegexBuilder.js';
 import { ACHIEVEMENTS_SCREEN_COPY, LIST_COPY, type Bilingual } from '../game/copy.js';
+import { achievementEmoji } from '../game/emoji.js';
 import { useStructureSnapshot } from '../game/GameProvider.js';
 import { matchesSearch } from '../game/local-regex-search.js';
-
-/** Badge glyph by condition family — purely decorative, hidden from assistive technology. */
-function badgeGlyph(def: AchievementDefinition): string {
-  switch (def.condition.kind) {
-    case 'lifetimeCookies':
-      return '🍪';
-    case 'totalClicks':
-      return '👆';
-    case 'generatorOwned':
-      return '🏭';
-    case 'prestigeCount':
-      return '🌟';
-  }
-}
 
 /** The requirement, described from the STATIC definition alone. Deliberately no live
  *  current-value readout: this grid subscribes only to the structure slice (see store.ts),
@@ -61,7 +48,8 @@ const AchievementCell = memo(function AchievementCell({
             : `${LIST_COPY.locked.en}: ${def.nameEn} — ${requirement.en} · ${LIST_COPY.locked.yue}：${def.nameYue}——${requirement.yue}`
         }
       >
-        <span aria-hidden="true">{unlocked ? badgeGlyph(def) : '🔒'}</span>
+        {/* Decorative only — the badge's accessible name lives on the role="img" wrapper above. */}
+        <span aria-hidden="true">{unlocked ? achievementEmoji(def) : '🔒'}</span>
       </div>
       <span className="achievement-name">{def.nameEn}</span>
       <span className="achievement-name-zh">{def.nameYue}</span>

@@ -3,16 +3,19 @@ import { memo, useState } from 'react';
 import { bnCompare } from '../../shared/game/big-number.js';
 import { formatBigNum } from '../../shared/game/format-number.js';
 import { toolPrice } from '../../shared/game/tool-shop.js';
+import { isFeatureAvailable, TOOL_DEFINITIONS } from '../../shared/game/tools.js';
 import type { GameState } from '../../shared/game/types.js';
 import { createSearchState, SearchWithRegexBuilder } from '../components/SearchWithRegexBuilder.js';
 import { LIST_COPY, TOOLS_SCREEN_COPY, type Bilingual } from '../game/copy.js';
+import { toolEmoji, toolTier } from '../game/emoji.js';
 import { useFastSnapshot, useGameDispatch, useStructureSnapshot } from '../game/GameProvider.js';
 import { matchesSearch } from '../game/local-regex-search.js';
 import { buildAllToolRowViewModels, type ToolRowViewModel } from '../game/tool-view-model.js';
 
-/** Decorative card glyph; the mystery state gets the same treatment as design/tool-card.html. */
+/** Decorative card glyph; the mystery state keeps its ❔ exactly as design/tool-card.html shows,
+ *  and every discovered tool wears its own face from the one emoji table. */
 function toolGlyph(vm: ToolRowViewModel): string {
-  return vm.state === 'undiscovered' ? '❔' : '🧰';
+  return vm.state === 'undiscovered' ? '❔' : toolEmoji(vm.id);
 }
 
 /** What this card is allowed to call itself: undiscovered cards hide name AND flavour. */
@@ -55,21 +58,33 @@ const ToolBuyButton = memo(function ToolBuyButton({ vm }: { vm: ToolRowViewModel
   );
 });
 
-const ToolCard = memo(function ToolCard({ vm }: { vm: ToolRowViewModel }) {
+const ToolCard = memo(function ToolCard({
+  vm,
+  featureAvailable,
+  rosterIndex,
+  rosterSize,
+}: {
+  vm: ToolRowViewModel;
+  featureAvailable: boolean;
+  rosterIndex: number;
+  rosterSize: number;
+}) {
   const [openedMessage, setOpenedMessage] = useState<Bilingual | null>(null);
   const { nameEn, nameYue, body } = visibleName(vm);
   const stateClass = vm.state === 'unlocked' ? ' unlocked' : vm.state === 'undiscovered' ? ' undiscovered locked' : ' locked';
+  // The jewel ladder only shows on cards the player has actually earned: a locked or mystery
+  // card must not leak how far up the roster its prize sits (design/tokens-color.html).
+  const tierClass = vm.state === 'unlocked' ? ` tier${toolTier(vm.def, rosterIndex, rosterSize)}` : '';
 
   function openRealFeature(): void {
-    // The one feature this screen can genuinely present in place is the regex builder — this
-    // very screen's search field carries the real one. Everything else gets the honest
-    // "not wired into a screen of its own yet" note; either way the message proves the
-    // click did something and the feature was never behind this card.
+    // Only reachable when the feature is switched on. The one feature this screen can present
+    // in place is the regex builder — this very screen's search field carries the real one.
+    // Everything else gets the honest "owned, but not wired into a screen of its own yet" note.
     setOpenedMessage(vm.id === 'regexBuilder' ? TOOLS_SCREEN_COPY.openedRegexBuilder : TOOLS_SCREEN_COPY.openedGeneric);
   }
 
   return (
-    <div className={`item-card${stateClass}`}>
+    <div className={`item-card${stateClass}${tierClass}`}>
       <div className="item-card__icon" aria-hidden="true">
         {toolGlyph(vm)}
       </div>
@@ -87,16 +102,25 @@ const ToolCard = memo(function ToolCard({ vm }: { vm: ToolRowViewModel }) {
         <div className="item-card__progress-fill" style={{ width: `${Math.round(vm.progressRatio * 100)}%` }} />
       </div>
       <ToolBuyButton vm={vm} />
-      {/* The always-present, state-identical "the real feature is not locked" callout — the
-          tools contract made visible (see HANDOFF.md and design/tool-card.html). It renders
-          the SAME way on an undiscovered mystery card as on a fully unlocked one. */}
+      {/* The feature callout sits on every card, but it is now a real gate: the button only
+          opens the application feature once `isFeatureAvailable` says the tool is bought or
+          naturally unlocked. A locked or mystery card explains that the feature itself is off
+          and offers no way through. */}
       <div className="open-real-feature">
-        <span className="open-real-feature__note">
-          {TOOLS_SCREEN_COPY.openItNowNote.en} · {TOOLS_SCREEN_COPY.openItNowNote.yue}
-        </span>
-        <button type="button" className="open-real-feature__button" onClick={openRealFeature}>
-          {TOOLS_SCREEN_COPY.openItNow.en} · {TOOLS_SCREEN_COPY.openItNow.yue}
-        </button>
+        {featureAvailable ? (
+          <button type="button" className="open-real-feature__button" onClick={openRealFeature}>
+            {TOOLS_SCREEN_COPY.openFeature.en} · {TOOLS_SCREEN_COPY.openFeature.yue}
+          </button>
+        ) : (
+          <>
+            <span className="feature-gate-note">
+              {TOOLS_SCREEN_COPY.featureGateNote.en} · {TOOLS_SCREEN_COPY.featureGateNote.yue}
+            </span>
+            <button type="button" className="open-real-feature__button" disabled>
+              {TOOLS_SCREEN_COPY.featureLocked.en} · {TOOLS_SCREEN_COPY.featureLocked.yue}
+            </button>
+          </>
+        )}
       </div>
       {openedMessage && (
         <p className="item-card__progress-line" role="status">
@@ -118,10 +142,15 @@ export function ToolsScreen() {
 
   const state: GameState = structure;
   const viewModels = buildAllToolRowViewModels(state);
-  const visible = viewModels.filter((vm) => {
-    const { nameEn, nameYue } = visibleName(vm);
-    return matchesSearch(`${nameEn} ${nameYue}`, search);
-  });
+  // The jewel tier is a property of the fixed roster order, not of what the search happens to
+  // show, so the index is taken from TOOL_DEFINITIONS itself and survives any filtering.
+  const rosterSize = TOOL_DEFINITIONS.length;
+  const visible = viewModels
+    .map((vm, rosterIndex) => ({ vm, rosterIndex, featureAvailable: isFeatureAvailable(state, vm.id) }))
+    .filter(({ vm }) => {
+      const { nameEn, nameYue } = visibleName(vm);
+      return matchesSearch(`${nameEn} ${nameYue}`, search);
+    });
 
   const progressionCopy = state.toolProgressionEnabled ? TOOLS_SCREEN_COPY.progressionToggleOn : TOOLS_SCREEN_COPY.progressionToggleOff;
 
@@ -155,8 +184,8 @@ export function ToolsScreen() {
         </p>
       ) : (
         <div className="card-grid">
-          {visible.map((vm) => (
-            <ToolCard key={vm.id} vm={vm} />
+          {visible.map(({ vm, rosterIndex, featureAvailable }) => (
+            <ToolCard key={vm.id} vm={vm} featureAvailable={featureAvailable} rosterIndex={rosterIndex} rosterSize={rosterSize} />
           ))}
         </div>
       )}

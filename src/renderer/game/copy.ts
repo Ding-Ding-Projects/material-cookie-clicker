@@ -269,6 +269,33 @@ export const SHELL_COPY = {
      featureOpened instead and that honest placeholder has been deleted rather than left behind. */
 } as const satisfies Record<string, Bilingual | ((...args: any[]) => Bilingual)>;
 
+/**
+ * The automatic-update notice (src/renderer/components/UpdateNotice.tsx).
+ *
+ * The warning line is not decoration and is not shortened for layout: this application's
+ * installers and update packages are unsigned permanently (ROADMAP.md), Squirrel checks the
+ * package against the SHA1 in an unsigned `RELEASES` file fetched over HTTPS, and the notice
+ * says that rather than the word "verified". Nothing here is a game control, so nothing here
+ * carries a price — the commodification decrees cover the game's own UI, not the plumbing that
+ * keeps the application current.
+ */
+export const UPDATE_COPY = {
+  readyTitle: {
+    en: "Update ready — restart to install",
+    yue: "更新已備妥——重新啟動就會安裝",
+  },
+  readyTitleVersioned: (version: string): Bilingual => ({
+    en: `Update ready (${version}) — restart to install`,
+    yue: `更新已備妥（${version}）——重新啟動就會安裝`,
+  }),
+  unsignedWarning: {
+    en: "This update is unsigned. It came over HTTPS from this project's GitHub releases and its package matches the hash listed there — nothing proves who built it.",
+    yue: "呢個更新冇簽署。佢經 HTTPS 由本專案嘅 GitHub 發佈頁下載，套件同嗰度列出嘅雜湊值脗合——但冇任何嘢可以證明係邊個整。",
+  },
+  restart: { en: "Restart", yue: "重新啟動" },
+  later: { en: "Later", yue: "遲啲先" },
+} as const satisfies Record<string, Bilingual | ((...args: any[]) => Bilingual)>;
+
 export const COOKIE_SCREEN_COPY = {
   clickTarget: { en: "Click the cookie", yue: "撳曲奇" },
   cookiesLabel: { en: "Cookies", yue: "曲奇" },

@@ -2,11 +2,14 @@ import { contextBridge, ipcRenderer } from 'electron';
 
 import {
   DIESEL_IPC_CHANNELS,
+  UPDATE_IPC_CHANNELS,
+  type UpdateIpcApi,
   type DieselIpcApi,
   type DieselMintRequest,
   type DieselMintResponse,
   type DieselReadResponse,
 } from '../shared/game/ipc-contracts.js';
+import type { UpdateStatus } from '../shared/game/updates.js';
 
 // A deliberately narrow bridge: window-chrome controls, plus the two diesel-exchange calls.
 // The game-state save IPC surface is still not exposed here — the renderer persists to
@@ -34,6 +37,12 @@ export interface MaterialCookieClickerApi {
    * renderer gets no path, no handle and no `fs` — only these two questions.
    */
   diesel: DieselIpcApi;
+  /**
+   * Automatic updates. The renderer may listen and it may ask to restart; it cannot start a
+   * check, cannot see the feed address and cannot install anything itself. The status object it
+   * receives is whatever the main process last decided (src/shared/game/updates.ts).
+   */
+  updates: UpdateIpcApi;
 }
 
 const api: MaterialCookieClickerApi = {
@@ -49,6 +58,17 @@ const api: MaterialCookieClickerApi = {
       ipcRenderer.invoke(DIESEL_IPC_CHANNELS.mint, request) as Promise<DieselMintResponse>,
     read: (): Promise<DieselReadResponse> =>
       ipcRenderer.invoke(DIESEL_IPC_CHANNELS.read) as Promise<DieselReadResponse>,
+  },
+  updates: {
+    onStatus: (listener: (status: UpdateStatus) => void): (() => void) => {
+      // The IpcRendererEvent is deliberately not passed through: the renderer gets the status
+      // value and nothing else — no sender, no ports, no way back up the channel.
+      const handler = (_event: unknown, status: UpdateStatus) => listener(status);
+      ipcRenderer.on(UPDATE_IPC_CHANNELS.status, handler);
+      return () => { ipcRenderer.off(UPDATE_IPC_CHANNELS.status, handler); };
+    },
+    requestStatus: () => ipcRenderer.send(UPDATE_IPC_CHANNELS.requestStatus),
+    restart: () => ipcRenderer.send(UPDATE_IPC_CHANNELS.restart),
   },
 };
 

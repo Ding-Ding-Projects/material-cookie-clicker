@@ -24,6 +24,7 @@ import {
 } from './game/GameProvider';
 import { CONSOLE_EMBLEMS, PanelCorner } from './ConsoleEmblems';
 import { CoinSlot, useControlRung } from './components/CoinSlot';
+import { UpdateNotice } from './components/UpdateNotice';
 import { HUD_COOKIES_TARGET_KEY, PurchaseFxLayer, usePurchaseFxTarget } from './game/purchase-fx';
 import {
   bilingualText,
@@ -810,6 +811,11 @@ function GameShell() {
           </button>
         </div>
       )}
+
+      {/* Application plumbing rather than a game surface: it renders only when the main process
+          says a downloaded update is waiting, and it is free — updates are not a control the
+          owner has put a price on. */}
+      <UpdateNotice />
 
       {/* The medal celebration, cabinet-wide: an achievement unlocks during PLAY, so the toast
           lives on the shell rather than inside the Achievements panel that the player almost

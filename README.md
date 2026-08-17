@@ -64,6 +64,22 @@ Windows installers from this project are **unsigned** and will trigger the
 operating system's unknown-publisher warning. That is expected, and is stated
 plainly rather than worked around.
 
+### Automatic updates
+
+An installed copy checks this repository's GitHub releases for a newer version
+a while after it starts and then roughly every four hours, through the
+Squirrel.Windows updater the installer sets up. It never blocks the game: the
+check and the download happen outside the window, and a failure is a log line.
+When a package has downloaded, a small corner card offers **Restart** or
+**Later**.
+
+Squirrel checks the downloaded package's bytes against the SHA1 recorded for it
+in the `RELEASES` index it fetched over HTTPS, and refuses a package that does
+not match. It cannot check who wrote that index — the artifacts are unsigned
+and permanently will be — so the card says the update is unsigned and that
+nothing proves who built it, rather than the word "verified". Running from
+source has no updater in the process at all; it logs that and shows nothing.
+
 ## Build it yourself
 
 | Script | What it does |

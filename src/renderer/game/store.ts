@@ -42,6 +42,11 @@ const STRUCTURE_KEYS = [
   "achievements",
   "prestige",
   "goldenCookie",
+  // The random-event scheduler: spawns, expiries and every claimed rain drop are discrete
+  // structural changes, and a plain tick that rolls nothing returns the SAME object reference
+  // (see random-events.ts#tickRandomEvents), so the stage does not re-render five times a
+  // second just because the scheduler was asked whether anything should happen.
+  "randomEvents",
   "toolProgressionEnabled",
   // Buying a tool early changes which console emblems progressive disclosure shows (see
   // disclosure.ts#hasDiscoveredATool), so it has to wake the structural slice like any other

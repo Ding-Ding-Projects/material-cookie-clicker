@@ -48,6 +48,7 @@ import { CookieHero } from './screens/CookieHero';
 import { DiscoveryTicket } from './screens/DiscoveryTicket';
 import { ShopRail } from './screens/ShopRail';
 import { PrestigeScreen } from './screens/PrestigeScreen';
+import { RandomEventIndicator, RandomEventStage, RandomEventToast } from './screens/RandomEventStage';
 import { StatisticsScreen } from './screens/StatisticsScreen';
 import { ToolsScreen, type OpenApplicationFeature } from './screens/ToolsScreen';
 import { UpgradeStrip } from './screens/UpgradeStrip';
@@ -115,6 +116,11 @@ function Hud() {
       <HudReadout label={GAME_SURFACE_COPY.hudCookies} value={fast.cookies} fxKey={HUD_COOKIES_TARGET_KEY} />
       {disclosure.perSecondReadout ? <HudReadout label={GAME_SURFACE_COPY.hudPerSecond} value={fast.cps} /> : null}
       {disclosure.perClickReadout ? <HudReadout label={GAME_SURFACE_COPY.hudPerClick} value={clickValue} /> : null}
+      {/* The active random event and how long is left on it (random-events.ts). It renders
+          nothing when nothing is running, so the HUD keeps exactly the shape it always had, and
+          it is not behind progressive disclosure: an event that halves production has to be
+          visible on the save it happens to, including a brand-new one. */}
+      <RandomEventIndicator />
     </div>
   );
 }
@@ -180,6 +186,10 @@ function GameSurface() {
 
   return (
     <div className={`stage${disclosure.shop ? '' : ' stage--solo'}`}>
+      {/* The event layer sits ON the stage, over the cookie and the shop alike, because that is
+          where the falling cookies are falling. It returns null whenever no clickable event is
+          running, so it never takes part in layout. */}
+      <RandomEventStage />
       <div className="stage__hero-column">
         <CookieHero />
         <DiscoveryTicket />
@@ -600,6 +610,10 @@ function GameShell() {
           never has open at that moment. It is aria-hidden — the milestone region below is the
           single spoken announcement. */}
       <AchievementUnlockToast />
+
+      {/* The same treatment for a random event landing. Also aria-hidden: narration.ts already
+          put this event through the one milestone region that speaks. */}
+      <RandomEventToast />
 
       <div className="milestone-region" role="status" aria-live="polite">
         {milestoneMessage ? `${bilingualText(milestoneMessage)}` : ''}

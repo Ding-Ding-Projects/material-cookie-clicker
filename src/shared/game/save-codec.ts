@@ -1,6 +1,25 @@
 import { migrateToLatest, SaveVersionTooNewError } from "./migrations.js";
+import {
+  decodeRandomEvents,
+  encodeRandomEvents,
+  type RandomEventsSaveData,
+} from "./random-events.js";
 import { SaveDataLatestSchema, SaveVersionProbeSchema, type SaveDataLatest } from "./save-schema.js";
 import type { GameState } from "./types.js";
+import type { RandomEventsState } from "./random-events.js";
+
+/**
+ * What actually goes on disk: the versioned schema plus the random-event scheduler's own
+ * optional block (random-events.ts owns that block's schema, its defaulting and its decoding).
+ *
+ * Random-event state is kept OUT of save-schema.ts and out of the version ladder deliberately.
+ * It needs no migration, because "no events have happened" is the correct and complete reading
+ * of any older save; it needs no version bump, because a build that does not know the field
+ * ignores it and a build that does supplies a fresh scheduler when it is missing. Adding a
+ * fifth schema version for a field whose only honest migration is `createInitialRandomEvents-
+ * State()` would be ceremony, not safety.
+ */
+export type SaveDataOnDisk = SaveDataLatest & { readonly randomEvents?: RandomEventsSaveData };
 
 export type DecodeSaveResult =
   | { readonly ok: true; readonly state: GameState }
@@ -29,7 +48,10 @@ export function decodeSave(raw: unknown): DecodeSaveResult {
     if (!parsed.success) {
       return { ok: false, reason: "malformed", detail: parsed.error.message };
     }
-    return { ok: true, state: saveDataToGameState(parsed.data) };
+    // The random-event block rides alongside the validated payload rather than through it:
+    // SaveDataLatestSchema is a strict object and would have stripped an unknown key.
+    const randomEvents = decodeRandomEvents((migrated.data as { randomEvents?: unknown }).randomEvents);
+    return { ok: true, state: saveDataToGameState(parsed.data, randomEvents) };
   } catch (error) {
     if (error instanceof SaveVersionTooNewError) {
       return {
@@ -48,8 +70,9 @@ export function decodeSave(raw: unknown): DecodeSaveResult {
 }
 
 /** Encodes a GameState into JSON-safe save data. The reverse of decodeSave; never throws. */
-export function encodeSave(state: GameState): SaveDataLatest {
+export function encodeSave(state: GameState): SaveDataOnDisk {
   return {
+    randomEvents: encodeRandomEvents(state.randomEvents),
     schemaVersion: state.schemaVersion as 4,
     cookies: state.cookies,
     lifetimeCookies: state.lifetimeCookies,
@@ -72,9 +95,10 @@ export function encodeSave(state: GameState): SaveDataLatest {
   };
 }
 
-function saveDataToGameState(data: SaveDataLatest): GameState {
-  // SaveDataLatest and GameState are structurally identical by construction; this function
-  // exists as the single seam where that assumption is asserted, so a future schema/type
+function saveDataToGameState(data: SaveDataLatest, randomEvents: RandomEventsState): GameState {
+  // SaveDataLatest and GameState are structurally identical by construction APART from
+  // `randomEvents`, which is decoded separately (see SaveDataOnDisk) and grafted on here. This
+  // function stays the single seam where that assumption is asserted, so a future schema/type
   // divergence fails here rather than scattering silent `as GameState` casts everywhere else.
-  return data as unknown as GameState;
+  return { ...(data as unknown as Omit<GameState, "randomEvents">), randomEvents };
 }

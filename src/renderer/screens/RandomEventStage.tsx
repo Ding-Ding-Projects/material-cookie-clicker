@@ -1,6 +1,6 @@
 import { useEffect, useRef, useState, type CSSProperties } from 'react';
 
-import { bnCompare, bnFromNumber } from '../../shared/game/big-number.js';
+import { bnCompare, bnFromNumber, type BigNum } from '../../shared/game/big-number.js';
 import { formatExact, formatExactDigits } from '../../shared/game/format-number.js';
 import {
   BIGGER_WHACK_RADIUS_PX,
@@ -8,13 +8,16 @@ import {
   getRaidConsumableDefinition,
   isRaidConsumableAtCap,
   miceWithinWhackRadius,
+  nextWhackStoragePrice,
   raidConsumablePrice,
+  whackStorageCap,
   RAID_CONSUMABLE_DEFINITIONS,
   remainingFraction,
   remainingMs,
   tasteTestServePayout,
   type ActiveRandomEvent,
   type MousePoint,
+  type RaidConsumablesState,
   type RaidMouse,
   type RandomEventId,
 } from '../../shared/game/random-events.js';
@@ -35,6 +38,7 @@ import {
   showsEnglish,
 } from '../game/copy.js';
 import { describeMilestone, detectMilestones } from '../game/narration.js';
+import { suppliesTargetKey, usePurchaseFxTarget } from '../game/purchase-fx.js';
 import { useGameDispatch, useGameStoreInstance, useStructureSnapshot } from '../game/GameProvider.js';
 import type { Bilingual } from '../game/copy.js';
 
@@ -520,10 +524,111 @@ function MouseRaidStage({ active }: { active: ActiveRandomEvent }) {
  * There is nothing automatic here: no auto-buy, no subscription, no "restock" button. Each pass
  * is one deliberate purchase, exactly like a generator.
  */
+/**
+ * One supply plate: a real buy control, in the coin-press idiom the rest of the cabinet uses.
+ *
+ * Its own component only because each plate registers itself as a purchase-fx target, and a
+ * hook cannot be called inside a `.map`. Everything it decides it decides from the domain —
+ * price, cap, affordability — and everything it does it does by dispatching, so a stale render
+ * cannot buy anything the reducer would refuse.
+ */
+function SupplyPlate({ def, cookies, consumables, cap }: {
+  readonly def: (typeof RAID_CONSUMABLE_DEFINITIONS)[number];
+  readonly cookies: BigNum;
+  readonly consumables: RaidConsumablesState;
+  readonly cap: number;
+}) {
+  const dispatch = useGameDispatch();
+  const fxRef = usePurchaseFxTarget<HTMLSpanElement>(suppliesTargetKey(def.id));
+  const price = raidConsumablePrice(def.id, consumables);
+  const stock = consumables[def.id].stock;
+  const atCap = stock >= cap;
+  const affordable = bnCompare(cookies, price) >= 0;
+  const priceText = formatExact(price, 'en');
+  const definition = getRaidConsumableDefinition(def.id);
+  // The state line and the stock line, each assembled per language before formatting, so
+  // the mode setting reaches these labels the way it reaches the visible spans.
+  const state: Bilingual = atCap
+    ? MOUSE_RAID_COPY.suppliesFull
+    : {
+        en: MOUSE_RAID_COPY.suppliesBuy(formatExact(price, 'en')).en,
+        yue: MOUSE_RAID_COPY.suppliesBuy(formatExact(price, 'yue')).yue,
+      };
+  const stockLine = MOUSE_RAID_COPY.suppliesStock(stock, cap);
+  const label = bilingualText({
+    en: `${def.nameEn} — ${state.en} ${stockLine.en}`,
+    yue: `${def.nameYue}——${state.yue} ${stockLine.yue}`,
+  });
+  return (
+    /* Never `disabled`: the same rule CoinSlot states and the home buy buttons follow.
+       A pass you cannot afford is still where its price is written, the press is
+       refused by the domain, and narration.ts speaks the refusal. */
+    <button
+      type="button"
+      className="raid-supplies__buy"
+      aria-disabled={atCap || !affordable}
+      title={bilingualText({ en: definition.blurbEn, yue: definition.blurbYue })}
+      aria-label={label}
+      onClick={() => dispatch({ type: 'buyRaidConsumable', consumableId: def.id })}
+    >
+      <span className="raid-supplies__name">
+        {showsEnglish() ? <span>{def.nameEn}</span> : null}
+        {showsCantonese() ? <span lang="zh-HK">{def.nameYue}</span> : null}
+      </span>
+      <span className="raid-supplies__stock" ref={fxRef}>
+        {stock} / {cap}
+      </span>
+      <span className="raid-supplies__price">
+        {atCap ? bilingualText(MOUSE_RAID_COPY.suppliesFull) : priceText}
+      </span>
+    </button>
+  );
+}
+
+/**
+ * The storage chip: it reads "Storage 3" and it is ITSELF the ladder's buy control, rather than
+ * a badge beside one. A number a player wants to raise and a button that raises it are the same
+ * thing here, which is one control instead of two and one place to look.
+ */
+function StorageChip({ level, cookies }: { readonly level: number; readonly cookies: BigNum }) {
+  const dispatch = useGameDispatch();
+  const fxRef = usePurchaseFxTarget<HTMLSpanElement>(suppliesTargetKey('storage'));
+  const cap = whackStorageCap(level);
+  const price = nextWhackStoragePrice(level);
+  const maxed = price === null;
+  const affordable = price !== null && bnCompare(cookies, price) >= 0;
+  const nextCap = maxed ? cap : whackStorageCap(level + 1);
+  const label = maxed
+    ? bilingualText(MOUSE_RAID_COPY.storageMax(cap))
+    : bilingualText({
+        en: MOUSE_RAID_COPY.storageBuy(nextCap, formatExact(price, 'en')).en,
+        yue: MOUSE_RAID_COPY.storageBuy(nextCap, formatExact(price, 'yue')).yue,
+      });
+  return (
+    <button
+      type="button"
+      className="raid-supplies__storage"
+      aria-disabled={maxed || !affordable}
+      title={label}
+      aria-label={label}
+      onClick={() => dispatch({ type: 'buyWhackStorage' })}
+    >
+      <span className="raid-supplies__storage-chip" ref={fxRef}>
+        {showsEnglish() ? <span>{MOUSE_RAID_COPY.storageChip(cap).en}</span> : null}
+        {showsCantonese() ? <span lang="zh-HK">{MOUSE_RAID_COPY.storageChip(cap).yue}</span> : null}
+      </span>
+      <span className="raid-supplies__storage-price">
+        {maxed ? bilingualText(MOUSE_RAID_COPY.suppliesFull) : formatExact(price, 'en')}
+      </span>
+    </button>
+  );
+}
+
 export function RaidSuppliesShelf() {
   const structure = useStructureSnapshot();
-  const dispatch = useGameDispatch();
   const consumables = structure.randomEvents.consumables;
+  const level = structure.randomEvents.whackStorageLevel;
+  const cap = whackStorageCap(level);
 
   // The shelf appears once a save is rich enough to be raided at all (the same thousand-cookie
   // floor the raid itself uses) or once one raid has happened, so a fresh game is never shown a
@@ -533,60 +638,21 @@ export function RaidSuppliesShelf() {
 
   return (
     <div className="raid-supplies" role="group" aria-label={bilingualText(MOUSE_RAID_COPY.suppliesLabel)}>
-      <span className="raid-supplies__title">
-        {showsEnglish() ? <span>{MOUSE_RAID_COPY.suppliesLabel.en}</span> : null}
-        {showsCantonese() ? (
-          <span lang="zh-HK">{MOUSE_RAID_COPY.suppliesLabel.yue}</span>
-        ) : null}
-      </span>
+      <div className="raid-supplies__head">
+        <span className="raid-supplies__title">
+          {showsEnglish() ? <span>{MOUSE_RAID_COPY.suppliesLabel.en}</span> : null}
+          {showsCantonese() ? (
+            <span lang="zh-HK">{MOUSE_RAID_COPY.suppliesLabel.yue}</span>
+          ) : null}
+        </span>
+        <StorageChip level={level} cookies={structure.cookies} />
+      </div>
       <ul className="raid-supplies__list">
-        {RAID_CONSUMABLE_DEFINITIONS.map((def) => {
-          const price = raidConsumablePrice(def.id, consumables);
-          const atCap = isRaidConsumableAtCap(def.id, consumables);
-          const affordable = bnCompare(structure.cookies, price) >= 0;
-          const stock = consumables[def.id].stock;
-          const priceText = formatExact(price, 'en');
-          const definition = getRaidConsumableDefinition(def.id);
-          // The state line and the stock line, each assembled per language before formatting, so
-          // the mode setting reaches these labels the way it reaches the visible spans.
-          const state: Bilingual = atCap
-            ? MOUSE_RAID_COPY.suppliesFull
-            : {
-                en: MOUSE_RAID_COPY.suppliesBuy(formatExact(price, 'en')).en,
-                yue: MOUSE_RAID_COPY.suppliesBuy(formatExact(price, 'yue')).yue,
-              };
-          const stockLine = MOUSE_RAID_COPY.suppliesStock(stock, def.stockCap);
-          const label = bilingualText({
-            en: `${def.nameEn} — ${state.en} ${stockLine.en}`,
-            yue: `${def.nameYue}——${state.yue} ${stockLine.yue}`,
-          });
-          return (
-            <li key={def.id}>
-              {/* Never `disabled`: the same rule CoinSlot states and the home buy buttons follow.
-                  A pass you cannot afford is still where its price is written, the press is
-                  refused by the domain, and narration.ts speaks the refusal. */}
-              <button
-                type="button"
-                className="raid-supplies__buy"
-                aria-disabled={atCap || !affordable}
-                title={bilingualText({ en: definition.blurbEn, yue: definition.blurbYue })}
-                aria-label={label}
-                onClick={() => dispatch({ type: 'buyRaidConsumable', consumableId: def.id })}
-              >
-                <span className="raid-supplies__name">
-                  {showsEnglish() ? <span>{def.nameEn}</span> : null}
-                  {showsCantonese() ? <span lang="zh-HK">{def.nameYue}</span> : null}
-                </span>
-                <span className="raid-supplies__stock">
-                  {stock} / {def.stockCap}
-                </span>
-                <span className="raid-supplies__price">
-                  {atCap ? bilingualText(MOUSE_RAID_COPY.suppliesFull) : priceText}
-                </span>
-              </button>
-            </li>
-          );
-        })}
+        {RAID_CONSUMABLE_DEFINITIONS.map((def) => (
+          <li key={def.id}>
+            <SupplyPlate def={def} cookies={structure.cookies} consumables={consumables} cap={cap} />
+          </li>
+        ))}
       </ul>
     </div>
   );

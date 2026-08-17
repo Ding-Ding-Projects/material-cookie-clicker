@@ -18,6 +18,11 @@ import {
   MOUSE_RAID_DEFINITION,
   mouseRaidDefenceReward,
   raidConsumablePrice,
+  whackStorageCap,
+  buyWhackStorage,
+  nextWhackStoragePrice,
+  MAX_WHACK_STORAGE_LEVEL,
+  WHACK_STORAGE_TIERS,
   RAID_CONSUMABLE_DEFINITIONS,
   rollRaidMice,
   tickRandomEvents,
@@ -279,7 +284,7 @@ describe("raid consumables: buying them", () => {
 
   it("refuses to stock more than the cap, however rich the player is", () => {
     let consumables = createInitialRaidConsumables();
-    const cap = getRaidConsumableDefinition("whack_pass").stockCap;
+    const cap = whackStorageCap(0);
     for (let i = 0; i < cap + 5; i += 1) {
       consumables = buyRaidConsumable(consumables, "whack_pass", bnFromNumber(1e30)).consumables;
     }
@@ -288,10 +293,14 @@ describe("raid consumables: buying them", () => {
     expect(isRaidConsumableAtCap("whack_pass", consumables)).toBe(true);
   });
 
-  it("caps every kind, so no consumable is immunity", () => {
+  it("caps every kind off the one shared ladder, so no consumable is immunity", () => {
+    let consumables = createInitialRaidConsumables();
     for (const def of RAID_CONSUMABLE_DEFINITIONS) {
-      expect(def.stockCap).toBeGreaterThan(0);
-      expect(def.stockCap).toBeLessThanOrEqual(3);
+      for (let i = 0; i < whackStorageCap(0) + 3; i += 1) {
+        consumables = buyRaidConsumable(consumables, def.id, bnFromNumber(1e30)).consumables;
+      }
+      expect(consumables[def.id].stock).toBe(whackStorageCap(0));
+      expect(isRaidConsumableAtCap(def.id, consumables)).toBe(true);
     }
   });
 
@@ -316,6 +325,123 @@ describe("raid consumables: buying them", () => {
 });
 
 /* ------------------------------------------------------------------------ spending them */
+
+describe("whack storage: the shared cap ladder", () => {
+  it("starts at the cap the game always had and climbs to eight", () => {
+    expect(whackStorageCap(0)).toBe(3);
+    expect(whackStorageCap(1)).toBe(5);
+    expect(whackStorageCap(MAX_WHACK_STORAGE_LEVEL)).toBe(8);
+    // A level from a future build, or a nonsense one, reads as the top rung rather than throwing.
+    expect(whackStorageCap(99)).toBe(8);
+    expect(whackStorageCap(-4)).toBe(3);
+  });
+
+  it("prices each rung literally and has nothing to sell at the top", () => {
+    expect(bnToNumber(nextWhackStoragePrice(0)!)).toBe(5_000_000);
+    expect(bnToNumber(nextWhackStoragePrice(1)!)).toBe(25_000_000);
+    expect(nextWhackStoragePrice(MAX_WHACK_STORAGE_LEVEL)).toBeNull();
+    // The ladder only ever climbs, in cap and in price.
+    for (let i = 1; i < WHACK_STORAGE_TIERS.length; i += 1) {
+      expect(WHACK_STORAGE_TIERS[i].cap).toBeGreaterThan(WHACK_STORAGE_TIERS[i - 1].cap);
+      expect(WHACK_STORAGE_TIERS[i].cost).toBeGreaterThan(WHACK_STORAGE_TIERS[i - 1].cost);
+    }
+  });
+
+  it("buys a rung when the cookies are there, refuses when they are not, and stops at the top", () => {
+    expect(buyWhackStorage(0, bnFromNumber(4_999_999)).bought).toBe(false);
+    const first = buyWhackStorage(0, bnFromNumber(5_000_000));
+    expect(first.bought).toBe(true);
+    expect(first.level).toBe(1);
+    expect(buyWhackStorage(MAX_WHACK_STORAGE_LEVEL, bnFromNumber(1e30)).bought).toBe(false);
+  });
+
+  it("raises the cap for ALL THREE consumables at every rung, one shelf rather than three", () => {
+    for (let level = 0; level <= MAX_WHACK_STORAGE_LEVEL; level += 1) {
+      const cap = whackStorageCap(level);
+      for (const def of RAID_CONSUMABLE_DEFINITIONS) {
+        let consumables = createInitialRaidConsumables();
+        for (let i = 0; i < cap + 3; i += 1) {
+          consumables = buyRaidConsumable(consumables, def.id, bnFromNumber(1e40), level).consumables;
+        }
+        expect(consumables[def.id].stock).toBe(cap);
+        expect(isRaidConsumableAtCap(def.id, consumables, level)).toBe(true);
+      }
+    }
+  });
+
+  it("stocks a fourth pass only after the ladder rung that allows it", () => {
+    let consumables = createInitialRaidConsumables();
+    for (let i = 0; i < 3; i += 1) {
+      consumables = buyRaidConsumable(consumables, "whack_pass", bnFromNumber(1e30)).consumables;
+    }
+    expect(buyRaidConsumable(consumables, "whack_pass", bnFromNumber(1e30), 0).bought).toBe(false);
+    const allowed = buyRaidConsumable(consumables, "whack_pass", bnFromNumber(1e30), 1);
+    expect(allowed.bought).toBe(true);
+    expect(allowed.consumables.whack_pass.stock).toBe(4);
+  });
+
+  it("buys from the shelf through the reducer: cookies leave, stock rises, price escalates", () => {
+    const start = producing(1e12);
+    const priceBefore = raidConsumablePrice("whack_pass", start.randomEvents.consumables);
+    const after = applyGameAction(start, { type: "buyRaidConsumable", consumableId: "whack_pass" }, ctxAt(1));
+    expect(after.randomEvents.consumables.whack_pass.stock).toBe(1);
+    expect(bnToNumber(after.cookies)).toBeCloseTo(1e12 - bnToNumber(priceBefore), 0);
+    const priceAfter = raidConsumablePrice("whack_pass", after.randomEvents.consumables);
+    expect(bnToNumber(priceAfter)).toBeCloseTo(
+      bnToNumber(priceBefore) * getRaidConsumableDefinition("whack_pass").costRatio,
+      0,
+    );
+  });
+
+  it("buys a storage rung through the reducer, and refuses one it cannot pay for", () => {
+    const rich = producing(1e12);
+    const upgraded = applyGameAction(rich, { type: "buyWhackStorage" }, ctxAt(1));
+    expect(upgraded.randomEvents.whackStorageLevel).toBe(1);
+    expect(bnToNumber(upgraded.cookies)).toBeCloseTo(1e12 - 5_000_000, 0);
+
+    const poor = producing(10);
+    expect(applyGameAction(poor, { type: "buyWhackStorage" }, ctxAt(1))).toBe(poor);
+  });
+
+  it("enforces the reducer's cap at each rung the player has actually bought", () => {
+    let state = producing(1e30);
+    const fill = () => {
+      for (let i = 0; i < 12; i += 1) {
+        state = applyGameAction(state, { type: "buyRaidConsumable", consumableId: "whack_pass" }, ctxAt(1));
+      }
+    };
+    fill();
+    expect(state.randomEvents.consumables.whack_pass.stock).toBe(3);
+    state = applyGameAction(state, { type: "buyWhackStorage" }, ctxAt(1));
+    fill();
+    expect(state.randomEvents.consumables.whack_pass.stock).toBe(5);
+    state = applyGameAction(state, { type: "buyWhackStorage" }, ctxAt(1));
+    fill();
+    expect(state.randomEvents.consumables.whack_pass.stock).toBe(8);
+    expect(state.randomEvents.whackStorageLevel).toBe(MAX_WHACK_STORAGE_LEVEL);
+  });
+
+  it("survives the save seam, and salvages the paid-for rung when the rest is rubbish", () => {
+    const state: RandomEventsState = {
+      ...createInitialRandomEventsState(),
+      consumables: stocked({ whack_pass: 2 }),
+      whackStorageLevel: 2,
+    };
+    expect(decodeRandomEvents(encodeRandomEvents(state))).toEqual(state);
+
+    const wrecked = { ...(encodeRandomEvents(state) as object), nextEligibleAtEpochMs: "not a number" };
+    const salvaged = decodeRandomEvents(wrecked);
+    expect(salvaged.whackStorageLevel).toBe(2);
+    expect(salvaged.consumables.whack_pass.stock).toBe(2);
+  });
+
+  it("reads a sidecar written before the ladder existed as the cap the game always had", () => {
+    const legacy = { ...(encodeRandomEvents(createInitialRandomEventsState()) as Record<string, unknown>) };
+    delete legacy.whackStorageLevel;
+    expect(decodeRandomEvents(legacy).whackStorageLevel).toBe(0);
+    expect(whackStorageCap(decodeRandomEvents(legacy).whackStorageLevel)).toBe(3);
+  });
+});
 
 describe("raid consumables: when they are spent", () => {
   it("arms the two whack consumables at spawn and takes them out of stock", () => {

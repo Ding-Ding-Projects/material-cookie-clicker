@@ -87,6 +87,26 @@ lands. The pattern and the sample text were typed in as real key events. The
 image is a Win32 `PrintWindow` capture of that one window, resolved by title and
 class, and it was opened and looked at afterwards.
 
+### The raid supplies shelf
+
+| File | What it shows |
+| --- | --- |
+| `whack-storage.png` | The HUD's `RAID SUPPLIES` shelf after two real purchases: a Whack Pass standing at `1 / 5` with its next price already stepped up to `4,000,000`, and the `Storage 5` chip beside the shelf title asking `25,000,000` for the last rung. The other two plates read `0 / 5` — the cap is one shared ladder, so buying it once raised all three at once. |
+
+**How this one was taken.** From the built `dist/`, launched by the real
+`electron` binary onto an off-screen Windows desktop named `WhackStoreCapture`,
+on its own debugging port (9731) and its own throwaway `--user-data-dir`, with the
+page target's URL verified as this worktree's `dist/renderer/index.html` first.
+The save was seeded by `scripts/capture-seed-whack-storage.test.ts` with 50,000,000
+cookies and NOTHING bought on the shelf — the stock started at `0 / 3` and the
+storage chip at rung zero. Both purchases were then made inside the running
+application with real Win32 presses on the real controls: one press on the Whack
+Pass plate (`0 / 3` → `1 / 3`, price `1,000,000` → `4,000,000`) and one on the
+storage chip (`Storage 3` → `Storage 5`). The balance falling from 50,000,000 is
+the receipt. The image is a `PrintWindow` capture of that one window, resolved by
+handle from the headless desktop's own window list, and it was opened and looked
+at afterwards.
+
 ### The frenzy-class events
 
 | File | What it shows |

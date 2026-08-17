@@ -426,6 +426,7 @@ describe("random events: configuration and persistence", () => {
       lastRaid: null,
       raidCount: 0,
       consumables: createInitialRaidConsumables(),
+      whackStorageLevel: 0,
     };
     expect(decodeRandomEvents(encodeRandomEvents(state))).toEqual(state);
   });

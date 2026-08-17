@@ -19,6 +19,7 @@ export {
   controlTargetKey,
   generatorTargetKey,
   upgradeTargetKey,
+  suppliesTargetKey,
 } from './purchase-fx-core.js';
 
 /**

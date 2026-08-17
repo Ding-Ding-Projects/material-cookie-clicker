@@ -6,6 +6,7 @@ import { formatExact } from "../../shared/game/format-number.js";
 import {
   getRandomEventDefinition,
   getRaidConsumableDefinition,
+  whackStorageCap,
   type MouseRaidOutcome,
   type RaidConsumableId,
   type RandomEventId,
@@ -77,6 +78,7 @@ export type MilestoneEvent =
   | { readonly kind: "home-furniture-bought"; readonly furnitureId: string }
   | { readonly kind: "home-room-completed"; readonly roomId: string }
   | { readonly kind: "raid-consumable-bought"; readonly consumableId: RaidConsumableId }
+  | { readonly kind: "whack-storage-bought"; readonly cap: number }
   /**
    * A press the domain refused. CoinSlot already prints its own refusal into its own status
    * span (CoinSlot.tsx), and the rule it set is the one followed here: a purchase button that
@@ -205,7 +207,22 @@ export function detectMilestones(previous: GameState, next: GameState, action: G
         kind: "purchase-refused",
         nameEn: def.nameEn,
         nameYue: def.nameYue,
-        reason: before >= def.stockCap ? "cap" : "afford",
+        reason: before >= whackStorageCap(previous.randomEvents.whackStorageLevel) ? "cap" : "afford",
+      });
+    }
+  }
+
+  if (action.type === "buyWhackStorage") {
+    const before = previous.randomEvents.whackStorageLevel;
+    const after = next.randomEvents.whackStorageLevel;
+    if (after > before) {
+      events.push({ kind: "whack-storage-bought", cap: whackStorageCap(after) });
+    } else {
+      events.push({
+        kind: "purchase-refused",
+        nameEn: "Whack Storage",
+        nameYue: "裝備倉",
+        reason: "afford",
       });
     }
   }
@@ -326,6 +343,12 @@ export function describeMilestone(event: MilestoneEvent): Bilingual {
     case "raid-consumable-bought": {
       const def = getRaidConsumableDefinition(event.consumableId);
       return { en: `Bought ${def.nameEn}.`, yue: `買咗${def.nameYue}。` };
+    }
+    case "whack-storage-bought": {
+      return {
+        en: `Whack Storage upgraded — you can hold ${event.cap} of each raid supply now.`,
+        yue: `裝備倉升咗級——每樣防鼠裝備而家可以擺 ${event.cap} 件。`,
+      };
     }
     case "purchase-refused": {
       if (event.reason === "cap") {

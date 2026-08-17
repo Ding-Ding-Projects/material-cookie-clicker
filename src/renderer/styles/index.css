@@ -8281,6 +8281,74 @@ ul.card-grid {
   font-variant-numeric: tabular-nums;
 }
 
+/* ============================================================================================
+   THE WHACK STORAGE CHIP — additive, and kept beside the shelf it belongs to rather than at
+   the end of the sheet: everything past the look ladder's own section down there is colour,
+   border and shadow only, and a control's size may not be written in it.
+
+   The shelf's three plates were already buttons; the only new control is the storage chip, and
+   it is styled as a chip rather than a fourth plate because it is not a fourth thing to hold.
+   It sits on the shelf's own title row, reads "Storage 3", and pressing it buys the next rung.
+   Same 44px floor, same disabled-but-visible rule: a rung you cannot afford still prints its
+   price, because a price is information.
+   ========================================================================================== */
+
+.raid-supplies__head {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+}
+
+.raid-supplies__storage {
+  min-height: 44px;
+  margin-left: auto;
+  padding: 2px 10px;
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  cursor: pointer;
+  border: 2px solid var(--cabinet-frame-dark);
+  border-radius: 999px;
+  background: var(--surface-lowest);
+  color: var(--on-surface);
+  font: inherit;
+  box-shadow: 0 3px 0 0 var(--cabinet-frame-dark);
+}
+
+.raid-supplies__storage:hover:not([aria-disabled='true']) {
+  background: var(--spark);
+}
+
+.raid-supplies__storage:active:not([aria-disabled='true']) {
+  transform: translateY(3px);
+  box-shadow: inset 0 3px 0 0 var(--bevel-hi);
+}
+
+.raid-supplies__storage[aria-disabled='true'] {
+  opacity: 0.55;
+  cursor: default;
+}
+
+.raid-supplies__storage:focus-visible {
+  outline: 4px solid var(--spark-ring);
+  outline-offset: 2px;
+}
+
+.raid-supplies__storage-chip {
+  display: flex;
+  gap: 6px;
+  font-size: 11px;
+  font-weight: 900;
+  letter-spacing: 0.04em;
+}
+
+.raid-supplies__storage-price {
+  font-size: 11px;
+  font-weight: 700;
+  font-variant-numeric: tabular-nums;
+  opacity: 0.85;
+}
+
 /* --- The fat mouse ---------------------------------------------------------------------- */
 
 /* Bigger, and outlined more heavily, because it is worth double in the theft split and takes

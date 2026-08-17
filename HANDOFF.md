@@ -49,7 +49,7 @@ X yet", that is this contract being eroded.
 
 | Thing | Evidence |
 | --- | --- |
-| Project test suite | **15 files, 235 tests, all passing** (`npx vitest run tests`) |
+| Project test suite | **26 files, 590 tests, all passing** (`npx vitest run tests`) |
 | `packages/surface-kernel` | **89 tests passing** (`npm test` in that package) |
 | `packages/local-ollama` | **37 tests passing** — previously unverifiable, now green once the workspace was wired |
 | Smoke test | **7/7** (`npm run smoke`) |
@@ -116,11 +116,40 @@ about.
 
 ### Settings, language mode and the funny levels
 
-There IS a settings surface now: a fifth console emblem (a gear), visible from
+There IS a settings surface now: a console emblem (a gear), on the console from
 the first frame of a brand-new save because Settings is an application surface
 and progressive disclosure does not apply to it — asserted in
 `tests/game/settings.test.ts`, which also fails if a `settings` key ever appears
 in the disclosure record.
+
+**It is now BOUGHT, by owner decree** ("settings still appearing" /
+"needs to be purchased"). The emblem is the `settings.open` control, 25 cookies,
+and until it is paid for that position on the console holds the ordinary
+coin-slot plate with the figure printed on it, which buys itself when pressed.
+Priced is not progress-gated, and the distinction is the point: no milestone, no
+tool and no unlock stands in front of it, so any save can buy it as soon as it
+has clicked 25 cookies — under a minute from a cold start. It is a till, not a
+grind.
+
+The boundary that used to justify keeping Settings free — the price list lives
+in it — was answered rather than waved away: **the controls catalogue is now its
+own free console button** (`console-panels.ts#CATALOGUE_PANEL_ID`), appended
+unconditionally beside the Settings slot and never sold at any price, and still
+also rendered at the bottom of the Settings panel. A save with zero cookies can
+read every price in the game, including the 25 that Settings costs.
+
+**English is the default language and is free forever.** Cantonese and Bilingual
+are separate purchases (`settings.language.yue`, 40; `settings.language.both`,
+90). Until bought they appear as coin-slot plates inside the language switch,
+and `effectiveLanguageMode` renders English whenever the stored preference is a
+mode the save does not own — without rewriting the stored preference, which is
+still the player's choice.
+
+Migration: schema version 7 exists for exactly this. A save above the same
+thousand-lifetime-cookie threshold the v6 grant used is handed
+`settings.open`, `settings.language.yue` and `settings.language.both` and
+nothing else (`migrations.ts#migrateV6ToV7`, frozen list
+`V7_GRANDFATHERED_RUNG_IDS`).
 
 What is real:
 
@@ -135,10 +164,16 @@ What is real:
   `material-cookie-clicker:settings:v1`), so a save wipe never resets the
   language somebody reads the app in. Verified by relaunching the built app
   against the same profile and finding it still in Cantonese-only mode.
-- **"Open it now" on a tool card now opens Settings** and highlights the
-  closest row, instead of announcing that no surface exists. It still consults
-  nothing: `openFeatureRequest` in `console-panels.ts` does not take the game
-  state.
+- **"Open it now" on a tool card opens Settings** and highlights the closest
+  row — when Settings has been bought. When it has not, the press surfaces the
+  PURCHASE instead of silently failing: the status region announces the control
+  and its literal price, and focus moves to the coin-slot plate on the console
+  that sells it. `console-panels.ts#openFeatureOutcome` is the pure decision and
+  takes one boolean — whether the rung is owned — and still never consults the
+  tech tree. The callout carries one extra honest line saying so, with the
+  figure in it, while Settings is unbought. The tools contract is unchanged: no
+  application feature is gated behind the tech tree. This one has a price on the
+  door, which is a different thing and is written down as such.
 
 What is stored but not yet visible:
 

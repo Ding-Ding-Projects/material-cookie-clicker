@@ -3,6 +3,7 @@ import { memo, useMemo, useState } from 'react';
 import { bnCompare, bnToNumber } from '../../shared/game/big-number.js';
 import { formatExact, formatExactDigits } from '../../shared/game/format-number.js';
 import { GENERATOR_DEFINITIONS } from '../../shared/game/generators.js';
+import { controlRungPrice } from '../../shared/game/control-unlocks.js';
 import { toolPrice } from '../../shared/game/tool-shop.js';
 import { TOOL_DEFINITIONS, type ToolDefinition, type ToolUnlockCondition } from '../../shared/game/tools.js';
 import { ToolIcon, ToolTierGem } from '../assets/icons.js';
@@ -10,6 +11,7 @@ import { CoinSlot, useControlRung } from '../components/CoinSlot.js';
 import { createSearchState, SearchWithRegexBuilder } from '../components/SearchWithRegexBuilder.js';
 import { showsEnglish, showsCantonese, bilingualText, LIST_COPY, TOOLS_SCREEN_COPY, type Bilingual } from '../game/copy.js';
 import { useFastSnapshot, useGameDispatch, useStructureSnapshot } from '../game/GameProvider.js';
+import { SETTINGS_OPEN_RUNG_ID } from '../game/console-panels.js';
 import { matchesSearch } from '../game/local-regex-search.js';
 import { buildToolRowViewModel, type ToolRowViewModel } from '../game/tool-view-model.js';
 
@@ -92,8 +94,19 @@ type NodeState = 'undiscovered' | 'locked' | 'ready' | 'unlocked';
 /**
  * The always-present escape hatch from the lock. Rendered identically, and always enabled, in
  * all four node states — an undiscovered card gets exactly the same one as a fully unlocked one.
+ *
+ * WHAT THE OWNER'S DECREE CHANGED HERE, and what it did not. It did not change the tech-tree
+ * contract: no application feature is gated behind this tree, and this button is live in every
+ * node state exactly as before. What it changed is that the destination — the Settings panel —
+ * is now a 25-cookie purchase (control-unlocks.ts#settings.open). So while that is unbought the
+ * callout gains ONE honest line saying so with the figure in it, and the press surfaces the
+ * purchase (App.tsx#openApplicationFeature) rather than pretending to open something. Priced is
+ * not gated: any save can pay it whenever it has the cookies, and the price is free to read in
+ * the prices catalogue on the console.
  */
 function OpenItNowCallout({ def, onOpen }: { def: ToolDefinition; onOpen: OpenApplicationFeature }) {
+  const settingsBought = useControlRung(SETTINGS_OPEN_RUNG_ID);
+  const buttonBought = useControlRung('tools.openItNow');
   return (
     <div className="open-real-feature">
       <span className="open-real-feature__badge">
@@ -102,14 +115,26 @@ function OpenItNowCallout({ def, onOpen }: { def: ToolDefinition; onOpen: OpenAp
       <span className="open-real-feature__note">
         {bilingualText(TOOLS_SCREEN_COPY.openItNowNote)}
       </span>
-      <button
-        type="button"
-        className="open-real-feature__button"
-        onClick={() => onOpen(def.id, def)}
-        aria-label={`${TOOLS_SCREEN_COPY.openItNow.en} — ${def.nameEn} · ${TOOLS_SCREEN_COPY.openItNow.yue} — ${def.nameYue}`}
-      >
-        {bilingualText(TOOLS_SCREEN_COPY.openItNow)}
-      </button>
+      {settingsBought ? null : (
+        <span className="open-real-feature__note open-real-feature__note--priced">
+          {bilingualText(TOOLS_SCREEN_COPY.openItNowPriced(formatExactDigits(controlRungPrice(SETTINGS_OPEN_RUNG_ID))))}
+        </span>
+      )}
+      {buttonBought ? (
+        <button
+          type="button"
+          className="open-real-feature__button"
+          onClick={() => onOpen(def.id, def)}
+          aria-label={`${TOOLS_SCREEN_COPY.openItNow.en} — ${def.nameEn} · ${TOOLS_SCREEN_COPY.openItNow.yue} — ${def.nameYue}`}
+        >
+          {bilingualText(TOOLS_SCREEN_COPY.openItNow)}
+        </button>
+      ) : (
+        /* Priced by decree ("must be bought"): one purchase covers the button on every card.
+           The plate is the same coin slot as everywhere; the feature behind it stays reachable
+           through Settings regardless — this sells the shortcut, not the feature. */
+        <CoinSlot rungId="tools.openItNow" variant="inline" className="open-real-feature__slot" />
+      )}
     </div>
   );
 }

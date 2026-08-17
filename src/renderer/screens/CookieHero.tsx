@@ -3,6 +3,7 @@ import { useEffect, useMemo, useRef, useState, type CSSProperties } from 'react'
 import { bnMulScalar } from '../../shared/game/big-number.js';
 import { formatBigNum } from '../../shared/game/format-number.js';
 import { isEffectActive } from '../../shared/game/golden-cookie.js';
+import { GOLDEN_COOKIE_REDEEM_CLICKS } from '../../shared/game/reducer.js';
 import { computeMultipliers } from '../../shared/game/upgrades.js';
 import { computeDisclosure } from '../../shared/game/disclosure.js';
 import { HeroCookieArt } from '../assets/icons.js';
@@ -43,6 +44,7 @@ export function CookieHero() {
   const lastPointRef = useRef<{ x: number; y: number } | null>(null);
 
   const goldenActive = structure.goldenCookie.isSpawned;
+  const goldenPresses = structure.goldenCookie.redeemClicks ?? 0;
   // Progressive disclosure (src/shared/game/disclosure.ts): a fresh save is the cookie alone.
   // The per-second line arrives with the first generator, and press-and-hold — plus the hint
   // that teaches it — only after the Steady Hand reveal upgrade is bought.
@@ -134,6 +136,14 @@ export function CookieHero() {
             Pure CSS: a repeating conic gradient behind a ring mask. Under reduced motion it stays
             fully visible but stops rotating, exactly as the spec calls for. */}
         {goldenActive ? <span className="golden-rays" aria-hidden="true" /> : null}
+        {/* Ten presses to redeem (reducer.ts GOLDEN_COOKIE_REDEEM_CLICKS): the countdown is on
+            the surface so nobody wonders why one press did nothing. aria-hidden — the same
+            figure is appended to the button's accessible name below via the wrap's label. */}
+        {goldenActive ? (
+          <span className="golden-press-count" role="status">
+            {GOLDEN_COOKIE_REDEEM_CLICKS - goldenPresses}
+          </span>
+        ) : null}
         {/* Oven embers drifting up behind the cookie. Decorative, and still under reduced motion.
             Six motes now rather than three, in two depth bands: the three carrying
             `--far` are smaller, dimmer, slightly blurred and drift slower, so the air in front

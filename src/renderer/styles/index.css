@@ -967,6 +967,10 @@ body {
   right: 22px;
   top: 160px;
   width: min(760px, calc(100vw - 44px));
+  /* A real height, not just a cap: the panel used to size to its content, so a dialog whose
+     first paint was short opened as a strip ("opens too small"). It now opens at full working
+     height and the screen inside scrolls. */
+  height: calc(100vh - 200px);
   max-height: calc(100vh - 200px);
   display: flex;
   flex-direction: column;
@@ -7091,6 +7095,12 @@ ul.card-grid {
   display: flex;
   flex-direction: column;
   gap: 18px;
+  /* Same internal-scroll recipe as .screen/.settings-screen: without it the anchored panel's
+     overflow:hidden clips the production floor ("diesel factory not scrollable"). */
+  flex: 1;
+  min-height: 0;
+  overflow-y: auto;
+  padding: 18px 22px 28px;
 }
 
 .factory-lede {
@@ -8915,6 +8925,12 @@ ul.card-grid {
   display: flex;
   flex-direction: column;
   gap: 14px;
+  /* The internal-scroll recipe every dialog screen needs (owner: "almost all dialogs not
+     scrollable"). The anchored panel clips overflow, so the screen root must scroll itself. */
+  flex: 1;
+  min-height: 0;
+  overflow-y: auto;
+  padding: 18px 22px 28px;
 }
 
 .home-lede {
@@ -9465,6 +9481,92 @@ ul.card-grid {
 .controls-catalogue__rung[data-state='owned'] .controls-catalogue__rung-detail {
   opacity: 0.62;
 }
+
+/* ── GOLDEN PRESS COUNTDOWN ──────────────────────────────────────────────────────────────────
+   Ten presses to redeem; the remaining count sits on the golden cookie as a stamped counter so
+   the first press reading as "nothing happened" is impossible. Static under reduced motion. */
+.golden-press-count {
+  position: absolute;
+  top: 8%;
+  right: 12%;
+  min-width: 44px;
+  min-height: 44px;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  border: var(--border-chunky) solid var(--spark-ring);
+  border-radius: var(--shape-full);
+  background: var(--tertiary-container);
+  color: var(--on-tertiary-container);
+  font-family: var(--font-display);
+  font-size: 22px;
+  font-variant-numeric: tabular-nums;
+  box-shadow: 0 4px 0 0 var(--tertiary-shadow);
+  pointer-events: none;
+  z-index: 3;
+}
+
+/* ─────────────────────────────────────────────────────────────────────────────────────────────
+   THE PRICED SETTINGS EMBLEM, AND THE PRICED LANGUAGE MODES.
+
+   Both are the ordinary coin-slot plate (components/CoinSlot.tsx) standing exactly where the
+   control it sells would stand, so these rules only size it to the hole it is filling. Nothing
+   here changes the plate's colours, its focus ring or its 44px target — the plate is the same
+   object everywhere in the app on purpose, and a player who has learned what one looks like on
+   the title bar should recognise this one on the console without being told.
+   ───────────────────────────────────────────────────────────────────────────────────────────── */
+.console__coin-slot {
+  /* Matches .console__button's footprint so the console row does not change shape when the
+     emblem is bought — the buttons beside it must not shuffle sideways at the moment of sale. */
+  width: 96px;
+  align-items: stretch;
+}
+
+.console__coin-slot .coin-slot {
+  width: 100%;
+  min-height: 44px;
+  flex-direction: column;
+  gap: 3px;
+  padding: 6px 4px;
+  justify-content: center;
+  text-align: center;
+}
+
+.console__coin-slot .coin-slot__name {
+  font-family: var(--font-display);
+  font-size: 8px;
+  font-weight: 900;
+  letter-spacing: 0.06em;
+  text-transform: uppercase;
+  line-height: 1.1;
+}
+
+.console__coin-slot .coin-slot__price {
+  font-size: 10px;
+}
+
+/* In the language switch the plate takes the same share of the row as the mode button it
+   replaces, so the segmented switch keeps its three equal columns whatever is bought. */
+.settings-modes__slot {
+  flex: 1 1 0;
+  align-items: stretch;
+}
+
+.settings-modes__slot .coin-slot {
+  width: 100%;
+  min-height: 48px;
+  flex-direction: column;
+  gap: 3px;
+  justify-content: center;
+  text-align: center;
+}
+
+/* The one extra line the Tools callout grows while Settings is unbought. Marked as the honest
+   aside it is rather than as a warning: nothing is broken, there is simply a price. */
+.open-real-feature__note--priced {
+  border-top: var(--border-thin) dashed var(--outline);
+  padding-top: 6px;
+  opacity: 0.95;}
 
 /* ==========================================================================================
    LAYOUT STABILITY

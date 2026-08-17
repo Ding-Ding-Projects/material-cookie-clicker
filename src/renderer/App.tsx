@@ -5,9 +5,12 @@ import { formatExact, formatExactDigits } from '../shared/game/format-number.js'
 import { isEffectActive } from '../shared/game/golden-cookie.js';
 import { computeMultipliers } from '../shared/game/upgrades.js';
 import { computeDisclosure, type ConsoleSurfaceId } from '../shared/game/disclosure.js';
+import { controlRungPrice, isControlUnlocked } from '../shared/game/control-unlocks.js';
 import {
+  CATALOGUE_PANEL_ID,
   consolePanelIds,
-  openFeatureRequest,
+  openFeatureOutcome,
+  SETTINGS_OPEN_RUNG_ID,
   SETTINGS_PANEL_ID,
   type PanelId,
   type SettingsRowId,
@@ -25,6 +28,7 @@ import { HUD_COOKIES_TARGET_KEY, PurchaseFxLayer, usePurchaseFxTarget } from './
 import {
   bilingualText,
   CONSOLE_COPY,
+  CONTROL_COPY,
   GAME_SURFACE_COPY,
   SETTINGS_COPY,
   setActiveLanguageMode,
@@ -37,6 +41,7 @@ import {
 } from './game/copy';
 import {
   DEFAULT_APP_SETTINGS,
+  effectiveLanguageMode,
   resolveAppSettingsStore,
   type AppSettings,
   type FunnyLevel,
@@ -44,6 +49,7 @@ import {
 } from './game/app-settings';
 import { AppSettingsProvider, type AppSettingsContextValue } from './game/AppSettingsContext';
 import { SettingsScreen } from './screens/SettingsScreen';
+import { ControlsCatalogue } from './screens/ControlsCatalogue';
 import { AchievementsScreen, AchievementUnlockToast } from './screens/AchievementsScreen';
 import { CookieHero } from './screens/CookieHero';
 import { DiscoveryTicket } from './screens/DiscoveryTicket';
@@ -87,6 +93,7 @@ const SURFACE_LABELS: Readonly<Record<PanelId, Bilingual>> = {
   prestige: TAB_COPY.prestige,
   factory: TAB_COPY.factory,
   home: TAB_COPY.home,
+  catalogue: CONTROL_COPY.catalogueConsole,
   settings: SETTINGS_COPY.title,
 };
 
@@ -236,10 +243,14 @@ function CabinetConsole({
   openId,
   onOpen,
   buttonRefs,
+  settingsSlotRef,
 }: {
   openId: PanelId | null;
   onOpen: (id: PanelId, button: HTMLButtonElement) => void;
   buttonRefs: React.MutableRefObject<Partial<Record<PanelId, HTMLButtonElement | null>>>;
+  /** The Settings coin-slot plate's own button, while Settings is unbought, so "Open it now"
+   *  can send the keyboard to the thing that sells it. Null once the emblem is bought. */
+  settingsSlotRef: React.MutableRefObject<HTMLButtonElement | null>;
 }) {
   // Each GAME emblem is earned by the progress its panel is about: a first achievement, a first
   // discovered tool, a first generator, a first sight of the prestige horizon. Hiding a button
@@ -248,15 +259,38 @@ function CabinetConsole({
   // identically the moment the panel is open (see tools.ts#gatesApplicationFeature).
   const structure = useStructureSnapshot();
   const disclosure = computeDisclosure(structure);
-  // Settings is last in the row and FIRST in time: consolePanelIds appends it unconditionally,
-  // so the console is never empty and a fresh save always has somewhere to change its language.
+  // The prices catalogue and Settings are last in the row and FIRST in time: consolePanelIds
+  // appends both unconditionally, so the console is never empty.
+  //
+  // THE SETTINGS EMBLEM IS NOW BOUGHT (control-unlocks.ts#settings.open, 25 cookies, by the
+  // owner's decree). Until it is, its position on the console holds a coin-slot plate with that
+  // figure on it instead — the same plate every other unbought control in this application
+  // wears, in the same place, with the same tab stop, buying itself when pressed. It is a price,
+  // not a gate: nothing has to be achieved first, only paid.
+  //
+  // The catalogue plate beside it is never sold at any price. That is what keeps this honest —
+  // the entire price list, including the 25 cookies Settings costs, is one free press away on a
+  // save that has never earned a cookie.
   const visibleIds = consolePanelIds(disclosure);
+  const settingsBought = isControlUnlocked(structure, SETTINGS_OPEN_RUNG_ID);
 
   return (
     <div className="console" role="group" aria-label={bilingualText(CONSOLE_COPY.consoleLabel)}>
       {visibleIds.map((id) => {
         const label = SURFACE_LABELS[id];
         const open = id === openId;
+        if (id === SETTINGS_PANEL_ID && !settingsBought) {
+          return (
+            <CoinSlot
+              key={id}
+              rungId={SETTINGS_OPEN_RUNG_ID}
+              className="console__coin-slot"
+              labelEn={label.en}
+              labelYue={label.yue}
+              focusRef={settingsSlotRef}
+            />
+          );
+        }
         return (
           <button
             key={id}
@@ -544,10 +578,12 @@ export function App() {
     }
   });
 
-  // The one write to copy.ts's module-level mode, done during render of the topmost component so
-  // every child below — including the ~100 label sites that format labels as plain strings —
-  // renders against the current mode. Any change to `settings` re-renders this whole tree.
-  setActiveLanguageMode(settings.languageMode);
+  // The one write to copy.ts's module-level mode used to happen here. It now happens one level
+  // down, in <LanguageModeGate>, because the answer needs the SAVE: Cantonese and Bilingual are
+  // bought controls and English is the free default, so what the app renders in is a function of
+  // the stored preference AND of what has been paid for. The gate sits directly inside
+  // GameProvider and above everything that reads copy, so the guarantee is unchanged — every
+  // child below renders against one already-decided mode, with no flash of the previous one.
 
   const commit = useCallback(
     (next: AppSettings) => {
@@ -579,12 +615,38 @@ export function App() {
   return (
     <AppSettingsProvider value={settingsContext}>
       <GameProvider>
-        <div className="app-shell" data-language-mode={settings.languageMode}>
+        <LanguageModeGate stored={settings.languageMode}>
           <TitleBar />
           <GameShell />
-        </div>
+        </LanguageModeGate>
       </GameProvider>
     </AppSettingsProvider>
+  );
+}
+
+/**
+ * Decides the language the whole application renders in, and writes it to copy.ts's one seam.
+ *
+ * Two inputs, one answer. The STORED preference is what the player chose and is never rewritten
+ * behind their back. What is bought (control-unlocks.ts#settings.language.yue / .both) is what
+ * they are entitled to render in — English, the default, is free and always available and is the
+ * fallback whenever the chosen mode is not paid for. `effectiveLanguageMode` is the pure
+ * function that combines them and is asserted directly in tests.
+ *
+ * It lives inside GameProvider because the second input is the save, and above every consumer
+ * because copy.ts's mode is module-level state that must already be correct when children render.
+ */
+function LanguageModeGate({ stored, children }: { stored: LanguageMode; children: ReactNode }) {
+  const structure = useStructureSnapshot();
+  const mode = effectiveLanguageMode(stored, {
+    yue: isControlUnlocked(structure, 'settings.language.yue'),
+    both: isControlUnlocked(structure, 'settings.language.both'),
+  });
+  setActiveLanguageMode(mode);
+  return (
+    <div className="app-shell" data-language-mode={mode}>
+      {children}
+    </div>
   );
 }
 
@@ -603,6 +665,10 @@ function GameShell() {
   } | null>(null);
   const statusTimerRef = useRef<ReturnType<typeof setTimeout> | null>(null);
   const buttonRefs = useRef<Partial<Record<PanelId, HTMLButtonElement | null>>>({});
+  // The Settings coin-slot plate on the console, while Settings is unbought. "Open it now"
+  // sends the keyboard here rather than opening a panel nobody has paid for yet.
+  const settingsSlotRef = useRef<HTMLButtonElement | null>(null);
+  const settingsBought = useControlRung(SETTINGS_OPEN_RUNG_ID);
   const { notice: offlineNotice, dismiss: dismissOfflineNotice } = useOfflineNotice();
   const milestoneMessage = useMilestoneMessage();
 
@@ -647,28 +713,44 @@ function GameShell() {
   }, []);
 
   /**
-   * "Open it now" on a tool card. This now has a real destination: the Settings panel, which is
-   * the application surface this build ships. The click swaps the open panel from Tools to
-   * Settings, anchored to the Settings emblem, with the row the request is closest to
-   * highlighted and a note at the top saying where the player came from.
+   * "Open it now" on a tool card. Its destination is the Settings panel, which is the
+   * application surface this build ships — and which, by the owner's decree, now costs 25
+   * cookies to open (control-unlocks.ts#settings.open).
    *
-   * Nothing here consults the tech tree. The handler runs identically for every tool in every
-   * unlock state — an undiscovered card's button lands in exactly the same place as an unlocked
-   * one's (see tools.ts#gatesApplicationFeature).
+   * So the handler has two honest branches, decided by console-panels.ts#openFeatureOutcome:
+   *
+   *   • BOUGHT — unchanged from before. The open panel swaps from Tools to Settings, anchored to
+   *     the Settings emblem, with the closest row highlighted and a note saying where the player
+   *     came from.
+   *   • UNBOUGHT — the purchase is SURFACED rather than the panel silently failing to open. The
+   *     status region announces the control and its literal price, and focus moves to the
+   *     coin-slot plate standing in the emblem's place, which is the button that buys it. One
+   *     press from there and the panel opens.
+   *
+   * Nothing here consults the tech tree, in either branch. The handler runs identically for
+   * every tool in every unlock state, and the price in front of Settings is a price, not a
+   * progress gate: no tool, milestone or unlock stands in front of it, any save can pay it the
+   * moment it has the cookies, and the figure is readable for free in the prices catalogue on
+   * the console beside it (see tools.ts#gatesApplicationFeature).
    */
   const openApplicationFeature = useCallback<OpenApplicationFeature>(
     (toolId, def) => {
-      const request = openFeatureRequest(toolId);
-      setSettingsEntry({ row: request.row, nameEn: def.nameEn, nameYue: def.nameYue });
-      const button = buttonRefs.current[request.panel];
+      const outcome = openFeatureOutcome(toolId, settingsBought);
+      if (outcome.kind === 'purchase') {
+        announce(SETTINGS_COPY.featureNeedsPurchase(formatExactDigits(controlRungPrice(outcome.rungId))));
+        settingsSlotRef.current?.focus();
+        return;
+      }
+      setSettingsEntry({ row: outcome.row, nameEn: def.nameEn, nameYue: def.nameYue });
+      const button = buttonRefs.current[outcome.panel];
       if (button) {
         const rect = button.getBoundingClientRect();
         setAnchor({ x: rect.left + rect.width / 2, y: rect.bottom });
       }
-      setOpenSurface(request.panel);
+      setOpenSurface(outcome.panel);
       announce(SETTINGS_COPY.featureOpened(def.nameEn, def.nameYue));
     },
-    [announce],
+    [announce, settingsBought],
   );
 
   return (
@@ -679,7 +761,12 @@ function GameShell() {
       <div className="cabinet" data-panel-open={openSurface ? 'true' : undefined}>
         <div className="cabinet-head">
           <Hud />
-          <CabinetConsole openId={openSurface} onOpen={openPanel} buttonRefs={buttonRefs} />
+          <CabinetConsole
+            openId={openSurface}
+            onOpen={openPanel}
+            buttonRefs={buttonRefs}
+            settingsSlotRef={settingsSlotRef}
+          />
         </div>
 
         <div className="cabinet-body">
@@ -700,6 +787,11 @@ function GameShell() {
           {openSurface === 'tools' && <ToolsScreen onOpenApplicationFeature={openApplicationFeature} />}
           {openSurface === 'statistics' && <StatisticsScreen />}
           {openSurface === 'prestige' && <PrestigeScreen />}
+          {openSurface === CATALOGUE_PANEL_ID && (
+            <div className="screen">
+              <ControlsCatalogue />
+            </div>
+          )}
           {openSurface === 'settings' && (
             <SettingsScreen
               highlightRow={settingsEntry?.row ?? null}

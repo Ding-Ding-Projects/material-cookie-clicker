@@ -31,6 +31,12 @@ export interface GoldenCookieEffectState {
 export interface GoldenCookieState {
   /** Whether a golden cookie is currently spawned and waiting to be clicked. */
   readonly isSpawned: boolean;
+  /**
+   * Presses landed on the spawned golden cookie so far. Redemption takes TEN presses by owner
+   * decree ("the user must press it 10 times to redeem, not auto redeem") — each press chips it,
+   * the tenth collects. Absent/0 on saves from before the decree.
+   */
+  readonly redeemClicks?: number;
   readonly spawnedAtEpochMs?: number;
   /** PRNG stream position, so the seeded schedule survives save/load without re-seeding. */
   readonly rngStreamIndex: number;

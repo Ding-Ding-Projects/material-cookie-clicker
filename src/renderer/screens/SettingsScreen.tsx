@@ -1,5 +1,5 @@
 import { bilingualText, SETTINGS_COPY, showsCantonese, showsEnglish } from '../game/copy';
-import { LANGUAGE_MODES, type FunnyLevel, type LanguageMode } from '../game/app-settings';
+import { effectiveLanguageMode, LANGUAGE_MODES, type FunnyLevel, type LanguageMode } from '../game/app-settings';
 import { useAppSettings } from '../game/AppSettingsContext';
 import type { SettingsRowId } from '../game/console-panels';
 import { CoinSlot, useControlRung } from '../components/CoinSlot';
@@ -27,10 +27,20 @@ import { ControlsCatalogue } from './ControlsCatalogue';
  * generator. Until bought, the control is replaced IN PLACE by a coin-slot plate carrying its
  * price — never removed, because a settings panel that hid the settings would read as a bug.
  *
- * What is NOT bought, and is asserted by tests/game/control-unlocks.test.ts never to appear in
- * the registry: this PANEL. The Settings emblem and this dialog are free and always reachable.
- * It is where the price list lives (the catalogue below), and a player who cannot read English
- * must never have to earn their way to the language switch's neighbourhood — only to the switch.
+ * ── AND SO IS THE PANEL ITSELF, NOW ──────────────────────────────────────────────────────────
+ *
+ * By the owner's decree ("settings still appearing" / "needs to be purchased") the Settings
+ * emblem on the console is `settings.open`, 25 cookies, and until it is bought the console shows
+ * a coin-slot plate there instead. The old boundary — this panel is free because the price list
+ * lives in it — is answered by moving the price list out: the controls catalogue is now its own
+ * FREE console button (console-panels.ts#CATALOGUE_PANEL_ID) and is still rendered at the bottom
+ * of this panel as a convenience. Nobody has to buy anything to read what things cost.
+ *
+ * The language row carries the second decree ("unlock more languages by buying"). English is the
+ * default and is free forever — a fresh save is fully readable without paying — and the two
+ * other modes are separate purchases, shown as coin-slot plates in the switch until bought.
+ * Buying `settings.language` puts the switch on the panel; buying a MODE makes that button work.
+ * The two compose and neither implies the other.
  */
 
 const MODE_LABELS: Readonly<Record<LanguageMode, { en: string; yue: string }>> = {
@@ -49,6 +59,11 @@ export interface SettingsScreenProps {
 export function SettingsScreen({ highlightRow = null, openedFrom = null }: SettingsScreenProps = {}) {
   const { settings, setLanguageMode, setFunnyLevel } = useAppSettings();
   const languageBought = useControlRung('settings.language');
+  const ownedModes = {
+    yue: useControlRung('settings.language.yue'),
+    both: useControlRung('settings.language.both'),
+  };
+  const activeMode = effectiveLanguageMode(settings.languageMode, ownedModes);
   const funnyEnBought = useControlRung('settings.funny.en');
   const funnyYueBought = useControlRung('settings.funny.yue');
 
@@ -72,7 +87,27 @@ export function SettingsScreen({ highlightRow = null, openedFrom = null }: Setti
           <div className="settings-modes" role="group" aria-label={bilingualText(SETTINGS_COPY.languageLabel)}>
             {LANGUAGE_MODES.map((mode) => {
               const label = MODE_LABELS[mode];
-              const selected = settings.languageMode === mode;
+              // The PRESSED state is the mode actually being rendered, not the stored
+              // preference: a save that owns neither extra mode is reading English, and the
+              // switch has to agree with the screen the player is looking at.
+              const selected = activeMode === mode;
+              // English is free and always was. The other two are bought, one each, and until
+              // then their button is replaced in place by its coin-slot plate — same position in
+              // the switch, same tab stop, price printed on it, buys itself when pressed.
+              if (mode !== 'en' && !ownedModes[mode]) {
+                return (
+                  <CoinSlot
+                    key={mode}
+                    rungId={`settings.language.${mode}`}
+                    variant="inline"
+                    className="settings-modes__slot"
+                    labelEn={label.en}
+                    labelYue={label.yue}
+                    // Buying a mode does not switch to it: the purchase is a purchase, and
+                    // choosing is still the player's press on the button it becomes.
+                  />
+                );
+              }
               return (
                 <button
                   key={mode}
@@ -96,6 +131,7 @@ export function SettingsScreen({ highlightRow = null, openedFrom = null }: Setti
           <CoinSlot rungId="settings.language" />
         )}
         <p className="settings-caption">{bilingualText(SETTINGS_COPY.languageCaption)}</p>
+        <p className="settings-note settings-note--honest">{bilingualText(SETTINGS_COPY.languagePricedNote)}</p>
       </section>
 
       <section

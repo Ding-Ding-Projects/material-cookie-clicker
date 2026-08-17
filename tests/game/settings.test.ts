@@ -3,10 +3,17 @@ import { describe, expect, it } from "vitest";
 import { computeDisclosure } from "../../src/shared/game/disclosure";
 import { TOOL_DEFINITIONS } from "../../src/shared/game/tools";
 import {
+  CATALOGUE_PANEL_ID,
   consolePanelIds,
+  openFeatureOutcome,
   openFeatureRequest,
+  SETTINGS_OPEN_RUNG_ID,
   SETTINGS_PANEL_ID,
 } from "../../src/renderer/game/console-panels";
+import { controlRungPrice, isControlUnlocked } from "../../src/shared/game/control-unlocks";
+import { bnToNumber } from "../../src/shared/game/big-number";
+import { applyGameAction } from "../../src/shared/game/reducer";
+import { effectiveLanguageMode } from "../../src/renderer/game/app-settings";
 import {
   APP_SETTINGS_KEY,
   coerceFunnyLevel,
@@ -40,8 +47,10 @@ describe("LOAD-BEARING: Settings is visible on a brand-new save", () => {
     expect(consolePanelIds(disclosure)).toContain(SETTINGS_PANEL_ID);
   });
 
-  it("is the ONLY button on that console, so the cluster is never empty", () => {
-    expect(consolePanelIds(computeDisclosure(freshState()))).toEqual([SETTINGS_PANEL_ID]);
+  it("is one of the two unconditional buttons on that console, so the cluster is never empty", () => {
+    // The prices catalogue joined it here when Settings itself became a purchase: the catalogue
+    // is the free door, and it must be on the console of a save that owns nothing.
+    expect(consolePanelIds(computeDisclosure(freshState()))).toEqual([CATALOGUE_PANEL_ID, SETTINGS_PANEL_ID]);
   });
 
   it("progressive disclosure has no opinion about Settings at all", () => {
@@ -56,7 +65,12 @@ describe("LOAD-BEARING: Settings is visible on a brand-new save", () => {
       ...computeDisclosure(freshState()),
       consoles: { achievements: true, tools: true, statistics: false, prestige: false },
     };
-    expect(consolePanelIds(disclosure)).toEqual(["achievements", "tools", SETTINGS_PANEL_ID]);
+    expect(consolePanelIds(disclosure)).toEqual([
+      "achievements",
+      "tools",
+      CATALOGUE_PANEL_ID,
+      SETTINGS_PANEL_ID,
+    ]);
   });
 });
 
@@ -74,6 +88,79 @@ describe("Tools 'Open it now' opens the Settings surface", () => {
     // An id that is not a tool at all still gets a destination rather than an error: this
     // function decides where to look, never whether the player may.
     expect(openFeatureRequest("not-a-tool").panel).toBe(SETTINGS_PANEL_ID);
+  });
+});
+
+describe("Tools 'Open it now' when the Settings panel has not been bought", () => {
+  const bought = (state: ReturnType<typeof freshState>, rungId: string) =>
+    applyGameAction(state, { type: "buyControlUnlock", rungId }, { now: () => 0, rng: { next: () => 0.5, getStreamIndex: () => 0 } });
+
+  it("surfaces the purchase, with the rung and its price, instead of opening", () => {
+    const fresh = freshState();
+    expect(isControlUnlocked(fresh, SETTINGS_OPEN_RUNG_ID)).toBe(false);
+    for (const def of TOOL_DEFINITIONS) {
+      const outcome = openFeatureOutcome(def.id, false);
+      expect(outcome.kind).toBe("purchase");
+      if (outcome.kind !== "purchase") throw new Error("unreachable");
+      expect(outcome.rungId).toBe(SETTINGS_OPEN_RUNG_ID);
+      // The price is a real figure the callout and the announcement can print.
+      expect(bnToNumber(controlRungPrice(outcome.rungId))).toBe(25);
+    }
+  });
+
+  it("opens exactly as before once it is bought, same panel and same row", () => {
+    const paid = bought(freshState({ cookies: { mantissa: 2.5, exponent: 1 } }), SETTINGS_OPEN_RUNG_ID);
+    expect(isControlUnlocked(paid, SETTINGS_OPEN_RUNG_ID)).toBe(true);
+    const outcome = openFeatureOutcome("narrator", true);
+    expect(outcome).toEqual({ kind: "open", panel: SETTINGS_PANEL_ID, row: "funny" });
+    expect(openFeatureOutcome("regexBuilder", true)).toEqual({
+      kind: "open",
+      panel: SETTINGS_PANEL_ID,
+      row: "language",
+    });
+  });
+
+  it("is a PRICE and not a tech-tree gate: the outcome never depends on the tool", () => {
+    // The tools contract is unchanged — no tool unlocks any application feature. Every tool in
+    // the roster gets the identical answer, and it is decided solely by what has been paid for.
+    const locked = new Set(TOOL_DEFINITIONS.map((def) => openFeatureOutcome(def.id, false).kind));
+    expect([...locked]).toEqual(["purchase"]);
+    const open = new Set(TOOL_DEFINITIONS.map((def) => openFeatureOutcome(def.id, true).kind));
+    expect([...open]).toEqual(["open"]);
+  });
+});
+
+describe("LOAD-BEARING: English is the free default, the other two modes are bought", () => {
+  it("defaults a brand-new install to English", () => {
+    expect(DEFAULT_APP_SETTINGS.languageMode).toBe("en");
+  });
+
+  it("renders English until the chosen mode has actually been bought", () => {
+    expect(effectiveLanguageMode("yue", { yue: false, both: false })).toBe("en");
+    expect(effectiveLanguageMode("both", { yue: false, both: false })).toBe("en");
+    // Owning one mode does not confer the other.
+    expect(effectiveLanguageMode("both", { yue: true, both: false })).toBe("en");
+    expect(effectiveLanguageMode("yue", { yue: false, both: true })).toBe("en");
+  });
+
+  it("renders the chosen mode once its rung is bought", () => {
+    expect(effectiveLanguageMode("yue", { yue: true, both: false })).toBe("yue");
+    expect(effectiveLanguageMode("both", { yue: false, both: true })).toBe("both");
+  });
+
+  it("never needs a purchase for English, whatever is owned", () => {
+    expect(effectiveLanguageMode("en", { yue: false, both: false })).toBe("en");
+    expect(effectiveLanguageMode("en", { yue: true, both: true })).toBe("en");
+  });
+
+  it("leaves the STORED preference alone when it is not owned, rather than rewriting it", () => {
+    // The fallback is a rendering decision. A player who bought Cantonese, chose it, then
+    // prestiged into a save without it should still find their choice written down.
+    const storage = memoryStorage();
+    const store = createLocalStorageAppSettings(storage);
+    store.save({ ...DEFAULT_APP_SETTINGS, languageMode: "yue" });
+    expect(store.load().languageMode).toBe("yue");
+    expect(effectiveLanguageMode(store.load().languageMode, { yue: false, both: false })).toBe("en");
   });
 });
 

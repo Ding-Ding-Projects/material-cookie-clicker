@@ -50,7 +50,13 @@ import { MilkTide } from './screens/MilkTide';
 import { ShopRail } from './screens/ShopRail';
 import { FactoryScreen } from './screens/FactoryScreen';
 import { PrestigeScreen } from './screens/PrestigeScreen';
-import { RandomEventIndicator, RandomEventStage, RandomEventToast } from './screens/RandomEventStage';
+import {
+  MouseRaidAftermathToast,
+  RaidSuppliesShelf,
+  RandomEventIndicator,
+  RandomEventStage,
+  RandomEventToast,
+} from './screens/RandomEventStage';
 import { StatisticsScreen } from './screens/StatisticsScreen';
 import { ToolsScreen, type OpenApplicationFeature } from './screens/ToolsScreen';
 import { UpgradeStrip } from './screens/UpgradeStrip';
@@ -124,6 +130,11 @@ function Hud() {
           it is not behind progressive disclosure: an event that halves production has to be
           visible on the save it happens to, including a brand-new one. */}
       <RandomEventIndicator />
+
+      {/* What the player is holding against the next raid. In the HUD beside the raid's own
+          plate, because that is where a player looks for it — not in the generator shop, which
+          sells production. */}
+      <RaidSuppliesShelf />
     </div>
   );
 }
@@ -631,6 +642,11 @@ function GameShell() {
       {/* The same treatment for a random event landing. Also aria-hidden: narration.ts already
           put this event through the one milestone region that speaks. */}
       <RandomEventToast />
+
+      {/* What a Mouse Raid actually cost, or what defending it paid, with the literal figure in
+          it. Real content rather than aria-hidden decoration — the status region announced the
+          outcome once, and this is the copy of it a player can go back and read. */}
+      <MouseRaidAftermathToast />
 
       <div className="milestone-region" role="status" aria-live="polite">
         {milestoneMessage ? `${bilingualText(milestoneMessage)}` : ''}

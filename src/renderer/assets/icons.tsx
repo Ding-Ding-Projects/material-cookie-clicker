@@ -1294,6 +1294,58 @@ function MarketDayArt() {
   );
 }
 
+/**
+ * ONE MOUSE, for the raid.
+ *
+ * Drawn facing right and pointing where it is going, because it spends its whole life on screen
+ * moving: a symmetrical mouse would read as a blob sliding sideways. The nose, the whiskers and
+ * the tail all run the same way, so a horizontal flip in CSS is all it takes to turn it round
+ * when it scurries back the other way. Grey rather than dough-coloured, and outlined in the
+ * alarm colour, so it never reads as a cookie the player should be collecting.
+ */
+export function MouseArt({ extraClass }: { extraClass?: string } = {}) {
+  return (
+    <Art extraClass={extraClass}>
+      {/* Tail, trailing off the rear and curling up. Thick enough to survive 36px. */}
+      <path d="M5 24q-3.5 0.5-3.5-2.5T4.5 19" fill="none" stroke={INK} strokeWidth="1.8" />
+      {/* Body: one teardrop, fat at the rear (left) and tapering into the snout (right). */}
+      <path d="M6 25q-1-10 8.5-10 7 0 10.5 4.5 2.5 3.2 0 5.5H7q-1 0-1-0.9Z" fill={PLATE_DIM} stroke={INK} strokeWidth="1.6" />
+      {/* The ear sits BEHIND the head, not amidships — the one thing that stops a mouse at this
+          size reading as a beetle. */}
+      <circle cx="17.5" cy="14.5" r="4.2" fill={ALARM_LIGHT} stroke={INK} strokeWidth="1.5" />
+      <circle cx="17.5" cy="14.5" r="1.9" fill={ALARM} stroke="none" />
+      {/* Eye, snout and whiskers, all at the leading end. */}
+      <circle cx="22.5" cy="19.8" r="1.15" fill={CHIP} stroke="none" />
+      <circle cx="26.6" cy="22.2" r="1.4" fill={ALARM} stroke="none" />
+      <path d="M25.5 24.8 29.4 26.4M26.2 23 30 22.2" fill="none" stroke={INK} strokeWidth="1.1" />
+      {/* The crumb it is making off with, tucked under the belly where it reads as carried
+          rather than as part of the animal. */}
+      <circle cx="10.5" cy="27.4" r="2.9" fill={DOUGH} stroke={CRUST} strokeWidth="1.3" />
+      <circle cx="9.7" cy="26.9" r="0.75" fill={CHIP} stroke="none" />
+      <circle cx="11.6" cy="28.2" r="0.6" fill={CHIP} stroke="none" />
+    </Art>
+  );
+}
+
+/** The whole Mouse Raid, as one emblem: the cookie jar with two mice on it. */
+function MouseRaidArt() {
+  return (
+    <Art>
+      <path d="M8 12h16v13a3 3 0 0 1-3 3H11a3 3 0 0 1-3-3Z" fill={ALARM_LIGHT} />
+      <path d="M6.5 9.5h19v3h-19Z" fill={PLATE_DIM} />
+      <circle cx="13" cy="20" r="2.1" fill={DOUGH} stroke={CRUST} strokeWidth="1.1" />
+      <circle cx="19" cy="23" r="2.1" fill={DOUGH} stroke={CRUST} strokeWidth="1.1" />
+      {/* Two mice, one on the rim and one running off with the goods. */}
+      <path d="M22 9.5q4-0.5 5.5 2.5" fill="none" stroke={ALARM} strokeWidth="1.6" />
+      <circle cx="27" cy="8" r="2.6" fill={PLATE_DIM} stroke={INK} strokeWidth="1.3" />
+      <circle cx="28.1" cy="7.6" r="0.8" fill={CHIP} stroke="none" />
+      <circle cx="4.6" cy="26" r="2.8" fill={PLATE_DIM} stroke={INK} strokeWidth="1.3" />
+      <circle cx="5.8" cy="25.4" r="0.8" fill={CHIP} stroke="none" />
+      <path d="M1.6 28q-1.2-1.4 0.2-2.6" fill="none" stroke={INK} strokeWidth="1.3" />
+    </Art>
+  );
+}
+
 /** The emblem for one event id, for the HUD indicator and the toast. */
 export const RANDOM_EVENT_ART: Record<string, () => ReactElement> = {
   cookie_rain: CookieRainArt,
@@ -1302,4 +1354,5 @@ export const RANDOM_EVENT_ART: Record<string, () => ReactElement> = {
   sugar_rush: SugarRushArt,
   lucky_crumb: LuckyCrumbArt,
   market_day: MarketDayArt,
+  mouse_raid: MouseRaidArt,
 };

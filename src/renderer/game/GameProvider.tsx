@@ -125,6 +125,13 @@ export function GameProvider({ children }: { children: ReactNode }) {
     now: () => Date.now(),
     rng: rngRef.current,
     randomEventConfig: randomEventConfigRef.current ?? undefined,
+    // Read fresh on every dispatch rather than stored in state: it is an input to one decision
+    // (whether a Mouse Raid may START — see random-events.ts#tickRandomEvents) and nothing
+    // renders from it, so subscribing to visibilitychange would only re-render the tree for a
+    // fact no component shows. NO CLOCK IS PAUSED BY THIS. Cookies keep accruing while the
+    // window is hidden exactly as they did before, which is the same promise
+    // offline-progress.ts makes for an app that is not running at all.
+    windowHidden: typeof document !== 'undefined' ? document.visibilityState === 'hidden' : false,
   });
 
   const dieselBridge = typeof window !== 'undefined' ? window.materialCookieClicker?.diesel : undefined;

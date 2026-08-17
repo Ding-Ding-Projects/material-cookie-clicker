@@ -143,6 +143,42 @@ because the factory rode on the store's `fast` slice and a player with a
 refinery and no generators has a static cookie count. The factory has its own
 store slice now, and these captures are from the fixed build.
 
+### The mouse-raid set
+
+Two images of the Mouse Raid, the hourly event that puts mice on the counter and
+takes up to eighty per cent of the balance from the ones you fail to whack.
+
+Taken the same way as everything else: the built `dist/` launched by the real
+`electron` binary onto an off-screen Windows desktop named `MiceCapture`, the
+window resolved by title and class, `PrintWindow` on that one window, and a
+progressed save pushed in over the DevTools protocol by
+`scripts/capture-seed-localstorage.mjs`.
+
+| Image | What it shows |
+| --- | --- |
+| `mice-raid.png` | Five mice mid-raid, scattered across the lower half of the stage as five real pink buttons, with the HUD's fourth plate pink and outlined in red reading `Mouse Raid · 老鼠打劫`, a draining bar, `10s`, and `5 of 5 mice left · 仲有 5 / 5 隻老鼠`. |
+| `mice-aftermath.png` | The card that states the outcome: `2 of 4 mice got away with 16 quintillion cookies`, the same line in Cantonese, and the note that the lifetime total was untouched. The balance above it reads 24 quintillion, having been 40 quintillion before the raid — exactly the eighty per cent ceiling scaled by the two mice that escaped. |
+
+**Two things about this run that a reader should know.**
+
+A raid fires about once an hour, which no capture run can wait for, so this one
+set the documented developer-only local-storage key
+(`material-cookie-clicker:events:fast`) to the value `raid`, which shortens the
+raid's window to a few seconds and quiets the ordinary event pool. It changes
+the schedule and nothing else: the mouse count, the twenty-second window, the
+eighty-per-cent ceiling, the thousand-cookie floor and the never-two-at-once rule
+are all the shipped ones. There is no in-game control that reaches this.
+
+The two mice in `mice-aftermath.png` were whacked by real Win32 background clicks
+on the real buttons, and the arithmetic on the card is the reducer's answer to
+them. Those clicks were aimed with the reduced-motion layout — the same
+`prefers-reduced-motion` path a player with that preference gets, emulated over
+the DevTools protocol — because a click posted to a moving 56-pixel button from
+outside the process lands a second later and a stage away. The mice are still
+buttons, still worth the same, and still whackable either way; only the aiming
+was made possible. `mice-raid.png` has no such emulation and shows the mice
+mid-scurry.
+
 ### The manual-purchase set
 
 Three images from one run on a fresh profile, taken after the lane that made

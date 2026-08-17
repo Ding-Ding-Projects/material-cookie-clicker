@@ -2,7 +2,8 @@ import { getAchievementDefinition } from "../../shared/game/achievements.js";
 import { getGeneratorDefinition } from "../../shared/game/generators.js";
 import type { GameAction } from "../../shared/game/reducer.js";
 import { isToolDiscovered, TOOL_DEFINITIONS } from "../../shared/game/tools.js";
-import { getRandomEventDefinition, type RandomEventId } from "../../shared/game/random-events.js";
+import { formatExact } from "../../shared/game/format-number.js";
+import { getRandomEventDefinition, type MouseRaidOutcome, type RandomEventId } from "../../shared/game/random-events.js";
 import { getUpgradeDefinition } from "../../shared/game/upgrades.js";
 import type { GameState } from "../../shared/game/types.js";
 import type { Bilingual } from "./copy.js";
@@ -41,6 +42,13 @@ export type MilestoneEvent =
       readonly claimedCount: number;
       readonly endedEarly: boolean;
     }
+  /**
+   * A Mouse Raid finishing. It gets its own kind rather than reusing `random-event-resolved`
+   * because the only thing worth announcing about a raid is the OUTCOME — what was taken or
+   * what was saved — and that is a number, not an event name. A player who cannot see the stage
+   * learns from this line alone that their balance just moved and by exactly how much.
+   */
+  | { readonly kind: "mouse-raid-resolved"; readonly outcome: MouseRaidOutcome }
   | { readonly kind: "prestige-available" }
   | { readonly kind: "prestige"; readonly pointsEarned: number };
 
@@ -78,7 +86,18 @@ export function detectMilestones(previous: GameState, next: GameState, action: G
     if (id) events.push({ kind: "random-event-spawned", id });
   }
 
-  if (previous.randomEvents.active !== null && next.randomEvents.active === null && next.randomEvents.lastResolved) {
+  if (next.randomEvents.lastRaid !== previous.randomEvents.lastRaid && next.randomEvents.lastRaid) {
+    events.push({ kind: "mouse-raid-resolved", outcome: next.randomEvents.lastRaid });
+  }
+
+  if (
+    previous.randomEvents.active !== null &&
+    next.randomEvents.active === null &&
+    next.randomEvents.lastResolved &&
+    // A raid announces its outcome above and only there: two lines for one event would push the
+    // one that carries the figure out of the throttled status region.
+    next.randomEvents.lastResolved.id !== "mouse_raid"
+  ) {
     const resolved = next.randomEvents.lastResolved;
     events.push({
       kind: "random-event-resolved",
@@ -160,6 +179,29 @@ export function describeMilestone(event: MilestoneEvent): Bilingual {
       return {
         en: `${def.nameEn} over.`,
         yue: `${def.nameYue}完咗。`,
+      };
+    }
+    case "mouse-raid-resolved": {
+      const { outcome } = event;
+      if (outcome.defended) {
+        return {
+          en: `Mouse Raid defended — all ${outcome.miceTotal} mice chased off, nothing stolen.`,
+          yue: `老鼠打劫擋住咗——${outcome.miceTotal} 隻全部拍走，冇損失。`,
+        };
+      }
+      // A pass is not a defence and the announcement says so. The player did not whack them;
+      // they paid for the mice to leave empty-handed, which is a different sentence.
+      if (outcome.passSpent) {
+        return {
+          en: `Mouse Raid over — a Whack Pass was spent, so the ${outcome.miceEscaped} mice that got away took nothing.`,
+          yue: `老鼠打劫完咗——用咗一張打鼠券，走甩嘅 ${outcome.miceEscaped} 隻乜都攞唔到。`,
+        };
+      }
+      const stolenEn = formatExact(outcome.stolen, "en");
+      const stolenYue = formatExact(outcome.stolen, "yue");
+      return {
+        en: `Mouse Raid over — ${outcome.miceEscaped} of ${outcome.miceTotal} mice got away with ${stolenEn} cookies.`,
+        yue: `老鼠打劫完咗——${outcome.miceTotal} 隻走甩咗 ${outcome.miceEscaped} 隻，帶走 ${stolenYue} 粒曲奇。`,
       };
     }
     case "prestige-available":

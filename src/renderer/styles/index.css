@@ -7666,3 +7666,395 @@ ul.card-grid {
     box-shadow: inset 0 4px 0 0 var(--bevel-lo);
   }
 }
+
+/* ==========================================================================================
+   THE MOUSE RAID (src/shared/game/random-events.ts, id `mouse_raid`)
+   ------------------------------------------------------------------------------------------
+   Appended at the end of the sheet on purpose: everything here is additive, nothing above it
+   is edited, and the raid's surfaces are all new class names.
+
+   Three surfaces: the mice themselves on the stage, the HUD plate's mice-remaining line, and
+   the aftermath card that states what was taken or saved.
+
+   THE HIT AREA IS BIGGER THAN THE MOUSE. The sprite is 36px and the button is 56px, because
+   the target is moving: a 44px minimum measured against a stationary control is not the same
+   promise as one measured against a control crossing the stage in six seconds. The extra ring
+   is invisible until hover/focus and it is part of the button, so it is genuinely clickable.
+
+   REDUCED MOTION IS EQUIVALENT, NOT DEGRADED. With `prefers-reduced-motion: reduce` the mice
+   stop scurrying and stand still along the same counter line, at the same size, worth exactly
+   the same, each one still a button with the same accessible name. What goes away is the
+   movement; what stays is every way of winning.
+   ========================================================================================== */
+
+.event-stage--raid {
+  /* The mice run along the lower half of the stage — the counter, not the sky — so they never
+     cover the cookie the player is otherwise clicking. */
+  position: absolute;
+  inset: 0;
+}
+
+.event-mouse {
+  position: absolute;
+  top: var(--mouse-lane, 60%);
+  left: 0;
+  width: 56px;
+  height: 56px;
+  margin: -28px 0 0 -28px;
+  padding: 0;
+  display: grid;
+  place-items: center;
+  pointer-events: auto;
+  cursor: pointer;
+  border: 3px solid var(--error, #a33019);
+  border-radius: 50%;
+  background: var(--error-container, #ffdad3);
+  box-shadow: 0 3px 0 0 var(--error-shadow, #6b1c0b);
+  animation: event-mouse-scurry 6.5s linear var(--mouse-delay, 0s) infinite;
+}
+
+.event-mouse__art {
+  width: 36px;
+  height: 36px;
+  /* The drawing faces right; a lane running the other way flips it rather than reversing it. */
+  transform: scaleX(var(--mouse-facing, 1));
+}
+
+.event-mouse:hover {
+  background: var(--spark, #ffc94d);
+}
+
+.event-mouse:active {
+  transform: translateY(3px) scale(0.92);
+  box-shadow: inset 0 3px 0 0 var(--bevel-hi, rgba(255, 255, 255, 0.6));
+}
+
+.event-mouse:focus-visible {
+  outline: 4px solid var(--spark-ring, #9c4b00);
+  outline-offset: 3px;
+}
+
+@keyframes event-mouse-scurry {
+  0% {
+    left: -6%;
+    transform: translateY(0);
+  }
+  25% {
+    transform: translateY(-7px);
+  }
+  50% {
+    transform: translateY(0);
+  }
+  75% {
+    transform: translateY(-7px);
+  }
+  100% {
+    left: 106%;
+    transform: translateY(0);
+  }
+}
+
+/* The squeak, drawn where the pointer actually landed. Decoration only: the whack itself is
+   announced by the state changing, and the aftermath card carries the figures. */
+.event-squeak {
+  position: absolute;
+  transform: translate(-50%, -50%);
+  pointer-events: none;
+  font-weight: 900;
+  font-size: 15px;
+  letter-spacing: 0.06em;
+  color: var(--on-error-container, #3b0a02);
+  text-shadow: 0 1px 0 var(--bevel-hi, rgba(255, 255, 255, 0.7));
+  animation: event-squeak-puff 0.7s ease-out forwards;
+}
+
+@keyframes event-squeak-puff {
+  0% {
+    opacity: 0;
+    transform: translate(-50%, -50%) scale(0.6);
+  }
+  25% {
+    opacity: 1;
+    transform: translate(-50%, -70%) scale(1.12);
+  }
+  100% {
+    opacity: 0;
+    transform: translate(-50%, -160%) scale(0.9);
+  }
+}
+
+/* --- The HUD plate's extra line: how many mice are still loose -------------------------- */
+
+.event-indicator--raid {
+  border-color: var(--error, #a33019);
+  background: var(--error-container, #ffdad3);
+  color: var(--on-error-container, #3b0a02);
+}
+
+.event-indicator__mice {
+  display: flex;
+  flex-direction: column;
+  gap: 1px;
+  font-size: 11px;
+  font-weight: 800;
+  color: var(--on-error-container, #3b0a02);
+}
+
+/* --- The aftermath card ----------------------------------------------------------------- */
+
+.raid-aftermath {
+  position: fixed;
+  left: 50%;
+  bottom: 92px;
+  transform: translateX(-50%);
+  z-index: 60;
+  max-width: min(560px, 92vw);
+  display: flex;
+  align-items: flex-start;
+  gap: 12px;
+  padding: 12px 14px;
+  border: 3px solid var(--error, #a33019);
+  border-radius: 16px;
+  background: var(--error-container, #ffdad3);
+  color: var(--on-error-container, #3b0a02);
+  box-shadow: 0 6px 0 0 var(--error-shadow, #6b1c0b);
+  animation: raid-aftermath-in 0.28s ease-out;
+}
+
+/* A defended raid is good news and must not be dressed as a loss. */
+.raid-aftermath--defended {
+  border-color: var(--tier2, #1f6337);
+  background: var(--tier2-container, #b8f0c4);
+  color: var(--on-surface, #241a11);
+  box-shadow: 0 6px 0 0 var(--tier2, #1f6337);
+}
+
+.raid-aftermath__emblem {
+  width: 34px;
+  height: 34px;
+  flex: 0 0 auto;
+}
+
+.raid-aftermath__emblem svg {
+  width: 34px;
+  height: 34px;
+}
+
+.raid-aftermath__lines {
+  display: flex;
+  flex-direction: column;
+  gap: 3px;
+  font-size: 14px;
+  font-weight: 800;
+  line-height: 1.3;
+}
+
+.raid-aftermath__note {
+  font-size: 12px;
+  font-weight: 600;
+  opacity: 0.85;
+}
+
+.raid-aftermath__dismiss {
+  flex: 0 0 auto;
+  min-height: 44px;
+  min-width: 44px;
+  padding: 0 12px;
+  cursor: pointer;
+  border: 2px solid currentColor;
+  border-radius: 10px;
+  background: transparent;
+  color: inherit;
+  font-weight: 900;
+  font-size: 12px;
+}
+
+.raid-aftermath__dismiss:focus-visible {
+  outline: 4px solid var(--spark-ring, #9c4b00);
+  outline-offset: 2px;
+}
+
+@keyframes raid-aftermath-in {
+  from {
+    opacity: 0;
+    transform: translate(-50%, 14px);
+  }
+  to {
+    opacity: 1;
+    transform: translate(-50%, 0);
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .event-mouse {
+    animation: none;
+    left: var(--mouse-settled, 50%);
+  }
+
+  .event-mouse:active {
+    transform: none;
+  }
+
+  .event-squeak {
+    animation: none;
+    opacity: 1;
+  }
+
+  .raid-aftermath {
+    animation: none;
+  }
+}
+
+
+/* ==========================================================================================
+   RAID SUPPLIES, AND THE FAT MOUSE
+   ------------------------------------------------------------------------------------------
+   Appended at the end of the sheet, additive only.
+
+   The supplies shelf is three ordinary buttons with a price and a stock count on each. It is
+   styled off the cabinet's own plate idiom rather than the shop rail's, because it belongs to
+   the HUD corner where the raid plate appears, and a disabled card stays visible and readable
+   rather than vanishing — a price you cannot afford yet is information.
+   ========================================================================================== */
+
+.raid-supplies {
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+  padding: 6px 10px;
+  border: 2px solid var(--cabinet-frame-dark);
+  border-radius: 12px;
+  background: var(--surface-highest);
+  color: var(--on-surface);
+}
+
+.raid-supplies__title {
+  display: flex;
+  gap: 6px;
+  font-size: 10px;
+  font-weight: 900;
+  letter-spacing: 0.09em;
+  text-transform: uppercase;
+  opacity: 0.75;
+}
+
+.raid-supplies__list {
+  display: flex;
+  gap: 6px;
+  margin: 0;
+  padding: 0;
+  list-style: none;
+}
+
+.raid-supplies__buy {
+  min-height: 44px;
+  padding: 4px 10px;
+  display: flex;
+  flex-direction: column;
+  gap: 1px;
+  align-items: flex-start;
+  cursor: pointer;
+  border: 2px solid var(--cabinet-frame-dark);
+  border-radius: 10px;
+  background: var(--surface-lowest);
+  color: var(--on-surface);
+  font: inherit;
+  text-align: left;
+  box-shadow: 0 3px 0 0 var(--cabinet-frame-dark);
+}
+
+.raid-supplies__buy:hover:not(:disabled) {
+  background: var(--spark);
+}
+
+.raid-supplies__buy:active:not(:disabled) {
+  transform: translateY(3px);
+  box-shadow: inset 0 3px 0 0 var(--bevel-hi);
+}
+
+.raid-supplies__buy:disabled {
+  opacity: 0.55;
+  cursor: default;
+}
+
+.raid-supplies__buy:focus-visible {
+  outline: 4px solid var(--spark-ring);
+  outline-offset: 2px;
+}
+
+.raid-supplies__name {
+  display: flex;
+  flex-direction: column;
+  font-size: 11px;
+  font-weight: 900;
+}
+
+.raid-supplies__stock {
+  font-size: 11px;
+  font-weight: 800;
+  opacity: 0.8;
+}
+
+.raid-supplies__price {
+  font-size: 11px;
+  font-weight: 700;
+  font-variant-numeric: tabular-nums;
+}
+
+/* --- The fat mouse ---------------------------------------------------------------------- */
+
+/* Bigger, and outlined more heavily, because it is worth double in the theft split and takes
+   more than one hit. The size difference is the honest signal, not a label. */
+.event-mouse--fat {
+  width: 70px;
+  height: 70px;
+  margin: -35px 0 0 -35px;
+  border-width: 4px;
+  background: var(--error);
+}
+
+.event-mouse--fat .event-mouse__art {
+  width: 46px;
+  height: 46px;
+}
+
+.event-mouse__pips {
+  position: absolute;
+  bottom: 2px;
+  left: 50%;
+  transform: translateX(-50%);
+  display: flex;
+  gap: 2px;
+}
+
+.event-mouse__pips span {
+  width: 6px;
+  height: 6px;
+  border-radius: 50%;
+  border: 1px solid var(--cabinet-frame-dark);
+}
+
+.event-mouse__pips .is-full {
+  /* The spark colour rather than the error role's ink: a filled pip has to read as FILLED at
+     6px against a pink button in both themes, and the dark theme's on-error ink is close
+     enough to the button that three full pips looked like three empty ones. */
+  background: var(--spark);
+  border-color: var(--cabinet-frame-dark);
+}
+
+.event-mouse__pips .is-spent {
+  background: transparent;
+  opacity: 0.65;
+}
+
+/* A raid with a Bigger Whack armed says so on the stage: the swing reaches further than the
+   button, so the button shows a ring the size of the reach. */
+.event-stage--wide .event-mouse::after {
+  content: '';
+  position: absolute;
+  inset: -32px;
+  border: 2px dashed var(--spark-ring);
+  border-radius: 50%;
+  opacity: 0.35;
+  pointer-events: none;
+}

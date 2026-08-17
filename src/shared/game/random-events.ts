@@ -22,10 +22,26 @@
  *
  * The reducer is still the only mutation seam. Nothing here writes state; every function takes
  * a `RandomEventsState` and returns a new one, and the reducer decides what to do with it.
+ *
+ * THE MOUSE RAID sits alongside that pool rather than inside it. It is the owner's "rare event,
+ * every hour": mice scurry across the stage, each one the player fails to whack carries off a
+ * share of up to eighty per cent of the balance, and whacking all of them pays a small bonus
+ * instead. It has its own once-an-hour clock and its own fairness rails (not in a fresh save's
+ * first ten minutes, not below a thousand cookies, not against a window nobody is looking at),
+ * but it takes the SAME active slot as everything else here, so "never two events at once" and
+ * "never over a golden cookie" cost it nothing to obey.
+ *
+ * WHAT A RAID TAKES, AND WHAT IT DOES NOT. The theft comes off `cookies` — the balance — and
+ * never off `lifetimeCookies` or `stats.totalCookiesBaked`. Those two are HISTORY: they record
+ * what this save has ever baked, they gate achievements and the prestige projection, and a
+ * mouse eating a biscuit does not un-bake it. Letting a raid rewind them would also make the
+ * raid quietly retroactive — revoking achievements and ascension points hours after the fact —
+ * which is a far worse punishment than the one the player agreed to. So the raid is expensive
+ * and it is survivable, and nothing it does can move a number that only ever goes up.
  * ---------------------------------------------------------------------------------------- */
 import { z } from "zod";
 
-import { bnAdd, bnFromNumber, bnMulScalar, type BigNum } from "./big-number.js";
+import { bnAdd, bnCompare, bnFromNumber, bnMulScalar, type BigNum } from "./big-number.js";
 import { totalCps } from "./cps.js";
 import { computeMultipliers } from "./upgrades.js";
 import type { GameState, RngPort } from "./types.js";
@@ -38,7 +54,22 @@ export type RandomEventId =
   | "oven_hiccup"
   | "sugar_rush"
   | "lucky_crumb"
-  | "market_day";
+  | "market_day"
+  /**
+   * THE MOUSE RAID — the one event that is not in the common pool.
+   *
+   * Everything else in this file is drawn from one weighted bag every three to ten minutes.
+   * The raid is not: it is rare by the clock rather than rare by the dice, on its own
+   * fifty-to-seventy-five-minute schedule ("roughly hourly", which is what the owner asked
+   * for), and it can take up to eighty per cent of the balance. An eighty-per-cent loss that
+   * shares a bag with Lucky Crumb would either be so light it is not a raid or so frequent it
+   * is a punishment, so it gets its own clock and the pool keeps its weights.
+   *
+   * It still shares the ACTIVE SLOT with the pool, which is the property that matters: two
+   * events are never on screen at once, and a golden cookie still blocks it, because those
+   * rules live on the slot rather than on the schedule.
+   */
+  | "mouse_raid";
 
 /**
  * How an event behaves in time.
@@ -174,7 +205,46 @@ export const RANDOM_EVENT_DEFINITIONS: readonly RandomEventDefinition[] = [
   },
 ];
 
-const DEFINITIONS_BY_ID = new Map(RANDOM_EVENT_DEFINITIONS.map((d) => [d.id, d]));
+/**
+ * The Mouse Raid's definition, deliberately NOT a member of `RANDOM_EVENT_DEFINITIONS`.
+ *
+ * That array is the weighted bag `pickRandomEventId` draws from, and the raid must never be
+ * drawn from it — it arrives on its own hourly clock instead (see `tickRandomEvents`). Keeping
+ * it out of the array rather than giving it weight zero means the bag cannot accidentally
+ * produce it if someone later changes how the walk works. Its `weight` is therefore zero and
+ * means "not in the draw", not "very unlikely".
+ *
+ * `targetCount` is the CEILING, not the count: a raid spawns three to five mice, rolled when it
+ * fires (`MOUSE_RAID_MIN_MICE`..`MOUSE_RAID_MAX_MICE`). Five is what the field records so that
+ * anything reading the pool for "how many buttons can this event put on screen" gets the truth.
+ */
+export const MOUSE_RAID_DEFINITION: RandomEventDefinition = {
+  id: "mouse_raid",
+  nameEn: "Mouse Raid",
+  nameYue: "老鼠打劫",
+  blurbEn: "Mice are on the counter. Whack every one before they carry the jar off.",
+  blurbYue: "有老鼠爬上枱。趁佢哋未搬走個曲奇罌，逐隻拍走佢。",
+  shape: "clickable",
+  durationMs: 20_000,
+  weight: 0,
+  targetCount: 5,
+  cpsMultiplier: 1,
+  clickMultiplier: 1,
+  rebateFraction: 0,
+  isSetback: true,
+};
+
+/** Fewest and most mice one raid can bring. */
+export const MOUSE_RAID_MIN_MICE = 3;
+export const MOUSE_RAID_MAX_MICE = 5;
+
+/** Every event this module knows about, pool plus raid. Lookups use this; the draw does not. */
+export const ALL_RANDOM_EVENT_DEFINITIONS: readonly RandomEventDefinition[] = [
+  ...RANDOM_EVENT_DEFINITIONS,
+  MOUSE_RAID_DEFINITION,
+];
+
+const DEFINITIONS_BY_ID = new Map(ALL_RANDOM_EVENT_DEFINITIONS.map((d) => [d.id, d]));
 
 export function getRandomEventDefinition(id: RandomEventId): RandomEventDefinition {
   const def = DEFINITIONS_BY_ID.get(id);
@@ -195,6 +265,17 @@ export interface RandomEventPayoutConfig {
   readonly luckyCrumbCpsSeconds: number;
   /** Flat cookies a Lucky Crumb pays on top, so it is never worth exactly nothing. */
   readonly luckyCrumbFlatCookies: number;
+  /**
+   * Seconds of current production paid for chasing off EVERY mouse in a raid.
+   *
+   * A defended raid pays, and it is deliberately modest: the real reward for whacking all five
+   * mice is the eighty per cent of the balance that did not leave. This is the tip on top, so
+   * that a perfect defence is visibly better than a raid that never happened rather than merely
+   * identical to it.
+   */
+  readonly raidDefendedCpsSeconds: number;
+  /** Flat cookies a fully-defended raid pays on top, so early saves get something real. */
+  readonly raidDefendedFlatCookies: number;
 }
 
 export const DEFAULT_RANDOM_EVENT_PAYOUTS: RandomEventPayoutConfig = {
@@ -203,6 +284,8 @@ export const DEFAULT_RANDOM_EVENT_PAYOUTS: RandomEventPayoutConfig = {
   grandmasBatchCpsSeconds: 600,
   luckyCrumbCpsSeconds: 90,
   luckyCrumbFlatCookies: 25,
+  raidDefendedCpsSeconds: 120,
+  raidDefendedFlatCookies: 250,
 };
 
 /* ---------------------------------------------------------------- scheduler config */
@@ -217,6 +300,46 @@ export interface RandomEventConfig {
    * is always at least this much ordinary play between two events.
    */
   readonly cooldownMs: number;
+  /* ---------------------------------------------------------------- the raid's own clock */
+  /**
+   * The Mouse Raid's window, measured from the last raid (or from the first tick of a save) to
+   * the next: THIRTY TO SIXTY MINUTES, drawn uniformly across the whole band.
+   *
+   * The band is what makes the raid unpredictable, and it is doing real work. A raid drawn
+   * uniformly over a thirty-minute span means that at any moment during that span the player
+   * has no better guess than "some time in the next half hour"; there is no interval a mental
+   * clock can count down, and knowing exactly when the last raid ended tells you nothing
+   * useful about the next one beyond the band itself. Nothing narrower is ever exposed.
+   */
+  readonly raidMinDelayMs: number;
+  readonly raidMaxDelayMs: number;
+  /**
+   * A small second draw applied on top of the band draw and clamped back inside the band.
+   *
+   * Being honest about what this is and is not: it does NOT widen the distribution and it is
+   * not where the unpredictability comes from — the band and the per-session entropy seed are.
+   * What it does is stop a delay from being one single PRNG value, so a schedule can never be
+   * pinned down from one observed gap plus a known seed, and it breaks any alignment between
+   * the rolled delay and the fixed quantities around it (the raid's own duration, the pool's
+   * cooldown, the tick period).
+   */
+  readonly raidJitterMs: number;
+  /**
+   * A floor under the FIRST raid of a save. A fresh save's opening minutes are the tutorial by
+   * another name, and a raid there teaches the wrong lesson. The rolled window is already far
+   * longer than this under the shipped config; the floor is what makes the promise true under
+   * any config, including the developer-only fast one.
+   */
+  readonly raidFreshGraceMs: number;
+  /**
+   * Below this balance a raid does not fire at all. Eighty per cent of four hundred cookies is
+   * not a robbery, it is noise — and it is noise aimed at exactly the player least able to read
+   * a new mechanic. The raid waits (it does not re-roll) until the counter is worth raiding.
+   */
+  readonly raidMinCookies: number;
+  /** The most a raid can ever take, as a fraction of the CURRENT balance. Reached only when
+   *  every mouse escapes. */
+  readonly raidStealCeiling: number;
   readonly payouts: RandomEventPayoutConfig;
 }
 
@@ -224,6 +347,12 @@ export const DEFAULT_RANDOM_EVENT_CONFIG: RandomEventConfig = {
   minDelayMs: 3 * 60 * 1000,
   maxDelayMs: 10 * 60 * 1000,
   cooldownMs: 60 * 1000,
+  raidMinDelayMs: 30 * 60 * 1000,
+  raidMaxDelayMs: 60 * 60 * 1000,
+  raidJitterMs: 90 * 1000,
+  raidFreshGraceMs: 10 * 60 * 1000,
+  raidMinCookies: 1_000,
+  raidStealCeiling: 0.8,
   payouts: DEFAULT_RANDOM_EVENT_PAYOUTS,
 };
 
@@ -241,19 +370,307 @@ export const FAST_RANDOM_EVENT_CONFIG: RandomEventConfig = {
   minDelayMs: 2_000,
   maxDelayMs: 6_000,
   cooldownMs: 1_000,
+  // The raid keeps its hour under the fast flag. "Fast" is about the pool; a capture that wants
+  // the raid asks for the raid explicitly, below.
+  raidMinDelayMs: DEFAULT_RANDOM_EVENT_CONFIG.raidMinDelayMs,
+  raidMaxDelayMs: DEFAULT_RANDOM_EVENT_CONFIG.raidMaxDelayMs,
+  raidJitterMs: DEFAULT_RANDOM_EVENT_CONFIG.raidJitterMs,
+  raidFreshGraceMs: DEFAULT_RANDOM_EVENT_CONFIG.raidFreshGraceMs,
+  raidMinCookies: DEFAULT_RANDOM_EVENT_CONFIG.raidMinCookies,
+  raidStealCeiling: DEFAULT_RANDOM_EVENT_CONFIG.raidStealCeiling,
   payouts: DEFAULT_RANDOM_EVENT_PAYOUTS,
 };
 
-/** The localStorage key (and env var name) that selects the fast schedule. */
+/**
+ * The developer-only RAID schedule, and the honest reason it exists.
+ *
+ * A Mouse Raid fires about once an hour and lasts twenty seconds. Photographing one on the real
+ * schedule means sitting on a running capture desktop for an hour hoping the shutter and the
+ * mice coincide. So the same single localStorage key that already shortens the pool's window
+ * accepts one more value — `raid` — which shortens the RAID's window instead and quiets the
+ * pool, so a capture run sees mice and nothing else.
+ *
+ * It is the same deal as the fast flag and it comes with the same limits: no button, no
+ * settings row, no in-game way to reach it. A raid the player can summon is not a raid, and a
+ * pool event landing on top of the capture would only produce a misleading picture.
+ *
+ * The MIN-COOKIES and never-two-at-once rules are NOT relaxed here. A capture that had to
+ * disable the game's fairness rails to get a picture would be a picture of something the player
+ * cannot see.
+ */
+export const RAID_CAPTURE_EVENT_CONFIG: RandomEventConfig = {
+  // Effectively never: the pool is quiet so the raid is what lands.
+  minDelayMs: 1_000_000_000,
+  maxDelayMs: 1_000_000_000,
+  cooldownMs: 1_000,
+  raidMinDelayMs: 3_000,
+  raidMaxDelayMs: 6_000,
+  raidJitterMs: 500,
+  raidFreshGraceMs: 0,
+  raidMinCookies: DEFAULT_RANDOM_EVENT_CONFIG.raidMinCookies,
+  raidStealCeiling: DEFAULT_RANDOM_EVENT_CONFIG.raidStealCeiling,
+  payouts: DEFAULT_RANDOM_EVENT_PAYOUTS,
+};
+
+/** The localStorage key (and env var name) that selects a developer schedule. */
 export const FAST_RANDOM_EVENTS_FLAG = "material-cookie-clicker:events:fast";
 
 /**
  * Pure resolver for that flag, so the decision is tested rather than trusted. Any value other
- * than the exact string "1" or "true" leaves the shipped schedule in place.
+ * than the exact strings "1", "true" (fast pool) or "raid" (fast raid, quiet pool) leaves the
+ * shipped schedule in place.
  */
 export function resolveRandomEventConfig(flagValue: string | null | undefined): RandomEventConfig {
+  if (flagValue === "raid") return RAID_CAPTURE_EVENT_CONFIG;
   if (flagValue === "1" || flagValue === "true") return FAST_RANDOM_EVENT_CONFIG;
   return DEFAULT_RANDOM_EVENT_CONFIG;
+}
+
+/* ------------------------------------------------------------ mice, and what they carry */
+
+/**
+ * ONE MOUSE, with hit points.
+ *
+ * Ordinary mice die to a single whack, which is what makes the raid readable the first time you
+ * meet it. The FAT MOUSE is the exception and it exists so that the two whack consumables have
+ * something to be good against: it takes two or three hits, and it carries double an ordinary
+ * mouse's share of the theft, so ignoring it is expensive and swinging at it once is not enough.
+ *
+ * `share` — not a count of mice — is what the theft is apportioned by. A raid of four ordinary
+ * mice plus one fat one has six shares, so the fat one alone getting away costs two sixths of
+ * the ceiling rather than one fifth of it. The number a player sees ("2 of 5 mice got away")
+ * still counts heads, because that is what they watched happen; the arithmetic underneath is
+ * stated on the site rather than hidden.
+ */
+export interface RaidMouse {
+  readonly id: string;
+  /** Hits still needed to see it off. Always at least one while it is on the stage. */
+  readonly hp: number;
+  /** What it started with, so the UI can draw two pips out of three rather than a bare number. */
+  readonly maxHp: number;
+  /** Weight in the theft split. Ordinary mice 1, the fat mouse 2. */
+  readonly share: number;
+  readonly fat: boolean;
+}
+
+/** Hit points a fat mouse can bring. Rolled per raid. */
+const FAT_MOUSE_MIN_HP = 2;
+const FAT_MOUSE_MAX_HP = 3;
+/** The mouse count at which a raid is big enough to include a fat one. */
+const FAT_MOUSE_MIN_RAID_SIZE = 4;
+
+/** Builds the mice of one raid: ordinary ones, plus a fat one on the larger raids. */
+export function rollRaidMice(count: number, rng: RngPort, halved: boolean): readonly RaidMouse[] {
+  const fatIndex = count >= FAT_MOUSE_MIN_RAID_SIZE ? count - 1 : -1;
+  const fatHp = FAT_MOUSE_MIN_HP + Math.min(
+    FAT_MOUSE_MAX_HP - FAT_MOUSE_MIN_HP,
+    Math.floor(rng.next() * (FAT_MOUSE_MAX_HP - FAT_MOUSE_MIN_HP + 1)),
+  );
+  return Array.from({ length: count }, (_, index) => {
+    const fat = index === fatIndex;
+    const maxHp = fat ? fatHp : 1;
+    return {
+      id: `mouse:${index}`,
+      hp: halved ? halveHp(maxHp) : maxHp,
+      maxHp,
+      share: fat ? 2 : 1,
+      fat,
+    };
+  });
+}
+
+/**
+ * Half-HP, rounded UP. Rounding up is the honest reading of "halve it": a one-hit mouse still
+ * takes one hit, because a mouse that died to no hits at all would not be a mouse.
+ */
+export function halveHp(hp: number): number {
+  return Math.max(1, Math.ceil(hp / 2));
+}
+
+/** Total theft weight of a set of mice. */
+export function totalShare(mice: readonly RaidMouse[]): number {
+  return mice.reduce((sum, mouse) => sum + mouse.share, 0);
+}
+
+/* ------------------------------------------------------------------------- consumables */
+
+/**
+ * THE THREE RAID CONSUMABLES.
+ *
+ * All three are bought with cookies, by hand, one at a time, from a stock that is capped — they
+ * are insurance, not immunity. Nothing here is a subscription, a timer or a reward for waiting;
+ * a player who never buys one plays exactly the game that shipped before them.
+ *
+ * They differ in WHEN they are spent, and the difference is the whole design:
+ *
+ *   - `whack_pass` is spent only at the moment a raid would actually take cookies. A raid you
+ *     defended by hand spends nothing, so a pass in the drawer is never wasted on a raid you
+ *     were going to win anyway.
+ *   - `bigger_whack` and `half_hp_whack` are ARMED when a raid starts and are spent by that
+ *     raid whatever happens, because what they buy is that raid being easier to fight. Arming
+ *     is automatic when the stock is there: an "arm now?" prompt in the middle of a
+ *     twenty-second window would be a worse game and a worse accessibility story.
+ *
+ * Stock is a COUNT, not a list of individual items, so there is no such thing as the oldest
+ * pass; "oldest first" has nothing to sort. Saying so plainly beats inventing per-item
+ * timestamps that would never be looked at.
+ */
+export type RaidConsumableId = "whack_pass" | "bigger_whack" | "half_hp_whack";
+
+export interface RaidConsumableDefinition {
+  readonly id: RaidConsumableId;
+  readonly nameEn: string;
+  readonly nameYue: string;
+  readonly blurbEn: string;
+  readonly blurbYue: string;
+  /** Cookies the first one costs. */
+  readonly baseCost: number;
+  /** What each one already bought multiplies the next one's price by. */
+  readonly costRatio: number;
+  /** The most a player may hold at once. */
+  readonly stockCap: number;
+  /** True when the raid arms it at spawn rather than spending it on the theft. */
+  readonly armedAtSpawn: boolean;
+}
+
+export const RAID_CONSUMABLE_DEFINITIONS: readonly RaidConsumableDefinition[] = [
+  {
+    id: "whack_pass",
+    nameEn: "Whack Pass",
+    nameYue: "打鼠券",
+    blurbEn: "Spent automatically when a raid would take cookies. The mice flee empty-handed.",
+    blurbYue: "老鼠真係要攞走曲奇嗰陣自動用一張，佢哋咪空手走囉。",
+    baseCost: 1_000_000,
+    costRatio: 4,
+    stockCap: 3,
+    armedAtSpawn: false,
+  },
+  {
+    id: "bigger_whack",
+    nameEn: "Bigger Whack",
+    nameYue: "大力拍",
+    blurbEn: "Armed at the next raid: one press swats every mouse it lands near.",
+    blurbYue: "下次打劫自動用：一拍就掃到附近嘅老鼠。",
+    baseCost: 2_500_000,
+    costRatio: 4,
+    stockCap: 3,
+    armedAtSpawn: true,
+  },
+  {
+    id: "half_hp_whack",
+    nameEn: "Half-HP Whack",
+    nameYue: "半血拍",
+    blurbEn: "Armed at the next raid: every mouse needs half as many hits, rounded up.",
+    blurbYue: "下次打劫自動用：每隻老鼠要嘅拍數減半，唔夠一下就當一下。",
+    baseCost: 2_500_000,
+    costRatio: 4,
+    stockCap: 3,
+    armedAtSpawn: true,
+  },
+];
+
+const CONSUMABLES_BY_ID = new Map(RAID_CONSUMABLE_DEFINITIONS.map((d) => [d.id, d]));
+
+export function getRaidConsumableDefinition(id: RaidConsumableId): RaidConsumableDefinition {
+  const def = CONSUMABLES_BY_ID.get(id);
+  if (!def) throw new Error(`Unknown raid consumable id: ${id}`);
+  return def;
+}
+
+export interface RaidConsumableStock {
+  /** How many are in hand right now. Never above the definition's cap. */
+  readonly stock: number;
+  /** How many have EVER been bought. This is what the price escalates on, so selling the idea
+   *  of "buy three, spend them, buy three cheap ones again" is not on offer. */
+  readonly purchased: number;
+}
+
+export type RaidConsumablesState = Readonly<Record<RaidConsumableId, RaidConsumableStock>>;
+
+export function createInitialRaidConsumables(): RaidConsumablesState {
+  return {
+    whack_pass: { stock: 0, purchased: 0 },
+    bigger_whack: { stock: 0, purchased: 0 },
+    half_hp_whack: { stock: 0, purchased: 0 },
+  };
+}
+
+/** The price of the NEXT one of a kind: base × ratio^(how many have ever been bought). */
+export function raidConsumablePrice(id: RaidConsumableId, consumables: RaidConsumablesState): BigNum {
+  const def = getRaidConsumableDefinition(id);
+  return bnMulScalar(bnFromNumber(def.baseCost), Math.pow(def.costRatio, consumables[id].purchased));
+}
+
+/** True when the stock is full. A capped consumable is insurance; an uncapped one is immunity. */
+export function isRaidConsumableAtCap(id: RaidConsumableId, consumables: RaidConsumablesState): boolean {
+  return consumables[id].stock >= getRaidConsumableDefinition(id).stockCap;
+}
+
+/**
+ * Buys one. Pure, and refuses silently in exactly the same shape as every other purchase in
+ * this game: at the cap, or short of the price, the state comes back unchanged.
+ */
+export function buyRaidConsumable(
+  consumables: RaidConsumablesState,
+  id: RaidConsumableId,
+  cookies: BigNum,
+): { readonly consumables: RaidConsumablesState; readonly price: BigNum; readonly bought: boolean } {
+  const price = raidConsumablePrice(id, consumables);
+  if (isRaidConsumableAtCap(id, consumables) || bnCompare(cookies, price) < 0) {
+    return { consumables, price, bought: false };
+  }
+  const current = consumables[id];
+  return {
+    consumables: { ...consumables, [id]: { stock: current.stock + 1, purchased: current.purchased + 1 } },
+    price,
+    bought: true,
+  };
+}
+
+function spendOne(consumables: RaidConsumablesState, id: RaidConsumableId): RaidConsumablesState {
+  const current = consumables[id];
+  if (current.stock <= 0) return consumables;
+  return { ...consumables, [id]: { ...current, stock: current.stock - 1 } };
+}
+
+/* --------------------------------------------------------- the bigger whack's geometry */
+
+/** How far a Bigger Whack reaches from where the press landed, in CSS pixels. */
+export const BIGGER_WHACK_RADIUS_PX = 120;
+
+/** One mouse's position on screen, as measured from its own button. */
+export interface MousePoint {
+  readonly id: string;
+  readonly x: number;
+  readonly y: number;
+}
+
+/**
+ * Which mice a single press catches.
+ *
+ * The geometry lives here, in the domain, rather than in the click handler, because "did that
+ * swing reach the second mouse" is arithmetic and arithmetic belongs where it can be tested.
+ * The POSITIONS come from the view — the mice are animated by the browser, so their real
+ * coordinates are whatever the layout says they are, and measuring the actual buttons is the
+ * only honest source for that. Overlapping mice are caught together, which is the point.
+ *
+ * The origin is always included, even if the radius is zero, so an ordinary whack is just this
+ * function with a radius of nothing.
+ */
+export function miceWithinWhackRadius(
+  points: readonly MousePoint[],
+  originId: string,
+  radiusPx: number,
+): readonly string[] {
+  const origin = points.find((point) => point.id === originId);
+  if (!origin) return [];
+  const caught = points.filter((point) => {
+    if (point.id === originId) return true;
+    const dx = point.x - origin.x;
+    const dy = point.y - origin.y;
+    return Math.sqrt(dx * dx + dy * dy) <= radiusPx;
+  });
+  return caught.map((point) => point.id);
 }
 
 /* ------------------------------------------------------------------------- the state */
@@ -266,6 +683,17 @@ export interface ActiveRandomEvent {
   readonly pendingTargetIds: readonly string[];
   /** How many targets the player has taken so far. */
   readonly claimedCount: number;
+  /**
+   * The mice of an active Mouse Raid, with their hit points. Raid-only and absent for every
+   * other event. `pendingTargetIds` stays the authoritative list of what is still on the stage
+   * and these are kept in step with it: same ids, same order, always.
+   */
+  readonly mice?: readonly RaidMouse[];
+  /** Total theft weight the raid started with, kept so the split still divides by what was
+   *  there rather than by what is left. */
+  readonly startingShare?: number;
+  /** Consumables this raid armed at spawn. Already deducted from stock; spent either way. */
+  readonly armed?: readonly RaidConsumableId[];
 }
 
 export interface ResolvedRandomEvent {
@@ -274,6 +702,34 @@ export interface ResolvedRandomEvent {
   readonly claimedCount: number;
   /** True when the player ended it themselves rather than letting the clock run out. */
   readonly endedEarly: boolean;
+}
+
+/**
+ * What one finished Mouse Raid did, kept so the aftermath toast can state it exactly.
+ *
+ * `stolen` is the cookies that actually left the balance, computed at the instant the raid
+ * ended, so the toast prints the real figure rather than re-deriving a percentage of a number
+ * that has since moved.
+ */
+export interface MouseRaidOutcome {
+  readonly resolvedAtEpochMs: number;
+  readonly miceTotal: number;
+  readonly miceWhacked: number;
+  readonly miceEscaped: number;
+  readonly stolen: BigNum;
+  /** The defended bonus, paid only when `defended` is true. Zero otherwise. */
+  readonly reward: BigNum;
+  /** True when every mouse was whacked: nothing was taken and the bonus was paid. */
+  readonly defended: boolean;
+  /**
+   * True when a Whack Pass was spent to stop the theft. Deliberately its own flag rather than
+   * being folded into `defended`: the aftermath card has to say a pass was spent, because
+   * telling a player they whacked mice they did not whack would be a lie in the one place they
+   * are looking for a straight answer.
+   */
+  readonly passSpent: boolean;
+  /** Every consumable this raid spent, armed ones included. */
+  readonly consumablesSpent: readonly RaidConsumableId[];
 }
 
 export interface RandomEventsState {
@@ -286,6 +742,18 @@ export interface RandomEventsState {
   readonly lastResolved: ResolvedRandomEvent | null;
   /** Lifetime count of events that have spawned. A statistic, and nothing depends on it. */
   readonly spawnCount: number;
+  /**
+   * The Mouse Raid's own next-eligible instant, separate from the pool's because the raid is on
+   * its own hourly clock. Zero means "never scheduled" — the first tick of a save seeds it, and
+   * that seeding is what enforces the fresh-save grace period.
+   */
+  readonly raidNextEligibleAtEpochMs: number;
+  /** The most recent raid's result, kept only so the aftermath toast can state what happened. */
+  readonly lastRaid: MouseRaidOutcome | null;
+  /** Lifetime count of raids that have fired. A statistic; nothing depends on it. */
+  readonly raidCount: number;
+  /** What the player has bought to fight raids with, and how much they have ever bought. */
+  readonly consumables: RaidConsumablesState;
 }
 
 export function createInitialRandomEventsState(): RandomEventsState {
@@ -295,6 +763,10 @@ export function createInitialRandomEventsState(): RandomEventsState {
     rngStreamIndex: 0,
     lastResolved: null,
     spawnCount: 0,
+    raidNextEligibleAtEpochMs: 0,
+    lastRaid: null,
+    raidCount: 0,
+    consumables: createInitialRaidConsumables(),
   };
 }
 
@@ -311,12 +783,52 @@ export function createInitialRandomEventsState(): RandomEventsState {
  * (the unknown key is ignored). save-codec.ts calls the two functions below and nothing else
  * knows this state is stored at all.
  */
+const RandomEventIdSchema = z.enum([
+  "cookie_rain",
+  "grandmas_batch",
+  "oven_hiccup",
+  "sugar_rush",
+  "lucky_crumb",
+  "market_day",
+  "mouse_raid",
+]);
+
+const RaidBigNumSchema = z.object({ mantissa: z.number(), exponent: z.number() });
+
+const RaidConsumableIdSchema = z.enum(["whack_pass", "bigger_whack", "half_hp_whack"]);
+
+const RaidMouseSchema = z.object({
+  id: z.string(),
+  hp: z.number().int().positive(),
+  maxHp: z.number().int().positive(),
+  share: z.number().positive(),
+  fat: z.boolean(),
+});
+
+const RaidConsumableStockSchema = z.object({
+  stock: z.number().int().nonnegative(),
+  purchased: z.number().int().nonnegative(),
+});
+
+const RaidConsumablesSchema = z
+  .object({
+    whack_pass: RaidConsumableStockSchema,
+    bigger_whack: RaidConsumableStockSchema,
+    half_hp_whack: RaidConsumableStockSchema,
+  })
+  .default(createInitialRaidConsumables);
+
 const ActiveRandomEventSchema = z.object({
-  id: z.enum(["cookie_rain", "grandmas_batch", "oven_hiccup", "sugar_rush", "lucky_crumb", "market_day"]),
+  id: RandomEventIdSchema,
   startedAtEpochMs: z.number(),
   endsAtEpochMs: z.number(),
   pendingTargetIds: z.array(z.string()),
   claimedCount: z.number().int().nonnegative(),
+  // Raid-only, and optional so a raid saved by an older build reloads as a raid of ordinary
+  // one-hit mice — which is exactly what it was.
+  mice: z.array(RaidMouseSchema).optional(),
+  startingShare: z.number().optional(),
+  armed: z.array(RaidConsumableIdSchema).optional(),
 });
 
 export const RandomEventsStateSchema = z.object({
@@ -332,6 +844,28 @@ export const RandomEventsStateSchema = z.object({
     })
     .nullable(),
   spawnCount: z.number().int().nonnegative(),
+  /* The three raid fields are OPTIONAL with defaults, for the same reason this whole block is
+     optional in the save: a save written before the raid existed is not corrupt, it is a save
+     from a game where no raid had ever happened, and that reads exactly as "unscheduled, none
+     yet, zero". Making them required would throw away a perfectly good pool schedule on the
+     first load after an update. */
+  raidNextEligibleAtEpochMs: z.number().default(0),
+  lastRaid: z
+    .object({
+      resolvedAtEpochMs: z.number(),
+      miceTotal: z.number().int().nonnegative(),
+      miceWhacked: z.number().int().nonnegative(),
+      miceEscaped: z.number().int().nonnegative(),
+      stolen: RaidBigNumSchema,
+      reward: RaidBigNumSchema,
+      defended: z.boolean(),
+      passSpent: z.boolean().default(false),
+      consumablesSpent: z.array(RaidConsumableIdSchema).default([]),
+    })
+    .nullable()
+    .default(null),
+  raidCount: z.number().int().nonnegative().default(0),
+  consumables: RaidConsumablesSchema,
 });
 
 /** JSON-safe form of the state. Structurally identical; typed separately so it can diverge. */
@@ -340,12 +874,32 @@ export type RandomEventsSaveData = z.infer<typeof RandomEventsStateSchema>;
 export function encodeRandomEvents(state: RandomEventsState): RandomEventsSaveData {
   return {
     active: state.active
-      ? { ...state.active, pendingTargetIds: [...state.active.pendingTargetIds] }
+      ? {
+          ...state.active,
+          pendingTargetIds: [...state.active.pendingTargetIds],
+          mice: state.active.mice ? state.active.mice.map((mouse) => ({ ...mouse })) : undefined,
+          armed: state.active.armed ? [...state.active.armed] : undefined,
+        }
       : null,
     nextEligibleAtEpochMs: state.nextEligibleAtEpochMs,
     rngStreamIndex: state.rngStreamIndex,
     lastResolved: state.lastResolved ? { ...state.lastResolved } : null,
     spawnCount: state.spawnCount,
+    raidNextEligibleAtEpochMs: state.raidNextEligibleAtEpochMs,
+    lastRaid: state.lastRaid
+      ? {
+          ...state.lastRaid,
+          stolen: { ...state.lastRaid.stolen },
+          reward: { ...state.lastRaid.reward },
+          consumablesSpent: [...state.lastRaid.consumablesSpent],
+        }
+      : null,
+    raidCount: state.raidCount,
+    consumables: {
+      whack_pass: { ...state.consumables.whack_pass },
+      bigger_whack: { ...state.consumables.bigger_whack },
+      half_hp_whack: { ...state.consumables.half_hp_whack },
+    },
   };
 }
 
@@ -392,10 +946,85 @@ function scheduleNext(nowEpochMs: number, rng: RngPort, config: RandomEventConfi
   return nowEpochMs + config.cooldownMs + rollDelayMs(rng, config);
 }
 
+/**
+ * The delay to the next raid: a uniform draw across the whole thirty-to-sixty-minute band, plus
+ * a small independent jitter, clamped back inside the band so the advertised bounds are the
+ * real bounds. Exported because a distribution nobody can test is a claim rather than a
+ * property.
+ */
+export function rollRaidDelayMs(rng: RngPort, config: RandomEventConfig): number {
+  const span = Math.max(0, config.raidMaxDelayMs - config.raidMinDelayMs);
+  const base = config.raidMinDelayMs + rng.next() * span;
+  const jitter = (rng.next() * 2 - 1) * config.raidJitterMs;
+  const clamped = Math.min(config.raidMaxDelayMs, Math.max(config.raidMinDelayMs, base + jitter));
+  return Math.round(clamped);
+}
+
+/**
+ * When the NEXT raid becomes eligible: one rolled delay, floored by the fresh-save grace. The
+ * floor is why the first raid of a save can never land in the opening ten minutes, whatever the
+ * window is set to.
+ */
+function scheduleNextRaid(nowEpochMs: number, rng: RngPort, config: RandomEventConfig): number {
+  return nowEpochMs + Math.max(config.raidFreshGraceMs, rollRaidDelayMs(rng, config));
+}
+
+/** How many mice this raid brings: three to five, rolled when it fires. */
+export function rollMouseCount(rng: RngPort): number {
+  const span = MOUSE_RAID_MAX_MICE - MOUSE_RAID_MIN_MICE + 1;
+  return MOUSE_RAID_MIN_MICE + Math.min(span - 1, Math.floor(rng.next() * span));
+}
+
+/** The mice of one raid, as target ids. */
+export function mouseTargetIds(count: number): readonly string[] {
+  return Array.from({ length: count }, (_, index) => `mouse:${index}`);
+}
+
+/**
+ * WHAT A RAID TAKES.
+ *
+ *   stolen = cookies × ceiling × escaped / total
+ *
+ * so one mouse of five getting away costs sixteen per cent and all five cost the full eighty.
+ * It is scaled by escapes rather than being all-or-nothing on purpose: a raid you nearly
+ * stopped should cost nearly nothing, and a player who whacked four of five has visibly bought
+ * themselves four fifths of their balance back.
+ *
+ * The multiplier is on the CURRENT balance, which is what the owner asked for ("80% of
+ * cookies") and is also the only reading that stays fair as a save grows — a flat number would
+ * be a catastrophe early and a rounding error late.
+ */
+export function mouseRaidTheft(
+  cookies: BigNum,
+  escaped: number,
+  total: number,
+  ceiling: number = DEFAULT_RANDOM_EVENT_CONFIG.raidStealCeiling,
+): BigNum {
+  if (total <= 0 || escaped <= 0) return bnFromNumber(0);
+  const fraction = ceiling * (Math.min(escaped, total) / total);
+  return bnMulScalar(cookies, fraction);
+}
+
+/** What chasing off every mouse pays. */
+export function mouseRaidDefenceReward(
+  gameState: GameState,
+  payouts: RandomEventPayoutConfig = DEFAULT_RANDOM_EVENT_PAYOUTS,
+): BigNum {
+  return bnAdd(
+    bnMulScalar(totalCps(gameState), payouts.raidDefendedCpsSeconds),
+    bnFromNumber(payouts.raidDefendedFlatCookies),
+  );
+}
+
 export interface RandomEventTickResult {
   readonly randomEvents: RandomEventsState;
   /** Cookies an instant event paid out during this tick. Zero when nothing spawned. */
   readonly instantBonus: BigNum;
+  /**
+   * Set on the tick a Mouse Raid expires with mice still loose. The reducer takes
+   * `raidTheft.stolen` off the BALANCE and nothing else — see the note on `handleTick`.
+   */
+  readonly raidTheft: MouseRaidOutcome | null;
 }
 
 /**
@@ -421,36 +1050,165 @@ export function tickRandomEvents(
   gameState: GameState,
   nowEpochMs: number,
   rng: RngPort,
-  options: { readonly blocked: boolean; readonly config?: RandomEventConfig },
+  options: {
+    readonly blocked: boolean;
+    readonly config?: RandomEventConfig;
+    /**
+     * True when the game window is hidden or minimised.
+     *
+     * THE CLOCK IS NOT PAUSED BY THIS, and that is deliberate. Every timestamp in this game is
+     * wall-clock epoch milliseconds, and offline-progress.ts credits a player for time the app
+     * was not even running; inventing a second, visibility-aware clock just for the raid would
+     * make two parts of the same save disagree about what "an hour" is. So an active raid keeps
+     * running out on the ordinary clock.
+     *
+     * What this flag DOES do is stop a raid from STARTING against a window nobody is looking
+     * at. Eligibility is deferred, not re-rolled: the raid fires on the first tick after the
+     * window comes back, so the twenty seconds the player gets to whack are twenty seconds they
+     * could actually see. That is a spawn rule, not a clock rule.
+     */
+    readonly hidden?: boolean;
+  },
 ): RandomEventTickResult {
   const config = options.config ?? DEFAULT_RANDOM_EVENT_CONFIG;
   const zero = bnFromNumber(0);
+  const quiet = { randomEvents: state, instantBonus: zero, raidTheft: null } as const;
 
   // 1 — expiry.
   if (state.active !== null && nowEpochMs >= state.active.endsAtEpochMs) {
+    const expired = state.active;
+    const resolved = {
+      id: expired.id,
+      resolvedAtEpochMs: nowEpochMs,
+      claimedCount: expired.claimedCount,
+      endedEarly: false,
+    };
+
+    // A raid that runs out with mice still loose is the only expiry in the game that COSTS
+    // something. Its own clock restarts; the pool gets a plain cooldown so the player is not
+    // robbed and then immediately interrupted again.
+    if (expired.id === "mouse_raid") {
+      const miceEscaped = expired.pendingTargetIds.length;
+      const miceTotal = miceEscaped + expired.claimedCount;
+      // The split is by SHARE, not by head: a fat mouse getting away costs what a fat mouse
+      // was carrying. Older saves (and any raid without a mouse list) fall back to heads, which
+      // is the same number when every mouse weighs one.
+      const escapedShare = expired.mice ? totalShare(expired.mice) : miceEscaped;
+      const startingShare = expired.startingShare ?? miceTotal;
+
+      // THE WHACK PASS. Spent only here, at the one moment cookies would actually leave, so a
+      // raid the player fought off by hand never costs them a pass.
+      const hasPass = state.consumables.whack_pass.stock > 0;
+      const consumables = hasPass ? spendOne(state.consumables, "whack_pass") : state.consumables;
+      const spent = [...(expired.armed ?? []), ...(hasPass ? (["whack_pass"] as const) : [])];
+
+      const outcome: MouseRaidOutcome = {
+        resolvedAtEpochMs: nowEpochMs,
+        miceTotal,
+        miceWhacked: expired.claimedCount,
+        miceEscaped,
+        stolen: hasPass
+          ? zero
+          : mouseRaidTheft(gameState.cookies, escapedShare, startingShare, config.raidStealCeiling),
+        reward: zero,
+        defended: false,
+        passSpent: hasPass,
+        consumablesSpent: spent,
+      };
+      return {
+        randomEvents: {
+          ...state,
+          active: null,
+          consumables,
+          nextEligibleAtEpochMs: Math.max(state.nextEligibleAtEpochMs, nowEpochMs + config.cooldownMs),
+          rngStreamIndex: rng.getStreamIndex(),
+          lastResolved: resolved,
+          raidNextEligibleAtEpochMs: scheduleNextRaid(nowEpochMs, rng, config),
+          lastRaid: outcome,
+        },
+        instantBonus: zero,
+        raidTheft: outcome,
+      };
+    }
+
     return {
       randomEvents: {
+        ...state,
         active: null,
         nextEligibleAtEpochMs: scheduleNext(nowEpochMs, rng, config),
         rngStreamIndex: rng.getStreamIndex(),
-        lastResolved: {
-          id: state.active.id,
-          resolvedAtEpochMs: nowEpochMs,
-          claimedCount: state.active.claimedCount,
-          endedEarly: false,
-        },
-        spawnCount: state.spawnCount,
+        lastResolved: resolved,
       },
       instantBonus: zero,
+      raidTheft: null,
     };
   }
 
-  // 2 and 3 — no overlap, and not over a golden cookie.
-  if (state.active !== null) return { randomEvents: state, instantBonus: zero };
-  if (options.blocked) return { randomEvents: state, instantBonus: zero };
+  // 2 and 3 — no overlap, and not over a golden cookie. Both rules live on the ACTIVE SLOT, so
+  // the raid inherits them for free by taking that same slot.
+  if (state.active !== null) return quiet;
+  if (options.blocked) return quiet;
 
-  // 4 — the window.
-  if (nowEpochMs < state.nextEligibleAtEpochMs) return { randomEvents: state, instantBonus: zero };
+  // 4 — the raid's own clock, checked before the pool's so that on the rare tick where both are
+  // due, the once-an-hour event wins over the once-every-few-minutes one.
+  if (state.raidNextEligibleAtEpochMs === 0) {
+    // First sight of this save: seed the raid clock and spawn nothing. The seed carries the
+    // fresh-save grace, which is why a brand new save cannot be raided in its opening minutes.
+    return {
+      randomEvents: {
+        ...state,
+        raidNextEligibleAtEpochMs: scheduleNextRaid(nowEpochMs, rng, config),
+        rngStreamIndex: rng.getStreamIndex(),
+      },
+      instantBonus: zero,
+      raidTheft: null,
+    };
+  }
+
+  if (nowEpochMs >= state.raidNextEligibleAtEpochMs) {
+    const richEnough = bnCompare(gameState.cookies, bnFromNumber(config.raidMinCookies)) >= 0;
+    // Both guards DEFER rather than re-roll: the raid stays due and lands on the first tick
+    // where the window is visible and the counter is worth raiding.
+    if (!options.hidden && richEnough) {
+      const count = rollMouseCount(rng);
+      // Arm what the player has stocked. Both armed consumables are spent HERE, by this raid,
+      // whatever the raid then does — what they bought is a raid that is easier to fight, and
+      // they got one.
+      let consumables = state.consumables;
+      const armed: RaidConsumableId[] = [];
+      for (const def of RAID_CONSUMABLE_DEFINITIONS) {
+        if (!def.armedAtSpawn) continue;
+        if (consumables[def.id].stock <= 0) continue;
+        consumables = spendOne(consumables, def.id);
+        armed.push(def.id);
+      }
+      const mice = rollRaidMice(count, rng, armed.includes("half_hp_whack"));
+      return {
+        randomEvents: {
+          ...state,
+          active: {
+            id: "mouse_raid",
+            startedAtEpochMs: nowEpochMs,
+            endsAtEpochMs: nowEpochMs + MOUSE_RAID_DEFINITION.durationMs,
+            pendingTargetIds: mice.map((mouse) => mouse.id),
+            claimedCount: 0,
+            mice,
+            startingShare: totalShare(mice),
+            armed,
+          },
+          consumables,
+          rngStreamIndex: rng.getStreamIndex(),
+          spawnCount: state.spawnCount + 1,
+          raidCount: state.raidCount + 1,
+        },
+        instantBonus: zero,
+        raidTheft: null,
+      };
+    }
+  }
+
+  // 5 — the pool's window.
+  if (nowEpochMs < state.nextEligibleAtEpochMs) return quiet;
 
   const id = pickRandomEventId(rng);
   const def = getRandomEventDefinition(id);
@@ -458,6 +1216,7 @@ export function tickRandomEvents(
   if (def.shape === "instant") {
     return {
       randomEvents: {
+        ...state,
         active: null,
         nextEligibleAtEpochMs: scheduleNext(nowEpochMs, rng, config),
         rngStreamIndex: rng.getStreamIndex(),
@@ -465,11 +1224,13 @@ export function tickRandomEvents(
         spawnCount: state.spawnCount + 1,
       },
       instantBonus: instantPayout(id, gameState, config.payouts),
+      raidTheft: null,
     };
   }
 
   return {
     randomEvents: {
+      ...state,
       active: {
         id,
         startedAtEpochMs: nowEpochMs,
@@ -477,12 +1238,11 @@ export function tickRandomEvents(
         pendingTargetIds: targetIdsFor(def),
         claimedCount: 0,
       },
-      nextEligibleAtEpochMs: state.nextEligibleAtEpochMs,
       rngStreamIndex: rng.getStreamIndex(),
-      lastResolved: state.lastResolved,
       spawnCount: state.spawnCount + 1,
     },
     instantBonus: zero,
+    raidTheft: null,
   };
 }
 
@@ -601,6 +1361,11 @@ export function clickRandomEventTarget(
   const active = state.active;
   if (!active) return { randomEvents: state, bonus: zero, claimed: false };
   if (nowEpochMs >= active.endsAtEpochMs) return { randomEvents: state, bonus: zero, claimed: false };
+  // A mouse is not a rain drop: it has hit points, and a swing can catch several of them. That
+  // lives in `whackMice`, and this function forwards rather than growing a second copy of it.
+  if (active.id === "mouse_raid") {
+    return whackMice(state, gameState, [targetId], nowEpochMs, rng, config);
+  }
   if (!active.pendingTargetIds.includes(targetId)) return { randomEvents: state, bonus: zero, claimed: false };
 
   const pendingTargetIds = active.pendingTargetIds.filter((id) => id !== targetId);
@@ -612,6 +1377,7 @@ export function clickRandomEventTarget(
   if (active.id === "oven_hiccup") {
     return {
       randomEvents: {
+        ...state,
         active: null,
         nextEligibleAtEpochMs: scheduleNext(nowEpochMs, rng, config),
         rngStreamIndex: rng.getStreamIndex(),
@@ -630,6 +1396,7 @@ export function clickRandomEventTarget(
   if (pendingTargetIds.length === 0) {
     return {
       randomEvents: {
+        ...state,
         active: null,
         nextEligibleAtEpochMs: scheduleNext(nowEpochMs, rng, config),
         rngStreamIndex: rng.getStreamIndex(),
@@ -649,6 +1416,110 @@ export function clickRandomEventTarget(
     bonus,
     claimed: true,
   };
+}
+
+
+/**
+ * ONE SWING, at one or more mice.
+ *
+ * Several ids at once is only legal when the raid armed a Bigger Whack — the domain enforces
+ * that rather than trusting the caller, so a hand-built action cannot swat five mice with a
+ * bare press. WHICH mice a Bigger Whack reaches is geometry the view measures (the mice are
+ * animated, so their real positions are whatever the layout says) and `miceWithinWhackRadius`
+ * decides; this function only asks whether the player was entitled to a wide swing at all.
+ *
+ * Each id in the swing costs its mouse ONE hit point. A mouse at zero leaves the stage and
+ * counts as whacked; a fat mouse that is still standing stays, one pip down. Clearing the stage
+ * ends the raid early, banks a defended outcome, and pays the defence bonus — and it does NOT
+ * spend a Whack Pass, because there was no theft for a pass to stop.
+ */
+export function whackMice(
+  state: RandomEventsState,
+  gameState: GameState,
+  mouseIds: readonly string[],
+  nowEpochMs: number,
+  rng: RngPort,
+  config: RandomEventConfig = DEFAULT_RANDOM_EVENT_CONFIG,
+): RandomEventClickResult {
+  const zero = bnFromNumber(0);
+  const active = state.active;
+  const refused = { randomEvents: state, bonus: zero, claimed: false };
+  if (!active || active.id !== "mouse_raid") return refused;
+  if (nowEpochMs >= active.endsAtEpochMs) return refused;
+
+  const wide = (active.armed ?? []).includes("bigger_whack");
+  const unique = [...new Set(mouseIds)];
+  if (unique.length === 0) return refused;
+  if (unique.length > 1 && !wide) return refused;
+
+  const mice = active.mice ?? active.pendingTargetIds.map((id) => ({ id, hp: 1, maxHp: 1, share: 1, fat: false }));
+  const hit = new Set(unique.filter((id) => mice.some((mouse) => mouse.id === id)));
+  if (hit.size === 0) return refused;
+
+  const survivors = mice
+    .map((mouse) => (hit.has(mouse.id) ? { ...mouse, hp: mouse.hp - 1 } : mouse))
+    .filter((mouse) => mouse.hp > 0);
+  const seenOff = mice.length - survivors.length;
+  const claimedCount = active.claimedCount + seenOff;
+
+  if (survivors.length > 0) {
+    return {
+      randomEvents: {
+        ...state,
+        active: {
+          ...active,
+          mice: survivors,
+          pendingTargetIds: survivors.map((mouse) => mouse.id),
+          claimedCount,
+        },
+      },
+      bonus: zero,
+      claimed: true,
+    };
+  }
+
+  const reward = mouseRaidDefenceReward(gameState, config.payouts);
+  return {
+    randomEvents: {
+      ...state,
+      active: null,
+      nextEligibleAtEpochMs: Math.max(state.nextEligibleAtEpochMs, nowEpochMs + config.cooldownMs),
+      rngStreamIndex: rng.getStreamIndex(),
+      lastResolved: { id: "mouse_raid", resolvedAtEpochMs: nowEpochMs, claimedCount, endedEarly: true },
+      raidNextEligibleAtEpochMs: scheduleNextRaid(nowEpochMs, rng, config),
+      lastRaid: {
+        resolvedAtEpochMs: nowEpochMs,
+        miceTotal: claimedCount,
+        miceWhacked: claimedCount,
+        miceEscaped: 0,
+        stolen: zero,
+        reward,
+        defended: true,
+        // A Whack Pass is NOT spent here. The raid was beaten by hand.
+        passSpent: false,
+        consumablesSpent: [...(active.armed ?? [])],
+      },
+    },
+    bonus: reward,
+    claimed: true,
+  };
+}
+
+/** Clears the finished-raid record, so the aftermath toast can be dismissed.
+ *
+ * Separate from `clearLastResolved` because the two toasts are separate: the marquee names an
+ * event as it lands, and the aftermath states what a raid cost or saved. Dismissing one should
+ * not silently swallow the other.
+ */
+export function clearLastRaid(state: RandomEventsState): RandomEventsState {
+  if (state.lastRaid === null) return state;
+  return { ...state, lastRaid: null };
+}
+
+/** Mice still loose in the active raid, for the HUD's remaining count. Zero when none is on. */
+export function miceRemaining(state: RandomEventsState): number {
+  if (!state.active || state.active.id !== "mouse_raid") return 0;
+  return state.active.pendingTargetIds.length;
 }
 
 /** Clears the finished-event record, so the toast naming it can be dismissed. */

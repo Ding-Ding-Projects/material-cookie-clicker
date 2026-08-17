@@ -10,6 +10,8 @@ import {
   DEFAULT_GOLDEN_COOKIE_CONFIG,
 } from "./golden-cookie.js";
 import {
+  buyRaidConsumable as buyRaidConsumablePure,
+  clearLastRaid,
   clearLastResolved,
   clickRandomEventTarget,
   createInitialRandomEventsState,
@@ -17,6 +19,8 @@ import {
   randomEventCpsMultiplier,
   randomEventRebateFraction,
   tickRandomEvents,
+  whackMice,
+  type RaidConsumableId,
   type RandomEventConfig,
   DEFAULT_RANDOM_EVENT_CONFIG,
 } from "./random-events.js";
@@ -54,6 +58,16 @@ export interface ReducerCtx {
    * is set, and tests pass their own so a scheduler assertion never has to wait ten minutes.
    */
   readonly randomEventConfig?: RandomEventConfig;
+  /**
+   * True when the game window is hidden or minimised, read at dispatch time by GameProvider.
+   *
+   * It does NOT pause any clock — every timestamp in this game is wall-clock epoch ms and
+   * offline-progress.ts already credits time the app was not running, so a second
+   * visibility-aware clock would make two halves of the same save disagree. Its one job is to
+   * keep a Mouse Raid from starting against a window nobody can see; see
+   * random-events.ts#tickRandomEvents.
+   */
+  readonly windowHidden?: boolean;
 }
 
 export type GameAction =
@@ -94,8 +108,27 @@ export type GameAction =
    * cannot pay twice.
    */
   | { readonly type: "randomEventClick"; readonly targetId: string }
+  /**
+   * A whack on one mouse of an active Mouse Raid. Its own action kind rather than a
+   * `randomEventClick` with a differently-shaped id, because it is its own gesture with its own
+   * arithmetic: a whack pays nothing by itself (what it buys is the share of the balance that
+   * mouse would have carried off) and only the LAST whack pays, as the defended bonus. Keeping
+   * it separate also means a stray `mouse:` id cannot reach the rain/oven path, and the
+   * transcript of a session says plainly which gesture happened.
+   */
+  | { readonly type: "randomEventWhack"; readonly mouseIds: readonly string[] }
+  /**
+   * Buys one raid consumable (random-events.ts): a Whack Pass, a Bigger Whack or a Half-HP
+   * Whack. An ordinary manual purchase, shaped like every other one here — it refuses silently
+   * at the stock cap or short of the price, and it takes Market Day's rebate like anything else
+   * bought with cookies.
+   */
+  | { readonly type: "buyRaidConsumable"; readonly consumableId: RaidConsumableId }
   /** Clears the finished-event record behind the "what just happened" toast. */
   | { readonly type: "randomEventResolve" }
+  /** Clears the finished-raid record behind the aftermath toast. Separate from the above
+   *  because the two toasts are separate surfaces saying different things. */
+  | { readonly type: "randomEventRaidDismiss" }
   | { readonly type: "prestige" }
   /**
    * Buys one node of the Reborn tree (reborn.ts) with ascension points. Additive, and shaped
@@ -361,11 +394,27 @@ function handleTick(state: GameState, ctx: ReducerCtx, elapsedMs: number): GameS
   // RngPort, and is told whether a golden cookie is currently holding the stage.
   const eventResult = tickRandomEvents(nextState.randomEvents, nextState, nowMs, ctx.rng, {
     blocked: goldenCookie.isSpawned,
+    hidden: ctx.windowHidden ?? false,
     config: ctx.randomEventConfig ?? DEFAULT_RANDOM_EVENT_CONFIG,
   });
   nextState = { ...nextState, randomEvents: eventResult.randomEvents };
   if (eventResult.instantBonus.mantissa !== 0) {
     nextState = addCookies(nextState, eventResult.instantBonus);
+  }
+
+  // A MOUSE RAID THAT WAS NOT FULLY DEFENDED.
+  //
+  // The theft is applied here and deliberately NOT through `addCookies` with a negative amount:
+  // that helper also advances `lifetimeCookies` and `stats.totalCookiesBaked`, and those two are
+  // history rather than balance. The mice take cookies out of the jar; they do not un-bake them,
+  // they do not revoke the achievements that lifetime total already unlocked, and they do not
+  // claw back ascension points hours after the fact. So exactly one number moves, and it is
+  // clamped at zero so a raid can empty the jar but never overdraw it.
+  if (eventResult.raidTheft && eventResult.raidTheft.stolen.mantissa !== 0) {
+    nextState = {
+      ...nextState,
+      cookies: bnClampNonNegative(bnSub(nextState.cookies, eventResult.raidTheft.stolen)),
+    };
   }
 
   // THE FACTORY RUNS ON THE SAME CLOCK. One slice of the production line per game tick, from
@@ -404,6 +453,47 @@ function handleRandomEventClick(state: GameState, ctx: ReducerCtx, targetId: str
   if (result.bonus.mantissa !== 0) nextState = addCookies(nextState, result.bonus);
 
   return withAchievements(nextState, nowIso(ctx));
+}
+
+/**
+ * One swing, at one or more mice.
+ *
+ * More than one id is only legal when the raid armed a Bigger Whack, and the DOMAIN decides
+ * that (random-events.ts#whackMice) rather than this handler trusting the action: a hand-built
+ * dispatch cannot clear a stage it was not entitled to clear. The ids are gated on shape here
+ * too, so this action can only ever reach mice.
+ */
+function handleRandomEventWhack(state: GameState, ctx: ReducerCtx, mouseIds: readonly string[]): GameState {
+  if (mouseIds.length === 0) return state;
+  if (!mouseIds.every((id) => id.startsWith("mouse:"))) return state;
+
+  const config = ctx.randomEventConfig ?? DEFAULT_RANDOM_EVENT_CONFIG;
+  const result = whackMice(state.randomEvents, state, mouseIds, ctx.now(), ctx.rng, config);
+  if (!result.claimed) return state;
+
+  let nextState: GameState = { ...state, randomEvents: result.randomEvents };
+  if (result.bonus.mantissa !== 0) nextState = addCookies(nextState, result.bonus);
+  return withAchievements(nextState, nowIso(ctx));
+}
+
+/**
+ * Buys one raid consumable. The domain owns the price, the cap and the refusal; this handler
+ * owns nothing but moving the cookies, which is the same division every purchase here uses.
+ */
+function handleBuyRaidConsumable(state: GameState, id: RaidConsumableId): GameState {
+  const result = buyRaidConsumablePure(state.randomEvents.consumables, id, state.cookies);
+  if (!result.bought) return state;
+  return {
+    ...state,
+    cookies: bnClampNonNegative(bnSub(state.cookies, result.price)),
+    randomEvents: { ...state.randomEvents, consumables: result.consumables },
+  };
+}
+
+function handleRandomEventRaidDismiss(state: GameState): GameState {
+  const randomEvents = clearLastRaid(state.randomEvents);
+  if (randomEvents === state.randomEvents) return state;
+  return { ...state, randomEvents };
 }
 
 function handleRandomEventResolve(state: GameState): GameState {
@@ -546,8 +636,14 @@ export function applyGameAction(state: GameState, action: GameAction, ctx: Reduc
       return handleCollectGoldenCookie(state, ctx);
     case "randomEventClick":
       return handleRandomEventClick(state, ctx, action.targetId);
+    case "randomEventWhack":
+      return handleRandomEventWhack(state, ctx, action.mouseIds);
+    case "buyRaidConsumable":
+      return withMarketDayRebate(state, handleBuyRaidConsumable(state, action.consumableId), ctx);
     case "randomEventResolve":
       return handleRandomEventResolve(state);
+    case "randomEventRaidDismiss":
+      return handleRandomEventRaidDismiss(state);
     case "prestige":
       return handlePrestige(state, ctx);
     case "buyRebornNode":

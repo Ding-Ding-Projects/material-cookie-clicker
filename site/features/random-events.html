@@ -4,7 +4,7 @@
 <meta charset="utf-8" />
 <meta name="viewport" content="width=device-width, initial-scale=1" />
 <title>Random events — Material Cookie Clicker</title>
-<meta name="description" content="Six events on a bounded random schedule, one of them a setback, all of them photographed running." />
+<meta name="description" content="Six events on a bounded random schedule plus an hourly Mouse Raid that can take 80% of your cookies, photographed running." />
 <link rel="stylesheet" href="../assets/site.css" />
 </head>
 <body>
@@ -24,10 +24,10 @@
 <main id="main" class="wrap">
   <article>
     <h1>Random events</h1>
-    <p class="lede">Six events on a bounded random schedule, one of them a setback, all of them photographed running.</p>
+    <p class="lede">Six events on a bounded random schedule, plus a rare Mouse Raid on its own hourly clock that can take up to 80% of your cookies if you do not whack the mice. All photographed running.</p>
     <div class="inset" style="margin-bottom:18px">
   <span class="label">Current state</span>
-  <p style="margin:0"><span class="tag">Shipped</span> the scheduler and all six events are in the build (<code>src/shared/game/random-events.ts</code>), and two of them were photographed on the running game surface.</p>
+  <p style="margin:0"><span class="tag">Shipped</span> the scheduler, all six pool events and the Mouse Raid are in the build (<code>src/shared/game/random-events.ts</code>), and four of them were photographed on the running game surface.</p>
 </div>
 
     <h2>From the running application</h2>
@@ -57,6 +57,67 @@
     </table>
     </div>
     <p>The draw is weighted, not uniform. The two plain windfalls are the most likely, and the Oven Hiccup is the least &mdash; an interruption that takes something away should be the one you remember, not the one you resent.</p>
+
+    <h2 id="mouse-raid">The Mouse Raid</h2>
+    <p>Roughly once an hour, mice get onto the counter. Three to five of them scurry across the game stage for twenty seconds, each one a real button you can whack. Every mouse still loose when the twenty seconds are up carries cookies away with it, and if all of them get away the raid takes <strong>eighty per cent of your current balance</strong>. Whack every one and it takes nothing at all, and pays you a small bonus for the trouble.</p>
+    <figure class="capture">
+      <img src="../assets/captures/mice-raid.png" alt="The game surface during a Mouse Raid. Five round pink buttons, each carrying a small grey mouse with a red ear, a red nose, whiskers and a cookie crumb under its belly, are scattered across the lower half of the stage, running over the upgrade shelf and the shop rail. The fourth HUD plate is pink and outlined in red, reading Mouse Raid in English and Cantonese with a draining dark red bar, the figure 10s, and the line 5 of 5 mice left with its Cantonese equivalent. The cookies plate reads 320 quadrillion." width="1557" height="1093" loading="lazy" />
+      <figcaption><strong>Five mice, mid-raid.</strong> Taken before hit points and the supplies shelf existed, so every mouse here is a one-hit mouse and there is no supplies plate in the HUD. Each one is a real button with its own accessible name and a 56-pixel hit area around a 36-pixel drawing &mdash; deliberately larger than the sprite, because a minimum target size measured against a stationary control is not the same promise when the control is crossing the stage. The HUD plate counts down and counts the mice still loose. Captured from the built application running on an off-screen Windows desktop, photographed with the Win32 PrintWindow API.</figcaption>
+    </figure>
+    <figure class="capture">
+      <img src="../assets/captures/mice-aftermath.png" alt="The same surface just after a raid ended. A wide pink card sits over the lower half of the stage reading: 2 of 4 mice got away with 16 quintillion cookies, the same sentence in Cantonese below it, and in smaller type, Your lifetime total is untouched — they took cookies, not history, again in both languages. A Dismiss button sits at its right. The cookies plate above now reads 24 quintillion." width="1557" height="1093" loading="lazy" />
+      <figcaption><strong>The aftermath, with the arithmetic showing.</strong> Two of the four mice were whacked with real clicks, so the raid took eighty per cent scaled by the two that escaped &mdash; forty per cent of a forty-quintillion balance, and the counter above the card reads twenty-four quintillion afterwards. The card states the amount rather than the percentage, because a percentage is not a number you can check against your own counter.</figcaption>
+    </figure>
+
+    <h3>What it takes, exactly</h3>
+    <p>The theft is <code>balance &times; 0.8 &times; escaped / total</code>, so one mouse of five getting away costs sixteen per cent and all five cost the full eighty. It is scaled rather than all-or-nothing on purpose: a raid you nearly stopped should cost you nearly nothing, and whacking four of five visibly buys back four fifths of your balance.</p>
+    <div class="scroller">
+    <table>
+      <caption>What one raid of five mice costs, by how many got away</caption>
+      <thead><tr><th scope="col">Mice that escaped</th><th scope="col">Share of your balance taken</th></tr></thead>
+      <tbody>
+        <tr><td>0 &mdash; all whacked</td><td>Nothing, plus a defended bonus of two minutes&rsquo; production and 250 cookies</td></tr>
+        <tr><td>1 of 5</td><td>16%</td></tr>
+        <tr><td>2 of 5</td><td>32%</td></tr>
+        <tr><td>3 of 5</td><td>48%</td></tr>
+        <tr><td>4 of 5</td><td>64%</td></tr>
+        <tr><td>5 of 5</td><td>80% &mdash; the ceiling, and the most a raid can ever take</td></tr>
+      </tbody>
+    </table>
+    </div>
+    <p><strong>It takes cookies, not history.</strong> The theft comes off your balance and never off your lifetime total or your baked-cookies statistic. Those two are the record of what this save has ever produced; they gate achievements and the prestige projection, and a mouse eating a biscuit does not un-bake it. Letting a raid rewind them would make it quietly retroactive &mdash; revoking achievements and ascension points hours after the fact &mdash; which is a far worse punishment than the one you agreed to. So a raid is expensive and it is survivable, and nothing it does can move a number that only ever goes up.</p>
+
+    <h3>Fat mice, and hit points</h3>
+    <p>Most mice go down to a single whack. Raids of four or five bring one <strong>fat mouse</strong>, which takes two or three hits and carries double an ordinary mouse&rsquo;s share of the theft &mdash; so a raid of four ordinary mice plus a fat one splits into six shares, and the fat one getting away on its own costs a third of the ceiling rather than a fifth of it. The head count you see in the aftermath card still counts heads, because that is what you watched happen; the split underneath is by share, and this is where that is written down.</p>
+    <p>A fat mouse is drawn larger and carries a row of pips showing how many hits it has left, and its accessible name says the same thing in words.</p>
+
+    <h3>Raid supplies</h3>
+    <p>Three consumables, bought with cookies, by hand, one at a time, from a stock that is capped at three each. They are insurance, not immunity, and a save that never buys one plays exactly the game that shipped before them. Each is priced from a base that multiplies by four for every one you have <em>ever</em> bought, so spending your stock does not reset the price.</p>
+    <div class="scroller">
+    <table>
+      <caption>The three raid consumables</caption>
+      <thead><tr><th scope="col">Item</th><th scope="col">What it does</th><th scope="col">When it is spent</th></tr></thead>
+      <tbody>
+        <tr><td>Whack Pass &middot; <span lang="zh-HK">打鼠券</span></td><td>The raid takes nothing. The mice that got away leave empty-handed.</td><td>Only at the moment a raid would actually take cookies</td></tr>
+        <tr><td>Bigger Whack &middot; <span lang="zh-HK">大力拍</span></td><td>One press swats every mouse within reach of it, overlapping mice included</td><td>Armed when a raid starts; spent by that raid</td></tr>
+        <tr><td>Half-HP Whack &middot; <span lang="zh-HK">半血拍</span></td><td>Every mouse in that raid needs half as many hits, rounded up</td><td>Armed when a raid starts; spent by that raid</td></tr>
+      </tbody>
+    </table>
+    </div>
+    <p><strong>A pass is not a defence, and the game does not pretend it is.</strong> Whacking every mouse yourself pays the defended bonus and spends no pass &mdash; a pass in the drawer is never wasted on a raid you were going to win. When a pass <em>is</em> spent, the aftermath card says so in as many words (&ldquo;A Whack Pass was spent&rdquo;) and the announcement says it too, rather than congratulating you on mice you never touched.</p>
+    <p>The two whack consumables arm themselves at the start of a raid if you have them in stock. That is deliberate: an &ldquo;arm this now?&rdquo; prompt in the middle of a twenty-second window would be a worse game and a much worse experience for anyone who needs a moment to read it. They are spent by that raid whatever happens, because what they buy is a raid that is easier to fight, and you got one. Stock is a plain count rather than a list of individual items, so there is no oldest pass to spend first &mdash; there is nothing to sort.</p>
+    <p>Where the reach of a Bigger Whack ends is arithmetic, and it lives in the domain with the rest of the arithmetic: the interface measures where the mice actually are (they are animated, so the layout is the only honest source for that) and a tested pure function decides which of them one swing caught. The domain then checks independently that the raid had a Bigger Whack armed at all, so a swing can never clear a stage it did not pay for.</p>
+
+    <h3>Rarity, and the rails around it</h3>
+    <ul>
+      <li><strong>Its own clock, not the pool&rsquo;s.</strong> The raid is never drawn from the weighted bag the other six events come from. It runs on a separate <strong>thirty-to-sixty-minute</strong> window &mdash; rare by the clock rather than rare by the dice &mdash; because an eighty-per-cent loss sharing a bag with Lucky Crumb would be either too light to be a raid or too frequent to be fair.</li>
+      <li><strong>Unpredictable inside that window.</strong> The gap is drawn uniformly across the whole half-hour band, so at any moment the best guess available is &ldquo;some time in the next half hour&rdquo; and no mental clock does better. Nothing in the interface tells you more: there is no countdown, no warning and no readable state before a raid lands &mdash; the HUD plate and the mice appear together, at the moment it starts. And the session&rsquo;s randomness is seeded from real entropy at start-up rather than from a constant, so no two installations share a timeline and a schedule worked out once is a schedule for nobody. Reloading cannot dodge a raid either: the instant the next one is due is saved as a wall-clock time and reloading does not move it.</li>
+      <li><strong>Still one event at a time.</strong> It occupies the same single active slot as everything else here, so it can never land on top of a Cookie Rain, and a golden cookie waiting to be clicked still blocks it.</li>
+      <li><strong>Never in a fresh save&rsquo;s first ten minutes.</strong> The opening minutes are the tutorial by another name, and a raid there teaches the wrong lesson.</li>
+      <li><strong>Never below a thousand cookies.</strong> Eighty per cent of four hundred cookies is not a robbery, it is noise, and it is noise aimed at exactly the player least able to read a new mechanic. The raid waits rather than re-rolling.</li>
+      <li><strong>Never against a window you are not looking at.</strong> Nothing about the game clock pauses when the window is hidden &mdash; cookies keep accruing exactly as they do while the app is closed, which is what the offline-progress rules already promise &mdash; but a raid will not <em>start</em> against a hidden or minimised window. It fires on the first tick after you come back, so the twenty seconds you get are twenty seconds you could actually see.</li>
+    </ul>
+    <p>Unpredictable in play, deterministic in the lab: the scheduler takes its randomness through an injected port, so a test supplies a seed and replays a timeline exactly while the application supplies entropy. The suite drives forty-eight hours of simulated play and asserts that the gaps really do spread across the band rather than clustering on one interval, that every rolled delay lands inside the advertised thirty-to-sixty minutes, that two independently seeded sessions produce different timelines, that no raid ever began inside an exclusion, and that the theft arithmetic is exact for every escaped-mouse count.</p>
 
     <h2>The scheduling rules, stated plainly</h2>
     <ul>

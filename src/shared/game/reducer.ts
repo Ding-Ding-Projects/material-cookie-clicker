@@ -640,7 +640,16 @@ function handleTick(state: GameState, ctx: ReducerCtx, elapsedMs: number): GameS
   return withAchievements(nextState, nowIso(ctx));
 }
 
+export const GOLDEN_COOKIE_REDEEM_CLICKS = 10;
+
 function handleCollectGoldenCookie(state: GameState, ctx: ReducerCtx): GameState {
+  if (!state.goldenCookie.isSpawned) return state;
+  // Ten presses to redeem, by owner decree — "the user must press it 10 times to redeem, not
+  // auto redeem". The first nine chip it; only the tenth runs the real collection below.
+  const pressed = (state.goldenCookie.redeemClicks ?? 0) + 1;
+  if (pressed < GOLDEN_COOKIE_REDEEM_CLICKS) {
+    return { ...state, goldenCookie: { ...state.goldenCookie, redeemClicks: pressed } };
+  }
   const config = ctx.goldenCookieConfig ?? DEFAULT_GOLDEN_COOKIE_CONFIG;
   const nowMs = ctx.now();
   const result = collectGoldenCookiePure(state.goldenCookie, state, nowMs, ctx.rng, config);

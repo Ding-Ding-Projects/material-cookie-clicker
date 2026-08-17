@@ -1277,6 +1277,80 @@ body {
 }
 
 /* ---------------------------------------------------------------------------------------- *
+ * Update notice — the one application-plumbing surface on the cabinet. Same corner card as the
+ * offline banner, one step warmer, and never a modal: the game runs behind it.
+ * ---------------------------------------------------------------------------------------- */
+/* Bottom-right, stacked ABOVE the milestone region rather than in the top-right corner: that
+   corner belongs to the console emblems, and a card there sat on top of the only navigation in
+   the cabinet. */
+.update-notice {
+  position: fixed;
+  bottom: 168px;
+  right: 20px;
+  max-width: 340px;
+  background: var(--surface-highest);
+  color: var(--on-surface);
+  border-radius: var(--shape-medium);
+  border: var(--border-thick) solid var(--outline);
+  box-shadow: 0 5px 0 0 var(--outline);
+  padding: 12px 14px;
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+  font-size: 13px;
+  z-index: 20;
+}
+
+.update-notice__title {
+  font-size: 14px;
+  font-weight: 800;
+}
+
+/* The unsigned warning is quieter than the headline but never small print: it stays at the
+   body size the rest of the card uses, because it is the part that is actually a caveat. */
+.update-notice__warning {
+  margin: 0;
+  line-height: 1.45;
+  color: var(--on-surface-variant);
+}
+
+.update-notice__actions {
+  display: flex;
+  gap: 8px;
+  justify-content: flex-end;
+}
+
+.update-notice__button {
+  font: inherit;
+  font-size: 12px;
+  font-weight: 700;
+  min-height: 44px;
+  padding: 0 16px;
+  border-radius: var(--shape-full);
+  border: var(--border-thick) solid var(--outline);
+  background: var(--surface-low);
+  color: var(--on-surface);
+  box-shadow: var(--press-1);
+  cursor: pointer;
+  transition: transform 90ms ease, box-shadow 90ms ease;
+}
+
+.update-notice__button--restart {
+  background: var(--primary-container);
+  color: var(--on-primary-container);
+}
+
+.update-notice__button:active {
+  transform: translateY(var(--drop-1));
+  box-shadow: var(--press-0);
+}
+
+.update-notice__button:focus-visible {
+  outline: 3px solid var(--primary);
+  outline-offset: 2px;
+}
+
+/* ---------------------------------------------------------------------------------------- *
  * Milestone status region — throttled, one message at a time, never the plain click counter.
  * ---------------------------------------------------------------------------------------- */
 /* Anchored bottom-RIGHT, clear of the secondary dock along the bottom-left of the cabinet, so a

@@ -4,7 +4,9 @@ import { app, BrowserWindow, ipcMain } from 'electron';
 import squirrelStartup from 'electron-squirrel-startup';
 
 import { DieselLedgerService } from './diesel-ledger-service.js';
+import { UpdateService } from './update-service.js';
 import {
+  UPDATE_IPC_CHANNELS,
   DIESEL_IPC_CHANNELS,
   type DieselMintRequest,
   type DieselMintResponse,
@@ -155,6 +157,21 @@ void app.whenReady().then(() => {
     if (!result.ok) return result;
     return { ok: true, ledger: result.ledger, filePath: dieselLedger.filePath };
   });
+
+  // Automatic updates against the unsigned Squirrel.Windows feed the release pipeline publishes
+  // (see src/shared/game/updates.ts for what Squirrel does and does not guarantee). The service
+  // is started unconditionally: in a development checkout it works out that there is no updater
+  // behind it, logs that, and publishes an `unsupported` status the notice never renders.
+  const updates = new UpdateService();
+  const pushStatus = () => {
+    if (!mainWindow || mainWindow.isDestroyed()) return;
+    mainWindow.webContents.send(UPDATE_IPC_CHANNELS.status, updates.current);
+  };
+  updates.onStatus(pushStatus);
+  ipcMain.on(UPDATE_IPC_CHANNELS.requestStatus, pushStatus);
+  ipcMain.on(UPDATE_IPC_CHANNELS.restart, () => updates.restartAndInstall());
+  app.on('before-quit', () => updates.stop());
+  updates.start();
 
   app.on('activate', () => {
     if (BrowserWindow.getAllWindows().length === 0) {

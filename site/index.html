@@ -131,6 +131,11 @@
       <p>Nobody ever pays anything for this application, and it asks for no account, no key and no network access.</p>
     </div>
     <div class="note">
+      <strong class="note-title">It updates itself, and it tells you what that is worth</strong>
+      <p>An installed copy asks this repository's GitHub releases for a newer version &mdash; once, a while after it starts, and then roughly every four hours &mdash; using the Squirrel.Windows updater the installer sets up. Nothing about that blocks the game: the check runs outside the window, the download happens in the background, and if there is no network the check simply fails and is logged. When a package has finished downloading, a small card appears in the corner saying <em>Update ready &mdash; restart to install</em>, with a Restart button and a Later button. Later hides the card; the update is still there next time you start the game.</p>
+      <p>What is actually checked: Squirrel downloads the <code>RELEASES</code> index over HTTPS, downloads the package it names, and rejects that package unless its bytes hash to the SHA1 the index recorded. What is <em>not</em> checked, ever: who wrote the index. It is unsigned, like everything else here, so the guarantee is &ldquo;these bytes match what github.com served for this repository&rdquo; and never &ldquo;this update is verified as authentic&rdquo;. The card in the corner says so in both languages rather than leaving you to assume the stronger version. If you would rather not have this at all, do not install it &mdash; run it from source, where there is no updater in the process to begin with.</p>
+    </div>
+    <div class="note">
       <strong class="note-title">What you get if you install it today</strong>
       <p>The game, playable: the single game surface with the cookie, the shop rail and the upgrade strip, plus the Diesel Factory, The Home, Achievements, Tools, Statistics and Prestige panels &mdash; all bilingual, all offline. The <a href="#captures">capture matrix above</a> is what it actually looks like.</p>
       <p>Also in this release: a Settings panel, reachable from the first frame of a new save, with a language-mode selector that really does switch the whole application between English, Cantonese and both, and two independent funny-level sliders whose values are stored across restarts.</p>

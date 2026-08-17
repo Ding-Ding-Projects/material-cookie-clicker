@@ -63,6 +63,26 @@ arithmetic and the real one-event-at-a-time rule. Waiting for a Production
 Frenzy on the shipped schedule would be about a four-hour wait, and for a Burnt
 Batch Frenzy about fifteen hours, which is not a capture process.
 
+### The update notice
+
+| File | What it shows |
+| --- | --- |
+| `update-notice.png` | The automatic-update notice on the running game: `Update ready (0.3.0) — restart to install`, the unsigned-artifact warning underneath it, and the Restart and Later buttons. It sits in the bottom-right of the cabinet over the shop rail, leaves the console emblems and the cookie alone, and dims nothing — the game is still running behind it. |
+
+**How it was taken, and what it does and does not prove.** The status in that
+card was **injected**, not earned. A development checkout has no Squirrel
+updater in it at all, so no real update could ever download here; the notice was
+driven through the dev-only seam the component listens on beside the real IPC
+push (a `material-cookie-clicker:update-status` window event, dispatched over
+the devtools connection). The picture is therefore honest evidence that the
+notice renders, reads correctly, and sits where it says it sits — and it is
+**not** evidence that an update was ever downloaded, hash-checked or installed
+on this machine. In the same session the real IPC path was exercised separately:
+asking the main process for its status returned
+`{"kind":"unsupported","reason":"this is an unpackaged development checkout, not
+a Squirrel installation"}`, which is the honest answer, and pressing the channel
+the Restart button uses did nothing, because there was no package to install.
+
 **What is not captured.** Eleven of the sixteen pool events have no picture yet:
 Grandma's Surprise Batch, Sugar Rush, Lucky Crumb, Market Day, Click Frenzy,
 Burnt Batch Frenzy, Clot, Combo Window, Delivery Rush, Flour Shortage, Night

@@ -24,6 +24,7 @@ import {
 } from './game/GameProvider';
 import { CONSOLE_EMBLEMS, PanelCorner } from './ConsoleEmblems';
 import { CoinSlot, useControlRung } from './components/CoinSlot';
+import { UpdateNotice } from './components/UpdateNotice';
 import { HUD_COOKIES_TARGET_KEY, PurchaseFxLayer, usePurchaseFxTarget } from './game/purchase-fx';
 import {
   bilingualText,
@@ -819,12 +820,15 @@ function GameShell() {
           instead of sitting on top of it. The column itself is inert to the pointer; each card
           takes its own clicks back. */}
       <div className="toast-stack">
+        {/* Application plumbing rather than a game surface: renders only when the main process
+            says a downloaded update is waiting, and it is free — updates are not a control the
+            owner has put a price on. In the stack so it can never overlap the game's cards. */}
+        <UpdateNotice />
         {/* The medal celebration, cabinet-wide: an achievement unlocks during PLAY, so the toast
             lives on the shell rather than inside the Achievements panel that the player almost
             never has open at that moment. It is aria-hidden — the milestone region below is the
             single spoken announcement. */}
         <AchievementUnlockToast />
-
         {/* The same treatment for a random event landing. Also aria-hidden: narration.ts already
             put this event through the one milestone region that speaks. */}
         <RandomEventToast />

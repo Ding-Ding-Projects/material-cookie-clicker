@@ -1,3 +1,4 @@
+import type { UpdateStatus } from "./updates.js";
 import type { DieselVoucher, DieselVoucherLedger } from "./diesel-exchange.js";
 import type { SaveDataLatest } from "./save-schema.js";
 
@@ -78,4 +79,32 @@ export type DieselReadResponse =
 export interface DieselIpcApi {
   mint(request: DieselMintRequest): Promise<DieselMintResponse>;
   read(): Promise<DieselReadResponse>;
+}
+
+/**
+ * THE UPDATE CHANNELS.
+ *
+ * Two, and deliberately asymmetric: `status` is a one-way PUSH from main to renderer (the main
+ * process owns the updater and tells the window what it knows), and `restart` is a one-way
+ * command the other way, sent only by the notice's Restart button. The renderer cannot start a
+ * check, cannot choose a feed and cannot ask where the package came from — same discipline as
+ * the window channels, where the renderer asks and the main process decides.
+ */
+export const UPDATE_IPC_CHANNELS = {
+  /** main → renderer: the current `UpdateStatus`. */
+  status: "update:status",
+  /** renderer → main: replay the current status (the window asks once, on mount). */
+  requestStatus: "update:request-status",
+  /** renderer → main: quit and install the package Squirrel already downloaded. */
+  restart: "update:restart",
+} as const;
+
+/** The shape the preload bridge exposes to the renderer for updates. */
+export interface UpdateIpcApi {
+  /** Subscribes to status pushes. Returns the unsubscribe function. */
+  onStatus(listener: (status: UpdateStatus) => void): () => void;
+  /** Asks the main process to push the current status again. */
+  requestStatus(): void;
+  /** Quits and installs. Only ever sent from the notice's Restart button. */
+  restart(): void;
 }

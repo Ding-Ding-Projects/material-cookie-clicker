@@ -5908,6 +5908,12 @@ ul.card-grid {
   display: flex;
   flex-direction: column;
   gap: 20px;
+  /* Same internal-scroll recipe as .screen: without it the anchored panel's overflow:hidden
+     clips the lower half of the dialog (the funny-level sliders were cut off entirely). */
+  flex: 1;
+  min-height: 0;
+  overflow-y: auto;
+  padding: 18px 22px 28px;
 }
 
 /* Where "Open it now" on a tool card lands, saying so plainly. */

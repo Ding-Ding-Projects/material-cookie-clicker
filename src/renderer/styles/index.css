@@ -1796,7 +1796,12 @@ body {
  * ---------------------------------------------------------------------------------------- */
 .shop-row {
   display: grid;
-  grid-template-columns: auto 34px minmax(0, 1fr) auto;
+  /* icon, names, owned count. There is NO leading checkbox column here: the bulk-select rung is
+     a purchase, and until it is bought the row has no checkbox to put in one. When the grid did
+     declare that column unconditionally every cell slid one track left — the names ended up in
+     the 34px icon track and wrapped one word per line, while the owned count sprawled across the
+     1fr track. The checkbox column arrives with the checkbox, on .shop-row--selectable below. */
+  grid-template-columns: 34px minmax(0, 1fr) auto;
   gap: 6px 10px;
   align-items: center;
   border-radius: var(--shape-sm);
@@ -1882,10 +1887,27 @@ body {
   text-align: center;
 }
 
+/* The row grows its checkbox column only when there is a checkbox to stand in it. */
+.shop-row--selectable {
+  grid-template-columns: auto 34px minmax(0, 1fr) auto;
+}
+
 .shop-row__names {
   display: flex;
   flex-direction: column;
   min-width: 0;
+}
+
+/* Every line in the name plate is one line. A rail is a narrow fixed column and a name that
+   wrapped down it a character at a time was not readable at any width; the full text is on the
+   plate's `title` and in the buy button's accessible name, so the ellipsis costs nothing. */
+.shop-row__name,
+.shop-row__name-zh,
+.shop-row__sub {
+  min-width: 0;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
 }
 
 .shop-row__name {
@@ -9442,4 +9464,323 @@ ul.card-grid {
 .controls-catalogue__rung[data-state='owned'] .controls-catalogue__rung-name,
 .controls-catalogue__rung[data-state='owned'] .controls-catalogue__rung-detail {
   opacity: 0.62;
+}
+
+/* ==========================================================================================
+   LAYOUT STABILITY
+
+   THE RULE THIS SECTION EXISTS FOR, in the owner's words: "cookie position shouldn't change
+   when new stuff appears." Progressive disclosure means panels and strips arrive during play —
+   the shop rail, the discovery ticket, the upgrade shelf, the milk tide, the event cards — and
+   every one of them used to be a member of the same flow the cookie was in, so buying a reveal
+   moved the thing the player was in the middle of clicking.
+
+   The fix is not to animate the move. It is to stop the move: the cookie's slot is reserved
+   from the first frame and sized against the WINDOW rather than against its siblings, and
+   everything that appears later either lands in a slot that was already being held for it or is
+   painted over the stage instead of inside it.
+
+   Appended at the end of the sheet in this file's established order, so nothing above is edited
+   out from under another lane.
+   ========================================================================================== */
+
+/* --- 1. The rail's column is reserved before the rail is bought -------------------------- */
+
+/* `.stage--solo` used to collapse the grid to a single column while the shop was still unbought,
+   which meant buying the Shop Sign narrowed the hero column by 372px and slid the cookie left by
+   half of that in one frame. The track is now held open from the start and simply stands empty:
+   an empty stretch of cabinet floor, with no plate drawn on it, is a much smaller cost than the
+   hero moving under the player's cursor. */
+.stage {
+  --stage-rail-width: 360px;
+  grid-template-columns: minmax(0, 1fr) var(--stage-rail-width);
+}
+
+.stage--solo {
+  grid-template-columns: minmax(0, 1fr) var(--stage-rail-width, 360px);
+}
+
+/* --- 2. The cookie's own band ------------------------------------------------------------ */
+
+/*
+ * The hero panel is a FIXED band at the top of the hero column, and the cookie is centred in the
+ * band's first row. Both measurements come from the viewport, so neither the discovery ticket
+ * arriving underneath, nor the upgrade shelf arriving under that, nor the per-second line
+ * appearing inside the panel itself can move the cookie by a pixel. What those reveals take is
+ * the space BELOW the band, which is the space that was always going to be theirs.
+ */
+.stage__hero-column {
+  --hero-cookie-band: clamp(168px, 26vh, 300px);
+  --hero-cookie-row: clamp(132px, 20vh, 236px);
+}
+
+.stage__hero-column > .panel.cookie-hero {
+  flex: 0 0 var(--hero-cookie-band);
+  height: var(--hero-cookie-band);
+  min-height: var(--hero-cookie-band);
+  display: grid;
+  grid-template-rows: var(--hero-cookie-row) repeat(2, auto);
+  justify-items: center;
+  align-content: start;
+  overflow: hidden;
+}
+
+/* Row one, centred in it. This is the element whose centre the layout contract is about. */
+.stage__hero-column > .panel.cookie-hero > .cookie-target-wrap,
+.stage__hero-column > .panel.cookie-hero > .golden-overlay-wrap {
+  grid-row: 1;
+  align-self: center;
+}
+
+/* Everything the hero panel says about itself flows underneath the band, inside it. */
+.stage__hero-column > .panel.cookie-hero > .cookie-cps,
+.stage__hero-column > .panel.cookie-hero > .cookie-hero__hint {
+  align-self: start;
+}
+
+/* The shelf takes the rest of the column, and only the rest of it. */
+.stage__hero-column > .panel.upgrade-shelf {
+  flex: 1 1 auto;
+  min-height: 0;
+}
+
+/* --- 3. The upgrade shelf's three sections never overlap --------------------------------- */
+
+/*
+ * "READY TO BUY" was printed on top of "NEARLY THERE", and buyable tickets floated over the
+ * requirement rows beneath them, because the buyable section was allowed to shrink below its
+ * contents (flex: 1 1 auto; min-height: 0) while its contents kept their own fixed heights and
+ * simply overflowed a section that had no `overflow` of its own. A flex item that shrinks past
+ * its content does not clip it — it lets it out, over whatever comes next.
+ *
+ * So: every section clips to itself, the sections keep their natural heights instead of being
+ * squeezed, and when the column is genuinely too short for all three the SHELF scrolls. A
+ * scrollbar is an honest way to run out of room; two headings sharing one line is not.
+ */
+.upgrade-shelf {
+  overflow-y: auto;
+  overflow-x: hidden;
+  gap: 10px;
+}
+
+.shelf-section {
+  min-height: 0;
+  overflow: hidden;
+}
+
+.upgrade-shelf .shelf-section--buyable {
+  /* No longer the elastic one. Its own grid already scrolls past two rows. */
+  flex: 0 0 auto;
+}
+
+.upgrade-shelf .shelf-grid {
+  height: calc(var(--shelf-ticket-height) * 2 + 6px);
+  min-height: calc(var(--shelf-ticket-height) * 2 + 6px);
+  max-height: calc(var(--shelf-ticket-height) * 2 + 6px);
+  flex: 0 0 auto;
+}
+
+/* A heading is a fixed strip of the section, never something a grid can push through. */
+.shelf-section__heading {
+  flex: 0 0 auto;
+  min-height: 18px;
+}
+
+/* --- 4. The ticket says what it does ----------------------------------------------------- */
+
+/* Tickets grew a third line (the effect), so the two-row cap grew with them. */
+.shelf-grid {
+  --shelf-ticket-height: 82px;
+}
+
+.shelf-ticket__effect {
+  font-size: 0.68rem;
+  line-height: 1.25;
+  color: var(--on-surface-variant);
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+  min-width: 0;
+}
+
+/* An affordable ticket is the one being read, so its effect line is not the quiet one. */
+.shelf-ticket--affordable .shelf-ticket__effect {
+  color: var(--on-surface);
+}
+
+/* --- 5. The cookies plate takes the room the big figures need ---------------------------- */
+
+/*
+ * The three HUD plates shared the width evenly, which is the wrong split: PER SECOND and PER
+ * CLICK are small figures and COOKIES is the one that reaches fourteen grouped digits. The
+ * cookies plate is now twice the flex weight of its neighbours and has a much larger basis, so
+ * it takes width from them before the existing shrink-to-fit in `.hud__value` has to start
+ * shrinking the type. The two mechanisms compose: flex finds the room first, and the font-size
+ * clamp is the floor for a figure that outgrows even that.
+ */
+.hud .hud__readout:first-child {
+  flex: 2 1 260px;
+  min-width: 190px;
+}
+
+/* --- 6. Toasts stack instead of piling up ------------------------------------------------ */
+
+/*
+ * Four cards, four hard-coded corners, offsets 24px and 92px and 96px apart: any two of them on
+ * screen together overlapped, and the achievement card and the milestone region did it every
+ * single time an achievement landed, because one unlock produces both. They are now flowed
+ * children of one bottom-right column that grows upwards with a real gap.
+ */
+.toast-stack {
+  position: fixed;
+  right: 24px;
+  bottom: 24px;
+  z-index: 60;
+  display: flex;
+  flex-direction: column;
+  align-items: flex-end;
+  gap: 12px;
+  max-width: min(560px, calc(100vw - 48px));
+  /* The column is only a layout: it must not swallow clicks aimed at the cabinet behind it. */
+  pointer-events: none;
+}
+
+/* Each card gives up its own anchoring and becomes a row in the stack. Nothing about how a card
+   LOOKS changes here — only where it is allowed to decide it lives. */
+.toast-stack > .achievement-toast,
+.toast-stack > .event-toast,
+.toast-stack > .raid-aftermath,
+.toast-stack > .milestone-region {
+  position: static;
+  inset: auto;
+  transform: none;
+  margin: 0;
+  pointer-events: auto;
+}
+
+/* The entry animations translated the card into place from its old fixed anchor; in a flow
+   column the horizontal half of that is a lie, so the cards rise into place instead. */
+.toast-stack > .event-toast {
+  animation: toast-stack-in 260ms cubic-bezier(0.2, 1.4, 0.4, 1);
+}
+
+.toast-stack > .raid-aftermath {
+  animation: toast-stack-in 280ms ease-out;
+}
+
+@keyframes toast-stack-in {
+  from {
+    transform: translateY(14px);
+    opacity: 0;
+  }
+  to {
+    transform: translateY(0);
+    opacity: 1;
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .toast-stack > .event-toast,
+  .toast-stack > .raid-aftermath {
+    animation: none;
+  }
+}
+
+/* --- 7. The narrow layout keeps all of the above ----------------------------------------- */
+
+@media (max-width: 900px) {
+  /* Below the rail breakpoint the stage is a flex column, so there is no rail track to reserve
+     and the hero band is measured against a shorter window. */
+  .stage,
+  .stage--solo {
+    grid-template-columns: none;
+  }
+
+  .stage__hero-column {
+    --hero-cookie-band: clamp(168px, 30vh, 260px);
+    --hero-cookie-row: clamp(130px, 23vh, 200px);
+  }
+
+  .toast-stack {
+    left: 16px;
+    right: 16px;
+    bottom: 16px;
+    align-items: stretch;
+    max-width: none;
+  }
+}
+
+/* --- 8. A readout that cannot outgrow its own plate -------------------------------------- */
+
+/*
+ * `.hud__value` already shrank its type as the figure got longer, but it did the sum against the
+ * VIEWPORT (3.6vw), which knows nothing about how wide this particular plate ended up. Once the
+ * cookies plate started taking width from its neighbours in rule 5 above, PER SECOND could be
+ * handed a plate narrower than the size the viewport sum had chosen, and `overflow: hidden` did
+ * exactly what it says: it cut the last digits off a number.
+ *
+ * Each plate is now a query container, and the type takes the SMALLER of the two sums — the
+ * viewport one it always used, and one derived from this plate's real inline size and the real
+ * character count. A figure can no longer be clipped by a plate it does not fit, whatever the
+ * flex distribution above it decides.
+ */
+.hud__readout {
+  container-type: inline-size;
+}
+
+.hud__value {
+  font-size: min(
+    max(13px, calc(clamp(24px, 3.6vw, 40px) * 6 / var(--hud-value-chars, 6))),
+    calc(100cqi / (var(--hud-value-chars, 6) * 0.66))
+  );
+}
+
+/* --- 9. The buyable grid gives up its second row before the shelf gives up the section ---- */
+
+/* Two ticket rows when the cabinet can pay for them, one when it cannot, and its own scrollbar
+   past that. Fixing the height at two rows meant that on a short window the section was taller
+   than the shelf could hold and the shelf scrolled instead — which put half a ticket against the
+   bottom edge of the panel rather than a whole one. */
+.upgrade-shelf .shelf-grid {
+  height: auto;
+  min-height: var(--shelf-ticket-height);
+  max-height: calc(var(--shelf-ticket-height) * 2 + 6px);
+  flex: 0 1 auto;
+}
+
+/* --- 10. The owned count is never the thing that gives way ------------------------------- */
+
+/*
+ * How many of a generator you already own is the single fact the row exists to report, so it
+ * outranks everything else on the plate. It sits in its own track, it never shrinks, it never
+ * wraps and it is never ellipsized: when the rail runs short of width it is the rate sub-line
+ * that loses characters, because a rate can be read again off the ladder and a missing count
+ * cannot be read anywhere.
+ */
+.shop-row__owned {
+  grid-column: -2 / -1;
+  justify-self: end;
+  white-space: nowrap;
+  overflow: visible;
+  min-width: 2ch;
+  text-align: right;
+}
+
+/* The rate line is the designated loser, and says so in one place rather than by accident. */
+.shop-row__sub {
+  min-width: 0;
+}
+
+/* Ticket names carry their own multiples ("Cursor Upgrade (x5)"), and those live at the END of
+   the string — exactly where an ellipsis bites. The tickets are therefore given real width
+   before truncation is reached: a wider minimum column, and a body that takes every pixel the
+   glyph does not. What still has to truncate keeps its full name in the ticket's `title` and in
+   its accessible name, both of which now carry the name as well as the effect and the price. */
+.shelf-grid {
+  grid-template-columns: repeat(auto-fill, minmax(212px, 1fr));
+}
+
+.shelf-ticket__body {
+  flex: 1 1 auto;
+  min-width: 0;
 }

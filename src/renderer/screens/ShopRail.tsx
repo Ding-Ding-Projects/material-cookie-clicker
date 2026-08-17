@@ -106,8 +106,15 @@ const GeneratorRow = memo(function GeneratorRow({
   // count and wiggles the icon. Registering the element is all this component does about it —
   // the animation is started by the fx layer from the reducer's own state diff, never here.
   const fxRef = usePurchaseFxTarget<HTMLDivElement>(generatorTargetKey(def.id));
+  const rate = formatBigNum(generatorCps(def, 1), 'en');
+  const rateLine = `+${rate}/sec each · 每個 +${rate}`;
   return (
-    <div ref={fxRef} className={`shop-row${owned > 0 ? ' owned' : ''}`}>
+    // `shop-row--selectable` is not decoration: the row's grid has a leading column FOR the
+    // checkbox, and until the bulk-select rung is bought there is no checkbox to put in it. The
+    // class is what tells the grid whether that column exists — without it every cell shifted one
+    // track to the left, the names landed in the 34px icon track, and "Cursor" wrapped one
+    // character per line while the owned count sat in the 1fr track doing nothing with it.
+    <div ref={fxRef} className={`shop-row${selectable ? ' shop-row--selectable' : ''}${owned > 0 ? ' owned' : ''}`}>
       {/* The row checkbox is bought once, for every row at once — so only the FIRST row carries
           the price plate (see the list below), and every other locked row simply has no
           checkbox. Fourteen identical price tags down one rail would be noise, not an offer. */}
@@ -123,12 +130,14 @@ const GeneratorRow = memo(function GeneratorRow({
       <div className="shop-row__icon" aria-hidden="true">
         <GeneratorIcon id={def.id} />
       </div>
-      <div className="shop-row__names">
+      {/* Each line is ONE line: the rail is a fixed-width column, and a name that wrapped
+          vertically down it was unreadable. The lines ellipsize instead, and the whole plate
+          carries the untruncated text in `title` — the buy button's aria-label already names the
+          generator in full, so nothing accessible is lost to the ellipsis. */}
+      <div className="shop-row__names" title={`${def.nameEn} · ${def.nameYue} — ${rateLine}`}>
         {showsEnglish() ? <span className="shop-row__name">{def.nameEn}</span> : null}
         {showsCantonese() ? <span className="shop-row__name-zh">{def.nameYue}</span> : null}
-        <span className="shop-row__sub">
-          {`+${formatBigNum(generatorCps(def, 1), 'en')}/sec each · 每個 +${formatBigNum(generatorCps(def, 1), 'en')}`}
-        </span>
+        <span className="shop-row__sub">{rateLine}</span>
       </div>
       <span className="shop-row__owned" aria-label={`${LIST_COPY.owned.en} ${owned} · ${LIST_COPY.owned.yue} ${owned}`}>
         {owned}

@@ -215,7 +215,7 @@ const UpgradeTicket = memo(function UpgradeTicket({
       type="button"
       className={`shelf-ticket${affordable ? ' shelf-ticket--affordable' : ''}`}
       disabled={!affordable}
-      title={`${bilingualText(effect)} — 🍪 ${formatExactDigits(def.cost)}`}
+      title={`${def.nameEn} · ${def.nameYue} — ${bilingualText(effect)} — 🍪 ${formatExactDigits(def.cost)}`}
       aria-label={`${def.nameEn} · ${def.nameYue} — ${bilingualText(effect)} — ${bilingualText(LIST_COPY.buy)} — 🍪 ${formatExactDigits(def.cost)}`}
       onClick={() => dispatch({ type: 'buyUpgrade', upgradeId: def.id })}
     >
@@ -225,6 +225,12 @@ const UpgradeTicket = memo(function UpgradeTicket({
       <span className="shelf-ticket__body">
         {showsEnglish() ? <span className="shelf-ticket__name">{def.nameEn}</span> : null}
         {showsCantonese() ? <span className="shelf-ticket__name-zh">{def.nameYue}</span> : null}
+        {/* WHAT IT DOES, on the ticket. A name and a price alone ask the player to buy something
+            without saying what they are buying — and the names truncate, so half of them did not
+            even say that. This is the same derived effect line the tooltip and the accessible
+            name already carried; it just stops being hidden behind a hover the keyboard never
+            reaches. It is one line and ellipsizes; the full text stays in `title` and aria. */}
+        <span className="shelf-ticket__effect">{bilingualText(effect)}</span>
         <span className="shelf-ticket__cost">{`🍪 ${formatExact(def.cost, 'en')}`}</span>
       </span>
     </button>

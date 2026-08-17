@@ -719,23 +719,32 @@ function GameShell() {
         </div>
       )}
 
-      {/* The medal celebration, cabinet-wide: an achievement unlocks during PLAY, so the toast
-          lives on the shell rather than inside the Achievements panel that the player almost
-          never has open at that moment. It is aria-hidden — the milestone region below is the
-          single spoken announcement. */}
-      <AchievementUnlockToast />
+      {/* ONE STACK FOR EVERYTHING THAT POPS UP.
+          Each of these four used to pin itself to its own corner with its own `bottom` offset,
+          and the offsets were close enough together that two of them landing at once drew one
+          card straight through another. They are now flowed children of a single fixed column
+          that stacks bottom-up with a real gap, so a second card pushes the first up the screen
+          instead of sitting on top of it. The column itself is inert to the pointer; each card
+          takes its own clicks back. */}
+      <div className="toast-stack">
+        {/* The medal celebration, cabinet-wide: an achievement unlocks during PLAY, so the toast
+            lives on the shell rather than inside the Achievements panel that the player almost
+            never has open at that moment. It is aria-hidden — the milestone region below is the
+            single spoken announcement. */}
+        <AchievementUnlockToast />
 
-      {/* The same treatment for a random event landing. Also aria-hidden: narration.ts already
-          put this event through the one milestone region that speaks. */}
-      <RandomEventToast />
+        {/* The same treatment for a random event landing. Also aria-hidden: narration.ts already
+            put this event through the one milestone region that speaks. */}
+        <RandomEventToast />
 
-      {/* What a Mouse Raid actually cost, or what defending it paid, with the literal figure in
-          it. Real content rather than aria-hidden decoration — the status region announced the
-          outcome once, and this is the copy of it a player can go back and read. */}
-      <MouseRaidAftermathToast />
+        {/* What a Mouse Raid actually cost, or what defending it paid, with the literal figure in
+            it. Real content rather than aria-hidden decoration — the status region announced the
+            outcome once, and this is the copy of it a player can go back and read. */}
+        <MouseRaidAftermathToast />
 
-      <div className="milestone-region" role="status" aria-live="polite">
-        {milestoneMessage ? `${bilingualText(milestoneMessage)}` : ''}
+        <div className="milestone-region" role="status" aria-live="polite">
+          {milestoneMessage ? `${bilingualText(milestoneMessage)}` : ''}
+        </div>
       </div>
 
       {/* The one purchase-feedback overlay for the whole game. It renders nothing until a

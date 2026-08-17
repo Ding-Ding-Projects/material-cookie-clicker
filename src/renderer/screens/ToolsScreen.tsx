@@ -106,6 +106,7 @@ type NodeState = 'undiscovered' | 'locked' | 'ready' | 'unlocked';
  */
 function OpenItNowCallout({ def, onOpen }: { def: ToolDefinition; onOpen: OpenApplicationFeature }) {
   const settingsBought = useControlRung(SETTINGS_OPEN_RUNG_ID);
+  const buttonBought = useControlRung('tools.openItNow');
   return (
     <div className="open-real-feature">
       <span className="open-real-feature__badge">
@@ -119,14 +120,21 @@ function OpenItNowCallout({ def, onOpen }: { def: ToolDefinition; onOpen: OpenAp
           {bilingualText(TOOLS_SCREEN_COPY.openItNowPriced(formatExactDigits(controlRungPrice(SETTINGS_OPEN_RUNG_ID))))}
         </span>
       )}
-      <button
-        type="button"
-        className="open-real-feature__button"
-        onClick={() => onOpen(def.id, def)}
-        aria-label={`${TOOLS_SCREEN_COPY.openItNow.en} — ${def.nameEn} · ${TOOLS_SCREEN_COPY.openItNow.yue} — ${def.nameYue}`}
-      >
-        {bilingualText(TOOLS_SCREEN_COPY.openItNow)}
-      </button>
+      {buttonBought ? (
+        <button
+          type="button"
+          className="open-real-feature__button"
+          onClick={() => onOpen(def.id, def)}
+          aria-label={`${TOOLS_SCREEN_COPY.openItNow.en} — ${def.nameEn} · ${TOOLS_SCREEN_COPY.openItNow.yue} — ${def.nameYue}`}
+        >
+          {bilingualText(TOOLS_SCREEN_COPY.openItNow)}
+        </button>
+      ) : (
+        /* Priced by decree ("must be bought"): one purchase covers the button on every card.
+           The plate is the same coin slot as everywhere; the feature behind it stays reachable
+           through Settings regardless — this sells the shortcut, not the feature. */
+        <CoinSlot rungId="tools.openItNow" variant="inline" className="open-real-feature__slot" />
+      )}
     </div>
   );
 }

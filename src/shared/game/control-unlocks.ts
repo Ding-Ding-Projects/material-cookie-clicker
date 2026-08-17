@@ -229,6 +229,28 @@ export const CONTROL_UNLOCKS: readonly ControlUnlockDefinition[] = [
     ],
   },
   {
+    id: "tools.openItNow",
+    group: "toggle",
+    nameEn: "The 'Open it now' button",
+    nameYue: "「而家就開」個掣",
+    whereEn: "Every tool card in the tech tree",
+    whereYue: "科技樹每張工具卡",
+    rungs: [
+      {
+        // The owner priced even this ("must be bought"). The FEATURE stays priced-never-
+        // progress-gated: the button's price is flat, visible, and buyable from the first
+        // minute — what is sold is the shortcut button, never the feature behind it, which
+        // remains reachable through Settings once that is bought.
+        id: "tools.openItNow",
+        nameEn: "Open it now",
+        nameYue: "而家就開",
+        detailEn: "The shortcut button on every tool card that opens the real application feature.",
+        detailYue: "每張工具卡上面嗰個直接開真功能嘅捷徑掣。",
+        price: 75,
+      },
+    ],
+  },
+  {
     id: "chrome.drag",
     group: "chrome",
     nameEn: "Drag the window",
@@ -723,6 +745,7 @@ export const MIGRATION_GRANT_LIFETIME_THRESHOLD = 1_000;
  */
 export const V6_GRANDFATHERED_RUNG_IDS: readonly string[] = [
   "chrome.close",
+  "tools.openItNow",
   "chrome.drag",
   // "chrome.drag.full" was retired when one purchase became the whole bar; saves that carry the
   // old id keep it harmlessly, and granting it to new migrations would grant nothing.

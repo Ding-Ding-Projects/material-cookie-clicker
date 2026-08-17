@@ -1,6 +1,6 @@
 import { memo, useState } from 'react';
 
-import { bnCompare, bnFromNumber } from '../../shared/game/big-number.js';
+import { bnCompare, bnFromNumber, bnSub } from '../../shared/game/big-number.js';
 import { formatExact, formatExactDigits } from '../../shared/game/format-number.js';
 import {
   buildProgressFraction,
@@ -77,15 +77,19 @@ function CozinessGauge({ home }: { home: HomeConstructionState }) {
     <section className="home-coziness" aria-label={bilingualText(HOME_COPY.cozinessTitle)}>
       <h3 className="home-section__title">{bilingualText(HOME_COPY.cozinessTitle)}</h3>
       <div className="home-coziness__body">
+        {/* role="progressbar" with a STABLE name: the score is the value, and a value belongs in
+            aria-valuetext, not in a name that would otherwise be rewritten every time a piece of
+            furniture landed. */}
         <div
           className="home-gauge"
-          role="meter"
+          role="progressbar"
           aria-valuemin={0}
           aria-valuemax={MAX_COZINESS}
           aria-valuenow={Math.round(bonuses.coziness)}
-          aria-label={bilingualText(
+          aria-valuetext={bilingualText(
             HOME_COPY.cozinessMeterLabel(figure(Math.round(bonuses.coziness)), figure(MAX_COZINESS)),
           )}
+          aria-label={bilingualText(HOME_COPY.cozinessTitle)}
         >
           <span className="home-gauge__arc" aria-hidden="true" />
           <span className="home-gauge__fill" style={{ '--home-gauge-fraction': fraction } as React.CSSProperties} aria-hidden="true" />
@@ -164,17 +168,28 @@ function BuildingSite({ home }: { home: HomeConstructionState }) {
   );
 }
 
-/** A real progress bar: the fill is the fraction, and the value is announced as a meter. */
+/**
+ * A real progress bar. `role="progressbar"` rather than `role="meter"`: this is a task's progress
+ * towards completion, which is what progressbar means, and meter is ignored outright by several
+ * shipping screen readers.
+ *
+ * The value is derived from the fraction ONCE, as a number, and both the announced value and the
+ * printed text come off it. The previous shape read `Number(percentText(...))` — parsing a
+ * locale-formatted string back into a number, which stops working the moment that string ever
+ * carries a grouping separator.
+ */
 function ProgressBar({ fraction }: { fraction: number }) {
-  const percent = percentText(fraction);
+  const percentValue = Math.round(Math.min(1, Math.max(0, fraction)) * 100);
+  const percent = percentValue.toLocaleString('en-US');
   return (
     <div
       className="home-progress"
-      role="meter"
+      role="progressbar"
       aria-valuemin={0}
       aria-valuemax={100}
-      aria-valuenow={Number(percent)}
-      aria-label={bilingualText(HOME_COPY.buildProgress(percent))}
+      aria-valuenow={percentValue}
+      aria-valuetext={bilingualText(HOME_COPY.buildProgressValue(percent))}
+      aria-label={bilingualText(HOME_COPY.buildProgressName)}
     >
       <span className="home-progress__fill" style={{ width: `${Math.min(100, Math.max(0, fraction * 100))}%` }} />
       <span className="home-progress__label" aria-hidden="true">
@@ -351,24 +366,46 @@ function RoomCard({ home, def }: { home: HomeConstructionState; def: RoomDefinit
   );
 }
 
-/** The affordability leaf, split out so a five-times-a-second tick does not redraw the card. */
+/**
+ * WHY NONE OF THESE THREE BUTTONS EVER CARRIES `disabled`.
+ *
+ * The rule is CoinSlot's (components/CoinSlot.tsx): a control the player cannot afford YET is
+ * still the place the price is written, and `disabled` takes it out of the tab order, so the
+ * keyboard player loses the one surface that would have told them what they are saving up for.
+ * These buttons stay pressable and carry `aria-disabled`; the reducer refuses the press, and
+ * narration.ts turns that refusal into a spoken line in the status region — success and refusal
+ * are both announced, which is what the silent version could not do.
+ *
+ * The reason a press cannot succeed lives in `aria-describedby`, on a real element, not in a
+ * `title` tooltip that a keyboard never reaches.
+ */
 const BlueprintButton = memo(function BlueprintButton({ def }: { def: RoomDefinition }) {
   const dispatch = useGameDispatch();
   const fast = useFastSnapshot();
   const cost = bnFromNumber(def.blueprintCost);
   const affordable = bnCompare(fast.cookies, cost) >= 0;
+  const priceText = formatExactDigits(cost);
+  const reasonId = `home-blueprint-why-${def.id}`;
 
   return (
-    <button
-      type="button"
-      className="buy-btn"
-      disabled={!affordable}
-      title={`${def.nameEn} · ${def.nameYue} — 🍪 ${formatExactDigits(cost)}`}
-      aria-label={`${HOME_COPY.buyBlueprint.en} ${def.nameEn} · ${HOME_COPY.buyBlueprint.yue}${def.nameYue} — 🍪 ${formatExactDigits(cost)}`}
-      onClick={() => dispatch({ type: 'buyHomeBlueprint', roomId: def.id })}
-    >
-      {bilingualText(HOME_COPY.buyBlueprint)} — 🍪 {figure(def.blueprintCost)}
-    </button>
+    <>
+      <button
+        type="button"
+        className="buy-btn"
+        aria-disabled={!affordable}
+        aria-describedby={affordable ? undefined : reasonId}
+        title={bilingualText(HOME_COPY.blueprintButtonLabel(def.nameEn, def.nameYue, priceText))}
+        aria-label={bilingualText(HOME_COPY.blueprintButtonLabel(def.nameEn, def.nameYue, priceText))}
+        onClick={() => dispatch({ type: 'buyHomeBlueprint', roomId: def.id })}
+      >
+        {bilingualText(HOME_COPY.buyBlueprint)} — 🍪 {figure(def.blueprintCost)}
+      </button>
+      {affordable ? null : (
+        <span className="home-why" id={reasonId}>
+          {bilingualText(HOME_COPY.blockedShortfall(formatExactDigits(bnSub(cost, fast.cookies))))}
+        </span>
+      )}
+    </>
   );
 });
 
@@ -386,18 +423,37 @@ const StartBuildButton = memo(function StartBuildButton({
   // The one-at-a-time rule is visible here as well as stated in words above: the button is dead
   // while another room is up, and the site card says why.
   const allowed = canStartConstruction(home, def.id);
+  const priceText = formatExactDigits(cost);
+  const reasonId = `home-build-why-${def.id}`;
+  // The blocked reason is part of what this button IS, so it is appended to the accessible name
+  // as well as described: a button that goes from pressable to blocked under a reader's cursor
+  // has to say what changed, and the site card two sections up is not where that reader is.
+  const blocked: string | null = !allowed
+    ? bilingualText(HOME_COPY.blockedBusy)
+    : !affordable
+      ? bilingualText(HOME_COPY.blockedShortfall(formatExactDigits(bnSub(cost, fast.cookies))))
+      : null;
+  const name = bilingualText(HOME_COPY.startBuildButtonLabel(def.nameEn, def.nameYue, priceText));
 
   return (
-    <button
-      type="button"
-      className="buy-btn buy-btn--build"
-      disabled={!affordable || !allowed}
-      title={`${def.nameEn} · ${def.nameYue} — 🍪 ${formatExactDigits(cost)}`}
-      aria-label={`${HOME_COPY.startBuild.en} ${def.nameEn} · ${HOME_COPY.startBuild.yue}${def.nameYue} — 🍪 ${formatExactDigits(cost)}`}
-      onClick={() => dispatch({ type: 'startHomeConstruction', roomId: def.id })}
-    >
-      {bilingualText(HOME_COPY.startBuild)} — 🍪 {figure(def.buildCost)}
-    </button>
+    <>
+      <button
+        type="button"
+        className="buy-btn buy-btn--build"
+        aria-disabled={!affordable || !allowed}
+        aria-describedby={blocked ? reasonId : undefined}
+        title={blocked ? `${name} — ${blocked}` : name}
+        aria-label={blocked ? `${name} — ${blocked}` : name}
+        onClick={() => dispatch({ type: 'startHomeConstruction', roomId: def.id })}
+      >
+        {bilingualText(HOME_COPY.startBuild)} — 🍪 {figure(def.buildCost)}
+      </button>
+      {blocked ? (
+        <span className="home-why" id={reasonId}>
+          {blocked}
+        </span>
+      ) : null}
+    </>
   );
 });
 
@@ -436,18 +492,28 @@ const FurnitureBuyButton = memo(function FurnitureBuyButton({ def }: { def: Furn
   const fast = useFastSnapshot();
   const cost = bnFromNumber(def.cost);
   const affordable = bnCompare(fast.cookies, cost) >= 0;
+  const priceText = formatExactDigits(cost);
+  const reasonId = `home-furniture-why-${def.id}`;
 
   return (
-    <button
-      type="button"
-      className="buy-btn"
-      disabled={!affordable}
-      title={`${def.nameEn} · ${def.nameYue} — 🍪 ${formatExactDigits(cost)}`}
-      aria-label={`${HOME_COPY.buyFurniture.en} ${def.nameEn} · ${HOME_COPY.buyFurniture.yue}${def.nameYue} — 🍪 ${formatExactDigits(cost)}`}
-      onClick={() => dispatch({ type: 'buyHomeFurniture', furnitureId: def.id })}
-    >
-      {bilingualText(HOME_COPY.buyFurniture)} — 🍪 {formatExact(cost, 'en')}
-    </button>
+    <>
+      <button
+        type="button"
+        className="buy-btn"
+        aria-disabled={!affordable}
+        aria-describedby={affordable ? undefined : reasonId}
+        title={bilingualText(HOME_COPY.furnitureButtonLabel(def.nameEn, def.nameYue, priceText))}
+        aria-label={bilingualText(HOME_COPY.furnitureButtonLabel(def.nameEn, def.nameYue, priceText))}
+        onClick={() => dispatch({ type: 'buyHomeFurniture', furnitureId: def.id })}
+      >
+        {bilingualText(HOME_COPY.buyFurniture)} — 🍪 {formatExact(cost, 'en')}
+      </button>
+      {affordable ? null : (
+        <span className="home-why" id={reasonId}>
+          {bilingualText(HOME_COPY.blockedShortfall(formatExactDigits(bnSub(cost, fast.cookies))))}
+        </span>
+      )}
+    </>
   );
 });
 
@@ -484,14 +550,36 @@ function FurnitureShop({ home }: { home: HomeConstructionState }) {
     <section className="home-shop" aria-label={bilingualText(HOME_COPY.furnitureTitle)}>
       <h3 className="home-section__title">{bilingualText(HOME_COPY.furnitureTitle)}</h3>
 
-      <div className="home-shop__tabs" role="group" aria-label={bilingualText(HOME_COPY.cutawayTitle)}>
-        {builtRooms.map((def) => (
+      {/* A RADIOGROUP, not a row of toggles. The selection is mutually exclusive — exactly one
+          room's shelf is showing — and `aria-pressed` on each button announced them as three
+          independent on/off switches instead of "2 of 3". Only the selected tab is in the tab
+          order; the arrow keys move between them, which is the pattern a radio group has. */}
+      <div className="home-shop__tabs" role="radiogroup" aria-label={bilingualText(HOME_COPY.roomTabsLabel)}>
+        {builtRooms.map((def, index) => (
           <button
             key={def.id}
             type="button"
+            role="radio"
             className="home-shop__tab"
             data-active={def.id === activeId ? 'true' : undefined}
-            aria-pressed={def.id === activeId}
+            aria-checked={def.id === activeId}
+            tabIndex={def.id === activeId ? 0 : -1}
+            onKeyDown={(event) => {
+              const step =
+                event.key === 'ArrowRight' || event.key === 'ArrowDown'
+                  ? 1
+                  : event.key === 'ArrowLeft' || event.key === 'ArrowUp'
+                    ? -1
+                    : 0;
+              if (step === 0) return;
+              event.preventDefault();
+              const at = (index + step + builtRooms.length) % builtRooms.length;
+              setSelected(builtRooms[at]!.id);
+              // Focus follows selection, as it does in a radio group.
+              const group = event.currentTarget.parentElement;
+              const buttons = group ? [...group.querySelectorAll<HTMLButtonElement>('.home-shop__tab')] : [];
+              buttons[at]?.focus();
+            }}
             onClick={() => setSelected(def.id)}
           >
             {bilingualText({ en: def.nameEn, yue: def.nameYue })}

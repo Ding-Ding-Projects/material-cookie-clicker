@@ -336,7 +336,7 @@ export const BULK_COPY = {
     en: `${count} selected`,
     yue: `已選 ${count} 項`,
   }),
-  buySelected: (count: number): Bilingual => ({ en: `Buy ${count} selected`, yue: `買落${count} 項已選` }),
+  buySelected: (count: number): Bilingual => ({ en: `Buy ${count} selected`, yue: `買咗已選 ${count} 項` }),
   exportSelected: (count: number): Bilingual => ({ en: `Export ${count} selected`, yue: `匯出 ${count} 項已選` }),
   clearSelection: { en: "Clear selection", yue: "清除選擇" },
   /**
@@ -933,6 +933,14 @@ export const HOME_COPY = {
     en: `Construction progress, ${percent}% complete`,
     yue: `工程進度，完成咗 ${percent}%`,
   }),
+  /* The progress bar's NAME never moves; the figure moves, and it moves in aria-valuetext. A
+     name that changed five times a second would be a control renaming itself under the reader's
+     cursor. Same split on the coziness gauge below. */
+  buildProgressName: { en: "Construction progress", yue: "工程進度" },
+  buildProgressValue: (percent: string): Bilingual => ({
+    en: `${percent}% complete`,
+    yue: `完成咗 ${percent}%`,
+  }),
 
   /** Duration, spelled out rather than rendered as a bare clock — a build is minutes, not a time. */
   duration: (minutes: number, seconds: number): Bilingual => ({
@@ -943,6 +951,34 @@ export const HOME_COPY = {
   buyBlueprint: { en: "Buy blueprint", yue: "買圖則" },
   startBuild: { en: "Start construction", yue: "開工" },
   buyFurniture: { en: "Buy", yue: "買" },
+
+  /* THE THREE BUY BUTTONS' ACCESSIBLE NAMES. Each takes both room/furniture names and gives each
+     language its own, exactly as CONTROL_COPY.slotLabel does, so a mode of 'en' or 'yue' does not
+     leave the other language stranded inside the label. The price is literal grouped digits and
+     is therefore the same string in both halves. */
+  blueprintButtonLabel: (nameEn: string, nameYue: string, price: string): Bilingual => ({
+    en: `Buy blueprint: ${nameEn} — ${price} cookies`,
+    yue: `買圖則：${nameYue}——${price} 粒曲奇`,
+  }),
+  startBuildButtonLabel: (nameEn: string, nameYue: string, price: string): Bilingual => ({
+    en: `Start construction: ${nameEn} — ${price} cookies`,
+    yue: `開工起${nameYue}——${price} 粒曲奇`,
+  }),
+  furnitureButtonLabel: (nameEn: string, nameYue: string, price: string): Bilingual => ({
+    en: `Buy ${nameEn} — ${price} cookies`,
+    yue: `買${nameYue}——${price} 粒曲奇`,
+  }),
+  /* Why a still-pressable button cannot succeed right now, said in its own description rather
+     than in a tooltip a keyboard never reaches. */
+  blockedShortfall: (short: string): Bilingual => ({
+    en: `Not enough cookies — ${short} short.`,
+    yue: `曲奇唔夠——爭 ${short} 粒。`,
+  }),
+  blockedBusy: {
+    en: "Another room is under construction. Only one site runs at a time.",
+    yue: "仲有第二間房起緊。同一時間淨係起得一間。",
+  },
+  roomTabsLabel: { en: "Room", yue: "房間" },
   blueprintForSale: { en: "For sale", yue: "有得買" },
   blueprintOwned: { en: "Blueprint owned", yue: "已有圖則" },
   roomBuilt: { en: "Built", yue: "起好" },

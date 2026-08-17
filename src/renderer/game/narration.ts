@@ -3,7 +3,20 @@ import { getGeneratorDefinition } from "../../shared/game/generators.js";
 import type { GameAction } from "../../shared/game/reducer.js";
 import { isToolDiscovered, TOOL_DEFINITIONS } from "../../shared/game/tools.js";
 import { formatExact } from "../../shared/game/format-number.js";
-import { getRandomEventDefinition, type MouseRaidOutcome, type RandomEventId } from "../../shared/game/random-events.js";
+import {
+  getRandomEventDefinition,
+  getRaidConsumableDefinition,
+  type MouseRaidOutcome,
+  type RaidConsumableId,
+  type RandomEventId,
+} from "../../shared/game/random-events.js";
+import {
+  getFurnitureDefinition,
+  getRoomDefinition,
+  isRoomBuilt,
+  ownsBlueprint,
+  ownsFurniture,
+} from "../../shared/game/home-construction.js";
 import { getUpgradeDefinition } from "../../shared/game/upgrades.js";
 import type { GameState } from "../../shared/game/types.js";
 import type { Bilingual } from "./copy.js";
@@ -50,7 +63,32 @@ export type MilestoneEvent =
    */
   | { readonly kind: "mouse-raid-resolved"; readonly outcome: MouseRaidOutcome }
   | { readonly kind: "prestige-available" }
-  | { readonly kind: "prestige"; readonly pointsEarned: number };
+  | { readonly kind: "prestige"; readonly pointsEarned: number }
+  /**
+   * THE HOME AND THE RAID SHELF. These are purchases exactly like a generator's, and they are
+   * announced exactly like one: the buy buttons on those two surfaces carry no live region of
+   * their own, so this is the only path by which a screen-reader user learns that a press did
+   * anything. A room FINISHING is here for a different reason — it is a delayed change nobody
+   * pressed a button for, and the player was almost certainly looking somewhere else when it
+   * happened.
+   */
+  | { readonly kind: "home-blueprint-bought"; readonly roomId: string }
+  | { readonly kind: "home-construction-started"; readonly roomId: string }
+  | { readonly kind: "home-furniture-bought"; readonly furnitureId: string }
+  | { readonly kind: "home-room-completed"; readonly roomId: string }
+  | { readonly kind: "raid-consumable-bought"; readonly consumableId: RaidConsumableId }
+  /**
+   * A press the domain refused. CoinSlot already prints its own refusal into its own status
+   * span (CoinSlot.tsx), and the rule it set is the one followed here: a purchase button that
+   * stays pressable when it cannot succeed owes the player a spoken reason, or the press is
+   * indistinguishable from a broken control.
+   */
+  | {
+      readonly kind: "purchase-refused";
+      readonly nameEn: string;
+      readonly nameYue: string;
+      readonly reason: "afford" | "busy" | "cap";
+    };
 
 export function detectMilestones(previous: GameState, next: GameState, action: GameAction): MilestoneEvent[] {
   const events: MilestoneEvent[] = [];
@@ -115,6 +153,71 @@ export function detectMilestones(previous: GameState, next: GameState, action: G
 
   if (action.type === "buyTool" && next.purchasedToolIds.length > previous.purchasedToolIds.length) {
     events.push({ kind: "tool-bought", id: action.toolId });
+  }
+
+  // ---- the home and the raid shelf -------------------------------------------------------
+  // Each of these compares the state the reducer actually produced rather than trusting the
+  // action, so a refused press falls through to the refusal branch instead of announcing a
+  // purchase that never happened.
+  if (action.type === "buyHomeBlueprint") {
+    const def = getRoomDefinition(action.roomId);
+    if (!ownsBlueprint(previous.homeConstruction, action.roomId) && ownsBlueprint(next.homeConstruction, action.roomId)) {
+      events.push({ kind: "home-blueprint-bought", roomId: action.roomId });
+    } else if (!ownsBlueprint(previous.homeConstruction, action.roomId)) {
+      events.push({ kind: "purchase-refused", nameEn: def.nameEn, nameYue: def.nameYue, reason: "afford" });
+    }
+  }
+
+  if (action.type === "startHomeConstruction") {
+    const def = getRoomDefinition(action.roomId);
+    if (previous.homeConstruction.build?.roomId !== action.roomId && next.homeConstruction.build?.roomId === action.roomId) {
+      events.push({ kind: "home-construction-started", roomId: action.roomId });
+    } else if (next.homeConstruction.build?.roomId !== action.roomId) {
+      // Blocked by the one-site rule is a different sentence from blocked by the balance, and
+      // the button's own accessible name says the same thing this line does.
+      const busy = previous.homeConstruction.build !== null;
+      events.push({
+        kind: "purchase-refused",
+        nameEn: def.nameEn,
+        nameYue: def.nameYue,
+        reason: busy ? "busy" : "afford",
+      });
+    }
+  }
+
+  if (action.type === "buyHomeFurniture") {
+    const def = getFurnitureDefinition(action.furnitureId);
+    if (!ownsFurniture(previous.homeConstruction, action.furnitureId) && ownsFurniture(next.homeConstruction, action.furnitureId)) {
+      events.push({ kind: "home-furniture-bought", furnitureId: action.furnitureId });
+    } else if (!ownsFurniture(previous.homeConstruction, action.furnitureId)) {
+      events.push({ kind: "purchase-refused", nameEn: def.nameEn, nameYue: def.nameYue, reason: "afford" });
+    }
+  }
+
+  if (action.type === "buyRaidConsumable") {
+    const def = getRaidConsumableDefinition(action.consumableId);
+    const before = previous.randomEvents.consumables[action.consumableId].stock;
+    const after = next.randomEvents.consumables[action.consumableId].stock;
+    if (after > before) {
+      events.push({ kind: "raid-consumable-bought", consumableId: action.consumableId });
+    } else {
+      events.push({
+        kind: "purchase-refused",
+        nameEn: def.nameEn,
+        nameYue: def.nameYue,
+        reason: before >= def.stockCap ? "cap" : "afford",
+      });
+    }
+  }
+
+  // A room finishing is not tied to any action — it lands on whichever tick crosses the build
+  // time — so it is detected by diffing the built rooms rather than by inspecting the action.
+  if (next.homeConstruction.rooms.length > previous.homeConstruction.rooms.length) {
+    for (const room of next.homeConstruction.rooms) {
+      if (!isRoomBuilt(previous.homeConstruction, room.roomId)) {
+        events.push({ kind: "home-room-completed", roomId: room.roomId });
+      }
+    }
   }
 
   for (const def of TOOL_DEFINITIONS) {
@@ -202,6 +305,46 @@ export function describeMilestone(event: MilestoneEvent): Bilingual {
       return {
         en: `Mouse Raid over — ${outcome.miceEscaped} of ${outcome.miceTotal} mice got away with ${stolenEn} cookies.`,
         yue: `老鼠打劫完咗——${outcome.miceTotal} 隻走甩咗 ${outcome.miceEscaped} 隻，帶走 ${stolenYue} 粒曲奇。`,
+      };
+    }
+    case "home-blueprint-bought": {
+      const def = getRoomDefinition(event.roomId);
+      return { en: `Blueprint bought: ${def.nameEn}.`, yue: `買咗圖則：${def.nameYue}。` };
+    }
+    case "home-construction-started": {
+      const def = getRoomDefinition(event.roomId);
+      return { en: `Construction started on the ${def.nameEn}.`, yue: `開工起${def.nameYue}。` };
+    }
+    case "home-furniture-bought": {
+      const def = getFurnitureDefinition(event.furnitureId);
+      return { en: `Bought ${def.nameEn} for the home.`, yue: `買咗${def.nameYue}擺屋企。` };
+    }
+    case "home-room-completed": {
+      const def = getRoomDefinition(event.roomId);
+      return { en: `The ${def.nameEn} is finished.`, yue: `${def.nameYue}起好喇。` };
+    }
+    case "raid-consumable-bought": {
+      const def = getRaidConsumableDefinition(event.consumableId);
+      return { en: `Bought ${def.nameEn}.`, yue: `買咗${def.nameYue}。` };
+    }
+    case "purchase-refused": {
+      if (event.reason === "cap") {
+        return {
+          en: `${event.nameEn} not bought — stock is already full.`,
+          yue: `買唔到${event.nameYue}——庫存已經滿咗。`,
+        };
+      }
+      if (event.reason === "busy") {
+        return {
+          en: `${event.nameEn} not started — another room is already under construction.`,
+          yue: `開唔到工起${event.nameYue}——仲有第二間房起緊。`,
+        };
+      }
+      // Neutral about WHAT was refused, because this line covers a blueprint, a build and a pass
+      // alike; the name in front of it already says which.
+      return {
+        en: `${event.nameEn} — not enough cookies.`,
+        yue: `${event.nameYue}——曲奇唔夠。`,
       };
     }
     case "prestige-available":

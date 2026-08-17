@@ -121,7 +121,7 @@ export function SearchWithRegexBuilder({
       </div>
       {state.builderOpen && effectiveLevel >= 2 && (
         <div className="regex-popover" id={`${idPrefix}-${reactId}-popover`}>
-          <div className="mode-row" role="group" aria-label="Search mode · 搜尋模式">
+          <div className="mode-row" role="group" aria-label={bilingualText({ en: 'Search mode', yue: '搜尋模式' })}>
             <button type="button" aria-pressed={!state.regex} onClick={() => onChange({ ...state, regex: false })}>
               Plain text · 純文字
             </button>
@@ -140,7 +140,7 @@ export function SearchWithRegexBuilder({
           </div>
           {effectiveLevel >= 3 ? (
             <>
-              <div className="flag-row" role="group" aria-label="Flags · 旗標">
+              <div className="flag-row" role="group" aria-label={bilingualText({ en: 'Flags', yue: '旗標' })}>
                 {TOGGLE_FLAGS.map(({ flag, label }) => (
                   <label key={flag}>
                     <input
@@ -152,7 +152,7 @@ export function SearchWithRegexBuilder({
                   </label>
                 ))}
               </div>
-              <div className="regex-token-list" role="group" aria-label="Insert token · 插入符號">
+              <div className="regex-token-list" role="group" aria-label={bilingualText({ en: 'Insert token', yue: '插入符號' })}>
                 {BUILDER_TOKENS.map((token) => (
                   <button
                     key={token.id}

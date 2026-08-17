@@ -156,7 +156,14 @@ export class GameStore {
   dispatch(action: GameAction, ctx: ReducerCtx): GameState {
     const previous = this.#state;
     const next = applyGameAction(previous, action, ctx);
-    if (next === previous) return next;
+    if (next === previous) {
+      // A REFUSED action still happened. Nothing re-renders — there is nothing new to draw — but
+      // the narration listeners are told, because "the reducer said no" is exactly the thing a
+      // player who cannot see the button needs said out loud. Returning early here used to make
+      // every refusal silent no matter what narration.ts detected.
+      this.#dispatchListeners.forEach((listener) => listener(previous, next, action));
+      return next;
+    }
 
     this.#state = next;
 

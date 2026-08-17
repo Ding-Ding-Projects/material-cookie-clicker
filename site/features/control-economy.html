@@ -1,0 +1,126 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1" />
+<title>The control economy — Material Cookie Clicker</title>
+<meta name="description" content="Every setting, every button, dragging, minimize, maximize and resize are bought with cookies at a printed price — twenty-eight rungs across fifteen controls." />
+<link rel="stylesheet" href="../assets/site.css" />
+</head>
+<body>
+<a class="skip-link" href="#main">Skip to main content</a>
+<header class="site-head">
+  <div class="wrap">
+    <a class="brand" href="../index.html"><span aria-hidden="true">&#127850;</span> Material Cookie Clicker</a>
+    <nav class="site-nav" aria-label="Primary">
+      <ul>
+        <li><a href="../index.html">Home</a></li>
+        <li><a href="../features/index.html">Features</a></li>
+        <li><a href="../index.html#download">Download</a></li>
+      </ul>
+    </nav>
+  </div>
+</header>
+<main id="main" class="wrap">
+  <article>
+    <h1>The control economy</h1>
+    <p class="lede">Every setting, every button, dragging the window, minimizing it, maximizing it and resizing it: each one is bought with cookies at a printed price. Twenty-eight rungs across fifteen controls.</p>
+    <div class="inset" style="margin-bottom:18px">
+      <span class="label">Current state</span>
+      <p style="margin:0"><span class="tag">Shipped</span> the registry, the reducer purchase, the save subtree and every gated surface are in the build, and the locked title bar and the first purchase were photographed from the running application. One deliberate compromise is documented below: an already-played save is granted the whole table for free.</p>
+    </div>
+
+    <h2>What it does</h2>
+    <p>Everything else in this game is bought. Generators are bought, upgrades are bought, tools are bought, the diesel factory is bought a machine at a time. The control economy extends exactly that rule to the application&rsquo;s own controls, because the owner asked for it in those words: &ldquo;every setting must be bought to unlock too&rdquo;, &ldquo;and every button must be bought&rdquo;, &ldquo;even dragging the window or minimize and maximize each have to be bought&rdquo;, &ldquo;resizing the app needs to be purchased&rdquo;, and &ldquo;every feature with upgrades&rdquo;.</p>
+    <p>So a control is a shelf item. It has an identifier, a flat cookie price, and &mdash; where a second rung is a real convenience rather than an invented one &mdash; a ladder above it. Nothing here unlocks itself, nothing is granted for reaching a milestone, and there is no condition to satisfy. You press the control, you see the price, you pay it.</p>
+
+    <h2>From the running application</h2>
+    <figure class="capture">
+      <img src="../assets/captures/controls-locked-chrome.png" alt="The application window on a completely fresh profile, in the dark arcade-night theme. The title bar carries the bevelled Material Cookie Clicker marquee at the left, then a price plate in the middle reading Drag the window in English and Cantonese with a cookie token and the figure 10 beside it. Where the minimize and maximize caps would be there are two smaller plates, one showing a dash glyph with a cookie token and 30, the other a square glyph with a cookie token and 45. The close cross at the far right is an ordinary button with no price on it. Below the bar the cookie counter reads 10, and an open confirmation panel hangs under the drag plate saying that dragging the window costs 10 cookies, that you have 10, with a Buy it button and a Not now button under it." width="1557" height="1093" loading="lazy" />
+      <figcaption><strong>A fresh save cannot move its own window.</strong> The drag region is replaced by its price, the two window caps are replaced by theirs, and the confirmation asks before spending a purchase worth more than one percent of the balance. The close button is untouched and always will be. Captured from the built application running on an off-screen Windows desktop, photographed with the Win32 PrintWindow API.</figcaption>
+    </figure>
+    <figure class="capture">
+      <img src="../assets/captures/controls-drag-bought.png" alt="The same title bar a few seconds later, after ten cookies were earned by clicking and spent on the drag unlock. The price plate in the middle of the bar has gone entirely and the marquee plate now sits alone at the left as the drag handle. The two smaller plates for minimize and maximize are still there, still priced at 30 and 45, and the close cross is unchanged." width="1557" height="1093" loading="lazy" />
+      <figcaption><strong>Ten cookies later.</strong> The plate is gone and the marquee is the drag handle. Windows itself confirms it: asking the window where the marquee is now answers HTCAPTION, the answer that makes a press start a window drag, while the rest of the bar still answers HTCLIENT. Both cookies and the purchase were real presses on the real controls.</figcaption>
+    </figure>
+    <p><a href="../index.html#captures">See the full capture matrix</a>.</p>
+
+    <h2>The price table</h2>
+    <p>Prices are flat &mdash; a control is bought once, so there is no second unit for a cost curve to price &mdash; and they fall into three bands. Window chrome is the cheapest thing in the whole game, because the first minute of a fresh save is spent clicking a cookie in a window that will not move, and that minute has to end quickly. Settings entries and the first rung of a search field sit just above it. Everything that genuinely multiplies how fast the rest of the game goes costs real cookies.</p>
+    <div class="scroller">
+    <table>
+      <caption>Every purchasable control, in catalogue order. Within a ladder the prices strictly increase, which a test enforces.</caption>
+      <thead>
+        <tr><th scope="col">Group</th><th scope="col">Control</th><th scope="col">Rung</th><th scope="col">Price</th></tr>
+      </thead>
+      <tbody>
+        <tr><th scope="row" rowspan="6">The window</th><td rowspan="2">Drag the window</td><td>unlock &mdash; the marquee plate becomes a drag handle</td><td>10</td></tr>
+        <tr><td>upgrade &mdash; the whole bar drags, no aiming required</td><td>240</td></tr>
+        <tr><td>Minimize</td><td>unlock</td><td>30</td></tr>
+        <tr><td rowspan="2">Maximize and restore</td><td>unlock</td><td>45</td></tr>
+        <tr><td>upgrade &mdash; double-click the bar to toggle</td><td>320</td></tr>
+        <tr><td>Resize the window</td><td>unlock &mdash; the edges become live</td><td>75</td></tr>
+        <tr><th scope="row" rowspan="3">Settings entries</th><td>Language mode switch</td><td>unlock</td><td>60</td></tr>
+        <tr><td>English funny slider</td><td>unlock</td><td>35</td></tr>
+        <tr><td>Cantonese funny slider</td><td>unlock</td><td>35</td></tr>
+        <tr><th scope="row" rowspan="3">Search fields</th><td rowspan="3">Generators, upgrades, achievements and tools &mdash; four separate purchases, one per surface, at identical prices</td><td>unlock &mdash; the field, plain-text matching</td><td>50</td></tr>
+        <tr><td>upgrade &mdash; the regex builder gear and its popover</td><td>400</td></tr>
+        <tr><td>upgrade &mdash; the flag toggles and the token palette</td><td>1,500</td></tr>
+        <tr><th scope="row" rowspan="3">Buy quantity</th><td rowspan="3">The stepper on every shop row. <strong>&times;1 is free and always was</strong></td><td>unlock &mdash; &times;10</td><td>120</td></tr>
+        <tr><td>upgrade &mdash; &times;100</td><td>900</td></tr>
+        <tr><td>upgrade &mdash; Max</td><td>6,000</td></tr>
+        <tr><th scope="row" rowspan="2">Bulk actions</th><td rowspan="2">Bulk select and bulk buy</td><td>unlock &mdash; a checkbox on every shop row</td><td>200</td></tr>
+        <tr><td>upgrade &mdash; the bulk toolbar</td><td>1,200</td></tr>
+        <tr><th scope="row" rowspan="2">Feature switches</th><td>Tool progression switch</td><td>unlock</td><td>300</td></tr>
+        <tr><td>Auto-ship switch</td><td>unlock</td><td>2,500</td></tr>
+      </tbody>
+    </table>
+    </div>
+    <p>The auto-ship switch is the one deliberate outlier at 2,500. It belongs to a refinery that costs millions of cookies to build, so pricing it like a drag handle would be pricing it like nothing.</p>
+
+    <h2>Three things that are never for sale</h2>
+    <p>The joke has floors, and each one is held in place by a test that fails if the thing ever appears in the price table.</p>
+    <ul>
+      <li><strong>Close.</strong> The window&rsquo;s close button always works, in the renderer and in the main process alike. Nobody should ever have to earn the right to quit an application, and a build that could trap somebody inside itself is not a joke, it is a defect.</li>
+      <li><strong>The Settings panel.</strong> The gear emblem and the dialog behind it are free and always present. The settings <em>inside</em> are bought &mdash; that is the gag &mdash; but the room they live in is where the price list is kept, so locking the door would make the whole economy undiscoverable.</li>
+      <li><strong>The controls catalogue and its own search box.</strong> The catalogue inside Settings lists every control, every rung, every price and one line saying what buying it does. Charging for the ability to find out what things cost would be a circular lock, so that one search field is free and says so on the surface.</li>
+    </ul>
+    <p>There is a fourth floor that is a behaviour rather than a table entry: <strong>an unbought control does not disappear.</strong> It stays exactly where the real control would be, drawn as a coin slot with the literal price stamped on it, and pressing it is how you buy it. A locked control that vanished would just look like a feature the build forgot to write. And every control that <em>is</em> bought keeps precisely the keyboard access and screen-reader semantics it always had &mdash; buying something never makes it worse than it was.</p>
+    <p>The coin-slot plate is a real button, never a disabled one. A disabled button drops out of the tab order, and a player who cannot yet afford a control still deserves to land on it and hear what it costs. Pressing one you cannot afford opens the same confirmation, which prints the exact shortfall in figures instead of doing nothing.</p>
+
+    <h2>How the window chrome is really enforced</h2>
+    <p>Dragging and resizing are not gated by hiding anything, because hiding would not work. On a frameless window the drag behaviour and the resize grips belong to the operating system.</p>
+    <p>Dragging is enforced by the drag region itself: until it is bought, the title bar is marked no-drag, so Windows never treats a press there as the start of a window move. Resizing is enforced further out still &mdash; the window is <em>created</em> not resizable by the main process, and the renderer can only ask, over the same narrow preload bridge the rest of the application uses, for that flag to change once the unlock is genuinely in the save. A renderer that never asks can never make the edges live.</p>
+
+    <h2>The migration compromise, stated plainly</h2>
+    <div class="note">
+      <strong class="note-title">This is the one decision in the feature that a reviewer needs to agree with</strong>
+      <p>Applied literally, &ldquo;everything is bought&rdquo; would mean a returning player with a built-out factory opening this build to find they can no longer move their own window, no longer reach the &times;100 stepper they had been buying generator tiers with, and no longer search a hundred and seventy-nine upgrades. That does not read as the joke landing. It reads as the update having broken a save, and the player would be right.</p>
+      <p>So the migration grants, and the grant is bounded by evidence rather than generosity: <strong>a save with more than one thousand lifetime cookies keeps every control it was already using, for free.</strong> That threshold is a few minutes of play, comfortably past the point where the chrome prices above would have been pocket change anyway. A fresh save, and any save that never got past a thousand lifetime cookies, buys the lot.</p>
+      <p>The honest cost: a grandfathered player never meets the coin-slot plates at all until they start a new save. If the owner would rather have the joke than the compatibility, one constant in the domain flips it, and the migration, the granted set and the tests all key off that same constant.</p>
+    </div>
+    <p>What is granted is a frozen list of the rungs that exist at this save version, not the live registry. A control invented after the migration was written was never usable by an older save, so it must never appear in an older save&rsquo;s grant.</p>
+
+    <h2>Where it lives in the code</h2>
+    <p>One registry module holds every control, every rung, every price and both languages of every label; the catalogue, the coin-slot plates, the reducer&rsquo;s purchase arithmetic and the integrity tests all read that one table and nothing else. Buying goes through the same single reducer seam every other purchase in the game uses, refuses silently in the same shape &mdash; unknown rung, already owned, ladder order wrong, cookies short &mdash; and takes Market Day&rsquo;s rebate exactly like a generator does. A ladder can only be climbed in order: a hand-built dispatch cannot skip to Max without paying for &times;10 and &times;100 on the way.</p>
+
+    <nav class="related plate" aria-labelledby="related-heading">
+      <h2 id="related-heading">Related articles</h2>
+      <ul>
+        <li><a href="language-and-humour.html">Bilingual text and the funny-level sliders</a></li>
+        <li><a href="generator-ladder.html">The 20-tier generator ladder</a></li>
+        <li><a href="tools-tech-tree.html">The Tools tech tree</a></li>
+        <li><a href="diesel-factory.html">The Diesel Factory</a></li>
+        <li><a href="index.html">All features &amp; search</a></li>
+      </ul>
+    </nav>
+  </article>
+</main>
+<footer class="site-foot">
+  <div class="wrap">
+    <p>Material Cookie Clicker is free, unsigned by permanent policy, and nobody ever pays anything to use it. This site is fully self-contained: no CDN, no remote font, no remote image, no analytics, no network request of any kind. Every graphic is either drawn in CSS or a screenshot of the application stored in this repository.</p>
+    <p><a href="https://github.com/Ding-Ding-Projects/material-cookie-clicker">Source code on GitHub</a> &middot; <a href="../features/index.html">All feature articles</a></p>
+  </div>
+</footer>
+</body>
+</html>

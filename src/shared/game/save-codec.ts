@@ -73,7 +73,7 @@ export function decodeSave(raw: unknown): DecodeSaveResult {
 export function encodeSave(state: GameState): SaveDataOnDisk {
   return {
     randomEvents: encodeRandomEvents(state.randomEvents),
-    schemaVersion: state.schemaVersion as 5,
+    schemaVersion: state.schemaVersion as 6,
     cookies: state.cookies,
     lifetimeCookies: state.lifetimeCookies,
     baseClickValue: state.baseClickValue,
@@ -96,6 +96,9 @@ export function encodeSave(state: GameState): SaveDataOnDisk {
     },
     toolProgressionEnabled: state.toolProgressionEnabled,
     purchasedToolIds: [...state.purchasedToolIds],
+    // The control economy (control-unlocks.ts). A state built without the subtree — a test
+    // helper, an older in-memory path — encodes as "nothing bought", which is the truth.
+    controlUnlocks: { purchasedRungIds: [...(state.controlUnlocks?.purchasedRungIds ?? [])] },
     lastTickAtIso: state.lastTickAtIso,
     lastSavedAtIso: state.lastSavedAtIso,
   };

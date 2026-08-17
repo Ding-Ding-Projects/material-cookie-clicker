@@ -20,6 +20,7 @@ import {
   useStructureSnapshot,
 } from './game/GameProvider';
 import { CONSOLE_EMBLEMS, PanelCorner } from './ConsoleEmblems';
+import { CoinSlot, useControlRung } from './components/CoinSlot';
 import { HUD_COOKIES_TARGET_KEY, PurchaseFxLayer, usePurchaseFxTarget } from './game/purchase-fx';
 import {
   bilingualText,
@@ -410,11 +411,109 @@ function AnchoredPanel({
   );
 }
 
-export function App() {
+/**
+ * THE CABINET'S TITLE BAR — and the one part of this application whose own chrome is for sale.
+ *
+ * Dragging, minimizing, maximizing and resizing are each a separate purchase in the control
+ * economy (src/shared/game/control-unlocks.ts). CLOSE IS NOT AND NEVER WILL BE: it is
+ * unconditional here, it is unconditional in the main process, and the registry-integrity test
+ * fails if anything called "close" ever appears in the price table. A build that could trap
+ * somebody inside itself is not a joke.
+ *
+ * The bar lives inside GameProvider (see `App` below) because every one of those questions is a
+ * question about the save. It is still the first child of `.app-shell`, so nothing about the
+ * layout, the drag region or the window's own geometry moved.
+ */
+function TitleBar() {
+  const dragBought = useControlRung('chrome.drag');
+  const dragFull = useControlRung('chrome.drag.full');
+  const minimizeBought = useControlRung('chrome.minimize');
+  const maximizeBought = useControlRung('chrome.maximize');
+  const maximizeDoubleClick = useControlRung('chrome.maximize.doubleClick');
+  const resizeBought = useControlRung('chrome.resize');
+
   const minimize = useCallback(() => window.materialCookieClicker?.window.minimize(), []);
   const toggleMaximize = useCallback(() => window.materialCookieClicker?.window.toggleMaximize(), []);
   const close = useCallback(() => window.materialCookieClicker?.window.close(), []);
 
+  /**
+   * RESIZING IS ENFORCED BY THE MAIN PROCESS, not by this renderer.
+   *
+   * On a frameless window the resize grips belong to the operating system — there is no element
+   * here to disable and no CSS that would stop a drag on the real edge. So the window is CREATED
+   * not resizable (main.ts) and this effect is the only thing that ever asks for it to change.
+   * It runs on mount too, which is what makes a reload of an unlocked save re-assert the flag.
+   */
+  useEffect(() => {
+    window.materialCookieClicker?.window.setResizable?.(resizeBought);
+  }, [resizeBought]);
+
+  // Three states, not two: nothing drags, the marquee plate drags, or the whole bar drags.
+  const dragState = !dragBought ? 'locked' : dragFull ? 'full' : 'marquee';
+
+  return (
+    <header
+      className="title-bar"
+      role="banner"
+      data-drag={dragState}
+      onDoubleClick={maximizeBought && maximizeDoubleClick ? toggleMaximize : undefined}
+    >
+      {/* The cabinet's marquee: the game's name on a bevelled plate between two rivets. The
+          plate sits inside the drag region, so dragging the rail and double-clicking it to
+          toggle maximize still work anywhere that is not one of the three caps. */}
+      <span className="title-bar__marquee">
+        <span className="title-bar__rivet" aria-hidden="true" />
+        <span className="title-bar__label">Material Cookie Clicker</span>
+        <span className="title-bar__rivet" aria-hidden="true" />
+      </span>
+      {/* Until dragging is bought the bar carries its price instead of its drag region, so the
+          very first thing a fresh save sees is what a control costs. */}
+      {!dragBought ? (
+        <span className="title-bar__drag-plate">
+          <CoinSlot
+            rungId="chrome.drag"
+            variant="inline"
+            labelEn="Drag the window"
+            labelYue="拖呢個窗"
+            className="title-bar__drag-slot"
+          />
+        </span>
+      ) : null}
+      <div className="title-bar__controls" role="group" aria-label={bilingualText(TITLE_BAR_COPY.controlsLabel)}>
+        {minimizeBought ? (
+          <button type="button" className="title-bar__button" aria-label={bilingualText(TITLE_BAR_COPY.minimize)} onClick={minimize}>
+            <span className="title-bar__glyph" aria-hidden="true">&#x2013;</span>
+          </button>
+        ) : (
+          <CoinSlot rungId="chrome.minimize" variant="chrome" glyph="&#x2013;" labelEn="Minimize" labelYue="縮到最細" />
+        )}
+        {maximizeBought ? (
+          <button
+            type="button"
+            className="title-bar__button"
+            aria-label={bilingualText(TITLE_BAR_COPY.maximizeRestore)}
+            onClick={toggleMaximize}
+          >
+            <span className="title-bar__glyph" aria-hidden="true">&#x25A1;</span>
+          </button>
+        ) : (
+          <CoinSlot rungId="chrome.maximize" variant="chrome" glyph="&#x25A1;" labelEn="Maximize" labelYue="放到最大" />
+        )}
+        {/* Never gated. Never will be. */}
+        <button
+          type="button"
+          className="title-bar__button title-bar__button--close"
+          aria-label={bilingualText(TITLE_BAR_COPY.close)}
+          onClick={close}
+        >
+          <span className="title-bar__glyph" aria-hidden="true">&#x2715;</span>
+        </button>
+      </div>
+    </header>
+  );
+}
+
+export function App() {
   // The settings STORE is resolved once and kept in a ref: it is a backend, not state, and
   // re-resolving it on every render would re-read localStorage for nothing.
   const settingsStoreRef = useRef<ReturnType<typeof resolveAppSettingsStore> | null>(null);
@@ -459,47 +558,20 @@ export function App() {
     ),
   };
 
+  // One GameProvider for the whole shell: every screen reads the same store, so switching
+  // panels never restarts the tick loop or reloads the save. It now also wraps the TITLE BAR,
+  // because the window's own buttons are bought with cookies (control-unlocks.ts) and therefore
+  // ask the save a question. The rendered DOM is unchanged: `.app-shell` is still the shell and
+  // the bar is still its first child.
   return (
-    <div className="app-shell" data-language-mode={settings.languageMode}>
-      <header className="title-bar" role="banner">
-        {/* The cabinet's marquee: the game's name on a bevelled plate between two rivets. The
-            plate sits inside the drag region, so dragging the rail and double-clicking it to
-            toggle maximize still work anywhere that is not one of the three caps. */}
-        <span className="title-bar__marquee">
-          <span className="title-bar__rivet" aria-hidden="true" />
-          <span className="title-bar__label">Material Cookie Clicker</span>
-          <span className="title-bar__rivet" aria-hidden="true" />
-        </span>
-        <div className="title-bar__controls" role="group" aria-label={bilingualText(TITLE_BAR_COPY.controlsLabel)}>
-          <button type="button" className="title-bar__button" aria-label={bilingualText(TITLE_BAR_COPY.minimize)} onClick={minimize}>
-            <span className="title-bar__glyph" aria-hidden="true">&#x2013;</span>
-          </button>
-          <button
-            type="button"
-            className="title-bar__button"
-            aria-label={bilingualText(TITLE_BAR_COPY.maximizeRestore)}
-            onClick={toggleMaximize}
-          >
-            <span className="title-bar__glyph" aria-hidden="true">&#x25A1;</span>
-          </button>
-          <button
-            type="button"
-            className="title-bar__button title-bar__button--close"
-            aria-label={bilingualText(TITLE_BAR_COPY.close)}
-            onClick={close}
-          >
-            <span className="title-bar__glyph" aria-hidden="true">&#x2715;</span>
-          </button>
-        </div>
-      </header>
-      {/* One GameProvider for the whole shell: every screen reads the same store, so switching
-          tabs never restarts the tick loop or reloads the save. */}
-      <AppSettingsProvider value={settingsContext}>
-        <GameProvider>
+    <AppSettingsProvider value={settingsContext}>
+      <GameProvider>
+        <div className="app-shell" data-language-mode={settings.languageMode}>
+          <TitleBar />
           <GameShell />
-        </GameProvider>
-      </AppSettingsProvider>
-    </div>
+        </div>
+      </GameProvider>
+    </AppSettingsProvider>
   );
 }
 

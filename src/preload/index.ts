@@ -16,6 +16,13 @@ export interface MaterialCookieClickerWindowApi {
   minimize: () => void;
   toggleMaximize: () => void;
   close: () => void;
+  /**
+   * Tells the main process whether the window may be resized at all — the renderer half of the
+   * "chrome.resize" control purchase (src/shared/game/control-unlocks.ts). It is a REQUEST, not
+   * a decision: the main process owns the window flag, and the window is created not resizable,
+   * so a renderer that never calls this can never make the edges live.
+   */
+  setResizable: (resizable: boolean) => void;
 }
 
 export interface MaterialCookieClickerApi {
@@ -33,6 +40,7 @@ const api: MaterialCookieClickerApi = {
     minimize: () => ipcRenderer.send('window:minimize'),
     toggleMaximize: () => ipcRenderer.send('window:toggle-maximize'),
     close: () => ipcRenderer.send('window:close'),
+    setResizable: (resizable: boolean) => ipcRenderer.send('window:set-resizable', resizable === true),
   },
   diesel: {
     mint: (request: DieselMintRequest): Promise<DieselMintResponse> =>

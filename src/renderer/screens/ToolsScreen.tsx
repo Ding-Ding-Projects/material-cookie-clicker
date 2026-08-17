@@ -6,6 +6,7 @@ import { GENERATOR_DEFINITIONS } from '../../shared/game/generators.js';
 import { toolPrice } from '../../shared/game/tool-shop.js';
 import { TOOL_DEFINITIONS, type ToolDefinition, type ToolUnlockCondition } from '../../shared/game/tools.js';
 import { ToolIcon, ToolTierGem } from '../assets/icons.js';
+import { CoinSlot, useControlRung } from '../components/CoinSlot.js';
 import { createSearchState, SearchWithRegexBuilder } from '../components/SearchWithRegexBuilder.js';
 import { showsEnglish, showsCantonese, bilingualText, LIST_COPY, TOOLS_SCREEN_COPY, type Bilingual } from '../game/copy.js';
 import { useFastSnapshot, useGameDispatch, useStructureSnapshot } from '../game/GameProvider.js';
@@ -243,6 +244,7 @@ export function ToolsScreen({ onOpenApplicationFeature }: ToolsScreenProps = {})
   );
 
   const progressionOn = structure.toolProgressionEnabled;
+  const progressionUnlocked = useControlRung('toggle.toolProgression');
 
   return (
     <div className="screen">
@@ -299,6 +301,11 @@ export function ToolsScreen({ onOpenApplicationFeature }: ToolsScreenProps = {})
           <div className="tools-hud__fill" style={{ width: `${percent}%` }} />
         </div>
         <div className="tools-hud__toggle-wrap">
+          {/* The progression switch is itself a bought control (control-unlocks.ts,
+              "toggle.toolProgression"). Gating it changes NOTHING about the tech tree's own
+              contract: the switch only ever moved display and gameplay bonuses, never whether a
+              real application feature is reachable, and it still does not. */}
+          {progressionUnlocked ? (
           <button
             type="button"
             className="tools-hud__toggle"
@@ -309,6 +316,9 @@ export function ToolsScreen({ onOpenApplicationFeature }: ToolsScreenProps = {})
               ? `${bilingualText(TOOLS_SCREEN_COPY.progressionToggleOn)}`
               : `${bilingualText(TOOLS_SCREEN_COPY.progressionToggleOff)}`}
           </button>
+          ) : (
+            <CoinSlot rungId="toggle.toolProgression" variant="inline" />
+          )}
           <details className="hud-strip hud-strip--caption">
             <summary className="hud-strip__summary">
               <span className="hud-strip__headline">
@@ -335,6 +345,7 @@ export function ToolsScreen({ onOpenApplicationFeature }: ToolsScreenProps = {})
         onChange={setSearch}
         placeholder={LIST_COPY.searchPlaceholderTools}
         ariaLabel={LIST_COPY.searchPlaceholderTools}
+        controlId="search.tools"
       />
 
       {visible.length === 0 ? (

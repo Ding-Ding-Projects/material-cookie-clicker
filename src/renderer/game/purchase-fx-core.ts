@@ -17,7 +17,7 @@ import type { GameState } from "../../shared/game/types.js";
  * mint that failed its reveal check all produce no intent and therefore no animation.
  */
 
-export type PurchaseKind = "generator" | "upgrade" | "diesel";
+export type PurchaseKind = "generator" | "upgrade" | "diesel" | "control";
 
 /** What a successful purchase was, in the terms the animation layer needs. */
 export interface PurchaseIntent {
@@ -37,6 +37,10 @@ export function generatorTargetKey(id: string): string {
 }
 export function upgradeTargetKey(id: string): string {
   return `upgrade:${id}`;
+}
+/** The coin-slot plate for one control rung (control-unlocks.ts) — see CoinSlot.tsx. */
+export function controlTargetKey(rungId: string): string {
+  return `control:${rungId}`;
 }
 export const DIESEL_TARGET_KEY = "diesel:depot";
 export const HUD_COOKIES_TARGET_KEY = "hud:cookies";
@@ -61,6 +65,15 @@ export function detectPurchase(previous: GameState, next: GameState, action: Gam
       if (!owned || alreadyOwned) return null;
       return { kind: "upgrade", targetKey: upgradeTargetKey(action.upgradeId), quantity: 1 };
     }
+    // Buying a control is a purchase like any other and gets the same handful of coins. The
+    // diff is what proves it: a rung the reducer refused (already owned, ladder order wrong,
+    // cookies short) leaves the list unchanged and animates nothing.
+    case "buyControlUnlock": {
+      const before = previous.controlUnlocks?.purchasedRungIds ?? [];
+      const after = next.controlUnlocks?.purchasedRungIds ?? [];
+      if (after.length <= before.length) return null;
+      return { kind: "control", targetKey: controlTargetKey(action.rungId), quantity: 1 };
+    }
     case "mintDiesel": {
       const litres = next.dieselDepot.litresMinted - previous.dieselDepot.litresMinted;
       if (litres <= 0) return null;
@@ -81,6 +94,9 @@ export const FX_DURATION_MS: Readonly<Record<PurchaseKind, number>> = {
   generator: 700,
   upgrade: 850,
   diesel: 2000,
+  // The shortest of the four: a coin drops into a slot and the control it was blocking is simply
+  // there. Nothing tears, nothing pumps, and the plate it replaces is usually small.
+  control: 620,
 };
 
 /**

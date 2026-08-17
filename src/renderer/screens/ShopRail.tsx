@@ -9,6 +9,7 @@ import { GeneratorIcon } from '../assets/icons.js';
 import { BuyStepper, type BuyQuantity } from '../components/BuyStepper.js';
 import { BulkToolbar } from '../components/BulkToolbar.js';
 import { createSearchState, SearchWithRegexBuilder } from '../components/SearchWithRegexBuilder.js';
+import { CoinSlot, useControlRung } from '../components/CoinSlot.js';
 import { useSelection } from '../components/useSelection.js';
 import { matchesSearch } from '../game/local-regex-search.js';
 import { DieselDepot } from './DieselDepot.js';
@@ -89,6 +90,7 @@ const GeneratorRow = memo(function GeneratorRow({
   onQuantityChange,
   selected,
   onToggleSelect,
+  selectable,
 }: {
   def: GeneratorDefinition;
   owned: number;
@@ -96,6 +98,8 @@ const GeneratorRow = memo(function GeneratorRow({
   onQuantityChange: (q: BuyQuantity) => void;
   selected: boolean;
   onToggleSelect: () => void;
+  /** Whether the bulk-selection control (control-unlocks.ts, "bulk.select") has been bought. */
+  selectable: boolean;
 }) {
   const stepperLabelId = `stepper-label-${def.id}`;
   // The row is the purchase-feedback target: a successful buy bounces it, rolls the owned
@@ -104,13 +108,18 @@ const GeneratorRow = memo(function GeneratorRow({
   const fxRef = usePurchaseFxTarget<HTMLDivElement>(generatorTargetKey(def.id));
   return (
     <div ref={fxRef} className={`shop-row${owned > 0 ? ' owned' : ''}`}>
-      <input
-        type="checkbox"
-        className="select-checkbox"
-        checked={selected}
-        onChange={onToggleSelect}
-        aria-label={`Select ${def.nameEn} · 選取${def.nameYue}`}
-      />
+      {/* The row checkbox is bought once, for every row at once — so only the FIRST row carries
+          the price plate (see the list below), and every other locked row simply has no
+          checkbox. Fourteen identical price tags down one rail would be noise, not an offer. */}
+      {selectable ? (
+        <input
+          type="checkbox"
+          className="select-checkbox"
+          checked={selected}
+          onChange={onToggleSelect}
+          aria-label={`Select ${def.nameEn} · 選取${def.nameYue}`}
+        />
+      ) : null}
       <div className="shop-row__icon" aria-hidden="true">
         <GeneratorIcon id={def.id} />
       </div>
@@ -154,6 +163,9 @@ export function ShopRail({ onOpenFactory }: { onOpenFactory?: (button: HTMLButto
   // down and back up. At rail width the handle is hidden and the body is always shown.
   const [drawerOpen, setDrawerOpen] = useState(true);
   const [resultText, setResultText] = useState<ReactNode | null>(null);
+  // The two rungs of the bulk ladder (control-unlocks.ts): the checkboxes, then the toolbar.
+  const bulkSelectable = useControlRung('bulk.select');
+  const bulkToolbar = useControlRung('bulk.toolbar');
 
   const ownedById = useMemo(() => {
     const map = new Map<string, number>();
@@ -245,7 +257,16 @@ export function ShopRail({ onOpenFactory }: { onOpenFactory?: (button: HTMLButto
           onChange={setSearch}
           placeholder={LIST_COPY.searchPlaceholderGenerators}
           ariaLabel={LIST_COPY.searchPlaceholderGenerators}
+          controlId="search.generators"
         />
+        {/* The bulk ladder's own doors, in order. The checkbox plate stands where the first
+            row's checkbox would be; the toolbar plate stands where the toolbar would be, and is
+            only offered once there is something to select with. */}
+        {!bulkSelectable ? <CoinSlot rungId="bulk.select" className="shop-rail__bulk-slot" /> : null}
+        {bulkSelectable && !bulkToolbar ? (
+          <CoinSlot rungId="bulk.toolbar" className="shop-rail__bulk-slot" />
+        ) : null}
+        {bulkToolbar ? (
         <BulkToolbar
           selectedCount={selection.ids.size}
           matchingCount={visibleRows.length}
@@ -264,6 +285,7 @@ export function ShopRail({ onOpenFactory }: { onOpenFactory?: (button: HTMLButto
             },
           ]}
         />
+        ) : null}
         {visibleRows.length === 0 ? (
           <p className="empty-slot">
             <span className="empty-slot__key">No results · 冇結果</span>
@@ -282,6 +304,7 @@ export function ShopRail({ onOpenFactory }: { onOpenFactory?: (button: HTMLButto
                 onQuantityChange={(q) => setQuantities((prev) => ({ ...prev, [row.def.id]: q }))}
                 selected={selection.has(row.def.id)}
                 onToggleSelect={() => selection.toggle(row.def.id)}
+                selectable={bulkSelectable}
               />
             ))}
             {showMysteryRow ? <MysteryRow /> : null}

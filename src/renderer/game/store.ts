@@ -1,4 +1,4 @@
-import { totalCps } from "../../shared/game/cps.js";
+import { effectiveCps } from "../../shared/game/effective-cps.js";
 import { applyGameAction, type GameAction, type ReducerCtx } from "../../shared/game/reducer.js";
 import type { BigNum } from "../../shared/game/big-number.js";
 import type { GameState } from "../../shared/game/types.js";
@@ -52,10 +52,26 @@ const STRUCTURE_KEYS = [
   // disclosure.ts#hasDiscoveredATool), so it has to wake the structural slice like any other
   // discrete purchase. It only ever changes on a `buyTool` action, never on a tick.
   "purchasedToolIds",
+  // The control economy (control-unlocks.ts). Buying a control changes what the title bar, the
+  // steppers, the search fields and the settings panel RENDER, and it only ever changes on a
+  // `buyControlUnlock` action, never on a tick — so it belongs here and nowhere else. Leaving it
+  // out was a real bug for the length of one build: the reducer took the cookies, the save
+  // recorded the rung, and the title bar went on showing the price plate until something else
+  // happened to wake this slice.
+  "controlUnlocks",
 ] as const satisfies readonly (keyof GameState)[];
 
 function computeFastSnapshot(state: GameState): FastSnapshot {
-  return { cookies: state.cookies, lifetimeCookies: state.lifetimeCookies, cps: totalCps(state) };
+  // `effectiveCps`, not `totalCps`: the HUD's PER SECOND plate is a readout of what the game is
+  // paying RIGHT NOW, and the reducer's own accrual goes through the same function
+  // (effective-cps.ts), so a Frenzy or an Oven Hiccup can never make the plate disagree with the
+  // cookies actually arriving. The snapshot is recomputed on every dispatch that moves cookies,
+  // which is every tick, so a timed multiplier expiring is reflected within one tick.
+  return {
+    cookies: state.cookies,
+    lifetimeCookies: state.lifetimeCookies,
+    cps: effectiveCps(state, Date.now()),
+  };
 }
 
 function structureChanged(previous: GameState, next: GameState): boolean {

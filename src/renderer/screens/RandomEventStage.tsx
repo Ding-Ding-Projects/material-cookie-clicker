@@ -54,10 +54,24 @@ import type { Bilingual } from '../game/copy.js';
  * The honesty rules the rest of the app follows apply unchanged. Every target is a real
  * `<button>` with a real accessible name and a 44px hit area, never a decorated `<div>`. The
  * announcement is the existing throttled `role="status"` milestone region (narration.ts already
- * describes spawns and resolutions), so this file adds no second live region and the toast is
- * `aria-hidden`. Nothing an event does gates a feature; the worst one costs production for
+ * describes spawns and resolutions), so this file adds no second live region: neither toast is a
+ * live region, and both are reachable content rather than hidden decoration.
+ * Nothing an event does gates a feature; the worst one costs production for
  * thirty seconds and gives the player a button to end it early.
  */
+
+/**
+ * An event's name joined to whatever the label goes on to say, ONE LANGUAGE AT A TIME.
+ *
+ * These labels used to be built as `${def.nameEn} · ${def.nameYue} — …`, which hardcoded the
+ * paired presentation into every accessible name on this file: a player who set the language mode
+ * to English or to Cantonese still heard both names, even though the visible spans beside them
+ * obeyed the setting. copy.ts is explicit that `formatBilingual`/`bilingualText` is the one place
+ * that decides which languages render, so the pair is assembled here and formatted there.
+ */
+function namedLabel(def: { readonly nameEn: string; readonly nameYue: string }, tail: Bilingual): string {
+  return bilingualText({ en: `${def.nameEn} — ${tail.en}`, yue: `${def.nameYue}——${tail.yue}` });
+}
 
 /** How long the marquee names an event before it clears itself. Matches the achievement toast. */
 const TOAST_DISMISS_MS = 6_000;
@@ -135,7 +149,7 @@ export function RandomEventStage() {
         <button
           type="button"
           className="event-oven"
-          aria-label={`${def.nameEn} · ${def.nameYue} — ${bilingualText(RANDOM_EVENT_COPY.fixOven)}`}
+          aria-label={namedLabel(def, RANDOM_EVENT_COPY.fixOven)}
           onClick={() => dispatch({ type: 'randomEventClick', targetId: 'oven:fix' })}
         >
           <OvenHiccupArt extraClass="event-oven__art" />
@@ -152,7 +166,7 @@ export function RandomEventStage() {
     <div
       className="event-stage event-stage--rain"
       role="group"
-      aria-label={`${def.nameEn} · ${def.nameYue} — ${bilingualText(RANDOM_EVENT_COPY.stageLabel)}`}
+      aria-label={namedLabel(def, RANDOM_EVENT_COPY.stageLabel)}
     >
       {active.pendingTargetIds.map((targetId, index) => (
         <button
@@ -194,7 +208,7 @@ function SprinkleStormStage({ active }: { active: ActiveRandomEvent }) {
     <div
       className="event-stage event-stage--sprinkles"
       role="group"
-      aria-label={`${def.nameEn} · ${def.nameYue} — ${bilingualText(RANDOM_EVENT_COPY.stageLabel)}`}
+      aria-label={namedLabel(def, RANDOM_EVENT_COPY.stageLabel)}
     >
       {active.pendingTargetIds.map((targetId, index) => {
         const seed = Number(targetId.split(':')[1] ?? index);
@@ -246,7 +260,7 @@ function DeliveryRushStage({ active }: { active: ActiveRandomEvent }) {
     <div
       className="event-stage event-stage--delivery"
       role="group"
-      aria-label={`${def.nameEn} · ${def.nameYue} — ${bilingualText(RANDOM_EVENT_COPY.stageLabel)}`}
+      aria-label={namedLabel(def, RANDOM_EVENT_COPY.stageLabel)}
     >
       <ul className="event-parcels">
         {active.pendingTargetIds.map((targetId) => {
@@ -315,7 +329,7 @@ function TasteTestStage({ active }: { active: ActiveRandomEvent }) {
     <div
       className="event-stage event-stage--choice"
       role="group"
-      aria-label={`${def.nameEn} · ${def.nameYue} — ${bilingualText(EVENT_EXTRA_COPY.chooseLabel)}`}
+      aria-label={namedLabel(def, EVENT_EXTRA_COPY.chooseLabel)}
     >
       <div className="event-choice">
         <p className="event-choice__prompt">
@@ -327,7 +341,13 @@ function TasteTestStage({ active }: { active: ActiveRandomEvent }) {
             type="button"
             className="event-choice__option event-choice__option--now"
             title={formatExactDigits(servePayout)}
-            aria-label={bilingualText(EVENT_EXTRA_COPY.chooseServe(formatExact(servePayout, 'en')))}
+            /* Each half of the label carries the payout formatted for ITS OWN locale, exactly as
+               the two visible spans below do. Passing the 'en' figure to both put English compact
+               suffixes inside the Cantonese sentence. */
+            aria-label={bilingualText({
+              en: EVENT_EXTRA_COPY.chooseServe(formatExact(servePayout, 'en')).en,
+              yue: EVENT_EXTRA_COPY.chooseServe(formatExact(servePayout, 'yue')).yue,
+            })}
             onClick={() => dispatch({ type: 'randomEventChoose', choiceId: 'serve' })}
           >
             {showsEnglish() ? (
@@ -445,7 +465,7 @@ function MouseRaidStage({ active }: { active: ActiveRandomEvent }) {
       className={`event-stage event-stage--raid${wide ? ' event-stage--wide' : ''}`}
       ref={stageRef}
       role="group"
-      aria-label={`${MOUSE_RAID_DEFINITION_NAME} — ${bilingualText(MOUSE_RAID_COPY.stageLabel)}`}
+      aria-label={namedLabel(getRandomEventDefinition('mouse_raid'), MOUSE_RAID_COPY.stageLabel)}
     >
       {mice.map((mouse, index) => (
         <button
@@ -527,16 +547,30 @@ export function RaidSuppliesShelf() {
           const stock = consumables[def.id].stock;
           const priceText = formatExact(price, 'en');
           const definition = getRaidConsumableDefinition(def.id);
+          // The state line and the stock line, each assembled per language before formatting, so
+          // the mode setting reaches these labels the way it reaches the visible spans.
+          const state: Bilingual = atCap
+            ? MOUSE_RAID_COPY.suppliesFull
+            : {
+                en: MOUSE_RAID_COPY.suppliesBuy(formatExact(price, 'en')).en,
+                yue: MOUSE_RAID_COPY.suppliesBuy(formatExact(price, 'yue')).yue,
+              };
+          const stockLine = MOUSE_RAID_COPY.suppliesStock(stock, def.stockCap);
+          const label = bilingualText({
+            en: `${def.nameEn} — ${state.en} ${stockLine.en}`,
+            yue: `${def.nameYue}——${state.yue} ${stockLine.yue}`,
+          });
           return (
             <li key={def.id}>
+              {/* Never `disabled`: the same rule CoinSlot states and the home buy buttons follow.
+                  A pass you cannot afford is still where its price is written, the press is
+                  refused by the domain, and narration.ts speaks the refusal. */}
               <button
                 type="button"
                 className="raid-supplies__buy"
-                disabled={atCap || !affordable}
-                title={`${definition.blurbEn} · ${definition.blurbYue} — ${formatExactDigits(price)}`}
-                aria-label={`${def.nameEn} · ${def.nameYue} — ${bilingualText(
-                  atCap ? MOUSE_RAID_COPY.suppliesFull : MOUSE_RAID_COPY.suppliesBuy(priceText),
-                )} · ${bilingualText(MOUSE_RAID_COPY.suppliesStock(stock, def.stockCap))}`}
+                aria-disabled={atCap || !affordable}
+                title={bilingualText({ en: definition.blurbEn, yue: definition.blurbYue })}
+                aria-label={label}
                 onClick={() => dispatch({ type: 'buyRaidConsumable', consumableId: def.id })}
               >
                 <span className="raid-supplies__name">
@@ -557,10 +591,6 @@ export function RaidSuppliesShelf() {
     </div>
   );
 }
-
-const MOUSE_RAID_DEFINITION_NAME = `${getRandomEventDefinition('mouse_raid').nameEn} · ${
-  getRandomEventDefinition('mouse_raid').nameYue
-}`;
 
 /**
  * The HUD's active-event indicator: the event's emblem, its name in both languages, and a bar
@@ -595,9 +625,10 @@ export function RandomEventIndicator() {
         def.isSetback ? ' event-indicator--setback' : ''
       }${isRaid ? ' event-indicator--raid' : ''}`}
       aria-live="off"
-      aria-label={`${bilingualText(RANDOM_EVENT_COPY.indicatorLabel)}: ${def.nameEn} · ${def.nameYue}${
-        miceLine ? ` — ${bilingualText(miceLine)}` : ''
-      }`}
+      aria-label={bilingualText({
+        en: `${RANDOM_EVENT_COPY.indicatorLabel.en}: ${def.nameEn}${miceLine ? ` — ${miceLine.en}` : ''}`,
+        yue: `${RANDOM_EVENT_COPY.indicatorLabel.yue}：${def.nameYue}${miceLine ? `——${miceLine.yue}` : ''}`,
+      })}
     >
       <span className="event-indicator__emblem" aria-hidden="true">
         {Emblem ? <Emblem /> : null}
@@ -642,11 +673,16 @@ export function MouseRaidAftermathToast() {
   const dispatch = useGameDispatch();
   const raid = structure.randomEvents.lastRaid;
 
+  // The record is destroyed when this fires, and the whole point of this toast is that a
+  // screen-reader user can reach it and re-read the figure. So the clock stops while a pointer is
+  // over it or focus is inside it, and starts again from the top when they leave (WCAG 2.2.1).
+  const [held, setHeld] = useState(false);
+
   useEffect(() => {
-    if (!raid) return;
+    if (!raid || held) return;
     const timer = setTimeout(() => dispatch({ type: 'randomEventRaidDismiss' }), RAID_AFTERMATH_DISMISS_MS);
     return () => clearTimeout(timer);
-  }, [raid, dispatch]);
+  }, [raid, held, dispatch]);
 
   if (!raid) return null;
   // Three outcomes, three sentences, and the middle one is the reason this is not a boolean:
@@ -668,6 +704,10 @@ export function MouseRaidAftermathToast() {
       className={`raid-aftermath${raid.defended || raid.passSpent ? ' raid-aftermath--defended' : ''}`}
       role="group"
       aria-label={bilingualText(MOUSE_RAID_COPY.aftermathLabel)}
+      onMouseEnter={() => setHeld(true)}
+      onMouseLeave={() => setHeld(false)}
+      onFocus={() => setHeld(true)}
+      onBlur={() => setHeld(false)}
     >
       <span className="raid-aftermath__emblem" aria-hidden="true">{Emblem ? <Emblem /> : null}</span>
       {/* Past a quadrillion the sentence prints the compact figure, because that is what the
@@ -745,12 +785,15 @@ let toastKeySeq = 0;
  *
  * Driven off the SAME narration seam the status region uses — `detectMilestones` on every
  * dispatch — rather than off a second diff of its own, so the thing that is announced and the
- * thing that is drawn can never disagree about what happened. It is `aria-hidden` for exactly
+ * thing that is drawn can never disagree about what happened. It is `not a live region for exactly
  * that reason: the message has already been spoken once, by the one region that speaks.
  *
  * The dismiss button is real and focusable, and it also dispatches `randomEventResolve`, which
  * clears the domain's finished-event record. Closing the marquee therefore actually closes it
- * rather than hiding a thing that is still notionally on screen.
+ * rather than hiding a thing that is still notionally on screen. Because that button performs a
+ * real state change, the marquee is NOT `aria-hidden`: a control nobody can reach is worse than
+ * no control. The six-second clock pauses on hover AND on focus, so a keyboard or touch user can
+ * hold it open long enough to press it.
  */
 export function RandomEventToast() {
   const store = useGameStoreInstance();
@@ -792,11 +835,19 @@ export function RandomEventToast() {
       className={`event-toast event-toast--${def.eventClass}${
         toast.isSetback ? ' event-toast--setback' : ''
       }`}
-      aria-hidden="true"
+      /* NOT aria-hidden any more. It carries a real dismiss button that clears domain state, and
+         an interactive control inside a hidden subtree is a control keyboard and screen-reader
+         users simply cannot operate. It is still not a live region — the status region spoke this
+         message once, through narration.ts — but it is now reachable, re-readable content, the
+         same shape the raid aftermath toast already had. */
+      role="group"
+      aria-label={bilingualText(RANDOM_EVENT_COPY.toastLabel)}
       onMouseEnter={() => setPaused(true)}
       onMouseLeave={() => setPaused(false)}
+      onFocus={() => setPaused(true)}
+      onBlur={() => setPaused(false)}
     >
-      <span className="event-toast__emblem">{Emblem ? <Emblem /> : null}</span>
+      <span className="event-toast__emblem" aria-hidden="true">{Emblem ? <Emblem /> : null}</span>
       <span className="event-toast__lines">
         {showsEnglish() ? <span className="event-toast__en">{toast.message.en}</span> : null}
         {showsCantonese() ? (
@@ -820,7 +871,6 @@ export function RandomEventToast() {
       <button
         type="button"
         className="event-toast__dismiss"
-        tabIndex={-1}
         onClick={() => {
           setToast(null);
           dispatch({ type: 'randomEventResolve' });

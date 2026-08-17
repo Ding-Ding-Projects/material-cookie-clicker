@@ -100,14 +100,34 @@ export function CoinSlot({ rungId, variant = 'plate', labelEn, labelYue, glyph, 
     buttonRef.current?.focus();
   }
 
+  /** Back out of the confirmation and put focus back where it came from. */
+  function closeConfirm(): void {
+    setConfirming(false);
+    buttonRef.current?.focus();
+  }
+
+  const confirmId = `coin-slot-confirm-${rungId}`;
+
   return (
-    <span className={`coin-slot-wrap${className ? ` ${className}` : ''}`}>
+    <span
+      className={`coin-slot-wrap${className ? ` ${className}` : ''}`}
+      // Escape closes the popup and returns focus to the plate, from anywhere inside it — the
+      // trigger included, since focus is on the trigger for the split second after it opens.
+      // The popup is absolutely positioned over whatever is behind it, so "Tab to Cancel" was
+      // the only way out of something that may be covering the thing you were reading.
+      onKeyDown={(event) => {
+        if (!confirming || event.key !== 'Escape') return;
+        event.stopPropagation();
+        closeConfirm();
+      }}
+    >
       <button
         ref={buttonRef}
         type="button"
         className={`coin-slot coin-slot--${variant}${affordable ? '' : ' coin-slot--short'}`}
         aria-label={bilingualText(CONTROL_COPY.slotLabel(nameEn, nameYue, priceText))}
         aria-expanded={confirming}
+        aria-controls={confirming ? confirmId : undefined}
         title={`${nameEn} · ${nameYue} — 🍪 ${priceText}`}
         onClick={() => (askFirst ? setConfirming((open) => !open) : buy())}
       >
@@ -132,7 +152,12 @@ export function CoinSlot({ rungId, variant = 'plate', labelEn, labelYue, glyph, 
       </button>
 
       {confirming ? (
-        <span className="coin-slot__confirm" role="group" aria-label={bilingualText(CONTROL_COPY.confirmTitle)}>
+        <span
+          className="coin-slot__confirm"
+          id={confirmId}
+          role="group"
+          aria-label={bilingualText(CONTROL_COPY.confirmTitle)}
+        >
           <span className="coin-slot__confirm-body">
             {bilingualText(
               CONTROL_COPY.confirmBody(nameEn, nameYue, priceText, formatExactDigits(fast.cookies)),
@@ -156,10 +181,7 @@ export function CoinSlot({ rungId, variant = 'plate', labelEn, labelYue, glyph, 
               type="button"
               className="coin-slot__confirm-cancel"
               autoFocus={!affordable}
-              onClick={() => {
-                setConfirming(false);
-                buttonRef.current?.focus();
-              }}
+              onClick={closeConfirm}
             >
               {bilingualText(CONTROL_COPY.confirmCancel)}
             </button>

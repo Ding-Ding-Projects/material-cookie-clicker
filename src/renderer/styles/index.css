@@ -2417,7 +2417,7 @@ body {
 }
 
 /* Compresses flat like a real arcade-cabinet button. */
-.buy-btn:active:not([disabled]) {
+.buy-btn:active:not([disabled]):not([aria-disabled='true']) {
   transform: translateY(4px);
   box-shadow: none;
 }
@@ -2427,7 +2427,7 @@ body {
     transition: none;
   }
 
-  .buy-btn:active:not([disabled]) {
+  .buy-btn:active:not([disabled]):not([aria-disabled='true']) {
     transform: none;
   }
 }
@@ -2437,7 +2437,11 @@ body {
   outline-offset: 2px;
 }
 
-.buy-btn[disabled] {
+/* A buy button that cannot succeed yet stays in the tab order and carries `aria-disabled`
+   instead of `disabled` (see CoinSlot.tsx and HomeScreen.tsx), so the spent look has to be
+   painted from that attribute as well as from the real one. */
+.buy-btn[disabled],
+.buy-btn[aria-disabled='true'] {
   background: var(--surface-highest);
   color: var(--on-surface-variant);
   box-shadow: none;
@@ -7963,16 +7967,17 @@ ul.card-grid {
   box-shadow: 0 3px 0 0 var(--cabinet-frame-dark);
 }
 
-.raid-supplies__buy:hover:not(:disabled) {
+.raid-supplies__buy:hover:not(:disabled):not([aria-disabled='true']) {
   background: var(--spark);
 }
 
-.raid-supplies__buy:active:not(:disabled) {
+.raid-supplies__buy:active:not(:disabled):not([aria-disabled='true']) {
   transform: translateY(3px);
   box-shadow: inset 0 3px 0 0 var(--bevel-hi);
 }
 
-.raid-supplies__buy:disabled {
+.raid-supplies__buy:disabled,
+.raid-supplies__buy[aria-disabled='true'] {
   opacity: 0.55;
   cursor: default;
 }
@@ -8535,6 +8540,10 @@ ul.card-grid {
 
 /* The flat form that fits a title-bar cap or sits beside a search input. */
 .coin-slot--chrome {
+  /* The PLATE stays the small flat cap a title bar has room for; the TARGET is expanded to the
+     44px floor by a transparent ::after that reaches out from it. Growing the padding instead
+     would have made the drawn cap taller than the bar it sits in. */
+  position: relative;
   padding: 2px 8px;
   font-size: 0.8em;
   color: var(--on-cabinet);
@@ -8545,6 +8554,23 @@ ul.card-grid {
   box-shadow: none;
   /* A title bar is a drag region; its buttons must not be. */
   -webkit-app-region: no-drag;
+}
+
+.coin-slot--chrome::after {
+  content: '';
+  position: absolute;
+  left: 50%;
+  top: 50%;
+  transform: translate(-50%, -50%);
+  min-width: 44px;
+  min-height: 44px;
+  width: 100%;
+  height: 100%;
+  /* Never paints and never intercepts a press meant for a neighbour: it only extends the hit
+     area of the button it belongs to. */
+  background: none;
+  border: none;
+  pointer-events: auto;
 }
 
 .coin-slot--chrome .coin-slot__price {
@@ -9231,6 +9257,16 @@ ul.card-grid {
 
 /* ------------------------------------------------------------------ the furniture shop ---- */
 
+/* The reason a still-pressable buy button cannot succeed. Visible text, not a tooltip: it is
+   what `aria-describedby` points at, and a keyboard user never sees a `title`. */
+.home-why {
+  display: block;
+  margin-top: 4px;
+  font-size: 11px;
+  font-weight: 700;
+  color: var(--on-surface-variant);
+}
+
 .home-shop__tabs {
   display: flex;
   flex-wrap: wrap;
@@ -9239,13 +9275,18 @@ ul.card-grid {
 }
 
 .home-shop__tab {
-  padding: 5px 11px;
+  /* 44px, like every other target in this app. The old 5px/11px at font-size 11 gave a roughly
+     25px-tall pill — the smallest thing on a panel that has 44px buy buttons directly below it. */
+  min-height: 44px;
+  display: inline-flex;
+  align-items: center;
+  padding: 8px 16px;
   border-radius: 999px;
   border: 2px solid var(--outline-variant);
   background: var(--surface-lowest);
   color: var(--on-surface-variant);
   font: inherit;
-  font-size: 11px;
+  font-size: 13px;
   font-weight: 700;
   cursor: pointer;
 }

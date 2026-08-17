@@ -9886,3 +9886,256 @@ ul.card-grid {
   flex: 1 1 auto;
   min-width: 0;
 }
+
+/* --- 11. The cabinet head is one row, always --------------------------------------------- */
+
+/*
+ * THE LAST WAY THE COOKIE COULD STILL MOVE. Everything above rule 10 holds the cookie steady
+ * inside the stage — but the stage begins where the cabinet head ends, so anything that made the
+ * HEAD taller moved the cookie down just as surely as a panel appearing beside it.
+ *
+ * Two things did:
+ *
+ *   1. A random event lands and puts its countdown indicator in the HUD. The indicator would not
+ *      shrink, so the HUD wrapped onto a second row and the head grew by fifty pixels — measured,
+ *      on a fresh save, buying the Upgrade Catalogue while an event was running: the cookie's
+ *      centre dropped from y=263.79 to y=313.46.
+ *   2. The readout plates were as tall as their own type, and their type shrinks as the figure
+ *      gets longer (`.hud__value`). So the head changed height as the cookie count crossed a
+ *      digit — the head twitching every few seconds during ordinary play.
+ *
+ * So the row does not wrap, and the plates reserve a constant height: the tallest line the value
+ * can ever be, plus the second-language line whether or not this particular figure has one. Both
+ * measurements come from the same viewport-derived value the type already used, so the head is a
+ * constant height for a given window and NOTHING that appears inside it can change that.
+ */
+.hud {
+  --hud-value-line: clamp(24px, 3.6vw, 40px);
+}
+
+/* The head is one row. The readouts and the event indicator give up width to each other rather
+   than any of them taking a new row; the shrink-to-fit type in rule 8 is what makes that safe. */
+/*
+ * NOWRAP, BUT NOT SHRINK-TO-NOTHING. The HUD keeps its own contents on one row — that is the
+ * whole point of this rule — but it deliberately does NOT get `min-width: 0`. Its min-content
+ * width is what pushes the console cluster onto its own row of the head, which is where the
+ * console has always lived; with the HUD free to shrink to nothing the head kept everything on
+ * one row instead and crushed the readouts, the raid strip and the console captions together.
+ */
+.cabinet-head .hud {
+  flex-wrap: nowrap;
+}
+
+.cabinet-head .hud__readout {
+  min-width: 96px;
+}
+
+/* The countdown is the newcomer to the row and therefore the one that yields first. Its name
+   ellipsizes; its draining bar and its clock, which are the parts carrying the actual state, do
+   not shrink at all. */
+.hud > .event-indicator {
+  flex: 0 1 auto;
+  min-width: 0;
+}
+
+.event-indicator__name {
+  min-width: 0;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+.event-indicator__bar,
+.event-indicator__time,
+.event-indicator__emblem {
+  flex: 0 0 auto;
+}
+
+/* A plate is as tall as the tallest value it could ever hold, not as tall as today's. The value
+   itself is centred in that reserved line, so a figure that shrank to fit still sits where a
+   figure belongs instead of riding the top of the plate. */
+.hud__value {
+  display: flex;
+  align-items: center;
+  height: calc(var(--hud-value-line, 40px) * 1.08);
+}
+
+/* ...and the second-language line is reserved whether or not this figure prints one, so the
+   plate does not change height as the number crosses from one wording into another. */
+.hud__readout {
+  min-height: calc(var(--hud-value-line, 40px) * 1.08 + 56px);
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+}
+
+.hud__value-zh {
+  min-height: 15px;
+}
+
+/* --- 12. The vertical budget at 1000x720 ------------------------------------------------- */
+
+/*
+ * The window can be as short as 720px and the cabinet head is legitimately two rows by then (the
+ * readouts, the raid strip, and the console cluster on its own row). What was left for the
+ * upgrade shelf was 140px, of which its own heading row took 59 — so the first ticket was cut in
+ * half by the bottom of the panel.
+ *
+ * Three small economies, none of which removes anything: the cookie band is a little shorter, the
+ * shelf's heading row stops reserving the margin it used to need under a stacked search field,
+ * and the milk band gives back the strip it was keeping for a meniscus nobody can see at this
+ * height. That is enough for a WHOLE first row of tickets, which is the thing that mattered — a
+ * shelf that scrolls is fine, a shelf whose first row is sliced is not.
+ */
+.stage__hero-column {
+  --hero-cookie-band: clamp(150px, 21vh, 300px);
+  --hero-cookie-row: clamp(118px, 16vh, 236px);
+}
+
+/* The shelf's heading row carries the search field beside the title, so the extra bottom margin
+   the field needs when it stacks is dead space here. */
+.upgrade-shelf .panel__header {
+  margin-bottom: 2px;
+}
+
+.upgrade-shelf .panel__header .panel__title {
+  margin-bottom: 0;
+}
+
+.upgrade-shelf .panel__header-search {
+  margin-bottom: 0;
+}
+
+/* One whole row of tickets before anything else, two when the cabinet can pay for them. */
+.upgrade-shelf .shelf-grid {
+  min-height: calc(var(--shelf-ticket-height) + 2px);
+}
+
+@media (max-height: 800px) {
+  .stage {
+    padding-bottom: 44px;
+  }
+
+  .milk-tide {
+    height: 42px;
+  }
+}
+
+/* --- 13. The buy controls stay inside the rail ------------------------------------------- */
+
+/*
+ * The stepper grew price plates on its ×10 and ×100 rungs, and at rail width the row of them ran
+ * off the right-hand edge of the shop rail — a price you cannot see is not an offer. The controls
+ * row wraps, the stepper wraps inside it, and both are allowed to be narrower than their contents
+ * would like rather than pushing past the plate they sit on.
+ */
+.shop-row__controls {
+  min-width: 0;
+}
+
+.shop-row__controls > .stepper {
+  flex: 1 1 auto;
+  min-width: 0;
+  flex-wrap: wrap;
+}
+
+.shop-row__controls .buy-btn {
+  min-width: 120px;
+}
+
+/* --- 14. The band is measured from the cookie, not guessed ------------------------------- */
+
+/*
+ * The reserved band was a hand-picked clamp, and the cookie inside it is a DIFFERENT hand-picked
+ * clamp, so at some window heights the drawing (which overhangs its button by about a fifth, on
+ * purpose — see `.cookie-btn__art`) reached down into the per-second line underneath it.
+ *
+ * Both measurements now come off the cookie's own size: the first row is the art's real height,
+ * and the band is that plus the two lines the hero panel prints under it. The band therefore
+ * still cannot change when a panel appears — the cookie size is viewport-derived and nothing else
+ * feeds into it — but it is now guaranteed to be big enough for what it holds.
+ */
+.stage__hero-column {
+  --hero-cookie-size: clamp(110px, 17vh, 190px);
+  --hero-cookie-row: calc(var(--hero-cookie-size) * 1.2);
+  --hero-cookie-band: calc(var(--hero-cookie-row) + 48px);
+}
+
+/* The two lines under the cookie sit ABOVE its glow. The glow is a decorative radial wash that
+   spreads well past the drawing, and a readout is not something a decoration gets to sit on. */
+.stage__hero-column > .panel.cookie-hero > .cookie-cps,
+.stage__hero-column > .panel.cookie-hero > .cookie-hero__hint {
+  position: relative;
+  z-index: 2;
+}
+
+/* The savings that pay for the taller band, all of them in the shelf's fixed furniture rather
+   than in the tickets: a ticket is three short lines and never needed 82px, the requirement list
+   shows the same number of rows in less height, and the stamp wall is a strip of 22px stamps. */
+.shelf-grid {
+  --shelf-ticket-height: 74px;
+}
+
+@media (max-height: 800px) {
+  .shelf-locked-list {
+    height: 44px;
+  }
+
+  .shelf-stamp-wall {
+    height: 28px;
+  }
+}
+
+/* --- 15. What the milk band is worth on a short window ----------------------------------- */
+
+/*
+ * The tide reserves a strip of stage floor so the liquid has somewhere to rise (see "the milk
+ * tide" above). At 720px that strip was 44px of the 155px the upgrade shelf had left, and it was
+ * being spent on the empty air above a level that is usually near the bottom of the glass.
+ *
+ * On a short window the band is a thin one. The level is still the real level, the caption still
+ * names the flavour and the percentage, and the twenty pixels bought back are what let a whole
+ * upgrade ticket — name, effect and price — fit on the shelf instead of two thirds of one.
+ */
+@media (max-height: 800px) {
+  .stage {
+    padding-bottom: 26px;
+  }
+
+  .milk-tide {
+    height: 24px;
+  }
+
+  .milk-tide__caption {
+    bottom: 3px;
+    left: 12px;
+    font-size: 0.62rem;
+  }
+}
+
+/* --- 16. The raid strip is a fixed-height plate too --------------------------------------- */
+
+/*
+ * The last eleven pixels. When a random event lands in the HUD everything on that row gives up
+ * width — and the raid strip answered by wrapping "Whack Pass" onto two lines, which made the
+ * strip taller, which made the head taller, which moved the cookie down by 11px.
+ *
+ * The supply names are single-line and ellipsize, and the strip reserves the same height the
+ * readouts beside it reserve. What each pass costs and how many are left are the parts that must
+ * stay legible, and they are the parts that are not allowed to shrink.
+ */
+.cabinet-head .raid-supplies {
+  min-height: calc(var(--hud-value-line, 40px) * 1.08 + 56px);
+  justify-content: center;
+  min-width: 0;
+}
+
+.raid-supplies__buy {
+  min-width: 0;
+}
+
+.raid-supplies__buy > * {
+  max-width: 100%;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}

@@ -490,3 +490,39 @@ The panel behind the third capture in this lane — the free `PRICES` console
 button — was opened in the same session and read `1 OF 31 BOUGHT`, which is the
 whole registry counted live and agrees with the figure the documentation site
 publishes.
+
+
+## `layout-1000px.png` / `layout-1440px.png` — the layout-stability pass
+
+Both taken from the built `dist/` in one session, on an off-screen Windows
+desktop named `LayoutLane`, launched by the real Electron binary with its own
+debugging port (9411) and a throwaway `--user-data-dir`. Both were opened and
+looked at afterwards.
+
+**How the two widths were reached.** The window itself cannot be resized from
+outside while the resize purchase is unbought — that is enforced in the main
+process on purpose (`src/main/main.ts`, `resizable: false`). So the viewport was
+set over the devtools connection with `Emulation.setDeviceMetricsOverride` at
+1000x720 and 1440x900, `deviceScaleFactor: 1`, and the images are
+`Page.captureScreenshot` of that emulated viewport. The CSS genuinely lays out at
+those widths in CSS pixels; nothing about the layout is scaled or faked.
+
+The save is the progressed one `scripts/capture-seed-save.test.ts` writes, pushed
+into `localStorage` over the same connection and then loaded normally.
+
+| File | What it shows |
+| --- | --- |
+| `layout-1000px.png` | The narrowest width the game has to hold, which is where the owner's screenshots came from. The Cursor row reads across: name, rate sub-line and the owned count `220`, each on one line — it used to wrap one word per line down a 34px column. The upgrade shelf shows `READY TO BUY` alone above a whole row of tickets, each carrying its name, what it actually does, and its price. The cabinet head is one row of readouts plus one row of console caps and stays that way whatever lands in it. The card over the rail is the offline-earnings notice, sitting in the one toast column with the achievement toast below it rather than through it. |
+| `layout-1440px.png` | The default window. Eight tickets across two rows with their effect lines, `NEARLY THERE` and `ALREADY BOUGHT` below them as separate sections rather than printed over each other, and the shop rail carrying the full priced stepper and its buy button. |
+
+**The cookie-position invariant, measured rather than eyeballed.** From a
+genuinely fresh profile, the cookie button's bounding rect was read from the DOM
+before any reveal, after buying Shop Sign, and after buying Upgrade Catalogue —
+each purchase made by a real press on the discovery ticket's own button.
+
+| Width | Before any reveal | After Shop Sign | After Upgrade Catalogue |
+| --- | --- | --- | --- |
+| 1000x720 | centre (314.00, 265.21), 122.4 x 122.4 | (314.00, 265.21) | (314.00, 265.21) |
+| 1440x900 | centre (534.00, 287.53), 153 x 153 | (534.00, 287.53) | (534.00, 287.53) |
+
+Zero drift on both axes at both widths.

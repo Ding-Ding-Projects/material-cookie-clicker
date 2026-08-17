@@ -165,6 +165,20 @@ function searchRungs(surfaceId: string, surfaceEn: string, surfaceYue: string): 
  * Adding an entry here is the whole job of selling a new control: the catalogue, the coin-slot
  * plates, the reducer's purchase arithmetic and the integrity tests all read this table and
  * nothing else.
+ *
+ * WHAT THIS TABLE DELIBERATELY DOES NOT SELL, since new panels keep arriving and the question
+ * comes up every time: a shelf's own Buy button, and the tab strip that picks which shelf you
+ * are looking at. Those are not controls in the sense this economy means — they ARE the
+ * purchase, and charging cookies for the button that spends cookies is a circular lock of the
+ * same shape as charging for the catalogue's search box. The shop rail's Buy button, the
+ * factory's equipment buttons and the home's blueprint, build and furniture buttons are all
+ * free for that one reason, and it applies to all of them equally rather than exempting any.
+ *
+ * The kinds this table DOES sell are window chrome, Settings entries, search fields, the
+ * buy-quantity stepper, bulk selection and feature switches. A new panel joins the registry the
+ * moment it grows one of those — a search field over the furniture shelves would be
+ * `search.home` at the same three prices every other surface pays. The home panel has none of
+ * them today, which is why it adds no rung here.
  */
 export const CONTROL_UNLOCKS: readonly ControlUnlockDefinition[] = [
   {

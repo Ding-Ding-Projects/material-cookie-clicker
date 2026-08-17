@@ -50,6 +50,7 @@ import { DiscoveryTicket } from './screens/DiscoveryTicket';
 import { MilkTide } from './screens/MilkTide';
 import { ShopRail } from './screens/ShopRail';
 import { FactoryScreen } from './screens/FactoryScreen';
+import { HomeScreen } from './screens/HomeScreen';
 import { PrestigeScreen } from './screens/PrestigeScreen';
 import {
   MouseRaidAftermathToast,
@@ -85,6 +86,7 @@ const SURFACE_LABELS: Readonly<Record<PanelId, Bilingual>> = {
   statistics: TAB_COPY.statistics,
   prestige: TAB_COPY.prestige,
   factory: TAB_COPY.factory,
+  home: TAB_COPY.home,
   settings: SETTINGS_COPY.title,
 };
 
@@ -682,6 +684,7 @@ function GameShell() {
           onClose={closePanel}
         >
           {openSurface === 'factory' && <FactoryScreen />}
+          {openSurface === 'home' && <HomeScreen />}
           {openSurface === 'achievements' && <AchievementsScreen />}
           {openSurface === 'tools' && <ToolsScreen onOpenApplicationFeature={openApplicationFeature} />}
           {openSurface === 'statistics' && <StatisticsScreen />}

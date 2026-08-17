@@ -153,22 +153,55 @@ export const SaveDataV5Schema = SaveDataV4Schema.omit({ schemaVersion: true }).e
 export type SaveDataV5 = z.infer<typeof SaveDataV5Schema>;
 
 /**
+ * `homeConstruction` (the bakery-home — see home-construction.ts) is a DEFAULTED field rather
+ * than a schema version of its own, following exactly the precedent `rebornNodeIds` set above.
+ *
+ * The reasoning is worth restating. A version bump exists to carry a save across a change a
+ * reader cannot work out for itself. This is not one of those: a save written before the house
+ * existed has no house, and "no blueprints, no rooms, nothing being built, nothing invested" is
+ * the complete and honest reading of it. A migration step could add nothing this default does
+ * not already say correctly.
+ *
+ * Note what the default does NOT do: it does not hand anybody the Property Deed. An older save
+ * buys that reveal upgrade like everyone else, and until it does there is no house to have.
+ */
+const HomeConstructionSchema = z
+  .object({
+    blueprintIds: z.array(z.string()),
+    rooms: z.array(z.object({ roomId: z.string(), furnitureIds: z.array(z.string()) })),
+    build: z
+      .object({
+        roomId: z.string(),
+        elapsedMs: z.number().nonnegative(),
+        requiredMs: z.number().nonnegative(),
+      })
+      .nullable(),
+    cookiesInvested: BigNumSchema,
+  })
+  .default({ blueprintIds: [], rooms: [], build: null, cookiesInvested: { mantissa: 0, exponent: 0 } });
+
+/**
  * Schema for save-format version 6. Adds `controlUnlocks` — the control economy
- * (control-unlocks.ts): which of the application's OWN controls the player has bought.
+ * (control-unlocks.ts): which of the application's OWN controls the player has bought. It also
+ * carries the defaulted `homeConstruction` block described above, which costs no version of its
+ * own and grants nothing.
  *
- * One flat list of rung ids, and nothing else. Not a per-control record with levels in it,
- * because a level is derived (control-unlocks.ts#controlRungLevel) and storing a derived number
- * beside the facts it comes from is how the two end up disagreeing. Unknown ids are tolerated on
- * read rather than rejected: a save written by a build that sold one more control than this one
- * knows about should still load, and every reader looks a rung up in the registry before
- * believing it means anything.
+ * `controlUnlocks` is one flat list of rung ids, and nothing else. Not a per-control record with
+ * levels in it, because a level is derived (control-unlocks.ts#controlRungLevel) and storing a
+ * derived number beside the facts it comes from is how the two end up disagreeing. Unknown ids
+ * are tolerated on read rather than rejected: a save written by a build that sold one more
+ * control than this one knows about should still load, and every reader looks a rung up in the
+ * registry before believing it means anything.
  *
- * `migrations.ts#migrateV5ToV6` is where the one genuinely debatable decision in this feature
- * lives — an already-played save is handed the whole table for free. It is argued out in full
- * there and in control-unlocks.ts#MIGRATION_GRANT_LIFETIME_THRESHOLD.
+ * `migrations.ts#migrateV5ToV6` is where the one genuinely debatable decision in this file
+ * lives, and it is the ONLY step in the whole v1-to-v6 chain that grants anything: an
+ * already-played save is handed the control table for free. It is argued out in full there and
+ * in control-unlocks.ts#MIGRATION_GRANT_LIFETIME_THRESHOLD. Every other step, including the
+ * home default above, adds emptiness and nothing else.
  */
 export const SaveDataV6Schema = SaveDataV5Schema.omit({ schemaVersion: true }).extend({
   schemaVersion: z.literal(6),
+  homeConstruction: HomeConstructionSchema,
   controlUnlocks: z.object({
     purchasedRungIds: z.array(z.string()),
   }),

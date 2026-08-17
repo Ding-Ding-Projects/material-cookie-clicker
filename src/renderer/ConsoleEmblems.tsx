@@ -205,6 +205,51 @@ export function RefineryEmblem({ className }: EmblemProps) {
   );
 }
 
+/** THE HOME — a cutaway house: a pitched roof over a two-storey front, one window lit warm and
+ *  one still dark, a chimney with smoke off it, and a door on the ground floor. The lit-versus-
+ *  dark pair is the emblem's whole argument: this is a house you are part way through building,
+ *  and the point of it is the rooms that are not finished yet. */
+export function HouseEmblem({ className }: EmblemProps) {
+  return (
+    <svg {...frame(className)}>
+      <defs>
+        <linearGradient id="mcc-house-wall" x1="0" y1="0" x2="0" y2="1">
+          <stop offset="0" stopColor="var(--surface-highest)" />
+          <stop offset="1" stopColor="var(--surface-lowest)" />
+        </linearGradient>
+        <linearGradient id="mcc-house-roof" x1="0" y1="0" x2="0.2" y2="1">
+          <stop offset="0" stopColor="var(--tier1-container)" />
+          <stop offset="1" stopColor="var(--tier1)" />
+        </linearGradient>
+        <radialGradient id="mcc-house-lit" cx="0.5" cy="0.4" r="0.75">
+          <stop offset="0" stopColor="var(--metal-hi)" />
+          <stop offset="0.55" stopColor="var(--spark)" />
+          <stop offset="1" stopColor="var(--spark-glow)" />
+        </radialGradient>
+      </defs>
+      {/* smoke, drawn first so the chimney sits over it */}
+      <path d="M23.4 5.4c2-1.5 3.9-.5 4.1 1.3" fill="none" stroke="var(--metal-hi)" strokeWidth="1.5" strokeLinecap="round" opacity="0.45" />
+      <rect x="21.4" y="6.2" width="3.4" height="5.6" rx="0.8" fill="var(--metal-lo)" stroke="var(--spark-ring)" strokeWidth="1" />
+      {/* the pitched roof */}
+      <path d="M2.6 14.6L16 4.2l13.4 10.4z" fill="url(#mcc-house-roof)" stroke="var(--spark-ring)" strokeWidth="1.4" strokeLinejoin="round" />
+      {/* the two-storey front */}
+      <rect x="5.6" y="14.2" width="20.8" height="12.4" rx="1.2" fill="url(#mcc-house-wall)" stroke="var(--spark-ring)" strokeWidth="1.4" />
+      {/* the floor line — this is a CUTAWAY, so the storeys are drawn separately */}
+      <path d="M5.6 20.4h20.8" stroke="var(--outline)" strokeWidth="1.1" opacity="0.7" />
+      {/* upstairs: one window lit, one dark */}
+      <rect x="8.4" y="15.8" width="4.4" height="3.4" rx="0.7" fill="url(#mcc-house-lit)" stroke="var(--spark-ring)" strokeWidth="0.9" />
+      <rect x="19.2" y="15.8" width="4.4" height="3.4" rx="0.7" fill="var(--surface-lowest)" stroke="var(--outline)" strokeWidth="0.9" />
+      {/* downstairs: the door, and the kitchen window beside it */}
+      <path d="M13.6 26.6v-4.8a2.4 2.4 0 0 1 4.8 0v4.8z" fill="var(--tier1)" stroke="var(--spark-ring)" strokeWidth="1.1" strokeLinejoin="round" />
+      <circle cx="17.3" cy="24.4" r="0.7" fill="var(--metal-hi)" />
+      <rect x="8" y="22" width="4" height="3.2" rx="0.7" fill="url(#mcc-house-lit)" stroke="var(--spark-ring)" strokeWidth="0.9" />
+      {/* the ground it stands on */}
+      <path d="M2.4 26.8h27.2" stroke="var(--outline)" strokeWidth="2.2" strokeLinecap="round" />
+      <path d="M7.4 12.4a5 5 0 0 1 3.4-2.8" fill="none" stroke="#fff" strokeWidth="1.5" strokeLinecap="round" opacity="0.5" />
+    </svg>
+  );
+}
+
 /** Decorative rivets/brackets for the panel header plate — chrome, never content. */
 export function PanelCorner({ className }: EmblemProps) {
   return (
@@ -217,6 +262,7 @@ export function PanelCorner({ className }: EmblemProps) {
 
 export const CONSOLE_EMBLEMS = {
   factory: RefineryEmblem,
+  home: HouseEmblem,
   achievements: MedalEmblem,
   tools: GemWrenchEmblem,
   statistics: GaugeEmblem,

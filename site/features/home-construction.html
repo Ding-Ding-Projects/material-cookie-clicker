@@ -1,0 +1,127 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1" />
+<title>Building the home — Material Cookie Clicker</title>
+<meta name="description" content="You live over the shop. Buy a blueprint, pay the builders, and wait out a build that takes real minutes — then furnish the room. Six rooms, twenty-six pieces of furniture, and a coziness score that pays a modest multiplier on everything the ovens make." />
+<link rel="stylesheet" href="../assets/site.css" />
+</head>
+<body>
+<a class="skip-link" href="#main">Skip to main content</a>
+<header class="site-head">
+  <div class="wrap">
+    <a class="brand" href="../index.html"><span aria-hidden="true">&#127850;</span> Material Cookie Clicker</a>
+    <nav class="site-nav" aria-label="Primary">
+      <ul>
+        <li><a href="../index.html">Home</a></li>
+        <li><a href="../features/index.html">Features</a></li>
+        <li><a href="../index.html#download">Download</a></li>
+      </ul>
+    </nav>
+  </div>
+</header>
+<main id="main" class="wrap">
+  <article>
+    <h1>Building the home</h1>
+    <p class="lede">You live over the shop. Buy the drawing, pay the builders, and then wait &mdash; a room takes real minutes to put up. Furnish it afterwards, and the house pays you back a little for being a nice place to be.</p>
+    <div class="inset" style="margin-bottom:18px">
+  <span class="label">Current state</span>
+  <p style="margin:0"><span class="tag">Shipped</span> The Home is its own console panel, opened by the Property Deed upgrade; the subgame lives in <code>src/shared/game/home-construction.ts</code>.</p>
+</div>
+
+    <h2>The second game inside the game</h2>
+    <p>The <a href="diesel-factory.html">diesel factory</a> is a production line: things flow through it and stall against each other. This is not that. This is a <strong>house</strong>, and it is built the way a house is really built &mdash; one room at a time, in an order you choose, and each room takes real time to put up.</p>
+    <p>The whole loop is four steps and there is no fifth:</p>
+    <ol>
+      <li>Buy a room's <strong>blueprint</strong> with cookies. It buys the right to build, and nothing else.</li>
+      <li>Pay the <strong>builders</strong> to start construction on it.</li>
+      <li><strong>Wait.</strong> Construction advances on elapsed game time and finishes when the time has genuinely been served.</li>
+      <li><strong>Furnish</strong> the finished room, a piece at a time, each piece carrying a coziness score and usually a small bonus.</li>
+    </ol>
+    <p>Cookies touch the house in exactly those three purchases &mdash; blueprint, builders, furniture &mdash; and nothing here ever pays cookies back out.</p>
+
+    <h2>From the running application</h2>
+    <figure class="capture">
+      <img src="../assets/captures/home-building.png" alt="The Home panel open as an anchored dialog over the dimmed cookie surface, hanging from THE HOME console emblem beside the DIESEL FACTORY one. A BUILDING SITE section reads Building the Parlour in English and Cantonese above a wide progress bar filled to 70 percent, a line reading Time remaining 1m 30s, and a bolded rule that only one room is ever under construction. Below it THE HOUSE section shows six room cards in three columns. Kitchen is outlined green and chipped BUILT, with two small furniture glyphs standing on the floor of its cutaway. Pantry is chipped FOR SALE, its cutaway holding a dashed floor-plan sketch with a door swing, and carries tiles reading builders 40,000 and build time 2m 0s above an orange Buy blueprint button priced 20,000. Parlour is outlined orange and chipped BUILDING, its cutaway crossed by scaffolding, with its own 70 percent bar and the same 1m 30s remaining under it. Bedroom, Workshop and Garden sit below, each chipped FOR SALE over a dashed plan sketch." width="2582" height="1550" loading="lazy" />
+      <figcaption><strong>A room going up.</strong> Every purchase in this frame was a real press: the Property Deed, the Kitchen blueprint, the builders, two pieces of kitchen furniture, then the Parlour blueprint and its builders. The Kitchen's full sixty seconds and the two hundred and ten seconds behind that 70% were served in real time on a real clock &mdash; nothing here was fast-forwarded. Captured from the built application on an off-screen Windows desktop with the Win32 PrintWindow API, window maximised.</figcaption>
+    </figure>
+    <p>Three states, three drawings. A room you could buy the plan for is drawn as <em>the plan</em>: dashed walls, a door swing, a dimension line. A room going up is drawn with scaffolding across it and carries the real bar and the real countdown. A finished room is drawn as a floor with its furniture standing on it.</p>
+
+    <h2>The six rooms</h2>
+    <p>The Kitchen is first and is the only one that is first &mdash; this is a bakery, and a bakery with no kitchen is a shop with nothing to sell. Everything else hangs off the Kitchen being <strong>built</strong>, not merely bought, and is then taken in whatever order you like. A player who wants a Garden before a Bedroom is not wrong, only slower to sleep.</p>
+    <table>
+      <thead><tr><th>Room</th><th>Blueprint</th><th>Builders</th><th>Build time</th><th>Empty shell coziness</th></tr></thead>
+      <tbody>
+        <tr><td>Kitchen</td><td>5,000</td><td>10,000</td><td>1m</td><td>6</td></tr>
+        <tr><td>Pantry</td><td>20,000</td><td>40,000</td><td>2m</td><td>4</td></tr>
+        <tr><td>Parlour</td><td>100,000</td><td>200,000</td><td>5m</td><td>8</td></tr>
+        <tr><td>Bedroom</td><td>500,000</td><td>1,000,000</td><td>10m</td><td>8</td></tr>
+        <tr><td>Workshop</td><td>2,500,000</td><td>5,000,000</td><td>20m</td><td>4</td></tr>
+        <tr><td>Garden</td><td>12,000,000</td><td>25,000,000</td><td>30m</td><td>6</td></tr>
+      </tbody>
+    </table>
+    <p>Costs climb about an order of magnitude a room against a doubling of minutes, so the last room is a genuine project rather than a long till receipt. The whole house is <strong>sixty-eight minutes</strong> of construction, and that is before any of it is furnished.</p>
+
+    <h3>One site, one crew</h3>
+    <p>Only one room is ever under construction. Starting a second while the first is up is <strong>refused outright</strong> &mdash; not queued behind it, not silently dropped in its place. The panel says so in words rather than leaving a disabled button to imply it, because a queue nobody asked for is a queue that spends cookies while the player is looking somewhere else.</p>
+
+    <h3>The time is real, and it is only real time</h3>
+    <p>Construction advances on the elapsed milliseconds the game loop hands it, exactly as the factory's tick does. No start timestamp is stored and no clock is consulted, so winding the system clock forward buys nothing. For the same reason a build does <strong>not</strong> advance while the application is closed: offline progress credits cookies and touches neither subgame. The builders keep the same hours the refinery does. The panel prints the time genuinely remaining, never an estimate.</p>
+    <p>The required time is frozen at the moment a build <em>starts</em>, after every build-speed bonus the house owns at that instant. Buying a Joiner's Bench halfway through a build does not retroactively shorten the build it is not helping with &mdash; and the countdown you are watching never jumps backwards.</p>
+
+    <h2>Twenty-six pieces of furniture</h2>
+    <figure class="capture">
+      <img src="../assets/captures/home-furnished.png" alt="The Home panel with three rooms finished. A COZINESS gauge at the top left is a round black dial with a yellow arc filled about a third of the way round, a needle standing just past vertical and the number 89 beneath it. Beside it a sentence reads that the house pays plus 19.3 percent on everything the ovens make, the coziness curve and the furniture together, in English and Cantonese. Five figure tiles read coziness 89 of 249, rooms built 3 of 6, furniture placed 9, builders' pace plus 0 percent, and spent on the house 2,560,000 cookies. The BUILDING SITE section below says nothing is being built and repeats the one-site-one-crew rule. THE HOUSE section shows Kitchen, Pantry and Parlour side by side, all three outlined green and chipped BUILT, each cutaway holding its furniture as small glyphs on the floor — four in the Kitchen, three in the Pantry, two in the Parlour — with per-room coziness readings of 31, 24 and 34 underneath their descriptions." width="2582" height="1550" loading="lazy" />
+      <figcaption><strong>Three rooms, nine things in them.</strong> The gauge reads the real total: 31 + 24 + 34 = 89, against a fully finished house's 249. The +19.3% beside it is the number the cookie economy is actually multiplied by, not a separate display figure &mdash; it is the coziness curve and the furniture's own production bonuses in one. The Parlour was finished on the clock during this run and its armchair and hearth were bought with real presses.</figcaption>
+    </figure>
+    <p>Four to five pieces per room, twenty-six in all, each buyable once and only into a room that is actually built. Prices rise across the house rather than within a room, so a freshly finished Garden is a shopping trip rather than a shopping list with the first item greyed out.</p>
+    <p>What a piece can carry, on top of its coziness:</p>
+    <ul>
+      <li><strong>Production</strong> &mdash; eleven pieces, 1.5% to 4% each, multiplied into total cookies per second.</li>
+      <li><strong>Click</strong> &mdash; four pieces, 3% to 6% each. Together they are &times;1.1922 on a click.</li>
+      <li><strong>Builders' pace</strong> &mdash; four pieces, shortening future builds by 5%, 8%, 12% and 15%. They add to 40%, and are capped at 60% so that adding a fifth later cannot produce an instant house.</li>
+      <li><strong>Nothing at all</strong> &mdash; seven pieces are only there to be nice, and say so on the card. The Wall of Jars is the proudest wall in the house and does nothing.</li>
+    </ul>
+
+    <h2>The coziness curve</h2>
+    <p>Every built room contributes its shell's coziness; every piece of furniture contributes its own. Nothing else contributes anything &mdash; coziness is not a function of cookies, of time, or of how long you have been playing. The total feeds one logarithmic curve:</p>
+    <p><code>multiplier = 1 + 0.06 &times; ln(1 + coziness / 40)</code></p>
+    <table>
+      <thead><tr><th>Coziness</th><th>What it means</th><th>Curve</th></tr></thead>
+      <tbody>
+        <tr><td>0</td><td>A fresh save. Exactly one, not nearly one.</td><td>&times;1.0000</td></tr>
+        <tr><td>36</td><td>All six rooms built, not one stick of furniture in them</td><td>&times;1.0385</td></tr>
+        <tr><td>89</td><td>The state in the capture above</td><td>&times;1.0703</td></tr>
+        <tr><td>249</td><td>The entire house, fully furnished</td><td>&times;1.1187</td></tr>
+      </tbody>
+    </table>
+    <p>Logarithmic deliberately. A linear curve would make the last few pieces &mdash; the ones costing tens of millions &mdash; worth exactly as much as the first ones, which is wrong as an economy and wrong as a feeling: the difference between a bare room and a chair is enormous, and the difference between nine nice things and ten is small.</p>
+    <p>The curve is not the whole of what a furnished house pays. The eleven production pieces multiply to &times;1.3505, and the panel folds both into the single figure it prints, so the honest ceiling is <strong>&times;1.5108 on production</strong> for six rooms, thirty-eight purchases (six blueprints, six constructions, twenty-six pieces of furniture), <strong>405,780,000 cookies</strong> and sixty-eight minutes of building.</p>
+    <p>Half again on production sounds large until you put it beside the main economy. It is deliberately of the same order as <em>one</em> of the cookie side's own global upgrades &mdash; Sturdier Ovens is &times;1.1, Industrial-Grade Yeast &times;1.25 &mdash; and there are a dozen of those, alongside a twenty-tier ladder and a prestige multiplier. Finishing the entire house is worth about as much as one good upgrade, spread across the entire mid-game. That is the point: the main economy stays primary, and stays primary by an enormous margin.</p>
+
+    <h2>Nothing unlocks itself</h2>
+    <p>The house arrives with the <strong>Property Deed</strong>, an upgrade costing 2,000 cookies and chained behind the Shop Sign &mdash; a player who has not yet found the shop has no business buying property. Buying the deed gives you a building and nothing inside it. Every room after that is a blueprint you buy, a construction you pay for, and a wait you actually serve. No room, no piece of furniture and no blueprint is ever granted, by progress, by a milestone, or by loading an old save.</p>
+    <p>A save written before the house existed reads back with an empty plot &mdash; no blueprints, no rooms, nothing being built, nothing invested &mdash; and no deed. It buys the deed like everyone else.</p>
+
+    <h2>What is not photographed</h2>
+    <p>Two things. The <strong>later rooms</strong>: no capture run has reached the Bedroom, Workshop or Garden, so the twenty- and thirty-minute builds and the fifteen most expensive pieces of furniture are unit-tested and undrawn. And the <strong>build-speed bonus doing its job</strong> &mdash; the builders' pace tile reads +0% in both captures, because the four pieces that raise it live in rooms this run never built. Those are gaps in evidence, not features known to be broken.</p>
+    <nav class="related plate" aria-labelledby="related-heading">
+      <h2 id="related-heading">Related articles</h2>
+      <ul>
+      <li><a href="diesel-factory.html">The diesel factory</a></li>
+      <li><a href="upgrades.html">Upgrades</a></li>
+      <li><a href="cookie-clicking.html">Cookie clicking and the CPS loop</a></li>
+        <li><a href="index.html">All features &amp; search</a></li>
+      </ul>
+    </nav>
+  </article>
+</main>
+<footer class="site-foot">
+  <div class="wrap">
+    <p>Material Cookie Clicker is free, unsigned by permanent policy, and nobody ever pays anything to use it. This site is fully self-contained: no CDN, no remote font, no remote image, no analytics, no network request of any kind. Every graphic is either drawn in CSS or a screenshot of the application stored in this repository.</p>
+    <p><a href="https://github.com/Ding-Ding-Projects/material-cookie-clicker">Source code on GitHub</a> &middot; <a href="../features/index.html">All feature articles</a></p>
+  </div>
+</footer>
+</body>
+</html>

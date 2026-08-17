@@ -94,6 +94,15 @@ export function encodeSave(state: GameState): SaveDataOnDisk {
       equipment: state.dieselFactory.equipment.map((e) => ({ id: e.id, count: e.count })),
       upgradeIds: [...state.dieselFactory.upgradeIds],
     },
+    homeConstruction: {
+      blueprintIds: [...state.homeConstruction.blueprintIds],
+      rooms: state.homeConstruction.rooms.map((r) => ({
+        roomId: r.roomId,
+        furnitureIds: [...r.furnitureIds],
+      })),
+      build: state.homeConstruction.build ? { ...state.homeConstruction.build } : null,
+      cookiesInvested: state.homeConstruction.cookiesInvested,
+    },
     toolProgressionEnabled: state.toolProgressionEnabled,
     purchasedToolIds: [...state.purchasedToolIds],
     // The control economy (control-unlocks.ts). A state built without the subtree — a test

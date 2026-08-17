@@ -68,10 +68,10 @@ describe("the upgrade catalogue", () => {
     }
   });
 
-  it("only the four reveals are reveals, and nothing else buys a surface", () => {
+  it("only the five reveals are reveals, and nothing else buys a surface", () => {
     const reveals = UPGRADE_DEFINITIONS.filter((u) => u.effect.kind === "reveal");
     expect(reveals).toHaveLength(REVEAL_UPGRADE_DEFINITIONS.length);
-    expect(reveals).toHaveLength(4);
+    expect(reveals).toHaveLength(5);
   });
 
   it("locks nothing behind an unreachable condition", () => {

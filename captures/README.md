@@ -173,6 +173,53 @@ because the factory rode on the store's `fast` slice and a player with a
 refinery and no generators has a static cookie count. The factory has its own
 store slice now, and these captures are from the fixed build.
 
+### The home-construction set
+
+Two images from one session on the off-screen desktop `HomeFinishCapture`, both
+opened and looked at afterwards. They are the evidence for the second nested
+subgame — the bakery-home (`src/shared/game/home-construction.ts`).
+
+| File | What it shows |
+| --- | --- |
+| `home-building.png` | The Home panel with a room genuinely going up. `BUILDING SITE` reads **Building the Parlour**, a progress bar at **70%** and **1m 30s** remaining; the house grid below carries a green `BUILT` Kitchen with two furniture glyphs standing on its floor, a `FOR SALE` Pantry drawn as a dashed floor plan with its builders' price and build time beside a Buy blueprint button, and a `BUILDING` Parlour crossed by scaffolding. The three card states of the subgame in one frame. |
+| `home-furnished.png` | Three rooms finished. The coziness dial reads **89 of 249** with its needle on the real fraction, and the sentence beside it prints **+19.3%** — the figure the cookie economy is actually multiplied by, curve and furniture folded into one number. Per-room coziness reads 31, 24 and 34, which is the 89 the gauge shows, and the site is idle. |
+
+**How this set was taken.** From the built `dist/`, launched by the real
+`electron` binary onto an off-screen Windows desktop named `HomeFinishCapture`,
+with `--remote-debugging-port=9331` and a throwaway `--user-data-dir`. The window
+was maximised through the application's own title-bar API (2582x1550 device
+pixels at 144 DPI) and both images are Win32 `PrintWindow` captures of that one
+window, resolved by title and class from the desktop's window list.
+
+The run was seeded with `scripts/capture-seed-home.test.ts` in its `before`
+stage — a rich save with the shop open and, deliberately, **no Property Deed**,
+because the point of that stage is to photograph somebody buying the house
+rather than owning it. Everything after that balance was a real press posted to
+the window at the control's real coordinates: the Property Deed ticket, the
+Kitchen blueprint, the Kitchen builders, two pieces of kitchen furniture, the
+Parlour blueprint, the Parlour builders, and later the Parlour's armchair and
+hearth.
+
+**The clock in these images is real.** The Kitchen's full sixty seconds and two
+hundred and ten seconds of the Parlour's five minutes were served by the running
+application in real time; nothing was fast-forwarded and no elapsed value was
+written into the save. `home-building.png` was taken after the renderer was
+rebuilt and the window reloaded mid-build, and the build resumed at exactly the
+elapsed it had been saved with — which is also the proof that a closed
+application does not build.
+
+`home-furnished.png` starts from the harness's `furnished` stage, a save two
+rooms in with a Parlour most of the way through its build; that build then
+finished on the clock during the session and its two pieces of furniture were
+bought by real presses. One frame was discarded before it: a `PrintWindow` taken
+seconds after a scroll came back torn, half the window painted and half stale.
+It was retaken rather than shipped.
+
+**What this set does not show.** The Bedroom, Workshop and Garden were never
+reached, so the twenty- and thirty-minute builds and the fifteen dearest pieces
+of furniture are unphotographed, and the builders'-pace tile reads `+0%` in both
+images because every piece that raises it lives in a room this run never built.
+
 ### The mouse-raid set
 
 Two images of the Mouse Raid, the hourly event that puts mice on the counter and
@@ -377,6 +424,17 @@ bordered callout, deliberately separated from the lock chrome above it, and
 appears **identically** on an undiscovered card and a fully unlocked one. It is
 never greyed out and never hidden behind the silhouette.
 
+## Integration sanity checks
+
+Not feature captures. Each one is a single frame taken from the built application
+on a fresh profile straight after an integration merge, to prove the merged tree
+still starts and still shows the right nothing.
+
+| File | What it shows |
+| --- | --- |
+| `integrate-sanity.png` | After the factory and mouse-raid lanes were merged. |
+| `wave-sanity.png` | After the frenzy-events, control-economy and home-construction lanes were merged. A fresh profile is the cookie, the COOKIES plate reading 0, and the free Settings emblem — no shop rail, no console emblems, no house and no factory. The title bar carries the three coin plates the control economy puts there: drag at 10, minimize at 30, maximize at 45. The close button is a real button, because close is never for sale. Taken on an off-screen desktop named `WaveCapture` with the Win32 PrintWindow API. |
+
 ## Not captured yet
 
 - The factory's **automation** branch actually shipping by itself when a tank
@@ -385,6 +443,13 @@ never greyed out and never hidden behind the silhouette.
   leaving without a press.
 - The factory panel under **reduced motion**, where the pipe flow and the derrick
   stop dead. That is declared in CSS and asserted nowhere else.
+- The home's **Bedroom, Workshop and Garden** — their blueprints, their twenty-
+  and thirty-minute builds, and the fifteen dearest pieces of furniture. The
+  builders'-pace figure has therefore never been photographed reading anything
+  but `+0%`, because all four pieces that raise it live in those rooms.
+- The home's **furniture shop shelf**. Nine pieces were bought through it during
+  the home session, so it certainly works, but both frames were composed around
+  the coziness gauge and the house grid and the shelf sits below them.
 
 - The command palette and the appearance editor — neither exists in the
   application yet. The settings surface DOES exist now and is captured; see

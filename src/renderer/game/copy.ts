@@ -81,6 +81,7 @@ export const TAB_COPY = {
   statistics: { en: "Statistics", yue: "統計" },
   prestige: { en: "Prestige", yue: "轉生" },
   factory: { en: "Diesel Factory", yue: "柴油廠" },
+  home: { en: "The Home", yue: "住家" },
 } as const satisfies Record<string, Bilingual>;
 
 /**
@@ -304,6 +305,10 @@ export const DISCLOSURE_COPY = {
   revealDieselDepot: {
     en: "A signed contract to supply WinForge with diesel — and a refinery to actually make it.",
     yue: "同 WinForge 簽咗供柴油嘅合約——同埋一間真係煉到油嘅廠。",
+  },
+  revealHomeConstruction: {
+    en: "The deed to the building over the shop. An empty house, and the right to start building it out.",
+    yue: "舖頭樓上嗰間屋嘅物業契。得個空殼，同埋開始起嘅權利。",
   },
   ladderMysteryName: { en: "???", yue: "???" },
   ladderMysteryHint: {
@@ -891,4 +896,96 @@ export const CONTROL_COPY = {
     en: "×1 is free. The rest are bought in Settings → Controls catalogue, or by pressing them here.",
     yue: "×1 免費。其他喺「設定 → 控制項目錄」買，或者喺呢度㩒一下就買。",
   },
+} as const satisfies Record<string, Bilingual | ((...args: any[]) => Bilingual)>;
+
+/**
+ * THE BAKERY-HOME (home-construction.ts). Chrome only: room and furniture names carry their own
+ * bilingual fields on the domain definitions and are read straight from there, exactly as the
+ * factory's equipment names are.
+ */
+export const HOME_COPY = {
+  title: { en: "The Home", yue: "住家" },
+  subtitle: {
+    en: "You live over the shop. One room at a time, in whatever order you like — and each one takes as long as it takes.",
+    yue: "你就住喺舖頭樓上。一次起一間房，順序你話事——起幾耐就係幾耐，急唔嚟。",
+  },
+
+  cutawayTitle: { en: "The house", yue: "間屋" },
+  furnitureTitle: { en: "Furniture", yue: "傢俬" },
+  cozinessTitle: { en: "Coziness", yue: "溫馨度" },
+  queueTitle: { en: "Building site", yue: "地盤" },
+
+  /** The one-at-a-time rule, said in words rather than implied by a disabled button. */
+  queueRule: {
+    en: "One site, one crew: only one room is ever under construction. Start another when this one is finished.",
+    yue: "一個地盤，一隊師傅：同一時間淨係起得一間房。等呢間起好咗先開下一間。",
+  },
+  queueIdle: {
+    en: "Nothing is being built. Buy a blueprint, then start construction on it.",
+    yue: "而家冇嘢起緊。買張圖則，然後開工。",
+  },
+  building: (nameEn: string, nameYue: string): Bilingual => ({
+    en: `Building the ${nameEn}`,
+    yue: `起緊${nameYue}`,
+  }),
+  timeRemaining: { en: "Time remaining", yue: "仲要幾耐" },
+  buildProgress: (percent: string): Bilingual => ({
+    en: `Construction progress, ${percent}% complete`,
+    yue: `工程進度，完成咗 ${percent}%`,
+  }),
+
+  /** Duration, spelled out rather than rendered as a bare clock — a build is minutes, not a time. */
+  duration: (minutes: number, seconds: number): Bilingual => ({
+    en: minutes > 0 ? `${minutes}m ${seconds}s` : `${seconds}s`,
+    yue: minutes > 0 ? `${minutes} 分 ${seconds} 秒` : `${seconds} 秒`,
+  }),
+
+  buyBlueprint: { en: "Buy blueprint", yue: "買圖則" },
+  startBuild: { en: "Start construction", yue: "開工" },
+  buyFurniture: { en: "Buy", yue: "買" },
+  blueprintForSale: { en: "For sale", yue: "有得買" },
+  blueprintOwned: { en: "Blueprint owned", yue: "已有圖則" },
+  roomBuilt: { en: "Built", yue: "起好" },
+  /* Short on purpose. This is a corner chip on a narrow card, and the BUILDING SITE panel above
+     already says which room is going up and how long is left; a chip that wraps onto three lines
+     to say so a second time pushes the room's own name out of the way. */
+  underConstruction: { en: "Building", yue: "施工中" },
+  buildTimeLabel: { en: "Build time", yue: "工期" },
+  buildCostLabel: { en: "Builders", yue: "工程費" },
+
+  emptyRooms: {
+    en: "Nothing built yet. The Kitchen comes first — this is a bakery.",
+    yue: "重未起過嘢。要由廚房開始——呢度係餅舖嚟㗎。",
+  },
+  emptyFurniture: {
+    en: "Fully furnished. There is nothing left to buy for this room.",
+    yue: "傢俬齊晒。呢間房冇嘢好買。",
+  },
+
+  cozinessMeterLabel: (value: string, max: string): Bilingual => ({
+    en: `Coziness ${value} out of a possible ${max}`,
+    yue: `溫馨度 ${value}，滿分 ${max}`,
+  }),
+  /* Says what the figure actually IS. It is the coziness curve AND the furniture's own small
+     production bonuses multiplied together, which is what the ovens really get — printing the
+     curve alone under a gauge labelled "coziness" would be a true number answering the wrong
+     question. */
+  cozinessEffect: (percent: string): Bilingual => ({
+    en: `The house pays +${percent}% on everything the ovens make — the coziness curve and the furniture together.`,
+    yue: `間屋令所有產量 +${percent}%——溫馨度曲線同傢俬加成一齊計。`,
+  }),
+  cozinessNone: {
+    en: "An empty building is worth nothing yet. Build a room, then put something in it.",
+    yue: "得個空殼仲未計得分。起間房，然後擺啲嘢入去。",
+  },
+  cozinessOf: { en: "Coziness", yue: "溫馨度" },
+  roomsBuiltLabel: { en: "Rooms built", yue: "已起房間" },
+  furnitureOwnedLabel: { en: "Furniture placed", yue: "已擺傢俬" },
+  investedLabel: { en: "Spent on the house", yue: "屋企總開支" },
+  buildSpeedLabel: { en: "Builders' pace", yue: "施工速度" },
+
+  bonusCps: (percent: string): Bilingual => ({ en: `+${percent}% production`, yue: `產量 +${percent}%` }),
+  bonusClick: (percent: string): Bilingual => ({ en: `+${percent}% per click`, yue: `每次撳 +${percent}%` }),
+  bonusBuild: (percent: string): Bilingual => ({ en: `Builds ${percent}% faster`, yue: `施工快 ${percent}%` }),
+  bonusNone: { en: "Nothing but nice", yue: "淨係靚，冇加成" },
 } as const satisfies Record<string, Bilingual | ((...args: any[]) => Bilingual)>;

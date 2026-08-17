@@ -2,6 +2,7 @@ import type { BigNum } from "./big-number.js";
 import type { RandomEventsState } from "./random-events.js";
 import type { ControlUnlocksState } from "./control-unlocks.js";
 import type { DieselFactoryState } from "./diesel-factory.js";
+import type { HomeConstructionState } from "./home-construction.js";
 
 /** Small discrete counters use plain `number` — see big-number.ts header comment for why. */
 
@@ -118,6 +119,15 @@ export interface GameState {
    * same one reducer seam.
    */
   readonly dieselFactory: DieselFactoryState;
+
+  /**
+   * The bakery-home: blueprints bought, rooms built, the one construction under way, and the
+   * furniture in each finished room (home-construction.ts). The second nested subgame, and the
+   * one that runs on elapsed construction time rather than on a production rate. Its coziness
+   * total is a gentle multiplier on the whole cookie economy, folded in at the single
+   * `computeMultipliers` seam like every other multiplier in the game.
+   */
+  readonly homeConstruction: HomeConstructionState;
 
   /**
    * Player-facing switch for the Tools tech tree's progression gate (see tools.ts). When

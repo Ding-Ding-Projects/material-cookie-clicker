@@ -47,6 +47,18 @@ import {
 } from "./control-unlocks.js";
 import { computeDisclosure } from "./disclosure.js";
 import { effectiveCps } from "./effective-cps.js";
+import {
+  canStartConstruction,
+  createInitialHomeState,
+  getFurnitureDefinition,
+  getRoomDefinition,
+  isBlueprintOffered,
+  isRoomBuilt,
+  ownsBlueprint,
+  ownsFurniture,
+  requiredBuildMs,
+  tickHome,
+} from "./home-construction.js";
 import { costOfBulk, costOfNext, getGeneratorDefinition, maxAffordable } from "./generators.js";
 import { computeOfflineProgressWithTools, type OfflineProgressOptions } from "./offline-progress.js";
 import { canPrestige, performPrestige } from "./prestige.js";
@@ -106,6 +118,22 @@ export type GameAction =
   | { readonly type: "buyFactoryUpgrade"; readonly upgradeId: string }
   /** Player switch for automatic shipping. Does nothing until an automation upgrade is bought. */
   | { readonly type: "setFactoryAutoShip"; readonly enabled: boolean }
+  /**
+   * Buys one room's BLUEPRINT with cookies (home-construction.ts). The drawing and nothing else:
+   * it buys the right to start a construction, never the room. Refuses silently when the house
+   * is not revealed, when the blueprint is already owned, when the room it depends on is not
+   * built yet, or when the cookies are not there.
+   */
+  | { readonly type: "buyHomeBlueprint"; readonly roomId: string }
+  /**
+   * Starts construction on one room, paying the builders. The ONE-AT-A-TIME rule lives in
+   * home-construction.ts#canStartConstruction and is checked here: a second start while a build
+   * is up is refused outright rather than queued, because a queue nobody asked for is a queue
+   * that spends cookies while the player is looking somewhere else.
+   */
+  | { readonly type: "startHomeConstruction"; readonly roomId: string }
+  /** Buys one piece of furniture into a room that is actually BUILT. Once each, never twice. */
+  | { readonly type: "buyHomeFurniture"; readonly furnitureId: string }
   | { readonly type: "setToolProgression"; readonly enabled: boolean }
   /**
    * Buys ONE rung of ONE control's ladder (control-unlocks.ts) — a settings entry, a piece of
@@ -431,11 +459,113 @@ function handleBuyControlUnlock(state: GameState, ctx: ReducerCtx, rungId: strin
   return withAchievements(nextState, nowIso(ctx));
 }
 
+/* ------------------------------------------------------------------ home construction ----
+ *
+ * Three handlers, one per way cookies can enter the house, and they are the only three. Each
+ * refuses silently in the same shape every other purchase in this reducer does — a refusal
+ * returns the state unchanged, which is also what tells the store not to notify anybody.
+ */
+
+function handleBuyHomeBlueprint(state: GameState, ctx: ReducerCtx, roomId: string): GameState {
+  if (!computeDisclosure(state).homeConstruction) return state;
+  const def = getRoomDefinition(roomId);
+  if (!isBlueprintOffered(state.homeConstruction, roomId)) return state;
+
+  const cost = bnFromNumber(def.blueprintCost);
+  if (bnCompare(state.cookies, cost) < 0) return state;
+
+  const nextState: GameState = {
+    ...state,
+    cookies: bnClampNonNegative(bnSub(state.cookies, cost)),
+    homeConstruction: {
+      ...state.homeConstruction,
+      blueprintIds: [...state.homeConstruction.blueprintIds, roomId],
+      cookiesInvested: bnAdd(state.homeConstruction.cookiesInvested, cost),
+    },
+  };
+
+  return withAchievements(nextState, nowIso(ctx));
+}
+
+function handleStartHomeConstruction(state: GameState, ctx: ReducerCtx, roomId: string): GameState {
+  if (!computeDisclosure(state).homeConstruction) return state;
+  if (!canStartConstruction(state.homeConstruction, roomId)) return state;
+
+  const def = getRoomDefinition(roomId);
+  const cost = bnFromNumber(def.buildCost);
+  if (bnCompare(state.cookies, cost) < 0) return state;
+
+  // The required time is frozen HERE, with the build-speed bonus the house owns at this instant
+  // already applied, so the countdown the panel prints can only ever go one direction.
+  const requiredMs = requiredBuildMs(state.homeConstruction, roomId);
+
+  const nextState: GameState = {
+    ...state,
+    cookies: bnClampNonNegative(bnSub(state.cookies, cost)),
+    homeConstruction: {
+      ...state.homeConstruction,
+      build: { roomId, elapsedMs: 0, requiredMs },
+      cookiesInvested: bnAdd(state.homeConstruction.cookiesInvested, cost),
+    },
+  };
+
+  return withAchievements(nextState, nowIso(ctx));
+}
+
+function handleBuyHomeFurniture(state: GameState, ctx: ReducerCtx, furnitureId: string): GameState {
+  if (!computeDisclosure(state).homeConstruction) return state;
+  const def = getFurnitureDefinition(furnitureId);
+  // Furniture goes in a room that EXISTS. Not a room whose blueprint you own, and not a room
+  // currently being put up around it.
+  if (!isRoomBuilt(state.homeConstruction, def.roomId)) return state;
+  if (ownsFurniture(state.homeConstruction, furnitureId)) return state;
+
+  const cost = bnFromNumber(def.cost);
+  if (bnCompare(state.cookies, cost) < 0) return state;
+
+  const nextState: GameState = {
+    ...state,
+    cookies: bnClampNonNegative(bnSub(state.cookies, cost)),
+    homeConstruction: {
+      ...state.homeConstruction,
+      rooms: state.homeConstruction.rooms.map((room) =>
+        room.roomId === def.roomId ? { ...room, furnitureIds: [...room.furnitureIds, furnitureId] } : room,
+      ),
+      cookiesInvested: bnAdd(state.homeConstruction.cookiesInvested, cost),
+    },
+  };
+
+  return withAchievements(nextState, nowIso(ctx));
+}
+
 function handleSetToolProgression(state: GameState, enabled: boolean): GameState {
   if (state.toolProgressionEnabled === enabled) return state;
   return { ...state, toolProgressionEnabled: enabled };
 }
 
+/**
+ * ONE TICK, FOUR ECONOMIES, AND A STATED ORDER.
+ *
+ * Three lanes each added a timed system to this function, so the order they run in is now a
+ * decision rather than an accident, and it is written down here:
+ *
+ *   1. cookie accrual, at the composed effective rate;
+ *   2. the golden cookie's own spawn and expiry;
+ *   3. the random-event scheduler, and the instant bonus a resolved event pays;
+ *   4. a Mouse Raid's theft, applied where the event result that produced it is read;
+ *   5. the diesel factory's production slice, and automatic shipping if it was bought;
+ *   6. the home construction timer;
+ *   7. achievements, evaluated once at the end against the state all six produced.
+ *
+ * All of it runs off the SAME `elapsedMs` and the same `nowMs`, so a paused game pauses every
+ * economy together and none of them can drift apart from the others.
+ *
+ * The order between 3 and 6 is chosen for readability rather than forced by data: the theft
+ * belongs next to the event result it comes out of; production reads no cookies and the theft
+ * reads no litres and neither reads a room, so no two of these can observe each other's
+ * half-finished state. Achievements are genuinely last, because they must see the finished tick
+ * and not a room that is about to be built.
+ */
 function handleTick(state: GameState, ctx: ReducerCtx, elapsedMs: number): GameState {
   if (elapsedMs <= 0) return state;
 
@@ -497,6 +627,11 @@ function handleTick(state: GameState, ctx: ReducerCtx, elapsedMs: number): GameS
   // the tank, and the provider's observer writes its voucher exactly as it writes a manual one.
   const automatic = autoShipQuantity(nextState.dieselFactory);
   if (automatic > 0) nextState = shipFromTanks(nextState, ctx, automatic);
+
+  // THE BUILDING SITE RUNS ON THE SAME CLOCK TOO. Same elapsed milliseconds, same slice, same
+  // rule that a quiet site returns the same object and costs nothing. A room finishes here and
+  // only here — there is no completion path that does not go through a tick.
+  nextState = { ...nextState, homeConstruction: tickHome(nextState.homeConstruction, elapsedMs / 1000).state };
 
   return withAchievements(nextState, nowIso(ctx));
 }
@@ -706,6 +841,14 @@ export function applyGameAction(state: GameState, action: GameAction, ctx: Reduc
       );
     case "buyFactoryUpgrade":
       return withMarketDayRebate(state, handleBuyFactoryUpgrade(state, ctx, action.upgradeId), ctx);
+    // All three house purchases are ordinary cookie purchases at a printed price, so all three
+    // take Market Day's rebate exactly as the factory shelf does.
+    case "buyHomeBlueprint":
+      return withMarketDayRebate(state, handleBuyHomeBlueprint(state, ctx, action.roomId), ctx);
+    case "startHomeConstruction":
+      return withMarketDayRebate(state, handleStartHomeConstruction(state, ctx, action.roomId), ctx);
+    case "buyHomeFurniture":
+      return withMarketDayRebate(state, handleBuyHomeFurniture(state, ctx, action.furnitureId), ctx);
     case "setFactoryAutoShip":
       return handleSetFactoryAutoShip(state, action.enabled);
     case "setToolProgression":
@@ -761,6 +904,7 @@ export function createInitialGameState(nowIsoString: string): GameState {
     stats: { totalClicks: 0, totalCookiesBaked: zero, clockAnomalyCount: 0 },
     dieselDepot: { litresMinted: 0, vouchersMinted: 0, cookiesSpent: zero },
     dieselFactory: createInitialFactoryState(),
+    homeConstruction: createInitialHomeState(),
     toolProgressionEnabled: true,
     purchasedToolIds: [],
     // A fresh save owns NO control. The window will not move, the sliders will not slide and

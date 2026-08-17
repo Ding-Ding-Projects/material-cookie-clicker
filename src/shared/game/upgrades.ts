@@ -1,5 +1,6 @@
 import { bnCompare, bnFromNumber, bnMulScalar, type BigNum } from "./big-number.js";
 import { GENERATOR_DEFINITIONS } from "./generators.js";
+import { computeHomeBonuses, createInitialHomeState } from "./home-construction.js";
 import { kittenMultiplier, milkPercent } from "./milk.js";
 import { prestigeMultiplierFor } from "./prestige.js";
 import { rebornMultipliers } from "./reborn.js";
@@ -53,7 +54,7 @@ export type UpgradeEffect =
   | { readonly kind: "reveal"; readonly surface: RevealSurface };
 
 /** The game-surface pieces a reveal upgrade can turn on. Mirrored in disclosure.ts. */
-export type RevealSurface = "shop" | "upgradeStrip" | "holdToClick" | "dieselDepot";
+export type RevealSurface = "shop" | "upgradeStrip" | "holdToClick" | "dieselDepot" | "homeConstruction";
 
 export type UnlockCondition =
   | { readonly kind: "generatorOwned"; readonly generatorId: string; readonly atLeast: number }
@@ -146,6 +147,25 @@ export const REVEAL_UPGRADE_DEFINITIONS: readonly UpgradeDefinition[] = [
     nameYue: "燃油合約",
     cost: bnFromNumber(500),
     effect: { kind: "reveal", surface: "dieselDepot" },
+    unlockCondition: { kind: "upgradeOwned", upgradeId: "reveal_shop_sign" },
+  },
+  /**
+   * The fifth reveal: the deed to the building the bakery is in, which turns on the whole home
+   * construction subgame (home-construction.ts) and its console emblem.
+   *
+   * It hangs off the Shop Sign for the same reason the Fuel Contract does — a player who has not
+   * yet found the shop has no business buying property — and it is dearer than any of them
+   * because what it opens is not a view or a shelf but a second game with its own clock.
+   *
+   * Buying the deed gives you a building and NOTHING inside it. Every room after that is a
+   * blueprint you buy, a construction you pay for, and a wait you actually serve.
+   */
+  {
+    id: "reveal_property_deed",
+    nameEn: "Property Deed",
+    nameYue: "物業契",
+    cost: bnFromNumber(2_000),
+    effect: { kind: "reveal", surface: "homeConstruction" },
     unlockCondition: { kind: "upgradeOwned", upgradeId: "reveal_shop_sign" },
   },
 ];
@@ -687,6 +707,14 @@ export function computeMultipliers(state: GameState): DerivedMultipliers {
   const reborn = rebornMultipliers(state.prestige.rebornNodeIds ?? []);
   clickMultiplier *= reborn.clickMultiplier;
   globalCpsMultiplier *= reborn.globalCpsMultiplier;
+
+  // THE HOUSE (home-construction.ts). Folded in here, at the one derivation seam, rather than
+  // anywhere near the CPS pipeline itself — so the coziness curve is applied exactly once, to
+  // clicks and production alike, and offline progress gets it for free because offline progress
+  // already goes through this function. A save with no house multiplies by exactly 1.
+  const home = computeHomeBonuses(state.homeConstruction ?? createInitialHomeState());
+  clickMultiplier *= home.clickMultiplier;
+  globalCpsMultiplier *= home.globalCpsMultiplier;
 
   return { clickMultiplier, generatorMultipliers, globalCpsMultiplier };
 }

@@ -4,7 +4,7 @@
 <meta charset="utf-8" />
 <meta name="viewport" content="width=device-width, initial-scale=1" />
 <title>Upgrades — Material Cookie Clicker</title>
-<meta name="description" content="A hundred and seventy-nine upgrades: click lines, global lines, a golden-cookie line, the kitten line that drinks your milk, five stacking tiers per generator, and a synergy in both directions for every neighbouring pair." />
+<meta name="description" content="A hundred and eighty upgrades: click lines, global lines, a golden-cookie line, the kitten line that drinks your milk, five stacking tiers per generator, and a synergy in both directions for every neighbouring pair." />
 <link rel="stylesheet" href="../assets/site.css" />
 </head>
 <body>
@@ -24,7 +24,7 @@
 <main id="main" class="wrap">
   <article>
     <h1>Upgrades</h1>
-    <p class="lede">A hundred and seventy-nine upgrades: click lines, global lines, a golden-cookie line, the kitten line that drinks your milk, five stacking tiers per generator, and a synergy in both directions for every neighbouring pair.</p>
+    <p class="lede">A hundred and eighty upgrades: click lines, global lines, a golden-cookie line, the kitten line that drinks your milk, five stacking tiers per generator, and a synergy in both directions for every neighbouring pair.</p>
     <div class="inset" style="margin-bottom:18px">
   <span class="label">Current state</span>
   <p style="margin:0"><span class="tag">Shipped</span> the upgrade ticket strip is in this release; 79 definitions in <code>src/shared/game/upgrades.ts</code>.</p>
@@ -37,9 +37,9 @@
     <p><a href="../index.html#captures">See all nine captures in the capture matrix</a>.</p>
     
 <h2>What it does</h2>
-<p>An upgrade is a one-time purchase that permanently multiplies something. There are <strong>179</strong> of them, and that number is not a target &mdash; it is what the definition list actually contains:</p>
+<p>An upgrade is a one-time purchase that permanently multiplies something. There are <strong>180</strong> of them, and that number is not a target &mdash; it is what the definition list actually contains:</p>
 <ul>
-  <li><strong>4 reveal upgrades</strong> &mdash; Shop Sign (10 cookies), Upgrade Catalogue (50), Steady Hand (100) and Fuel Contract (500). These multiply nothing at all. A fresh save is the cookie and its counter alone, and each of these buys back one piece of the game&rsquo;s own surface: the shop rail, this very ticket strip, press-and-hold clicking, and the whole <a href="diesel-factory.html">diesel factory</a> &mdash; its console panel and the depot status card in the shop rail&rsquo;s footer together. Before the strip exists there is nowhere to buy them from, so the next one appears as a single discovery ticket beside the cookie once its price is within reach. None of the four is ever handed out: a save carried forward from an older version is not granted them either, and in particular Steady Hand &mdash; which changes what holding the mouse button does &mdash; only ever arrives by purchase.</li>
+  <li><strong>5 reveal upgrades</strong> &mdash; Shop Sign (10 cookies), Upgrade Catalogue (50), Steady Hand (100), Fuel Contract (500) and the Property Deed (2,000). These multiply nothing at all. A fresh save is the cookie and its counter alone, and each of these buys back one piece of the game&rsquo;s own surface: the shop rail, this very ticket strip, press-and-hold clicking, and the whole <a href="diesel-factory.html">diesel factory</a> &mdash; its console panel and the depot status card in the shop rail&rsquo;s footer together &mdash; and the <a href="home-construction.html">bakery-home</a>, which arrives as an empty plot with nothing built on it. Before the strip exists there is nowhere to buy them from, so the next one appears as a single discovery ticket beside the cookie once its price is within reach. None of the five is ever handed out: a save carried forward from an older version is not granted them either, and in particular Steady Hand &mdash; which changes what holding the mouse button does &mdash; only ever arrives by purchase.</li>
   <li><strong>10 click upgrades</strong> &mdash; three unlocked by lifetime cookies, seven by how much you have actually clicked, from a Callused Knuckle up to the Finger of the Ancestor.</li>
   <li><strong>10 global upgrades</strong>, unlocked by lifetime-cookie thresholds, from Sturdier Ovens up to The Recipe That Bends Physics.</li>
   <li><strong>7 golden-cookie upgrades</strong> &mdash; a chain that makes a caught golden cookie pay more and shortens the wait a catch schedules. They change no production number at all.</li>
@@ -54,8 +54,8 @@
 <p>Presentation is fixed by <code>design/upgrade-card.html</code>: upgrades are ticket-shaped purchases with notches punched out of both edges, a dashed perforation and a price stub, in locked, unlocked-buyable and owned states, with a metallic treatment once owned and a hover tilt that has a still equivalent under reduced motion.</p>
 
 <h2>In the shipped build</h2>
-<p>The upgrade shelf sits on the same screen as the cookie and the shop, with its own search field and a live &ldquo;owned / 179&rdquo; counter. It is no longer one horizontal strip: at a hundred and seventy-nine upgrades the handful you can actually buy were lost in the middle of a kilometre of ones you already owned. The shelf now says three different things in three different shapes &mdash; a wrapping grid of buyable tickets sorted next-affordable-first and capped at two visible rows, a short list of the locked upgrades closest to unlocking shown as requirement lines rather than prices, and the ones you already bought collapsed into a compact stamp wall with a count badge. The strip is not on screen at the start of a run: it arrives with the Upgrade Catalogue. Nothing here is ever handed out on load &mdash; the version-2 to version-3 migration deliberately grants nothing, and a save carried forward keeps the surfaces it demonstrably used by derivation from its own progress instead, by deriving them from the progress already in the save. The dark-theme capture on the front page shows the same shelf rendered from the dark token set.</p>
-<p>These 179 are the game&rsquo;s own upgrades. The <a href="diesel-factory.html">diesel factory</a> keeps a second, separate shelf of its own &mdash; 6 pieces of equipment and 14 factory upgrades, bought with cookies inside the factory panel &mdash; and those are not counted in the 179 or in the shelf&rsquo;s owned counter.</p>
+<p>The upgrade shelf sits on the same screen as the cookie and the shop, with its own search field and a live &ldquo;owned / 180&rdquo; counter. It is no longer one horizontal strip: at a hundred and eighty upgrades the handful you can actually buy were lost in the middle of a kilometre of ones you already owned. The shelf now says three different things in three different shapes &mdash; a wrapping grid of buyable tickets sorted next-affordable-first and capped at two visible rows, a short list of the locked upgrades closest to unlocking shown as requirement lines rather than prices, and the ones you already bought collapsed into a compact stamp wall with a count badge. The strip is not on screen at the start of a run: it arrives with the Upgrade Catalogue. Nothing here is ever handed out on load &mdash; the version-2 to version-3 migration deliberately grants nothing, and a save carried forward keeps the surfaces it demonstrably used by derivation from its own progress instead, by deriving them from the progress already in the save. The dark-theme capture on the front page shows the same shelf rendered from the dark token set.</p>
+<p>These 180 are the game&rsquo;s own upgrades. The <a href="diesel-factory.html">diesel factory</a> keeps a second, separate shelf of its own &mdash; 6 pieces of equipment and 14 factory upgrades, bought with cookies inside the factory panel &mdash; and those are not counted in the 179 or in the shelf&rsquo;s owned counter.</p>
     <nav class="related plate" aria-labelledby="related-heading">
       <h2 id="related-heading">Related articles</h2>
       <ul>

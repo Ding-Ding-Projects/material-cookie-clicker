@@ -11,7 +11,7 @@ from the root of `https://ding-ding-projects.github.io/material-cookie-clicker/`
 | `index.html` | Landing page: game identity, bilingual blurb, download section, feature overview. |
 | `features/index.html` | Feature index plus the client-side search. |
 | `features/*.html` | One article per feature area, each with behaviour, configuration and related links. |
-| `assets/captures/*.png` | Five screenshots of the real running application, shown in the landing page's capture matrix and in the matching articles. |
+| `assets/captures/*.png` | Twenty-four screenshots of the real running application, shown in the landing page's capture matrix and in the matching articles. |
 | `assets/site.css` | The site's only stylesheet. Tokens copied verbatim from the `design/` v2 specs. |
 | `assets/search.js` | The search index (baked in at authoring time) and the matcher. |
 | `assets/search-ui.js` | The small module that wires the matcher to the search field. |

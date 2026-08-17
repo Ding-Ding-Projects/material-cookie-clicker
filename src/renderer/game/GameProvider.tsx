@@ -405,6 +405,16 @@ export function useFactorySnapshot(): GameState['dieselFactory'] {
   return useSyncExternalStore(store.subscribeFactory, store.getFactorySnapshot, store.getFactorySnapshot);
 }
 
+/**
+ * The home construction subtree (home-construction.ts). Its own slice for the same reason the
+ * factory has one: a build in progress moves on every tick whether or not a cookie does, and the
+ * progress bar has to move with it.
+ */
+export function useHomeSnapshot(): GameState['homeConstruction'] {
+  const { store } = useGameContext();
+  return useSyncExternalStore(store.subscribeHome, store.getHomeSnapshot, store.getHomeSnapshot);
+}
+
 /** Stats slice: `state.stats` alone — also updates every click/tick. */
 export function useStatsSnapshot(): GameState['stats'] {
   const { store } = useGameContext();

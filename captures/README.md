@@ -74,6 +74,96 @@ retaken after the panel settled.
 | `golden-dial-won.png` | Three hits in a row and the payout: a yellow pill at the top of the stage reading `Golden cookie redeemed: Windfall`. Another sprite has already spawned lower down, which is the fast developer schedule doing what it is for. |
 | `event-sugar-rush.png` | A **Sugar Rush** five seconds from the end of it: an amber event plate in the HUD with a sun glyph, a draining bar and a `5s` countdown, and a marquee card in the corner saying in plain words what it does — every click lands seven times as hard. Worth a second look for a layout reason as well: the event plate pushed the eight console buttons onto a row of their own, and in that wider HUD the raid-supplies shelf prints all three plates whole. |
 
+### The gap-closing set
+
+Ten images from one sitting on the same build as the current set, taken to close
+the gaps the "Not captured yet" list below used to name. Every one was opened
+and looked at afterwards, and two of them turned out to be photographs of faults
+as well as of features — both written down here rather than cropped away.
+
+**How they were taken.** From the built `dist/`, launched by the real `electron`
+binary onto an off-screen Windows desktop named `GapClose`. Six separate runs,
+each with its own `--remote-debugging-port` (9801 through 9806), its own
+throwaway `--user-data-dir` and its own process, and the page target's URL
+verified as this worktree's `dist/renderer/index.html` before anything else
+happened. The window was maximised through the application's own title-bar API
+(2604x1562 device pixels at 144 DPI, 1722x1027 CSS pixels at a device pixel
+ratio of 1.5) and every image is a Win32 `PrintWindow` capture of that one
+window, resolved by handle from the desktop's own window list. Only ever one
+application window was alive on that desktop at a time, for the stale-frame
+reason the current set's section gives above. The capture desktop follows a dark
+operating-system colour scheme, so the frames on a bought look tier are in the
+dark theme; nothing was patched to make that happen.
+
+**The developer-only keys and preferences, named where they apply.** Three, and
+they are the documented ones: `material-cookie-clicker:events:fast` set to
+`raid` for the raid frame, `material-cookie-clicker:golden:fast` for the two
+golden frames, and `prefers-reduced-motion: reduce` emulated over the devtools
+connection for `plain-reduced-motion.png` — which is a real user preference a
+player sets in Windows, not a developer key. Each changes *when* something
+happens, or which media query matches; none of them changes what the thing does.
+
+| File | What it shows |
+| --- | --- |
+| `raid.png` | A Mouse Raid in progress: five mice mid-scurry as five real buttons scattered across the lower half of the stage, one of them paler because the pointer is on it, and a red `Mouse Raid` plate in the HUD with its bar running down. Behind that, the outcome card from the *previous* raid in the same session — `4 of 4 mice got away with 51.2 quadrillion cookies`, with the line that the lifetime total is untouched — and a `COOKIES` plate reading 12.8 quadrillion where every other frame from this save reads 40 quintillion. The economics are visible in one picture. |
+| `mode-yue.png` | Cantonese-only mode, on the plain look tier. Every string on the surface is Cantonese: the title bar's drag plate, the `曲奇` readout label above 275, all four console buttons, the discovery ticket and its `買` button, and the milk line along the floor. The one thing left in English is the flat grey disc reading `COOKIE`, which is the plain tier's stand-in for the drawn cookie rather than a piece of copy. |
+| `reborn-tree.png` | The Reborn tree, whole, with the counter above it reading `42 ascension points unspent · 8 spent in this tree`. Three branches — Inheritance, Power, Memory — and all three card states at once: bought (solid green, `BOUGHT`), affordable now (amber, its price repeated as the button label), and locked behind a *named* prerequisite (`REQUIRES RED PACKET`) rather than behind a hidden condition. The footer says outright why the panel above it reads `NOTHING YET`. |
+| `prestige-gate.png` | The prestige two-key gate, opened and left alone. Both key toggles are off, the confirmation slider is greyed, and the line under it reads `Both keys required before this slider unlocks`. The card states what is lost and what is carried *before* it asks for anything, with the carried figure — 490 points — computed rather than rounded, and an `Emergency exit` at the foot. |
+| `ladder-deep.png` | A generator row past Shipment: the Antimatter Condenser, tier thirteen of twenty, two owned, `+430 million/sec each`, the next one priced at `224,825,000,000,000`, with the Prism below it. It also shows the honest limit of the rail — a row is 205px tall and the rail's viewport is about 250px, because the Diesel Depot is docked in its footer, so about one row and a sliver is all that is ever on screen. |
+| `home-coziness.png` | Three rooms built and furnished. The coziness dial reads **106 of 249** and the sentence beside it prints **+20.1%**, the figure the cookie economy is really multiplied by. Per-room coziness reads 31, 24 and 51, which is the 106 the gauge shows. And `BUILDERS' PACE` reads **+8%** — the first time that tile has read anything but `+0%` in any capture — because the Parlour's Mantel Clock is now standing in a room. |
+| `factory-autoship.png` | The factory automation branch shipping a lorry **by itself**. Nobody pressed the ship button: the tanks filled to 85 of 85, the level float tripped, and seconds later storage reads `6.2 / 85 L`, the whole line is green and `Running` rather than stalled, litres shipped has jumped to 269 and vouchers minted to 165. The `Ship automatically` box is ticked, with the line `Sends a lorry once the tanks reach 100% full` under it. |
+| `golden-dial-r2.png` | The Oven Dial on `Round 2 of 3`, reached by really winning round one. The golden band is visibly shorter than round one's, the needle is well clear of it, and the status line reads `In the band. Next round is tighter.` |
+| `plain-reduced-motion.png` | Two things that had only ever been declared in CSS, in one frame. The golden sprite keeps its full drawing at the **plain look tier** while the hero cookie has lost its own and is a flat grey disc reading `COOKIE` — because a sprite you have to find and press must stay findable at every tier. It renders in greys rather than gold because the plain tier has no palette to be gold with. And under **reduced motion** the ray burst is a fixed set of shafts rather than a turning one. |
+| `update-notice.png` | The update notice, retaken on this build: `Update ready (0.3.0) — restart to install`, the unsigned-artifact warning under it, and the Restart and Later buttons, sitting in the bottom-right over the shop rail's Diesel Depot card and dimming nothing. |
+
+**What each frame cost in real presses, so nothing here reads as scripted.**
+`mode-yue.png` started from a save seeded with 400 cookies and nothing else; the
+Settings emblem at 25, the language-mode switch at 60 and Cantonese mode at 40
+were each bought with a real Win32 background press on the real control, each
+through its own confirmation, and the balance falling 400 → 375 → 315 → 275 is
+the receipt. Pressing Cantonese *after* buying it is what switched the
+application; buying it does not, which is what the panel's own copy promises.
+`home-coziness.png` started from the `furnished` stage of
+`scripts/capture-seed-home.test.ts` and its four Parlour pieces were bought with
+real presses. `factory-autoship.png` took three real presses — the Auto-ship
+switch at 2,500, the Depot Telemetry upgrade at 100,000, and the tick — and then
+the run simply watched; the shipped-litres counter moved twice on its own before
+the shutter. `reborn-tree.png` and `prestige-gate.png` were reached by a real
+press on the Prestige console button and then by scrolling. **No reset was
+completed and the wipe gate was never opened.**
+
+**The one place a press was not a Win32 press, and why.** In
+`golden-dial-r2.png` the sprite was caught with a real Win32 background press,
+but the press that *won round one* was dispatched as a pointer event over the
+devtools connection at the Stop button's real coordinates. A Win32 message
+posted from another process cannot be timed to a band the needle crosses in
+under two seconds; the moment was chosen by polling the dial's own accessible
+value text — the shipped one that says in words whether the needle is inside the
+band — so the reducer judged that press exactly as it judges a player's. Stated
+here rather than left to look like the rest.
+
+**Two faults these frames found, by being looked at.**
+
+The first is in `raid.png` itself. The raid's HUD plate prints
+`6s5 of 5 mice left`: in the single-plate layout the countdown and the mice count
+are set with nothing between them, so the seconds run straight into the count.
+It is the same class of fault as the `Night Shift38s` one the double-event lane
+found and fixed in the *two*-plate layout, recurring in the layout beside it.
+
+The second is on the Oven Dial. While a pointer rests on the `Stop the needle`
+button, `:hover` swaps its background to `--spark` but leaves its colour as
+`--on-tertiary-container`. In the dark theme those are pale yellow on bright
+yellow: a contrast ratio of **1.05:1**, measured from the running renderer's own
+computed styles, against **7.29:1** for the same label in the button's resting
+state. For as long as a player is pointing at the only control this minigame
+has, its label is effectively invisible. Two frames were discarded and retaken
+because of it — the first two attempts at `golden-dial-r2.png` came back with a
+washed-out button label, and chasing that is what found the cause; the frame
+that shipped was taken with the pointer moved off.
+
+Neither fault is fixed in this release. Both are named because a capture set
+that quietly cropped them would be worth less than one that says what it saw.
+
 ### The wave-two events set
 
 Two images from one session on the off-screen desktop `EventsWave2Capture`, both
@@ -366,7 +456,13 @@ arithmetic and the real one-event-at-a-time rule. Waiting for a Production
 Frenzy on the shipped schedule would be about a four-hour wait, and for a Burnt
 Batch Frenzy about fifteen hours, which is not a capture process.
 
-### The update notice
+### The update notice — **retaken**
+
+> `update-notice.png` was re-shot on the current build in the gap-closing set
+> above, so the file this section describes no longer exists as it was. The
+> account below is kept because the method in it is still exactly how the notice
+> is reached, and because the honest limits it states — the status is injected,
+> not earned — apply word for word to the new frame as well.
 
 | File | What it shows |
 | --- | --- |
@@ -543,7 +639,13 @@ reached, so the twenty- and thirty-minute builds and the fifteen dearest pieces
 of furniture are unphotographed, and the builders'-pace tile reads `+0%` in both
 images because every piece that raises it lives in a room this run never built.
 
-### The mouse-raid set
+### The mouse-raid set — **superseded**
+
+> A raid on the current build is now photographed as `raid.png` in the
+> gap-closing set above. `mice-raid.png` and `mice-aftermath.png` are still on
+> disk and the account below is kept for its method, which is the same one the
+> new frame used; they are no longer in either table because they predate hit
+> points and the raid-supplies shelf.
 
 Two images of the Mouse Raid, the hourly event that puts mice on the counter and
 takes up to eighty per cent of the balance from the ones you fail to whack.
@@ -773,53 +875,48 @@ still starts and still shows the right nothing.
 Rewritten against the current set rather than accumulated. Everything here is a
 gap in evidence, not a feature known to be broken — nobody has looked.
 
+The gap-closing set above removed most of what this list used to hold: the Mouse
+Raid, Cantonese-only mode and the language purchase, the Reborn tree, the
+prestige two-key gate, the deep end of the generator ladder, the finished and
+furnished house with its coziness gauge, the builders'-pace figure, the factory
+automation branch shipping by itself, the golden sprite at the plain look tier,
+and the reduced-motion rendering of that sprite. What is written below is what
+genuinely remains.
+
 **Whole features with no photograph on this build**
 
-- **Fifteen of the sixteen pool events.** Only Sugar Rush is photographed here.
-  Grandma's Surprise Batch, Cookie Rain, the Oven Hiccup, Lucky Crumb, Market
-  Day, Production Frenzy, Click Frenzy, Burnt Batch Frenzy, Clot, Combo Window,
-  Delivery Rush, Taste Test, Flour Shortage, Night Shift and Sprinkle Storm are
-  described on the site from their shipped definitions. Older photographs of
-  Cookie Rain, the Oven Hiccup, a Production Frenzy and a Taste Test are on disk
-  from earlier lanes and are described above; they predate several changes to
-  the surface, which is why they are not in the current tables.
-- **The Mouse Raid itself.** The supplies shelf you buy for it is photographed;
-  mice on the counter, on this build, are not. The `mice-*.png` pair from the
-  earlier lane is still on disk.
-- **The update notice.** `update-notice.png` from the earlier lane is on disk,
-  and its section above is explicit that the status behind it was injected
-  through a dev-only seam rather than earned.
-- **Cantonese-only mode**, and the language-mode switch being bought at all.
-- **The Reborn tree**, and the prestige two-key confirmation gate. Both ship and
-  both sit below the fold of `dialog-prestige.png`.
+- **Eighteen of the twenty-two pool events.** Sugar Rush, Cookie Eclipse, Clot
+  and Market Day are photographed (the last two together, in the double-event
+  frame). The rest are described on the site from their shipped definitions.
+  Older photographs of Cookie Rain, the Oven Hiccup, a Production Frenzy and a
+  Taste Test are on disk from earlier lanes and are described above; they
+  predate several changes to the surface, which is why they are not in the
+  current tables.
 - **Milk at a level worth looking at.** The tide is in every surface capture as a
   band along the floor reading `Wong Tai Sin Milk — 312% milk`, but nothing in
   this set is composed around it.
 
 **States of features that are photographed**
 
-- The home past **one room under construction**: no finished room, no furniture,
-  no coziness gauge reading anything but `0 / 249`, no builders'-pace figure
-  other than `+0%`, and none of the later rooms with their twenty- and
-  thirty-minute builds.
-- The factory's **automation** branch shipping by itself when a tank crosses its
-  threshold. The Auto-ship switch is in `dialog-factory.png` with its price on
-  it; no capture shows a lorry leaving without a press.
+- The home past **three finished rooms**: the Bedroom, Workshop and Garden have
+  never been reached, so the twenty- and thirty-minute builds and the fifteen
+  dearest pieces of furniture are unit-tested and undrawn.
 - A **missed** press on the Oven Dial, with the card's shake and its
   `Missed the band — two seconds off the clock` line. The miss and the walk-away
   were both driven and watched during the dial lane and written down there as
-  observations; only the win was photographed.
-- The **deep end of the generator ladder**, past Shipment.
+  observations; only wins have been photographed.
+- The prestige gate **once a key has been turned** — its keyed, sliding and
+  completed states. The gap-closing run opened the gate and stopped there on
+  purpose: reaching those states means really spending a run, and a capture is
+  not a good enough reason to.
 
 **Things declared only in CSS**
 
-- The factory panel, the golden sprite and the raid under **reduced motion**,
-  where the pipe flow, the derrick, the ray-burst and the scurrying all stop.
-  (The dial's own reduced-motion behaviour is the exception — it is a domain
-  mode rather than a CSS declaration, and it is photographed in
-  `golden-dial-stepped.png`.)
-- The golden sprite under the **plain look tier**, where it deliberately keeps
-  its drawing while the hero cookie loses its own.
+- The **factory panel** and the **raid** under reduced motion, where the pipe
+  flow, the derrick and the scurrying stop. The golden sprite's reduced-motion
+  rendering is now photographed (`plain-reduced-motion.png`), and the dial's own
+  reduced-motion behaviour was always the exception — it is a domain mode rather
+  than a CSS declaration, and it is in `golden-dial-stepped.png`.
 
 **Things that do not exist yet**
 
@@ -832,6 +929,15 @@ gap in evidence, not a feature known to be broken — nobody has looked.
   window, so the shop-drawer breakpoint and the bottom-sheet behind it stay
   verified by forcing the breakpoint (see the layout-stability section below)
   rather than by really resizing the application.
+
+**Two faults, photographed rather than missing**
+
+Not gaps, and listed here so a reader looking for what is wrong finds it in the
+same place as what is unshown: the raid's HUD plate runs its countdown into its
+mice count (`6s5 of 5 mice left`), and the Oven Dial's `Stop the needle` button
+drops to a 1.05:1 contrast ratio in the dark theme while a pointer is on it.
+Both are described in full in the gap-closing set's section above. Neither is
+fixed in this release.
 
 ## `sp-locked.png` / `sp-unlocked.png` — the Settings panel becomes a purchase
 

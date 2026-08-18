@@ -115,15 +115,25 @@ local-storage keys that shorten the golden-cookie and random-event schedules.
 Those keys change *when* something happens and nothing else — the event that
 lands is the real event, at its real duration, with its real arithmetic.
 
-What these still do not show: a genuinely narrow window (every frame is one
-maximised window, so the shop-drawer breakpoint stays verified by forcing the
-breakpoint); a finished, furnished home; the Reborn tree and the prestige
-two-key gate, which both ship but sit below the fold of the Prestige capture;
-the deep end of the generator ladder past Shipment; fifteen of the sixteen pool
-events and the Mouse Raid itself as opposed to its supplies shelf; the update
-notice; and Cantonese-only mode. Older photographs of several of those exist on
-disk and are described in `captures/README.md`; they are not listed below
-because they are pictures of builds that have since changed.
+A second sitting on the same build closed most of the gaps this list used to
+name. Ten more frames now exist and are in the table below with the rest: a
+Mouse Raid actually in progress, Cantonese-only mode bought and switched to with
+real presses, the Reborn tree in full, the prestige two-key gate opened without
+being used, a generator row past Shipment, the furnished house with its coziness
+gauge and a builders' pace above zero, the factory sending a lorry out
+unattended, the Oven Dial on round two, the golden sprite at the plain look tier
+under reduced motion, and the update notice retaken on this build.
+
+What is still not photographed, listed rather than glossed: a genuinely narrow
+window (every frame is one maximised window, so the shop-drawer breakpoint stays
+verified by forcing the breakpoint); eighteen of the twenty-two pool events; the
+later rooms of the house, so the twenty- and thirty-minute builds and the
+dearest furniture stay undrawn; a *missed* press on the Oven Dial, with its
+shake and its two-second penalty; the prestige gate once a key has been turned,
+which cannot be reached without actually spending a run; and the factory panel
+under reduced motion. Older photographs of several surfaces exist on disk and
+are described in `captures/README.md`; they are not listed below because they
+are pictures of builds that have since changed.
 
 One thing the run found by looking rather than by testing, and it is a fault
 rather than a gap: when all eight console buttons sit on the HUD row, the
@@ -133,8 +143,19 @@ the condition — in `event-sugar-rush.png` an event plate pushes the console
 buttons onto a second row and all three plates then print whole — so it is the
 crowded single-row HUD that cuts it. Named here rather than cropped out.
 
+Two more faults came out of the second sitting the same way, by opening the
+frames and reading them rather than by running anything. In `raid.png` the
+raid's HUD plate prints `6s5 of 5 mice left`: the countdown and the mice count
+meet with nothing between them, which is the same fault the double-event lane
+already found and fixed one layout over. And on the Oven Dial, while a pointer
+rests on the `Stop the needle` button, the background swaps to `--spark` while
+the label keeps `--on-tertiary-container`; in the dark theme that is a measured
+1.05:1, against 7.29:1 for the same label at rest, so the only control the
+minigame has goes unreadable exactly while you are pointing at it. Both are
+named here and neither is fixed in this release.
+
 <details>
-<summary>The sixteen captures of the current build</summary>
+<summary>The twenty-six captures of the current build</summary>
 
 | What it shows | Capture |
 | --- | --- |
@@ -154,6 +175,16 @@ crowded single-row HUD that cuts it. Named here rather than cropped out.
 | A golden cookie spawned as its own sprite on the stage — the hero cookie no longer collects them | ![The full game surface with a small golden cookie sprite standing low and left of centre over the upgrade shelf, drawn inside a pale ray burst. The large hero cookie in the panel above is plainly separate and not gold at all — it is the ordinary baked one. The rest of the surface is unchanged: HUD plates at 40 quintillion cookies and 14,302,000,300 per second, a RAID SUPPLIES shelf, eight console buttons, the upgrade shelf at 68 / 180, and the shop rail with the Diesel Depot card](captures/app/golden-spawn.png) |
 | The Odd Cookie Out puzzle that catching it opens | ![The Odd Cookie Out card open over a dimmed game surface. It is headed Odd Cookie Out, then Round 1 of 3, then the instruction that one cookie is not like the others, press it. Below sits a four-by-four grid of sixteen near-identical pale cookie tiles, each drawn with a scatter of small chocolate chips, one of which differs by a single chip. A wide Let it go button runs along the bottom of the card](captures/app/golden-puzzle.png) |
 | One random event running on the real surface | ![The game surface with a Sugar Rush running. The HUD has reflowed to two rows: the top row holds COOKIES 40 quintillion, PER SECOND 14,302,000,300, PER CLICK 136.32, then a bright amber event plate carrying a small sun glyph, the words Sugar Rush, a draining bar and a 5s countdown, and beyond it the RAID SUPPLIES shelf, whose three plates and Storage 3 chip are all fully readable in this wider layout. The eight console buttons have wrapped onto a second row of their own. The drawn hero cookie sits below over its oven glow, the upgrade shelf reads 68 / 180, and a card in the bottom right reads Sugar Rush: Every click lands seven times as hard.](captures/app/event-sugar-rush.png) |
+| The update notice, injected through the documented dev-only seam rather than earned — it renders, reads correctly and dims nothing | ![The mid-game surface in the dark theme with a small rounded card in the bottom-right corner over the shop rail's Diesel Depot footer. It is headed Update ready, 0.3.0, restart to install, then a paragraph saying the update is unsigned, that it came over HTTPS from this project's GitHub releases and its package matches the hash listed there, and that nothing proves who built it. A filled Restart button and an outlined Later button close the card. Nothing behind it is dimmed: the HUD still reads 40 quintillion cookies and 14,302,000,300 per second, and the upgrade shelf reads 68 / 180.](captures/app/update-notice.png) |
+| A Mouse Raid actually running, with five mice on the stage as real buttons and the previous raid's outcome card still on screen | ![The game surface mid-raid in the dark theme. A wide red HUD plate carries a mouse-and-crate glyph, the words Mouse Raid, a draining bar and the run-together text 6s5 of 5 mice left. Five round red mouse buttons are scattered over the lower half of the window, one of them paler because the pointer is on it. The COOKIES plate reads 12.8 quadrillion. A red card along the bottom reads 4 of 4 mice got away with 51.2 quadrillion cookies, with the line that the lifetime total is untouched and a Dismiss button.](captures/app/raid.png) |
+| Cantonese-only mode, bought for 25 + 60 + 40 cookies with real presses and then switched to | ![The whole application in Cantonese on a plain, unbought look: a white page, square corners, the system font. The title bar's drag plate, the single readout label above the figure 275, all four console buttons, the discovery ticket and its Buy button, and the milk line along the floor are all Cantonese. In the middle of the empty panel sits one flat grey circle carrying the English word COOKIE, which is the plain tier's placeholder rather than a translated string.](captures/app/mode-yue.png) |
+| The Reborn tree in full: three branches, and bought, affordable and locked cards all in one frame | ![The Prestige panel scrolled to a section headed Reborn, over a dimmed dark surface. A line reads 42 ascension points unspent, 8 spent in this tree. Three columns headed INHERITANCE, POWER and MEMORY each begin with a solid green card captioned BOUGHT — Lucky Pocket at 1 point, Second Wind at 3, Dog-Eared Catalogue at 4 — followed by amber-outlined affordable cards such as Red Packet at 5 points and Heavenly Dough at 15, and then flat dim cards carrying a named requirement instead of a price, such as Family Vault requiring Red Packet. A footer headed Pinned permanents says there are no permanent slots yet.](captures/app/reborn-tree.png) |
+| The prestige two-key gate, opened and deliberately left alone: both keys off, the slider locked, and a line saying so | ![The Prestige panel scrolled to its foot over a dimmed dark surface. An olive-bordered card is headed Prestige now?, with a bold This will reset line and its Cantonese pair above a sentence about buildings, upgrades and the cookie count going to zero, then a bold This carries forward line above a sentence listing 490 ascension points, every Reborn node, all achievements and the milk they pour. Two switches sit side by side, both off, captioned Confirm intent and Confirm you read the impact, above a greyed slider and the line Both keys required before this slider unlocks. A wide Emergency exit button closes the card.](captures/app/prestige-gate.png) |
+| A generator row past Shipment — tier thirteen of twenty, with its real price | ![The dark-theme game surface with the shop rail scrolled deep. The selected row is the Antimatter Condenser: an atom glyph, the sub-line plus 430 million per second each with its Cantonese pair, an owned count of 2, the x1/x10/x100/Max stepper caps priced at 120, 900 and 6,000, and a wide Buy button reading 224,825,000,000,000. The Prism row below shows an owned count of 1 before the Diesel Depot card cuts it off. An olive event plate in the HUD reads Baker's Dozen with 50s left.](captures/app/ladder-deep.png) |
+| The house with three rooms finished and furnished, the coziness gauge at 106 of 249, and a builders' pace above zero for the first time | ![The Home panel over a dimmed plain-look surface. A coziness dial reads 106 with the sentence that the house pays plus 20.1 percent on everything the ovens make. Readouts give coziness 106 of 249, rooms built 3 of 6, furniture placed 11, builders' pace plus 8 percent and spent on the house 5,360,000 cookies. The building site says nothing is being built. Below, Kitchen, Pantry and Parlour cards are all badged BUILT with furniture glyphs standing on their floors and per-room coziness of 31, 24 and 51, above a row of Bedroom, Workshop and Garden cards badged FOR SALE.](captures/app/home-coziness.png) |
+| The factory automation branch shipping a lorry by itself, with nobody pressing anything | ![The Diesel Factory panel over a dimmed dark surface just after an automatic shipment. All three production stations are outlined green above the word Running: crude intake 7.50 bbl/s, refining 1.00 of 1.00 L/s, storage 6.2 of 85 L with its gauges nearly empty. The shipping station's button now reads Ship 6 L to WinForge, and below it a ticked checkbox labelled Ship automatically carries the line Sends a lorry once the tanks reach 100% full. Figures read ready to ship 6 L, litres shipped 269 L, vouchers minted 165, consumed by WinForge 76.](captures/app/factory-autoship.png) |
+| The Oven Dial on round two, after round one was really won — the band is visibly narrower | ![The Oven Dial card over a dimmed dark surface, headed The Oven Dial with Round 2 of 3 beneath it and the line Stop the needle inside the golden band. The amber half-circle gauge carries a short golden band across its upper left with a marker line at each end, and the needle points up and to the right, well clear of it. A wide olive button reads Stop the needle in dark letters inside a bright focus ring, and under it a bold line reads In the band. Next round is tighter.](captures/app/golden-dial-r2.png) |
+| The golden sprite keeping its drawing at the plain look tier, under reduced motion, while the hero cookie has lost its own | ![A brand-new save on the plain look: a white page, the system font, a Cookies readout of 400, and four console buttons of which SETTINGS still carries a price of 25. The hero cookie is a flat light-grey circle with the word COOKIE on it and no drawing at all. Lower right in the same panel, a golden cookie sprite is drawn in full detail — a shaded, chipped cookie rendered in silver-grey rather than gold — inside a burst of thin straight light shafts that are static rather than turning.](captures/app/plain-reduced-motion.png) |
 
 </details>
 

@@ -10943,7 +10943,12 @@ body[data-eclipse='on'] .cookie-hero::after {
 }
 
 .golden-dial-card__stop:hover {
+  /* The spark fill kept the resting text colour, which in dark theme measured 1.05:1 —
+     invisible label on the game's one decisive button (gap-closer finding). The spark family is
+     light in BOTH themes, so the hover text is the fixed dark ink the spark swatches were
+     AA-verified against. */
   background: var(--spark, #ffc94d);
+  color: #3a2100;
 }
 
 .golden-dial-card__stop:focus-visible,

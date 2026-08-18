@@ -1,0 +1,1605 @@
+[
+  {
+    "state": "plain",
+    "size": "1440x900",
+    "view": "surface",
+    "findings": [
+      {
+        "kind": "flush-label",
+        "el": "span.coin-slot__price «🍪 10»",
+        "detail": "text inset L 0.0 R -0.0px in a 48px box",
+        "excluded": "shrink-to-fit plate: the box is sized by its own text, so it is snug by construction and nothing is cut"
+      },
+      {
+        "kind": "flush-label",
+        "el": "span.coin-slot__price «🍪 30»",
+        "detail": "text inset L 0.0 R 0.0px in a 46px box",
+        "excluded": "shrink-to-fit plate: the box is sized by its own text, so it is snug by construction and nothing is cut"
+      },
+      {
+        "kind": "flush-label",
+        "el": "span.coin-slot__price «🍪 45»",
+        "detail": "text inset L 0.0 R 0.0px in a 46px box",
+        "excluded": "shrink-to-fit plate: the box is sized by its own text, so it is snug by construction and nothing is cut"
+      },
+      {
+        "kind": "flush-label",
+        "el": "span.coin-slot__price «🍪 1»",
+        "detail": "text inset L 0.0 R 0.0px in a 38px box",
+        "excluded": "shrink-to-fit plate: the box is sized by its own text, so it is snug by construction and nothing is cut"
+      },
+      {
+        "kind": "flush-label",
+        "el": "span.coin-slot__price «🍪 25»",
+        "detail": "text inset L 0.0 R 0.0px in a 38px box",
+        "excluded": "shrink-to-fit plate: the box is sized by its own text, so it is snug by construction and nothing is cut"
+      }
+    ]
+  },
+  {
+    "state": "plain",
+    "size": "1232x860",
+    "view": "surface",
+    "findings": [
+      {
+        "kind": "flush-label",
+        "el": "span.coin-slot__price «🍪 10»",
+        "detail": "text inset L 0.0 R -0.0px in a 48px box",
+        "excluded": "shrink-to-fit plate: the box is sized by its own text, so it is snug by construction and nothing is cut"
+      },
+      {
+        "kind": "flush-label",
+        "el": "span.coin-slot__price «🍪 30»",
+        "detail": "text inset L 0.0 R 0.0px in a 46px box",
+        "excluded": "shrink-to-fit plate: the box is sized by its own text, so it is snug by construction and nothing is cut"
+      },
+      {
+        "kind": "flush-label",
+        "el": "span.coin-slot__price «🍪 45»",
+        "detail": "text inset L 0.0 R 0.0px in a 46px box",
+        "excluded": "shrink-to-fit plate: the box is sized by its own text, so it is snug by construction and nothing is cut"
+      },
+      {
+        "kind": "flush-label",
+        "el": "span.coin-slot__price «🍪 1»",
+        "detail": "text inset L 0.0 R 0.0px in a 38px box",
+        "excluded": "shrink-to-fit plate: the box is sized by its own text, so it is snug by construction and nothing is cut"
+      },
+      {
+        "kind": "flush-label",
+        "el": "span.coin-slot__price «🍪 25»",
+        "detail": "text inset L 0.0 R 0.0px in a 38px box",
+        "excluded": "shrink-to-fit plate: the box is sized by its own text, so it is snug by construction and nothing is cut"
+      }
+    ]
+  },
+  {
+    "state": "plain",
+    "size": "1000x720",
+    "view": "surface",
+    "findings": [
+      {
+        "kind": "flush-label",
+        "el": "span.coin-slot__price «🍪 10»",
+        "detail": "text inset L 0.0 R -0.0px in a 48px box",
+        "excluded": "shrink-to-fit plate: the box is sized by its own text, so it is snug by construction and nothing is cut"
+      },
+      {
+        "kind": "flush-label",
+        "el": "span.coin-slot__price «🍪 30»",
+        "detail": "text inset L 0.0 R 0.0px in a 46px box",
+        "excluded": "shrink-to-fit plate: the box is sized by its own text, so it is snug by construction and nothing is cut"
+      },
+      {
+        "kind": "flush-label",
+        "el": "span.coin-slot__price «🍪 45»",
+        "detail": "text inset L 0.0 R 0.0px in a 46px box",
+        "excluded": "shrink-to-fit plate: the box is sized by its own text, so it is snug by construction and nothing is cut"
+      },
+      {
+        "kind": "flush-label",
+        "el": "span.coin-slot__price «🍪 1»",
+        "detail": "text inset L 0.0 R -0.0px in a 38px box",
+        "excluded": "shrink-to-fit plate: the box is sized by its own text, so it is snug by construction and nothing is cut"
+      },
+      {
+        "kind": "flush-label",
+        "el": "span.coin-slot__price «🍪 25»",
+        "detail": "text inset L 0.0 R 0.0px in a 38px box",
+        "excluded": "shrink-to-fit plate: the box is sized by its own text, so it is snug by construction and nothing is cut"
+      }
+    ]
+  },
+  {
+    "state": "mid",
+    "size": "1440x900",
+    "view": "surface",
+    "findings": [
+      {
+        "kind": "escapes-clipper",
+        "el": "span.golden-rays",
+        "detail": "clipped by div.panel.cookie-hero «10COOKIE221.6 / secHold to click repeate»",
+        "excluded": "hero decoration drawn to spill past the cookie on purpose"
+      },
+      {
+        "kind": "escapes-clipper",
+        "el": "span.cookie-embers",
+        "detail": "clipped by div.panel.cookie-hero «10COOKIE221.6 / secHold to click repeate»",
+        "excluded": "hero decoration drawn to spill past the cookie on purpose"
+      },
+      {
+        "kind": "escapes-clipper",
+        "el": "div.milk-tide__surface",
+        "detail": "clipped by div.stage «10COOKIE221.6 / secHold to click repeate»",
+        "excluded": "the milk tide is a decorative band drawn behind the hero"
+      },
+      {
+        "kind": "overflow-x",
+        "el": "span.milk-tide__sr «Malted Milk — 84% milk, poured by your a»",
+        "detail": "content runs 286.6px past a 1px box",
+        "excluded": "visually-hidden text: a 1px clipped box that exists for the accessibility tree"
+      },
+      {
+        "kind": "clipped-text",
+        "el": "span.milk-tide__sr «Malted Milk — 84% milk, poured by your a»",
+        "detail": "text cut at 1px, no ellipsis",
+        "excluded": "visually-hidden text: a 1px clipped box that exists for the accessibility tree"
+      }
+    ]
+  },
+  {
+    "state": "mid",
+    "size": "1440x900",
+    "view": "dialog:factory",
+    "findings": [
+      {
+        "kind": "escapes-clipper",
+        "el": "span.golden-rays",
+        "detail": "clipped by div.panel.cookie-hero «10COOKIE221.6 / secHold to click repeate»",
+        "excluded": "hero decoration drawn to spill past the cookie on purpose"
+      },
+      {
+        "kind": "escapes-clipper",
+        "el": "span.cookie-embers",
+        "detail": "clipped by div.panel.cookie-hero «10COOKIE221.6 / secHold to click repeate»",
+        "excluded": "hero decoration drawn to spill past the cookie on purpose"
+      },
+      {
+        "kind": "escapes-clipper",
+        "el": "div.milk-tide__surface",
+        "detail": "clipped by div.stage «10COOKIE221.6 / secHold to click repeate»",
+        "excluded": "the milk tide is a decorative band drawn behind the hero"
+      },
+      {
+        "kind": "overflow-x",
+        "el": "span.milk-tide__sr «Malted Milk — 84% milk, poured by your a»",
+        "detail": "content runs 286.6px past a 1px box",
+        "excluded": "visually-hidden text: a 1px clipped box that exists for the accessibility tree"
+      },
+      {
+        "kind": "clipped-text",
+        "el": "span.milk-tide__sr «Malted Milk — 84% milk, poured by your a»",
+        "detail": "text cut at 1px, no ellipsis",
+        "excluded": "visually-hidden text: a 1px clipped box that exists for the accessibility tree"
+      }
+    ]
+  },
+  {
+    "state": "mid",
+    "size": "1440x900",
+    "view": "dialog:home",
+    "findings": [
+      {
+        "kind": "escapes-clipper",
+        "el": "span.golden-rays",
+        "detail": "clipped by div.panel.cookie-hero «10COOKIE221.6 / secHold to click repeate»",
+        "excluded": "hero decoration drawn to spill past the cookie on purpose"
+      },
+      {
+        "kind": "escapes-clipper",
+        "el": "span.cookie-embers",
+        "detail": "clipped by div.panel.cookie-hero «10COOKIE221.6 / secHold to click repeate»",
+        "excluded": "hero decoration drawn to spill past the cookie on purpose"
+      },
+      {
+        "kind": "escapes-clipper",
+        "el": "div.milk-tide__surface",
+        "detail": "clipped by div.stage «10COOKIE221.6 / secHold to click repeate»",
+        "excluded": "the milk tide is a decorative band drawn behind the hero"
+      },
+      {
+        "kind": "overflow-x",
+        "el": "span.milk-tide__sr «Malted Milk — 84% milk, poured by your a»",
+        "detail": "content runs 286.6px past a 1px box",
+        "excluded": "visually-hidden text: a 1px clipped box that exists for the accessibility tree"
+      },
+      {
+        "kind": "clipped-text",
+        "el": "span.milk-tide__sr «Malted Milk — 84% milk, poured by your a»",
+        "detail": "text cut at 1px, no ellipsis",
+        "excluded": "visually-hidden text: a 1px clipped box that exists for the accessibility tree"
+      },
+      {
+        "kind": "cut-mid-row",
+        "el": "section.home-cutaway «The houseKitchenFor saleWhere the whole »",
+        "detail": "card cut 137px with only 164px of scroll left",
+        "excluded": "a bakery room card is deliberately larger than the dialog viewport; the panel scrolls and snaps to whole cards"
+      },
+      {
+        "kind": "cut-mid-row",
+        "el": "div.home-cutaway__grid «KitchenFor saleWhere the whole business »",
+        "detail": "card cut 119px with only 164px of scroll left",
+        "excluded": "a bakery room card is deliberately larger than the dialog viewport; the panel scrolls and snaps to whole cards"
+      },
+      {
+        "kind": "cut-mid-row",
+        "el": "article.home-room «KitchenFor saleWhere the whole business »",
+        "detail": "card cut 119px with only 164px of scroll left",
+        "excluded": "a bakery room card is deliberately larger than the dialog viewport; the panel scrolls and snaps to whole cards"
+      }
+    ]
+  },
+  {
+    "state": "mid",
+    "size": "1440x900",
+    "view": "dialog:achievements",
+    "findings": [
+      {
+        "kind": "escapes-clipper",
+        "el": "span.golden-rays",
+        "detail": "clipped by div.panel.cookie-hero «10COOKIE221.6 / secHold to click repeate»",
+        "excluded": "hero decoration drawn to spill past the cookie on purpose"
+      },
+      {
+        "kind": "escapes-clipper",
+        "el": "span.cookie-embers",
+        "detail": "clipped by div.panel.cookie-hero «10COOKIE221.6 / secHold to click repeate»",
+        "excluded": "hero decoration drawn to spill past the cookie on purpose"
+      },
+      {
+        "kind": "escapes-clipper",
+        "el": "div.milk-tide__surface",
+        "detail": "clipped by div.stage «10COOKIE221.6 / secHold to click repeate»",
+        "excluded": "the milk tide is a decorative band drawn behind the hero"
+      },
+      {
+        "kind": "overflow-x",
+        "el": "span.milk-tide__sr «Malted Milk — 84% milk, poured by your a»",
+        "detail": "content runs 286.6px past a 1px box",
+        "excluded": "visually-hidden text: a 1px clipped box that exists for the accessibility tree"
+      },
+      {
+        "kind": "clipped-text",
+        "el": "span.milk-tide__sr «Malted Milk — 84% milk, poured by your a»",
+        "detail": "text cut at 1px, no ellipsis",
+        "excluded": "visually-hidden text: a 1px clipped box that exists for the accessibility tree"
+      }
+    ]
+  },
+  {
+    "state": "mid",
+    "size": "1440x900",
+    "view": "dialog:tools",
+    "findings": [
+      {
+        "kind": "escapes-clipper",
+        "el": "span.golden-rays",
+        "detail": "clipped by div.panel.cookie-hero «10COOKIE221.6 / secHold to click repeate»",
+        "excluded": "hero decoration drawn to spill past the cookie on purpose"
+      },
+      {
+        "kind": "escapes-clipper",
+        "el": "span.cookie-embers",
+        "detail": "clipped by div.panel.cookie-hero «10COOKIE221.6 / secHold to click repeate»",
+        "excluded": "hero decoration drawn to spill past the cookie on purpose"
+      },
+      {
+        "kind": "escapes-clipper",
+        "el": "div.milk-tide__surface",
+        "detail": "clipped by div.stage «10COOKIE221.6 / secHold to click repeate»",
+        "excluded": "the milk tide is a decorative band drawn behind the hero"
+      },
+      {
+        "kind": "overflow-x",
+        "el": "span.milk-tide__sr «Malted Milk — 84% milk, poured by your a»",
+        "detail": "content runs 286.6px past a 1px box",
+        "excluded": "visually-hidden text: a 1px clipped box that exists for the accessibility tree"
+      },
+      {
+        "kind": "clipped-text",
+        "el": "span.milk-tide__sr «Malted Milk — 84% milk, poured by your a»",
+        "detail": "text cut at 1px, no ellipsis",
+        "excluded": "visually-hidden text: a 1px clipped box that exists for the accessibility tree"
+      },
+      {
+        "kind": "overflow-x",
+        "el": "span.hud-strip__more-text «What this toggle changes»",
+        "detail": "content runs 123.9px past a 1px box",
+        "excluded": "visually-hidden text: a 1px clipped box that exists for the accessibility tree"
+      },
+      {
+        "kind": "clipped-text",
+        "el": "span.hud-strip__more-text «What this toggle changes»",
+        "detail": "text cut at 1px, no ellipsis",
+        "excluded": "visually-hidden text: a 1px clipped box that exists for the accessibility tree"
+      }
+    ]
+  },
+  {
+    "state": "mid",
+    "size": "1440x900",
+    "view": "dialog:statistics",
+    "findings": [
+      {
+        "kind": "escapes-clipper",
+        "el": "span.golden-rays",
+        "detail": "clipped by div.panel.cookie-hero «10COOKIE221.6 / secHold to click repeate»",
+        "excluded": "hero decoration drawn to spill past the cookie on purpose"
+      },
+      {
+        "kind": "escapes-clipper",
+        "el": "span.cookie-embers",
+        "detail": "clipped by div.panel.cookie-hero «10COOKIE221.6 / secHold to click repeate»",
+        "excluded": "hero decoration drawn to spill past the cookie on purpose"
+      },
+      {
+        "kind": "escapes-clipper",
+        "el": "div.milk-tide__surface",
+        "detail": "clipped by div.stage «10COOKIE221.6 / secHold to click repeate»",
+        "excluded": "the milk tide is a decorative band drawn behind the hero"
+      },
+      {
+        "kind": "overflow-x",
+        "el": "span.milk-tide__sr «Malted Milk — 84% milk, poured by your a»",
+        "detail": "content runs 286.6px past a 1px box",
+        "excluded": "visually-hidden text: a 1px clipped box that exists for the accessibility tree"
+      },
+      {
+        "kind": "clipped-text",
+        "el": "span.milk-tide__sr «Malted Milk — 84% milk, poured by your a»",
+        "detail": "text cut at 1px, no ellipsis",
+        "excluded": "visually-hidden text: a 1px clipped box that exists for the accessibility tree"
+      }
+    ]
+  },
+  {
+    "state": "mid",
+    "size": "1440x900",
+    "view": "dialog:prestige",
+    "findings": [],
+    "note": "button not present in this state"
+  },
+  {
+    "state": "mid",
+    "size": "1440x900",
+    "view": "dialog:catalogue",
+    "findings": [
+      {
+        "kind": "escapes-clipper",
+        "el": "span.golden-rays",
+        "detail": "clipped by div.panel.cookie-hero «10COOKIE221.6 / secHold to click repeate»",
+        "excluded": "hero decoration drawn to spill past the cookie on purpose"
+      },
+      {
+        "kind": "escapes-clipper",
+        "el": "span.cookie-embers",
+        "detail": "clipped by div.panel.cookie-hero «10COOKIE221.6 / secHold to click repeate»",
+        "excluded": "hero decoration drawn to spill past the cookie on purpose"
+      },
+      {
+        "kind": "escapes-clipper",
+        "el": "div.milk-tide__surface",
+        "detail": "clipped by div.stage «10COOKIE221.6 / secHold to click repeate»",
+        "excluded": "the milk tide is a decorative band drawn behind the hero"
+      },
+      {
+        "kind": "overflow-x",
+        "el": "span.milk-tide__sr «Malted Milk — 84% milk, poured by your a»",
+        "detail": "content runs 286.6px past a 1px box",
+        "excluded": "visually-hidden text: a 1px clipped box that exists for the accessibility tree"
+      },
+      {
+        "kind": "clipped-text",
+        "el": "span.milk-tide__sr «Malted Milk — 84% milk, poured by your a»",
+        "detail": "text cut at 1px, no ellipsis",
+        "excluded": "visually-hidden text: a 1px clipped box that exists for the accessibility tree"
+      }
+    ]
+  },
+  {
+    "state": "mid",
+    "size": "1440x900",
+    "view": "dialog:settings",
+    "findings": [
+      {
+        "kind": "escapes-clipper",
+        "el": "span.golden-rays",
+        "detail": "clipped by div.panel.cookie-hero «10COOKIE221.6 / secHold to click repeate»",
+        "excluded": "hero decoration drawn to spill past the cookie on purpose"
+      },
+      {
+        "kind": "escapes-clipper",
+        "el": "span.cookie-embers",
+        "detail": "clipped by div.panel.cookie-hero «10COOKIE221.6 / secHold to click repeate»",
+        "excluded": "hero decoration drawn to spill past the cookie on purpose"
+      },
+      {
+        "kind": "escapes-clipper",
+        "el": "div.milk-tide__surface",
+        "detail": "clipped by div.stage «10COOKIE221.6 / secHold to click repeate»",
+        "excluded": "the milk tide is a decorative band drawn behind the hero"
+      },
+      {
+        "kind": "overflow-x",
+        "el": "span.milk-tide__sr «Malted Milk — 84% milk, poured by your a»",
+        "detail": "content runs 286.6px past a 1px box",
+        "excluded": "visually-hidden text: a 1px clipped box that exists for the accessibility tree"
+      },
+      {
+        "kind": "clipped-text",
+        "el": "span.milk-tide__sr «Malted Milk — 84% milk, poured by your a»",
+        "detail": "text cut at 1px, no ellipsis",
+        "excluded": "visually-hidden text: a 1px clipped box that exists for the accessibility tree"
+      }
+    ]
+  },
+  {
+    "state": "mid",
+    "size": "1232x860",
+    "view": "surface",
+    "findings": [
+      {
+        "kind": "escapes-clipper",
+        "el": "span.golden-rays",
+        "detail": "clipped by div.panel.cookie-hero «10COOKIE221.6 / secHold to click repeate»",
+        "excluded": "hero decoration drawn to spill past the cookie on purpose"
+      },
+      {
+        "kind": "escapes-clipper",
+        "el": "span.cookie-embers",
+        "detail": "clipped by div.panel.cookie-hero «10COOKIE221.6 / secHold to click repeate»",
+        "excluded": "hero decoration drawn to spill past the cookie on purpose"
+      },
+      {
+        "kind": "escapes-clipper",
+        "el": "div.milk-tide__surface",
+        "detail": "clipped by div.stage «10COOKIE221.6 / secHold to click repeate»",
+        "excluded": "the milk tide is a decorative band drawn behind the hero"
+      },
+      {
+        "kind": "overflow-x",
+        "el": "span.milk-tide__sr «Malted Milk — 84% milk, poured by your a»",
+        "detail": "content runs 286.6px past a 1px box",
+        "excluded": "visually-hidden text: a 1px clipped box that exists for the accessibility tree"
+      },
+      {
+        "kind": "clipped-text",
+        "el": "span.milk-tide__sr «Malted Milk — 84% milk, poured by your a»",
+        "detail": "text cut at 1px, no ellipsis",
+        "excluded": "visually-hidden text: a 1px clipped box that exists for the accessibility tree"
+      }
+    ]
+  },
+  {
+    "state": "mid",
+    "size": "1232x860",
+    "view": "dialog:factory",
+    "findings": [
+      {
+        "kind": "escapes-clipper",
+        "el": "span.golden-rays",
+        "detail": "clipped by div.panel.cookie-hero «10COOKIE221.6 / secHold to click repeate»",
+        "excluded": "hero decoration drawn to spill past the cookie on purpose"
+      },
+      {
+        "kind": "escapes-clipper",
+        "el": "span.cookie-embers",
+        "detail": "clipped by div.panel.cookie-hero «10COOKIE221.6 / secHold to click repeate»",
+        "excluded": "hero decoration drawn to spill past the cookie on purpose"
+      },
+      {
+        "kind": "escapes-clipper",
+        "el": "div.milk-tide__surface",
+        "detail": "clipped by div.stage «10COOKIE221.6 / secHold to click repeate»",
+        "excluded": "the milk tide is a decorative band drawn behind the hero"
+      },
+      {
+        "kind": "overflow-x",
+        "el": "span.milk-tide__sr «Malted Milk — 84% milk, poured by your a»",
+        "detail": "content runs 286.6px past a 1px box",
+        "excluded": "visually-hidden text: a 1px clipped box that exists for the accessibility tree"
+      },
+      {
+        "kind": "clipped-text",
+        "el": "span.milk-tide__sr «Malted Milk — 84% milk, poured by your a»",
+        "detail": "text cut at 1px, no ellipsis",
+        "excluded": "visually-hidden text: a 1px clipped box that exists for the accessibility tree"
+      }
+    ]
+  },
+  {
+    "state": "mid",
+    "size": "1232x860",
+    "view": "dialog:home",
+    "findings": [
+      {
+        "kind": "escapes-clipper",
+        "el": "span.golden-rays",
+        "detail": "clipped by div.panel.cookie-hero «10COOKIE221.6 / secHold to click repeate»",
+        "excluded": "hero decoration drawn to spill past the cookie on purpose"
+      },
+      {
+        "kind": "escapes-clipper",
+        "el": "span.cookie-embers",
+        "detail": "clipped by div.panel.cookie-hero «10COOKIE221.6 / secHold to click repeate»",
+        "excluded": "hero decoration drawn to spill past the cookie on purpose"
+      },
+      {
+        "kind": "escapes-clipper",
+        "el": "div.milk-tide__surface",
+        "detail": "clipped by div.stage «10COOKIE221.6 / secHold to click repeate»",
+        "excluded": "the milk tide is a decorative band drawn behind the hero"
+      },
+      {
+        "kind": "overflow-x",
+        "el": "span.milk-tide__sr «Malted Milk — 84% milk, poured by your a»",
+        "detail": "content runs 286.6px past a 1px box",
+        "excluded": "visually-hidden text: a 1px clipped box that exists for the accessibility tree"
+      },
+      {
+        "kind": "clipped-text",
+        "el": "span.milk-tide__sr «Malted Milk — 84% milk, poured by your a»",
+        "detail": "text cut at 1px, no ellipsis",
+        "excluded": "visually-hidden text: a 1px clipped box that exists for the accessibility tree"
+      },
+      {
+        "kind": "cut-mid-row",
+        "el": "section.home-cutaway «The houseKitchenFor saleWhere the whole »",
+        "detail": "card cut 177px with only 204px of scroll left",
+        "excluded": "a bakery room card is deliberately larger than the dialog viewport; the panel scrolls and snaps to whole cards"
+      },
+      {
+        "kind": "cut-mid-row",
+        "el": "div.home-cutaway__grid «KitchenFor saleWhere the whole business »",
+        "detail": "card cut 159px with only 204px of scroll left",
+        "excluded": "a bakery room card is deliberately larger than the dialog viewport; the panel scrolls and snaps to whole cards"
+      },
+      {
+        "kind": "cut-mid-row",
+        "el": "article.home-room «KitchenFor saleWhere the whole business »",
+        "detail": "card cut 159px with only 204px of scroll left",
+        "excluded": "a bakery room card is deliberately larger than the dialog viewport; the panel scrolls and snaps to whole cards"
+      }
+    ]
+  },
+  {
+    "state": "mid",
+    "size": "1232x860",
+    "view": "dialog:achievements",
+    "findings": [
+      {
+        "kind": "escapes-clipper",
+        "el": "span.golden-rays",
+        "detail": "clipped by div.panel.cookie-hero «10COOKIE221.6 / secHold to click repeate»",
+        "excluded": "hero decoration drawn to spill past the cookie on purpose"
+      },
+      {
+        "kind": "escapes-clipper",
+        "el": "span.cookie-embers",
+        "detail": "clipped by div.panel.cookie-hero «10COOKIE221.6 / secHold to click repeate»",
+        "excluded": "hero decoration drawn to spill past the cookie on purpose"
+      },
+      {
+        "kind": "escapes-clipper",
+        "el": "div.milk-tide__surface",
+        "detail": "clipped by div.stage «10COOKIE221.6 / secHold to click repeate»",
+        "excluded": "the milk tide is a decorative band drawn behind the hero"
+      },
+      {
+        "kind": "overflow-x",
+        "el": "span.milk-tide__sr «Malted Milk — 84% milk, poured by your a»",
+        "detail": "content runs 286.6px past a 1px box",
+        "excluded": "visually-hidden text: a 1px clipped box that exists for the accessibility tree"
+      },
+      {
+        "kind": "clipped-text",
+        "el": "span.milk-tide__sr «Malted Milk — 84% milk, poured by your a»",
+        "detail": "text cut at 1px, no ellipsis",
+        "excluded": "visually-hidden text: a 1px clipped box that exists for the accessibility tree"
+      }
+    ]
+  },
+  {
+    "state": "mid",
+    "size": "1232x860",
+    "view": "dialog:tools",
+    "findings": [
+      {
+        "kind": "escapes-clipper",
+        "el": "span.golden-rays",
+        "detail": "clipped by div.panel.cookie-hero «10COOKIE221.6 / secHold to click repeate»",
+        "excluded": "hero decoration drawn to spill past the cookie on purpose"
+      },
+      {
+        "kind": "escapes-clipper",
+        "el": "span.cookie-embers",
+        "detail": "clipped by div.panel.cookie-hero «10COOKIE221.6 / secHold to click repeate»",
+        "excluded": "hero decoration drawn to spill past the cookie on purpose"
+      },
+      {
+        "kind": "escapes-clipper",
+        "el": "div.milk-tide__surface",
+        "detail": "clipped by div.stage «10COOKIE221.6 / secHold to click repeate»",
+        "excluded": "the milk tide is a decorative band drawn behind the hero"
+      },
+      {
+        "kind": "overflow-x",
+        "el": "span.milk-tide__sr «Malted Milk — 84% milk, poured by your a»",
+        "detail": "content runs 286.6px past a 1px box",
+        "excluded": "visually-hidden text: a 1px clipped box that exists for the accessibility tree"
+      },
+      {
+        "kind": "clipped-text",
+        "el": "span.milk-tide__sr «Malted Milk — 84% milk, poured by your a»",
+        "detail": "text cut at 1px, no ellipsis",
+        "excluded": "visually-hidden text: a 1px clipped box that exists for the accessibility tree"
+      },
+      {
+        "kind": "overflow-x",
+        "el": "span.hud-strip__more-text «What this toggle changes»",
+        "detail": "content runs 123.9px past a 1px box",
+        "excluded": "visually-hidden text: a 1px clipped box that exists for the accessibility tree"
+      },
+      {
+        "kind": "clipped-text",
+        "el": "span.hud-strip__more-text «What this toggle changes»",
+        "detail": "text cut at 1px, no ellipsis",
+        "excluded": "visually-hidden text: a 1px clipped box that exists for the accessibility tree"
+      }
+    ]
+  },
+  {
+    "state": "mid",
+    "size": "1232x860",
+    "view": "dialog:statistics",
+    "findings": [
+      {
+        "kind": "escapes-clipper",
+        "el": "span.cookie-embers",
+        "detail": "clipped by div.panel.cookie-hero «COOKIE221.6 / secHold to click repeatedl»",
+        "excluded": "hero decoration drawn to spill past the cookie on purpose"
+      },
+      {
+        "kind": "escapes-clipper",
+        "el": "div.milk-tide__surface",
+        "detail": "clipped by div.stage «COOKIE221.6 / secHold to click repeatedl»",
+        "excluded": "the milk tide is a decorative band drawn behind the hero"
+      },
+      {
+        "kind": "overflow-x",
+        "el": "span.milk-tide__sr «Malted Milk — 84% milk, poured by your a»",
+        "detail": "content runs 286.6px past a 1px box",
+        "excluded": "visually-hidden text: a 1px clipped box that exists for the accessibility tree"
+      },
+      {
+        "kind": "clipped-text",
+        "el": "span.milk-tide__sr «Malted Milk — 84% milk, poured by your a»",
+        "detail": "text cut at 1px, no ellipsis",
+        "excluded": "visually-hidden text: a 1px clipped box that exists for the accessibility tree"
+      }
+    ]
+  },
+  {
+    "state": "mid",
+    "size": "1232x860",
+    "view": "dialog:prestige",
+    "findings": [],
+    "note": "button not present in this state"
+  },
+  {
+    "state": "mid",
+    "size": "1232x860",
+    "view": "dialog:catalogue",
+    "findings": [
+      {
+        "kind": "escapes-clipper",
+        "el": "span.cookie-embers",
+        "detail": "clipped by div.panel.cookie-hero «COOKIE221.6 / secHold to click repeatedl»",
+        "excluded": "hero decoration drawn to spill past the cookie on purpose"
+      },
+      {
+        "kind": "escapes-clipper",
+        "el": "div.milk-tide__surface",
+        "detail": "clipped by div.stage «COOKIE221.6 / secHold to click repeatedl»",
+        "excluded": "the milk tide is a decorative band drawn behind the hero"
+      },
+      {
+        "kind": "overflow-x",
+        "el": "span.milk-tide__sr «Malted Milk — 84% milk, poured by your a»",
+        "detail": "content runs 286.6px past a 1px box",
+        "excluded": "visually-hidden text: a 1px clipped box that exists for the accessibility tree"
+      },
+      {
+        "kind": "clipped-text",
+        "el": "span.milk-tide__sr «Malted Milk — 84% milk, poured by your a»",
+        "detail": "text cut at 1px, no ellipsis",
+        "excluded": "visually-hidden text: a 1px clipped box that exists for the accessibility tree"
+      }
+    ]
+  },
+  {
+    "state": "mid",
+    "size": "1232x860",
+    "view": "dialog:settings",
+    "findings": [
+      {
+        "kind": "escapes-clipper",
+        "el": "span.cookie-embers",
+        "detail": "clipped by div.panel.cookie-hero «COOKIE221.6 / secHold to click repeatedl»",
+        "excluded": "hero decoration drawn to spill past the cookie on purpose"
+      },
+      {
+        "kind": "escapes-clipper",
+        "el": "div.milk-tide__surface",
+        "detail": "clipped by div.stage «COOKIE221.6 / secHold to click repeatedl»",
+        "excluded": "the milk tide is a decorative band drawn behind the hero"
+      },
+      {
+        "kind": "overflow-x",
+        "el": "span.milk-tide__sr «Malted Milk — 84% milk, poured by your a»",
+        "detail": "content runs 286.6px past a 1px box",
+        "excluded": "visually-hidden text: a 1px clipped box that exists for the accessibility tree"
+      },
+      {
+        "kind": "clipped-text",
+        "el": "span.milk-tide__sr «Malted Milk — 84% milk, poured by your a»",
+        "detail": "text cut at 1px, no ellipsis",
+        "excluded": "visually-hidden text: a 1px clipped box that exists for the accessibility tree"
+      }
+    ]
+  },
+  {
+    "state": "mid",
+    "size": "1000x720",
+    "view": "surface",
+    "findings": [
+      {
+        "kind": "escapes-clipper",
+        "el": "span.cookie-embers",
+        "detail": "clipped by div.panel.cookie-hero «COOKIE221.6 / secHold to click repeatedl»",
+        "excluded": "hero decoration drawn to spill past the cookie on purpose"
+      },
+      {
+        "kind": "escapes-clipper",
+        "el": "div.milk-tide__surface",
+        "detail": "clipped by div.stage «COOKIE221.6 / secHold to click repeatedl»",
+        "excluded": "the milk tide is a decorative band drawn behind the hero"
+      },
+      {
+        "kind": "overflow-x",
+        "el": "span.milk-tide__sr «Malted Milk — 84% milk, poured by your a»",
+        "detail": "content runs 261.3px past a 1px box",
+        "excluded": "visually-hidden text: a 1px clipped box that exists for the accessibility tree"
+      },
+      {
+        "kind": "clipped-text",
+        "el": "span.milk-tide__sr «Malted Milk — 84% milk, poured by your a»",
+        "detail": "text cut at 1px, no ellipsis",
+        "excluded": "visually-hidden text: a 1px clipped box that exists for the accessibility tree"
+      }
+    ]
+  },
+  {
+    "state": "mid",
+    "size": "1000x720",
+    "view": "dialog:factory",
+    "findings": [
+      {
+        "kind": "escapes-clipper",
+        "el": "span.cookie-embers",
+        "detail": "clipped by div.panel.cookie-hero «COOKIE221.6 / secHold to click repeatedl»",
+        "excluded": "hero decoration drawn to spill past the cookie on purpose"
+      },
+      {
+        "kind": "escapes-clipper",
+        "el": "div.milk-tide__surface",
+        "detail": "clipped by div.stage «COOKIE221.6 / secHold to click repeatedl»",
+        "excluded": "the milk tide is a decorative band drawn behind the hero"
+      },
+      {
+        "kind": "overflow-x",
+        "el": "span.milk-tide__sr «Malted Milk — 84% milk, poured by your a»",
+        "detail": "content runs 261.3px past a 1px box",
+        "excluded": "visually-hidden text: a 1px clipped box that exists for the accessibility tree"
+      },
+      {
+        "kind": "clipped-text",
+        "el": "span.milk-tide__sr «Malted Milk — 84% milk, poured by your a»",
+        "detail": "text cut at 1px, no ellipsis",
+        "excluded": "visually-hidden text: a 1px clipped box that exists for the accessibility tree"
+      }
+    ]
+  },
+  {
+    "state": "mid",
+    "size": "1000x720",
+    "view": "dialog:home",
+    "findings": [
+      {
+        "kind": "escapes-clipper",
+        "el": "span.cookie-embers",
+        "detail": "clipped by div.panel.cookie-hero «COOKIE221.6 / secHold to click repeatedl»",
+        "excluded": "hero decoration drawn to spill past the cookie on purpose"
+      },
+      {
+        "kind": "escapes-clipper",
+        "el": "div.milk-tide__surface",
+        "detail": "clipped by div.stage «COOKIE221.6 / secHold to click repeatedl»",
+        "excluded": "the milk tide is a decorative band drawn behind the hero"
+      },
+      {
+        "kind": "overflow-x",
+        "el": "span.milk-tide__sr «Malted Milk — 84% milk, poured by your a»",
+        "detail": "content runs 261.3px past a 1px box",
+        "excluded": "visually-hidden text: a 1px clipped box that exists for the accessibility tree"
+      },
+      {
+        "kind": "clipped-text",
+        "el": "span.milk-tide__sr «Malted Milk — 84% milk, poured by your a»",
+        "detail": "text cut at 1px, no ellipsis",
+        "excluded": "visually-hidden text: a 1px clipped box that exists for the accessibility tree"
+      },
+      {
+        "kind": "cut-mid-row",
+        "el": "section.home-cutaway «The houseKitchenFor saleWhere the whole »",
+        "detail": "card cut 317px with only 344px of scroll left",
+        "excluded": "a bakery room card is deliberately larger than the dialog viewport; the panel scrolls and snaps to whole cards"
+      }
+    ]
+  },
+  {
+    "state": "mid",
+    "size": "1000x720",
+    "view": "dialog:achievements",
+    "findings": [
+      {
+        "kind": "escapes-clipper",
+        "el": "span.cookie-embers",
+        "detail": "clipped by div.panel.cookie-hero «COOKIE221.6 / secHold to click repeatedl»",
+        "excluded": "hero decoration drawn to spill past the cookie on purpose"
+      },
+      {
+        "kind": "escapes-clipper",
+        "el": "div.milk-tide__surface",
+        "detail": "clipped by div.stage «COOKIE221.6 / secHold to click repeatedl»",
+        "excluded": "the milk tide is a decorative band drawn behind the hero"
+      },
+      {
+        "kind": "overflow-x",
+        "el": "span.milk-tide__sr «Malted Milk — 84% milk, poured by your a»",
+        "detail": "content runs 261.3px past a 1px box",
+        "excluded": "visually-hidden text: a 1px clipped box that exists for the accessibility tree"
+      },
+      {
+        "kind": "clipped-text",
+        "el": "span.milk-tide__sr «Malted Milk — 84% milk, poured by your a»",
+        "detail": "text cut at 1px, no ellipsis",
+        "excluded": "visually-hidden text: a 1px clipped box that exists for the accessibility tree"
+      }
+    ]
+  },
+  {
+    "state": "mid",
+    "size": "1000x720",
+    "view": "dialog:tools",
+    "findings": [
+      {
+        "kind": "escapes-clipper",
+        "el": "span.cookie-embers",
+        "detail": "clipped by div.panel.cookie-hero «COOKIE221.6 / secHold to click repeatedl»",
+        "excluded": "hero decoration drawn to spill past the cookie on purpose"
+      },
+      {
+        "kind": "escapes-clipper",
+        "el": "div.milk-tide__surface",
+        "detail": "clipped by div.stage «COOKIE221.6 / secHold to click repeatedl»",
+        "excluded": "the milk tide is a decorative band drawn behind the hero"
+      },
+      {
+        "kind": "overflow-x",
+        "el": "span.milk-tide__sr «Malted Milk — 84% milk, poured by your a»",
+        "detail": "content runs 261.3px past a 1px box",
+        "excluded": "visually-hidden text: a 1px clipped box that exists for the accessibility tree"
+      },
+      {
+        "kind": "clipped-text",
+        "el": "span.milk-tide__sr «Malted Milk — 84% milk, poured by your a»",
+        "detail": "text cut at 1px, no ellipsis",
+        "excluded": "visually-hidden text: a 1px clipped box that exists for the accessibility tree"
+      },
+      {
+        "kind": "overflow-x",
+        "el": "span.hud-strip__more-text «What this toggle changes»",
+        "detail": "content runs 123.9px past a 1px box",
+        "excluded": "visually-hidden text: a 1px clipped box that exists for the accessibility tree"
+      },
+      {
+        "kind": "clipped-text",
+        "el": "span.hud-strip__more-text «What this toggle changes»",
+        "detail": "text cut at 1px, no ellipsis",
+        "excluded": "visually-hidden text: a 1px clipped box that exists for the accessibility tree"
+      }
+    ]
+  },
+  {
+    "state": "mid",
+    "size": "1000x720",
+    "view": "dialog:statistics",
+    "findings": [
+      {
+        "kind": "escapes-clipper",
+        "el": "span.cookie-embers",
+        "detail": "clipped by div.panel.cookie-hero «COOKIE221.6 / secHold to click repeatedl»",
+        "excluded": "hero decoration drawn to spill past the cookie on purpose"
+      },
+      {
+        "kind": "escapes-clipper",
+        "el": "div.milk-tide__surface",
+        "detail": "clipped by div.stage «COOKIE221.6 / secHold to click repeatedl»",
+        "excluded": "the milk tide is a decorative band drawn behind the hero"
+      },
+      {
+        "kind": "overflow-x",
+        "el": "span.milk-tide__sr «Malted Milk — 84% milk, poured by your a»",
+        "detail": "content runs 261.3px past a 1px box",
+        "excluded": "visually-hidden text: a 1px clipped box that exists for the accessibility tree"
+      },
+      {
+        "kind": "clipped-text",
+        "el": "span.milk-tide__sr «Malted Milk — 84% milk, poured by your a»",
+        "detail": "text cut at 1px, no ellipsis",
+        "excluded": "visually-hidden text: a 1px clipped box that exists for the accessibility tree"
+      }
+    ]
+  },
+  {
+    "state": "mid",
+    "size": "1000x720",
+    "view": "dialog:prestige",
+    "findings": [],
+    "note": "button not present in this state"
+  },
+  {
+    "state": "mid",
+    "size": "1000x720",
+    "view": "dialog:catalogue",
+    "findings": [
+      {
+        "kind": "escapes-clipper",
+        "el": "span.cookie-embers",
+        "detail": "clipped by div.panel.cookie-hero «COOKIE221.6 / secHold to click repeatedl»",
+        "excluded": "hero decoration drawn to spill past the cookie on purpose"
+      },
+      {
+        "kind": "escapes-clipper",
+        "el": "div.milk-tide__surface",
+        "detail": "clipped by div.stage «COOKIE221.6 / secHold to click repeatedl»",
+        "excluded": "the milk tide is a decorative band drawn behind the hero"
+      },
+      {
+        "kind": "overflow-x",
+        "el": "span.milk-tide__sr «Malted Milk — 84% milk, poured by your a»",
+        "detail": "content runs 261.3px past a 1px box",
+        "excluded": "visually-hidden text: a 1px clipped box that exists for the accessibility tree"
+      },
+      {
+        "kind": "clipped-text",
+        "el": "span.milk-tide__sr «Malted Milk — 84% milk, poured by your a»",
+        "detail": "text cut at 1px, no ellipsis",
+        "excluded": "visually-hidden text: a 1px clipped box that exists for the accessibility tree"
+      }
+    ]
+  },
+  {
+    "state": "mid",
+    "size": "1000x720",
+    "view": "dialog:settings",
+    "findings": [
+      {
+        "kind": "escapes-clipper",
+        "el": "span.cookie-embers",
+        "detail": "clipped by div.panel.cookie-hero «COOKIE221.6 / secHold to click repeatedl»",
+        "excluded": "hero decoration drawn to spill past the cookie on purpose"
+      },
+      {
+        "kind": "escapes-clipper",
+        "el": "div.milk-tide__surface",
+        "detail": "clipped by div.stage «COOKIE221.6 / secHold to click repeatedl»",
+        "excluded": "the milk tide is a decorative band drawn behind the hero"
+      },
+      {
+        "kind": "overflow-x",
+        "el": "span.milk-tide__sr «Malted Milk — 84% milk, poured by your a»",
+        "detail": "content runs 261.3px past a 1px box",
+        "excluded": "visually-hidden text: a 1px clipped box that exists for the accessibility tree"
+      },
+      {
+        "kind": "clipped-text",
+        "el": "span.milk-tide__sr «Malted Milk — 84% milk, poured by your a»",
+        "detail": "text cut at 1px, no ellipsis",
+        "excluded": "visually-hidden text: a 1px clipped box that exists for the accessibility tree"
+      }
+    ]
+  },
+  {
+    "state": "late",
+    "size": "1440x900",
+    "view": "surface",
+    "findings": [
+      {
+        "kind": "escapes-clipper",
+        "el": "span.golden-rays",
+        "detail": "clipped by div.panel.cookie-hero «10COOKIE15.85 trillion / secHold to clic»",
+        "excluded": "hero decoration drawn to spill past the cookie on purpose"
+      },
+      {
+        "kind": "escapes-clipper",
+        "el": "span.cookie-embers",
+        "detail": "clipped by div.panel.cookie-hero «10COOKIE15.85 trillion / secHold to clic»",
+        "excluded": "hero decoration drawn to spill past the cookie on purpose"
+      },
+      {
+        "kind": "overflow-x",
+        "el": "span.milk-tide__sr «Milk That Should Not Exist — 496% milk, »",
+        "detail": "content runs 368.9px past a 1px box",
+        "excluded": "visually-hidden text: a 1px clipped box that exists for the accessibility tree"
+      },
+      {
+        "kind": "clipped-text",
+        "el": "span.milk-tide__sr «Milk That Should Not Exist — 496% milk, »",
+        "detail": "text cut at 1px, no ellipsis",
+        "excluded": "visually-hidden text: a 1px clipped box that exists for the accessibility tree"
+      }
+    ]
+  },
+  {
+    "state": "late",
+    "size": "1232x860",
+    "view": "surface",
+    "findings": [
+      {
+        "kind": "escapes-clipper",
+        "el": "span.golden-rays",
+        "detail": "clipped by div.panel.cookie-hero «10COOKIE15.85 trillion / secHold to clic»",
+        "excluded": "hero decoration drawn to spill past the cookie on purpose"
+      },
+      {
+        "kind": "escapes-clipper",
+        "el": "span.cookie-embers",
+        "detail": "clipped by div.panel.cookie-hero «10COOKIE15.85 trillion / secHold to clic»",
+        "excluded": "hero decoration drawn to spill past the cookie on purpose"
+      },
+      {
+        "kind": "overflow-x",
+        "el": "span.milk-tide__sr «Milk That Should Not Exist — 496% milk, »",
+        "detail": "content runs 368.9px past a 1px box",
+        "excluded": "visually-hidden text: a 1px clipped box that exists for the accessibility tree"
+      },
+      {
+        "kind": "clipped-text",
+        "el": "span.milk-tide__sr «Milk That Should Not Exist — 496% milk, »",
+        "detail": "text cut at 1px, no ellipsis",
+        "excluded": "visually-hidden text: a 1px clipped box that exists for the accessibility tree"
+      }
+    ]
+  },
+  {
+    "state": "late",
+    "size": "1000x720",
+    "view": "surface",
+    "findings": [
+      {
+        "kind": "escapes-clipper",
+        "el": "span.golden-rays",
+        "detail": "clipped by div.panel.cookie-hero «10COOKIE15.85 trillion / secHold to clic»",
+        "excluded": "hero decoration drawn to spill past the cookie on purpose"
+      },
+      {
+        "kind": "escapes-clipper",
+        "el": "span.cookie-embers",
+        "detail": "clipped by div.panel.cookie-hero «10COOKIE15.85 trillion / secHold to clic»",
+        "excluded": "hero decoration drawn to spill past the cookie on purpose"
+      },
+      {
+        "kind": "overflow-x",
+        "el": "span.milk-tide__sr «Milk That Should Not Exist — 496% milk, »",
+        "detail": "content runs 336.3px past a 1px box",
+        "excluded": "visually-hidden text: a 1px clipped box that exists for the accessibility tree"
+      },
+      {
+        "kind": "clipped-text",
+        "el": "span.milk-tide__sr «Milk That Should Not Exist — 496% milk, »",
+        "detail": "text cut at 1px, no ellipsis",
+        "excluded": "visually-hidden text: a 1px clipped box that exists for the accessibility tree"
+      }
+    ]
+  },
+  {
+    "state": "mid",
+    "size": "900x720",
+    "view": "narrow-rail",
+    "findings": [
+      {
+        "kind": "escapes-clipper",
+        "el": "span.golden-rays",
+        "detail": "clipped by div.panel.cookie-hero «10COOKIE221.6 / secHold to click repeate»",
+        "excluded": "hero decoration drawn to spill past the cookie on purpose"
+      },
+      {
+        "kind": "escapes-clipper",
+        "el": "span.cookie-embers",
+        "detail": "clipped by div.panel.cookie-hero «10COOKIE221.6 / secHold to click repeate»",
+        "excluded": "hero decoration drawn to spill past the cookie on purpose"
+      },
+      {
+        "kind": "overflow-x",
+        "el": "span.milk-tide__sr «Malted Milk — 84% milk, poured by your a»",
+        "detail": "content runs 261.3px past a 1px box",
+        "excluded": "visually-hidden text: a 1px clipped box that exists for the accessibility tree"
+      },
+      {
+        "kind": "clipped-text",
+        "el": "span.milk-tide__sr «Malted Milk — 84% milk, poured by your a»",
+        "detail": "text cut at 1px, no ellipsis",
+        "excluded": "visually-hidden text: a 1px clipped box that exists for the accessibility tree"
+      }
+    ],
+    "buyButton": {
+      "row": true,
+      "buy": true,
+      "insideRow": true,
+      "insideScroller": true,
+      "scroller": "shop-rail__list",
+      "rowH": 123,
+      "buyRect": [
+        300,
+        830,
+        120,
+        44
+      ]
+    }
+  },
+  {
+    "state": "mid",
+    "size": "820x700",
+    "view": "narrow-rail",
+    "findings": [
+      {
+        "kind": "escapes-clipper",
+        "el": "span.golden-rays",
+        "detail": "clipped by div.panel.cookie-hero «10COOKIE221.6 / secHold to click repeate»",
+        "excluded": "hero decoration drawn to spill past the cookie on purpose"
+      },
+      {
+        "kind": "escapes-clipper",
+        "el": "span.cookie-embers",
+        "detail": "clipped by div.panel.cookie-hero «10COOKIE221.6 / secHold to click repeate»",
+        "excluded": "hero decoration drawn to spill past the cookie on purpose"
+      },
+      {
+        "kind": "overflow-x",
+        "el": "span.milk-tide__sr «Malted Milk — 84% milk, poured by your a»",
+        "detail": "content runs 261.3px past a 1px box",
+        "excluded": "visually-hidden text: a 1px clipped box that exists for the accessibility tree"
+      },
+      {
+        "kind": "clipped-text",
+        "el": "span.milk-tide__sr «Malted Milk — 84% milk, poured by your a»",
+        "detail": "text cut at 1px, no ellipsis",
+        "excluded": "visually-hidden text: a 1px clipped box that exists for the accessibility tree"
+      }
+    ],
+    "buyButton": {
+      "row": true,
+      "buy": true,
+      "insideRow": true,
+      "insideScroller": true,
+      "scroller": "shop-rail__list",
+      "rowH": 123,
+      "buyRect": [
+        300,
+        891,
+        120,
+        44
+      ]
+    }
+  },
+  {
+    "state": "mid",
+    "size": "1440x900",
+    "view": "anchor:console-factory",
+    "findings": [
+      {
+        "kind": "escapes-clipper",
+        "el": "span.golden-rays",
+        "detail": "clipped by div.panel.cookie-hero «10COOKIE221.6 / secHold to click repeate»",
+        "excluded": "hero decoration drawn to spill past the cookie on purpose"
+      },
+      {
+        "kind": "escapes-clipper",
+        "el": "span.cookie-embers",
+        "detail": "clipped by div.panel.cookie-hero «10COOKIE221.6 / secHold to click repeate»",
+        "excluded": "hero decoration drawn to spill past the cookie on purpose"
+      },
+      {
+        "kind": "escapes-clipper",
+        "el": "div.milk-tide__surface",
+        "detail": "clipped by div.stage «10COOKIE221.6 / secHold to click repeate»",
+        "excluded": "the milk tide is a decorative band drawn behind the hero"
+      },
+      {
+        "kind": "overflow-x",
+        "el": "span.milk-tide__sr «Malted Milk — 84% milk, poured by your a»",
+        "detail": "content runs 286.6px past a 1px box",
+        "excluded": "visually-hidden text: a 1px clipped box that exists for the accessibility tree"
+      },
+      {
+        "kind": "clipped-text",
+        "el": "span.milk-tide__sr «Malted Milk — 84% milk, poured by your a»",
+        "detail": "text cut at 1px, no ellipsis",
+        "excluded": "visually-hidden text: a 1px clipped box that exists for the accessibility tree"
+      }
+    ],
+    "panel": {
+      "open": true,
+      "rect": [
+        658,
+        172,
+        760,
+        700
+      ],
+      "viewport": [
+        1440,
+        900
+      ],
+      "bottomOverhang": -28,
+      "barVisible": [
+        177,
+        253
+      ],
+      "closeVisible": [
+        191,
+        235
+      ],
+      "bodyHeight": 615
+    }
+  },
+  {
+    "state": "mid",
+    "size": "1440x900",
+    "view": "anchor:depot-card",
+    "findings": [
+      {
+        "kind": "escapes-clipper",
+        "el": "span.golden-rays",
+        "detail": "clipped by div.panel.cookie-hero «10COOKIE221.6 / secHold to click repeate»",
+        "excluded": "hero decoration drawn to spill past the cookie on purpose"
+      },
+      {
+        "kind": "escapes-clipper",
+        "el": "span.cookie-embers",
+        "detail": "clipped by div.panel.cookie-hero «10COOKIE221.6 / secHold to click repeate»",
+        "excluded": "hero decoration drawn to spill past the cookie on purpose"
+      },
+      {
+        "kind": "escapes-clipper",
+        "el": "div.milk-tide__surface",
+        "detail": "clipped by div.stage «10COOKIE221.6 / secHold to click repeate»",
+        "excluded": "the milk tide is a decorative band drawn behind the hero"
+      },
+      {
+        "kind": "overflow-x",
+        "el": "span.milk-tide__sr «Malted Milk — 84% milk, poured by your a»",
+        "detail": "content runs 286.6px past a 1px box",
+        "excluded": "visually-hidden text: a 1px clipped box that exists for the accessibility tree"
+      },
+      {
+        "kind": "clipped-text",
+        "el": "span.milk-tide__sr «Malted Milk — 84% milk, poured by your a»",
+        "detail": "text cut at 1px, no ellipsis",
+        "excluded": "visually-hidden text: a 1px clipped box that exists for the accessibility tree"
+      }
+    ],
+    "panel": {
+      "open": true,
+      "rect": [
+        658,
+        172,
+        760,
+        700
+      ],
+      "viewport": [
+        1440,
+        900
+      ],
+      "bottomOverhang": -28,
+      "barVisible": [
+        177,
+        253
+      ],
+      "closeVisible": [
+        191,
+        235
+      ],
+      "bodyHeight": 615
+    }
+  },
+  {
+    "state": "mid",
+    "size": "1232x860",
+    "view": "anchor:console-factory",
+    "findings": [
+      {
+        "kind": "escapes-clipper",
+        "el": "span.golden-rays",
+        "detail": "clipped by div.panel.cookie-hero «10COOKIE221.6 / secHold to click repeate»",
+        "excluded": "hero decoration drawn to spill past the cookie on purpose"
+      },
+      {
+        "kind": "escapes-clipper",
+        "el": "span.cookie-embers",
+        "detail": "clipped by div.panel.cookie-hero «10COOKIE221.6 / secHold to click repeate»",
+        "excluded": "hero decoration drawn to spill past the cookie on purpose"
+      },
+      {
+        "kind": "escapes-clipper",
+        "el": "div.milk-tide__surface",
+        "detail": "clipped by div.stage «10COOKIE221.6 / secHold to click repeate»",
+        "excluded": "the milk tide is a decorative band drawn behind the hero"
+      },
+      {
+        "kind": "overflow-x",
+        "el": "span.milk-tide__sr «Malted Milk — 84% milk, poured by your a»",
+        "detail": "content runs 286.6px past a 1px box",
+        "excluded": "visually-hidden text: a 1px clipped box that exists for the accessibility tree"
+      },
+      {
+        "kind": "clipped-text",
+        "el": "span.milk-tide__sr «Malted Milk — 84% milk, poured by your a»",
+        "detail": "text cut at 1px, no ellipsis",
+        "excluded": "visually-hidden text: a 1px clipped box that exists for the accessibility tree"
+      }
+    ],
+    "panel": {
+      "open": true,
+      "rect": [
+        450,
+        172,
+        760,
+        660
+      ],
+      "viewport": [
+        1232,
+        860
+      ],
+      "bottomOverhang": -28,
+      "barVisible": [
+        177,
+        253
+      ],
+      "closeVisible": [
+        191,
+        235
+      ],
+      "bodyHeight": 575
+    }
+  },
+  {
+    "state": "mid",
+    "size": "1232x860",
+    "view": "anchor:depot-card",
+    "findings": [
+      {
+        "kind": "escapes-clipper",
+        "el": "span.golden-rays",
+        "detail": "clipped by div.panel.cookie-hero «10COOKIE221.6 / secHold to click repeate»",
+        "excluded": "hero decoration drawn to spill past the cookie on purpose"
+      },
+      {
+        "kind": "escapes-clipper",
+        "el": "span.cookie-embers",
+        "detail": "clipped by div.panel.cookie-hero «10COOKIE221.6 / secHold to click repeate»",
+        "excluded": "hero decoration drawn to spill past the cookie on purpose"
+      },
+      {
+        "kind": "escapes-clipper",
+        "el": "div.milk-tide__surface",
+        "detail": "clipped by div.stage «10COOKIE221.6 / secHold to click repeate»",
+        "excluded": "the milk tide is a decorative band drawn behind the hero"
+      },
+      {
+        "kind": "overflow-x",
+        "el": "span.milk-tide__sr «Malted Milk — 84% milk, poured by your a»",
+        "detail": "content runs 286.6px past a 1px box",
+        "excluded": "visually-hidden text: a 1px clipped box that exists for the accessibility tree"
+      },
+      {
+        "kind": "clipped-text",
+        "el": "span.milk-tide__sr «Malted Milk — 84% milk, poured by your a»",
+        "detail": "text cut at 1px, no ellipsis",
+        "excluded": "visually-hidden text: a 1px clipped box that exists for the accessibility tree"
+      }
+    ],
+    "panel": {
+      "open": true,
+      "rect": [
+        450,
+        172,
+        760,
+        660
+      ],
+      "viewport": [
+        1232,
+        860
+      ],
+      "bottomOverhang": -28,
+      "barVisible": [
+        177,
+        253
+      ],
+      "closeVisible": [
+        191,
+        235
+      ],
+      "bodyHeight": 575
+    }
+  },
+  {
+    "state": "mid",
+    "size": "1000x720",
+    "view": "anchor:console-factory",
+    "findings": [
+      {
+        "kind": "escapes-clipper",
+        "el": "span.golden-rays",
+        "detail": "clipped by div.panel.cookie-hero «10COOKIE221.6 / secHold to click repeate»",
+        "excluded": "hero decoration drawn to spill past the cookie on purpose"
+      },
+      {
+        "kind": "escapes-clipper",
+        "el": "span.cookie-embers",
+        "detail": "clipped by div.panel.cookie-hero «10COOKIE221.6 / secHold to click repeate»",
+        "excluded": "hero decoration drawn to spill past the cookie on purpose"
+      },
+      {
+        "kind": "escapes-clipper",
+        "el": "div.milk-tide__surface",
+        "detail": "clipped by div.stage «10COOKIE221.6 / secHold to click repeate»",
+        "excluded": "the milk tide is a decorative band drawn behind the hero"
+      },
+      {
+        "kind": "overflow-x",
+        "el": "span.milk-tide__sr «Malted Milk — 84% milk, poured by your a»",
+        "detail": "content runs 261.3px past a 1px box",
+        "excluded": "visually-hidden text: a 1px clipped box that exists for the accessibility tree"
+      },
+      {
+        "kind": "clipped-text",
+        "el": "span.milk-tide__sr «Malted Milk — 84% milk, poured by your a»",
+        "detail": "text cut at 1px, no ellipsis",
+        "excluded": "visually-hidden text: a 1px clipped box that exists for the accessibility tree"
+      }
+    ],
+    "panel": {
+      "open": true,
+      "rect": [
+        218,
+        172,
+        760,
+        520
+      ],
+      "viewport": [
+        1000,
+        720
+      ],
+      "bottomOverhang": -28,
+      "barVisible": [
+        177,
+        253
+      ],
+      "closeVisible": [
+        191,
+        235
+      ],
+      "bodyHeight": 435
+    }
+  },
+  {
+    "state": "mid",
+    "size": "1000x720",
+    "view": "anchor:depot-card",
+    "findings": [
+      {
+        "kind": "escapes-clipper",
+        "el": "span.golden-rays",
+        "detail": "clipped by div.panel.cookie-hero «10COOKIE221.6 / secHold to click repeate»",
+        "excluded": "hero decoration drawn to spill past the cookie on purpose"
+      },
+      {
+        "kind": "escapes-clipper",
+        "el": "span.cookie-embers",
+        "detail": "clipped by div.panel.cookie-hero «10COOKIE221.6 / secHold to click repeate»",
+        "excluded": "hero decoration drawn to spill past the cookie on purpose"
+      },
+      {
+        "kind": "escapes-clipper",
+        "el": "div.milk-tide__surface",
+        "detail": "clipped by div.stage «10COOKIE221.6 / secHold to click repeate»",
+        "excluded": "the milk tide is a decorative band drawn behind the hero"
+      },
+      {
+        "kind": "overflow-x",
+        "el": "span.milk-tide__sr «Malted Milk — 84% milk, poured by your a»",
+        "detail": "content runs 261.3px past a 1px box",
+        "excluded": "visually-hidden text: a 1px clipped box that exists for the accessibility tree"
+      },
+      {
+        "kind": "clipped-text",
+        "el": "span.milk-tide__sr «Malted Milk — 84% milk, poured by your a»",
+        "detail": "text cut at 1px, no ellipsis",
+        "excluded": "visually-hidden text: a 1px clipped box that exists for the accessibility tree"
+      }
+    ],
+    "panel": {
+      "open": true,
+      "rect": [
+        218,
+        172,
+        760,
+        520
+      ],
+      "viewport": [
+        1000,
+        720
+      ],
+      "bottomOverhang": -28,
+      "barVisible": [
+        177,
+        253
+      ],
+      "closeVisible": [
+        191,
+        235
+      ],
+      "bodyHeight": 435
+    }
+  },
+  {
+    "state": "mid",
+    "size": "1440x900",
+    "view": "toast-over-dialog",
+    "findings": [],
+    "toast": {
+      "stackZ": "30",
+      "scrimZ": "40",
+      "panelZ": "auto",
+      "stackRect": [
+        856,
+        757,
+        560,
+        119
+      ],
+      "panelRect": [
+        658,
+        172,
+        760,
+        700
+      ],
+      "overlap": [
+        560,
+        115
+      ],
+      "hitAtOverlap": "anchored-panel"
+    }
+  }
+]

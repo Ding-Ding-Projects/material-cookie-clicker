@@ -10788,6 +10788,369 @@ ul.card-grid {
   }
 }
 
+/* ── CLIPPING AUDIT, SECOND PASS: what the re-measurement found still cut ────────────────────
+ *
+ * The pass above fixed the console cap, the head row at 1000px and the depot's own overflow. Its
+ * report was then re-run against the built app at 1440x900, 1232x860, 1000x720, 900x720 and
+ * 820x700, across the plain, mid and late saves, with every dialog open. These are the findings
+ * that survived it, plus the two the owner photographed that it did not reach. Every number below
+ * is a rect read off the running window, not an estimate.
+ * ---------------------------------------------------------------------------------------- */
+
+/* THE HOLD-TO-CLICK HINT WAS 11px SHORT OF ITS OWN BAND, at every size.
+ *
+ * The hero panel is a fixed band with `overflow: hidden` and its height is the cookie row plus a
+ * hand-added allowance. The allowance was 48px and the two lines under the cookie plus the
+ * panel's own padding and border need 59.3px, so the hint sat at y 545–560 inside a panel that
+ * ended at 549: four pixels of a fifteen-pixel line. Nothing was decorative about it — that line
+ * is where a player is told press-and-hold exists.
+ *
+ * The allowance is now measured rather than guessed: 30px for the two lines (13px and 11px type
+ * at their real line heights), 20px for the panel's padding, 9.4px for its two 4.67px borders,
+ * and 2px of slack so a rounding difference cannot put us back here. The cookie ROW is untouched,
+ * so the cookie's own centre — the thing section 14's contract is about — does not move. */
+.stage__hero-column {
+  --hero-cookie-band: calc(var(--hero-cookie-row) + 62px);
+}
+
+/* THE DEPOT FOOTER WAS CLIPPED OUT OF THE RAIL AT 1000x720.
+ *
+ * Measured: the rail ended at y 663, the depot status card ran 300→698 and its own "Open the
+ * Diesel Factory" button 668→712 — a 44px control forty-nine pixels past the panel that contains
+ * it. `overflow: hidden` on the rail (added by the pass above) stopped it painting outside, which
+ * is why it stopped LOOKING wrong; it did not put the button back on screen.
+ *
+ * The cause is the ladder's 120px floor. `.shop-rail__list` claims 120px come what may, and with
+ * the header furniture above it and the depot below, the three of them wanted 386px of a 363px
+ * rail. The floor is the right idea at rail height and the wrong one when there is no rail height
+ * to floor. The ladder is the one thing in the rail that already has an answer for not having
+ * room — it scrolls, and every rung stays reachable — so the ladder is what yields.
+ *
+ * (`min(120px, 100%)` was tried first and does nothing at all: a percentage min-height resolves
+ * against the rail's own height, so the smaller of the two is always still 120px.)
+ *
+ * The footer, meanwhile, does NOT yield. Two attempts at making it shrink both failed in the same
+ * way, and the measurements are worth keeping because they are the argument for this shape:
+ * shrinking it to a 50% cap put its "Open the Diesel Factory" button past the bottom of the card
+ * instead of past the bottom of the rail, and shrinking it to a 66px floor put the button 58px
+ * below its own card at 1440x900 — the card is a scroller, so anything that makes it shorter than
+ * its contents just moves the button below a different fold. A status card is 166–201px and the
+ * ladder beside it is hundreds; the card keeps its natural height and the ladder pays. */
+.shop-rail__list {
+  min-height: 0;
+}
+
+.shop-rail .diesel-depot--status {
+  flex: 0 0 auto;
+  /* AND THE CAP THAT WAS ACTUALLY CUTTING THE DOOR. The card carries `max-height: 55%` as a
+     "safety valve" so a longer translation cannot let it take over the rail — a good rule, but a
+     percentage of the rail is not a measure of what the card needs. At 1000x720 the rail's body
+     is 287px, so 55% is 158px, the card wants about 180, and the 44px "Open the Diesel Factory"
+     button lands 21px below its own fold inside a card most players will never think to scroll.
+     The valve stays; it simply cannot close tighter than the card's own contents. 190px is that
+     card measured with its heading, its bar, its two figures and its door. */
+  max-height: max(55%, 190px);
+}
+
+/* ...and because 190px of a 349px rail leaves the generator ladder a 28px sliver at 1000x720,
+   which is not a shop either, the card gets SHORTER rather than the ladder getting thinner. On a
+   short window it drops its closing note and its two figures — the litres and the vouchers, both
+   of which are also printed inside the factory panel the card's own button opens — and keeps the
+   three things that make it a status card you can act on: what it is, how full it is, and the
+   door. That is about 120px, and it hands the ladder back a whole generator row. */
+@media (max-height: 800px) {
+  .shop-rail .diesel-depot__figures,
+  .shop-rail .diesel-depot__note {
+    display: none;
+  }
+}
+
+/* THE NARROW DRAWER PUT THE BUY BUTTON OFF THE BOTTOM OF THE WINDOW.
+ *
+ * Below 900px the stage collapses to one column and the rail becomes a row underneath the hero.
+ * Measured at 900x720: that row got 167px, and inside it the ladder ran to y 760, the first row's
+ * Buy button to 749 and the depot card to 808 — all past a 720px window, all invisible behind the
+ * stage's own clip. A shop whose Buy button is not on the screen is not a shop, and no amount of
+ * clipping fixes that; the contents have to be reachable.
+ *
+ * So in the stacked layout the stage scrolls. The hero keeps its band and its place at the top,
+ * the rail sits under it at its natural height with its own furniture intact, and the player
+ * reaches the ladder and the depot by scrolling the stage — which is the ordinary behaviour of a
+ * column of panels too tall for the window. At rail width (>900px) nothing changes: the stage is
+ * still the fixed, non-scrolling two-column floor it has always been. */
+@media (max-width: 900px) {
+  /* WHICH BOX SCROLLS, at a width where nothing fits.
+   *
+   * Making the STAGE the scroller was the first answer and it does not survive a small window:
+   * the cabinet head is legitimately tall down here (a row of readouts, the supplies shelf on its
+   * own row, and the console cluster wrapped onto two), and at 820x700 it took 583px of a 632px
+   * cabinet — which left the stage 26px to scroll 608px of game through. Technically reachable,
+   * genuinely unusable, and it is this lane's own ≤900px rules that made the head that tall.
+   *
+   * So the CABINET scrolls, not the stage. Below the rail breakpoint the whole thing — head,
+   * cookie, shelf and rail — is one column that runs off the bottom of the window and is scrolled
+   * through, which is what the stacked layout has always looked like it wanted to be. Nothing is
+   * clipped, nothing is squeezed into a sliver, and at 901px and up the cabinet is exactly the
+   * fixed, non-scrolling floor it has always been. */
+  .cabinet {
+    overflow-y: auto;
+  }
+
+  .cabinet-body,
+  .stage,
+  .stage__hero-column {
+    min-height: 0;
+    overflow-y: visible;
+  }
+
+  .stage {
+    align-items: start;
+  }
+
+  /* The rail keeps its own internal scroller here rather than unrolling the whole ladder into the
+     page: a stacked rail that grows to its content is a thousand pixels tall with fourteen
+     generators in it, which puts the depot a very long way from the shop it belongs to. It asks
+     instead for enough height to BE a shop — its furniture, a couple of rows, and the footer —
+     and the stage scrolls once for the two panels rather than once for every rung. */
+  /* The rail is sized by what is in it rather than by a number picked to be big enough. Two
+     numbers were tried, 320px and 400px, and both left the depot card hanging a few pixels out of
+     the bottom — a floor has to be re-guessed every time the furniture above it changes, which is
+     exactly how the card ended up outside the rail in the first place. Instead the LADDER is
+     given a ceiling, which is the only part of the rail with unbounded content, and the rail then
+     wraps its own contents exactly. */
+  /* `height: auto` was tried and collapsed the rail to 33px — the rail's body is `flex: 1`, so
+     with no height to divide there is nothing for it to take. It gets a floor instead, and the
+     floor is the sum of what is measured to be inside it: 145px of header furniture, the 220px
+     ladder ceiling below, the 150px depot card under that, and the rail's own padding and border.
+     Anything left over lands in the empty part of the body rather than pushing the card out. */
+  .stage > .shop-rail {
+    min-height: 570px;
+  }
+
+  .shop-rail__list {
+    min-height: 96px;
+    max-height: 220px;
+  }
+
+  /* HERE the supplies shelf does get its own row, and only here. At 1000px giving it one cost
+     107px of cabinet head and moved the cookie, which is why it is not done there; at 900px the
+     shelf is down to a 91px box holding a 138px storage chip, and no amount of scrolling inside a
+     91px shelf makes a 138px control usable. The head is already two rows at this width, so the
+     third costs the layout much less than the control costs the player. */
+  .cabinet-head .hud {
+    flex-wrap: wrap;
+  }
+
+  .cabinet-head .hud > .raid-supplies {
+    flex: 1 0 100%;
+  }
+}
+
+/* THE SUPPLIES SHELF RAN OFF THE RIGHT-HAND EDGE OF THE WINDOW.
+ *
+ * The newest thing in the head row is the raid supplies shop, and it is the one thing in there
+ * with no instruction about what to do when the row runs short. Measured at 900x720: the shelf's
+ * own box was squeezed to 100px wide (769→869) while its head row, its storage chip and its
+ * plates kept their full size and carried on to x 1063 — a hundred and sixty pixels past a
+ * 900px window, with the storage chip's price among the casualties.
+ *
+ * The first attempt at this let the shelf shrink and wrap wherever it liked, and that was worse
+ * than the bug: with no min-content floor left to hold it, the shelf folded into a 200px column
+ * at 1440px too, the cabinet head grew from 232px to 273px and the cookie's centre dropped 42px.
+ * That is precisely the failure section 11 exists to prevent, so the floor stays and the shelf is
+ * given a whole row of its own instead.
+ *
+ * Giving the shelf a whole row of its own was the second attempt, and it was too expensive to
+ * keep: at 1000x720 it took the cabinet head from 228px to 335px and pushed the cookie 107px
+ * down the window, which is a worse thing to do to the layout than the bug it fixed.
+ *
+ * What the shelf actually needs is not more room, it is somewhere for the plates to go. So below
+ * 1260px it may shrink like everything else on that row, and its list of plates becomes a
+ * DECLARED horizontal scroller: every plate is still reachable, at full size, with its price on
+ * it, and the head row keeps exactly the height it had. `overflow: hidden` on the shelf itself is
+ * the guarantee behind that — whatever happens to the row, the shelf cannot paint outside its own
+ * plate and off the edge of the window again. */
+.raid-supplies {
+  overflow: hidden;
+}
+
+@media (max-width: 1260px) {
+  .cabinet-head .hud > .raid-supplies,
+  .raid-supplies__head {
+    min-width: 0;
+  }
+
+  /* The storage chip is NOT one of the things allowed to shrink. Letting it gave a 70px chip
+     holding 117px of "Storage 35,000,000", with the price running 47px out of the shelf and,
+     at 820px, off the window. It keeps its own size and takes a second line instead. */
+  .raid-supplies__storage {
+    flex: 0 0 auto;
+  }
+
+  /* The label the HUD plates print above their figures. At 1000px the plate is 81px and
+     "PER SECOND" wants 87 of them, so the tracking — which is decoration, not information —
+     is what gives way rather than the last two letters of the word. */
+  .hud__key {
+    letter-spacing: 0.01em;
+  }
+
+  /* (Wrapping the head row was tried here too and withdrawn: it is not needed at 1000px, where
+     the chip already fits on one line, and it cost 27px of cabinet head — which came straight out
+     of the shop rail underneath. Below 900px the shelf gets a whole row of its own instead, which
+     gives the chip more room than a wrap ever did.) */
+
+  .raid-supplies__list {
+    min-width: 0;
+    flex-wrap: nowrap;
+    overflow-x: auto;
+    /* Scrolled to, not squashed: a plate keeps its size and the row moves under it. */
+    scrollbar-width: thin;
+  }
+
+  .raid-supplies__list > li,
+  .raid-supplies__buy {
+    flex: 0 0 auto;
+  }
+}
+
+/* ...and with the shelf keeping its contents inside its own box, the prices go back on the
+   plates. The pass above hid them below 1180px to stop them overflowing, but these are BUY
+   controls now — the raid supplies shelf became a real shop in the whack-storage change — and
+   this stylesheet already has a rule about that, thirty lines up: "a price you cannot see is not
+   an offer". Hiding the figure was the one fix in the previous pass that cost the player
+   something, so it is withdrawn rather than kept. */
+@media (max-width: 1180px) {
+  .raid-supplies__price {
+    display: revert;
+  }
+}
+
+/* TWO BUTTON LABELS WERE PRESSED AGAINST THEIR OWN BORDERS.
+ *
+ * Both are block-level buttons, which is what makes this easy to get wrong: their width comes
+ * from the container, so adding horizontal padding does not widen the button, it narrows the room
+ * the label has. The "Open it now" button measured a 72px label in a 71.7px content box after the
+ * previous pass gave it `padding-inline: 14px` — 0.17px INTO its border on each side, slightly
+ * worse than the 1.8px it had before. The factory panel's Buy plate measured a 112px label in a
+ * 112.7px box for the same reason: 22px of padding on a 162px button.
+ *
+ * So the padding comes back down to what a block button can afford, and both labels are allowed
+ * to wrap as the real safety valve — a two-line label is legible and a label sitting on its
+ * border is not, and a longer Cantonese or bilingual string will find this edge again. */
+.open-real-feature__button {
+  padding-inline: 10px;
+  white-space: normal;
+}
+
+/* The coin-slot plates in the title bar print their figure with no room around it at all: every
+   one of the five measured 0.0px of inset on both sides inside an `overflow: hidden` box, so the
+   next digit a price grows would be the one that disappears. Three pixels each side is enough
+   that the plate has somewhere to put it. */
+.coin-slot__price {
+  padding-inline: 3px;
+}
+
+.buy-btn {
+  padding-inline: 12px;
+  white-space: normal;
+}
+
+/* THE TOAST STACK COVERED THE DIALOG THE PLAYER HAD JUST OPENED — the owner's screenshot.
+ *
+ * Measured with the Achievements panel open at 1440x900: the panel occupied 658,321 760x551 and
+ * the toast stack 856,726 560x150, overlapping it by 560x146 — and `elementFromPoint` in the
+ * middle of that overlap returned the TOAST, not the panel. So it was not merely drawn on top,
+ * it was taking the presses aimed at the panel underneath.
+ *
+ * The stack was at z-index 60 against the modal scrim's 40. It moves to 30, below the scrim: an
+ * achievement that lands while a dialog is open now dims behind it with the rest of the game,
+ * exactly like the cabinet does, and is there when the dialog closes. A toast is an
+ * announcement about the game and the game is what the scrim is covering; the dialog is the thing
+ * the player asked for, and nothing unasked-for gets to sit on top of it or take its clicks.
+ *
+ * The screen-reader path is untouched: the toasts' live regions announce on arrival whatever is
+ * painted over them, so nothing about this hides the event from anyone who is not looking. */
+.toast-stack {
+  z-index: 30;
+}
+
+/* THE EVENT COUNTDOWN'S CLOCK WAS BEING CLIPPED BY A BLANKET SELECTOR.
+ *
+ * The pass above narrowed the event indicator below 1180px and put `overflow: hidden` and an
+ * ellipsis on `.event-indicator *` — every descendant, the clock included. Measured at 1000x720
+ * with a Clot running: the "62s" readout was cut inside `.event-indicator__body`.
+ *
+ * Section 11 of this file already decided which part of that indicator yields, and it is not this
+ * one: "Its name ellipsizes; its draining bar and its clock, which are the parts carrying the
+ * actual state, do not shrink at all." The name already has its own ellipsis rule up there, so
+ * the blanket selector is not adding anything the indicator needs — it is only reaching the two
+ * things that were deliberately exempted. The clock and the bar get their exemption back. */
+.event-indicator__time,
+.event-indicator__bar,
+.event-indicator__emblem {
+  overflow: visible;
+  text-overflow: clip;
+}
+
+/* THE CONSOLE CAP LABELS STOPPED OVERFLOWING AND STARTED BREAKING MID-WORD.
+ *
+ * Letting the labels wrap fixed the measured 3.2px overflow on DIESEL FACTORY, which wraps at its
+ * space and looks right. ACHIEVEMENTS has no space to wrap at, so `overflow-wrap: break-word` did
+ * the only other thing it can and split it across the two lines as "ACHIEVEMEN / TS" — visible in
+ * captures/app/clip-before.png. Wrapping was the right idea; breaking words was not.
+ *
+ * Measured in the running app with the cabinet's own display face: ACHIEVEMENTS is 92.1px at
+ * 11px/0.04em and 81.4px at 10px/0.02em, against 82.7px of content inside a 96px cap. So the type
+ * comes down one pixel, the tracking halves — both still far above the 8px the legibility note
+ * further up this file was fixing — and the cap gains four pixels, which puts the longest single
+ * word on one line with 2.6px to spare on each side. The whole console is 879px at eight caps,
+ * which still fits the 939px the cabinet head has at a 1000px window.
+ *
+ * Word breaking is then turned off outright rather than left as a fallback: a cap label that has
+ * to hyphenate is a label that needs a shorter name or a wider cap, and it should show up in the
+ * audit as an overflow rather than hide as a broken word. */
+.console__button {
+  width: 100px;
+}
+
+.console__coin-slot {
+  width: 100px;
+}
+
+.console__button .console__label--legible {
+  font-size: 10px;
+  letter-spacing: 0.02em;
+  overflow-wrap: normal;
+  word-break: normal;
+}
+
+/* Below 900px the cluster cannot have eight full-width caps on one row: the head is 759px at
+   820px and eight 100px caps need 879. This file's existing answer was to shrink the cap to 82px,
+   and shrinking is what does not work — a 71px content box cannot hold ACHIEVEMENTS at any type
+   size this cabinet is willing to print, which is measured: 81.4px at 10px/0.02em, and 71.1px
+   even at 9px with no tracking at all, against a 2px-inset requirement. Below the shrink is the
+   8px the legibility note further up this file exists to have got away from.
+   So the CLUSTER wraps instead of the caps shrinking. Two rows of four keep every label whole and
+   every cap at its full size, and cost about 50px of a cabinet head that is already three rows
+   tall at this width — the same trade the supplies shelf makes twenty lines up, for the same
+   reason: at 820px the layout's problem is width, and height is what there is to spend. */
+@media (max-width: 900px) {
+  .console {
+    flex-wrap: wrap;
+    justify-content: flex-end;
+    /* `flex-wrap` alone did nothing: the cluster is `flex: 0 0 auto` on the head, so it sizes to
+       its own contents and there is never a width for it to wrap against. Measured at 820px it
+       stayed one 774px row inside a 759px head. It has to be allowed to be narrower than it wants
+       before wrapping means anything. */
+    flex: 0 1 auto;
+    max-width: 100%;
+  }
+
+  .console__button,
+  .console__coin-slot {
+    width: 100px;  }
+}
+
 /* ============================================================================================
  * THE PLAIN LAYER
  *

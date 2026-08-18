@@ -6441,9 +6441,6 @@ ul.card-grid {
   position: absolute;
   left: var(--drop-x, 50%);
   top: 0;
-  width: 48px;
-  height: 48px;
-  margin: 0 0 0 -24px;
   padding: 0;
   display: grid;
   place-items: center;
@@ -6453,7 +6450,14 @@ ul.card-grid {
   border-radius: 50%;
   background: var(--primary-container);
   box-shadow: 0 3px 0 0 var(--cabinet-frame-dark);
-  animation: event-drop-fall 3.4s linear var(--drop-delay, 0s) infinite;
+  /* 3.4s was uncatchable ("cookie rain is uncatchable, make it slower") — a 48px target crossing
+     the stage in under four seconds while the pointer is elsewhere is a reflex test, not a treat.
+     7s gives roughly two full seconds inside comfortable reach per drop, and the 20s event window
+     still cycles every drop twice. Targets are also bigger: 56px disc, 64px hit area. */
+  animation: event-drop-fall 7s linear var(--drop-delay, 0s) infinite;
+  width: 56px;
+  height: 56px;
+  margin: 0 0 0 -28px;
 }
 
 .event-drop__art {

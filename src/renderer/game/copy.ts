@@ -158,6 +158,11 @@ export const EVENT_EXTRA_COPY = {
     en: `Order ${position} — not this one yet`,
     yue: `第 ${position} 張單——仲未到佢`,
   }),
+  catchCrumb: (left: number, total: number): Bilingual => ({
+    en: `Pick up a glowing crumb (${left} of ${total} left)`,
+    yue: `執起粒發光嘅餅碎（仲有 ${left} / ${total}）`,
+  }),
+  catchComet: { en: "Catch the crumb comet — one chance", yue: "接住嗰粒餅碎彗星——得一次機會" },
   chooseLabel: { en: "Taste test — pick one", yue: "試味——揀一樣" },
   chooseServe: (amount: string): Bilingual => ({
     en: `Serve it now — ${amount} cookies straight away`,
@@ -183,6 +188,48 @@ export const EVENT_EXTRA_COPY = {
     yue: "唔撳嘅話好抵；不過天光之前，撳一下淨係值四分一。",
   },
   frenzyNote: { en: "This is the good weather. Spend it.", yue: "難得順風。好好用佢。" },
+  eclipseNote: {
+    en: "The stage has gone dark. Five crumbs are still glowing — everything you read stays lit.",
+    yue: "個台暗晒。五粒餅碎仲喺度發光——你要睇嘅字冇暗過。",
+  },
+  cometNote: { en: "One pass, one chance. Miss it and it is gone.", yue: "得一次機會。接唔到就冇。" },
+  bakersDozenNote: {
+    en: "One cookie in every thirteen you spend comes straight back. Prices are unchanged.",
+    yue: "你每花十三粒就有一粒返返嚟。啲價錢冇變過。",
+  },
+  staticClingNote: {
+    en: "Clicks only. Production is untouched — put the mouse down and wait it out.",
+    yue: "淨係影響撳。產量冇變——放低隻滑鼠等佢過。",
+  },
+  conventionNote: {
+    en: "Grandmas and farms only. Worth exactly as much as you own of them.",
+    yue: "淨係婆婆同農場。你有幾多就值幾多。",
+  },
+  overtimeNote: {
+    en: "Speeds up a room being built. If nothing is under construction, this one does nothing.",
+    yue: "加快起緊嘅房間。如果冇嘢起緊，今次就真係乜都唔會發生。",
+  },
+} as const;
+
+/**
+ * DOUBLE AND TRIPLE EVENTS: the headline, and the plate that counts them.
+ *
+ * The headline is deliberately the loudest copy in the game, exclamation mark and all, because a
+ * double event happens about once every four hours and a triple about once a day of play. It is
+ * the one moment where shouting is proportionate — and it is followed immediately by the NAMES,
+ * not by adjectives, so the announcement is still a statement of what is happening.
+ */
+export const STACK_HEADLINE = {
+  double: { en: "DOUBLE EVENT!", yue: "雙重事件！" },
+  triple: { en: "TRIPLE EVENT!", yue: "三重事件！" },
+} as const satisfies Record<string, Bilingual>;
+
+export const STACK_COPY = {
+  /** The HUD group's accessible name when more than one event is running. */
+  stackLabel: (count: number): Bilingual => ({
+    en: `${count} events running at once`,
+    yue: `同時有 ${count} 個事件`,
+  }),
 } as const;
 
 /**

@@ -72,6 +72,50 @@ retaken after the panel settled.
 | `golden-puzzle.png` | The Odd Cookie Out card the catch opens, on `Round 1 of 3`, over the dimmed window: sixteen near-identical tiles in a four-by-four grid, and a `Let it go` button. The tiles are anonymous to a screen reader as well as to the eye — each is named only `Cookie tile 1` through `16`, so the accessible name cannot give the answer away. |
 | `event-sugar-rush.png` | A **Sugar Rush** five seconds from the end of it: an amber event plate in the HUD with a sun glyph, a draining bar and a `5s` countdown, and a marquee card in the corner saying in plain words what it does — every click lands seven times as hard. Worth a second look for a layout reason as well: the event plate pushed the eight console buttons onto a row of their own, and in that wider HUD the raid-supplies shelf prints all three plates whole. |
 
+### The wave-two events set
+
+Two images from one session on the off-screen desktop `EventsWave2Capture`, both
+opened and looked at afterwards. They are the evidence for double events and for
+the six events that shipped alongside them.
+
+| File | What it shows |
+| --- | --- |
+| `events-double.png` | **A double event** — two pool events drawn in one spawn and running at once, which the scheduler could not do before this lane. Two stacked plates in the HUD where one used to sit: a red `Clot` at `62s` and a green `Market Day` at `56s`, both with their countdown bars dropped to fit and their seconds kept. The marquee reads `DOUBLE EVENT! Clot + Market Day` and carries both emblems. The proof the Clot is really running is on the `PER SECOND` plate: `7,151,000,150`, exactly half the `14,302,000,300` the same seeded save shows in the frame below. |
+| `event-cookie-eclipse.png` | **A Cookie Eclipse**, twelve seconds from the end: the cookie panel dark, five haloed crumbs scattered across it, and every readable figure in the window — the HUD, the whole shop column, every price on the upgrade shelf — at its ordinary contrast. |
+
+**How these were taken.** From the built `dist/`, launched by the real `electron`
+binary onto an off-screen Windows desktop named `EventsWave2Capture`, on its own
+debugging port (9758) and its own throwaway `--user-data-dir`, with the page
+target's URL verified as this worktree's `dist/renderer/index.html` before
+anything else happened. The window was maximised through the application's own
+title-bar API (2582x1550 device pixels at 144 DPI) and both images are Win32
+`PrintWindow` captures of that one window, resolved by handle from the headless
+desktop's own window list. Only one application window was alive on that desktop
+at a time, for the reason stated further down.
+
+**How the shutter was timed, and the one thing that was driven.** Both events last
+seconds, so the run polls the DOM over the devtools connection and only fires the
+shutter once the real state is on screen — five crumbs present, or two indicator
+plates and a stacked marquee with at least twenty-five seconds left on both. The
+marquee itself dismisses after six seconds unless a pointer is over it **or focus
+is inside it**, which is a shipped WCAG 2.2.1 behaviour rather than a capture
+hack; the run moves focus to the marquee's own `Dismiss` button, exactly as a
+keyboard user would, to hold the card open. That focus is real and is why the
+button carries a focus ring in both frames. Nothing else was pressed, and no
+state was written except the seeded save and the developer key.
+
+**Three frames were thrown away, and looking is what threw them away.** The first
+`event-cookie-eclipse.png` came back with every price in the shop dimmed — the
+event's scrim had been put on the event stage, which turns out to span the upgrade
+shelf as well as the cookie panel, so an event whose own copy promises that
+everything you read stays lit was making the shop hard to read. The second
+confined the darkness correctly but still scattered one glowing crumb onto the
+brightly lit shop rail, outside the picture it was supposed to be part of. And the
+first `events-double.png` read `Night Shift38s` on its plates: hiding the
+countdown bar to make two plates fit had also removed the only thing separating
+the event's name from its remaining seconds. All three were fixed in the source
+and re-shot; none of them would have been found by reading the code.
+
 **What was seeded, and what was bought.** One image, `plain-start.png`, is an
 untouched fresh profile: nothing seeded, nothing pressed. `plain-upgrading.png` starts from a save carrying 400 cookies and
 a lifetime total of 400 — deliberately under the 1,000-cookie grandfather
@@ -111,11 +155,15 @@ taken with `material-cookie-clicker:golden:fast` set in a throwaway profile,
 which shortens the five-to-fifteen-minute spawn schedule and lengthens the
 window enough to photograph. `event-sugar-rush.png` was taken with
 `material-cookie-clicker:events:fast` set to `event:sugar_rush`, which shortens
-the pool's schedule and pins the draw to one event. Both keys change **when**
-something happens and nothing else: the event that lands is the real event, with
-its real duration, its real arithmetic and the real one-event-at-a-time rule,
-and the golden's spawn position and the puzzle's odd tile are the scheduler's
-and the PRNG's own choices. There is no button and no settings row that reaches
+the pool's schedule and pins the draw to one event; the same key was set to
+`stack:2` for `events-double.png` and to `event:cookie_eclipse` for
+`event-cookie-eclipse.png`. Every one of these keys changes **when** something
+happens, or **which** of the real events it is, and nothing else: the event that
+lands is the real event, with its real duration, its real arithmetic and the real
+compatibility rules, and the golden's spawn position and the puzzle's odd tile are
+the scheduler's and the PRNG's own choices. `stack:2` in particular does not relax
+the matrix — it asks the draw to fill two slots, and which two events land is the
+ordinary weighted draw refusing every pair the rules forbid. There is no button and no settings row that reaches
 either key, and a player who never sets one never leaves the shipped timing.
 
 **The toasts, and why one is in shot.** A save producing fourteen billion cookies

@@ -72,7 +72,7 @@ function activeEvent(id: RandomEventId, startedAtEpochMs = 0): ActiveRandomEvent
 function withActive(state: GameState, id: RandomEventId, startedAtEpochMs = 0): GameState {
   return {
     ...state,
-    randomEvents: { ...createInitialRandomEventsState(), active: activeEvent(id, startedAtEpochMs) },
+    randomEvents: { ...createInitialRandomEventsState(), actives: [activeEvent(id, startedAtEpochMs)] },
   };
 }
 
@@ -117,11 +117,11 @@ function simulate(
     state = tickRandomEvents(state, gameState, now, rng, { blocked, config }).randomEvents;
 
     if (state.spawnCount > before.spawnCount) {
-      const id = state.active?.id ?? state.lastResolved!.id;
+      const id = state.actives[0]?.id ?? state.lastResolved!.id;
       // An instant event spawns and resolves in the same tick.
-      log.push({ id, spawnedAt: now, resolvedAt: state.active ? Number.NaN : now });
-      openIndex = state.active ? log.length - 1 : -1;
-    } else if (before.active !== null && state.active === null && openIndex >= 0) {
+      log.push({ id, spawnedAt: now, resolvedAt: state.actives.length > 0 ? Number.NaN : now });
+      openIndex = state.actives.length > 0 ? log.length - 1 : -1;
+    } else if (before.actives.length > 0 && state.actives.length === 0 && openIndex >= 0) {
       log[openIndex] = { ...log[openIndex], resolvedAt: now };
       openIndex = -1;
     }
@@ -132,12 +132,12 @@ function simulate(
 /* --------------------------------------------------------------------------- the pool */
 
 describe("random events: the pool", () => {
-  it("has sixteen distinct events, each with a real effect", () => {
+  it("has twenty-two distinct events, each with a real effect", () => {
     // Six when this module shipped, sixteen after the frenzy class and the five events designed
-    // alongside it. The count is asserted rather than derived so that adding an event to the
-    // pool is always a deliberate act with a test to update.
-    expect(RANDOM_EVENT_DEFINITIONS).toHaveLength(16);
-    expect(new Set(RANDOM_EVENT_DEFINITIONS.map((d) => d.id)).size).toBe(16);
+    // alongside it, twenty-two after the second wave. The count is asserted rather than derived
+    // so that adding an event to the pool is always a deliberate act with a test to update.
+    expect(RANDOM_EVENT_DEFINITIONS).toHaveLength(22);
+    expect(new Set(RANDOM_EVENT_DEFINITIONS.map((d) => d.id)).size).toBe(22);
     for (const def of RANDOM_EVENT_DEFINITIONS) {
       const hasEffect =
         def.cpsMultiplier !== 1 ||
@@ -145,6 +145,12 @@ describe("random events: the pool", () => {
         def.rebateFraction !== 0 ||
         def.targetCount > 0 ||
         def.shape === "instant" ||
+        // The second wave added two events whose effect is not a multiplier on this definition
+        // at all: one surges named GENERATORS and one speeds up a named SUBGAME. Both reach
+        // outwards by id string, so "does this event do anything" has to ask about those too —
+        // and a surge or a hook with no multiplier beside it really would do nothing.
+        (def.surgeGeneratorIds !== undefined && (def.surgeMultiplier ?? 1) !== 1) ||
+        (def.subgameSpeedId !== undefined && (def.subgameSpeedMultiplier ?? 1) !== 1) ||
         // A choice event's effect is whichever answer the player presses, so its own definition
         // carries multipliers of one. `chooseRandomEventOption` is where its arithmetic lives
         // and there are tests for both of its branches further down.
@@ -156,17 +162,24 @@ describe("random events: the pool", () => {
     }
   });
 
-  it("includes three setbacks, so the pool is not all upside", () => {
-    // One when the pool was six events; three now. Every one of them costs PRODUCTION and
-    // nothing else — no event in the common pool touches the balance, which is what keeps the
-    // Mouse Raid the only thing in the game that can take cookies you already have.
+  it("includes four setbacks, so the pool is not all upside", () => {
+    // One when the pool was six events; four now. Not one of them touches the BALANCE, which is
+    // what keeps the Mouse Raid the only thing in the game that can take cookies you already
+    // have — but they no longer all cost production. Static Cling costs clicks instead, so the
+    // assertion is "costs the player something", stated as a multiplier below one on one axis
+    // or the other, rather than the narrower claim the pool used to be able to make.
     expect(RANDOM_EVENT_DEFINITIONS.filter((d) => d.isSetback).map((d) => d.id)).toEqual([
       "oven_hiccup",
       "clot",
       "flour_shortage",
+      "static_cling",
     ]);
     for (const def of RANDOM_EVENT_DEFINITIONS.filter((d) => d.isSetback)) {
-      expect(def.cpsMultiplier, `${def.id} claims to be a setback`).toBeLessThan(1);
+      expect(
+        def.cpsMultiplier < 1 || def.clickMultiplier < 1,
+        `${def.id} claims to be a setback but costs nothing`,
+      ).toBe(true);
+      expect(def.rebateFraction, `${def.id} is a setback that also pays a rebate`).toBe(0);
     }
   });
 
@@ -184,7 +197,7 @@ describe("random events: scheduler determinism", () => {
   it("replays exactly from the same seed", () => {
     const a = simulate(1234, FAST_RANDOM_EVENT_CONFIG, 10 * 60 * 1000);
     const b = simulate(1234, FAST_RANDOM_EVENT_CONFIG, 10 * 60 * 1000);
-    expect(a.length).toBeGreaterThan(20);
+    expect(a.length).toBeGreaterThan(10);
     expect(b).toEqual(a);
   });
 
@@ -196,7 +209,7 @@ describe("random events: scheduler determinism", () => {
 
   it("never has two events running at once", () => {
     const log = simulate(99, FAST_RANDOM_EVENT_CONFIG, 30 * 60 * 1000);
-    expect(log.length).toBeGreaterThan(50);
+    expect(log.length).toBeGreaterThan(30);
     for (let i = 1; i < log.length; i += 1) {
       expect(log[i].spawnedAt).toBeGreaterThanOrEqual(log[i - 1].resolvedAt);
     }
@@ -242,7 +255,7 @@ describe("random events: scheduler determinism", () => {
       state = tickRandomEvents(state, gameState, now, rng, { blocked: true, config: FAST_RANDOM_EVENT_CONFIG }).randomEvents;
     }
     expect(state.spawnCount).toBe(0);
-    expect(state.active).toBeNull();
+    expect(state.actives).toHaveLength(0);
   });
 
   it("returns the identical state object when a tick changes nothing", () => {
@@ -348,9 +361,9 @@ describe("random events: clicking targets", () => {
     const result = clickRandomEventTarget(game.randomEvents, game, "rain:3", 1_000, fixedRng(0.5));
     expect(result.claimed).toBe(true);
     expect(bnToNumber(result.bonus)).toBeCloseTo(bnToNumber(rainDropPayout(game)), 4);
-    expect(result.randomEvents.active?.pendingTargetIds).not.toContain("rain:3");
-    expect(result.randomEvents.active?.pendingTargetIds).toHaveLength(11);
-    expect(result.randomEvents.active?.claimedCount).toBe(1);
+    expect(result.randomEvents.actives[0]?.pendingTargetIds).not.toContain("rain:3");
+    expect(result.randomEvents.actives[0]?.pendingTargetIds).toHaveLength(11);
+    expect(result.randomEvents.actives[0]?.claimedCount).toBe(1);
   });
 
   it("refuses a drop that has already been caught, so a double click cannot pay twice", () => {
@@ -375,7 +388,7 @@ describe("random events: clicking targets", () => {
     for (let i = 0; i < 12; i += 1) {
       events = clickRandomEventTarget(events, game, `rain:${i}`, 1_000, fixedRng(0.5)).randomEvents;
     }
-    expect(events.active).toBeNull();
+    expect(events.actives).toHaveLength(0);
     expect(events.lastResolved).toEqual({
       id: "cookie_rain",
       resolvedAtEpochMs: 1_000,
@@ -390,7 +403,7 @@ describe("random events: clicking targets", () => {
     const result = clickRandomEventTarget(game.randomEvents, game, "oven:fix", 5_000, fixedRng(0.5));
     expect(result.claimed).toBe(true);
     expect(bnToNumber(result.bonus)).toBe(0);
-    expect(result.randomEvents.active).toBeNull();
+    expect(result.randomEvents.actives).toHaveLength(0);
     expect(result.randomEvents.lastResolved?.endedEarly).toBe(true);
     expect(randomEventCpsMultiplier(result.randomEvents, 5_000)).toBe(1);
   });
@@ -408,16 +421,18 @@ describe("random events: configuration and persistence", () => {
   });
 
   it("keeps the shipped window measured in minutes, not seconds", () => {
-    // Widened from three-to-ten when the pool grew from six events to sixteen: more faces in
-    // the bag is supposed to make each one rarer, not make the session busier.
-    expect(DEFAULT_RANDOM_EVENT_CONFIG.minDelayMs).toBe(4 * 60 * 1000);
-    expect(DEFAULT_RANDOM_EVENT_CONFIG.maxDelayMs).toBe(12 * 60 * 1000);
+    // Widened twice: from three-to-ten when the pool grew to sixteen events, and again to
+    // four-and-a-half-to-thirteen-and-a-half when it grew to twenty-two AND spawns started
+    // arriving in stacks. More faces in the bag is supposed to make each one rarer, not make
+    // the session busier.
+    expect(DEFAULT_RANDOM_EVENT_CONFIG.minDelayMs).toBe(4.5 * 60 * 1000);
+    expect(DEFAULT_RANDOM_EVENT_CONFIG.maxDelayMs).toBe(13.5 * 60 * 1000);
     expect(DEFAULT_RANDOM_EVENT_CONFIG.cooldownMs).toBeGreaterThan(0);
   });
 
   it("round-trips its own state through the save seam", () => {
     const state: RandomEventsState = {
-      active: activeEvent("cookie_rain", 4_000),
+      actives: [activeEvent("cookie_rain", 4_000)],
       nextEligibleAtEpochMs: 900_000,
       rngStreamIndex: 17,
       lastResolved: { id: "sugar_rush", resolvedAtEpochMs: 3_000, claimedCount: 0, endedEarly: false },
@@ -484,7 +499,7 @@ describe("random events: through the reducer", () => {
     const game = withActive(producingState({ cookies: bnFromNumber(0) }), "cookie_rain");
     const next = applyGameAction(game, { type: "randomEventClick", targetId: "rain:0" }, ctxAt(1_000));
     expect(bnToNumber(next.cookies)).toBeCloseTo(bnToNumber(rainDropPayout(game)), 4);
-    expect(next.randomEvents.active?.pendingTargetIds).toHaveLength(11);
+    expect(next.randomEvents.actives[0]?.pendingTargetIds).toHaveLength(11);
   });
 
   it("is a no-op for a click on a target that is not there", () => {
@@ -530,7 +545,7 @@ describe("random events: through the reducer", () => {
       sawSpawn = state.randomEvents.spawnCount > 0;
     }
     expect(sawSpawn).toBe(true);
-    expect(state.randomEvents.active !== null || state.randomEvents.lastResolved !== null).toBe(true);
+    expect(state.randomEvents.actives.length > 0 || state.randomEvents.lastResolved !== null).toBe(true);
   });
 });
 
@@ -578,9 +593,9 @@ function simulateRaids(
       config,
     }).randomEvents;
 
-    if (before.active?.id !== "mouse_raid" && state.active?.id === "mouse_raid") {
-      open = { spawnedAt: now, mice: state.active.pendingTargetIds.length };
-    } else if (open && before.active?.id === "mouse_raid" && state.active === null) {
+    if (before.actives[0]?.id !== "mouse_raid" && state.actives[0]?.id === "mouse_raid") {
+      open = { spawnedAt: now, mice: state.actives[0]!.pendingTargetIds.length };
+    } else if (open && before.actives[0]?.id === "mouse_raid" && state.actives.length === 0) {
       log.push({ ...open, resolvedAt: now });
       open = null;
     }
@@ -713,7 +728,11 @@ describe("mouse raid: the schedule", () => {
     // Deferred, not re-rolled: the same run visible again raids on the first eligible tick.
     const rng = createSplitMix32Rng(12);
     const gameState = raidableState();
-    let state = createInitialRandomEventsState();
+    // The pool is pushed out of the way explicitly rather than relied upon to stay quiet. The
+    // raid-capture config lengthens the pool's WINDOW but a fresh state is eligible at t=0, so
+    // without this the very first tick draws a pool event and the thing under test — whether a
+    // RAID fires against a hidden window — never gets a chance to happen either way.
+    let state = { ...createInitialRandomEventsState(), nextEligibleAtEpochMs: 10 * 60 * 60 * 1000 };
     for (let now = 0; now <= 60_000; now += 200) {
       state = tickRandomEvents(state, gameState, now, rng, {
         blocked: false,
@@ -721,7 +740,7 @@ describe("mouse raid: the schedule", () => {
         config: RAID_CAPTURE_EVENT_CONFIG,
       }).randomEvents;
     }
-    expect(state.active).toBeNull();
+    expect(state.actives).toHaveLength(0);
     expect(state.raidNextEligibleAtEpochMs).toBeLessThanOrEqual(60_000);
 
     const next = tickRandomEvents(state, gameState, 60_200, rng, {
@@ -729,7 +748,7 @@ describe("mouse raid: the schedule", () => {
       hidden: false,
       config: RAID_CAPTURE_EVENT_CONFIG,
     }).randomEvents;
-    expect(next.active?.id).toBe("mouse_raid");
+    expect(next.actives[0]?.id).toBe("mouse_raid");
   });
 
   it("never raids a player holding less than a thousand cookies", () => {
@@ -737,15 +756,21 @@ describe("mouse raid: the schedule", () => {
     expect(simulateRaids(13, RAID_CAPTURE_EVENT_CONFIG, 60 * 60 * 1000, { gameState: broke })).toEqual([]);
   });
 
-  it("never lands on top of another event, because it takes the same active slot", () => {
+  it("never lands on top of another event, because a spawn needs a clear stage", () => {
     const both: RandomEventConfig = { ...RAID_CAPTURE_EVENT_CONFIG, minDelayMs: 2_000, maxDelayMs: 6_000 };
     const rng = createSplitMix32Rng(2027);
     const gameState = raidableState();
     let state = createInitialRandomEventsState();
     for (let now = 0; now <= 60 * 60 * 1000; now += 200) {
       const next = tickRandomEvents(state, gameState, now, rng, { blocked: false, config: both }).randomEvents;
-      // A spawn may only ever happen into an empty slot.
-      if (next.active !== null && state.active !== null) expect(next.active).toBe(state.active);
+      // NOTHING IS EVER ADDED TO A LIST THAT IS ALREADY BUSY. A stack is drawn whole, at one
+      // instant, into an empty list; members only ever LEAVE a non-empty one. So on any tick
+      // where the list was already occupied, every event still running must be one that was
+      // already there — which is a stronger and more useful statement than the old "the slot
+      // did not change", because it survives a member of a triple expiring on its own.
+      if (state.actives.length > 0) {
+        for (const event of next.actives) expect(state.actives).toContain(event);
+      }
       state = next;
     }
     expect(state.raidCount).toBeGreaterThan(0);
@@ -786,7 +811,7 @@ describe("mouse raid: the schedule", () => {
     expect(miceRemaining(scheduled)).toBe(0);
     expect(remainingMs(scheduled, 0)).toBe(0);
     expect(remainingFraction(scheduled, 0)).toBe(0);
-    expect(scheduled.active).toBeNull();
+    expect(scheduled.actives).toHaveLength(0);
     expect(scheduled.lastRaid).toBeNull();
   });
 });
@@ -840,13 +865,15 @@ describe("mouse raid: whacking", () => {
     return {
       ...createInitialRandomEventsState(),
       raidNextEligibleAtEpochMs: 10_000_000,
-      active: {
-        id: "mouse_raid",
-        startedAtEpochMs,
-        endsAtEpochMs: startedAtEpochMs + MOUSE_RAID_DEFINITION.durationMs,
-        pendingTargetIds: mouseTargetIds(mice),
-        claimedCount: 0,
-      },
+      actives: [
+        {
+          id: "mouse_raid",
+          startedAtEpochMs,
+          endsAtEpochMs: startedAtEpochMs + MOUSE_RAID_DEFINITION.durationMs,
+          pendingTargetIds: mouseTargetIds(mice),
+          claimedCount: 0,
+        },
+      ],
     };
   }
 
@@ -857,7 +884,7 @@ describe("mouse raid: whacking", () => {
     expect(first.claimed).toBe(true);
     expect(bnToNumber(first.bonus)).toBe(0);
     expect(miceRemaining(first.randomEvents)).toBe(2);
-    expect(first.randomEvents.active?.claimedCount).toBe(1);
+    expect(first.randomEvents.actives[0]?.claimedCount).toBe(1);
     state = first.randomEvents;
 
     const second = clickRandomEventTarget(state, game, "mouse:1", 1_200, fixedRng(0.5));
@@ -875,7 +902,7 @@ describe("mouse raid: whacking", () => {
 
     expect(last.claimed).toBe(true);
     expect(bnToNumber(last.bonus)).toBeCloseTo(bnToNumber(mouseRaidDefenceReward(game)), 3);
-    expect(last.randomEvents.active).toBeNull();
+    expect(last.randomEvents.actives).toHaveLength(0);
     expect(last.randomEvents.lastRaid).toMatchObject({
       defended: true,
       miceTotal: 3,
@@ -917,7 +944,7 @@ describe("mouse raid: whacking", () => {
     // Three of five escaped: 80% x 3/5 = 48%.
     expect(bnToNumber(result.raidTheft!.stolen)).toBeCloseTo(480_000, 2);
     expect(result.randomEvents.lastRaid).toEqual(result.raidTheft);
-    expect(result.randomEvents.active).toBeNull();
+    expect(result.randomEvents.actives).toHaveLength(0);
   });
 
   it("clears the finished-raid record on demand, and is a no-op when there is none", () => {
@@ -985,13 +1012,15 @@ describe("mouse raid: through the reducer", () => {
       randomEvents: {
         ...createInitialRandomEventsState(),
         raidNextEligibleAtEpochMs: 10_000_000,
-        active: {
-          id: "mouse_raid",
-          startedAtEpochMs: 0,
-          endsAtEpochMs: MOUSE_RAID_DEFINITION.durationMs,
-          pendingTargetIds: mouseTargetIds(mice),
-          claimedCount: 0,
-        },
+        actives: [
+          {
+            id: "mouse_raid",
+            startedAtEpochMs: 0,
+            endsAtEpochMs: MOUSE_RAID_DEFINITION.durationMs,
+            pendingTargetIds: mouseTargetIds(mice),
+            claimedCount: 0,
+          },
+        ],
       },
     };
   }
@@ -1035,7 +1064,7 @@ describe("mouse raid: through the reducer", () => {
     }
     expect(bnToNumber(state.cookies)).toBeCloseTo(1_000_000 + reward, 2);
     expect(state.randomEvents.lastRaid?.defended).toBe(true);
-    expect(state.randomEvents.active).toBeNull();
+    expect(state.randomEvents.actives).toHaveLength(0);
   });
 
   it("is a no-op for a whack that is not aimed at a mouse that is there", () => {
@@ -1076,7 +1105,7 @@ describe("mouse raid: through the reducer", () => {
     const state = stateWithRaid(4, 1_000_000);
     const decoded = decodeRandomEvents(encodeRandomEvents(state.randomEvents));
     expect(decoded).toEqual(state.randomEvents);
-    expect(decoded.active?.pendingTargetIds).toEqual(["mouse:0", "mouse:1", "mouse:2", "mouse:3"]);
+    expect(decoded.actives[0]?.pendingTargetIds).toEqual(["mouse:0", "mouse:1", "mouse:2", "mouse:3"]);
   });
 
   /* ----------------------------------------------------------- a raid that outlived the app */
@@ -1104,7 +1133,7 @@ describe("mouse raid: through the reducer", () => {
     expect(stolen).toBeCloseTo(1_000_000 * 0.8, 0);
     const offline = bnToNumber(totalCps(saved)) * (8 * 60 * 60) * 0.5;
     expect(bnToNumber(imported.cookies)).toBeCloseTo(1_000_000 * 0.2 + offline, 0);
-    expect(imported.randomEvents.active).toBeNull();
+    expect(imported.randomEvents.actives).toHaveLength(0);
   });
 
   it("leaves a raid still inside its window alone when the save is reloaded straight away", () => {
@@ -1120,7 +1149,7 @@ describe("mouse raid: through the reducer", () => {
       },
       ctxAt(1_000),
     );
-    expect(imported.randomEvents.active?.id).toBe("mouse_raid");
+    expect(imported.randomEvents.actives[0]?.id).toBe("mouse_raid");
     expect(bnToNumber(imported.cookies)).toBeCloseTo(1_000_000, 4);
   });
 });
@@ -1145,7 +1174,7 @@ describe("random events: what a sidecar decode refuses to throw away", () => {
 
   it("stamps its own version on the way out and reads a version-less sidecar as version one", () => {
     const encoded = encodeRandomEvents(stocked()) as unknown as Record<string, unknown>;
-    expect(encoded.sidecarVersion).toBe(1);
+    expect(encoded.sidecarVersion).toBe(2);
 
     const { sidecarVersion: _dropped, ...older } = encoded;
     expect(decodeRandomEvents(older)).toEqual(stocked());
@@ -1179,7 +1208,7 @@ describe("random events: what a sidecar decode refuses to throw away", () => {
     const decoded = decodeRandomEvents(mangled);
     expect(decoded.consumables).toEqual(stocked().consumables);
     // The schedule is genuinely gone, and that is fine: it regenerates on the next tick.
-    expect(decoded.active).toBeNull();
+    expect(decoded.actives).toHaveLength(0);
     expect(decoded.spawnCount).toBe(0);
   });
 

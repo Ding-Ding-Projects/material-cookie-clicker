@@ -80,7 +80,7 @@ function activeOf(id: RandomEventId, startedAtEpochMs = 0, extra: Partial<Active
 }
 
 function eventsWith(active: ActiveRandomEvent): RandomEventsState {
-  return { ...createInitialRandomEventsState(), active };
+  return { ...createInitialRandomEventsState(), actives: [active] };
 }
 
 function withActive(state: GameState, id: RandomEventId, startedAtEpochMs = 0): GameState {
@@ -168,7 +168,7 @@ describe("the frenzy class: weights and rarity", () => {
 
   it("keeps the events that cost something a clear minority of the bag", () => {
     const setbackWeight = RANDOM_EVENT_DEFINITIONS.filter((d) => d.isSetback).reduce((s, d) => s + d.weight, 0);
-    expect(setbackWeight).toBe(13);
+    expect(setbackWeight).toBe(15);
     expect(setbackWeight / POOL_WEIGHT_TOTAL).toBeLessThan(0.2);
   });
 
@@ -199,7 +199,7 @@ describe("the frenzy class: weights and rarity", () => {
       const before = state;
       state = tickRandomEvents(state, gameState, now, rng, { blocked: false, config }).randomEvents;
       if (state.spawnCount > before.spawnCount) {
-        const id = state.active?.id ?? state.lastResolved!.id;
+        const id = state.actives[0]?.id ?? state.lastResolved!.id;
         if (id !== "mouse_raid") {
           counts.set(id, (counts.get(id) ?? 0) + 1);
           seen += 1;
@@ -230,8 +230,8 @@ describe("the frenzy class: weights and rarity", () => {
         blocked: false,
         config: FAST_RANDOM_EVENT_CONFIG,
       }).randomEvents;
-      if (state.active !== null && before.active === null) active += 1;
-      if (state.active === null && before.active !== null) active -= 1;
+      if (state.actives.length > 0 && before.actives.length === 0) active += 1;
+      if (state.actives.length === 0 && before.actives.length > 0) active -= 1;
       expect(active).toBeLessThanOrEqual(1);
     }
   });
@@ -365,15 +365,15 @@ describe("the frenzy class: stacking rules", () => {
 describe("Combo Window", () => {
   it("extends by one step per click and never past its ceiling", () => {
     let state = eventsWith(activeOf("combo_window", 0));
-    const originalEnd = state.active!.endsAtEpochMs;
+    const originalEnd = state.actives[0]!.endsAtEpochMs;
 
     state = extendComboWindow(state, 1_000);
-    expect(state.active!.endsAtEpochMs).toBe(originalEnd + COMBO_EXTEND_MS);
-    expect(state.active!.claimedCount).toBe(1);
+    expect(state.actives[0]!.endsAtEpochMs).toBe(originalEnd + COMBO_EXTEND_MS);
+    expect(state.actives[0]!.claimedCount).toBe(1);
 
     // Hammer it far past the ceiling; the window stops exactly at the ceiling.
     for (let i = 0; i < 500; i += 1) state = extendComboWindow(state, 2_000);
-    expect(state.active!.endsAtEpochMs).toBe(COMBO_MAX_DURATION_MS);
+    expect(state.actives[0]!.endsAtEpochMs).toBe(COMBO_MAX_DURATION_MS);
   });
 
   it("is a no-op — the same object — when no combo is running or the window has closed", () => {
@@ -391,11 +391,11 @@ describe("Combo Window", () => {
     const base = producingState();
     const combo = withActive(base, "combo_window", 0);
     const after = applyGameAction(combo, { type: "click" }, ctxAt(1_000));
-    expect(after.randomEvents.active!.endsAtEpochMs).toBe(combo.randomEvents.active!.endsAtEpochMs + COMBO_EXTEND_MS);
+    expect(after.randomEvents.actives[0]!.endsAtEpochMs).toBe(combo.randomEvents.actives[0]!.endsAtEpochMs + COMBO_EXTEND_MS);
 
     const frenzy = withActive(base, "production_frenzy", 0);
     const unchanged = applyGameAction(frenzy, { type: "click" }, ctxAt(1_000));
-    expect(unchanged.randomEvents.active!.endsAtEpochMs).toBe(frenzy.randomEvents.active!.endsAtEpochMs);
+    expect(unchanged.randomEvents.actives[0]!.endsAtEpochMs).toBe(frenzy.randomEvents.actives[0]!.endsAtEpochMs);
   });
 });
 
@@ -413,7 +413,7 @@ describe("Delivery Rush", () => {
 
     const right = clickRandomEventTarget(state, gameState, "parcel:0", 1_000, fixedRng());
     expect(right.claimed).toBe(true);
-    expect(right.randomEvents.active!.pendingTargetIds).toEqual(["parcel:1", "parcel:2"]);
+    expect(right.randomEvents.actives[0]!.pendingTargetIds).toEqual(["parcel:1", "parcel:2"]);
     expect(bnToNumber(right.bonus)).toBeCloseTo(bnToNumber(deliveryParcelPayout(gameState, false)), 6);
   });
 
@@ -427,7 +427,7 @@ describe("Delivery Rush", () => {
       total += bnToNumber(result.bonus);
       state = result.randomEvents;
     }
-    expect(state.active).toBeNull();
+    expect(state.actives).toHaveLength(0);
     expect(state.lastResolved).toEqual({
       id: "delivery_rush",
       resolvedAtEpochMs: 1_000,
@@ -485,7 +485,7 @@ describe("Sprinkle Storm", () => {
       state = result.randomEvents;
     }
     for (let i = 1; i < paid.length; i += 1) expect(paid[i]).toBeGreaterThan(paid[i - 1]);
-    expect(state.active).toBeNull();
+    expect(state.actives).toHaveLength(0);
     expect(state.lastResolved!.endedEarly).toBe(true);
 
     // The whole storm is worth 23.5 sprinkles at the shipped 0.3, not ten.
@@ -513,7 +513,7 @@ describe("Taste Test: both branches", () => {
 
     expect(result.claimed).toBe(true);
     expect(bnToNumber(result.bonus)).toBeCloseTo(bnToNumber(tasteTestServePayout(gameState)), 6);
-    expect(result.randomEvents.active).toBeNull();
+    expect(result.randomEvents.actives).toHaveLength(0);
     expect(result.randomEvents.lastResolved).toEqual({
       id: "taste_test",
       resolvedAtEpochMs: 1_000,
@@ -533,9 +533,9 @@ describe("Taste Test: both branches", () => {
 
     expect(result.claimed).toBe(true);
     expect(bnToNumber(result.bonus)).toBe(0);
-    expect(result.randomEvents.active!.choiceTaken).toBe("send_back");
+    expect(result.randomEvents.actives[0]!.choiceTaken).toBe("send_back");
     // The minute starts at the press, not at the spawn.
-    expect(result.randomEvents.active!.endsAtEpochMs).toBe(1_000 + TASTE_TEST_BUFF_MS);
+    expect(result.randomEvents.actives[0]!.endsAtEpochMs).toBe(1_000 + TASTE_TEST_BUFF_MS);
     expect(randomEventCpsMultiplier(result.randomEvents, 2_000)).toBe(TASTE_TEST_BUFF_MULTIPLIER);
     expect(randomEventCpsMultiplier(result.randomEvents, 1_000 + TASTE_TEST_BUFF_MS)).toBe(1);
   });
@@ -584,7 +584,7 @@ describe("Taste Test: both branches", () => {
       config: DEFAULT_RANDOM_EVENT_CONFIG,
     });
     expect(bnToNumber(result.instantBonus)).toBe(0);
-    expect(result.randomEvents.active).toBeNull();
+    expect(result.randomEvents.actives).toHaveLength(0);
   });
 
   it("moves real cookies through the reducer for both answers", () => {
@@ -655,10 +655,10 @@ describe("Flour Shortage", () => {
     // A tick inside the window records the frenzy; by the time the lorry arrives the frenzy is
     // long over, and the rebound still has to be measured at the rate the dip was suffered at.
     const during = applyGameAction(withFrenzy, { type: "tick", elapsedMs: 1_000 }, ctxAt(10_000));
-    expect(during.randomEvents.active?.peakLiveCpsMultiplier).toBe(frenzy);
+    expect(during.randomEvents.actives[0]?.peakLiveCpsMultiplier).toBe(frenzy);
 
     const after = applyGameAction(during, { type: "tick", elapsedMs: 1_000 }, ctxAt(60_000));
-    expect(after.randomEvents.active).toBeNull();
+    expect(after.randomEvents.actives).toHaveLength(0);
     const rebound = bnToNumber(after.cookies) - bnToNumber(during.cookies) - cps;
     expect(rebound).toBeCloseTo(cps * DEFAULT_RANDOM_EVENT_PAYOUTS.flourShortageReboundCpsSeconds * frenzy, 2);
   });
@@ -669,7 +669,7 @@ describe("Flour Shortage", () => {
     const cps = bnToNumber(totalCps(gameState));
     // One tick after the window has closed: the event resolves and the lorry arrives.
     const next = applyGameAction(active, { type: "tick", elapsedMs: 1_000 }, ctxAt(60_000));
-    expect(next.randomEvents.active).toBeNull();
+    expect(next.randomEvents.actives).toHaveLength(0);
     // A resolved event no longer multiplies, so the tick's own second is at full rate.
     expect(bnToNumber(next.cookies)).toBeCloseTo(
       cps + cps * DEFAULT_RANDOM_EVENT_PAYOUTS.flourShortageReboundCpsSeconds,
@@ -685,7 +685,7 @@ describe("the frenzy class: persistence and the capture flag", () => {
     for (const id of NEW_EVENT_IDS) {
       const state: RandomEventsState = {
         ...createInitialRandomEventsState(),
-        active: activeOf(id, 4_000),
+        actives: [activeOf(id, 4_000)],
         nextEligibleAtEpochMs: 900_000,
         rngStreamIndex: 17,
         spawnCount: 5,
@@ -698,7 +698,7 @@ describe("the frenzy class: persistence and the capture flag", () => {
   it("round-trips a Taste Test that has already been answered", () => {
     const state: RandomEventsState = {
       ...createInitialRandomEventsState(),
-      active: activeOf("taste_test", 4_000, { choiceTaken: "send_back", claimedCount: 1 }),
+      actives: [activeOf("taste_test", 4_000, { choiceTaken: "send_back", claimedCount: 1 })],
       spawnCount: 1,
     };
     const back = decodeRandomEvents(JSON.parse(JSON.stringify(encodeRandomEvents(state))));
@@ -712,7 +712,7 @@ describe("the frenzy class: persistence and the capture flag", () => {
       const full = activeOf(id, 0);
       const state: RandomEventsState = {
         ...createInitialRandomEventsState(),
-        active: { ...full, pendingTargetIds: full.pendingTargetIds.slice(1), claimedCount: 1 },
+        actives: [{ ...full, pendingTargetIds: full.pendingTargetIds.slice(1), claimedCount: 1 }],
       };
       const back = decodeRandomEvents(JSON.parse(JSON.stringify(encodeRandomEvents(state))));
       expect(back).toEqual(state);
@@ -743,12 +743,12 @@ describe("the frenzy class: persistence and the capture flag", () => {
     const rng = createSplitMix32Rng(7);
     const gameState = producingState();
     let state = createInitialRandomEventsState();
-    for (let now = 0; now <= 60_000 && state.active === null; now += 200) {
+    for (let now = 0; now <= 60_000 && state.actives.length === 0; now += 200) {
       state = tickRandomEvents(state, gameState, now, rng, { blocked: false, config }).randomEvents;
       // The raid clock seeds on the first tick; skip past that without spawning anything.
-      if (state.active?.id === "mouse_raid") throw new Error("the raid should not be forced");
+      if (state.actives[0]?.id === "mouse_raid") throw new Error("the raid should not be forced");
     }
-    expect(state.active!.id).toBe("production_frenzy");
-    expect(state.active!.endsAtEpochMs - state.active!.startedAtEpochMs).toBe(77_000);
+    expect(state.actives[0]!.id).toBe("production_frenzy");
+    expect(state.actives[0]!.endsAtEpochMs - state.actives[0]!.startedAtEpochMs).toBe(77_000);
   });
 });

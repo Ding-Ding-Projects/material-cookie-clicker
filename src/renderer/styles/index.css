@@ -8724,9 +8724,240 @@ ul.card-grid {
   box-shadow: 0 4px 0 0 var(--cabinet-frame-dark);
 }
 
+/* --- Cookie Eclipse: the stage goes dark, five crumbs do not ----------------------------- */
+
+/* THE SCRIM COVERS THE COOKIE PANEL AND NOTHING ELSE, and the selector is deliberately that
+   specific. The first version put it on `.event-stage`, which turned out to span the upgrade
+   shelf as well — the first photograph of the event came back with every price in the shop
+   dimmed. Painting it onto `.cookie-hero` through a body attribute means the region that goes
+   dark is named rather than inherited, so it cannot quietly grow when the stage's layout does.
+   Everything with a number on it is outside this panel and keeps its full contrast. */
+.cookie-hero {
+  position: relative;
+}
+
+body[data-eclipse='on'] .cookie-hero::after {
+  content: '';
+  position: absolute;
+  inset: 0;
+  pointer-events: none;
+  border-radius: inherit;
+  background: var(--primary-shadow);
+  opacity: 0.72;
+  z-index: 2;
+  animation: event-eclipse-fall 900ms ease-out both;
+}
+
+.event-crumb {
+  position: absolute;
+  left: var(--crumb-x, 50%);
+  top: var(--crumb-y, 50%);
+  width: 58px;
+  height: 58px;
+  margin: -29px 0 0 -29px;
+  padding: 0;
+  display: grid;
+  place-items: center;
+  pointer-events: auto;
+  cursor: pointer;
+  border: 3px solid var(--spark-ring);
+  border-radius: 50%;
+  /* The crumbs are the brightest thing on a dimmed stage, which is the event: the scrim takes
+     the background away and these keep their full-strength surface and their own ring of light. */
+  background: var(--surface-lowest);
+  box-shadow: 0 3px 0 0 var(--cabinet-frame-dark), 0 0 0 6px var(--spark);
+  animation: event-crumb-glow 1.8s ease-in-out var(--crumb-delay, 0s) infinite;
+}
+
+.event-crumb__art {
+  width: 38px;
+  height: 38px;
+}
+
+.event-crumb:hover {
+  background: var(--spark);
+}
+
+.event-crumb:active {
+  box-shadow: inset 0 3px 0 0 var(--bevel-hi), 0 0 0 6px var(--spark);
+}
+
+.event-crumb:focus-visible {
+  outline: 4px solid var(--spark-ring);
+  outline-offset: 4px;
+}
+
+@keyframes event-eclipse-fall {
+  from {
+    opacity: 0;
+  }
+}
+
+@keyframes event-crumb-glow {
+  0%,
+  100% {
+    box-shadow: 0 3px 0 0 var(--cabinet-frame-dark), 0 0 0 5px var(--spark);
+  }
+  50% {
+    box-shadow: 0 3px 0 0 var(--cabinet-frame-dark), 0 0 0 10px var(--spark);
+  }
+}
+
+/* --- Crumb Comet: one big target, one pass across the stage ------------------------------ */
+
+.event-stage--comet {
+  overflow: hidden;
+}
+
+/* Deliberately the biggest target in the game (96px against a rain drop's 44). The comet is a
+   test of TIMING, not of aim: making it small as well would be making it unfair rather than
+   making it harder. It crosses once, on a linear track, so the difficulty is a fact about the
+   clock the player can learn rather than about the curve of an easing function they cannot. */
+.event-comet {
+  position: absolute;
+  top: 38%;
+  left: 0;
+  width: 96px;
+  height: 96px;
+  margin: -48px 0 0 -48px;
+  padding: 0;
+  display: grid;
+  place-items: center;
+  pointer-events: auto;
+  cursor: pointer;
+  border: 3px solid var(--spark-ring);
+  border-radius: 50%;
+  background: var(--surface-lowest);
+  box-shadow: 0 4px 0 0 var(--cabinet-frame-dark), 0 0 0 8px var(--spark);
+  animation: event-comet-cross 9s linear both;
+}
+
+.event-comet__art {
+  width: 68px;
+  height: 68px;
+}
+
+.event-comet:hover {
+  background: var(--spark);
+}
+
+.event-comet:focus-visible {
+  outline: 4px solid var(--spark-ring);
+  outline-offset: 4px;
+}
+
+@keyframes event-comet-cross {
+  from {
+    transform: translateX(-10%) rotate(-8deg);
+  }
+  to {
+    transform: translateX(calc(100vw + 10%)) rotate(8deg);
+  }
+}
+
+/* --- Double and triple events: the plates stack, and compress as they do ------------------ */
+
+/* The stack is a COLUMN, top-aligned, in the space one plate used to have. Two plates at
+   `tight` and three at `tightest` fit the cabinet without pushing anything below them down,
+   which is the property that matters: a triple must not relayout the HUD. */
+.event-indicator-stack {
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+  align-items: stretch;
+  min-width: 0;
+}
+
+/* WHAT COMPRESSION ACTUALLY REMOVES, and what it never touches. At `tight` the countdown bar
+   goes and the seconds stay, because the number is the fact and the bar is a picture of it. At
+   `tightest` the plate also loses its vertical padding and its emblem shrinks. The NAME and the
+   SECONDS are on every plate at every size, and the accessible name is byte-for-byte identical
+   at all three — compression is a visual budget, never an information one. */
+.event-indicator[data-compression='tight'],
+.event-indicator[data-compression='tightest'] {
+  gap: 8px;
+  padding: 4px 10px;
+  min-height: 36px;
+}
+
+.event-indicator[data-compression='tight'] .event-indicator__bar,
+.event-indicator[data-compression='tightest'] .event-indicator__bar {
+  display: none;
+}
+
+/* The bar was doing double duty: it showed the time AND it separated the name from the number of
+   seconds. Hiding it ran the two together — the first capture of a double read "Night Shift38s" —
+   so the gap has to be put back explicitly. Found by looking at the photograph, not by reasoning
+   about the rule. */
+.event-indicator[data-compression='tight'] .event-indicator__body,
+.event-indicator[data-compression='tightest'] .event-indicator__body {
+  gap: 10px;
+}
+
+.event-indicator[data-compression='tightest'] {
+  padding: 2px 8px;
+  min-height: 32px;
+}
+
+.event-indicator[data-compression='tightest'] .event-indicator__emblem {
+  width: 22px;
+  height: 22px;
+  font-size: 22px;
+}
+
+/* The marquee for a stack: the emblems sit in a row under one headline, and the headline is
+   allowed to be the loudest type in the application because it appears about once every four
+   hours of play. */
+.event-toast--stacked .event-toast__emblem {
+  display: flex;
+  gap: 4px;
+  width: auto;
+}
+
+.event-toast--stacked .event-toast__en {
+  font-weight: 800;
+  letter-spacing: 0.02em;
+}
+
+@media (max-width: 900px) {
+  /* At narrow widths every stacked plate drops to the tightest treatment regardless of how many
+     there are, because the width, not the count, is what has run out. */
+  .event-indicator-stack .event-indicator {
+    padding: 2px 8px;
+    min-height: 32px;
+  }
+
+  .event-indicator-stack .event-indicator__bar {
+    display: none;
+  }
+
+  .event-indicator-stack .event-indicator__body {
+    gap: 10px;
+  }
+}
+
 /* --- reduced motion: the same events, standing still -------------------------------------- */
 
 @media (prefers-reduced-motion: reduce) {
+  /* The eclipse stops fading in and the crumbs stop pulsing. The panel is still dark, the
+     crumbs are still the bright thing on it, and all five are still exactly where they were. */
+  body[data-eclipse='on'] .cookie-hero::after {
+    animation: none;
+  }
+
+  .event-crumb {
+    animation: none;
+  }
+
+  /* The comet does not cross. It sits in the middle of the stage for the whole nine seconds:
+     one press, the same 96px target, the same payout. The motion was the flavour and the
+     nine-second window was always the mechanic. */
+  .event-comet {
+    animation: none;
+    left: 50%;
+    transform: none;
+  }
+
   /* The frenzy plate keeps its ring — the ring is what says "frenzy" — and stops breathing. */
   .event-indicator--frenzy {
     animation: none;

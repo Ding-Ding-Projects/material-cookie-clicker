@@ -1586,6 +1586,124 @@ function SprinkleStormArt() {
   );
 }
 
+/* ------------------------------------------------- the second wave of pool events ------ */
+
+/** Cookie Eclipse: a cookie eclipsing a light, with a corona around it. */
+function CookieEclipseArt() {
+  return (
+    <Art>
+      <circle cx="16" cy="16" r="13.2" fill="none" stroke={GOLD} strokeWidth="1.6" opacity="0.75" />
+      <path d="M16 1.2v3.4M16 27.4v3.4M1.2 16h3.4M27.4 16h3.4M5.6 5.6l2.4 2.4M24 24l2.4 2.4M26.4 5.6L24 8M8 24l-2.4 2.4" stroke={GOLD} strokeWidth="1.6" strokeLinecap="round" />
+      <circle cx="16" cy="16" r="9.5" fill={CRUST_DARK} stroke={CRUST} strokeWidth="1.6" />
+      <circle cx="12.5" cy="13.5" r="1.7" fill={GOLD} stroke="none" />
+      <circle cx="19" cy="18" r="2" fill={GOLD} stroke="none" />
+      <circle cx="14" cy="20" r="1.3" fill={GOLD_DEEP} stroke="none" />
+    </Art>
+  );
+}
+
+/** Crumb Comet: one big crumb with a tail, crossing on the diagonal. */
+function CrumbCometArt() {
+  return (
+    <Art>
+      <path d="M3 27L13 17M6.5 29.5L14 22M1.5 22.5L9 15" stroke={GOLD_DEEP} strokeWidth="2.4" strokeLinecap="round" opacity="0.8" />
+      <circle cx="20" cy="11" r="8" fill={DOUGH} stroke={CRUST} strokeWidth="2" />
+      <path d="M13.5 8a7 7 0 0 1 5-5" fill="none" stroke={HIGHLIGHT} strokeWidth="2.2" strokeLinecap="round" />
+      <circle cx="18" cy="9" r="1.8" fill={CHIP} stroke="none" />
+      <circle cx="23" cy="13" r="1.6" fill={CHIP} stroke="none" />
+      <circle cx="28" cy="4" r="1.2" fill={GOLD} stroke="none" />
+    </Art>
+  );
+}
+
+/** Baker's Dozen: twelve in the tray and a thirteenth on top of it. */
+function BakersDozenArt() {
+  return (
+    <Art>
+      <rect x="3" y="12" width="26" height="16" rx="3" fill={PLATE_DIM} stroke={CRUST} strokeWidth="1.8" />
+      {[0, 1, 2, 3].map((column) => [0, 1, 2].map((row) => (
+        <circle key={`${column}-${row}`} cx={7 + column * 6} cy={16.5 + row * 5} r="2" fill={DOUGH} stroke={CRUST} strokeWidth="1" />
+      )))}
+      <circle cx="22.5" cy="7" r="5.4" fill={GOLD} stroke={GOLD_RING} strokeWidth="1.8" />
+      <circle cx="21" cy="5.6" r="1.2" fill={CHIP} stroke="none" />
+      <circle cx="24" cy="8.4" r="1.1" fill={CHIP} stroke="none" />
+    </Art>
+  );
+}
+
+/** Static Cling: a hand with dough stuck to it and static arcs coming off it. Alarm-coloured. */
+function StaticClingArt() {
+  return (
+    <Art>
+      <path d="M11 28v-7l-3.5-4a2 2 0 0 1 3-2.6L13 17V5.5a1.8 1.8 0 0 1 3.6 0V15a1.8 1.8 0 0 1 3.6 0v1a1.8 1.8 0 0 1 3.4.9V22q0 6-5 6Z" fill={PLATE_DIM} stroke={ALARM} strokeWidth="1.7" />
+      <path d="M17 20q2.5 1 2.5 3.5" fill="none" stroke={ALARM} strokeWidth="1.3" opacity="0.6" />
+      <path d="M26 4l-3 5h3l-3.5 5" fill="none" stroke={ALARM} strokeWidth="1.8" strokeLinecap="round" />
+      <path d="M6 6l-2.5 4h2.5L4 14" fill="none" stroke={ALARM} strokeWidth="1.5" strokeLinecap="round" opacity="0.75" />
+    </Art>
+  );
+}
+
+/** Grandma Convention: three headscarved figures side by side behind a tray. */
+function GrandmaConventionArt() {
+  return (
+    <Art>
+      {[7, 16, 25].map((x, index) => (
+        <g key={x}>
+          <path d={`M${x - 4.2} 15q0-4.2 4.2-4.2t4.2 4.2q0 4.2-4.2 4.2T${x - 4.2} 15Z`} fill={DOUGH} stroke={CRUST} strokeWidth="1.4" />
+          <path d={`M${x - 4.4} 13.6q1.4-5 4.4-5t4.4 5`} fill="none" stroke={index === 1 ? AMETHYST : EMERALD} strokeWidth="2" />
+          <circle cx={x - 1.6} cy="15" r="0.9" fill={CHIP} stroke="none" />
+          <circle cx={x + 1.6} cy="15" r="0.9" fill={CHIP} stroke="none" />
+        </g>
+      ))}
+      <path d="M3 22h26l-2 6H5Z" fill={PLATE_DIM} stroke={CRUST} strokeWidth="1.6" />
+      <circle cx="10" cy="25" r="1.8" fill={GOLD} stroke={GOLD_RING} strokeWidth="1" />
+      <circle cx="16" cy="25" r="1.8" fill={GOLD} stroke={GOLD_RING} strokeWidth="1" />
+      <circle cx="22" cy="25" r="1.8" fill={GOLD} stroke={GOLD_RING} strokeWidth="1" />
+    </Art>
+  );
+}
+
+/** Overtime Crew: a half-built wall with a hard hat and a moon over it. */
+function OvertimeCrewArt() {
+  return (
+    <Art>
+      <path d="M22 4a5 5 0 1 0 5 5 3.8 3.8 0 0 1-5-5Z" fill={PLATE_DIM} stroke={AMETHYST} strokeWidth="1.5" />
+      <path d="M4 28h24" stroke={CRUST} strokeWidth="2.2" strokeLinecap="round" />
+      <rect x="4.5" y="22" width="7" height="5" fill={BRONZE_LIGHT} stroke={BRONZE} strokeWidth="1.4" />
+      <rect x="12.5" y="22" width="7" height="5" fill={BRONZE_LIGHT} stroke={BRONZE} strokeWidth="1.4" />
+      <rect x="8.5" y="16.5" width="7" height="5" fill={BRONZE_LIGHT} stroke={BRONZE} strokeWidth="1.4" />
+      <path d="M17 16.5q0-4.5 4.5-4.5T26 16.5Z" fill={GOLD} stroke={GOLD_RING} strokeWidth="1.5" />
+      <path d="M15 17h13" stroke={GOLD_RING} strokeWidth="1.8" strokeLinecap="round" />
+    </Art>
+  );
+}
+
+/** One glowing crumb, for the Cookie Eclipse's targets. Small, bright, and its own light. */
+export function EclipseCrumbArt({ extraClass }: { extraClass?: string } = {}) {
+  return (
+    <Art extraClass={extraClass}>
+      <circle cx="16" cy="16" r="13" fill={GOLD} stroke={GOLD_DEEP} strokeWidth="1.6" opacity="0.35" />
+      <path d="M16 6l3.5 5.5L26 13l-4.5 4.8L22.5 25 16 21.8 9.5 25l1-7.2L6 13l6.5-1.5Z" fill={DOUGH} stroke={CRUST} strokeWidth="1.6" strokeLinejoin="round" />
+      <circle cx="15" cy="15" r="1.7" fill={CHIP} stroke="none" />
+      <circle cx="19" cy="18" r="1.3" fill={CHIP} stroke="none" />
+    </Art>
+  );
+}
+
+/** The comet itself, on the stage: the emblem at target size, tail and all. */
+export function CometArt({ extraClass }: { extraClass?: string } = {}) {
+  return (
+    <Art extraClass={extraClass}>
+      <path d="M2 28L12 18M5.5 30.5L13 23M0.5 23.5L8 16" stroke={GOLD_DEEP} strokeWidth="3" strokeLinecap="round" opacity="0.85" />
+      <circle cx="20" cy="11" r="9.5" fill={DOUGH} stroke={CRUST} strokeWidth="2.2" />
+      <path d="M12.5 7.5a8.5 8.5 0 0 1 6-6" fill="none" stroke={HIGHLIGHT} strokeWidth="2.4" strokeLinecap="round" />
+      <circle cx="17.5" cy="8.5" r="2.1" fill={CHIP} stroke="none" />
+      <circle cx="23.5" cy="13.5" r="1.9" fill={CHIP} stroke="none" />
+      <circle cx="21" cy="6" r="1.3" fill={CHIP} stroke="none" />
+    </Art>
+  );
+}
+
 /** The emblem for one event id, for the HUD indicator and the toast. */
 export const RANDOM_EVENT_ART: Record<string, () => ReactElement> = {
   cookie_rain: CookieRainArt,
@@ -1604,6 +1722,12 @@ export const RANDOM_EVENT_ART: Record<string, () => ReactElement> = {
   flour_shortage: FlourShortageArt,
   night_shift: NightShiftArt,
   sprinkle_storm: SprinkleStormArt,
+  cookie_eclipse: CookieEclipseArt,
+  crumb_comet: CrumbCometArt,
+  bakers_dozen: BakersDozenArt,
+  static_cling: StaticClingArt,
+  grandma_convention: GrandmaConventionArt,
+  overtime_crew: OvertimeCrewArt,
   mouse_raid: MouseRaidArt,
 };
 

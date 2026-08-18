@@ -1,7 +1,14 @@
-import { bnMulScalar, type BigNum } from "./big-number.js";
+import { bnAdd, bnFromNumber, bnMulScalar, type BigNum } from "./big-number.js";
 import { totalCps } from "./cps.js";
+import { generatorCps, getGeneratorDefinition } from "./generators.js";
 import { isEffectActive } from "./golden-cookie.js";
-import { EVENT_CPS_STACK_CAP, randomEventCpsMultiplier, stackEventMultipliers } from "./random-events.js";
+import {
+  EVENT_CPS_STACK_CAP,
+  randomEventCpsMultiplier,
+  randomEventGeneratorSurge,
+  stackEventMultipliers,
+} from "./random-events.js";
+import { computeMultipliers } from "./upgrades.js";
 import type { GameState } from "./types.js";
 
 /**
@@ -38,6 +45,40 @@ import type { GameState } from "./types.js";
  * calls the very same function with the click ceiling: there is one stacking rule in the game,
  * stated once and tested once, and both the production line and the readout read it.
  */
+/**
+ * THE EXTRA PRODUCTION A GENERATOR SURGE IS WORTH, before any global multiplier.
+ *
+ * The Grandma Convention names `["grandma", "farm"]` as ID STRINGS on its definition and never
+ * imports generators.ts. This is where those strings are cashed: for each surged id, the standing
+ * output of that generator times (multiplier − 1), which is the EXTRA on top of the output
+ * `totalCps` already counted. Adding the extra rather than recomputing the whole total is what
+ * keeps this a small addition to one expression instead of a second copy of `totalCps` that could
+ * drift from the first.
+ *
+ * An id nothing owns contributes zero. An id no generator has contributes zero, and does not
+ * throw: `getGeneratorDefinition` is only ever called for ids that came off the player's own
+ * generator list, so a surge naming a generator that was renamed or removed simply surges nothing.
+ * That is the honest failure — the event still happens, still announces itself, and is worth what
+ * the player actually owns.
+ */
+function generatorSurgeBonus(state: GameState, nowMs: number): BigNum {
+  const surge = randomEventGeneratorSurge(state.randomEvents, nowMs);
+  const surgedIds = Object.keys(surge);
+  if (surgedIds.length === 0) return bnFromNumber(0);
+
+  const multipliers = computeMultipliers(state);
+  const extra = state.generators.reduce<BigNum>((acc, owned) => {
+    const factor = surge[owned.id];
+    if (factor === undefined || factor === 1) return acc;
+    const def = getGeneratorDefinition(owned.id);
+    const base = generatorCps(def, owned.count);
+    const withUpgrades = bnMulScalar(base, multipliers.generatorMultipliers[owned.id] ?? 1);
+    return bnAdd(acc, bnMulScalar(withUpgrades, factor - 1));
+  }, bnFromNumber(0));
+
+  return bnMulScalar(extra, multipliers.globalCpsMultiplier);
+}
+
 export function effectiveCps(state: GameState, nowMs: number): BigNum {
   const effect = state.goldenCookie.activeEffect;
   const goldenCps =
@@ -45,8 +86,15 @@ export function effectiveCps(state: GameState, nowMs: number): BigNum {
       ? effect.multiplier
       : 1;
 
+  // The surge is added to the standing rate BEFORE the timed multipliers, not after, because a
+  // Grandma Convention makes the grandmas produce more and a frenzy then multiplies everything
+  // the bakery is producing — including that. Applying it afterwards would mean a Convention
+  // inside a frenzy was worth exactly as much as one on a quiet save, which is not what either
+  // event's copy says.
+  const standing = bnAdd(totalCps(state), generatorSurgeBonus(state, nowMs));
+
   return bnMulScalar(
-    totalCps(state),
+    standing,
     stackEventMultipliers(goldenCps, randomEventCpsMultiplier(state.randomEvents, nowMs), EVENT_CPS_STACK_CAP),
   );
 }

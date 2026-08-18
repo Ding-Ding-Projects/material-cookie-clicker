@@ -49,7 +49,7 @@ X yet", that is this contract being eroded.
 
 | Thing | Evidence |
 | --- | --- |
-| Project test suite | **27 files, 626 tests, all passing** (`npx vitest run tests`) |
+| Project test suite | **31 files, 770 tests, all passing** (`npx vitest run tests`) |
 | `packages/surface-kernel` | **89 tests passing** (`npm test` in that package) |
 | `packages/local-ollama` | **37 tests passing** — previously unverifiable, now green once the workspace was wired |
 | Smoke test | **7/7** (`npm run smoke`) |
@@ -65,9 +65,10 @@ expects. `npm run smoke` exists precisely to cover that seam — it reads
 
 ### The published baseline
 
-**Latest release at the time of the 2026-08-16 rewrite is `v0.1.12`** (check
-`gh release view` rather than trusting this line — this file has gone stale on
-exactly this fact twice now). The last hand-audited release remains `v0.1.5`;
+**Latest release at the time of the 2026-08-18 update is `v0.2.51`, target
+`1dffc14`, verified by hand (tag, target, runs green)** — but check
+`gh release view` rather than trusting this line; this file has gone stale on
+exactly this fact three times now, because every push to main ships one. The last hand-audited release remains `v0.1.5`;
 everything after ships automatically through the same proven pipeline. An
 earlier baseline, `v0.1.7`, non-draft, target commit `37c967b`, carried a
 144,166,912-byte `MaterialCookieClicker-Setup.exe`, a full `.nupkg`, `RELEASES`
@@ -102,6 +103,22 @@ about.
   separate pages again.
 - A real Pages site now lives in `site/` and deploys via the existing
   `pages.yml`.
+
+### The 2026-08-17/18 run, in one paragraph
+
+The game is now a full incremental: progressive disclosure from a deliberately
+plain app (the entire look is bought in seven tiers), total commodification
+(41+ control rungs including the one-cookie exit, priced Settings, priced
+languages, the priced "Open it now" shortcut), 20 generators / 180 upgrades /
+201 achievements, milk + kittens + a Reborn tree, a diesel-factory subgame
+exporting to WinForge through the voucher ledger, a home-construction subgame,
+22 random events with rare double/triple stacks and a 30-60-minute Mouse Raid
+with buyable consumables and storage, a wandering golden cookie redeemed
+through the Oven Dial timing minigame, Squirrel auto-updates (proven by a real
+installed update), and a 26-row real-capture evidence matrix. Every system was
+built in its own lane, gate-checked (typecheck, vitest, build, smoke,
+check-site), captured from the running build, merged, and released through the
+standing pipeline.
 
 ### Still not verified — do not describe these as working
 

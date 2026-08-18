@@ -115,12 +115,12 @@ export function detectMilestones(previous: GameState, next: GameState, action: G
   if (!previous.goldenCookie.isSpawned && next.goldenCookie.isSpawned) {
     events.push({ kind: "golden-cookie-spawned" });
   }
-  // Redemption is now the THIRD correct puzzle pick, not a click — so the announcement is keyed
+  // Redemption is now the THIRD hit on the Oven Dial, not a click — so the announcement is keyed
   // on the cookie actually leaving the stage with a new effect on it, rather than on the action
   // kind. A cookie that fled (Escape, or the window running out) despawns with no new effect and
   // is deliberately silent: nothing was won, and a screen reader does not need telling twice.
   if (
-    action.type === "goldenPuzzlePick" &&
+    action.type === "goldenDialPress" &&
     previous.goldenCookie.isSpawned &&
     !next.goldenCookie.isSpawned
   ) {

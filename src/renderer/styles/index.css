@@ -10504,7 +10504,7 @@ ul.card-grid {
 }
 
 /* ==============================================================================================
-   THE GOLDEN COOKIE ON THE STAGE — the sprite, and the Odd Cookie Out card it opens.
+   THE GOLDEN COOKIE ON THE STAGE — the sprite, and the Oven Dial card it opens.
    (src/renderer/screens/GoldenCookieStage.tsx)
 
    Appended at the end of the file on purpose, and touching no existing block: the golden cookie
@@ -10606,13 +10606,13 @@ ul.card-grid {
   }
 }
 
-/* --- The puzzle card, grown from the sprite ------------------------------------------------ */
+/* --- The Oven Dial card, grown from the sprite --------------------------------------------- */
 /* FIXED, not absolute, and covering the whole window rather than just the stage. The card says
    aria-modal="true", and a scrim that only covered the stage would have left the HUD plates and
    the console buttons behind it live — a modal that is not modal. Same dim as .overlay-scrim so
    the golden card and the console panels read as the same kind of interruption, and the same
    promise: the game is dimmed but still there and still ticking behind it. */
-.golden-puzzle-scrim {
+.golden-dial-scrim {
   position: fixed;
   inset: 0;
   z-index: 40;
@@ -10622,9 +10622,9 @@ ul.card-grid {
   place-items: center;
 }
 
-.golden-puzzle {
+.golden-dial-card {
   position: relative;
-  width: min(340px, 92vw);
+  width: min(360px, 92vw);
   padding: 16px 18px 14px;
   border: var(--border-chunky, 3px) solid var(--outline, #75634e);
   border-radius: var(--shape-lg, 28px);
@@ -10634,10 +10634,10 @@ ul.card-grid {
   /* Grown from the sprite, the same gesture AnchoredPanel makes from its console button. The
      transform-origin points back at where on the stage the cookie was caught. */
   transform-origin: var(--golden-x, 50%) var(--golden-y, 40%);
-  animation: golden-puzzle-grow calc(0.18s * var(--motion-scale, 1)) ease-out;
+  animation: golden-dial-grow calc(0.18s * var(--motion-scale, 1)) ease-out;
 }
 
-@keyframes golden-puzzle-grow {
+@keyframes golden-dial-grow {
   from {
     transform: scale(0.6);
     opacity: 0;
@@ -10648,7 +10648,7 @@ ul.card-grid {
   }
 }
 
-.golden-puzzle__title {
+.golden-dial-card__title {
   margin: 0;
   font-family: var(--font-display);
   font-size: 20px;
@@ -10658,67 +10658,74 @@ ul.card-grid {
   align-items: baseline;
 }
 
-.golden-puzzle__title-zh {
+.golden-dial-card__title-zh {
   font-size: 16px;
   opacity: 0.85;
 }
 
-.golden-puzzle__round {
+.golden-dial-card__round {
   margin: 2px 0 0;
   font-variant-numeric: tabular-nums;
   font-weight: 700;
 }
 
-.golden-puzzle__instruction {
-  margin: 2px 0 10px;
+.golden-dial-card__instruction {
+  margin: 2px 0 8px;
   font-size: 13px;
   opacity: 0.86;
 }
 
-.golden-puzzle__grid {
-  display: grid;
-  grid-template-columns: repeat(4, 1fr);
-  gap: 6px;
+/* The dial face. It is a picture of a number, so it gets no interaction of its own — the one
+   button below is the whole input. */
+.golden-dial {
+  display: block;
+  margin: 0 auto;
+  width: 100%;
+  max-width: 300px;
 }
 
-/* 44px minimum per tile, every one of them, at every width the card is allowed to be. */
-.golden-puzzle__tile {
-  min-width: 44px;
-  min-height: 44px;
-  padding: 3px;
-  display: grid;
-  place-items: center;
-  border: 2px solid var(--outline, #75634e);
-  border-radius: var(--shape-sm, 10px);
-  background: var(--surface-low, #fff0de);
+.golden-dial__art {
+  display: block;
+  width: 100%;
+  height: auto;
+}
+
+/* THE ONE BUTTON THAT PLAYS THE GAME. Deliberately big, deliberately the same in every round,
+   and deliberately never renamed by what the needle is doing — a control whose label changed
+   under the player would be unusable at speed and unreadable to a screen reader. */
+.golden-dial-card__stop {
+  display: block;
+  width: 100%;
+  min-height: 56px;
+  margin-top: 6px;
+  border: var(--border-chunky, 3px) solid var(--spark-ring, #9c4b00);
+  border-radius: var(--shape-full);
+  background: var(--tertiary-container, #ffe1a8);
+  color: var(--on-tertiary-container, #2a1c00);
+  font-family: var(--font-display);
+  font-size: 18px;
   cursor: pointer;
 }
 
-.golden-puzzle__tile:hover {
-  background: var(--surface-high, #f5dfc4);
+.golden-dial-card__stop:hover {
+  background: var(--spark, #ffc94d);
 }
 
-.golden-puzzle__tile:focus-visible {
+.golden-dial-card__stop:focus-visible,
+.golden-dial-card__close:focus-visible {
   outline: 3px solid var(--spark-ring, #ffd54a);
   outline-offset: 2px;
 }
 
-.golden-puzzle__tile-art {
-  width: 100%;
-  height: auto;
-  max-width: 40px;
-  display: block;
-}
-
-.golden-puzzle__status {
+.golden-dial-card__status {
   margin: 8px 0 0;
-  min-height: 1.2em;
+  min-height: 2.4em;
   font-size: 13px;
   font-weight: 700;
 }
 
-.golden-puzzle__close {
-  margin-top: 8px;
+.golden-dial-card__close {
+  margin-top: 6px;
   min-height: 44px;
   width: 100%;
   border: 2px solid var(--outline, #75634e);
@@ -10729,20 +10736,22 @@ ul.card-grid {
   font: inherit;
 }
 
-.golden-puzzle__close:focus-visible {
-  outline: 3px solid var(--spark-ring, #ffd54a);
-  outline-offset: 2px;
-}
-
-/* A wrong pick shakes the card. The card is re-keyed on each wrong pick so the animation
-   restarts rather than being ignored as already-running. */
-.golden-puzzle[data-shake]:not([data-shake='0']) {
+/* A miss shakes the card. The card is re-keyed on each press so the animation restarts rather
+   than being ignored as already-running. A hit gets a short gold flare instead — the two
+   outcomes are never told apart by colour alone, because the status line says which it was. */
+.golden-dial-card[data-feedback='miss'] {
   animation:
-    golden-puzzle-grow calc(0.18s * var(--motion-scale, 1)) ease-out,
-    golden-puzzle-shake calc(0.32s * var(--motion-scale, 1)) ease-in-out;
+    golden-dial-grow calc(0.18s * var(--motion-scale, 1)) ease-out,
+    golden-dial-shake calc(0.32s * var(--motion-scale, 1)) ease-in-out;
 }
 
-@keyframes golden-puzzle-shake {
+.golden-dial-card[data-feedback='hit'] {
+  animation:
+    golden-dial-grow calc(0.18s * var(--motion-scale, 1)) ease-out,
+    golden-dial-flare calc(0.45s * var(--motion-scale, 1)) ease-out;
+}
+
+@keyframes golden-dial-shake {
   0%,
   100% {
     translate: 0 0;
@@ -10758,11 +10767,25 @@ ul.card-grid {
   }
 }
 
-/* What happened to the cookie, said once and then gone. */
+@keyframes golden-dial-flare {
+  0% {
+    box-shadow: 0 12px 28px rgba(0, 0, 0, 0.4), 0 0 0 0 var(--spark, #ffc94d);
+  }
+  60% {
+    box-shadow: 0 12px 28px rgba(0, 0, 0, 0.4), 0 0 0 12px rgba(255, 201, 77, 0);
+  }
+  100% {
+    box-shadow: 0 12px 28px rgba(0, 0, 0, 0.4), 0 0 0 0 rgba(255, 201, 77, 0);
+  }
+}
+
+/* What happened to the cookie, said once and then gone. Pinned to the TOP of the stage rather
+   than 12% down it: at 12% it landed across the face of the hero cookie, which is both the thing
+   the player is about to go back to clicking and the worst possible backdrop for a line of text. */
 .golden-outcome {
   position: absolute;
   left: 50%;
-  top: 12%;
+  top: 2%;
   transform: translateX(-50%);
   margin: 0;
   padding: 8px 14px;
@@ -10778,12 +10801,18 @@ ul.card-grid {
 
 @media (prefers-reduced-motion: reduce) {
   /* Reduced motion: the cookie is STILL. It keeps its full gilding, its rays stay lit but stop
-     turning, the card simply appears, and a wrong pick does not shake anything — the wrong-pick
-     line in the status region says what happened, which is what the shake was ever for. */
+     turning, the card simply appears, and neither outcome shakes or flares anything — the status
+     line says what happened, which is what the shake was ever for.
+
+     THE NEEDLE IS NOT LISTED HERE, and that is the point: it is not a CSS animation at all. Under
+     reduced motion the domain switches the dial to stepped mode (golden-cookie.ts), so the needle
+     advances one notch of twenty-four at a slower cadence instead of sweeping. The game is still
+     played — as a rhythm rather than a glide — rather than being silently turned off. */
   .golden-sprite,
   .golden-sprite__rays,
-  .golden-puzzle,
-  .golden-puzzle[data-shake]:not([data-shake='0']) {
+  .golden-dial-card,
+  .golden-dial-card[data-feedback='miss'],
+  .golden-dial-card[data-feedback='hit'] {
     animation: none;
   }
 }

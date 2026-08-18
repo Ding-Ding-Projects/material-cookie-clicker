@@ -316,37 +316,40 @@ export const COOKIE_SCREEN_COPY = {
 } as const satisfies Record<string, Bilingual>;
 
 /**
- * THE GOLDEN CATCH AND THE ODD COOKIE OUT PUZZLE (GoldenCookieStage.tsx).
+ * THE GOLDEN CATCH AND THE OVEN DIAL (GoldenCookieStage.tsx).
  *
- * Both languages carry the whole mechanic — the round count, what a wrong pick costs, and what
- * happens if the cookie gets away — because a player who reads only one of them should never be
- * the one who has to guess at the rules.
+ * Both languages carry the whole mechanic — what to do, the round count, what a miss costs, and
+ * what happens if the cookie gets away — because a player who reads only one of them should never
+ * be the one who has to guess at the rules.
  */
-export const GOLDEN_PUZZLE_COPY = {
+export const GOLDEN_DIAL_COPY = {
   /** The accessible name of the spawned sprite on the stage. */
   spriteLabel: { en: "Catch the golden cookie", yue: "捉住金曲奇" },
-  title: { en: "Odd Cookie Out", yue: "搵出唔同嗰塊" },
+  title: { en: "The Oven Dial", yue: "焗爐錶盤" },
   instruction: {
-    en: "One cookie is not like the others. Press it.",
-    yue: "有一塊曲奇同其他唔同。撳佢。",
+    en: "Stop the needle inside the golden band.",
+    yue: "喺金色範圍入面停低支針。",
+  },
+  steppedInstruction: {
+    en: "The needle steps one notch at a time. Stop it inside the golden band.",
+    yue: "支針一格一格咁行。喺金色範圍入面停低佢。",
   },
   round: (current: number, total: number): Bilingual => ({
     en: `Round ${current} of ${total}`,
     yue: `第 ${current} 關，共 ${total} 關`,
   }),
-  /** The one accessible name every tile shares — see the AT note in GoldenCookieStage.tsx. */
-  tileLabel: (index: number): Bilingual => ({
-    en: `Cookie tile ${index}`,
-    yue: `曲奇格 ${index}`,
+  /** The one button that plays the game. Its name never changes with the needle's position. */
+  stopLabel: { en: "Stop the needle", yue: "停針" },
+  hit: { en: "In the band. Next round is tighter.", yue: "入咗範圍。下一關窄啲。" },
+  miss: {
+    en: "Missed the band — two seconds off the clock.",
+    yue: "唔喺範圍度——扣兩秒。",
+  },
+  /** Announced when a round begins, so the difficulty step is stated rather than just felt. */
+  roundBriefing: (current: number, widthPct: number, sweepSeconds: string): Bilingual => ({
+    en: `Round ${current}: the band is ${widthPct}% of the dial and the needle crosses it in ${sweepSeconds} seconds.`,
+    yue: `第 ${current} 關：金色範圍佔錶盤 ${widthPct}%，支針行一個來回要 ${sweepSeconds} 秒。`,
   }),
-  wrongPick: {
-    en: "Not that one — two seconds off the clock.",
-    yue: "唔係嗰塊——扣兩秒。",
-  },
-  hintOffered: {
-    en: "A ring has been drawn around the odd cookie.",
-    yue: "已經喺唔同嗰塊曲奇周圍畫咗個圈。",
-  },
   fled: { en: "The golden cookie got away.", yue: "金曲奇走甩咗。" },
   redeemed: (effectEn: string, effectYue: string): Bilingual => ({
     en: `Golden cookie redeemed: ${effectEn}`,

@@ -69,7 +69,9 @@ retaken after the panel settled.
 | `dialog-settings.png` | Settings opened from a progressed save (a gap the previous set named and this one closes). The language-mode switch at 60, the note that English is free forever, the two-separate-controls warning, both funny sliders at 35 each, and the honest admission that no copy in this build actually varies by level yet. |
 | `raid-supplies.png` | The HUD's `RAID SUPPLIES` shelf after two real presses: a Whack Pass at `1 / 5` with its next price stepped to `4,000,000`, and the `Storage 5` chip now asking `25,000,000`. The point of the frame is that the other two plates also read `/ 5` — the cap is one shared ladder, so buying it once raised all three. |
 | `golden-spawn.png` | A golden cookie standing as its own sprite in its ray-burst, low and left of centre over the upgrade shelf. What is **not** gold matters as much: the hero cookie in the middle of its panel is the ordinary baked one, because the hero no longer collects golden cookies at all. |
-| `golden-puzzle.png` | The Odd Cookie Out card the catch opens, on `Round 1 of 3`, over the dimmed window: sixteen near-identical tiles in a four-by-four grid, and a `Let it go` button. The tiles are anonymous to a screen reader as well as to the eye — each is named only `Cookie tile 1` through `16`, so the accessible name cannot give the answer away. |
+| `golden-dial.png` | The Oven Dial the catch opens, on `Round 1 of 3`, over the dimmed window: a drawn half-circle gauge with the golden band across its upper right and the needle pointing up-left, its tip well outside the band. The line under the `Stop the needle` button reads `Round 1: the band is 26% of the dial and the needle crosses it in 1.8 seconds` — the difficulty stated in numbers rather than left to be felt. |
+| `golden-dial-stepped.png` | The same round with `prefers-reduced-motion` on. An inner ring of two dozen ticks appears — every position the needle may occupy — the instruction becomes `The needle steps one notch at a time`, and the briefed sweep goes from 1.8 to 2.9 seconds. Reduced motion changes the cadence, not the target: the band is the same 26%. |
+| `golden-dial-won.png` | Three hits in a row and the payout: a yellow pill at the top of the stage reading `Golden cookie redeemed: Windfall`. Another sprite has already spawned lower down, which is the fast developer schedule doing what it is for. |
 | `event-sugar-rush.png` | A **Sugar Rush** five seconds from the end of it: an amber event plate in the HUD with a sun glyph, a draining bar and a `5s` countdown, and a marquee card in the corner saying in plain words what it does — every click lands seven times as hard. Worth a second look for a layout reason as well: the event plate pushed the eight console buttons onto a row of their own, and in that wider HUD the raid-supplies shelf prints all three plates whole. |
 
 **What was seeded, and what was bought.** One image, `plain-start.png`, is an
@@ -106,7 +108,7 @@ was cleared afterwards. Neither is a file patch this time — nothing in `dist/`
 was edited — and neither reaches anything the application cannot already show a
 player whose machine is set the other way.
 
-**The developer-only keys.** `golden-spawn.png` and `golden-puzzle.png` were
+**The developer-only keys.** The four `golden-*.png` frames were
 taken with `material-cookie-clicker:golden:fast` set in a throwaway profile,
 which shortens the five-to-fifteen-minute spawn schedule and lengthens the
 window enough to photograph. `event-sugar-rush.png` was taken with
@@ -114,9 +116,47 @@ window enough to photograph. `event-sugar-rush.png` was taken with
 the pool's schedule and pins the draw to one event. Both keys change **when**
 something happens and nothing else: the event that lands is the real event, with
 its real duration, its real arithmetic and the real one-event-at-a-time rule,
-and the golden's spawn position and the puzzle's odd tile are the scheduler's
+and the golden's spawn position and the dial's band position are the scheduler's
 and the PRNG's own choices. There is no button and no settings row that reaches
 either key, and a player who never sets one never leaves the shipped timing.
+
+**The three Oven Dial frames, and exactly which press was a human's.** They were
+taken in their own session, from the built `dist/`, on an off-screen desktop
+named `GoldenDialCapture`, its own port (9351) and its own throwaway profile;
+`PrintWindow` on the one window, resolved by handle.
+
+The CATCH was a real background Win32 press on the sprite's real coordinates.
+The three winning presses behind `golden-dial-won.png` were **not** hand-timed: a
+short script in the page watched the dial's own `aria-valuetext` and clicked the
+real `Stop the needle` button on the frame it reported `in the band`. That is the
+real control and the real reducer path — the reducer recomputes the needle
+position from the round's start time regardless of who clicked — but it is an
+automated finger rather than a human one, and it is written down that way instead
+of dressed up. The reason is mechanical: a background press costs about a second
+of round trip, and round three's band is open for a fraction of that.
+
+For `golden-dial-stepped.png` one further thing was faked, and only this:
+`window.matchMedia` was overridden in the page so the component's reduced-motion
+probe answered yes, exactly as it would on a machine set that way. The catch then
+froze stepped mode onto the domain state through the ordinary code path. The
+needle positions sampled while that card was open came back as
+`17, 17, 25, 33, 33, 42, 42, 50, 50, 58, 58, 67, 67, 75` — discrete notches, each
+held for a countable stretch. That sample is the evidence behind the claim that
+reduced motion turns this into a rhythm game rather than switching it off.
+
+Three more behaviours were driven and watched rather than photographed: a
+deliberate miss produced the shake and `Missed the band — two seconds off the
+clock`, an Escape produced `The golden cookie got away.`, and reloading the app
+mid-dial round-tripped the caught cookie's position and open round back out of
+the save intact.
+
+**Two defects these frames caught that no test did.** The needle originally
+stopped short of the track, so judging whether it was inside the band — the
+entire game — meant estimating an alignment that was not actually drawn; it now
+crosses the band and carries a hard dot on the track. And the payout line sat 12%
+down the stage, which put it straight across the face of the hero cookie; it is
+pinned to the top of the stage now. Both were found by opening the pictures and
+looking at them.
 
 **The toasts, and why one is in shot.** A save producing fourteen billion cookies
 a second earns a milestone every few seconds, and the application also re-announces
@@ -147,7 +187,7 @@ reads +0%; the Reborn tree and the prestige two-key confirmation gate, which bot
 ship but sit below the fold of `dialog-prestige.png`; the deep end of the
 generator ladder past Shipment; fifteen of the sixteen pool events, and the Mouse
 Raid itself as opposed to the supplies shelf you buy for it; the update notice;
-Cantonese-only mode; and the golden cookie's own puzzle being *solved*. Older
+Cantonese-only mode; and a *missed* press on the Oven Dial, with its shake. Older
 photographs of several of those are still on disk and described further down this
 file; they are not in the tables because they are pictures of builds that have
 since changed.
@@ -173,12 +213,22 @@ lands. The pattern and the sample text were typed in as real key events. The
 image is a Win32 `PrintWindow` capture of that one window, resolved by title and
 class, and it was opened and looked at afterwards.
 
-### The golden cookie: the random spawn and its puzzle — **superseded**
+### The golden cookie: the random spawn and its puzzle — **superseded twice**
 
-> Retaken. `golden-spawn.png` and `golden-puzzle.png` on disk are now the images
-> described in **The current set** above, from the build with the whole feature
-> run in it. What follows is the account of the lane that first photographed
-> them, kept because the method and the observations in it are still true.
+> Superseded, and the file it described is gone. `golden-puzzle.png` photographed
+> **Odd Cookie Out**, a four-by-four "spot the different tile" grid that was the
+> golden cookie's minigame for exactly one release. It was replaced because it
+> failed a decree — *"golden cookie puzzle must be a minigame, not a chance
+> game"* — and it deserved to: the odd tile was seeded, so pressing at random won
+> a round one time in sixteen with no skill in it at all. The Oven Dial replaced
+> it, and `golden-dial*.png` in **The current set** above are what the golden
+> cookie actually opens now. `golden-spawn.png` is still a live file; the sprite
+> did not change.
+>
+> What follows is the account of the lane that first photographed the sprite and
+> that grid, kept because the method in it is still exactly how these are taken,
+> and because a record that quietly deleted its own wrong turn would be worth
+> less than one that says which turn was wrong.
 
 | File | What it shows |
 | --- | --- |
@@ -703,15 +753,19 @@ gap in evidence, not a feature known to be broken — nobody has looked.
 - The factory's **automation** branch shipping by itself when a tank crosses its
   threshold. The Auto-ship switch is in `dialog-factory.png` with its price on
   it; no capture shows a lorry leaving without a press.
-- The golden cookie's puzzle being **solved** — the win, the wrong-pick shake and
-  the walk-away line were all exercised in an earlier lane and written down as
-  observations there, never photographed.
+- A **missed** press on the Oven Dial, with the card's shake and its
+  `Missed the band — two seconds off the clock` line. The miss and the walk-away
+  were both driven and watched during the dial lane and written down there as
+  observations; only the win was photographed.
 - The **deep end of the generator ladder**, past Shipment.
 
 **Things declared only in CSS**
 
 - The factory panel, the golden sprite and the raid under **reduced motion**,
   where the pipe flow, the derrick, the ray-burst and the scurrying all stop.
+  (The dial's own reduced-motion behaviour is the exception — it is a domain
+  mode rather than a CSS declaration, and it is photographed in
+  `golden-dial-stepped.png`.)
 - The golden sprite under the **plain look tier**, where it deliberately keeps
   its drawing while the hero cookie loses its own.
 

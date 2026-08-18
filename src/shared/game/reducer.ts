@@ -6,7 +6,7 @@ import {
   despawnIfExpired,
   fleeGoldenCookie,
   maybeSpawnGoldenCookie,
-  pickGoldenPuzzleTile,
+  pressGoldenDial,
   isEffectActive,
   type GoldenCookieConfig,
   DEFAULT_GOLDEN_COOKIE_CONFIG,
@@ -153,14 +153,22 @@ export type GameAction =
   | { readonly type: "buyControlUnlock"; readonly rungId: string }
   | { readonly type: "tick"; readonly elapsedMs: number }
   /**
-   * CATCHING the golden-cookie sprite where it spawned on the stage. Opens the Odd Cookie Out
-   * puzzle; it does NOT redeem anything by itself. Replaces the old `collectGoldenCookie` action
-   * and its ten-press countdown.
+   * CATCHING the golden-cookie sprite where it spawned on the stage. Opens the Oven Dial; it
+   * does NOT redeem anything by itself.
+   *
+   * `stepped` is the player's `prefers-reduced-motion` setting at the moment of the catch, read
+   * by the view because the domain has no window to ask. It is the ONE thing the view is trusted
+   * with here, it is frozen onto the dial state immediately, and it changes only the cadence of
+   * the needle — never the zone, the rounds or the reward.
    */
-  | { readonly type: "goldenCatch" }
-  /** One tile press in the open puzzle. Three correct picks in a row redeem the cookie. */
-  | { readonly type: "goldenPuzzlePick"; readonly tileIndex: number }
-  /** Escape from the puzzle card, or a deliberate walk-away: the cookie flees, normal cooldown. */
+  | { readonly type: "goldenCatch"; readonly stepped?: boolean }
+  /**
+   * One press on the open dial. The action deliberately carries NO needle position: the reducer
+   * recomputes where the needle was from the round's start time and the clock, so a hand-built
+   * dispatch cannot claim a hit it did not earn. Three hits in a row redeem the cookie.
+   */
+  | { readonly type: "goldenDialPress" }
+  /** Escape from the dial card, or a deliberate walk-away: the cookie flees, normal cooldown. */
   | { readonly type: "goldenFlee" }
   /**
    * A click on one of the active random event's own targets -- a falling cookie during Cookie
@@ -662,33 +670,44 @@ function handleTick(state: GameState, ctx: ReducerCtx, elapsedMs: number): GameS
 }
 
 /**
- * CATCH, THEN PUZZLE — how a golden cookie is redeemed now.
+ * CATCH, THEN THE OVEN DIAL — how a golden cookie is redeemed.
  *
- * The old mechanism was a ten-press countdown on the hero cookie (`GOLDEN_COOKIE_REDEEM_CLICKS`,
- * deleted along with `GoldenCookieState.redeemClicks`). It has been replaced by: catch the
- * sprite where it spawned, then find the odd cookie out three times. The owner's standing decree
- * — "the user must press it 10 times to redeem, not auto redeem" — is kept in SPIRIT: the catch
- * plus three rounds of a sixteen-tile grid is about ten deliberate presses, and nothing about it
- * is automatic. A save written mid-spawn under the old scheme simply loses its press count and
- * gets a fresh spawn (see save-schema.ts).
+ * The history, because two owner decrees are stacked here and both still apply:
+ *
+ *   1. "the user must press it 10 times to redeem, not auto redeem". First built literally, as a
+ *      ten-press countdown on the hero cookie (`GOLDEN_COOKIE_REDEEM_CLICKS` and
+ *      `GoldenCookieState.redeemClicks`, both long deleted).
+ *   2. "golden cookie puzzle must be a minigame, not a chance game". The countdown was replaced
+ *      by Odd Cookie Out, a seeded spot-the-difference grid — and that failed this decree, since
+ *      a lucky first press won a round outright. Its fields are deleted too.
+ *
+ * What stands now satisfies both. The Oven Dial is pure timing: the needle's position is an
+ * exact function of elapsed milliseconds (golden-cookie.ts#goldenDialNeedlePosition) on a fixed
+ * published difficulty curve that is the same for everyone, so a press either was or was not
+ * inside a zone the player could see. And redemption still costs a catch plus at least three
+ * deliberate timed presses, with every miss costing seconds and another press — never one click,
+ * never automatic.
+ *
+ * A save written mid-dial under either older scheme simply loses it and gets a fresh spawn (see
+ * save-schema.ts).
  */
-function handleGoldenCatch(state: GameState, ctx: ReducerCtx): GameState {
-  const goldenCookie = catchGoldenCookie(state.goldenCookie, ctx.rng);
+function handleGoldenCatch(state: GameState, ctx: ReducerCtx, stepped: boolean): GameState {
+  const goldenCookie = catchGoldenCookie(state.goldenCookie, ctx.rng, ctx.now(), stepped);
   if (goldenCookie === state.goldenCookie) return state;
   return { ...state, goldenCookie };
 }
 
-function handleGoldenPuzzlePick(state: GameState, ctx: ReducerCtx, tileIndex: number): GameState {
-  const result = pickGoldenPuzzleTile(state.goldenCookie, tileIndex, ctx.rng);
-  if (!result.solved) {
+function handleGoldenDialPress(state: GameState, ctx: ReducerCtx): GameState {
+  const nowMs = ctx.now();
+  const result = pressGoldenDial(state.goldenCookie, nowMs, ctx.rng);
+  if (!result.won) {
     if (result.goldenCookie === state.goldenCookie) return state;
     return { ...state, goldenCookie: result.goldenCookie };
   }
 
-  // Solved all three rounds: the real redemption, through the same pure collect the game has
-  // always used, so the effect roll and the golden-upgrade bonuses are unchanged.
+  // Won all three rounds: the real redemption, through the same pure collect the game has always
+  // used, so the effect roll and the golden-upgrade bonuses are unchanged.
   const config = ctx.goldenCookieConfig ?? DEFAULT_GOLDEN_COOKIE_CONFIG;
-  const nowMs = ctx.now();
   const collected = collectGoldenCookiePure(result.goldenCookie, state, nowMs, ctx.rng, config);
 
   let nextState: GameState = { ...state, goldenCookie: collected.goldenCookie };
@@ -987,9 +1006,9 @@ export function applyGameAction(state: GameState, action: GameAction, ctx: Reduc
     case "tick":
       return handleTick(state, ctx, action.elapsedMs);
     case "goldenCatch":
-      return handleGoldenCatch(state, ctx);
-    case "goldenPuzzlePick":
-      return handleGoldenPuzzlePick(state, ctx, action.tileIndex);
+      return handleGoldenCatch(state, ctx, action.stepped ?? false);
+    case "goldenDialPress":
+      return handleGoldenDialPress(state, ctx);
     case "goldenFlee":
       return handleGoldenFlee(state, ctx);
     case "randomEventClick":

@@ -528,59 +528,150 @@ export function CookieIcon({ extraClass }: { extraClass?: string } = {}) {
   );
 }
 
+/** Polar helper for the dial: a track position 0..1 becomes a point on the half-circle face. */
+function dialPoint(position: number, radius: number): { x: number; y: number } {
+  const theta = Math.PI * (1 - Math.min(Math.max(position, 0), 1));
+  return { x: 100 + radius * Math.cos(theta), y: 100 - radius * Math.sin(theta) };
+}
+
+/** The arc path between two track positions at one radius. Always the short way round. */
+function dialArc(from: number, to: number, radius: number): string {
+  const a = dialPoint(from, radius);
+  const b = dialPoint(to, radius);
+  return `M ${a.x.toFixed(2)} ${a.y.toFixed(2)} A ${radius} ${radius} 0 0 1 ${b.x.toFixed(2)} ${b.y.toFixed(2)}`;
+}
+
 /**
- * ONE TILE of the Odd Cookie Out puzzle (GoldenCookieStage.tsx).
+ * THE OVEN DIAL (GoldenCookieStage.tsx) — a temperature gauge off the front of the oven, drawn in
+ * the same idiom as the rest of the cabinet: a chunky outlined face, struck-metal bezel, hard
+ * tick marks, and a needle with a real pivot boss.
  *
- * Sixteen of these are drawn per round and exactly one is `odd`. The difference is deliberately
- * SUBTLE but never invisible, and it is always a difference in the drawing itself rather than in
- * colour alone — a colour-only tell would be unfindable for a colour-blind player:
+ * Everything here is a function of its props and nothing here decides anything. `position` is the
+ * needle's place on the track and comes from the DOMAIN's pure needle function, so the drawing is
+ * a picture of the same number the reducer will judge. The golden zone is painted BEFORE the
+ * press — that is the whole reason the dial is a test of timing rather than of luck.
  *
- *   variant 0 — the whole cookie is rotated a few degrees
- *   variant 1 — one chip is missing
- *   variant 2 — one extra chip, low and left
- *   variant 3 — the chips are mirrored left-to-right
- *
- * `hint` draws a faint ring on the odd tile. It is set only after two wrong picks in a round,
- * as the merciful step described in GoldenCookieStage.tsx.
+ * `stepped` draws the tick marks the needle is allowed to land on, because in reduced-motion mode
+ * those positions are the entire game: the needle occupies them and nothing between them.
  */
-export function PuzzleCookieTileArt({
-  odd = false,
-  variant = 0,
-  hint = false,
-}: { odd?: boolean; variant?: number; hint?: boolean } = {}) {
-  const rotate = odd && variant === 0 ? 7 : 0;
-  const mirror = odd && variant === 3;
-  const chips: readonly (readonly [number, number, number])[] = [
-    [11.4, 11.6, 2],
-    [19.6, 10.6, 1.7],
-    [21.4, 18.6, 2.1],
-    [12.4, 20.4, 1.8],
-    [16, 15.4, 1.3],
-  ];
-  const drawn = odd && variant === 1 ? chips.slice(0, 4) : chips;
+export function OvenDialArt({
+  position,
+  zoneCentre,
+  zoneHalfWidth,
+  stepped = false,
+  steps = 24,
+  outcome,
+}: {
+  position: number;
+  zoneCentre: number;
+  zoneHalfWidth: number;
+  stepped?: boolean;
+  steps?: number;
+  outcome?: 'hit' | 'miss';
+}) {
+  // The needle reaches ACROSS the band (which spans radius 64..76) rather than stopping short of
+  // it. Judging "is the tip inside the gold" is the entire game, and a needle that ended before
+  // the track made the player estimate an alignment they could not actually see.
+  const needle = dialPoint(position, 78);
+  const needleInner = dialPoint(position, 16);
+  const needleTip = dialPoint(position, 70);
+  const zoneFrom = Math.max(0, zoneCentre - zoneHalfWidth);
+  const zoneTo = Math.min(1, zoneCentre + zoneHalfWidth);
+  const majorTicks = [0, 0.25, 0.5, 0.75, 1];
+  const stepTicks = stepped ? Array.from({ length: steps + 1 }, (_, i) => i / steps) : [];
 
   return (
     <svg
-      className="golden-puzzle__tile-art"
-      viewBox="0 0 32 32"
+      className="golden-dial__art"
+      viewBox="0 0 200 118"
+      role="img"
       aria-hidden="true"
       focusable="false"
-      stroke={INK}
-      strokeWidth={1.4}
-      strokeLinejoin="round"
-      strokeLinecap="round"
       fill="none"
+      strokeLinecap="round"
     >
-      <g transform={`rotate(${rotate} 16 16)${mirror ? ' translate(32 0) scale(-1 1)' : ''}`}>
-        <circle cx="16" cy="16" r="13" fill={DOUGH} stroke={CRUST_DARK} strokeWidth={1.6} />
-        <path d="M16 3a13 13 0 0 1 0 26z" fill={CRUST} stroke="none" opacity={0.28} />
-        {drawn.map(([cx, cy, r], index) => (
-          <circle key={index} cx={cx} cy={cy} r={r} fill={CHIP} stroke="none" />
-        ))}
-        {odd && variant === 2 ? <circle cx="9.6" cy="16.6" r="1.6" fill={CHIP} stroke="none" /> : null}
-        <path d="M7.6 9.6a11 11 0 0 1 5-4.4" stroke={HIGHLIGHT} strokeWidth={1.6} />
-      </g>
-      {hint ? <circle cx="16" cy="16" r="14.4" stroke={CRUST_DARK} strokeWidth={1.2} opacity={0.55} /> : null}
+      {/* The face: a struck-metal half disc under everything else. */}
+      <path
+        d={`${dialArc(0, 1, 84)} L 100 100 Z`}
+        fill={DOUGH}
+        stroke={INK}
+        strokeWidth={4}
+        strokeLinejoin="round"
+      />
+      {/* The track the needle runs along. */}
+      <path d={dialArc(0, 1, 70)} stroke={CRUST_DARK} strokeWidth={12} opacity={0.28} />
+      {/* THE GOLDEN ZONE — the target, painted before the press, never after it. */}
+      <path d={dialArc(zoneFrom, zoneTo, 70)} stroke={GOLD} strokeWidth={12} />
+      <path d={dialArc(zoneFrom, zoneTo, 70)} stroke={GOLD_RING} strokeWidth={2} opacity={0.75} />
+      {/* Its edges, marked hard, so where the zone stops is never a matter of judging a gradient. */}
+      {[zoneFrom, zoneTo].map((edge, index) => {
+        const outer = dialPoint(edge, 78);
+        const inner = dialPoint(edge, 62);
+        return (
+          <line
+            key={index}
+            x1={inner.x}
+            y1={inner.y}
+            x2={outer.x}
+            y2={outer.y}
+            stroke={GOLD_RING}
+            strokeWidth={3}
+          />
+        );
+      })}
+      {majorTicks.map((tick) => {
+        const outer = dialPoint(tick, 84);
+        const inner = dialPoint(tick, 74);
+        return (
+          <line
+            key={`major-${tick}`}
+            x1={inner.x}
+            y1={inner.y}
+            x2={outer.x}
+            y2={outer.y}
+            stroke={INK}
+            strokeWidth={3}
+          />
+        );
+      })}
+      {/* Stepped mode: every position the needle can occupy, drawn. In this mode they ARE the
+          game — the needle sits on one of these and never between two of them. */}
+      {stepTicks.map((tick) => {
+        const outer = dialPoint(tick, 60);
+        const inner = dialPoint(tick, 55);
+        return (
+          <line
+            key={`step-${tick}`}
+            x1={inner.x}
+            y1={inner.y}
+            x2={outer.x}
+            y2={outer.y}
+            stroke={INK}
+            strokeWidth={1.5}
+            opacity={0.5}
+          />
+        );
+      })}
+      {/* The needle, and the boss it turns on. */}
+      <line
+        x1={needleInner.x}
+        y1={needleInner.y}
+        x2={needle.x}
+        y2={needle.y}
+        stroke={outcome === 'hit' ? GOLD_DEEP : CRUST_DARK}
+        strokeWidth={6}
+      />
+      {/* A hard dot exactly on the track, so the reading is a point rather than a whole stroke. */}
+      <circle
+        cx={needleTip.x}
+        cy={needleTip.y}
+        r={4}
+        fill={outcome === 'hit' ? GOLD_DEEP : CRUST_DARK}
+        stroke={DOUGH}
+        strokeWidth={1.5}
+      />
+      <circle cx="100" cy="100" r="11" fill={METAL_LO} stroke={INK} strokeWidth={3} />
+      <circle cx="97" cy="97" r="3" fill={METAL_HI} stroke="none" />
     </svg>
   );
 }

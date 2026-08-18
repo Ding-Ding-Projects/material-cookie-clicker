@@ -1,80 +1,127 @@
 import { useEffect, useRef, useState, type CSSProperties } from 'react';
 
 import {
-  GOLDEN_PUZZLE_ROUNDS,
-  GOLDEN_PUZZLE_TILE_COUNT,
+  GOLDEN_DIAL_ROUNDS,
+  GOLDEN_DIAL_STEPS,
+  goldenDialNeedlePosition,
+  goldenDialRound,
+  goldenDialSweepMs,
 } from '../../shared/game/golden-cookie.js';
-import { HeroCookieArt, PuzzleCookieTileArt } from '../assets/icons.js';
-import { bilingualText, showsCantonese, showsEnglish, GOLDEN_PUZZLE_COPY } from '../game/copy.js';
+import { HeroCookieArt, OvenDialArt } from '../assets/icons.js';
+import { bilingualText, showsCantonese, showsEnglish, GOLDEN_DIAL_COPY } from '../game/copy.js';
 import { useGameDispatch, useStructureSnapshot } from '../game/GameProvider.js';
 
 /**
- * THE GOLDEN COOKIE, ON THE STAGE — catch it, then solve it.
+ * THE GOLDEN COOKIE, ON THE STAGE — catch it, then beat the Oven Dial.
  *
- * Owner decrees, in order: the golden cookie "needs to appear somewhere random on screen" "and
- * opens a puzzle". Both are here, and the older standing decree ("the user must press it 10
- * times to redeem, not auto redeem") is honoured in spirit rather than by literal count — see
- * reducer.ts#handleGoldenCatch. The catch is one press and the puzzle is three rounds of a
- * sixteen-tile grid, so redemption costs about ten deliberate presses and is never automatic.
+ * Owner decrees, in the order they arrived: the golden cookie "needs to appear somewhere random
+ * on screen" "and opens a puzzle"; then, of what that puzzle had to be, "golden cookie puzzle
+ * must be a minigame, not a chance game."
  *
- * A VIEW, like RandomEventStage beside it. Nothing here decides where the cookie is, which tile
- * is odd, what a wrong pick costs or what the cookie is worth: the position and the odd tile are
- * drawn from the seeded rng in the domain (golden-cookie.ts) and persisted in the save, so the
- * cookie does not teleport between renders and a seeded replay puts it in the same place twice.
- * This file positions, draws and dispatches.
+ * THE SECOND DECREE IS WHY THIS FILE NO LONGER DRAWS A GRID. The first attempt was Odd Cookie
+ * Out: sixteen tiles, one subtly different, three rounds. It looked like a puzzle and behaved
+ * like a lottery — the odd tile was seeded, and a player who pressed a tile at random won one
+ * round in sixteen with no skill involved at all. The Oven Dial has no such hole. A needle sweeps
+ * the face; its position is an exact function of how long the round has been running
+ * (golden-cookie.ts#goldenDialNeedlePosition); you press to stop it inside a band you can see.
+ * The difficulty curve is fixed and published — round one is a 26% band under a 1.8s sweep, round
+ * three a 13% band under a 1.05s sweep — and it is the same three rounds for every player, every
+ * save and every seed. The only seeded value in the whole minigame is where on the face the band
+ * SITS, which cannot decide anything, because the band is painted before the press.
  *
- * ── THE ACCESSIBILITY NOTE, STATED HONESTLY ─────────────────────────────────────────────────
+ * A VIEW, like RandomEventStage beside it. The spawn position, the band position, the needle
+ * function and the verdict on a press all live in the domain, and the press action deliberately
+ * carries no needle position — the reducer recomputes it from the round's start time and the
+ * clock, so this component cannot claim a hit it did not earn. What this file owns is the
+ * animation frame, the drawing and the words.
  *
- * Odd Cookie Out is a SIGHTED-SKILL minigame. Every tile carries the same accessible name
- * ("Cookie tile 5" and so on) and the odd one is NOT named as odd, because naming it would hand
- * a screen-reader user the answer instantly while a sighted player hunts for it — the mirror of
- * the unfairness, not a fix for it. So the difference is visual, and we do not pretend otherwise.
+ * ── ACCESSIBILITY: WHAT IS AND IS NOT ACHIEVED ──────────────────────────────────────────────
  *
- * What that costs is bounded on purpose, and this is the whole mitigation:
+ * This is a genuine improvement on the tile hunt it replaced, and it is still not a game a blind
+ * player can play as well as a sighted one. Both halves of that are worth stating.
  *
- *   - Failing costs NOTHING that was already owned. A wrong pick burns two seconds of the
- *     cookie's own window; running out of time, or pressing Escape, simply lets the cookie flee
- *     and the ordinary cooldown starts. No cookies are lost, no progress is undone, and golden
- *     cookies are a bonus on top of the game rather than a gate through it.
- *   - After TWO wrong picks in a round the odd tile is RINGED (PuzzleCookieTileArt `hint`) and
- *     that fact is announced through this card's status line. It is still a visual ring — it
- *     makes the puzzle easier for anyone with low vision or a bad monitor, and it does not make
- *     it solvable without sight. Saying so plainly is better than an aria-label that quietly
- *     turns a puzzle into a lottery for some players and a test for others.
- *   - The difference is never colour alone (rotation, a missing chip, an extra chip, a mirror),
- *     so it survives colour-blindness and a greyscale display.
+ * What IS achieved:
  *
- * The rest of the dialog discipline is the full AnchoredPanel contract, scaled down: role
- * dialog, aria-modal, labelled by its own heading, focus moved in and trapped, Escape closes
- * (here, Escape lets the cookie flee), and focus restored to what opened it.
+ *   - The game is ONE BUTTON with ONE fixed name ("Stop the needle"). There is nothing to hunt
+ *     for, nothing to compare, and no spatial search. Space or Enter on a focused button is the
+ *     entire input, which is a far better keyboard game than sixteen tiles ever were.
+ *   - The dial is a real `role="slider"`, and its `aria-valuetext` states, continuously, where
+ *     the needle is and whether it is currently inside the band ("42%, outside the band" /
+ *     "58%, IN THE BAND"). That is the position conveyed non-visually rather than only drawn.
+ *     Screen readers throttle live updates, so this is a coarse read of a moving value, not a
+ *     frame-accurate one — it is a genuine aid, not a promise of parity.
+ *   - Each round is BRIEFED in text before it is played: the band's width as a percentage and the
+ *     sweep time in seconds, announced through the card's status region. The difficulty is stated
+ *     rather than merely felt, and because the curve is fixed those numbers are the same numbers
+ *     every other player gets.
+ *   - Under `prefers-reduced-motion` the needle does not sweep: it STEPS, one notch of
+ *     twenty-four at a time, on a cadence 1.6x slower than the continuous sweep. That is a rhythm
+ *     game — countable, learnable, and playable without watching a moving object at all. The
+ *     mode is frozen onto the domain state at the catch, so the position judged is exactly the
+ *     position shown, and the drawn ticks are exactly the positions the needle can occupy.
+ *
+ * What is NOT achieved: a player who cannot see the dial at all is relying on `aria-valuetext`
+ * updates that no specification guarantees the timing of, and in continuous mode that is not good
+ * enough to hit a 13% band reliably. The honest mitigation is the same one the whole feature
+ * rests on: FAILING COSTS NOTHING ALREADY OWNED. A miss burns two seconds of the cookie's own
+ * window and nothing else, and a timeout or an Escape just lets a bonus go. Golden cookies sit on
+ * top of the game, never across it, so no progress, no purchase and no achievement is gated
+ * behind beating this dial.
+ *
+ * The rest of the dialog discipline is the full AnchoredPanel contract, scaled down: role dialog,
+ * aria-modal, labelled by its own heading, focus moved in and trapped, Escape closes (here,
+ * Escape lets the cookie flee), and focus restored afterwards.
  */
-
-/** The 4x4 grid, as a flat list of indices. */
-const TILE_INDICES = Array.from({ length: GOLDEN_PUZZLE_TILE_COUNT }, (_, index) => index);
-
-/** Wrong picks in one round after which the odd tile is ringed. */
-const HINT_AFTER_WRONG_PICKS = 2;
 
 const FOCUSABLE_SELECTOR = 'button:not([disabled])';
 
 type Outcome = { readonly kind: 'redeemed' | 'fled'; readonly key: number };
+type PressFeedback = { readonly kind: 'hit' | 'miss'; readonly key: number };
 
 let outcomeKeySeq = 0;
+
+/** Whether the player has asked the system for less motion. Read at the catch, then frozen. */
+function prefersReducedMotion(): boolean {
+  if (typeof window === 'undefined' || typeof window.matchMedia !== 'function') return false;
+  return window.matchMedia('(prefers-reduced-motion: reduce)').matches;
+}
 
 export function GoldenCookieStage() {
   const dispatch = useGameDispatch();
   const structure = useStructureSnapshot();
   const golden = structure.goldenCookie;
-  const spriteRef = useRef<HTMLButtonElement | null>(null);
   const cardRef = useRef<HTMLDivElement | null>(null);
   const [outcome, setOutcome] = useState<Outcome | null>(null);
-  const [shakeKey, setShakeKey] = useState(0);
+  const [feedback, setFeedback] = useState<PressFeedback | null>(null);
 
-  // A spawn with no position is a save written before this redesign (save-schema.ts explains
+  // A spawn with no position is a save written before the sprite existed (save-schema.ts explains
   // why no migration invents one): treat it as nothing spawned and let the scheduler hand out a
   // fresh cookie on the next tick rather than drawing one in the corner.
   const positioned = golden.isSpawned && golden.spawnXPct !== undefined && golden.spawnYPct !== undefined;
-  const puzzle = positioned ? golden.puzzle : undefined;
+  const dial = positioned ? golden.dial : undefined;
+  const dialOpen = dial !== undefined;
+
+  /**
+   * WHERE THE NEEDLE IS, THIS FRAME.
+   *
+   * Kept in component state and advanced on an animation frame, but NEVER used to decide
+   * anything: it is recomputed from the domain's own pure function on the domain's own round
+   * start time, so it is a picture of the number the reducer will independently recompute when a
+   * press lands. Drawing from a second, drifting clock is exactly how a dial minigame becomes a
+   * liar, so there is only one clock and one function.
+   */
+  const [needle, setNeedle] = useState(0);
+  useEffect(() => {
+    if (!dial) return undefined;
+    let frame = 0;
+    const roundIndex = Math.min(dial.roundsWon, GOLDEN_DIAL_ROUNDS - 1);
+    const tick = () => {
+      setNeedle(goldenDialNeedlePosition(Date.now() - dial.roundStartedAtEpochMs, roundIndex, dial.stepped));
+      frame = requestAnimationFrame(tick);
+    };
+    tick();
+    return () => cancelAnimationFrame(frame);
+  }, [dial?.roundStartedAtEpochMs, dial?.roundsWon, dial?.stepped, dialOpen]);
 
   /**
    * What happened to the cookie that just left the stage. Redeemed if it left carrying a new
@@ -92,57 +139,63 @@ export function GoldenCookieStage() {
     if (!previous.spawned || golden.isSpawned) return;
     const redeemed = golden.activeEffect !== previous.effect;
     setOutcome({ kind: redeemed ? 'redeemed' : 'fled', key: ++outcomeKeySeq });
+    setFeedback(null);
   }, [golden.isSpawned, golden.activeEffect]);
 
-  // The outcome line clears itself; it is a report, not a permanent fixture.
+  /**
+   * The outcome line clears itself; it is a report, not a permanent fixture. Six and a half
+   * seconds rather than the four it used to get: this is the ONE line that names what the cookie
+   * paid out, it arrives at the end of a minigame the player was concentrating on, and four
+   * seconds was short enough to miss while still looking at the dial that had just closed.
+   */
   useEffect(() => {
     if (!outcome) return;
-    const timer = setTimeout(() => setOutcome(null), 4200);
+    const timer = setTimeout(() => setOutcome(null), 6500);
     return () => clearTimeout(timer);
   }, [outcome]);
 
   /**
-   * Focus moves into the card when it opens, and on the way out it goes to the HERO COOKIE
-   * rather than back to whatever opened the card: the sprite that opened it no longer exists by
-   * then (caught, redeemed or fled), and a card that closed leaving focus on <body> would strand
-   * a keyboard player at the top of the document. The hero cookie is the thing they were using
-   * before the golden one interrupted them.
+   * Focus moves into the card when it opens, and on the way out it goes to the HERO COOKIE rather
+   * than back to whatever opened the card: the sprite that opened it no longer exists by then
+   * (caught, redeemed or fled), and a card that closed leaving focus on <body> would strand a
+   * keyboard player at the top of the document.
    */
-  const puzzleOpen = puzzle !== undefined;
   useEffect(() => {
-    if (puzzleOpen) {
-      cardRef.current?.querySelector<HTMLElement>(FOCUSABLE_SELECTOR)?.focus();
-      return () => {
-        if (document.activeElement === document.body || document.activeElement === null) {
-          document.querySelector<HTMLElement>('.cookie-btn')?.focus();
-        }
-      };
-    }
-    return undefined;
-  }, [puzzleOpen]);
+    if (!dialOpen) return undefined;
+    cardRef.current?.querySelector<HTMLElement>(FOCUSABLE_SELECTOR)?.focus();
+    return () => {
+      if (document.activeElement === document.body || document.activeElement === null) {
+        document.querySelector<HTMLElement>('.cookie-btn')?.focus();
+      }
+    };
+  }, [dialOpen]);
 
   if (!positioned && !outcome) return null;
 
-  const wrongPicks = puzzle?.wrongPicks ?? 0;
-  const roundsSolved = puzzle?.roundsSolved ?? 0;
-  const showHint = wrongPicks >= HINT_AFTER_WRONG_PICKS;
+  const roundIndex = dial ? Math.min(dial.roundsWon, GOLDEN_DIAL_ROUNDS - 1) : 0;
+  const curve = goldenDialRound(roundIndex);
+  const insideBand = dial ? Math.abs(needle - dial.zoneCentre) <= curve.zoneHalfWidth : false;
+  const bandWidthPct = Math.round(curve.zoneHalfWidth * 200);
+  const sweepSeconds = dial ? (goldenDialSweepMs(roundIndex, dial.stepped) / 1000).toFixed(1) : '0';
 
-  function pick(index: number): void {
-    if (!puzzle) return;
-    if (index !== puzzle.oddIndex) setShakeKey((key) => key + 1);
-    dispatch({ type: 'goldenPuzzlePick', tileIndex: index });
+  function press(): void {
+    if (!dial) return;
+    // Read the verdict the same way the reducer will, purely so the shake and the line match what
+    // the domain decided. The domain is still the only thing that CHANGES anything.
+    const wasInside = Math.abs(needle - dial.zoneCentre) <= curve.zoneHalfWidth;
+    setFeedback({ kind: wasInside ? 'hit' : 'miss', key: ++outcomeKeySeq });
+    dispatch({ type: 'goldenDialPress' });
   }
 
   return (
     <div className="golden-stage">
-      {positioned && !puzzle ? (
+      {positioned && !dial ? (
         <button
           type="button"
-          ref={spriteRef}
           className="golden-sprite"
           style={{ '--golden-x': `${golden.spawnXPct}%`, '--golden-y': `${golden.spawnYPct}%` } as CSSProperties}
-          aria-label={bilingualText(GOLDEN_PUZZLE_COPY.spriteLabel)}
-          onClick={() => dispatch({ type: 'goldenCatch' })}
+          aria-label={bilingualText(GOLDEN_DIAL_COPY.spriteLabel)}
+          onClick={() => dispatch({ type: 'goldenCatch', stepped: prefersReducedMotion() })}
         >
           {/* The wash and the ray-burst that used to sit over the hero cookie now sit on the
               thing they were always about. Decorative; the button carries the name. */}
@@ -151,28 +204,24 @@ export function GoldenCookieStage() {
         </button>
       ) : null}
 
-      {positioned && puzzle ? (
+      {positioned && dial ? (
         <div
-          className="golden-puzzle-scrim"
+          className="golden-dial-scrim"
           onMouseDown={(event) => {
-            // A press on the dimmed stage behind is a walk-away, and a walk-away lets it flee.
+            // A press on the dimmed surface behind is a walk-away, and a walk-away lets it flee.
             if (event.target === event.currentTarget) dispatch({ type: 'goldenFlee' });
           }}
         >
           <div
-            className="golden-puzzle"
+            className="golden-dial-card"
             role="dialog"
             aria-modal="true"
-            aria-labelledby="golden-puzzle-title"
-            aria-describedby="golden-puzzle-status"
+            aria-labelledby="golden-dial-title"
             ref={cardRef}
-            data-shake={shakeKey}
-            key={shakeKey}
+            data-feedback={feedback?.kind}
+            key={feedback?.key ?? 'fresh'}
             style={
-              {
-                '--golden-x': `${golden.spawnXPct}%`,
-                '--golden-y': `${golden.spawnYPct}%`,
-              } as CSSProperties
+              { '--golden-x': `${golden.spawnXPct}%`, '--golden-y': `${golden.spawnYPct}%` } as CSSProperties
             }
             onKeyDown={(event) => {
               if (event.key === 'Escape') {
@@ -196,49 +245,61 @@ export function GoldenCookieStage() {
               }
             }}
           >
-            <h2 className="golden-puzzle__title" id="golden-puzzle-title">
-              {showsEnglish() ? <span>{GOLDEN_PUZZLE_COPY.title.en}</span> : null}
-              {showsCantonese() ? <span className="golden-puzzle__title-zh">{GOLDEN_PUZZLE_COPY.title.yue}</span> : null}
+            <h2 className="golden-dial-card__title" id="golden-dial-title">
+              {showsEnglish() ? <span>{GOLDEN_DIAL_COPY.title.en}</span> : null}
+              {showsCantonese() ? (
+                <span className="golden-dial-card__title-zh">{GOLDEN_DIAL_COPY.title.yue}</span>
+              ) : null}
             </h2>
-            <p className="golden-puzzle__round">
-              {bilingualText(GOLDEN_PUZZLE_COPY.round(roundsSolved + 1, GOLDEN_PUZZLE_ROUNDS))}
+            <p className="golden-dial-card__round">
+              {bilingualText(GOLDEN_DIAL_COPY.round(dial.roundsWon + 1, GOLDEN_DIAL_ROUNDS))}
             </p>
-            <p className="golden-puzzle__instruction">{bilingualText(GOLDEN_PUZZLE_COPY.instruction)}</p>
-            {/* role="grid" would oblige a full grid-navigation contract (rows, cells, roving
-                focus). Sixteen buttons in a labelled group with ordinary Tab order keeps the
-                promise it makes, so that is what this is. */}
+            <p className="golden-dial-card__instruction">
+              {bilingualText(dial.stepped ? GOLDEN_DIAL_COPY.steppedInstruction : GOLDEN_DIAL_COPY.instruction)}
+            </p>
+
+            {/* The dial as a real slider: a value with a range and, crucially, a valuetext that
+                says in words both where the needle is and whether it is in the band. This is the
+                non-visual channel for a position that is otherwise only drawn. It is read-only —
+                arrow keys do not move the needle, because the needle is the clock's, not the
+                player's; the ONE thing the player does is stop it. */}
             <div
-              className="golden-puzzle__grid"
-              role="group"
-              aria-label={bilingualText(GOLDEN_PUZZLE_COPY.instruction)}
+              className="golden-dial"
+              role="slider"
+              aria-readonly="true"
+              aria-label={bilingualText(GOLDEN_DIAL_COPY.instruction)}
+              aria-valuemin={0}
+              aria-valuemax={100}
+              aria-valuenow={Math.round(needle * 100)}
+              aria-valuetext={`${Math.round(needle * 100)}%${insideBand ? ', in the band' : ', outside the band'}`}
             >
-              {TILE_INDICES.map((index) => (
-                <button
-                  key={index}
-                  type="button"
-                  className="golden-puzzle__tile"
-                  // EVERY tile gets the same shape of name and none of them says "odd". See the
-                  // accessibility note at the top of this file.
-                  aria-label={bilingualText(GOLDEN_PUZZLE_COPY.tileLabel(index + 1))}
-                  onClick={() => pick(index)}
-                >
-                  <PuzzleCookieTileArt
-                    odd={index === puzzle.oddIndex}
-                    variant={puzzle.variant}
-                    hint={showHint && index === puzzle.oddIndex}
-                  />
-                </button>
-              ))}
+              <OvenDialArt
+                position={needle}
+                zoneCentre={dial.zoneCentre}
+                zoneHalfWidth={curve.zoneHalfWidth}
+                stepped={dial.stepped}
+                steps={GOLDEN_DIAL_STEPS}
+                outcome={feedback?.kind}
+              />
             </div>
-            <p className="golden-puzzle__status" id="golden-puzzle-status" role="status" aria-live="polite">
-              {showHint
-                ? bilingualText(GOLDEN_PUZZLE_COPY.hintOffered)
-                : wrongPicks > 0
-                  ? bilingualText(GOLDEN_PUZZLE_COPY.wrongPick)
-                  : ''}
+
+            <button type="button" className="golden-dial-card__stop" onClick={press}>
+              {bilingualText(GOLDEN_DIAL_COPY.stopLabel)}
+            </button>
+
+            {/* One status region carrying the round briefing and the verdict on the last press.
+                The briefing states the difficulty in numbers, so the curve is something a player
+                is told rather than something they have to infer from how it felt. */}
+            <p className="golden-dial-card__status" role="status" aria-live="polite">
+              {feedback
+                ? bilingualText(feedback.kind === 'hit' ? GOLDEN_DIAL_COPY.hit : GOLDEN_DIAL_COPY.miss)
+                : bilingualText(
+                    GOLDEN_DIAL_COPY.roundBriefing(dial.roundsWon + 1, bandWidthPct, sweepSeconds),
+                  )}
             </p>
-            <button type="button" className="golden-puzzle__close" onClick={() => dispatch({ type: 'goldenFlee' })}>
-              {bilingualText(GOLDEN_PUZZLE_COPY.close)}
+
+            <button type="button" className="golden-dial-card__close" onClick={() => dispatch({ type: 'goldenFlee' })}>
+              {bilingualText(GOLDEN_DIAL_COPY.close)}
             </button>
           </div>
         </div>
@@ -247,11 +308,11 @@ export function GoldenCookieStage() {
       {outcome ? (
         <p className="golden-outcome" role="status" aria-live="polite" key={outcome.key}>
           {outcome.kind === 'fled'
-            ? bilingualText(GOLDEN_PUZZLE_COPY.fled)
+            ? bilingualText(GOLDEN_DIAL_COPY.fled)
             : bilingualText(
-                GOLDEN_PUZZLE_COPY.redeemed(
-                  GOLDEN_PUZZLE_COPY.effectNames[golden.activeEffect?.kind ?? 'windfall'].en,
-                  GOLDEN_PUZZLE_COPY.effectNames[golden.activeEffect?.kind ?? 'windfall'].yue,
+                GOLDEN_DIAL_COPY.redeemed(
+                  GOLDEN_DIAL_COPY.effectNames[golden.activeEffect?.kind ?? 'windfall'].en,
+                  GOLDEN_DIAL_COPY.effectNames[golden.activeEffect?.kind ?? 'windfall'].yue,
                 ),
               )}
         </p>

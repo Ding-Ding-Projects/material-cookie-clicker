@@ -29,24 +29,45 @@ export interface GoldenCookieEffectState {
 }
 
 /**
- * The Odd Cookie Out puzzle a CAUGHT golden cookie opens: a 4x4 grid of drawn cookie tiles with
- * exactly one visually different tile. Three rounds solved in a row redeem the cookie.
+ * THE OVEN DIAL — the minigame a CAUGHT golden cookie opens.
  *
- * This replaced the old ten-press countdown (`redeemClicks`, deleted). The owner's standing
- * decree — "the user must press it 10 times to redeem, not auto redeem" — is honoured in spirit
- * rather than by literal press count: one press to CATCH the sprite plus three rounds of the
- * puzzle costs roughly ten deliberate interactions (more if picks go wrong), and none of them is
- * automatic. Nothing about a golden cookie is ever redeemed by a single click.
+ * A needle sweeps back and forth across a dial. Press to stop it inside the golden zone. Three
+ * rounds redeem the cookie, and the zone narrows and the needle speeds up each round on a FIXED
+ * curve (golden-cookie.ts#GOLDEN_DIAL_ROUNDS) that is identical for every player and every save.
+ *
+ * IT IS A MINIGAME, NOT A CHANCE GAME, by owner decree: "golden cookie puzzle must be a
+ * minigame, not a chance game." Nothing about the outcome is rolled. The needle's position is an
+ * exact, pure function of how long the round has been running, so a press either was or was not
+ * inside the zone, and the same press at the same moment always lands the same way. The one
+ * seeded value here is where on the dial the zone SITS — and that cannot decide a round, because
+ * the zone is drawn on screen before the player presses. Moving a visible target is scenery, not
+ * luck.
+ *
+ * This replaced Odd Cookie Out, a 4x4 "spot the different tile" grid whose fields (`oddIndex`,
+ * `variant`) are deleted. That game failed the decree: with the odd tile seeded and the grid
+ * scanned rather than timed, a lucky first press won a round outright.
+ *
+ * The older standing decree — "the user must press it 10 times to redeem, not auto redeem" — is
+ * still honoured in spirit: one press to catch the sprite plus at least three timed presses, and
+ * a miss costs seconds and another press, so redemption is never one click and never automatic.
  */
-export interface GoldenPuzzleState {
-  /** Rounds solved so far: 0, 1 or 2 while the puzzle is open; 3 redeems and closes it. */
-  readonly roundsSolved: number;
-  /** Which tile of the 4x4 grid is the odd one this round. Drawn from the seeded rng. */
-  readonly oddIndex: number;
-  /** Which visual variant the odd tile wears this round (rotation/chip-count). Also seeded. */
-  readonly variant: number;
-  /** Wrong picks in the CURRENT puzzle, across all its rounds. Each one burned window seconds. */
-  readonly wrongPicks: number;
+export interface GoldenDialState {
+  /** Rounds won so far: 0, 1 or 2 while the dial is open; 3 redeems and closes it. */
+  readonly roundsWon: number;
+  /** Where the golden zone's centre sits on the track, 0..1. The one seeded value, and visible. */
+  readonly zoneCentre: number;
+  /** When the current round's sweep started. The needle's position is derived from this alone. */
+  readonly roundStartedAtEpochMs: number;
+  /** Misses in the CURRENT dial, across all its rounds. Each one burned window seconds. */
+  readonly misses: number;
+  /**
+   * Whether this dial runs in STEPPED mode: the needle advances in discrete ticks at a slower
+   * cadence rather than sweeping continuously. Set once, at the catch, from the player's
+   * `prefers-reduced-motion` setting, and persisted — so the position the reducer evaluates is
+   * always exactly the position the player was shown. Still pure skill: it is the same dial, the
+   * same zone and the same three rounds, played to a rhythm instead of to a glide.
+   */
+  readonly stepped: boolean;
 }
 
 export interface GoldenCookieState {
@@ -59,8 +80,8 @@ export interface GoldenCookieState {
    */
   readonly spawnXPct?: number;
   readonly spawnYPct?: number;
-  /** The open puzzle, if the sprite has been caught. Absent while it is still on the loose. */
-  readonly puzzle?: GoldenPuzzleState;
+  /** The open Oven Dial, if the sprite has been caught. Absent while it is still on the loose. */
+  readonly dial?: GoldenDialState;
   readonly spawnedAtEpochMs?: number;
   /** PRNG stream position, so the seeded schedule survives save/load without re-seeding. */
   readonly rngStreamIndex: number;

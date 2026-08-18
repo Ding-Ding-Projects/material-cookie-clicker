@@ -4,7 +4,7 @@
 <meta charset="utf-8" />
 <meta name="viewport" content="width=device-width, initial-scale=1" />
 <title>Golden-cookie events — Material Cookie Clicker</title>
-<meta name="description" content="Catch a golden cookie where it spawns, then solve Odd Cookie Out to redeem it. Seeded and replayable." />
+<meta name="description" content="Catch a golden cookie where it spawns, then beat The Oven Dial to redeem it. Pure timing, no luck." />
 <link rel="stylesheet" href="../assets/site.css" />
 </head>
 <body>
@@ -24,24 +24,32 @@
 <main id="main" class="wrap">
   <article>
     <h1>Golden-cookie events</h1>
-    <p class="lede">It appears somewhere random on the stage. Catch it, then find the odd cookie out three times.</p>
+    <p class="lede">It appears somewhere random on the stage. Catch it, then stop the needle in the band three times.</p>
     <div class="inset" style="margin-bottom:18px">
   <span class="label">Current state</span>
   <p style="margin:0"><span class="tag">Shipped</span> the golden cookie spawns as its own sprite at a random point on the stage and opens a puzzle when caught (<code>src/shared/game/golden-cookie.ts</code>, <code>src/renderer/screens/GoldenCookieStage.tsx</code>). Both photographs below are of that running.</p>
 </div>
     <h2>From the running application</h2>
     <figure>
-      <img src="../assets/captures/golden-spawn.png" alt="The full game surface with a small golden cookie sprite standing on it, low and left of centre, over the upgrade shelf. The sprite is a drawn cookie inside a pale ray burst, plainly separate from the large hero cookie in the middle of the panel above, which is the ordinary baked one with no gold on it at all. Around them the surface is unchanged: HUD plates reading COOKIES 40 quintillion, PER SECOND 14,302,000,300 and PER CLICK 136.32, a RAID SUPPLIES shelf, eight console buttons, the upgrade shelf at 68 / 180 and the shop rail with the Diesel Depot card." width="2604" height="1562" loading="lazy" />
-      <figcaption><strong>The sprite, where the scheduler put it.</strong> Nothing about the position was arranged &mdash; the spawn point is the scheduler&rsquo;s own choice and differs run to run. The thing worth noticing is what is <em>not</em> gold: the hero cookie in the middle is ordinary, because the hero no longer collects golden cookies at all. You have to find and press the sprite. Captured from the built application running on an off-screen Windows desktop, photographed with the Win32 PrintWindow API, window maximised, with the documented developer-only key <code>material-cookie-clicker:golden:fast</code> set in a throwaway profile &mdash; it shortens the five-to-fifteen-minute spawn schedule and nothing else. There is no button and no settings row that reaches it.
+      <img src="../assets/captures/golden-spawn.png" alt="The game surface with a golden cookie spawned low on the left of the stage: a small gilded cookie, pale gold with dark chocolate chunks, standing inside a burst of thin yellow light shafts, straddling the boundary between the hero cookie panel and the upgrades shelf below it. The ordinary hero cookie sits untouched and ungilded in the centre of its panel. The HUD above reads 40 quintillion cookies, 14,302,000,300 per second and 136.32 per click." width="2181" height="1363" loading="lazy" />
+      <figcaption>The sprite, where the seeded schedule put it. The hero cookie in the middle of the panel is unchanged &mdash; it no longer has anything to do with golden cookies.</figcaption>
     </figure>
     <figure>
-      <img src="../assets/captures/golden-puzzle.png" alt="The same window with the Odd Cookie Out card open over a dimmed game surface. The card is headed Odd Cookie Out, then Round 1 of 3, then the instruction that one cookie is not like the others, press it. Below sits a four-by-four grid of sixteen near-identical pale cookie tiles, each drawn with a scatter of small chocolate chips, one of which differs from the rest by a single chip. A wide Let it go button runs along the bottom of the card. The game surface behind it is dimmed but still legible." width="2604" height="1562" loading="lazy" />
-      <figcaption><strong>The card the catch opens, on round one of three.</strong> The catch behind this frame was a real Win32 press on the sprite&rsquo;s real coordinates, not a scripted click, and the arrangement is what the seeded PRNG picked. The tiles are deliberately anonymous to a screen reader as well as to the eye &mdash; each one is named only <em>Cookie tile 1</em> through <em>16</em>, so the accessible name cannot give the answer away. Captured the same way, seconds after the frame above.
+      <img src="../assets/captures/golden-dial.png" alt="The same surface with the whole window dimmed behind a cream rounded card headed The Oven Dial. Under the heading, in bold, Round 1 of 3, then the line Stop the needle inside the golden band. Below that a drawn half-circle gauge with a heavy dark outline: a thick golden band arcs across its upper right, hard marker lines at each end of the band, and a dark needle points up and to the left from a brass pivot boss, its tip carrying a dot that sits on the track well outside the band. A large golden button reads Stop the needle, and under it a line reads Round 1: the band is 26% of the dial and the needle crosses it in 1.8 seconds. A smaller button at the foot reads Let it go." width="2181" height="1363" loading="lazy" />
+      <figcaption>Mid-sweep on round one. The needle is outside the band, and the line under the button states this round&rsquo;s difficulty in numbers &mdash; the same numbers every player gets.</figcaption>
+    </figure>
+    <figure>
+      <img src="../assets/captures/golden-dial-stepped.png" alt="The same card in reduced-motion mode. The instruction now reads The needle steps one notch at a time. Stop it inside the golden band. An extra inner ring of two dozen short tick marks is drawn inside the gauge face, marking every position the needle can occupy, and the needle stands upright on one of them. The line under the button now reads Round 1: the band is 26% of the dial and the needle crosses it in 2.9 seconds." width="2181" height="1363" loading="lazy" />
+      <figcaption>The same round with <code>prefers-reduced-motion</code> set. The needle steps between the drawn notches instead of sweeping, at a 1.6&times; slower cadence &mdash; the same game played as a rhythm.</figcaption>
+    </figure>
+    <figure>
+      <img src="../assets/captures/golden-dial-won.png" alt="The game surface back to normal with the dial card gone. A yellow rounded pill sits at the top of the stage reading Golden cookie redeemed: Windfall. The hero cookie is below it, and another golden cookie sprite has already spawned lower on the stage." width="2181" height="1363" loading="lazy" />
+      <figcaption>Three hits in a row, and the cookie pays out. The effect is named in the line, and the payout itself goes through the same collection the game has always used.</figcaption>
     </figure>
     <h2>What it does</h2>
-<p>Every so often a golden cookie appears <strong>somewhere random on the game stage</strong> as its own clickable sprite &mdash; 64&nbsp;pixels of gilded cookie inside a 72-pixel hit area, scurrying a few pixels, with its own accessible name and an announcement through the status region. It is not a wash over the main cookie, which is where it used to live.</p>
-<p>Clicking it does not redeem anything. It <strong>catches</strong> the cookie and opens <strong>Odd Cookie Out</strong>: a four-by-four grid of sixteen drawn cookie tiles with exactly one subtly different. Press the odd one; <strong>three rounds</strong> redeem the cookie. A wrong pick shakes the card and burns two seconds off the golden window. The window running out, Escape, or a press on the dimmed surface behind lets the cookie <strong>flee</strong> &mdash; it despawns, the ordinary cooldown starts, and nothing already owned is lost.</p>
-<p>Solving all three rounds runs the same collection the game always ran, so the reward is unchanged:</p>
+<p>Every so often a golden cookie appears <strong>somewhere random on the game stage</strong> as its own clickable sprite &mdash; 64&nbsp;pixels of gilded cookie inside a 72-pixel hit area, scurrying a few pixels, with its own accessible name and an announcement through the status region.</p>
+<p>Clicking it does not redeem anything. It <strong>catches</strong> the cookie and opens <strong>The Oven Dial</strong>: a needle sweeps back and forth across a gauge, and a golden band is painted on that gauge. Press <em>Stop the needle</em> while the needle is inside the band. <strong>Three rounds</strong> redeem the cookie. A miss shakes the card and burns two seconds off the golden window. The window running out, Escape, or a press on the dimmed surface behind lets the cookie <strong>flee</strong> &mdash; it despawns, the ordinary cooldown starts, and nothing already owned is lost.</p>
+<p>Winning all three rounds runs the same collection the game always ran, so the reward is unchanged:</p>
 <div class="scroller">
 <table>
   <caption>Default event configuration</caption>
@@ -55,20 +63,39 @@
 </div>
 <p>By default a golden cookie becomes eligible somewhere between 5 and 15 minutes after the last one, and stays catchable for 15 seconds. It may land anywhere from 12% to 88% across the stage and 16% to 78% down it, which keeps it clear of the HUD above, the console below and the shop rail at the right &mdash; a spawn can never land under chrome that would swallow the click.</p>
 
-<h2>Why three rounds, and where the ten presses went</h2>
-<p>The standing instruction for this feature was that the player must press a golden cookie ten times to redeem it, never have it redeem itself. That used to be implemented literally, as a ten-press countdown chip on the main cookie. The chip, the constant behind it and the saved press count are all deleted now. The instruction is kept in spirit instead: one press to catch plus three rounds of a sixteen-tile grid is about ten deliberate presses &mdash; more when picks go wrong &mdash; and none of them is automatic.</p>
+<h2>A minigame, not a chance game</h2>
+<p>That is a requirement, not a description, and it is the reason the dial looks the way it does.</p>
+<p>The needle&rsquo;s position is an <strong>exact function of how long the round has been running</strong> &mdash; a triangle wave across the track with no easing, so no part of the track is worth more than any other. A press either was or was not inside the band, and the same press at the same millisecond lands the same way on every machine, every save and every seed. The reducer recomputes the needle&rsquo;s position itself rather than trusting a number sent by the interface, so there is exactly one definition of where the needle is and a hand-built press cannot claim a hit it did not earn.</p>
+<p>The difficulty curve is fixed, published, and the same for everybody:</p>
+<div class="scroller">
+<table>
+  <caption>The difficulty curve, identical for every player and every save</caption>
+  <thead><tr><th scope="col">Round</th><th scope="col">Band width</th><th scope="col">Sweep, there and back</th></tr></thead>
+  <tbody>
+    <tr><td>1</td><td>26% of the dial</td><td>1.80s</td></tr>
+    <tr><td>2</td><td>19%</td><td>1.40s</td></tr>
+    <tr><td>3</td><td>13%</td><td>1.05s</td></tr>
+  </tbody>
+</table>
+</div>
+<p>Nothing in that table is rolled, scaled by progress, or adjusted to how well the player is doing. The <em>one</em> seeded value in the whole minigame is where on the face the band <em>sits</em> &mdash; and that cannot decide a round, because the band is drawn before the press. A visible target that moves between rounds is scenery, not luck; it exists so that three rounds are not three identical presses at the same spot. There is a test that presses at a fixed moment across fifty different random streams and asserts the verdict is the same in all fifty.</p>
+
+<h2>What this replaced, and why</h2>
+<p>This slot has held three mechanics, and each one&rsquo;s data is deleted when the next arrives.</p>
+<p>First, a <strong>ten-press countdown</strong> on the main cookie &mdash; the literal reading of a standing instruction that a golden cookie must be pressed ten times to redeem and must never redeem itself. Then <strong>Odd Cookie Out</strong>, a four-by-four grid with one subtly different tile. That one looked like a puzzle and behaved like a lottery: the odd tile was seeded, so pressing at random won a round one time in sixteen with no skill involved at all. The Oven Dial has no such hole.</p>
+<p>The older ten-press instruction is still honoured in spirit: a catch plus at least three deliberate timed presses, with every miss costing seconds and another press. Redemption is never one click and never automatic.</p>
+
+<h2>Accessibility: what is and is not achieved</h2>
+<p><strong>What is achieved.</strong> The game is <strong>one button with one fixed name</strong> (&ldquo;Stop the needle&rdquo;) &mdash; nothing to hunt for, nothing to compare, no spatial search, and Space or Enter is the entire input. The dial is a real slider whose accessible value text continuously states where the needle is and whether it is currently inside the band (&ldquo;42%, outside the band&rdquo; / &ldquo;58%, in the band&rdquo;), so the position is conveyed non-visually rather than only drawn. Each round is <strong>briefed in text</strong> before it is played &mdash; the band&rsquo;s width as a percentage and the sweep time in seconds &mdash; so the difficulty is stated rather than merely felt. And with <code>prefers-reduced-motion</code> set, the needle does not sweep: it <strong>steps</strong>, one notch of twenty-four at a time, at a 1.6&times; slower cadence, with every position it can occupy drawn on the face. That is a rhythm game &mdash; countable, learnable, and playable without watching a moving object. The mode is fixed at the moment of the catch, so the position judged is always exactly the position shown.</p>
+<p><strong>What is not achieved.</strong> A player who cannot see the dial at all is relying on accessible-value updates whose timing no specification guarantees, and in continuous mode that is not good enough to hit a 13% band reliably. The honest mitigation is the one the whole feature rests on: <strong>failing costs nothing already owned.</strong> A miss burns two seconds of the cookie&rsquo;s own window and nothing else, and a timeout or an Escape simply lets a bonus go. Golden cookies sit on top of the game rather than across it, so no progress, no purchase and no achievement is gated behind beating this dial.</p>
+<p>The card keeps the same dialog contract the game&rsquo;s console panels keep, scaled down: a real modal dialog labelled by its own heading, focus moved in and trapped, Escape closing it, and focus restored afterwards to the main cookie.</p>
 
 <h2>Seeded, not random</h2>
-<p>The spawn moment, <em>the spawn position</em>, the effect roll, the odd tile and its visual variant all come from a small deterministic PRNG (splitmix32) with an explicit stream position that is saved and restored with the game. <code>Math.random()</code> is never called anywhere in this module. Given the same seed, the same cookie appears at the same point on the stage with the same odd tile &mdash; which is what makes the whole mechanic unit-testable, and what stops a save/load cycle from re-rolling your luck.</p>
-
-<h2>Accessibility, stated honestly</h2>
-<p>Odd Cookie Out is a <strong>sighted-skill minigame</strong>, and the code says so rather than pretending otherwise. Every tile is a real button, at least 44&nbsp;pixels, inside a labelled group and reachable by Tab. Every tile also carries the <em>same</em> shape of accessible name &mdash; &ldquo;Cookie tile 5&rdquo; &mdash; and the odd one is deliberately <strong>not</strong> named as odd: naming it would hand a screen-reader user the answer instantly while a sighted player hunts for it, which is the mirror of the unfairness rather than a fix for it.</p>
-<p>What that costs is bounded on purpose. Failing costs nothing already owned &mdash; a wrong pick spends the cookie&rsquo;s own seconds, and a timeout or an Escape simply lets a bonus go, because golden cookies sit on top of the game rather than across it. After two wrong picks in a round the odd tile is ringed and the card&rsquo;s status region says so; that helps low vision and a bad monitor, and it does not make the puzzle solvable without sight. The difference is never colour alone either &mdash; a rotation, a missing chip, an extra chip or a mirrored chip layout &mdash; so it survives colour-blindness and a greyscale display.</p>
-<p>The card keeps the same dialog contract the game&rsquo;s console panels keep, scaled down: a real modal dialog labelled by its own heading, focus moved in and trapped, Escape closes it, and focus restored afterwards to the main cookie. Under <code>prefers-reduced-motion</code> the sprite is still, its light shafts stay lit but stop turning, the card simply appears, and a wrong pick does not shake anything &mdash; the wrong-pick line says what happened, which is what the shake was ever for.</p>
+<p>The spawn moment, the spawn position, the effect roll and the band&rsquo;s position all come from a small deterministic PRNG (splitmix32) with an explicit stream position that is saved and restored with the game. <code>Math.random()</code> is never called anywhere in this module. The needle takes no random input at all &mdash; it is a function of elapsed time and nothing else.</p>
 
 <h2>How it is configured</h2>
-<p>Minimum and maximum delay, the catchable window, both multipliers, both durations and the windfall payout are all fields of one configuration object with a documented default set. The spawn bounds and the puzzle&rsquo;s shape &mdash; sixteen tiles, three rounds, four visual variants, a two-second wrong-pick penalty &mdash; are named constants in the same module rather than numbers buried in the scheduler. The golden treatment uses the tertiary colour role exclusively, so the accent keeps meaning something and is never reused for ordinary chrome.</p>
-<p>A save written while a cookie is caught carries its position and its open round through unchanged. A save written before this redesign carries neither, and carried a press count that no longer exists; it is read, the stale field is dropped, and the schedule simply hands out a fresh spawn. There is deliberately no migration step for it: a golden cookie in flight is worth seconds, and inventing a position for a cookie the player never saw would be the dishonest option.</p>
+<p>Minimum and maximum delay, the catchable window, both multipliers, both durations and the windfall payout are all fields of one configuration object with a documented default set. The spawn bounds and the dial&rsquo;s numbers &mdash; three rounds, the round curve, twenty-four steps, the stepped slowdown, the two-second miss penalty &mdash; are named constants in the same module rather than numbers buried in the code. The golden treatment uses the tertiary colour role exclusively, so the accent keeps meaning something and is never reused for ordinary chrome.</p>
+<p>A save written while a cookie is caught carries its position and its open round through unchanged. <strong>No save ever carries an open minigame across a version</strong>, and that is deliberate: a half-finished round of a game that no longer exists cannot be translated into a round of the game that replaced it, so the stale data is dropped and the schedule simply hands out a fresh spawn.</p>
     <nav class="related plate" aria-labelledby="related-heading">
       <h2 id="related-heading">Related articles</h2>
       <ul>

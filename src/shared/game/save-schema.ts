@@ -33,26 +33,36 @@ const GoldenCookieEffectSchema = z.object({
 });
 
 /**
- * The open Odd Cookie Out puzzle. Optional on purpose: a save written while no golden cookie is
- * caught simply has no puzzle, and a save written from BEFORE the catch-then-puzzle redesign has
- * neither this nor a spawn position. Such a save carried a `redeemClicks` press count instead;
- * that field no longer exists, zod drops it on read, and the loaded cookie is then a spawn with
- * no position — which the renderer treats as nothing spawned, so the schedule simply hands out a
- * fresh spawn on the next tick. No migration step: a golden cookie in flight is worth seconds,
- * and inventing a position for a cookie the player never saw would be the dishonest option.
+ * The open Oven Dial. Optional on purpose: a save written while no golden cookie is caught simply
+ * has no dial.
+ *
+ * NO SAVE EVER CARRIES AN OPEN MINIGAME ACROSS A VERSION, and that is a decision rather than an
+ * oversight. This is the third redemption mechanic in this slot — a ten-press countdown, then the
+ * Odd Cookie Out tile grid, now the dial — and each one's fields are simply gone from this schema
+ * when the next arrives. Zod drops what it does not recognise, the loaded cookie is then a spawn
+ * with no position, the renderer treats that as nothing on the stage, and the schedule hands out a
+ * fresh spawn on the next tick. There is deliberately no migration step: a golden cookie in flight
+ * is worth seconds, a half-finished round of a game that no longer exists cannot be translated
+ * into a round of the game that replaced it, and inventing one would be the dishonest option.
+ *
+ * `roundStartedAtEpochMs` is a wall-clock moment, so a dial reloaded long after it was saved has
+ * an enormous elapsed time. That is harmless: the needle position is periodic in elapsed time, so
+ * it is still a real position on the track — and the window it belongs to will have expired
+ * anyway, which despawns the cookie on the first tick.
  */
-const GoldenPuzzleSchema = z.object({
-  roundsSolved: z.number().int().nonnegative(),
-  oddIndex: z.number().int().nonnegative(),
-  variant: z.number().int().nonnegative(),
-  wrongPicks: z.number().int().nonnegative(),
+const GoldenDialSchema = z.object({
+  roundsWon: z.number().int().nonnegative(),
+  zoneCentre: z.number(),
+  roundStartedAtEpochMs: z.number(),
+  misses: z.number().int().nonnegative(),
+  stepped: z.boolean(),
 });
 
 const GoldenCookieStateSchema = z.object({
   isSpawned: z.boolean(),
   spawnXPct: z.number().optional(),
   spawnYPct: z.number().optional(),
-  puzzle: GoldenPuzzleSchema.optional(),
+  dial: GoldenDialSchema.optional(),
   spawnedAtEpochMs: z.number().optional(),
   rngStreamIndex: z.number().int().nonnegative(),
   activeEffect: GoldenCookieEffectSchema.optional(),

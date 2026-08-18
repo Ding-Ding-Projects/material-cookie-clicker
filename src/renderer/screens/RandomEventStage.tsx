@@ -12,8 +12,8 @@ import {
   raidConsumablePrice,
   whackStorageCap,
   RAID_CONSUMABLE_DEFINITIONS,
-  remainingFraction,
-  remainingMs,
+  remainingFractionFor,
+  remainingMsFor,
   tasteTestServePayout,
   type ActiveRandomEvent,
   type MousePoint,
@@ -23,6 +23,8 @@ import {
 } from '../../shared/game/random-events.js';
 import {
   RainDropArt,
+  CometArt,
+  EclipseCrumbArt,
   MouseArt,
   OvenHiccupArt,
   ParcelArt,
@@ -34,6 +36,7 @@ import {
   EVENT_EXTRA_COPY,
   MOUSE_RAID_COPY,
   RANDOM_EVENT_COPY,
+  STACK_COPY,
   showsCantonese,
   showsEnglish,
 } from '../game/copy.js';
@@ -129,12 +132,31 @@ function dropLayout(index: number): CSSProperties {
  * The event layer over the game stage. Renders nothing at all — not an empty box, not a
  * zero-height div — when no clickable event is running, so it never takes part in layout.
  */
+/**
+ * The stage layer for the whole spawn: one child per running event that actually has something
+ * to draw.
+ *
+ * A double or triple can only ever contain ONE event that wants the stage (the compatibility
+ * matrix's rule 2 sees to that), so in practice this renders at most one child and usually zero —
+ * a Baker's Dozen beside a Night Shift puts nothing here at all. It maps over the list rather than
+ * picking the clickable one because the rule that keeps them from colliding lives in the domain,
+ * where it is tested, and a view that quietly picked one would be a second, silent copy of it.
+ */
 export function RandomEventStage() {
   const structure = useStructureSnapshot();
-  const dispatch = useGameDispatch();
-  const active = structure.randomEvents.active;
+  const actives = structure.randomEvents.actives;
+  if (actives.length === 0) return null;
+  return (
+    <>
+      {actives.map((active) => (
+        <OneEventStage key={`${active.id}:${active.startedAtEpochMs}`} active={active} />
+      ))}
+    </>
+  );
+}
 
-  if (!active) return null;
+function OneEventStage({ active }: { active: ActiveRandomEvent }) {
+  const dispatch = useGameDispatch();
   const def = getRandomEventDefinition(active.id);
 
   // A choice event has no targets at all — it has a question, and the question is the stage.
@@ -146,6 +168,8 @@ export function RandomEventStage() {
   if (active.id === 'mouse_raid') return <MouseRaidStage active={active} />;
   if (active.id === 'sprinkle_storm') return <SprinkleStormStage active={active} />;
   if (active.id === 'delivery_rush') return <DeliveryRushStage active={active} />;
+  if (active.id === 'cookie_eclipse') return <CookieEclipseStage active={active} />;
+  if (active.id === 'crumb_comet') return <CrumbCometStage active={active} />;
 
   if (active.id === 'oven_hiccup') {
     return (
@@ -188,6 +212,119 @@ export function RandomEventStage() {
   );
 }
 
+
+/* --------------------------------------------------------------------- the cookie eclipse */
+
+/**
+ * THE COOKIE ECLIPSE: five glowing crumbs, and a cookie panel that has gone dark around them.
+ *
+ * WHAT GOES DARK, AND HOW THAT WAS PINNED DOWN. The scrim covers the COOKIE PANEL and nothing
+ * else. The first version of this event put it over the whole event stage — which is the layer
+ * the rain falls through — and photographing it is what showed that the event stage also spans
+ * the upgrade shelf: the capture came back with every price in the shop dimmed to the point of
+ * being hard to read. An event that makes prices hard to read is an accessibility regression
+ * dressed up as atmosphere, and it would have shipped if the picture had not been looked at.
+ *
+ * So the darkness is applied through a `data-eclipse` attribute on the document body, and the
+ * stylesheet paints it onto `.cookie-hero` alone. Everything a player reads a number off — the
+ * cookie counter, the per-second and per-click plates, the whole shop, the upgrade shelf, the
+ * HUD — is outside that panel and keeps its ordinary contrast for the entire sixteen seconds.
+ *
+ * The attribute is cleaned up when the event ends OR when this component unmounts for any other
+ * reason, which is what stops a dark counter from outliving the eclipse that caused it.
+ *
+ * The crumbs are laid out by the same golden-ratio arithmetic every other scattered event uses,
+ * so they hold still while their siblings are claimed, and their vertical range is deliberately
+ * confined to the panel that is dark: a glowing crumb sitting on a brightly lit upgrade card
+ * would be neither hard to find nor part of the same picture.
+ */
+function CookieEclipseStage({ active }: { active: ActiveRandomEvent }) {
+  const dispatch = useGameDispatch();
+  const def = getRandomEventDefinition('cookie_eclipse');
+  const left = active.pendingTargetIds.length;
+
+  useEffect(() => {
+    document.body.dataset.eclipse = 'on';
+    return () => {
+      delete document.body.dataset.eclipse;
+    };
+  }, []);
+
+  return (
+    <div
+      className="event-stage event-stage--eclipse"
+      role="group"
+      aria-label={namedLabel(def, RANDOM_EVENT_COPY.stageLabel)}
+    >
+      {active.pendingTargetIds.map((targetId, index) => {
+        const seed = Number(targetId.split(':')[1] ?? index);
+        // Held inside the COOKIE PANEL'S share of the stage, in both axes. The event stage spans
+        // the shop rail as well as the hero column, so the wider ranges the rain and the
+        // sprinkles use would put a crumb on top of the shop — a glowing target sitting on a
+        // brightly lit generator card, which is neither hard to find nor part of the picture.
+        // The second capture of this event is what found that one; the first found the scrim.
+        const across = ((seed * 0.6180339887) % 1) * 58 + 8;
+        const down = ((seed * 0.7548776662) % 1) * 22 + 8;
+        return (
+          <button
+            key={targetId}
+            type="button"
+            className="event-crumb"
+            style={
+              {
+                '--crumb-x': `${across.toFixed(2)}%`,
+                '--crumb-y': `${down.toFixed(2)}%`,
+                '--crumb-delay': `${((seed * 0.37) % 1).toFixed(2)}s`,
+              } as CSSProperties
+            }
+            aria-label={bilingualText(EVENT_EXTRA_COPY.catchCrumb(left, def.targetCount))}
+            onClick={() => dispatch({ type: 'randomEventClick', targetId })}
+          >
+            <EclipseCrumbArt extraClass="event-crumb__art" />
+          </button>
+        );
+      })}
+    </div>
+  );
+}
+
+/* ----------------------------------------------------------------------- the crumb comet */
+
+/**
+ * THE CRUMB COMET: one button, one pass, nine seconds.
+ *
+ * The single target is big — 96px against a rain drop's 44 — because the whole event is one
+ * press and a press that is hard to LAND is a different and worse test than a press that is hard
+ * to TIME. What makes it a skill catch is that it crosses the stage once and then it is over;
+ * making it small as well would just be making it unfair.
+ *
+ * Under reduced motion it does not cross at all: it sits in the middle of the stage for the full
+ * nine seconds, still one press, still worth exactly the same. That is the same bargain the rain
+ * and the mice already strike — the motion is the flavour, never the mechanic.
+ */
+function CrumbCometStage({ active }: { active: ActiveRandomEvent }) {
+  const dispatch = useGameDispatch();
+  const def = getRandomEventDefinition('crumb_comet');
+  const targetId = active.pendingTargetIds[0];
+  if (targetId === undefined) return null;
+
+  return (
+    <div
+      className="event-stage event-stage--comet"
+      role="group"
+      aria-label={namedLabel(def, RANDOM_EVENT_COPY.stageLabel)}
+    >
+      <button
+        type="button"
+        className="event-comet"
+        aria-label={bilingualText(EVENT_EXTRA_COPY.catchComet)}
+        onClick={() => dispatch({ type: 'randomEventClick', targetId })}
+      >
+        <CometArt extraClass="event-comet__art" />
+      </button>
+    </div>
+  );
+}
 
 /* --------------------------------------------------------------------- the sprinkle storm */
 
@@ -664,15 +801,70 @@ export function RaidSuppliesShelf() {
  * milestone region already announced this event once, and a bar that spoke four times a second
  * would be unusable.
  */
+/**
+ * THE HUD'S INDICATOR: one plate per running event, in the order they were drawn.
+ *
+ * ONE PLATE IS THE ORDINARY CASE and it looks exactly as it did before doubles existed. Two or
+ * three plates stack vertically inside a group whose accessible name says how many are running,
+ * so a screen-reader user meets "3 events running at once" before the three plates rather than
+ * discovering the count by counting.
+ *
+ * HOW THEY COMPRESS. The plates already shrank at narrow widths; with three of them the container
+ * carries `data-stack="2"` or `"3"` and the stylesheet uses that to drop the countdown bar and
+ * then the name to a shorter treatment, rather than letting three full plates push the rest of
+ * the cabinet down. The count is a DATA ATTRIBUTE precisely so that the compression rule is
+ * testable without a browser: `stackCompression` below is the pure function that decides it, and
+ * a test drives it at all three sizes.
+ */
 export function RandomEventIndicator() {
   const structure = useStructureSnapshot();
-  const active = structure.randomEvents.active;
-  const now = useEventClock(active !== null);
+  const actives = structure.randomEvents.actives;
+  const now = useEventClock(actives.length > 0);
 
-  if (!active) return null;
+  if (actives.length === 0) return null;
+  if (actives.length === 1) return <EventPlate active={actives[0]} now={now} />;
+
+  return (
+    <div
+      className="event-indicator-stack"
+      data-stack={actives.length}
+      role="group"
+      aria-label={bilingualText(STACK_COPY.stackLabel(actives.length))}
+    >
+      {actives.map((active) => (
+        <EventPlate key={`${active.id}:${active.startedAtEpochMs}`} active={active} now={now} compression={stackCompression(actives.length)} />
+      ))}
+    </div>
+  );
+}
+
+/**
+ * WHAT A PLATE DROPS AT EACH STACK SIZE, as a pure function of the count.
+ *
+ * One event: everything. Two: the plates lose their countdown BAR but keep the seconds, because
+ * the number is the fact and the bar is the picture of it. Three: they also drop to a single
+ * short line, so a triple occupies about the height a double did rather than three times a
+ * single's. Nothing that carries information leaves at any size — the seconds and the name are on
+ * every plate at every size, and the accessible name is completely unchanged throughout.
+ */
+export function stackCompression(count: number): 'full' | 'tight' | 'tightest' {
+  if (count <= 1) return 'full';
+  if (count === 2) return 'tight';
+  return 'tightest';
+}
+
+function EventPlate({
+  active,
+  now,
+  compression = 'full',
+}: {
+  readonly active: ActiveRandomEvent;
+  readonly now: number;
+  readonly compression?: 'full' | 'tight' | 'tightest';
+}) {
   const def = getRandomEventDefinition(active.id);
-  const fraction = remainingFraction(structure.randomEvents, now);
-  const seconds = Math.ceil(remainingMs(structure.randomEvents, now) / 1000);
+  const fraction = remainingFractionFor(active, now);
+  const seconds = Math.ceil(remainingMsFor(active, now) / 1000);
   const Emblem = RANDOM_EVENT_ART[def.id];
   // A raid's indicator carries one extra fact the countdown cannot: how many mice are still
   // loose. That number is what the player is actually racing, and it is in the accessible name
@@ -690,6 +882,7 @@ export function RandomEventIndicator() {
       className={`event-indicator event-indicator--${def.eventClass}${
         def.isSetback ? ' event-indicator--setback' : ''
       }${isRaid ? ' event-indicator--raid' : ''}`}
+      data-compression={compression}
       aria-live="off"
       aria-label={bilingualText({
         en: `${RANDOM_EVENT_COPY.indicatorLabel.en}: ${def.nameEn}${miceLine ? ` — ${miceLine.en}` : ''}`,
@@ -820,6 +1013,18 @@ function eventNote(id: RandomEventId, isSetback: boolean): Bilingual | null {
   switch (id) {
     case 'mouse_raid':
       return MOUSE_RAID_COPY.warning;
+    case 'cookie_eclipse':
+      return EVENT_EXTRA_COPY.eclipseNote;
+    case 'crumb_comet':
+      return EVENT_EXTRA_COPY.cometNote;
+    case 'bakers_dozen':
+      return EVENT_EXTRA_COPY.bakersDozenNote;
+    case 'static_cling':
+      return EVENT_EXTRA_COPY.staticClingNote;
+    case 'grandma_convention':
+      return EVENT_EXTRA_COPY.conventionNote;
+    case 'overtime_crew':
+      return EVENT_EXTRA_COPY.overtimeNote;
     case 'clot':
       return EVENT_EXTRA_COPY.clotNote;
     case 'flour_shortage':
@@ -840,6 +1045,8 @@ function eventNote(id: RandomEventId, isSetback: boolean): Bilingual | null {
 interface EventToast {
   readonly key: number;
   readonly id: RandomEventId;
+  /** Every event this spawn brought. One id normally; two or three on a double or triple. */
+  readonly stackIds: readonly RandomEventId[];
   readonly message: Bilingual;
   readonly isSetback: boolean;
 }
@@ -875,8 +1082,13 @@ export function RandomEventToast() {
         setToast({
           key: ++toastKeySeq,
           id: event.id,
+          stackIds: event.stackIds,
           message: describeMilestone(event),
-          isSetback: getRandomEventDefinition(event.id).isSetback,
+          // A stack is styled as a setback only if EVERY member is one, which the compatibility
+          // matrix makes impossible past a single: no two setbacks ever run together, so a double
+          // or triple is never painted in the alarm colour. Reading it off `every` rather than
+          // hardcoding that keeps the styling true to the rule instead of to a memory of it.
+          isSetback: event.stackIds.every((id) => getRandomEventDefinition(id).isSetback),
         });
       }
     });
@@ -892,15 +1104,17 @@ export function RandomEventToast() {
   }, [toast, paused]);
 
   if (!toast) return null;
-  const def = getRandomEventDefinition(toast.id);
-  const Emblem = RANDOM_EVENT_ART[def.id];
+  const defs = toast.stackIds.map(getRandomEventDefinition);
+  const def = defs[0] ?? getRandomEventDefinition(toast.id);
+  const stacked = defs.length > 1;
 
   return (
     <div
       key={toast.key}
       className={`event-toast event-toast--${def.eventClass}${
         toast.isSetback ? ' event-toast--setback' : ''
-      }`}
+      }${stacked ? ' event-toast--stacked' : ''}`}
+      data-stack={defs.length}
       /* NOT aria-hidden any more. It carries a real dismiss button that clears domain state, and
          an interactive control inside a hidden subtree is a control keyboard and screen-reader
          users simply cannot operate. It is still not a live region — the status region spoke this
@@ -913,7 +1127,15 @@ export function RandomEventToast() {
       onFocus={() => setPaused(true)}
       onBlur={() => setPaused(false)}
     >
-      <span className="event-toast__emblem" aria-hidden="true">{Emblem ? <Emblem /> : null}</span>
+      {/* EVERY event's emblem, not just the first. On a double the two badges sitting side by
+          side under one headline are the fastest way to see what actually landed — faster than
+          reading two names — and they match the plates that appear in the HUD a moment later. */}
+      <span className="event-toast__emblem" aria-hidden="true">
+        {defs.map((each) => {
+          const Emblem = RANDOM_EVENT_ART[each.id];
+          return Emblem ? <Emblem key={each.id} /> : null;
+        })}
+      </span>
       <span className="event-toast__lines">
         {showsEnglish() ? <span className="event-toast__en">{toast.message.en}</span> : null}
         {showsCantonese() ? (
@@ -928,7 +1150,12 @@ export function RandomEventToast() {
             down" line would be wrong about a Mouse Raid (which does not touch production), wrong
             about a Flour Shortage (which pays it all back), and useless on a Clot (whose whole
             point is that there is no button). So each one carries its own sentence. */}
-        {eventNote(def.id, def.isSetback) ? (
+        {/* A STACK PRINTS NO NOTES. Two or three of these sentences under one headline is a
+            paragraph, and the marquee has six seconds. The names are in the headline, each
+            event's own indicator plate is about to appear in the HUD carrying its accent and its
+            clock, and the site has the full description of every one of them. A single event is
+            unchanged and keeps the sentence that says what it actually does. */}
+        {!stacked && eventNote(def.id, def.isSetback) ? (
           <span className={`event-toast__warn${def.isSetback ? '' : ' event-toast__warn--good'}`}>
             {bilingualText(eventNote(def.id, def.isSetback)!)}
           </span>

@@ -20,6 +20,7 @@ import {
 } from "../../shared/game/home-construction.js";
 import { getUpgradeDefinition } from "../../shared/game/upgrades.js";
 import type { GameState } from "../../shared/game/types.js";
+import { STACK_HEADLINE } from "./copy.js";
 import type { Bilingual } from "./copy.js";
 
 /**
@@ -49,7 +50,18 @@ export type MilestoneEvent =
    * player who cannot see the stage has no other way to learn that production just halved or
    * that there are cookies falling they could be catching.
    */
-  | { readonly kind: "random-event-spawned"; readonly id: RandomEventId }
+  | {
+      readonly kind: "random-event-spawned";
+      /** The first event drawn. Always present, and equal to `stackIds[0]`. */
+      readonly id: RandomEventId;
+      /**
+       * EVERY event this one spawn put up: one id normally, two on a double, three on a triple.
+       *
+       * `id` is kept alongside it so nothing that only ever cared about "which event started"
+       * had to change, and so the two can never be read as describing different spawns.
+       */
+      readonly stackIds: readonly RandomEventId[];
+    }
   | {
       readonly kind: "random-event-resolved";
       readonly id: RandomEventId;
@@ -128,10 +140,19 @@ export function detectMilestones(previous: GameState, next: GameState, action: G
   }
 
   if (next.randomEvents.spawnCount > previous.randomEvents.spawnCount) {
-    // An instant event never occupies the active slot, so read the id from whichever place it
-    // landed: the active event for a timed/clickable one, the just-resolved record otherwise.
-    const id = next.randomEvents.active?.id ?? next.randomEvents.lastResolved?.id;
-    if (id) events.push({ kind: "random-event-spawned", id });
+    // A spawn now brings ONE, TWO OR THREE events at once, and they arrive as a whole list in a
+    // single dispatch, so the running list IS the stack that just landed. One milestone is pushed
+    // for the whole stack rather than one per member: three announcements in the throttled status
+    // region would push the first two out before anyone read them, and "DOUBLE EVENT" is one
+    // thing that happened, not two.
+    //
+    // An instant event never joins the list at all, so it is read off the just-resolved record,
+    // exactly as before.
+    const ids = next.randomEvents.actives.map((active) => active.id);
+    const stackIds = ids.length > 0 ? ids : next.randomEvents.lastResolved ? [next.randomEvents.lastResolved.id] : [];
+    if (stackIds.length > 0) {
+      events.push({ kind: "random-event-spawned", id: stackIds[0], stackIds });
+    }
   }
 
   if (next.randomEvents.lastRaid !== previous.randomEvents.lastRaid && next.randomEvents.lastRaid) {
@@ -139,8 +160,11 @@ export function detectMilestones(previous: GameState, next: GameState, action: G
   }
 
   if (
-    previous.randomEvents.active !== null &&
-    next.randomEvents.active === null &&
+    // The stage going from busy to CLEAR. A member of a stack expiring while its companions run
+    // on is deliberately silent: the player can see two plates become one, and announcing every
+    // departure of a triple would spend the status region on bookkeeping.
+    previous.randomEvents.actives.length > 0 &&
+    next.randomEvents.actives.length === 0 &&
     next.randomEvents.lastResolved &&
     // A raid announces its outcome above and only there: two lines for one event would push the
     // one that carries the figure out of the throttled status region.
@@ -290,7 +314,20 @@ export function describeMilestone(event: MilestoneEvent): Bilingual {
     case "golden-cookie-collected":
       return { en: "Golden cookie collected.", yue: "金曲奇收到手。" };
     case "random-event-spawned": {
-      const def = getRandomEventDefinition(event.id);
+      const defs = event.stackIds.map(getRandomEventDefinition);
+      // A stack is announced by its HEADLINE and its NAMES, and not by its blurbs. Two or three
+      // blurbs run together make a paragraph nobody reads and a status announcement nobody can
+      // follow; the names are what the player needs to match against the plates in the HUD, and
+      // each event's own indicator carries the rest. A single event keeps its blurb exactly as
+      // before, because there is nothing there to disambiguate.
+      if (defs.length > 1) {
+        const headline = defs.length >= 3 ? STACK_HEADLINE.triple : STACK_HEADLINE.double;
+        return {
+          en: `${headline.en} ${defs.map((def) => def.nameEn).join(" + ")}`,
+          yue: `${headline.yue} ${defs.map((def) => def.nameYue).join(" + ")}`,
+        };
+      }
+      const def = defs[0] ?? getRandomEventDefinition(event.id);
       return {
         en: `${def.nameEn}: ${def.blurbEn}`,
         yue: `${def.nameYue}：${def.blurbYue}`,

@@ -24,6 +24,7 @@ import {
   EVENT_CLICK_STACK_CAP,
   randomEventClickMultiplier,
   randomEventRebateFraction,
+  randomEventSubgameSpeed,
   tickRandomEvents,
   whackMice,
   type RaidConsumableId,
@@ -63,6 +64,16 @@ import {
   requiredBuildMs,
   tickHome,
 } from "./home-construction.js";
+
+/**
+ * The subgame id the Overtime Crew names, and the one place the string is written down.
+ *
+ * It lives HERE rather than in random-events.ts because this file is the seam that knows a
+ * subgame called "home" exists at all. random-events.ts carries the same string on the event's
+ * definition and nothing else; if the two ever disagree the event speeds up nothing, which a test
+ * pins so the disagreement cannot happen quietly.
+ */
+export const HOME_SUBGAME_ID = "home";
 import { costOfBulk, costOfNext, getGeneratorDefinition, maxAffordable } from "./generators.js";
 import { computeOfflineProgressWithTools, type OfflineProgressOptions } from "./offline-progress.js";
 import { canPrestige, performPrestige } from "./prestige.js";
@@ -664,7 +675,17 @@ function handleTick(state: GameState, ctx: ReducerCtx, elapsedMs: number): GameS
   // THE BUILDING SITE RUNS ON THE SAME CLOCK TOO. Same elapsed milliseconds, same slice, same
   // rule that a quiet site returns the same object and costs nothing. A room finishes here and
   // only here — there is no completion path that does not go through a tick.
-  nextState = { ...nextState, homeConstruction: tickHome(nextState.homeConstruction, elapsedMs / 1000).state };
+  // ...and the Overtime Crew is the one thing that can make that slice longer than the clock.
+  // `randomEventSubgameSpeed` is asked for the subgame by ID STRING — random-events.ts has never
+  // heard of home-construction.ts and does not need to — and returns 1 whenever no such event is
+  // running, which is every tick of an ordinary session. The crew serves MORE CONSTRUCTION per
+  // second; it does not skip ahead, does not finish a room the tick it lands, and cannot carry
+  // surplus past a completion, because all of that is still `tickHome`'s to decide.
+  const buildSpeed = randomEventSubgameSpeed(nextState.randomEvents, nowMs, HOME_SUBGAME_ID);
+  nextState = {
+    ...nextState,
+    homeConstruction: tickHome(nextState.homeConstruction, (elapsedMs / 1000) * buildSpeed).state,
+  };
 
   return withAchievements(nextState, nowIso(ctx));
 }

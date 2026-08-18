@@ -71,16 +71,18 @@ function raidState(mice: readonly RaidMouse[], overrides: Partial<RandomEventsSt
   return {
     ...createInitialRandomEventsState(),
     raidNextEligibleAtEpochMs: 10_000_000,
-    active: {
-      id: "mouse_raid",
-      startedAtEpochMs: 0,
-      endsAtEpochMs: MOUSE_RAID_DEFINITION.durationMs,
-      pendingTargetIds: mice.map((mouse) => mouse.id),
-      claimedCount: 0,
-      mice,
-      startingShare: totalShare(mice),
-      armed: [],
-    },
+    actives: [
+      {
+        id: "mouse_raid",
+        startedAtEpochMs: 0,
+        endsAtEpochMs: MOUSE_RAID_DEFINITION.durationMs,
+        pendingTargetIds: mice.map((mouse) => mouse.id),
+        claimedCount: 0,
+        mice,
+        startingShare: totalShare(mice),
+        armed: [],
+      },
+    ],
     ...overrides,
   };
 }
@@ -147,13 +149,13 @@ describe("raid mice: hit points and the fat one", () => {
     const game = producing();
 
     state = whackMice(state, game, ["mouse:1"], 1_000, fixedRng(0.5)).randomEvents;
-    expect(state.active?.mice?.find((mouse) => mouse.id === "mouse:1")?.hp).toBe(2);
-    expect(state.active?.claimedCount).toBe(0);
+    expect(state.actives[0]?.mice?.find((mouse) => mouse.id === "mouse:1")?.hp).toBe(2);
+    expect(state.actives[0]?.claimedCount).toBe(0);
 
     state = whackMice(state, game, ["mouse:1"], 1_100, fixedRng(0.5)).randomEvents;
     state = whackMice(state, game, ["mouse:1"], 1_200, fixedRng(0.5)).randomEvents;
-    expect(state.active?.pendingTargetIds).toEqual(["mouse:0"]);
-    expect(state.active?.claimedCount).toBe(1);
+    expect(state.actives[0]?.pendingTargetIds).toEqual(["mouse:0"]);
+    expect(state.actives[0]?.claimedCount).toBe(1);
   });
 
   it("splits the theft by share, so the fat mouse getting away costs double", () => {
@@ -222,11 +224,11 @@ describe("bigger whack: what one swing catches", () => {
 
   it("lets an armed raid take several mice with one swing", () => {
     const state = raidState(ordinary(4), {});
-    const armed: RandomEventsState = { ...state, active: { ...state.active!, armed: ["bigger_whack"] } };
+    const armed: RandomEventsState = { ...state, actives: [{ ...state.actives[0]!, armed: ["bigger_whack"] }] };
     const result = whackMice(armed, producing(), ["mouse:0", "mouse:1", "mouse:2"], 1_000, fixedRng(0.5));
     expect(result.claimed).toBe(true);
-    expect(result.randomEvents.active?.pendingTargetIds).toEqual(["mouse:3"]);
-    expect(result.randomEvents.active?.claimedCount).toBe(3);
+    expect(result.randomEvents.actives[0]?.pendingTargetIds).toEqual(["mouse:3"]);
+    expect(result.randomEvents.actives[0]?.claimedCount).toBe(3);
   });
 
   it("still only takes one hit point per mouse per swing", () => {
@@ -235,9 +237,9 @@ describe("bigger whack: what one swing catches", () => {
       { id: "mouse:1", hp: 3, maxHp: 3, share: 2, fat: true },
     ];
     const state = raidState(mice);
-    const armed: RandomEventsState = { ...state, active: { ...state.active!, armed: ["bigger_whack"] } };
+    const armed: RandomEventsState = { ...state, actives: [{ ...state.actives[0]!, armed: ["bigger_whack"] }] };
     const result = whackMice(armed, producing(), ["mouse:0", "mouse:1", "mouse:1"], 1_000, fixedRng(0.5));
-    expect(result.randomEvents.active?.mice?.find((mouse) => mouse.id === "mouse:1")?.hp).toBe(2);
+    expect(result.randomEvents.actives[0]?.mice?.find((mouse) => mouse.id === "mouse:1")?.hp).toBe(2);
   });
 });
 
@@ -458,7 +460,7 @@ describe("raid consumables: when they are spent", () => {
       config: DEFAULT_RANDOM_EVENT_CONFIG,
     });
 
-    expect(result.randomEvents.active?.armed).toEqual(["bigger_whack", "half_hp_whack"]);
+    expect(result.randomEvents.actives[0]?.armed).toEqual(["bigger_whack", "half_hp_whack"]);
     expect(result.randomEvents.consumables.bigger_whack.stock).toBe(1);
     expect(result.randomEvents.consumables.half_hp_whack.stock).toBe(0);
     // The pass is NOT armed: it is spent later, and only if cookies would actually leave.
@@ -477,7 +479,7 @@ describe("raid consumables: when they are spent", () => {
       blocked: false,
       config: DEFAULT_RANDOM_EVENT_CONFIG,
     });
-    expect(result.randomEvents.active?.armed).toEqual([]);
+    expect(result.randomEvents.actives[0]?.armed).toEqual([]);
   });
 
   it("halves the mice of the raid it armed a Half-HP Whack for", () => {
@@ -503,9 +505,9 @@ describe("raid consumables: when they are spent", () => {
       config: DEFAULT_RANDOM_EVENT_CONFIG,
     }).randomEvents;
 
-    expect(armed.active?.mice?.map((mouse) => mouse.maxHp)).toEqual(bare.active?.mice?.map((mouse) => mouse.maxHp));
-    expect(armed.active?.mice?.map((mouse) => mouse.hp)).toEqual(
-      bare.active!.mice!.map((mouse) => halveHp(mouse.maxHp)),
+    expect(armed.actives[0]?.mice?.map((mouse) => mouse.maxHp)).toEqual(bare.actives[0]?.mice?.map((mouse) => mouse.maxHp));
+    expect(armed.actives[0]?.mice?.map((mouse) => mouse.hp)).toEqual(
+      bare.actives[0]!.mice!.map((mouse) => halveHp(mouse.maxHp)),
     );
   });
 
@@ -563,7 +565,7 @@ describe("raid consumables: when they are spent", () => {
     const base = raidState(ordinary(2));
     let state: RandomEventsState = {
       ...base,
-      active: { ...base.active!, armed: ["bigger_whack", "half_hp_whack"] },
+      actives: [{ ...base.actives[0]!, armed: ["bigger_whack", "half_hp_whack"] }],
       consumables: stocked({ whack_pass: 1 }),
     };
     state = whackMice(state, game, ["mouse:0", "mouse:1"], 1_000, fixedRng(0.5)).randomEvents;
@@ -575,7 +577,7 @@ describe("raid consumables: when they are spent", () => {
     const state = raidState(rollRaidMice(5, createSplitMix32Rng(3), true), {
       consumables: stocked({ whack_pass: 2, bigger_whack: 1 }),
     });
-    const armed: RandomEventsState = { ...state, active: { ...state.active!, armed: ["half_hp_whack"] } };
+    const armed: RandomEventsState = { ...state, actives: [{ ...state.actives[0]!, armed: ["half_hp_whack"] }] };
     expect(decodeRandomEvents(encodeRandomEvents(armed))).toEqual(armed);
   });
 
@@ -594,7 +596,7 @@ describe("raid consumables: when they are spent", () => {
       spawnCount: 1,
     };
     const decoded = decodeRandomEvents(old) as RandomEventsState;
-    expect(decoded.active?.mice).toBeUndefined();
+    expect(decoded.actives[0]?.mice).toBeUndefined();
     expect(decoded.consumables).toEqual(createInitialRaidConsumables());
 
     // And such a raid still resolves, on heads, exactly as it used to.
@@ -609,14 +611,14 @@ describe("raid consumables: when they are spent", () => {
     const base = raidState(ordinary(4));
     const game: GameState = {
       ...producing(1_000_000),
-      randomEvents: { ...base, active: { ...base.active!, armed: ["bigger_whack"] } },
+      randomEvents: { ...base, actives: [{ ...base.actives[0]!, armed: ["bigger_whack"] }] },
     };
     const after = applyGameAction(
       game,
       { type: "randomEventWhack", mouseIds: ["mouse:0", "mouse:1"] },
       ctxAt(1_000),
     );
-    expect(after.randomEvents.active?.claimedCount).toBe(2);
-    expect(after.randomEvents.active?.pendingTargetIds).toEqual(["mouse:2", "mouse:3"]);
+    expect(after.randomEvents.actives[0]?.claimedCount).toBe(2);
+    expect(after.randomEvents.actives[0]?.pendingTargetIds).toEqual(["mouse:2", "mouse:3"]);
   });
 });

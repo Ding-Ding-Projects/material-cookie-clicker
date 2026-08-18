@@ -82,6 +82,24 @@ export type RandomEventId =
   | "flour_shortage"
   | "night_shift"
   | "sprinkle_storm"
+  /* ------------------------------------------------------ the second wave of pool events */
+  /**
+   * THE WAVE-TWO EVENTS. Six more faces, designed against the same rule as the first wave: an
+   * event earns its place by being worth a DIFFERENT amount to a different player, or by asking
+   * for a different gesture. A sixth "here is a lump of cookies" would only make the pool longer.
+   *
+   * Two of them are the pool's first hooks into things outside it — a generator family by id
+   * string (`grandma_convention`) and a subgame's clock by id string (`overtime_crew`). Neither
+   * imports the module it touches: this file names them as strings and the composition layers
+   * (effective-cps.ts, the reducer's tick) do the reaching. A pool that imported the home would
+   * be a pool that could not be tested without one.
+   */
+  | "cookie_eclipse"
+  | "crumb_comet"
+  | "bakers_dozen"
+  | "static_cling"
+  | "grandma_convention"
+  | "overtime_crew"
   /**
    * THE MOUSE RAID — the one event that is not in the common pool.
    *
@@ -155,6 +173,25 @@ export interface RandomEventDefinition {
   readonly isSetback: boolean;
   /** Which family this belongs to. Drives the accent, and nothing else. */
   readonly eventClass: RandomEventClass;
+  /**
+   * Generator ids whose output this event surges, and by how much. ID STRINGS ONLY.
+   *
+   * This is the pool's one hook into generators.ts and it is deliberately a hook rather than an
+   * import: this module never learns what a "grandma" is, it only names one. `effective-cps.ts`
+   * — the leaf that already depends on the generators, the golden cookie and this file — is
+   * where the name is resolved into arithmetic. An id that no longer exists surges nothing,
+   * which is the honest reading of "the thing this event was about is gone".
+   */
+  readonly surgeGeneratorIds?: readonly string[];
+  readonly surgeMultiplier?: number;
+  /**
+   * A subgame whose clock this event speeds up, named by id string, and the factor.
+   *
+   * Same deal as `surgeGeneratorIds`: `"home"` is a string here and the reducer's tick is what
+   * knows it means home-construction.ts. A subgame id nothing recognises speeds up nothing.
+   */
+  readonly subgameSpeedId?: string;
+  readonly subgameSpeedMultiplier?: number;
 }
 
 /**
@@ -165,24 +202,38 @@ export interface RandomEventDefinition {
  * the only reason the numbers are what they are — nothing in the draw needs them to sum to
  * anything in particular.
  *
- * WHAT THE PACING WAS, AND WHAT IT IS NOW. The gap between two pool events is
+ * WHAT THE PACING WAS, AND WHAT IT IS NOW. The gap between two pool SPAWNS is
  * `cooldownMs + uniform(minDelayMs, maxDelayMs)`, so the mean gap is the cooldown plus the
  * midpoint of the band:
  *
- *   before this lane — 60s + mean(180s, 600s) = 450s  →  8.0 pool events an hour, from 6 kinds
- *   after  this lane — 60s + mean(240s, 720s) = 540s  →  6.7 pool events an hour, from 16 kinds
+ *   wave one, before — 60s + mean(180s, 600s) = 450s  →  8.00 spawns an hour, from 6 kinds
+ *   wave one, after  — 60s + mean(240s, 720s) = 540s  →  6.67 spawns an hour, from 16 kinds
+ *   wave two (now)   — 60s + mean(270s, 810s) = 600s  →  6.00 spawns an hour, from 22 kinds
  *
- * The pool got nearly three times as many faces and FEWER interruptions an hour, which is the
- * whole point: variety is supposed to make each event rarer, not the session busier. The Mouse
- * Raid's own hourly clock is untouched by all of this, and so is the one-active-slot rule — a
- * bigger bag does not mean two events on screen.
+ * A SPAWN IS NO LONGER THE SAME THING AS AN EVENT, which is the one genuinely new fact in this
+ * paragraph. A spawn now draws a STACK of one, two or three compatible events (see
+ * `rollEventStackSize`), so the interruption count and the event count have come apart:
  *
- * What the rarest things now cost in real time, at 6.7 draws an hour:
+ *   mean events per spawn = 1×0.952 + 2×0.040 + 3×0.008 = 1.056
+ *   events an hour        = 6.00 × 1.056 = 6.34
  *
- *   Burnt Batch Frenzy   1%  →  about one every 15 hours of play
- *   Production Frenzy    4%  →  about one every 3.7 hours
- *   Click Frenzy         3%  →  about one every 5 hours
- *   anything that costs you something (Oven Hiccup, Flour Shortage, Clot) 13% → 0.87 an hour
+ * So the session gets FEWER interruptions than wave one (6.00 against 6.67) and very nearly the
+ * same number of events (6.34 against 6.67), out of a bag half again as big. That is the trade
+ * this lane is making on purpose: the pool is quieter and each interruption is more interesting.
+ *
+ * How rare "rare" actually is, at 6.00 spawns an hour:
+ *
+ *   Burnt Batch Frenzy    1%  →  about one every 16.7 hours of play
+ *   Crumb Comet           2%  →  about one every 8.3 hours
+ *   Production Frenzy     4%  →  about one every 4.2 hours
+ *   Click Frenzy          3%  →  about one every 5.6 hours
+ *   a DOUBLE EVENT      4.0% of spawns →  0.240 an hour, about one every 4.2 hours
+ *   a TRIPLE EVENT      0.8% of spawns →  0.048 an hour, about one every 20.8 hours
+ *   anything that costs you something (Oven Hiccup, Clot, Flour Shortage, Static Cling)
+ *                        15%  →  0.90 an hour
+ *
+ * The Mouse Raid's own hourly clock is untouched by all of this, and the raid never joins a
+ * stack — see `canStackWith`.
  */
 export const POOL_WEIGHT_TOTAL = 100;
 
@@ -195,7 +246,7 @@ export const RANDOM_EVENT_DEFINITIONS: readonly RandomEventDefinition[] = [
     blurbYue: "有曲奇跌緊落嚟，落到枱面之前接住佢。",
     shape: "clickable",
     durationMs: 20_000,
-    weight: 10,
+    weight: 8,
     targetCount: 12,
     cpsMultiplier: 1,
     clickMultiplier: 1,
@@ -211,7 +262,7 @@ export const RANDOM_EVENT_DEFINITIONS: readonly RandomEventDefinition[] = [
     blurbYue: "無啦啦送咗成盤過嚟。",
     shape: "instant",
     durationMs: 0,
-    weight: 10,
+    weight: 8,
     targetCount: 0,
     cpsMultiplier: 1,
     clickMultiplier: 1,
@@ -227,7 +278,7 @@ export const RANDOM_EVENT_DEFINITIONS: readonly RandomEventDefinition[] = [
     blurbYue: "焗爐鬧脾氣，產量跌咗。拍佢一下就得。",
     shape: "clickable",
     durationMs: 30_000,
-    weight: 6,
+    weight: 5,
     targetCount: 1,
     cpsMultiplier: 0.4,
     clickMultiplier: 1,
@@ -243,7 +294,7 @@ export const RANDOM_EVENT_DEFINITIONS: readonly RandomEventDefinition[] = [
     blurbYue: "每一下撳都重七倍。",
     shape: "timed",
     durationMs: 15_000,
-    weight: 8,
+    weight: 6,
     targetCount: 0,
     cpsMultiplier: 1,
     clickMultiplier: 7,
@@ -259,7 +310,7 @@ export const RANDOM_EVENT_DEFINITIONS: readonly RandomEventDefinition[] = [
     blurbYue: "喺枱底執到少少嘢。",
     shape: "instant",
     durationMs: 0,
-    weight: 12,
+    weight: 9,
     targetCount: 0,
     cpsMultiplier: 1,
     clickMultiplier: 1,
@@ -275,7 +326,7 @@ export const RANDOM_EVENT_DEFINITIONS: readonly RandomEventDefinition[] = [
     blurbYue: "供應商今日心情好，買嘢有錢回。",
     shape: "timed",
     durationMs: 60_000,
-    weight: 10,
+    weight: 6,
     targetCount: 0,
     cpsMultiplier: 1,
     clickMultiplier: 1,
@@ -448,7 +499,7 @@ export const RANDOM_EVENT_DEFINITIONS: readonly RandomEventDefinition[] = [
     blurbYue: "三張單要順住次序出。喺架車走之前逐張搞掂。",
     shape: "clickable",
     durationMs: 14_000,
-    weight: 6,
+    weight: 5,
     targetCount: 3,
     cpsMultiplier: 1,
     clickMultiplier: 1,
@@ -489,7 +540,7 @@ export const RANDOM_EVENT_DEFINITIONS: readonly RandomEventDefinition[] = [
     blurbYue: "有盤嘢出爐，好唔好食就好爭議。即刻賣咗佢，定係退返轉頭焗過？",
     shape: "choice",
     durationMs: 15_000,
-    weight: 5,
+    weight: 4,
     targetCount: 0,
     cpsMultiplier: 1,
     clickMultiplier: 1,
@@ -524,7 +575,7 @@ export const RANDOM_EVENT_DEFINITIONS: readonly RandomEventDefinition[] = [
     blurbYue: "麵粉用晒，架貨車又遲到。到貨之前產量得一半——到咗之後一次過補返。",
     shape: "timed",
     durationMs: 30_000,
-    weight: 4,
+    weight: 3,
     targetCount: 0,
     cpsMultiplier: 0.5,
     clickMultiplier: 1,
@@ -553,7 +604,7 @@ export const RANDOM_EVENT_DEFINITIONS: readonly RandomEventDefinition[] = [
     blurbYue: "啲焗爐通宵開，但係冇人睇住個櫃檯。產量 ×3，撳嘅價值 ×0.25。",
     shape: "timed",
     durationMs: 45_000,
-    weight: 7,
+    weight: 5,
     targetCount: 0,
     cpsMultiplier: 3,
     clickMultiplier: 0.25,
@@ -581,13 +632,218 @@ export const RANDOM_EVENT_DEFINITIONS: readonly RandomEventDefinition[] = [
     blurbYue: "周圍都係糖針。接得一粒，下一粒就值多啲。",
     shape: "clickable",
     durationMs: 18_000,
-    weight: 8,
+    weight: 6,
     targetCount: 10,
     cpsMultiplier: 1,
     clickMultiplier: 1,
     rebateFraction: 0,
     isSetback: false,
     eventClass: "boon",
+  },
+
+  /* ================================================= THE SECOND WAVE OF POOL EVENTS ====== */
+
+  /**
+   * COOKIE ECLIPSE — the lights go down and five crumbs are the only thing glowing.
+   *
+   * Intent: the answer to a real complaint about Cookie Rain. The rain puts TWELVE identical
+   * targets up and the correct play is to spray clicks at the stage, which is not a skill, it is
+   * a wrist. The Eclipse puts up FIVE, worth about three times a rain drop each, on a dimmed
+   * stage where finding them is the whole gesture. Same family, opposite density: rain rewards
+   * volume, the eclipse rewards looking.
+   *
+   * The dimming is CSS on the stage, never a change to contrast anywhere a player reads a
+   * number — the HUD, the counter and the shop keep their ordinary colours throughout, because
+   * an event that made the price of a farm hard to read would be an accessibility bug wearing a
+   * costume. The crumbs themselves are the brightest thing on the stage while it runs.
+   */
+  {
+    id: "cookie_eclipse",
+    nameEn: "Cookie Eclipse",
+    nameYue: "曲奇日蝕",
+    blurbEn: "The lights have gone. Five crumbs are still glowing — find them.",
+    blurbYue: "成間舖暗晒。得返五粒餅碎仲喺度發光——搵出佢哋。",
+    shape: "clickable",
+    durationMs: 16_000,
+    weight: 5,
+    targetCount: 5,
+    cpsMultiplier: 1,
+    clickMultiplier: 1,
+    rebateFraction: 0,
+    isSetback: false,
+    eventClass: "boon",
+  },
+  /**
+   * CRUMB COMET — one target, one pass, nine seconds. Miss it and it is gone.
+   *
+   * Intent: the pool's only pure SKILL prize, and it exists because Cookie Rain was slowed to a
+   * catchable pace in the previous lane. A catchable rain is a friendlier rain and it also took
+   * the last bit of pressure out of the clickable family, so this puts a single hard catch back
+   * — a big fast object crossing the stage exactly once, worth roughly nine rain drops if you get
+   * it and nothing at all if you do not.
+   *
+   * IT PAYS NOTHING ON EXPIRY, deliberately, and it is the only clickable event in the pool with
+   * that property. Everything else in the family is a bag of value the player takes some of; the
+   * comet is a single yes-or-no. That is only fair because it is rare (2%, about one every eight
+   * hours) and because the miss costs nothing that was already yours — a comet that fined you
+   * for being slow would be a different and much worse event.
+   */
+  {
+    id: "crumb_comet",
+    nameEn: "Crumb Comet",
+    nameYue: "餅碎彗星",
+    blurbEn: "Something big is crossing the counter, once. Catch it before it goes.",
+    blurbYue: "有嚿好大嘅嘢橫過個櫃檯，得一次機會。趁佢未走接住佢。",
+    shape: "clickable",
+    durationMs: 9_000,
+    weight: 2,
+    targetCount: 1,
+    cpsMultiplier: 1,
+    clickMultiplier: 1,
+    rebateFraction: 0,
+    isSetback: false,
+    eventClass: "boon",
+  },
+  /**
+   * BAKER'S DOZEN — for ninety seconds, every thirteenth cookie you spend is on the house.
+   *
+   * Intent: the owner's sketch was "a window where the thirteenth purchase is free". That was
+   * tried and rejected for the same reason the Flour Shortage's original sketch was: counting to
+   * thirteen means the shop's printed prices stop being what you pay, and worse, it means the
+   * player has to track a counter the game would then have to display, argue about and save.
+   *
+   * The rebate keeps the FICTION exactly — one cookie in thirteen comes back — and pays it
+   * continuously instead of in a lump: `1 / 13` = 7.69% of every purchase, handed back through
+   * the same seam Market Day already uses (see `randomEventRebateFraction`). A player who spends
+   * thirteen farms' worth during the window has had precisely one farm free, which is the thing
+   * the name promises, and no price anywhere ever printed a lie.
+   *
+   * It is deliberately WEAKER and LONGER than Market Day (7.69% for 90s against 15% for 60s):
+   * two rebate events that were the same size would be one event with two names.
+   */
+  {
+    id: "bakers_dozen",
+    nameEn: "Baker's Dozen",
+    nameYue: "十三件一打",
+    blurbEn: "Ninety seconds where every thirteenth cookie you spend comes straight back.",
+    blurbYue: "九十秒之內，你每花十三粒曲奇就有一粒即刻返返嚟。",
+    shape: "timed",
+    durationMs: 90_000,
+    weight: 5,
+    targetCount: 0,
+    cpsMultiplier: 1,
+    clickMultiplier: 1,
+    // One in thirteen, written as the division rather than as 0.0769 so the number and the name
+    // can never drift apart. `BAKERS_DOZEN_REBATE` states it once; this is that constant.
+    rebateFraction: 1 / 13,
+    isSetback: false,
+    eventClass: "boon",
+  },
+  /**
+   * STATIC CLING — everything sticks to everything, and clicks are worth ×0.35 for forty seconds.
+   *
+   * Intent: the pool's FIRST click-side setback, and that is the whole reason it exists. Every
+   * penalty this game had before it — Oven Hiccup, Clot, Flour Shortage — reduces PRODUCTION,
+   * which means a player who clicks for a living has never once been inconvenienced by bad
+   * weather. Static Cling is the mirror: an idle save barely notices it and an active clicker
+   * feels it immediately, so between it and Night Shift the two playstyles now each have one
+   * event that is aimed at them.
+   *
+   * ×0.35 rather than a token 0.9, for the reason Night Shift's note already gives: a penalty
+   * nobody can feel is not a penalty. Forty seconds rather than the Clot's sixty-six, because
+   * this one is felt continuously by the player who is doing something rather than sat through by
+   * one who is not. There is no button to clear it — like the Clot, it is weather.
+   *
+   * It touches production, the balance and the shop not at all. Reading the definition is enough
+   * to know that, which is the point of every field being on the definition.
+   */
+  {
+    id: "static_cling",
+    nameEn: "Static Cling",
+    nameYue: "痴晒靜電",
+    blurbEn: "Dough is sticking to everything, your hands included. Clicks are worth ×0.35.",
+    blurbYue: "啲麵糰痴晒周圍，連你隻手都痴埋。撳一下淨係值 ×0.35。",
+    shape: "timed",
+    durationMs: 40_000,
+    weight: 4,
+    targetCount: 0,
+    cpsMultiplier: 1,
+    clickMultiplier: 0.35,
+    rebateFraction: 0,
+    isSetback: true,
+    eventClass: "clot",
+  },
+  /**
+   * GRANDMA CONVENTION — the grandmas have brought friends, and for fifty seconds they bake ×4.
+   *
+   * Intent: an event whose value is a fact about YOUR save rather than a fact about the pool. A
+   * Production Frenzy is worth ×7 of everything to everybody; the Convention is worth ×4 of your
+   * grandmas and your farms and nothing else, so it is enormous on a save that leaned into the
+   * early generators and close to nothing on one that skipped straight to portals. Nothing else
+   * in the pool has that property, and it is the only kind of event that can make a player look
+   * at what they own and think about it.
+   *
+   * THE FAMILY IS TWO IDS, `grandma` and `farm`, and it is two rather than one because a single
+   * generator is too small a target to be worth an event at any point after the first hour. The
+   * farm is in because the fiction already puts grandmas in it — the tray of cookies comes from
+   * somewhere — and because the pair together is a coherent "the old guard is having a moment"
+   * rather than an arbitrary list.
+   *
+   * IT IS STATED AS A SURGE ON NAMED IDS, not as a global multiplier with a footnote, so the
+   * event's honesty is structural: `surgeGeneratorIds` is on the definition, the site prints it,
+   * and effective-cps.ts applies exactly those and nothing else.
+   */
+  {
+    id: "grandma_convention",
+    nameEn: "Grandma Convention",
+    nameYue: "婆婆大會",
+    blurbEn: "Every grandma in the district has turned up. Grandmas and farms bake ×4.",
+    blurbYue: "成區嘅婆婆都嚟晒。婆婆同農場產量 ×4。",
+    shape: "timed",
+    durationMs: 50_000,
+    weight: 3,
+    targetCount: 0,
+    cpsMultiplier: 1,
+    clickMultiplier: 1,
+    rebateFraction: 0,
+    isSetback: false,
+    eventClass: "boon",
+    surgeGeneratorIds: ["grandma", "farm"],
+    surgeMultiplier: 4,
+  },
+  /**
+   * OVERTIME CREW — the builders stay late, and the house goes up at triple speed for a minute.
+   *
+   * Intent: the only event in the pool that touches a SUBGAME, and the only one that can be worth
+   * literally nothing. If a room is under construction the crew serves three minutes of building
+   * in one; if the site is quiet the event happens, is announced, and does nothing at all.
+   *
+   * THAT IS NOT A BUG AND THE COPY SAYS SO. An event that silently became a production boon when
+   * it had nothing to speed up would be two events sharing one name, and a player would never
+   * work out which one they had. So it is drawn rarely (2%), it names its condition in the blurb,
+   * and the marquee note says outright that it does nothing when nothing is being built. The
+   * honest version of "sometimes useless" is telling people when.
+   *
+   * The reach is a STRING. `subgameSpeedId: "home"` is resolved by the reducer's tick, which is
+   * the only place that knows home-construction.ts exists. Nothing about this file needs to.
+   */
+  {
+    id: "overtime_crew",
+    nameEn: "Overtime Crew",
+    nameYue: "通宵開工隊",
+    blurbEn: "The builders are staying late. Any room under construction goes up ×3 as fast.",
+    blurbYue: "啲師傅肯開夜。起緊嘅房間快三倍完成。",
+    shape: "timed",
+    durationMs: 60_000,
+    weight: 2,
+    targetCount: 0,
+    cpsMultiplier: 1,
+    clickMultiplier: 1,
+    rebateFraction: 0,
+    isSetback: false,
+    eventClass: "boon",
+    subgameSpeedId: "home",
+    subgameSpeedMultiplier: 3,
   },
 ];
 
@@ -614,6 +870,23 @@ export const RANDOM_EVENT_CHOICE_IDS: readonly RandomEventChoiceId[] = ["serve",
 
 /** The Delivery Rush's parcels, in the order they must be sent. */
 export const DELIVERY_RUSH_PARCELS = 3;
+
+/**
+ * One cookie in thirteen, which is what a baker's dozen IS. Stated as the division so the
+ * arithmetic and the name are the same fact; the definition above uses this value.
+ */
+export const BAKERS_DOZEN_REBATE = 1 / 13;
+
+/**
+ * The ceiling on a COMBINED rebate, for the one case where two rebate events run together.
+ *
+ * Market Day (15%) and a Baker's Dozen (7.69%) are compatible under the stacking matrix, and
+ * when they coincide the player gets 22.69% of every purchase back. That is a good moment and it
+ * is allowed to be one. The cap exists so that no future third rebate can ever push the figure to
+ * or past 100%, which would turn the shop into a free shop and every price into a decoration.
+ * Half is far above anything two events can reach, so it never quietly eats a real rebate.
+ */
+export const EVENT_REBATE_CAP = 0.5;
 
 /**
  * The Mouse Raid's definition, deliberately NOT a member of `RANDOM_EVENT_DEFINITIONS`.
@@ -661,6 +934,183 @@ export function getRandomEventDefinition(id: RandomEventId): RandomEventDefiniti
   const def = DEFINITIONS_BY_ID.get(id);
   if (!def) throw new Error(`Unknown random event id: ${id}`);
   return def;
+}
+
+/* ------------------------------------------------------------- DOUBLE AND TRIPLE EVENTS */
+
+/**
+ * THE COMPATIBILITY MATRIX, stated once, in one predicate, and tested exhaustively.
+ *
+ * The owner asked for "double events" and "triple events" — rare spawns where two or three pool
+ * events run at the same time. The scheduler that used to guarantee "never two at once" now
+ * guarantees "never two INCOMPATIBLE at once", and the whole difference between those two
+ * sentences lives in this function and in `isStackable` below it.
+ *
+ * The rules, and why each one is a rule rather than a preference:
+ *
+ *   1. NO TWO SETBACKS. Weather is supposed to be survivable. An Oven Hiccup (×0.4) inside a Clot
+ *      (×0.5) is ×0.2 production for over a minute, which is not weather, it is a punishment for
+ *      a coincidence the player had no part in. One thing can be going wrong at a time.
+ *
+ *   2. NO TWO EVENTS THAT WANT THE SAME STAGE. Every clickable event scatters real buttons over
+ *      the same stage the cookie is on. Two of them at once means rain drops overlapping
+ *      sprinkles overlapping parcels: targets that cover each other, a chain whose "next parcel"
+ *      is behind a comet, and clicks that land on whichever button React drew last. There is one
+ *      stage, so there is at most one event using it.
+ *
+ *   3. CHOICE EVENTS NEVER STACK, in either direction. A choice event puts a question and two
+ *      buttons in the middle of the stage and then WAITS for an answer. Asking someone to weigh a
+ *      tradeoff while a comet crosses the screen is not a decision, it is noise — and worse, the
+ *      card would be sitting on top of the other event's targets. So a choice event is always
+ *      alone, and this is the one rule that is about attention rather than about arithmetic.
+ *
+ *   4. THE RAID IS NEVER IN A STACK. It is not drawn from the pool at all (it has its own hourly
+ *      clock), it can take eighty per cent of the balance, and it owns the stage completely. It
+ *      stays exactly as alone as it has always been, and rule 2 would catch it anyway.
+ *
+ *   5. NO EVENT STACKS WITH ITSELF. Two Sugar Rushes would be a ×49 the pool never designed, and
+ *      the HUD would draw the same plate twice with two different clocks on it.
+ *
+ *   6. INSTANT EVENTS NEVER STACK. An instant pays out and is over inside the tick it spawned in;
+ *      there is nothing to be simultaneous WITH. Announcing "DOUBLE EVENT" for a Lucky Crumb plus
+ *      a Sugar Rush would be announcing something that never happened.
+ *
+ * The predicate is symmetric by construction, which matters: `canStackWith(a, b)` and
+ * `canStackWith(b, a)` are the same expression, so there is no draw order in which a forbidden
+ * pair slips through. A test asserts that over every ordered pair, and a seeded long-run test
+ * asserts no forbidden pair is ever actually rolled.
+ */
+export function isStackable(def: RandomEventDefinition): boolean {
+  if (def.id === "mouse_raid") return false;
+  if (def.shape === "instant") return false;
+  if (def.shape === "choice") return false;
+  return true;
+}
+
+export function canStackWith(a: RandomEventDefinition, b: RandomEventDefinition): boolean {
+  if (!isStackable(a) || !isStackable(b)) return false;
+  if (a.id === b.id) return false;
+  if (a.isSetback && b.isSetback) return false;
+  if (a.targetCount > 0 && b.targetCount > 0) return false;
+  return true;
+}
+
+/** True when `id` can join a stack that already contains exactly `existing`. */
+export function canJoinStack(existing: readonly RandomEventId[], id: RandomEventId): boolean {
+  const def = getRandomEventDefinition(id);
+  if (!isStackable(def)) return false;
+  return existing.every((other) => canStackWith(getRandomEventDefinition(other), def));
+}
+
+/** The subset of the pool a stack can be drawn from. Its own array so the draw is a plain walk. */
+export const STACKABLE_EVENT_DEFINITIONS: readonly RandomEventDefinition[] =
+  RANDOM_EVENT_DEFINITIONS.filter(isStackable);
+
+/**
+ * The most events one spawn can put on screen at once. Three, because the owner asked for double
+ * and triple and there is no fourth word in that sentence — and because the HUD's indicator
+ * plates are laid out to compress to three and no further.
+ */
+export const MAX_STACKED_EVENTS = 3;
+
+/**
+ * HOW OFTEN A STACK HAPPENS, and why these two numbers and not bigger ones.
+ *
+ * 4% of spawns are doubles and 0.8% are triples, so at the shipped 6.00 spawns an hour a player
+ * meets a double about every four hours and a triple about every twenty-one. Those are the
+ * numbers that make a stack an event in itself rather than a variation: something that happened
+ * twice a session would just be "the pool", and the marquee shouting DOUBLE EVENT at it would
+ * wear out within an evening.
+ *
+ * The five-to-one ratio between them is deliberate. A triple has to be visibly rarer than a
+ * double or the two announcements mean the same thing.
+ */
+export const DOUBLE_EVENT_CHANCE = 0.04;
+export const TRIPLE_EVENT_CHANCE = 0.008;
+
+/**
+ * How many events THIS spawn wants to put up: 1, 2 or 3.
+ *
+ * One draw off the injected port, read against the two thresholds in the order rarest-first, so
+ * the two chances do not overlap and the arithmetic in the pacing note is the arithmetic here.
+ * "Wants" rather than "will": the draw below can find nothing compatible to fill the slots with,
+ * and a stack that cannot be filled shrinks rather than being re-rolled.
+ */
+export function rollEventStackSize(rng: RngPort): number {
+  const roll = rng.next();
+  if (roll < TRIPLE_EVENT_CHANCE) return 3;
+  if (roll < TRIPLE_EVENT_CHANCE + DOUBLE_EVENT_CHANCE) return 2;
+  return 1;
+}
+
+/** Weighted draw over the STACKABLE subset only. Same exact walk as `pickRandomEventId`. */
+export function pickStackableEventId(rng: RngPort): RandomEventId {
+  const totalWeight = STACKABLE_EVENT_DEFINITIONS.reduce((sum, d) => sum + d.weight, 0);
+  let roll = rng.next() * totalWeight;
+  for (const def of STACKABLE_EVENT_DEFINITIONS) {
+    roll -= def.weight;
+    if (roll < 0) return def.id;
+  }
+  return STACKABLE_EVENT_DEFINITIONS[STACKABLE_EVENT_DEFINITIONS.length - 1].id;
+}
+
+/**
+ * The number of draws a stack is allowed to spend looking for a compatible member before it gives
+ * up and ships one short.
+ *
+ * REJECTION SAMPLING, WITH A BUDGET, and the budget is the honest part. Drawing the whole
+ * stackable bag and filtering it to "compatible" would bias the result towards whatever is left
+ * after the clickables are excluded; drawing and rejecting keeps every member at its real weight.
+ * But rejection sampling with no bound is a loop whose worst case is unbounded, and a scheduler
+ * that can hang is not a scheduler. Eight attempts is far more than enough — the stackable bag is
+ * 79% of the pool and only 31% of it is clickable — and if all eight miss, the spawn is simply a
+ * smaller stack. A double that came out single is a spawn the player cannot tell from an ordinary
+ * one, which is the right way for this to fail.
+ */
+const STACK_DRAW_ATTEMPTS = 8;
+
+/**
+ * ONE SPAWN'S WORTH OF EVENTS, in the order they will be drawn on screen.
+ *
+ * The order of the two draws matters and is deliberate: the SIZE is rolled first, and only then
+ * is the first member drawn — from the stackable bag when a stack was rolled, and from the whole
+ * pool when it was not. That is what makes DOUBLE_EVENT_CHANCE an exact statement about spawns
+ * rather than an upper bound: if the first member were drawn from the whole pool, then every
+ * spawn that happened to draw a Lucky Crumb or a Taste Test would collapse to a single and the
+ * real double rate would be some smaller number nobody had written down.
+ *
+ * A forced id (the developer capture flag) replaces the FIRST member only, and forces the stack
+ * to that member alone unless the forced event is itself stackable — so a capture run photographs
+ * the event it asked for rather than that event plus whatever the dice added.
+ */
+export function drawRandomEventStack(rng: RngPort, config: RandomEventConfig): readonly RandomEventId[] {
+  // The roll happens whether or not a size is forced, so the stream advances identically and a
+  // forced run is not a differently-shaped run — the same rule the forced id already follows.
+  const rolled = rollEventStackSize(rng);
+  const wanted = Math.min(MAX_STACKED_EVENTS, Math.max(1, config.forcedStackSize ?? rolled));
+
+  // The first member. Drawn from the stackable subset when a stack is wanted, from the whole pool
+  // otherwise, and either way the stream advances by exactly one draw.
+  const first = wanted > 1 ? pickStackableEventId(rng) : pickRandomEventId(rng);
+  const forced = config.forcedPoolEventId;
+  const head = forced ?? first;
+  const stack: RandomEventId[] = [head];
+  if (wanted <= 1) return stack;
+  // A forced event that cannot stack is photographed alone, which is what a capture asked for.
+  if (!isStackable(getRandomEventDefinition(head))) return stack;
+
+  for (let slot = 1; slot < wanted; slot += 1) {
+    let filled = false;
+    for (let attempt = 0; attempt < STACK_DRAW_ATTEMPTS && !filled; attempt += 1) {
+      const candidate = pickStackableEventId(rng);
+      if (!canJoinStack(stack, candidate)) continue;
+      stack.push(candidate);
+      filled = true;
+    }
+    // Nothing compatible turned up in the budget. Ship what we have rather than looping.
+    if (!filled) break;
+  }
+  return stack;
 }
 
 /* -------------------------------------------------------------------- payout tuning */
@@ -733,6 +1183,30 @@ export interface RandomEventPayoutConfig {
   readonly sprinkleBaseClicks: number;
   /** How much each sprinkle already caught adds to the value of the next, as a fraction. */
   readonly sprinkleEscalation: number;
+
+  /* ------------------------------------------------- the events added by the second wave */
+  /**
+   * What one Cookie Eclipse crumb is worth, in seconds of production and in clicks.
+   *
+   * SIZED AGAINST COOKIE RAIN, which is the event it is a deliberate inversion of. A rain drop is
+   * 20 CPS-seconds + 15 clicks and there are twelve of them, so a fully-caught rain is 240 + 180.
+   * A crumb is 55 + 40 and there are five, so a fully-caught eclipse is 275 + 200 — about fifteen
+   * per cent more for a third of the presses. The eclipse pays better per click and worse per
+   * event than a rain the player actually cleared, which is exactly the trade its design note
+   * claims: fewer, better targets, and finding them is the work.
+   */
+  readonly eclipseCrumbCpsSeconds: number;
+  readonly eclipseCrumbClicks: number;
+  /**
+   * What catching the Crumb Comet is worth. One target, one chance, nothing on a miss.
+   *
+   * 400 CPS-seconds + 250 clicks is roughly nine rain drops or one and a half fully-cleared
+   * eclipses, and it is a single press. That ratio is the event: it is worth a lot BECAUSE it is
+   * all-or-nothing and rare, and the expected value per draw (2% weight) still lands below the
+   * Production Frenzy's, so the skill prize does not quietly become the best thing in the bag.
+   */
+  readonly cometCpsSeconds: number;
+  readonly cometClicks: number;
 }
 
 export const DEFAULT_RANDOM_EVENT_PAYOUTS: RandomEventPayoutConfig = {
@@ -750,6 +1224,10 @@ export const DEFAULT_RANDOM_EVENT_PAYOUTS: RandomEventPayoutConfig = {
   sprinkleBaseCpsSeconds: 12,
   sprinkleBaseClicks: 8,
   sprinkleEscalation: 0.3,
+  eclipseCrumbCpsSeconds: 55,
+  eclipseCrumbClicks: 40,
+  cometCpsSeconds: 400,
+  cometClicks: 250,
 };
 
 /* ---------------------------------------------------------------- scheduler config */
@@ -815,14 +1293,31 @@ export interface RandomEventConfig {
    * the real arithmetic and the real one-active-slot behaviour. Only WHICH one is decided here.
    */
   readonly forcedPoolEventId?: RandomEventId;
+  /**
+   * Forces every spawn to draw a stack of exactly this many events. Developer-only and undefined
+   * in every shipped config, exactly like `forcedPoolEventId` above.
+   *
+   * It exists for the same reason and under the same limits. A double event is 4% of spawns and a
+   * triple is 0.8%; photographing one on the shipped schedule means sitting on a capture desktop
+   * for hours hoping the shutter and the dice coincide, which is not a capture process, and
+   * faking the screenshot is not an option.
+   *
+   * WHAT IT DOES NOT DO is relax a single rule the player is subject to. The compatibility matrix
+   * still decides which events may share the stage, the rejection budget is still the budget, the
+   * durations and the arithmetic are the real ones, and a forced stack that cannot be filled still
+   * ships short. Only HOW MANY slots the draw tries to fill is decided here.
+   */
+  readonly forcedStackSize?: number;
   readonly payouts: RandomEventPayoutConfig;
 }
 
 export const DEFAULT_RANDOM_EVENT_CONFIG: RandomEventConfig = {
-  // Four to twelve minutes, widened from three-to-ten when the pool grew from six events to
-  // sixteen. See POOL_WEIGHT_TOTAL's note: more faces, fewer interruptions.
-  minDelayMs: 4 * 60 * 1000,
-  maxDelayMs: 12 * 60 * 1000,
+  // Four and a half to thirteen and a half minutes, widened again from four-to-twelve when the
+  // pool grew from sixteen events to twenty-two AND spawns started arriving in stacks. See
+  // POOL_WEIGHT_TOTAL's note for the full arithmetic: 6.00 spawns an hour carrying 6.34 events,
+  // against wave one's 6.67 spawns carrying 6.67.
+  minDelayMs: 4.5 * 60 * 1000,
+  maxDelayMs: 13.5 * 60 * 1000,
   cooldownMs: 60 * 1000,
   raidMinDelayMs: 30 * 60 * 1000,
   raidMaxDelayMs: 60 * 60 * 1000,
@@ -907,6 +1402,14 @@ export function resolveRandomEventConfig(flagValue: string | null | undefined): 
     const id = flagValue.slice("event:".length);
     const def = RANDOM_EVENT_DEFINITIONS.find((d) => d.id === id);
     if (def) return { ...FAST_RANDOM_EVENT_CONFIG, forcedPoolEventId: def.id };
+  }
+  // `stack:<n>` — the fast pool, forced to draw n events per spawn. Anything outside 1..3 falls
+  // through to the shipped schedule rather than to a stack the game could not draw anyway.
+  if (typeof flagValue === "string" && flagValue.startsWith("stack:")) {
+    const size = Number(flagValue.slice("stack:".length));
+    if (Number.isInteger(size) && size >= 1 && size <= MAX_STACKED_EVENTS) {
+      return { ...FAST_RANDOM_EVENT_CONFIG, forcedStackSize: size };
+    }
   }
   return DEFAULT_RANDOM_EVENT_CONFIG;
 }
@@ -1320,7 +1823,26 @@ export interface MouseRaidOutcome {
 }
 
 export interface RandomEventsState {
-  readonly active: ActiveRandomEvent | null;
+  /**
+   * EVERY EVENT RUNNING RIGHT NOW, in the order they were drawn. Empty when the pool is quiet.
+   *
+   * This was a single `active: ActiveRandomEvent | null` slot until doubles and triples arrived,
+   * and the change from "a slot" to "a list of at most `MAX_STACKED_EVENTS`" is the structural
+   * heart of this lane. What did NOT change is the rule the slot was really enforcing: two events
+   * that would fight each other still never run together. That rule simply moved from the shape
+   * of the field (one slot, so one event) into a stated, tested predicate (`canStackWith`), where
+   * it can say something more precise than "one".
+   *
+   * INVARIANTS, all of them checked by tests:
+   *   - length is at most `MAX_STACKED_EVENTS`;
+   *   - every ordered pair in it satisfies `canStackWith`;
+   *   - a Mouse Raid, when present, is the ONLY member;
+   *   - members expire independently, and the pool's next-eligible instant is set when the LAST
+   *     one goes, so a stack is one interruption rather than two or three.
+   *
+   * `primaryActive` is the first member and is what every single-event reader wants.
+   */
+  readonly actives: readonly ActiveRandomEvent[];
   /** Wall-clock instant the scheduler may next roll a spawn. */
   readonly nextEligibleAtEpochMs: number;
   /** PRNG stream position, persisted so the schedule survives save/load unchanged. */
@@ -1345,9 +1867,24 @@ export interface RandomEventsState {
   readonly whackStorageLevel: number;
 }
 
+/** The first (and on 95% of spawns, only) event running. Null when the pool is quiet. */
+export function primaryActive(state: RandomEventsState): ActiveRandomEvent | null {
+  return state.actives[0] ?? null;
+}
+
+/** The running event with this id, or null. Ids are unique within a stack by rule 5. */
+export function activeWithId(state: RandomEventsState, id: RandomEventId): ActiveRandomEvent | null {
+  return state.actives.find((event) => event.id === id) ?? null;
+}
+
+/** How many events are on screen: 1 for an ordinary spawn, 2 for a double, 3 for a triple. */
+export function activeStackSize(state: RandomEventsState): number {
+  return state.actives.length;
+}
+
 export function createInitialRandomEventsState(): RandomEventsState {
   return {
-    active: null,
+    actives: [],
     nextEligibleAtEpochMs: 0,
     rngStreamIndex: 0,
     lastResolved: null,
@@ -1392,7 +1929,26 @@ export function createInitialRandomEventsState(): RandomEventsState {
  * salvage below does that — it is so a build reading a sidecar from the FUTURE can say so
  * precisely instead of guessing from a parse failure.
  */
-export const RANDOM_EVENTS_SIDECAR_VERSION = 1;
+/**
+ * VERSION 2 — the one-slot-to-list migration.
+ *
+ * Version 1 wrote `active: ActiveRandomEvent | null`. Version 2 writes
+ * `actives: ActiveRandomEvent[]`, because a spawn can now put up to three events on screen. The
+ * migration is the obvious one and it is LOSSLESS in both directions that matter:
+ *
+ *   reading v1 → `active` becomes `actives: active ? [active] : []`. A save from before doubles
+ *   existed had exactly one event running or none, which is exactly a list of length one or zero.
+ *   Nothing is invented and nothing is discarded.
+ *
+ *   a v2 save read by a v1 build → the v1 schema does not know `actives`, fails to parse, and
+ *   falls through that build's salvage layers to "consumables kept, schedule regenerated". That
+ *   is the outcome the salvage design was written for and it is the right one: a half-finished
+ *   double event was going to expire anyway; the Whack Passes were paid for.
+ *
+ * The version number is what lets a future build say "this sidecar is from version 3" precisely
+ * instead of inferring it from a parse failure, which is the job the field was added to do.
+ */
+export const RANDOM_EVENTS_SIDECAR_VERSION = 2;
 const RandomEventIdSchema = z.enum([
   "cookie_rain",
   "grandmas_batch",
@@ -1410,6 +1966,12 @@ const RandomEventIdSchema = z.enum([
   "flour_shortage",
   "night_shift",
   "sprinkle_storm",
+  "cookie_eclipse",
+  "crumb_comet",
+  "bakers_dozen",
+  "static_cling",
+  "grandma_convention",
+  "overtime_crew",
   "mouse_raid",
 ]);
 
@@ -1458,7 +2020,10 @@ const ActiveRandomEventSchema = z.object({
 export const RandomEventsStateSchema = z.object({
   /* Absent in every sidecar written before this field existed, which is exactly version 1. */
   sidecarVersion: z.number().int().positive().default(RANDOM_EVENTS_SIDECAR_VERSION),
-  active: ActiveRandomEventSchema.nullable(),
+  /* Capped at MAX_STACKED_EVENTS on the way in as well as on the way out: a sidecar claiming
+     five simultaneous events is not a save this build can honour, and truncating is better than
+     rendering a stack the compatibility matrix says is impossible. */
+  actives: z.array(ActiveRandomEventSchema).max(MAX_STACKED_EVENTS),
   nextEligibleAtEpochMs: z.number(),
   rngStreamIndex: z.number().int().nonnegative(),
   lastResolved: z
@@ -1505,16 +2070,14 @@ export type RandomEventsSaveData = z.infer<typeof RandomEventsStateSchema>;
 export function encodeRandomEvents(state: RandomEventsState): RandomEventsSaveData {
   return {
     sidecarVersion: RANDOM_EVENTS_SIDECAR_VERSION,
-    active: state.active
-      ? {
-          ...state.active,
-          pendingTargetIds: [...state.active.pendingTargetIds],
-          mice: state.active.mice ? state.active.mice.map((mouse) => ({ ...mouse })) : undefined,
-          armed: state.active.armed ? [...state.active.armed] : undefined,
-          choiceTaken: state.active.choiceTaken,
-          peakLiveCpsMultiplier: state.active.peakLiveCpsMultiplier,
-        }
-      : null,
+    actives: state.actives.slice(0, MAX_STACKED_EVENTS).map((active) => ({
+      ...active,
+      pendingTargetIds: [...active.pendingTargetIds],
+      mice: active.mice ? active.mice.map((mouse) => ({ ...mouse })) : undefined,
+      armed: active.armed ? [...active.armed] : undefined,
+      choiceTaken: active.choiceTaken,
+      peakLiveCpsMultiplier: active.peakLiveCpsMultiplier,
+    })),
     nextEligibleAtEpochMs: state.nextEligibleAtEpochMs,
     rngStreamIndex: state.rngStreamIndex,
     lastResolved: state.lastResolved ? { ...state.lastResolved } : null,
@@ -1568,6 +2131,21 @@ function withoutSidecarVersion(data: RandomEventsSaveData): RandomEventsState {
   return state;
 }
 
+/**
+ * VERSION 1 → VERSION 2: the one slot becomes a list of at most three.
+ *
+ * Applied before parsing rather than after, because the v1 shape does not satisfy the v2 schema
+ * at all (`actives` is required and `active` is not a key it knows). It is a pure rename with a
+ * wrap, it only fires when the record actually carries a v1 `active` key and no v2 `actives` key,
+ * and it leaves every other field alone for the salvage layers below to deal with.
+ */
+function migrateSidecarV1(record: Record<string, unknown>): Record<string, unknown> {
+  if ("actives" in record) return record;
+  if (!("active" in record)) return record;
+  const { active, ...rest } = record;
+  return { ...rest, actives: active === null || active === undefined ? [] : [active] };
+}
+
 export function decodeRandomEvents(raw: unknown): RandomEventsState {
   if (raw === undefined || raw === null) return createInitialRandomEventsState();
 
@@ -1575,19 +2153,34 @@ export function decodeRandomEvents(raw: unknown): RandomEventsState {
   if (parsed.success) return withoutSidecarVersion(parsed.data);
 
   if (typeof raw === "object") {
-    const record = raw as Record<string, unknown>;
+    const record = migrateSidecarV1(raw as Record<string, unknown>);
+
+    // Layer 0 — the migrated v1 sidecar. Every field survives; only the shape moved.
+    const migrated = RandomEventsStateSchema.safeParse(record);
+    if (migrated.success) return withoutSidecarVersion(migrated.data);
 
     const withoutUnknownIds = { ...record };
     let droppedAnId = false;
-    for (const key of ["active", "lastResolved"] as const) {
-      const value = record[key];
-      if (value && typeof value === "object") {
-        const id = (value as { id?: unknown }).id;
-        if (typeof id === "string" && !RandomEventIdSchema.safeParse(id).success) {
-          withoutUnknownIds[key] = null;
-          droppedAnId = true;
-        }
+    const knownId = (value: unknown): boolean => {
+      if (!value || typeof value !== "object") return true;
+      const id = (value as { id?: unknown }).id;
+      if (typeof id !== "string") return true;
+      return RandomEventIdSchema.safeParse(id).success;
+    };
+    // The running events are now a LIST, so an unrecognised id costs one member rather than the
+    // whole stack: a future build's double event, half of which this build knows, reloads as the
+    // half it knows. The alternative — dropping both — would throw away an event this build can
+    // render perfectly well.
+    if (Array.isArray(record.actives)) {
+      const kept = record.actives.filter(knownId);
+      if (kept.length !== record.actives.length) {
+        withoutUnknownIds.actives = kept;
+        droppedAnId = true;
       }
+    }
+    if (!knownId(record.lastResolved)) {
+      withoutUnknownIds.lastResolved = null;
+      droppedAnId = true;
     }
     if (droppedAnId) {
       const retried = RandomEventsStateSchema.safeParse(withoutUnknownIds);
@@ -1631,6 +2224,14 @@ export function pickRandomEventId(rng: RngPort): RandomEventId {
 function targetIdsFor(def: RandomEventDefinition): readonly string[] {
   if (def.id === "cookie_rain") {
     return Array.from({ length: def.targetCount }, (_, index) => `rain:${index}`);
+  }
+  // Every clickable event owns its own id PREFIX, and that is what lets a click be routed to the
+  // right member of a stack without the view telling anyone which event it meant.
+  if (def.id === "cookie_eclipse") {
+    return Array.from({ length: def.targetCount }, (_, index) => `crumb:${index}`);
+  }
+  if (def.id === "crumb_comet") {
+    return Array.from({ length: def.targetCount }, (_, index) => `comet:${index}`);
   }
   if (def.id === "sprinkle_storm") {
     return Array.from({ length: def.targetCount }, (_, index) => `sprinkle:${index}`);
@@ -1743,12 +2344,16 @@ function withPeakMultiplier(
   gameState: GameState,
   nowEpochMs: number,
 ): RandomEventsState {
-  const active = state.active;
-  if (!active || active.id !== "flour_shortage") return state;
+  const index = state.actives.findIndex((active) => active.id === "flour_shortage");
+  if (index < 0) return state;
+  const active = state.actives[index];
   const live = liveGoldenCpsMultiplier(gameState, nowEpochMs);
   const peak = active.peakLiveCpsMultiplier ?? 1;
   if (live <= peak) return state;
-  return { ...state, active: { ...active, peakLiveCpsMultiplier: live } };
+  const actives = state.actives.map((event, at) =>
+    at === index ? { ...event, peakLiveCpsMultiplier: live } : event,
+  );
+  return { ...state, actives };
 }
 
 export interface RandomEventTickResult {
@@ -1809,9 +2414,17 @@ export function tickRandomEvents(
   const zero = bnFromNumber(0);
   const quiet = { randomEvents: state, instantBonus: zero, raidTheft: null } as const;
 
-  // 1 — expiry.
-  if (state.active !== null && nowEpochMs >= state.active.endsAtEpochMs) {
-    const expired = state.active;
+  // 1 — expiry. MEMBERS EXPIRE INDEPENDENTLY. A double of a six-second Burnt Batch Frenzy and a
+  // ninety-second Baker's Dozen is not one event with two durations: the frenzy goes when it is
+  // done and the rebate carries on. The pool's next-eligible instant is only set when the LAST
+  // member goes, which is what keeps a stack one interruption rather than two or three.
+  const expiring = state.actives.filter((active) => nowEpochMs >= active.endsAtEpochMs);
+  if (expiring.length > 0) {
+    const survivors = state.actives.filter((active) => nowEpochMs < active.endsAtEpochMs);
+    // The raid is never in a stack (rule 4), so if it is expiring it is the only member and the
+    // theft path below is reached with `survivors` empty. That is asserted by a test rather than
+    // assumed here: the branch reads `expiring` for the raid and clears the list either way.
+    const expired = expiring.find((active) => active.id === "mouse_raid") ?? expiring[expiring.length - 1];
     const resolved = {
       id: expired.id,
       resolvedAtEpochMs: nowEpochMs,
@@ -1853,7 +2466,7 @@ export function tickRandomEvents(
       return {
         randomEvents: {
           ...state,
-          active: null,
+          actives: [],
           consumables,
           nextEligibleAtEpochMs: Math.max(state.nextEligibleAtEpochMs, nowEpochMs + config.cooldownMs),
           rngStreamIndex: rng.getStreamIndex(),
@@ -1866,30 +2479,47 @@ export function tickRandomEvents(
       };
     }
 
+    // The Flour Shortage is the one event that PAYS on expiry: the late lorry arrives the moment
+    // the window closes. Everything else expires paying nothing, and `expiryPayout` returns zero
+    // for them — so summing over the whole expiring set is the same number as the old single
+    // lookup on every spawn that was not a stack, and the right one when it was.
+    const golden = liveGoldenCpsMultiplier(gameState, nowEpochMs);
+    const instantBonus = expiring.reduce<BigNum>(
+      (sum, event) =>
+        bnAdd(
+          sum,
+          expiryPayout(
+            event.id,
+            gameState,
+            config.payouts,
+            Math.max(event.peakLiveCpsMultiplier ?? 1, golden),
+          ),
+        ),
+      zero,
+    );
+
     return {
       randomEvents: {
         ...state,
-        active: null,
-        nextEligibleAtEpochMs: scheduleNext(nowEpochMs, rng, config),
-        rngStreamIndex: rng.getStreamIndex(),
+        actives: survivors,
+        // The window to the next spawn opens only once the stage is CLEAR. A member expiring out
+        // of a triple does not start the clock while its two companions are still running.
+        ...(survivors.length === 0
+          ? { nextEligibleAtEpochMs: scheduleNext(nowEpochMs, rng, config), rngStreamIndex: rng.getStreamIndex() }
+          : {}),
         lastResolved: resolved,
       },
-      // The Flour Shortage is the one event that PAYS on expiry: the late lorry arrives the
-      // moment the window closes. Everything else expires paying nothing, and `expiryPayout`
-      // returns zero for them.
-      instantBonus: expiryPayout(
-        expired.id,
-        gameState,
-        config.payouts,
-        Math.max(expired.peakLiveCpsMultiplier ?? 1, liveGoldenCpsMultiplier(gameState, nowEpochMs)),
-      ),
+      instantBonus,
       raidTheft: null,
     };
   }
 
-  // 2 and 3 — no overlap, and not over a golden cookie. Both rules live on the ACTIVE SLOT, so
-  // the raid inherits them for free by taking that same slot.
-  if (state.active !== null) {
+  // 2 and 3 — no new spawn while anything is running, and not over a golden cookie. Both rules
+  // used to live on the ACTIVE SLOT and now live on the list being non-empty: a stack is drawn
+  // whole, at one instant, so nothing is ever ADDED to a stack that is already on screen. That is
+  // deliberate — an event appearing next to one the player is already working is indistinguishable
+  // from a bug, and it would let a stack outgrow the compatibility rules by accretion.
+  if (state.actives.length > 0) {
     // The one thing a tick does to an event still running: remember the biggest golden frenzy
     // the Flour Shortage has had to live through, so its rebound can be paid at that rate. Any
     // other event, and any tick that sees nothing new, returns the state object untouched.
@@ -1935,16 +2565,20 @@ export function tickRandomEvents(
       return {
         randomEvents: {
           ...state,
-          active: {
-            id: "mouse_raid",
-            startedAtEpochMs: nowEpochMs,
-            endsAtEpochMs: nowEpochMs + MOUSE_RAID_DEFINITION.durationMs,
-            pendingTargetIds: mice.map((mouse) => mouse.id),
-            claimedCount: 0,
-            mice,
-            startingShare: totalShare(mice),
-            armed,
-          },
+          // A raid is ALWAYS a list of exactly one. It is not drawn from the pool, it never joins
+          // a stack, and nothing can be drawn while it is running.
+          actives: [
+            {
+              id: "mouse_raid",
+              startedAtEpochMs: nowEpochMs,
+              endsAtEpochMs: nowEpochMs + MOUSE_RAID_DEFINITION.durationMs,
+              pendingTargetIds: mice.map((mouse) => mouse.id),
+              claimedCount: 0,
+              mice,
+              startingShare: totalShare(mice),
+              armed,
+            },
+          ],
           consumables,
           rngStreamIndex: rng.getStreamIndex(),
           spawnCount: state.spawnCount + 1,
@@ -1959,23 +2593,27 @@ export function tickRandomEvents(
   // 5 — the pool's window.
   if (nowEpochMs < state.nextEligibleAtEpochMs) return quiet;
 
-  // A forced id (developer capture flag only) still draws, so the stream advances identically
-  // whether or not the flag is set and a forced run is not a differently-shaped run.
-  const drawn = pickRandomEventId(rng);
-  const id = config.forcedPoolEventId ?? drawn;
-  const def = getRandomEventDefinition(id);
+  // ONE SPAWN, one to three events. The stack size and every member come off the injected port,
+  // so a seeded run replays the same doubles and triples in the same places. A forced id (the
+  // developer capture flag only) still goes through the same draw, so the stream advances
+  // identically whether or not the flag is set and a forced run is not a differently-shaped run.
+  const stack = drawRandomEventStack(rng, config);
 
-  if (def.shape === "instant") {
+  // A single instant event is the one draw that occupies nothing: it pays and is over inside this
+  // tick. Rule 6 of the matrix means it can never be part of a stack, so a stack of length one is
+  // the only place this can happen.
+  const soleDef = stack.length === 1 ? getRandomEventDefinition(stack[0]) : null;
+  if (soleDef?.shape === "instant") {
     return {
       randomEvents: {
         ...state,
-        active: null,
+        actives: [],
         nextEligibleAtEpochMs: scheduleNext(nowEpochMs, rng, config),
         rngStreamIndex: rng.getStreamIndex(),
-        lastResolved: { id, resolvedAtEpochMs: nowEpochMs, claimedCount: 0, endedEarly: false },
+        lastResolved: { id: soleDef.id, resolvedAtEpochMs: nowEpochMs, claimedCount: 0, endedEarly: false },
         spawnCount: state.spawnCount + 1,
       },
-      instantBonus: instantPayout(id, gameState, config.payouts),
+      instantBonus: instantPayout(soleDef.id, gameState, config.payouts),
       raidTheft: null,
     };
   }
@@ -1983,15 +2621,20 @@ export function tickRandomEvents(
   return {
     randomEvents: {
       ...state,
-      active: {
-        id,
-        startedAtEpochMs: nowEpochMs,
-        endsAtEpochMs: nowEpochMs + def.durationMs,
-        pendingTargetIds: targetIdsFor(def),
-        claimedCount: 0,
-      },
+      actives: stack.map((id) => {
+        const def = getRandomEventDefinition(id);
+        return {
+          id,
+          startedAtEpochMs: nowEpochMs,
+          endsAtEpochMs: nowEpochMs + def.durationMs,
+          pendingTargetIds: targetIdsFor(def),
+          claimedCount: 0,
+        };
+      }),
       rngStreamIndex: rng.getStreamIndex(),
-      spawnCount: state.spawnCount + 1,
+      // Counts EVENTS, not spawns, which is what the statistic has always meant — a triple is
+      // three things that happened to you.
+      spawnCount: state.spawnCount + stack.length,
     },
     instantBonus: zero,
     raidTheft: null,
@@ -2089,18 +2732,58 @@ export function sprinklePayout(
   return bnMulScalar(base, 1 + payouts.sprinkleEscalation * Math.max(0, alreadyCaught));
 }
 
+/**
+ * What one Cookie Eclipse crumb is worth: a fixed slice of production plus a fixed number of
+ * clicks, exactly like a rain drop and for exactly the same reason — the click half is what makes
+ * the event mean something on a save with no generators. Flat rather than escalating: the Sprinkle
+ * Storm already owns "clear the stage for the multiplier", and an eclipse where the fifth crumb
+ * was the only one that mattered would punish a player for finding four in the dark.
+ */
+export function eclipseCrumbPayout(
+  gameState: GameState,
+  payouts: RandomEventPayoutConfig = DEFAULT_RANDOM_EVENT_PAYOUTS,
+): BigNum {
+  return bnAdd(
+    bnMulScalar(totalCps(gameState), payouts.eclipseCrumbCpsSeconds),
+    bnMulScalar(baseClickValue(gameState), payouts.eclipseCrumbClicks),
+  );
+}
+
+/** What catching the Crumb Comet is worth. One press, one payment, nothing on a miss. */
+export function crumbCometPayout(
+  gameState: GameState,
+  payouts: RandomEventPayoutConfig = DEFAULT_RANDOM_EVENT_PAYOUTS,
+): BigNum {
+  return bnAdd(
+    bnMulScalar(totalCps(gameState), payouts.cometCpsSeconds),
+    bnMulScalar(baseClickValue(gameState), payouts.cometClicks),
+  );
+}
+
 /* ---------------------------------------------------------------------- STACKING RULES */
 
 /**
  * THE STACKING RULES, decided once and enforced in one function.
  *
- * There are exactly two sources of a live multiplier in this game and they are independent:
+ * There are exactly two SOURCES of a live multiplier in this game and they are independent:
  *
  *   1. THE GOLDEN COOKIE (golden-cookie.ts) — frenzy ×7 for 77s, click frenzy ×3 for 13s.
- *   2. THE RANDOM-EVENT POOL (this file) — at most ONE at a time, because of the active slot.
+ *   2. THE RANDOM-EVENT POOL (this file) — up to THREE at a time, since doubles and triples.
  *
- * There is no third, and two pool events can never overlap, so the worst case is always exactly
- * one golden effect times one pool effect. The rules:
+ * THE WORST CASE GREW AND THE CAPS DID NOT, and that is a decision rather than an oversight. It
+ * used to be "one golden effect times one pool effect"; it is now "one golden effect times up to
+ * three pool effects". The ceilings below were always written as ceilings on the COMBINED figure
+ * rather than on any one contributor, and they were always set far above what one event can
+ * reach — so they already described this situation before it existed, and raising them because
+ * more things can now multiply would be quietly loosening the only stated limit in the system.
+ *
+ * The arithmetic that makes that safe: the biggest legal production stack is a Burnt Batch Frenzy
+ * (×666) with a Grandma Convention and a Baker's Dozen — the frenzy is the only large factor, and
+ * neither companion multiplies global production at all — inside a golden frenzy (×7), which is
+ * ×4662 and is capped to ×1000. The cap bites, as it did before, in exactly the case it was
+ * written for: two rare things coinciding. Nothing a player meets in an ordinary hour goes near it.
+ *
+ * The rules themselves are unchanged:
  *
  *   MULTIPLICATIVE, NOT MAXIMUM. Two effects that arrived independently both apply. Taking one
  *   away because the other landed would punish the player for good luck, and "which of my two
@@ -2126,10 +2809,23 @@ export function sprinklePayout(
 export const EVENT_CPS_STACK_CAP = 1000;
 export const EVENT_CLICK_STACK_CAP = 10_000;
 
-export function stackEventMultipliers(a: number, b: number, cap: number): number {
-  const product = a * b;
+/**
+ * THE STACK, for any number of contributors, under one cap applied ONCE at the end.
+ *
+ * "Once at the end" is the whole substance of this function and it is why the two-argument form
+ * below is now written in terms of it rather than the other way round. Capping pairwise as you
+ * fold gives a different — and wrong — answer the moment a factor below 1 is involved: a ×2000
+ * pair clipped to ×1000 and then multiplied by a ×0.5 Clot yields ×500, when the honest product
+ * ×1000 is under the ceiling and should stand. One product, one comparison, no order dependence.
+ */
+export function stackManyEventMultipliers(values: readonly number[], cap: number): number {
+  const product = values.reduce((acc, value) => acc * value, 1);
   if (!Number.isFinite(product) || product < 0) return 0;
   return Math.min(product, cap);
+}
+
+export function stackEventMultipliers(a: number, b: number, cap: number): number {
+  return stackManyEventMultipliers([a, b], cap);
 }
 
 /**
@@ -2149,10 +2845,20 @@ export function rainDropPayout(
 
 /* ------------------------------------------------------- live modifiers (read by the reducer) */
 
-function activeDefinition(state: RandomEventsState, nowEpochMs: number): RandomEventDefinition | null {
-  if (!state.active) return null;
-  if (nowEpochMs >= state.active.endsAtEpochMs) return null;
-  return getRandomEventDefinition(state.active.id);
+/**
+ * The events that are genuinely LIVE at this instant: on the list, and not past their end.
+ *
+ * The end-time check is the same one the single-slot version did and it matters more now, because
+ * a stack's members end at different moments and the list is only pruned on a tick. Between the
+ * frenzy's last millisecond and the next tick, the frenzy must already be worth ×1.
+ */
+function liveActives(
+  state: RandomEventsState,
+  nowEpochMs: number,
+): readonly { active: ActiveRandomEvent; def: RandomEventDefinition }[] {
+  return state.actives
+    .filter((active) => nowEpochMs < active.endsAtEpochMs)
+    .map((active) => ({ active, def: getRandomEventDefinition(active.id) }));
 }
 
 /**
@@ -2164,17 +2870,70 @@ function activeDefinition(state: RandomEventsState, nowEpochMs: number): RandomE
  * the buff unable to outlive its own slot.
  */
 export function randomEventCpsMultiplier(state: RandomEventsState, nowEpochMs: number): number {
-  const def = activeDefinition(state, nowEpochMs);
-  if (!def) return 1;
-  if (def.id === "taste_test") {
-    return state.active?.choiceTaken === "send_back" ? TASTE_TEST_BUFF_MULTIPLIER : 1;
-  }
-  return def.cpsMultiplier;
+  const live = liveActives(state, nowEpochMs);
+  if (live.length === 0) return 1;
+  return live.reduce((product, { active, def }) => {
+    if (def.id === "taste_test") {
+      return product * (active.choiceTaken === "send_back" ? TASTE_TEST_BUFF_MULTIPLIER : 1);
+    }
+    return product * def.cpsMultiplier;
+  }, 1);
 }
 
-/** Click-value multiplier from the active event: 1 when nothing is running. */
+/**
+ * Click-value multiplier from every running event: 1 when nothing is running.
+ *
+ * DELIBERATELY UNCAPPED HERE, and it always was. This function reports what the events are worth;
+ * `stackManyEventMultipliers` at the composition seams (effective-cps.ts for production, the
+ * reducer's click handler for clicks) is the one place a ceiling is applied, and applying one
+ * here as well would cap the same product twice at two different points in the arithmetic.
+ */
 export function randomEventClickMultiplier(state: RandomEventsState, nowEpochMs: number): number {
-  return activeDefinition(state, nowEpochMs)?.clickMultiplier ?? 1;
+  return liveActives(state, nowEpochMs).reduce((product, { def }) => product * def.clickMultiplier, 1);
+}
+
+/**
+ * Which generators are being surged right now, and by how much, keyed by GENERATOR ID STRING.
+ *
+ * The Grandma Convention's hook, and the only thing this module says about generators. It returns
+ * a plain record so `effective-cps.ts` can look up an id it already has and get 1 for every id
+ * nothing is surging — including ids this file has never heard of. Two events surging the same
+ * generator would multiply, which is the same rule everything else here follows; the compatibility
+ * matrix does not currently allow it (there is one such event) and the arithmetic does not care.
+ */
+export function randomEventGeneratorSurge(
+  state: RandomEventsState,
+  nowEpochMs: number,
+): Readonly<Record<string, number>> {
+  const surge: Record<string, number> = {};
+  for (const { def } of liveActives(state, nowEpochMs)) {
+    if (!def.surgeGeneratorIds || def.surgeMultiplier === undefined) continue;
+    for (const id of def.surgeGeneratorIds) {
+      surge[id] = (surge[id] ?? 1) * def.surgeMultiplier;
+    }
+  }
+  return surge;
+}
+
+/**
+ * How fast the named SUBGAME's clock is running: 1 when nothing is speeding it up.
+ *
+ * The Overtime Crew's hook. `subgameId` is a bare string — `"home"` today — and an id nothing
+ * recognises gets 1, which is the honest answer to "how much is this event speeding up a thing
+ * that does not exist".
+ */
+export function randomEventSubgameSpeed(
+  state: RandomEventsState,
+  nowEpochMs: number,
+  subgameId: string,
+): number {
+  return liveActives(state, nowEpochMs).reduce(
+    (speed, { def }) =>
+      def.subgameSpeedId === subgameId && def.subgameSpeedMultiplier !== undefined
+        ? speed * def.subgameSpeedMultiplier
+        : speed,
+    1,
+  );
 }
 
 /**
@@ -2188,22 +2947,46 @@ export function randomEventClickMultiplier(state: RandomEventsState, nowEpochMs:
  * the reducer hands a slice of it straight back afterwards. The shop stays honest and the
  * effect stays real.
  */
+/**
+ * ...and rebates ADD rather than multiply, which is the one place a stack does not compose the
+ * way multipliers do. Two rebates of 15% and 7.69% hand back 22.69% of a purchase, not 21.85%
+ * (which is what multiplying the remainders would give): each event independently promises a
+ * slice of what you paid, and the player gets both slices. Capped once at `EVENT_REBATE_CAP` so
+ * no future combination can make a purchase free.
+ */
 export function randomEventRebateFraction(state: RandomEventsState, nowEpochMs: number): number {
-  return activeDefinition(state, nowEpochMs)?.rebateFraction ?? 0;
+  const total = liveActives(state, nowEpochMs).reduce((sum, { def }) => sum + def.rebateFraction, 0);
+  return Math.min(EVENT_REBATE_CAP, total);
 }
 
-/** Milliseconds left on the active event, floored at zero. Drives the HUD's remaining-time bar. */
-export function remainingMs(state: RandomEventsState, nowEpochMs: number): number {
-  if (!state.active) return 0;
-  return Math.max(0, state.active.endsAtEpochMs - nowEpochMs);
+/** Milliseconds left on ONE running event, floored at zero. */
+export function remainingMsFor(active: ActiveRandomEvent, nowEpochMs: number): number {
+  return Math.max(0, active.endsAtEpochMs - nowEpochMs);
 }
 
-/** Fraction of the active event's duration still to run, in [0, 1]. */
-export function remainingFraction(state: RandomEventsState, nowEpochMs: number): number {
-  if (!state.active) return 0;
-  const total = state.active.endsAtEpochMs - state.active.startedAtEpochMs;
+/** Fraction of ONE running event's window still to run, in [0, 1]. Drives its plate's bar. */
+export function remainingFractionFor(active: ActiveRandomEvent, nowEpochMs: number): number {
+  const total = active.endsAtEpochMs - active.startedAtEpochMs;
   if (total <= 0) return 0;
-  return Math.min(1, Math.max(0, remainingMs(state, nowEpochMs) / total));
+  return Math.min(1, Math.max(0, remainingMsFor(active, nowEpochMs) / total));
+}
+
+/**
+ * Milliseconds until the STAGE IS CLEAR — the longest-running member's remaining time.
+ *
+ * The stack's members have different clocks, so "how long is left" has two possible readings and
+ * this is the one every caller of the old single-slot function wanted: when will the pool be
+ * quiet again. Each indicator plate draws its own member's clock with `remainingMsFor`.
+ */
+export function remainingMs(state: RandomEventsState, nowEpochMs: number): number {
+  return state.actives.reduce((longest, active) => Math.max(longest, remainingMsFor(active, nowEpochMs)), 0);
+}
+
+/** Fraction of the FIRST-drawn event's duration still to run, in [0, 1]. */
+export function remainingFraction(state: RandomEventsState, nowEpochMs: number): number {
+  const active = primaryActive(state);
+  if (!active) return 0;
+  return remainingFractionFor(active, nowEpochMs);
 }
 
 /* ------------------------------------------------------------------------- clicking */
@@ -2232,15 +3015,25 @@ export function clickRandomEventTarget(
   config: RandomEventConfig = DEFAULT_RANDOM_EVENT_CONFIG,
 ): RandomEventClickResult {
   const zero = bnFromNumber(0);
-  const active = state.active;
-  if (!active) return { randomEvents: state, bonus: zero, claimed: false };
-  if (nowEpochMs >= active.endsAtEpochMs) return { randomEvents: state, bonus: zero, claimed: false };
+  const refusal = { randomEvents: state, bonus: zero, claimed: false };
+  // WHICH EVENT DID THAT CLICK BELONG TO? The view never says, and it should not have to: it
+  // dispatches a target id and the domain finds the owner. Every clickable event owns its own id
+  // prefix (`rain:`, `crumb:`, `comet:`, `parcel:`, `sprinkle:`, `oven:fix`, `mouse:`), so the id
+  // alone identifies the event unambiguously. The compatibility matrix keeps at most one
+  // clickable event on the stage at a time, so this search finds at most one owner anyway — but
+  // searching rather than assuming means a stale render from a companion event cannot pay out
+  // against whatever happens to be first in the list.
+  const owner = state.actives.find(
+    (event) => nowEpochMs < event.endsAtEpochMs && event.pendingTargetIds.includes(targetId),
+  );
   // A mouse is not a rain drop: it has hit points, and a swing can catch several of them. That
   // lives in `whackMice`, and this function forwards rather than growing a second copy of it.
-  if (active.id === "mouse_raid") {
+  const raid = activeWithId(state, "mouse_raid");
+  if (raid && nowEpochMs < raid.endsAtEpochMs) {
     return whackMice(state, gameState, [targetId], nowEpochMs, rng, config);
   }
-  if (!active.pendingTargetIds.includes(targetId)) return { randomEvents: state, bonus: zero, claimed: false };
+  if (!owner) return refusal;
+  const active = owner;
   // THE CHAIN'S ONE RULE: a Delivery Rush parcel only counts if it is the NEXT one. An
   // out-of-order press is refused exactly like a stale one — nothing is taken, nothing is paid,
   // and the parcel is still there to press. The refusal is the whole lesson; a penalty on top of
@@ -2257,53 +3050,94 @@ export function clickRandomEventTarget(
   // production penalty off early is the reward.
   if (active.id === "oven_hiccup") {
     return {
-      randomEvents: {
-        ...state,
-        active: null,
-        nextEligibleAtEpochMs: scheduleNext(nowEpochMs, rng, config),
-        rngStreamIndex: rng.getStreamIndex(),
-        lastResolved: { id: active.id, resolvedAtEpochMs: nowEpochMs, claimedCount, endedEarly: true },
-        spawnCount: state.spawnCount,
-      },
+      randomEvents: endOneEvent(state, active, nowEpochMs, rng, config, {
+        id: active.id,
+        resolvedAtEpochMs: nowEpochMs,
+        claimedCount,
+        endedEarly: true,
+      }),
       bonus: zero,
       claimed: true,
     };
   }
 
-  // What this particular target was worth. Three clickable events, three different answers:
-  // a rain drop is flat, a sprinkle escalates with how many are already caught, and a parcel
-  // pays its own rate plus the completion bonus when it is the last of the three.
+  // What this particular target was worth. Five clickable events, four different answers: a rain
+  // drop is flat, an eclipse crumb is flat but much bigger, a sprinkle escalates with how many are
+  // already caught, a parcel pays its own rate plus the completion bonus when it is the last of
+  // the three, and the comet is one press for the whole event.
   const bonus =
     active.id === "sprinkle_storm"
       ? sprinklePayout(gameState, active.claimedCount, config.payouts)
       : active.id === "delivery_rush"
         ? deliveryParcelPayout(gameState, pendingTargetIds.length === 0, config.payouts)
-        : rainDropPayout(gameState, config.payouts);
+        : active.id === "cookie_eclipse"
+          ? eclipseCrumbPayout(gameState, config.payouts)
+          : active.id === "crumb_comet"
+            ? crumbCometPayout(gameState, config.payouts)
+            : rainDropPayout(gameState, config.payouts);
 
-  // Catching the last drop finishes the rain early rather than leaving an empty sky up for the
-  // rest of the window.
+  // Catching the last drop finishes THAT EVENT early rather than leaving an empty sky up for the
+  // rest of its window. Inside a stack it finishes only that member; a Baker's Dozen running
+  // beside a cleared Cookie Rain carries on for its own remaining minute.
   if (pendingTargetIds.length === 0) {
     return {
-      randomEvents: {
-        ...state,
-        active: null,
-        nextEligibleAtEpochMs: scheduleNext(nowEpochMs, rng, config),
-        rngStreamIndex: rng.getStreamIndex(),
-        lastResolved: { id: active.id, resolvedAtEpochMs: nowEpochMs, claimedCount, endedEarly: true },
-        spawnCount: state.spawnCount,
-      },
+      randomEvents: endOneEvent(state, active, nowEpochMs, rng, config, {
+        id: active.id,
+        resolvedAtEpochMs: nowEpochMs,
+        claimedCount,
+        endedEarly: true,
+      }),
       bonus,
       claimed: true,
     };
   }
 
   return {
-    randomEvents: {
-      ...state,
-      active: { ...active, pendingTargetIds, claimedCount },
-    },
+    randomEvents: replaceActive(state, active, { ...active, pendingTargetIds, claimedCount }),
     bonus,
     claimed: true,
+  };
+}
+
+/**
+ * Swaps one member of the stack for an updated copy, leaving every other member's object
+ * identity untouched so a React store's structural comparison only re-renders what moved.
+ */
+function replaceActive(
+  state: RandomEventsState,
+  target: ActiveRandomEvent,
+  replacement: ActiveRandomEvent,
+): RandomEventsState {
+  return { ...state, actives: state.actives.map((event) => (event === target ? replacement : event)) };
+}
+
+/**
+ * Takes ONE event off the stack, early, and starts the next spawn's clock only if that was the
+ * last one standing.
+ *
+ * This is the single-slot `active: null, nextEligibleAtEpochMs: scheduleNext(...)` pair from
+ * before doubles existed, generalised — and the generalisation is the whole reason it is a
+ * function rather than three copies. Clearing a Cookie Rain must NOT start the cooldown while its
+ * companion Baker's Dozen is still running, or a player who cleared the rain quickly would be
+ * granting themselves an earlier next event by playing well, and the stated pacing would be a
+ * figure that only held for people who ignored the clickable half of a double.
+ */
+function endOneEvent(
+  state: RandomEventsState,
+  target: ActiveRandomEvent,
+  nowEpochMs: number,
+  rng: RngPort,
+  config: RandomEventConfig,
+  resolved: ResolvedRandomEvent,
+): RandomEventsState {
+  const actives = state.actives.filter((event) => event !== target);
+  return {
+    ...state,
+    actives,
+    ...(actives.length === 0
+      ? { nextEligibleAtEpochMs: scheduleNext(nowEpochMs, rng, config), rngStreamIndex: rng.getStreamIndex() }
+      : {}),
+    lastResolved: resolved,
   };
 }
 
@@ -2331,9 +3165,11 @@ export function whackMice(
   config: RandomEventConfig = DEFAULT_RANDOM_EVENT_CONFIG,
 ): RandomEventClickResult {
   const zero = bnFromNumber(0);
-  const active = state.active;
+  // The raid is always alone on the list (matrix rule 4), so looking it up by id is the same
+  // answer as reading a slot would have been — and it stays correct if that ever changes.
+  const active = activeWithId(state, "mouse_raid");
   const refused = { randomEvents: state, bonus: zero, claimed: false };
-  if (!active || active.id !== "mouse_raid") return refused;
+  if (!active) return refused;
   if (nowEpochMs >= active.endsAtEpochMs) return refused;
 
   const wide = (active.armed ?? []).includes("bigger_whack");
@@ -2353,15 +3189,12 @@ export function whackMice(
 
   if (survivors.length > 0) {
     return {
-      randomEvents: {
-        ...state,
-        active: {
-          ...active,
-          mice: survivors,
-          pendingTargetIds: survivors.map((mouse) => mouse.id),
-          claimedCount,
-        },
-      },
+      randomEvents: replaceActive(state, active, {
+        ...active,
+        mice: survivors,
+        pendingTargetIds: survivors.map((mouse) => mouse.id),
+        claimedCount,
+      }),
       bonus: zero,
       claimed: true,
     };
@@ -2371,7 +3204,7 @@ export function whackMice(
   return {
     randomEvents: {
       ...state,
-      active: null,
+      actives: state.actives.filter((event) => event !== active),
       nextEligibleAtEpochMs: Math.max(state.nextEligibleAtEpochMs, nowEpochMs + config.cooldownMs),
       rngStreamIndex: rng.getStreamIndex(),
       lastResolved: { id: "mouse_raid", resolvedAtEpochMs: nowEpochMs, claimedCount, endedEarly: true },
@@ -2422,41 +3255,38 @@ export function chooseRandomEventOption(
   config: RandomEventConfig = DEFAULT_RANDOM_EVENT_CONFIG,
 ): RandomEventClickResult {
   const zero = bnFromNumber(0);
-  const active = state.active;
   const refused = { randomEvents: state, bonus: zero, claimed: false };
+  // A choice event is always alone on the list (matrix rule 3), so "the choice event" is
+  // unambiguous — but it is found rather than assumed, for the same reason clicks are routed.
+  const active = state.actives.find((event) => getRandomEventDefinition(event.id).shape === "choice");
   if (!active) return refused;
   if (nowEpochMs >= active.endsAtEpochMs) return refused;
-  if (getRandomEventDefinition(active.id).shape !== "choice") return refused;
   if (active.choiceTaken !== undefined) return refused;
   if (!RANDOM_EVENT_CHOICE_IDS.includes(choiceId)) return refused;
 
   if (choiceId === "serve") {
     return {
-      randomEvents: {
-        ...state,
-        active: null,
-        nextEligibleAtEpochMs: scheduleNext(nowEpochMs, rng, config),
-        rngStreamIndex: rng.getStreamIndex(),
-        lastResolved: { id: active.id, resolvedAtEpochMs: nowEpochMs, claimedCount: 1, endedEarly: true },
-      },
+      randomEvents: endOneEvent(state, active, nowEpochMs, rng, config, {
+        id: active.id,
+        resolvedAtEpochMs: nowEpochMs,
+        claimedCount: 1,
+        endedEarly: true,
+      }),
       bonus: tasteTestServePayout(gameState, config.payouts),
       claimed: true,
     };
   }
 
   return {
-    randomEvents: {
-      ...state,
-      active: {
-        ...active,
-        // The buff's clock starts when the button was pressed, not when the tray came out, so
-        // deliberating over the question never costs any of the minute it buys.
-        startedAtEpochMs: nowEpochMs,
-        endsAtEpochMs: nowEpochMs + TASTE_TEST_BUFF_MS,
-        claimedCount: 1,
-        choiceTaken: "send_back",
-      },
-    },
+    randomEvents: replaceActive(state, active, {
+      ...active,
+      // The buff's clock starts when the button was pressed, not when the tray came out, so
+      // deliberating over the question never costs any of the minute it buys.
+      startedAtEpochMs: nowEpochMs,
+      endsAtEpochMs: nowEpochMs + TASTE_TEST_BUFF_MS,
+      claimedCount: 1,
+      choiceTaken: "send_back",
+    }),
     bonus: zero,
     claimed: true,
   };
@@ -2478,13 +3308,17 @@ export function chooseRandomEventOption(
  * the player is buying is more seconds of ×5, which they then have to spend by clicking.
  */
 export function extendComboWindow(state: RandomEventsState, nowEpochMs: number): RandomEventsState {
-  const active = state.active;
-  if (!active || active.id !== "combo_window") return state;
+  const active = activeWithId(state, "combo_window");
+  if (!active) return state;
   if (nowEpochMs >= active.endsAtEpochMs) return state;
   const ceiling = active.startedAtEpochMs + COMBO_MAX_DURATION_MS;
   const extended = Math.min(ceiling, active.endsAtEpochMs + COMBO_EXTEND_MS);
   if (extended === active.endsAtEpochMs) return state;
-  return { ...state, active: { ...active, endsAtEpochMs: extended, claimedCount: active.claimedCount + 1 } };
+  return replaceActive(state, active, {
+    ...active,
+    endsAtEpochMs: extended,
+    claimedCount: active.claimedCount + 1,
+  });
 }
 
 /** Clears the finished-raid record, so the aftermath toast can be dismissed.
@@ -2500,8 +3334,7 @@ export function clearLastRaid(state: RandomEventsState): RandomEventsState {
 
 /** Mice still loose in the active raid, for the HUD's remaining count. Zero when none is on. */
 export function miceRemaining(state: RandomEventsState): number {
-  if (!state.active || state.active.id !== "mouse_raid") return 0;
-  return state.active.pendingTargetIds.length;
+  return activeWithId(state, "mouse_raid")?.pendingTargetIds.length ?? 0;
 }
 
 /** Clears the finished-event record, so the toast naming it can be dismissed. */

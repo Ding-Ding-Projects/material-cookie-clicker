@@ -103,7 +103,15 @@ const SURFACE_LABELS: Readonly<Record<PanelId, Bilingual>> = {
 
 /** Where a panel is allowed to grow from, measured in the viewport, so the open animation and the
  *  notch both point back at the button the player actually pressed. */
-type Anchor = { x: number; y: number };
+type Anchor = {
+  x: number;
+  y: number;
+  /** The button that opened the panel. When still connected, placement re-measures IT rather
+   *  than trusting coordinates frozen at press time — the head row can wrap or settle between
+   *  the press and the paint, and a caret pointing at a stale rect points at the wrong emblem
+   *  (seen in the evidence-refresh captures). */
+  button?: HTMLButtonElement;
+};
 
 /** How long a shell announcement stays in the status region before it clears itself. */
 const SHELL_STATUS_MS = 6_000;
@@ -386,6 +394,15 @@ function AnchoredPanel({
     const place = () => {
       const node = panelRef.current;
       if (!node) return;
+      // Live re-measure of the opening button when it is still in the document; the frozen
+      // coordinates are only the fallback (e.g. the button unmounted behind the open panel).
+      let ax = anchor.x;
+      let ay = anchor.y;
+      if (anchor.button && anchor.button.isConnected) {
+        const b = anchor.button.getBoundingClientRect();
+        ax = b.left + b.width / 2;
+        ay = b.bottom;
+      }
       // The height the stylesheet gives the panel (`height: calc(100vh - 200px)`), read back
       // rather than duplicated, so the two cannot drift apart. Falls back to the same sum.
       const styleHeight = parseFloat(getComputedStyle(node).height);
@@ -397,17 +414,23 @@ function AnchoredPanel({
       const roomFor = Math.max(0, window.innerHeight - working - 28);
       const headerFloor = Math.max(0, window.innerHeight - 240 - 28);
       const maxTop = Math.min(roomFor, headerFloor);
-      const top = Math.max(0, Math.min(Math.round(anchor.y + 26), maxTop));
+      const top = Math.max(0, Math.min(Math.round(ay + 26), maxTop));
       node.style.top = `${top}px`;
       node.style.maxHeight = `${Math.max(160, Math.round(window.innerHeight - top - 28))}px`;
       const rect = node.getBoundingClientRect();
-      const originX = Math.min(Math.max(anchor.x - rect.left, 0), rect.width);
+      const originX = Math.min(Math.max(ax - rect.left, 0), rect.width);
       node.style.setProperty('--anchor-x', `${Math.round(originX)}px`);
       node.style.setProperty('--notch-x', `${Math.round(Math.min(Math.max(originX, 30), rect.width - 30))}px`);
     };
     place();
+    // A second pass on the next frame catches layout that settles right after open (font load,
+    // head-row wrap) — the common cause of the stale caret.
+    const raf = requestAnimationFrame(place);
     window.addEventListener('resize', place);
-    return () => window.removeEventListener('resize', place);
+    return () => {
+      cancelAnimationFrame(raf);
+      window.removeEventListener('resize', place);
+    };
   }, [anchor]);
 
   useEffect(() => {
@@ -748,7 +771,7 @@ function GameShell() {
 
   const openPanel = useCallback((id: PanelId, button: HTMLButtonElement) => {
     const rect = button.getBoundingClientRect();
-    setAnchor({ x: rect.left + rect.width / 2, y: rect.bottom });
+    setAnchor({ x: rect.left + rect.width / 2, y: rect.bottom, button });
     setOpenSurface(id);
     // Pressing the Settings emblem directly is not an arrival from the tech tree.
     setSettingsEntry(null);

@@ -10788,6 +10788,15 @@ ul.card-grid {
   }
 }
 
+/* The supplies shelf clips its third plate when all eight console buttons crowd the head row
+   (seen in the evidence-refresh captures). A buy control must never clip: the list wraps its
+   plates instead. The wrap lands when the console fills — a discrete reveal event, not a
+   per-value change, so the stability contract's breakpoint rule holds. */
+.raid-supplies__list {
+  flex-wrap: wrap;
+  row-gap: 6px;
+}
+
 /* ── CLIPPING AUDIT, SECOND PASS: what the re-measurement found still cut ────────────────────
  *
  * The pass above fixed the console cap, the head row at 1000px and the depot's own overflow. Its

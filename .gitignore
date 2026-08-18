@@ -10,3 +10,6 @@ packages/*/dist/
 
 # Throwaway capture profile + seeded save, written by the capture harness. Never committed.
 .capture-golden/
+
+# Capture-run scratch: throwaway Electron profiles, seeded saves and staged frames.
+captures/tmp/refresh/

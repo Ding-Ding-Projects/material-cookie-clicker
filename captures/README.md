@@ -25,47 +25,133 @@ pixels.
 
 ### The current set
 
-Nine images, all taken in one session from the same build, and all of them
-opened and looked at afterwards. This is the set the README table and the
-documentation site's capture matrix both point at; everything below it in this
-file is older evidence from earlier lanes, kept for the record.
+Sixteen images, taken across three runs of one build in one sitting, and every
+one of them opened and looked at afterwards. This is the set the README table
+and the documentation site's capture matrix both point at. Everything below this
+section is older evidence from earlier lanes, kept for the record; where an old
+image and a new one show the same surface, the old one is no longer listed in
+either table and the new one is.
+
+**How they were taken.** From the built `dist/`, launched by the real `electron`
+binary onto an off-screen Windows desktop named `EvidenceRefresh`. Each run got
+its own `--remote-debugging-port` (9741, 9742, 9746) and its own throwaway
+`--user-data-dir`, and the page target's URL was verified as this worktree's
+`dist/renderer/index.html` before anything else happened. The window was
+maximised through the application's own title-bar API (2604x1562 device pixels
+at 144 DPI) and every image is a Win32 `PrintWindow` capture of that one window,
+resolved by handle from the headless desktop's own window list.
+
+**One thing about method that changed, and it is worth writing down.** Running
+two or three of these Electron windows on the same off-screen desktop at once
+does not work: an occluded window stops painting, and `PrintWindow` then returns
+a *stale but plausible* frame — the previous state of the surface, rendered
+perfectly, with no tearing to give it away. That was caught by looking: a
+capture came back showing the plain look several minutes after the DOM said the
+whole ladder had been bought. Every image in this set was therefore taken with
+exactly one application window alive on the desktop. Two frames were discarded
+for the older reason as well — a `PrintWindow` taken while the Settings panel
+was still animating open came back half-drawn, then checkerboarded — and were
+retaken after the panel settled.
 
 | File | What it shows |
 | --- | --- |
-| `fresh-start.png` | A genuinely fresh profile. One `COOKIES` plate reading 0, the cookie alone in an empty cabinet panel, and nothing else — no shop rail, no upgrade strip, no console emblems, no navigation. This is what progressive disclosure looks like at its starting point. |
-| `shop-revealed.png` | The same run after twelve real clicks on the cookie and one real press of the Shop Sign discovery ticket. The `SHOP` rail has docked, carrying a single Cursor row and one padlocked `???` rung; the Achievements and Tools console emblems arrived on their own progress. Still no upgrade strip. |
-| `game-progressed.png` | The full surface: three HUD plates, all four console emblems, the cookie hero with its per-second and hold-to-click lines, the `UPGRADES` strip at 6 / 79, the shop rail, and the Diesel Depot docked as the rail's footer. |
-| `game-dark.png` | The same surface in the dark "arcade night" theme. |
-| `dialog-achievements.png` `dialog-tools.png` `dialog-statistics.png` `dialog-prestige.png` | Each of the four anchored dialogs, open over the dimmed game surface and pointed at the console emblem that opened it: 15 / 100 achievements, 9 / 20 tools, ten stat tiles, and the ascension projection below the trillion-cookie threshold. |
-| `diesel-mint.png` | **Superseded — see the diesel factory set below.** One frame of the Diesel Depot's mint animation, from the build where cookies bought litres outright: the can pouring, the nozzle sweeping in behind it, a ghosted `14` rolling up under the litres figure, and the printed slip carrying `ed2d41c7` — a voucher identifier that really is in `%APPDATA%\DingDingProjects\exchange\diesel-vouchers.json`. |
+| `plain-start.png` | A genuinely fresh profile: white page, system font, a 1px grey rule under the title bar, square corners, no shadows, no illustrated art — and in the middle of it a flat grey circle with the word `COOKIE` on it. The title bar's own controls are coin-slot plates (`10` to drag the window, `30` minimize, `45` maximize) and the close cross beside them is an ordinary button with no price. The only two console buttons are the free `Prices` catalogue and a `SETTINGS` plate at `25`. Nothing was seeded and nothing was pressed before the shutter. |
+| `plain-upgrading.png` | The same run with exactly two of the seven look rungs bought — `look.palette` (50) and `look.cabinet` (250). The warm palette and the wooden cabinet are back; everything above them is still visibly absent (system font rather than the display face, flat cream rather than the oven glow, a brown disc rather than the drawn cookie, a plain `▪` on the Shop Sign ticket). The counter reads 100 because 300 of the seeded 400 cookies were really spent. |
+| `game-progressed.png` | The full mid-game surface in the light theme: three HUD plates, the raid-supplies shelf, eight console buttons, the drawn hero cookie over its oven glow, the three-section upgrade shelf at `68 / 180`, the shop rail and the Diesel Depot status card, with the milk tide along the floor at `Wong Tai Sin Milk — 312% milk`. |
+| `game-dark.png` | The same surface, same save, same minute, in the dark "arcade night" theme. Note that the dark theme is the seventh rung of the look ladder: a save that has not bought it cannot reach this picture at all. |
+| `dialog-factory.png` | The Diesel Factory panel, **stalled** — the honest-halt behaviour photographed rather than asserted. The tanks are at 85 of 85 litres so refining reads `0 / 1.00 L/s` while its rating stays at 1.00, and the yard is at 170 of 170 barrels so intake has stopped too. The status line names both reasons. The shipping station below reports ready to ship 85 L, litres shipped 14 L, vouchers minted 139 and consumed by WinForge 76 — the last two counted from the ledger file rather than from the game. |
+| `dialog-home.png` | The Home panel with the Kitchen genuinely under construction: `Building the Kitchen`, 54%, 28s remaining, and the room's own card badged `BUILDING` with scaffolding across its floor plan. The blueprint (5,000) and the builders (10,000) were bought with real presses — that is the 15,000 the panel reports as spent — and the sixty seconds were served by the running application in real time. |
+| `dialog-achievements.png` | The Achievements panel at `78 / 201 unlocked`, with earned badges drawn in gold and unearned ones flat grey behind a `???`. |
+| `dialog-tools.png` | The Tools tech tree reading `0 / 20 TOOLS UNLOCKED` while all twenty of those application features are already usable — which is the entire contract, stated twice on the surface: once in the callout across the top and once in every card's own bordered `ALWAYS AVAILABLE` block. |
+| `dialog-statistics.png` | Ten counters, including `CLOCK ANOMALIES CAUGHT 0`, above the per-generator breakdown of where the production comes from. |
+| `dialog-prestige.png` | The ascension projection with its arithmetic printed: 448 points if you reset now, each one a permanent +1%, so ×5.90. A golden cookie happened to spawn on the **shipped** schedule while this frame was open and is visible on the dimmed stage behind the panel. |
+| `dialog-prices.png` | The controls catalogue, reading `8 OF 41 BOUGHT` — the registry counted live. It carries the statement that the close button and the catalogue's own search field are never for sale, that free search field, and the first group of the price list. |
+| `dialog-settings.png` | Settings opened from a progressed save (a gap the previous set named and this one closes). The language-mode switch at 60, the note that English is free forever, the two-separate-controls warning, both funny sliders at 35 each, and the honest admission that no copy in this build actually varies by level yet. |
+| `raid-supplies.png` | The HUD's `RAID SUPPLIES` shelf after two real presses: a Whack Pass at `1 / 5` with its next price stepped to `4,000,000`, and the `Storage 5` chip now asking `25,000,000`. The point of the frame is that the other two plates also read `/ 5` — the cap is one shared ladder, so buying it once raised all three. |
+| `golden-spawn.png` | A golden cookie standing as its own sprite in its ray-burst, low and left of centre over the upgrade shelf. What is **not** gold matters as much: the hero cookie in the middle of its panel is the ordinary baked one, because the hero no longer collects golden cookies at all. |
+| `golden-puzzle.png` | The Odd Cookie Out card the catch opens, on `Round 1 of 3`, over the dimmed window: sixteen near-identical tiles in a four-by-four grid, and a `Let it go` button. The tiles are anonymous to a screen reader as well as to the eye — each is named only `Cookie tile 1` through `16`, so the accessible name cannot give the answer away. |
+| `event-sugar-rush.png` | A **Sugar Rush** five seconds from the end of it: an amber event plate in the HUD with a sun glyph, a draining bar and a `5s` countdown, and a marquee card in the corner saying in plain words what it does — every click lands seven times as hard. Worth a second look for a layout reason as well: the event plate pushed the eight console buttons onto a row of their own, and in that wider HUD the raid-supplies shelf prints all three plates whole. |
 
-### The plain start and the aesthetic ladder
+**What was seeded, and what was bought.** One image, `plain-start.png`, is an
+untouched fresh profile: nothing seeded, nothing pressed. `plain-upgrading.png` starts from a save carrying 400 cookies and
+a lifetime total of 400 — deliberately under the 1,000-cookie grandfather
+threshold, so the look had to be *bought* rather than granted — and both rungs
+were then bought inside the running application with real Win32 presses on the
+coin-slot plates and their confirmations. The balance falling 400 → 350 → 100 is
+the receipt.
 
-| File | What it shows |
-| --- | --- |
-| `plain-start.png` | A genuinely fresh profile on the build where the whole look is bought. A white page, the system font at normal weight, a 1px grey rule under the title bar, square corners, no shadows and no illustrated art anywhere — and in the middle of it, the game: a flat `#dddddd` circle with a 1px grey ring and the word `COOKIE` printed on it. The coin-slot plates in the title bar are perfectly legible in black on grey (`10` for dragging, `30` minimize, `45` maximize, `1` for the exit), the `Prices` catalogue button beside `SETTINGS` is free as always, and the Shop Sign discovery ticket's icon has fallen back to a plain `▪`. The small `10` overlapping the cookie is the golden-cookie redeem countdown: a golden spawned during the capture, and it is worth having in shot, because it shows the golden state in the plain look — no ray-burst, no sparkle wash, just the countdown. This is what the owner's decree looks like: deliberately cheap, entirely playable, and not broken. |
-| `plain-upgrading.png` | The same build a few hundred cookies later, with exactly two of the seven look rungs bought — `look.palette` (50) and `look.cabinet` (250) — and nothing else. The warm bakery palette is back and so is the wooden cabinet: the frame, the bevels, the chunky borders, the rounded corners and the console housing. Everything above those two rungs is still unbought and still visibly so: the title is the system font at normal weight rather than the letter-spaced display face, the cabinet interior is one flat cream rather than a radial oven glow, there are no embers and no crumbs, the Shop Sign ticket still carries the plain `▪`, and the hero cookie is a brown disc with the word `COOKIE` on it rather than the drawing. The counter reads 100 because 300 of the seeded 400 cookies were really spent. |
+Everything from `game-progressed.png` down starts from the progressed save that
+`scripts/capture-seed-save.test.ts` writes, pushed into `localStorage` over the
+running app's own devtools connection and then loaded normally. On top of that
+balance, these were bought with real Win32 presses on the real controls, and the
+catalogue's own counter climbing `0 → 7 → 8 OF 41 BOUGHT` is the receipt: all
+seven look rungs (50, 250, 750, 1,800, 4,000, 8,000, 15,000), the Settings
+emblem (25), a Whack Pass, a storage rung, the Kitchen blueprint and its
+builders.
 
-**How these were taken.** From the built `dist/`, launched by the real
-`electron` binary onto an off-screen Windows desktop named `PlainStartCapture`,
-each on its own debugging port and its own throwaway `--user-data-dir`, with the
-page target's URL verified as this worktree's `dist/renderer/index.html` before
-anything else happened. `plain-start.png` is an untouched fresh profile — nothing
-was seeded and nothing was pressed. For `plain-upgrading.png` the save was seeded
-by `scripts/capture-seed-plain-look.test.ts` with 400 cookies and a lifetime total
-of 400, deliberately UNDER the 1,000-cookie grandfather threshold so that the look
-had to be bought rather than granted, and with no look rung pre-owned. Both
-purchases were then made inside the running application with real presses: a mouse
-press on the free `Prices` console button, a mouse press on the coin-slot plate in
-the catalogue, and a mouse press on the confirmation's own `Buy it` button, twice
-over. The balance falling 400 → 350 → 100 is the receipt. Scrolling the catalogue
-to bring each plate into view was done through the debugging protocol; every press
-that spent a cookie was a real Win32 click on the real control. Both images are
-Win32 `PrintWindow` captures of that one window, resolved by handle from the
-headless desktop's own window list, and both were opened and looked at afterwards
-— the first pass showed a soft orange halo around the plain grey cookie, which
-turned out to be the golden-cookie overlay's literal rgba wash leaking through the
-token layer, and the stylesheet was fixed and the capture retaken.
+**One change to that seed, stated plainly.** The seed script now writes the seven
+`look` rung ids into the save's `controlUnlocks`. It did not before, and the
+first pass of this run photographed a ninety-quintillion-cookie save wearing the
+plain start look, which is not what a run that far along looks like. The ladder
+being *climbed* is photographed separately and with real presses, in
+`plain-start.png` and `plain-upgrading.png`; the seed grants it so the surface
+captures show the surface rather than the ladder. That is the only thing about
+the game state in this set that was written rather than played.
+
+**The theme, and why both halves are declared.** This capture desktop follows a
+dark operating-system colour scheme. So the light frames in this set were taken
+with `data-theme="light"` set on the running renderer's root element over the
+devtools connection, and `game-dark.png` with `data-theme="dark"`; the attribute
+was cleared afterwards. Neither is a file patch this time — nothing in `dist/`
+was edited — and neither reaches anything the application cannot already show a
+player whose machine is set the other way.
+
+**The developer-only keys.** `golden-spawn.png` and `golden-puzzle.png` were
+taken with `material-cookie-clicker:golden:fast` set in a throwaway profile,
+which shortens the five-to-fifteen-minute spawn schedule and lengthens the
+window enough to photograph. `event-sugar-rush.png` was taken with
+`material-cookie-clicker:events:fast` set to `event:sugar_rush`, which shortens
+the pool's schedule and pins the draw to one event. Both keys change **when**
+something happens and nothing else: the event that lands is the real event, with
+its real duration, its real arithmetic and the real one-event-at-a-time rule,
+and the golden's spawn position and the puzzle's odd tile are the scheduler's
+and the PRNG's own choices. There is no button and no settings row that reaches
+either key, and a player who never sets one never leaves the shipped timing.
+
+**The toasts, and why one is in shot.** A save producing fourteen billion cookies
+a second earns a milestone every few seconds, and the application also re-announces
+every achievement in the save on load — about two hundred of them, four seconds
+apart. Most frames here waited for the milestone region to empty.
+`game-progressed.png` did not get one: it carries a real `Tool discovered: Regex
+Builder` toast in the bottom-right, over the cabinet floor and obscuring nothing.
+It is described rather than cropped.
+
+**A fault found by looking.** When all eight console buttons sit on the HUD row,
+the raid-supplies shelf **clips its third plate**: `Half-HP Whack` runs under the
+shelf's right-hand edge and loses the end of its own label. It is visible in
+`game-progressed.png`, `game-dark.png`, `raid-supplies.png` and every dialog
+capture in this set.
+
+It is not a capture artefact, and comparing two frames in this set is what pins
+down the condition: in `event-sugar-rush.png` an event plate pushed the console
+buttons onto a second row, and in that wider layout the same shelf prints all
+three plates and its storage chip whole. So the shelf is not too small in
+principle; it is the crowded single-row HUD that cuts it. Stated here and on the
+site rather than framed out of shot.
+
+**Not shown by this set**, and listed rather than glossed: a genuinely narrow
+window (every frame is one maximised window, so the shop-drawer breakpoint is
+still verified by forcing the breakpoint); a finished, furnished home — no room
+was completed, so the coziness gauge reads 0 of 249 and the builders'-pace tile
+reads +0%; the Reborn tree and the prestige two-key confirmation gate, which both
+ship but sit below the fold of `dialog-prestige.png`; the deep end of the
+generator ladder past Shipment; fifteen of the sixteen pool events, and the Mouse
+Raid itself as opposed to the supplies shelf you buy for it; the update notice;
+Cantonese-only mode; and the golden cookie's own puzzle being *solved*. Older
+photographs of several of those are still on disk and described further down this
+file; they are not in the tables because they are pictures of builds that have
+since changed.
+
 
 ### The advanced regex builder
 
@@ -87,7 +173,12 @@ lands. The pattern and the sample text were typed in as real key events. The
 image is a Win32 `PrintWindow` capture of that one window, resolved by title and
 class, and it was opened and looked at afterwards.
 
-### The golden cookie: the random spawn and its puzzle
+### The golden cookie: the random spawn and its puzzle — **superseded**
+
+> Retaken. `golden-spawn.png` and `golden-puzzle.png` on disk are now the images
+> described in **The current set** above, from the build with the whole feature
+> run in it. What follows is the account of the lane that first photographed
+> them, kept because the method and the observations in it are still true.
 
 | File | What it shows |
 | --- | --- |
@@ -125,7 +216,11 @@ save with focus restored to the hero cookie, and an Escape produced `The golden
 cookie got away.` No capture was taken of those states; they are recorded here
 as observations, not as photographs.
 
-### The raid supplies shelf
+### The raid supplies shelf — **superseded**
+
+> Retaken as `raid-supplies.png` in the current set, on a save that could afford
+> the dearer rungs. The older `whack-storage.png` is still on disk; the account
+> below is kept for its method.
 
 | File | What it shows |
 | --- | --- |
@@ -423,7 +518,12 @@ waited for the event it wanted to come round.
 The oven chip was also pressed, with a real background mouse click on that
 window, and the Oven Hiccup ended immediately as designed. That is not visible in
 either photograph; it is written down here because it was actually checked.
-### The settings set
+### The settings set — **superseded**
+
+> Retaken as `dialog-settings.png` in the current set, and from a progressed save
+> rather than a fresh one, which is the gap this section itself named. The four
+> older files are still on disk. Note that `settings-fresh.png` shows a build in
+> which the Settings emblem was free; it is a purchase now.
 
 Four images from one session on the off-screen desktop `SettingsCapture`, each
 opened and looked at afterwards, taken from the built `dist/` launched by the
@@ -447,7 +547,12 @@ photographed as a pair: the application was closed through its own title-bar
 control and relaunched against the same profile, and came back up in
 Cantonese-only mode.
 
-### The control-economy set
+### The control-economy set — **superseded**
+
+> The chrome-price story is now told by `plain-start.png` and `dialog-prices.png`
+> in the current set. The three `commodify-*.png` files are still on disk, and
+> the `WM_NCHITTEST` evidence below is the strongest proof in this file that a
+> window really became draggable, so it is kept in full.
 
 Three images from one session on the off-screen desktop `CommodifyCapture`, each
 opened and looked at afterwards, taken from the built `dist/` launched by the
@@ -563,30 +668,64 @@ still starts and still shows the right nothing.
 
 ## Not captured yet
 
-- The factory's **automation** branch actually shipping by itself when a tank
-  crosses its threshold. It is unit-tested, and the Ship-automatically switch is
-  in `factory-ship.png` with its threshold caption, but no capture shows a lorry
-  leaving without a press.
-- The factory panel under **reduced motion**, where the pipe flow and the derrick
-  stop dead. That is declared in CSS and asserted nowhere else.
-- The home's **Bedroom, Workshop and Garden** — their blueprints, their twenty-
-  and thirty-minute builds, and the fifteen dearest pieces of furniture. The
-  builders'-pace figure has therefore never been photographed reading anything
-  but `+0%`, because all four pieces that raise it live in those rooms.
-- The home's **furniture shop shelf**. Nine pieces were bought through it during
-  the home session, so it certainly works, but both frames were composed around
-  the coziness gauge and the house grid and the shelf sits below them.
+Rewritten against the current set rather than accumulated. Everything here is a
+gap in evidence, not a feature known to be broken — nobody has looked.
 
-- The command palette and the appearance editor — neither exists in the
-  application yet. The settings surface DOES exist now and is captured; see
-  the settings set below.
-- The golden cookie under **reduced motion**, where the sprite stops scurrying
-  and its ray-burst stops turning, and under the **plain look tier**, where the
-  sprite deliberately keeps its drawing while the hero cookie loses its own.
-  Both are declared in CSS and asserted nowhere else. The spawn itself and its
-  puzzle ARE captured now — see the golden-cookie set above.
+**Whole features with no photograph on this build**
 
-These are gaps in evidence, not features known to be broken. Nobody has looked.
+- **Fifteen of the sixteen pool events.** Only Sugar Rush is photographed here.
+  Grandma's Surprise Batch, Cookie Rain, the Oven Hiccup, Lucky Crumb, Market
+  Day, Production Frenzy, Click Frenzy, Burnt Batch Frenzy, Clot, Combo Window,
+  Delivery Rush, Taste Test, Flour Shortage, Night Shift and Sprinkle Storm are
+  described on the site from their shipped definitions. Older photographs of
+  Cookie Rain, the Oven Hiccup, a Production Frenzy and a Taste Test are on disk
+  from earlier lanes and are described above; they predate several changes to
+  the surface, which is why they are not in the current tables.
+- **The Mouse Raid itself.** The supplies shelf you buy for it is photographed;
+  mice on the counter, on this build, are not. The `mice-*.png` pair from the
+  earlier lane is still on disk.
+- **The update notice.** `update-notice.png` from the earlier lane is on disk,
+  and its section above is explicit that the status behind it was injected
+  through a dev-only seam rather than earned.
+- **Cantonese-only mode**, and the language-mode switch being bought at all.
+- **The Reborn tree**, and the prestige two-key confirmation gate. Both ship and
+  both sit below the fold of `dialog-prestige.png`.
+- **Milk at a level worth looking at.** The tide is in every surface capture as a
+  band along the floor reading `Wong Tai Sin Milk — 312% milk`, but nothing in
+  this set is composed around it.
+
+**States of features that are photographed**
+
+- The home past **one room under construction**: no finished room, no furniture,
+  no coziness gauge reading anything but `0 / 249`, no builders'-pace figure
+  other than `+0%`, and none of the later rooms with their twenty- and
+  thirty-minute builds.
+- The factory's **automation** branch shipping by itself when a tank crosses its
+  threshold. The Auto-ship switch is in `dialog-factory.png` with its price on
+  it; no capture shows a lorry leaving without a press.
+- The golden cookie's puzzle being **solved** — the win, the wrong-pick shake and
+  the walk-away line were all exercised in an earlier lane and written down as
+  observations there, never photographed.
+- The **deep end of the generator ladder**, past Shipment.
+
+**Things declared only in CSS**
+
+- The factory panel, the golden sprite and the raid under **reduced motion**,
+  where the pipe flow, the derrick, the ray-burst and the scurrying all stop.
+- The golden sprite under the **plain look tier**, where it deliberately keeps
+  its drawing while the hero cookie loses its own.
+
+**Things that do not exist yet**
+
+- The command palette and the appearance editor. Both are named in the tools
+  tech tree as game content; neither is a built application surface.
+
+**Method gaps**
+
+- No **genuinely narrow window**. Every frame in the current set is one maximised
+  window, so the shop-drawer breakpoint and the bottom-sheet behind it stay
+  verified by forcing the breakpoint (see the layout-stability section below)
+  rather than by really resizing the application.
 
 ## `sp-locked.png` / `sp-unlocked.png` — the Settings panel becomes a purchase
 

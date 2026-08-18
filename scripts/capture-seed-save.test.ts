@@ -7,6 +7,7 @@ import { evaluateAchievements } from "../src/shared/game/achievements.js";
 import { encodeSave } from "../src/shared/game/save-codec.js";
 import { createInitialGameState } from "../src/shared/game/reducer.js";
 import { UPGRADE_DEFINITIONS, isUpgradeUnlocked } from "../src/shared/game/upgrades.js";
+import { LOOK_RUNG_IDS } from "../src/shared/game/look-tiers.js";
 import type { GameState } from "../src/shared/game/types.js";
 
 /**
@@ -65,6 +66,15 @@ it("seeds a progressed save", () => {
       autoShipEnabled: false,
       stalledSeconds: 0,
     },
+    // THE LOOK, PRE-BOUGHT — and stated plainly rather than left for a reader to discover.
+    //
+    // The whole v2 cabinet is a purchase now (look-tiers.ts), so a seeded save that owns nothing
+    // renders in the plain start look. That is the correct picture for the plain-start captures
+    // and the wrong one for a mid-game surface, where a player at ninety quintillion lifetime
+    // cookies would obviously have bought the seven rungs long ago. Seeding them here keeps the
+    // surface captures honest about what a progressed run looks like; the ladder being CLIMBED is
+    // photographed separately, with real presses, in `plain-start.png` / `plain-upgrading.png`.
+    controlUnlocks: { purchasedRungIds: [...LOOK_RUNG_IDS] },
     prestige: {
       ascensionPoints: 42,
       totalPrestigeCount: 3,

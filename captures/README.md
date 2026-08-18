@@ -614,3 +614,25 @@ each purchase made by a real press on the discovery ticket's own button.
 | 1440x900 | centre (534.00, 287.53), 153 x 153 | (534.00, 287.53) | (534.00, 287.53) |
 
 Zero drift on both axes at both widths.
+
+### The clipping audit
+
+| File | What it shows |
+| --- | --- |
+| `clip-before.png` `clip-after.png` | The same view — the mid-game save at 1000x720 — before and after the clipping audit's fixes. Before: the hero panel ends at `221.6 / SEC` with the hold-to-click line cut off beneath it, the shop rail's footer (the Diesel Depot card and the button that opens the factory) is missing entirely, and the console's third cap reads `ACHIEVEMEN / TS`. After: the hint line is on screen, the depot card is back in the rail with its door, every cap label is whole on one line, and the supplies plates carry their prices again. |
+
+**How these were taken.** From the built `dist/`, launched by the real `electron` binary
+onto an off-screen Windows desktop named `ClipAudit`, on its own debugging port and its
+own throwaway `--user-data-dir`, with the page target's URL verified as this worktree's
+`dist/renderer/index.html` before anything else happened. The save is the `mid` state
+written by `scripts/capture-seed-clipping.test.ts` and pushed into localStorage the same
+way every other seeded capture in this file is. The viewport is a real
+`Emulation.setDeviceMetricsOverride` at 1000x720, and both frames are
+`Page.captureScreenshot` of that window at that size. The `before` frame was taken from a
+build of the merge commit with this lane's own changes stashed, so the two images differ
+by exactly the fixes and nothing else. Both were opened and looked at afterwards — the
+mid-word `ACHIEVEMEN / TS` break in the before frame was found that way, by looking,
+after the DOM audit had already passed it as "not overflowing".
+
+The audit that produced them, its method and its findings table are in
+`docs/clipping-audit.md`.

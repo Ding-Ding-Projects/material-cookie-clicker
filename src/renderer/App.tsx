@@ -361,13 +361,37 @@ function AnchoredPanel({
   // window resize left the panel at its stale `top`, which could push the header — and with it
   // the only visible close button — off the bottom of the new viewport while focus stayed
   // trapped inside. The top is also clamped so the header always stays on screen.
+  //
+  // THE CLAMP USED TO GUARANTEE ONLY THAT THE HEADER WAS VISIBLE, WHICH IS NOT THE SAME AS
+  // GUARANTEEING A USABLE PANEL. Every door into a panel is a control somewhere on the cabinet,
+  // and not all of them are at the top of it: the Diesel Depot status card opens the factory
+  // panel from the FOOTER OF THE SHOP RAIL, three-quarters of the way down the window. Measured
+  // from the built app: opening the factory from the console emblem gave a 551px panel with a
+  // 466px body, and opening the same panel from the depot card gave a 240px strip with 155px of
+  // body — the same dialog, a third of the size, jammed against the bottom edge, because `top`
+  // simply followed the anchor down and `max-height` was whatever was left under it. The
+  // stylesheet's own note beside `.anchored-panel` says the panel "opens at full working height"
+  // and it did not; that is the bug the owner photographed.
+  //
+  // So the anchor still decides where the panel PREFERS to start, and the working height decides
+  // how far down it is allowed to. The panel keeps the height the stylesheet asks for whichever
+  // control opened it, and the notch — which is the part that actually points back at the button
+  // — is what carries the connection to a control further down the cabinet.
   useLayoutEffect(() => {
     const place = () => {
       const node = panelRef.current;
       if (!node) return;
-      // Never start the panel so far down that its header would sit below the viewport: leave
-      // at least a header's worth of room plus the bottom margin.
-      const maxTop = Math.max(0, window.innerHeight - 240 - 28);
+      // The height the stylesheet gives the panel (`height: calc(100vh - 200px)`), read back
+      // rather than duplicated, so the two cannot drift apart. Falls back to the same sum.
+      const styleHeight = parseFloat(getComputedStyle(node).height);
+      const working = Number.isFinite(styleHeight) && styleHeight > 0
+        ? styleHeight
+        : Math.max(160, window.innerHeight - 200);
+      // Never start the panel so far down that it would have to give up its working height —
+      // and, as before, never so far down that the header could leave the viewport at all.
+      const roomFor = Math.max(0, window.innerHeight - working - 28);
+      const headerFloor = Math.max(0, window.innerHeight - 240 - 28);
+      const maxTop = Math.min(roomFor, headerFloor);
       const top = Math.max(0, Math.min(Math.round(anchor.y + 26), maxTop));
       node.style.top = `${top}px`;
       node.style.maxHeight = `${Math.max(160, Math.round(window.innerHeight - top - 28))}px`;

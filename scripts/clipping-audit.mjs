@@ -98,9 +98,26 @@ const AUDIT = String.raw`
     ['.purchase-fx, .purchase-fx *', 'purchase FX: a decorative burst that deliberately flies past the card it came from'],
     ['.cookie-embers, .golden-rays, .cookie-sparkle', 'hero decoration drawn to spill past the cookie on purpose'],
     ['.golden-overlay-wrap, .golden-overlay-wrap *', 'the golden cookie deliberately overlays the hero'],
+    ['.home-cutaway, .home-cutaway *', 'a bakery room card is deliberately larger than the dialog viewport; the panel scrolls and snaps to whole cards'],
     ['[data-audit-overlay]', 'explicitly declared overlay'],
   ];
+  /* The visually-hidden idiom: a 1px box, clipped away, holding text that exists for the
+     accessibility tree and is never meant to be seen. Detected by its SHAPE rather than by a
+     class name, so it holds wherever the pattern is used. Text "clipped" here is the entire
+     point of the pattern, not a defect. */
+  function isVisuallyHidden(el) {
+    let node = el;
+    for (let up = 0; node && up < 3; up += 1, node = node.parentElement) {
+      const cs = getComputedStyle(node);
+      const tiny = parseFloat(cs.width) <= 1 || parseFloat(cs.height) <= 1;
+      const clipped = cs.clipPath !== 'none' || (cs.clip && cs.clip !== 'auto');
+      if (tiny && clipped && /hidden|clip/.test(cs.overflow + cs.overflowX)) return true;
+    }
+    return false;
+  }
+
   function excusedBy(el) {
+    if (isVisuallyHidden(el)) return 'visually-hidden text: a 1px clipped box that exists for the accessibility tree';
     for (const [sel, why] of EXCLUDED) {
       try { if (el.matches(sel) || el.closest(sel)) return why; } catch (e) { /* bad selector */ }
     }
@@ -144,7 +161,7 @@ const AUDIT = String.raw`
     while (p && p !== document.body) {
       const cs = getComputedStyle(p);
       if (cs.position === 'fixed') return null;
-      if (/hidden|clip|scroll|auto/.test(cs.overflowX + cs.overflowY)) return p;
+      if (/hidden|clip|scroll|auto/.test(cs.overflowX) || /hidden|clip|scroll|auto/.test(cs.overflowY)) return p;
       p = p.parentElement;
     }
     return null;
@@ -212,7 +229,14 @@ const AUDIT = String.raw`
       const cr = cl.getBoundingClientRect();
       const cs2 = getComputedStyle(cl);
       const scrolls = /auto|scroll/.test(cs2.overflowX + cs2.overflowY);
-      if (!scrolls && (rect.right > cr.right + 1 || rect.bottom > cr.bottom + 1 || rect.left < cr.left - 1 || rect.top < cr.top - 1)) {
+      /* PER AXIS. A box that sets overflow-x: clip and leaves overflow-y visible clips
+         horizontally and nothing else, so a child hanging below it is not being cut — checking
+         both axes against a single-axis clipper invents findings. */
+      const clipsX = /hidden|clip|scroll|auto/.test(cs2.overflowX);
+      const clipsY = /hidden|clip|scroll|auto/.test(cs2.overflowY);
+      const outX = clipsX && (rect.right > cr.right + 1 || rect.left < cr.left - 1);
+      const outY = clipsY && (rect.bottom > cr.bottom + 1 || rect.top < cr.top - 1);
+      if (!scrolls && (outX || outY)) {
         report('escapes-clipper', el, 'clipped by ' + describe(cl));
       }
       /* A scrolling clipper that cuts a card MID-ROW is still a defect: the visible area must
@@ -261,7 +285,12 @@ const AUDIT = String.raw`
       cs.backgroundImage !== 'none';
     const isControl = el.tagName === 'BUTTON' || el.getAttribute('role') === 'button';
     if (!bordered && !isControl) continue;
-    if (!(el.textContent || '').trim()) continue;
+    /* The element must own the TEXT, not merely contain elements that do. A flex or grid
+       container of spans has a range rect equal to its whole content box by construction, so
+       measuring one reports every such container as flush against itself. Its children are
+       visited on their own turn, which is where the real answer is. */
+    const own = Array.from(el.childNodes).filter((n) => n.nodeType === 3 && n.textContent.trim());
+    if (own.length === 0) continue;
     const range = document.createRange();
     range.selectNodeContents(el);
     const tr = range.getBoundingClientRect();
@@ -279,7 +308,23 @@ const AUDIT = String.raw`
        of room to its right is alignment, not crowding; a run pressed against both edges has
        nowhere left to go and is the DIESEL FACTORY shape. */
     if (insetL < 2 && insetR < 2) {
-      report('flush-label', el, 'text inset L ' + insetL.toFixed(1) + ' R ' + insetR.toFixed(1) + 'px in a ' + Math.round(r.width) + 'px box');
+      /* A SHRINK-TO-FIT PLATE IS NOT A CLIPPED ONE. When the box is sized BY its text — the
+       * coin-slot price plates are the case in this app — the content box equals the ink by
+       * construction, so "inset < 2px" is true of every such plate no matter how much room the
+       * window has, and no character is ever cut: the plate simply grew to fit. The 2px rule is
+       * about a label crowding a box it cannot enlarge. So the shape is recorded and excused
+       * rather than silently dropped: nothing cut, and the box is exactly its content. */
+      const nothingCut = el.scrollWidth <= el.clientWidth + 1;
+      const shrinkToFit = Math.abs(insetL) < 1 && Math.abs(insetR) < 1;
+      const detail = 'text inset L ' + insetL.toFixed(1) + ' R ' + insetR.toFixed(1) + 'px in a ' + Math.round(r.width) + 'px box';
+      if (nothingCut && shrinkToFit) {
+        findings.push({
+          kind: 'flush-label', el: describe(el), detail,
+          excluded: 'shrink-to-fit plate: the box is sized by its own text, so it is snug by construction and nothing is cut',
+        });
+      } else {
+        report('flush-label', el, detail);
+      }
     }
   }
 
@@ -358,13 +403,14 @@ for (const [stateName, savePath] of STATES) {
   }
 }
 
-/* The narrow shop rail the owner's second screenshot shows: the rail squeezed to a drawer
-   width, where the row must still carry its own Buy button. */
+/* THE NARROW RAIL — the owner's screenshot where the shop row's own Buy button is not there.
+   Driven by a genuinely narrow WINDOW rather than by forcing an inline width on the rail: an
+   inline width makes the rail refuse to shrink and produces an overflow the real app never has,
+   which is an artefact of the probe rather than a finding about the game. */
 await seed('captures/tmp/clipping/mid.json');
-for (const railWidth of [400, 360]) {
-  await setViewport(1000, 720);
-  await evaluate(`(() => { const r = document.querySelector('.shop-rail'); if (!r) return 'no rail'; r.style.width = '${railWidth}px'; r.style.flex = '0 0 ${railWidth}px'; return 'narrowed'; })()`);
-  await sleep(400);
+for (const [w, h] of [[900, 720], [820, 700]]) {
+  await setViewport(w, h);
+  await sleep(500);
   const f = await evaluate(AUDIT);
   const buy = await evaluate(`(() => {
     const row = document.querySelector('.shop-row:not(.shop-row--mystery)');
@@ -373,10 +419,99 @@ for (const railWidth of [400, 360]) {
     const b = row.querySelector('.buy-btn');
     if (!b) return { row: true, buy: false };
     const br = b.getBoundingClientRect();
-    return { row: true, buy: true, inside: br.bottom <= rr.bottom + 1 && br.right <= rr.right + 1, rowH: Math.round(rr.height), buyBottom: Math.round(br.bottom), rowBottom: Math.round(rr.bottom) };
+    /* Visible means inside the row AND inside whatever is scrolling the list. */
+    let sc = row.parentElement;
+    while (sc && !/auto|scroll/.test(getComputedStyle(sc).overflowY)) sc = sc.parentElement;
+    const sr = sc ? sc.getBoundingClientRect() : { top: 0, bottom: window.innerHeight };
+    return {
+      row: true, buy: true,
+      insideRow: br.bottom <= rr.bottom + 1 && br.right <= rr.right + 1,
+      insideScroller: br.bottom <= sr.bottom + 1 && br.top >= sr.top - 1,
+      scroller: sc ? sc.className : null,
+      rowH: Math.round(rr.height), buyRect: [Math.round(br.left), Math.round(br.top), Math.round(br.width), Math.round(br.height)],
+    };
   })()`);
-  report.push({ state: 'mid', size: `1000x720 rail@${railWidth}`, view: 'narrow-rail', findings: f, buyButton: buy });
+  report.push({ state: 'mid', size: `${w}x${h}`, view: 'narrow-rail', findings: f, buyButton: buy });
 }
+
+/* THE LEFTMOST BUTTON AND THE DEPOT DOOR — the owner's screenshot of a panel opening low down
+   and running off the bottom edge. Both doors into the factory panel are measured: the console
+   emblem at the top of the cabinet, and the depot status card down in the rail's footer. */
+async function panelGeometry() {
+  return evaluate(`(() => {
+    const p = document.querySelector('.anchored-panel');
+    if (!p) return { open: false };
+    const r = p.getBoundingClientRect();
+    const bar = p.querySelector('.anchored-panel__bar');
+    const close = p.querySelector('.anchored-panel__close');
+    const body = p.querySelector('.anchored-panel__body');
+    const rr = (x) => x ? [Math.round(x.getBoundingClientRect().top), Math.round(x.getBoundingClientRect().bottom)] : null;
+    return {
+      open: true,
+      rect: [Math.round(r.left), Math.round(r.top), Math.round(r.width), Math.round(r.height)],
+      viewport: [window.innerWidth, window.innerHeight],
+      bottomOverhang: Math.round(r.bottom - window.innerHeight),
+      barVisible: rr(bar), closeVisible: rr(close), bodyHeight: body ? Math.round(body.getBoundingClientRect().height) : null,
+    };
+  })()`);
+}
+for (const [w, h] of SIZES) {
+  await setViewport(w, h);
+  await sleep(400);
+  for (const door of ['console-factory', 'depot-card']) {
+    const opened = await evaluate(`(() => {
+      ${door === 'depot-card'
+        /* No scrollIntoView: the stage is not a scroller at these widths, so asking the browser
+           to scroll to this button offsets panels that were never meant to move and invents
+           escapes that the running game does not have. The button is on screen; press it. */
+        ? "const b = document.querySelector('.diesel-depot__open'); if (!b) return 'not-found'; b.click(); return 'clicked';"
+        : "const b = document.getElementById('console-factory'); if (!b) return 'not-found'; b.click(); return 'clicked';"}
+    })()`);
+    if (opened === 'not-found') {
+      report.push({ state: 'mid', size: `${w}x${h}`, view: `anchor:${door}`, findings: [], note: 'door not present' });
+      continue;
+    }
+    await sleep(700);
+    const geom = await panelGeometry();
+    const f = await evaluate(AUDIT);
+    report.push({ state: 'mid', size: `${w}x${h}`, view: `anchor:${door}`, findings: f, panel: geom });
+    await closePanel();
+    await sleep(300);
+  }
+}
+
+/* THE TOAST OVER THE DIALOG — the owner's third screenshot. A toast is forced into the stack
+   while a dialog is open, and the two rects are compared. A toast that covers the panel the
+   player just opened is the finding; one that sits under it, or beside it, is not. */
+await setViewport(1440, 900);
+await evaluate(`(() => { const b = document.getElementById('console-achievements'); if (b) b.click(); return 1; })()`);
+await sleep(700);
+const toastCase = await evaluate(`(() => {
+  const stack = document.querySelector('.toast-stack');
+  const panel = document.querySelector('.anchored-panel');
+  const scrim = document.querySelector('.overlay-scrim');
+  const z = (x) => x ? getComputedStyle(x).zIndex : null;
+  if (!stack || !panel) return { stack: !!stack, panel: !!panel, panelZ: z(panel), scrimZ: z(scrim), stackZ: z(stack) };
+  const a = stack.getBoundingClientRect(), b = panel.getBoundingClientRect();
+  const ox = Math.min(a.right, b.right) - Math.max(a.left, b.left);
+  const oy = Math.min(a.bottom, b.bottom) - Math.max(a.top, b.top);
+  return {
+    stackZ: z(stack), scrimZ: z(scrim), panelZ: z(panel),
+    stackRect: [Math.round(a.left), Math.round(a.top), Math.round(a.width), Math.round(a.height)],
+    panelRect: [Math.round(b.left), Math.round(b.top), Math.round(b.width), Math.round(b.height)],
+    overlap: ox > 0 && oy > 0 ? [Math.round(ox), Math.round(oy)] : null,
+    /* The one that actually matters: with both on screen, which one does the browser hand a
+       click at the overlap point to? */
+    hitAtOverlap: (() => {
+      if (!(ox > 0 && oy > 0)) return null;
+      const x = Math.max(a.left, b.left) + ox / 2, y = Math.max(a.top, b.top) + oy / 2;
+      const el = document.elementFromPoint(x, y);
+      return el ? (el.closest('.toast-stack') ? 'toast-stack' : el.closest('.anchored-panel') ? 'anchored-panel' : el.className) : null;
+    })(),
+  };
+})()`);
+report.push({ state: 'mid', size: '1440x900', view: 'toast-over-dialog', findings: [], toast: toastCase });
+await closePanel();
 
 mkdirSync(dirname(outfile), { recursive: true });
 writeFileSync(outfile, JSON.stringify(report, null, 2));

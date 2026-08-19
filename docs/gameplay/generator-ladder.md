@@ -1,13 +1,13 @@
-# The 20-tier generator ladder
+# The 21-tier generator ladder
 
-> **Status: not built.** No generator data, purchase logic, or list rendering exists in this
-> repository. This article documents the specified ladder and row behaviour from
-> `design/building-row.html` so the twenty tiers and their ordering are recorded in one place
-> before implementation starts.
+> **Status: implemented; verification pending.** The Office Buildings lane adds the
+> twenty-first generator definition and its permanent lifetime-cookie reveal. This article records
+> the ladder and row behaviour from `design/building-row.html`, including the ordering contract;
+> tests, captures, and UI-run evidence remain intentionally pending for the expedited lane.
 
 ## What it does
 
-Twenty generator tiers, each baking cookies automatically once owned, in escalating cost and
+Twenty-one generator tiers, each baking cookies automatically once owned, in escalating cost and
 output order:
 
 1. Cursor
@@ -18,24 +18,32 @@ output order:
 6. Bank
 7. Temple
 8. Wizard Tower
-9. Shipment
-10. Alchemy Lab
-11. Portal
-12. Time Machine
-13. Antimatter Condenser
-14. Prism
-15. Chancemaker
-16. Fractal Engine
-17. Script Console
-18. Idleverse
-19. Cortex Baker
-20. Wok of the Gods
+9. Office Building
+10. Shipment
+11. Alchemy Lab
+12. Portal
+13. Time Machine
+14. Antimatter Condenser
+15. Prism
+16. Chancemaker
+17. Fractal Engine
+18. Script Console
+19. Idleverse
+20. Cortex Baker
+21. Wok of the Gods
 
 Each tier is presented as a list row (`design/building-row.html`) with an icon, a bilingual name,
 the owned count, the current cost, its per-unit and total CPS contribution, and a buy-quantity
 stepper offering ×1, ×10, ×100, and Max. A row has three states: affordable (the player has enough
 cookies), unaffordable (visible but disabled, never hidden), and locked (not yet reachable — see
 below).
+
+The Office Buildings expansion adds the new ninth tier, displayed as **Office Building · 寫字樓**. It is
+permanently revealed when the all-time baked-cookie counter reaches **500,000,000**. The reveal
+uses lifetime production rather than the current cookie balance, so spending cookies cannot hide
+the row again, and prestige cannot remove it from a save. This addition does not move the existing
+thresholds: the Minigames panel still unlocks at 100,000 lifetime baked cookies, Mouse Raids at
+1,000,000, and prestige remains visible at 1,000,000,000 and usable at 1,000,000,000,000.
 
 Locking a later tier behind an earlier one's progress is a pacing decision for the gameplay
 implementation, separate from the tools tech tree described in

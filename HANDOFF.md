@@ -16,8 +16,9 @@ Its defining idea: **the application's own features are the game's tech tree.**
 The command palette, regex builder, authenticator, file converter, local model
 manager and the rest appear in-game as *tools* the player discovers and — as of
 the current design — **buys with cookies**, each granting a gameplay bonus,
-alongside a twenty-tier generator ladder from Cursor and Grandma out to
-Portal, the Time Machine, the Idleverse and the Wok of the Gods.
+alongside a twenty-one-tier generator ladder from Cursor and Grandma through
+Office Buildings and Shipment to Portal, the Time Machine, the Idleverse and
+the Wok of the Gods.
 
 ## Current minigame-events lane
 
@@ -125,7 +126,7 @@ about.
 The game is now a full incremental: progressive disclosure from a deliberately
 plain app (the entire look is bought in seven tiers), total commodification
 (41+ control rungs including the one-cookie exit, priced Settings, priced
-languages, the priced "Open it now" shortcut), 20 generators / 180 upgrades /
+languages, the priced "Open it now" shortcut), 21 generators / 180 upgrades /
 201 achievements, milk + kittens + a Reborn tree, a diesel-factory subgame
 exporting to WinForge through the voucher ledger, a home-construction subgame,
 22 random events with rare double/triple stacks and a 30-60-minute Mouse Raid
@@ -256,16 +257,30 @@ under its expedited delivery boundary. No paragraph above is a claim that the
 built artifact has been re-verified; that evidence remains open for a later
 verification pass.
 
+### Office Buildings expansion — documentation handoff, 2026-08-19
+
+The generator ladder now documents twenty-one real tiers. The **Office Buildings**
+expansion adds **Office Building · 寫字樓** as tier nine, between Wizard Tower and
+Shipment, and permanently reveals it at exactly **500,000,000 all-time baked
+cookies**. The unlock reads the
+lifetime production counter rather than the current balance, so spending cookies
+does not hide the row again and prestige does not remove it from the save.
+
+The established thresholds remain unchanged: Minigames at **100,000** lifetime
+baked cookies, Mouse Raids at **1,000,000**, prestige visible at
+**1,000,000,000**, and prestige usable at **1,000,000,000,000**. This lane changed
+only the directly related public documentation; tests, captures, reviews, and UI
+runs were intentionally not performed under the expedited delivery boundary.
+
 Files written in this lane:
 
 1. `README.md`
 2. `ROADMAP.md`
 3. `HANDOFF.md`
 4. `docs/gameplay/README.md`
-5. `docs/gameplay/minigame-events.md`
-6. `site/features/minigame-events.html`
-
-The pre-existing source changes and the pre-existing untracked
+5. `docs/gameplay/generator-ladder.md`
+6. `site/features/generator-ladder.html`
+7. `site/features/index.html`
 
 ## Work in flight at the end of this session
 

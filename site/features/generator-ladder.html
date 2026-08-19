@@ -3,8 +3,8 @@
 <head>
 <meta charset="utf-8" />
 <meta name="viewport" content="width=device-width, initial-scale=1" />
-<title>The 20-tier generator ladder — Material Cookie Clicker</title>
-<meta name="description" content="Cursor up to the Wok of the Gods: twenty generator tiers, a constant 1.15 cost curve, and the buy-quantity stepper." />
+<title>The 21-tier generator ladder — Material Cookie Clicker</title>
+<meta name="description" content="Cursor through Office Building and Shipment up to the Wok of the Gods: twenty-one generator tiers, a constant 1.15 cost curve, and the buy-quantity stepper." />
 <link rel="stylesheet" href="../assets/site.css" />
 </head>
 <body>
@@ -23,11 +23,11 @@
 </header>
 <main id="main" class="wrap">
   <article>
-    <h1>The 20-tier generator ladder</h1>
-    <p class="lede">Cursor up to the Wok of the Gods: twenty generator tiers, a constant 1.15 cost curve, and the buy-quantity stepper.</p>
+    <h1>The 21-tier generator ladder</h1>
+    <p class="lede">Cursor through Office Building and Shipment up to the Wok of the Gods: twenty-one generator tiers, a constant 1.15 cost curve, and the buy-quantity stepper.</p>
     <div class="inset" style="margin-bottom:18px">
   <span class="label">Current state</span>
-  <p style="margin:0"><span class="tag">Shipped</span> the shop rail is in this release; 20 definitions in <code>src/shared/game/generators.ts</code>.</p>
+  <p style="margin:0"><span class="tag">Shipped</span> the shop rail is in this release; 21 definitions in <code>src/shared/game/generators.ts</code>. Verification of the Office Buildings unlock remains pending under the expedited delivery boundary.</p>
 </div>
     <h2>From the running application</h2>
     <figure class="capture">
@@ -36,12 +36,12 @@
     </figure>
     <figure class="capture">
       <img src="../assets/captures/ladder-deep.png" alt="The game surface in the dark theme with the shop rail scrolled well past its first rows. The visible generator row is the Antimatter Condenser, the thirteenth tier, drawn as the selected row with a gold border: an atom glyph, the name, the sub-line reading plus 430 million per second each with the same figure repeated in Cantonese, an owned count of 2 on the right, the x1, x10, x100 and Max stepper caps priced at 120, 900 and 6,000 cookies, and a wide Buy button reading 224,825,000,000,000. The row below it, only its heading visible before the Diesel Depot card cuts it off, is the Prism at an owned count of 1. In the HUD above, an olive event plate reads Baker&rsquo;s Dozen with a draining bar and 50s. The rest of the surface is the ordinary mid-game one: COOKIES 40 quintillion, PER SECOND 14,302,000,300, the raid-supplies shelf, the drawn hero cookie, and the upgrade shelf at 68 / 180." width="2604" height="1562" loading="lazy" />
-      <figcaption><strong>The deep end of the ladder, past Shipment.</strong> This is tier thirteen of twenty &mdash; the Antimatter Condenser, two owned, each one worth 430 million cookies a second, with the next one priced at 224,825,000,000,000 &mdash; and the Prism below it. Every capture before this one showed the rail parked at Cursor and Grandma. It also shows the honest limit of the rail at this window height: a generator row is 205 pixels tall and the rail&rsquo;s viewport is about 250, because the Diesel Depot card is docked in its footer, so roughly one row and a sliver is all that is ever on screen at once. Captured from the built application running on an off-screen Windows desktop, photographed with the Win32 PrintWindow API, window maximised, from the same seeded save as the frame above, with the rail scrolled to this row.
+      <figcaption><strong>The deep end of the ladder, past Shipment.</strong> This historical capture shows tier thirteen of twenty &mdash; the Antimatter Condenser, two owned, each one worth 430 million cookies a second, with the next one priced at 224,825,000,000,000 &mdash; and the Prism below it. Office Building now sits between Wizard Tower and Shipment, so this same generator is tier fourteen of twenty-one in the current ladder. Every capture before this one showed the rail parked at Cursor and Grandma. It also shows the honest limit of the rail at this window height: a generator row is 205 pixels tall and the rail&rsquo;s viewport is about 250, because the Diesel Depot card is docked in its footer, so roughly one row and a sliver is all that is ever on screen at once. Captured from the built application running on an off-screen Windows desktop, photographed with the Win32 PrintWindow API, window maximised, from the same seeded save as the frame above, with the rail scrolled to this row.
     </figure>
     <p><a href="../index.html#captures">See all the captures in the capture matrix</a>.</p>
     
 <h2>What it does</h2>
-<p>Twenty generator tiers bake cookies automatically once owned. Each tier's base cost and base output are roughly ten times the previous tier's, so the &ldquo;the next tier is finally worth it&rdquo; moment recurs at a predictable cadence for the whole run. Every tier carries an English name and a Hong Kong Cantonese name, and the Cantonese names lean into local jokes rather than literal translation.</p>
+<p>Twenty-one generator tiers bake cookies automatically once owned. Each tier's base cost and base output are roughly ten times the previous tier's, so the &ldquo;the next tier is finally worth it&rdquo; moment recurs at a predictable cadence for the whole run. Every tier carries an English name and a Hong Kong Cantonese name, and the Cantonese names lean into local jokes rather than literal translation.</p>
 <div class="scroller">
 <table>
   <caption>The ladder, exactly as defined in source</caption>
@@ -55,22 +55,23 @@
     <tr><td>6</td><td>Bank</td><td lang="zh-HK">大耳窿銀行</td><td>1,400,000</td><td>1,400</td></tr>
     <tr><td>7</td><td>Temple</td><td lang="zh-HK">黃大仙廟</td><td>20,000,000</td><td>7,800</td></tr>
     <tr><td>8</td><td>Wizard Tower</td><td lang="zh-HK">巫師塔</td><td>330,000,000</td><td>44,000</td></tr>
-    <tr><td>9</td><td>Shipment</td><td lang="zh-HK">貨櫃碼頭</td><td>5,100,000,000</td><td>260,000</td></tr>
-    <tr><td>10</td><td>Alchemy Lab</td><td lang="zh-HK">煉金實驗室</td><td>75,000,000,000</td><td>1,600,000</td></tr>
-    <tr><td>11</td><td>Portal</td><td lang="zh-HK">傳送門</td><td colspan="2">continues the same ~10&times; step</td></tr>
-    <tr><td>12</td><td>Time Machine</td><td lang="zh-HK">時光機</td><td colspan="2">continues the same ~10&times; step</td></tr>
-    <tr><td>13</td><td>Antimatter Condenser</td><td lang="zh-HK">反物質凝聚器</td><td colspan="2">continues the same ~10&times; step</td></tr>
-    <tr><td>14</td><td>Prism</td><td lang="zh-HK">稜鏡</td><td colspan="2">continues the same ~10&times; step</td></tr>
-    <tr><td>15</td><td>Chancemaker</td><td lang="zh-HK">賭檔</td><td colspan="2">continues the same ~10&times; step</td></tr>
-    <tr><td>16</td><td>Fractal Engine</td><td lang="zh-HK">分形引擎</td><td colspan="2">continues the same ~10&times; step</td></tr>
-    <tr><td>17</td><td>Script Console</td><td lang="zh-HK">程式主控台</td><td colspan="2">continues the same ~10&times; step</td></tr>
-    <tr><td>18</td><td>Idleverse</td><td lang="zh-HK">掛機宇宙</td><td colspan="2">continues the same ~10&times; step</td></tr>
-    <tr><td>19</td><td>Cortex Baker</td><td lang="zh-HK">腦皮層焗爐</td><td colspan="2">continues the same ~10&times; step</td></tr>
-    <tr><td>20</td><td>Wok of the Gods</td><td lang="zh-HK">神級鑊氣</td><td colspan="2">continues the same ~10&times; step</td></tr>
+    <tr><td>9</td><td>Office Building</td><td lang="zh-HK">寫字樓</td><td>1,200,000,000</td><td>120,000</td></tr>
+    <tr><td>10</td><td>Shipment</td><td lang="zh-HK">貨櫃碼頭</td><td>5,100,000,000</td><td>260,000</td></tr>
+    <tr><td>11</td><td>Alchemy Lab</td><td lang="zh-HK">煉金實驗室</td><td>75,000,000,000</td><td>1,600,000</td></tr>
+    <tr><td>12</td><td>Portal</td><td lang="zh-HK">傳送門</td><td colspan="2">continues the same ~10&times; step</td></tr>
+    <tr><td>13</td><td>Time Machine</td><td lang="zh-HK">時光機</td><td colspan="2">continues the same ~10&times; step</td></tr>
+    <tr><td>14</td><td>Antimatter Condenser</td><td lang="zh-HK">反物質凝聚器</td><td colspan="2">continues the same ~10&times; step</td></tr>
+    <tr><td>15</td><td>Prism</td><td lang="zh-HK">稜鏡</td><td colspan="2">continues the same ~10&times; step</td></tr>
+    <tr><td>16</td><td>Chancemaker</td><td lang="zh-HK">賭檔</td><td colspan="2">continues the same ~10&times; step</td></tr>
+    <tr><td>17</td><td>Fractal Engine</td><td lang="zh-HK">分形引擎</td><td colspan="2">continues the same ~10&times; step</td></tr>
+    <tr><td>18</td><td>Script Console</td><td lang="zh-HK">程式主控台</td><td colspan="2">continues the same ~10&times; step</td></tr>
+    <tr><td>19</td><td>Idleverse</td><td lang="zh-HK">掛機宇宙</td><td colspan="2">continues the same ~10&times; step</td></tr>
+    <tr><td>20</td><td>Cortex Baker</td><td lang="zh-HK">腦皮層焗爐</td><td colspan="2">continues the same ~10&times; step</td></tr>
+    <tr><td>21</td><td>Wok of the Gods</td><td lang="zh-HK">神級鑊氣</td><td colspan="2">continues the same ~10&times; step</td></tr>
   </tbody>
 </table>
 </div>
-<p>Every tier uses the same per-unit cost growth ratio of <strong>1.15</strong>, held constant across the whole ladder rather than tuned per tier, so the price of the next unit is a single predictable formula the player can reason about.</p>
+<p>Office Building is permanently revealed at 500,000,000 all-time baked cookies. Because the check uses lifetime production rather than the current balance, spending cookies cannot hide the row again, and prestige cannot remove it from the save. The existing 100,000 Minigames unlock, 1,000,000 Mouse Raid unlock, and 1,000,000,000 / 1,000,000,000,000 prestige thresholds remain unchanged. Every tier uses the same per-unit cost growth ratio of <strong>1.15</strong>, held constant across the whole ladder rather than tuned per tier, so the price of the next unit is a single predictable formula the player can reason about.</p>
 
 <h2>How it is configured</h2>
 <p>Cost, output and growth ratio are data in one file, not scattered through the purchase logic. A row's three presentation states are fixed by <code>design/building-row.html</code>: affordable, unaffordable (visible but disabled, never hidden), and locked (shown-and-locked, so you always know what is coming). The buy-quantity stepper offers &times;1, &times;10, &times;100 and Max as a segmented cabinet switch.</p>

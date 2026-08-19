@@ -1,4 +1,4 @@
-import { GENERATOR_DEFINITIONS } from "./generators.js";
+import { GENERATOR_DEFINITIONS, isGeneratorUnlocked } from "./generators.js";
 import { evaluateNewlyUnlockedTools } from "./tools.js";
 import { areMinigameEventsUnlocked } from "./control-unlocks.js";
 import { REVEAL_UPGRADE_DEFINITIONS, type RevealSurface, type UpgradeDefinition } from "./upgrades.js";
@@ -200,9 +200,27 @@ export function visibleGeneratorLadder(state: GameState): readonly LadderRow[] {
   GENERATOR_DEFINITIONS.forEach((def, index) => {
     if ((ownedById.get(def.id) ?? 0) > 0) deepestOwned = index;
   });
-  // Named and buyable: everything down to one rung past the deepest tier owned. On a fresh save
-  // that is the Cursor alone.
-  const availableThrough = deepestOwned + 1;
+  // A milestone-unlocked tier becomes named as soon as the preserved all-time counter crosses
+  // its threshold, even when the player has spent the current cookie balance or just prestiged.
+  // Owned tiers remain visible for imported/older saves, but an unowned tier never leaks before
+  // its own explicit predicate is true.
+  let deepestLifetimeUnlocked = -1;
+  GENERATOR_DEFINITIONS.forEach((def, index) => {
+    if (def.lifetimeUnlock !== undefined && isGeneratorUnlocked(def, state.stats.totalCookiesBaked)) {
+      deepestLifetimeUnlocked = index;
+    }
+  });
+  // Named and buyable: everything down to one rung past the deepest tier owned. A lifetime-gated
+  // next tier is the exception: keep that exact rung as the unnamed mystery until its predicate
+  // is true, rather than leaking its name just because the previous tier is owned.
+  const nextCandidate = GENERATOR_DEFINITIONS[deepestOwned + 1];
+  const nextCandidateBlocked =
+    nextCandidate !== undefined &&
+    nextCandidate.lifetimeUnlock !== undefined &&
+    !isGeneratorUnlocked(nextCandidate, state.stats.totalCookiesBaked);
+  const availableThrough = nextCandidateBlocked
+    ? deepestOwned
+    : Math.max(deepestOwned + 1, deepestLifetimeUnlocked);
 
   const rows: LadderRow[] = [];
   for (let index = 0; index <= availableThrough && index < GENERATOR_DEFINITIONS.length; index += 1) {

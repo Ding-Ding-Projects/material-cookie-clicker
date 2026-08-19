@@ -42,7 +42,7 @@ const PRESTIGE_MILESTONES: readonly number[] = [1, 5, 10, 25, 50, 100, 250];
 /** Every machine on every rung, added together — the "wide bakery" ladder. */
 const TOTAL_GENERATOR_MILESTONES: readonly number[] = [10, 50, 100, 250, 500, 1000, 2500, 5000, 10000];
 /** Distinct rungs occupied. The top entry is the whole ladder, so it can only be all of it. */
-const GENERATOR_TYPE_MILESTONES: readonly number[] = [2, 5, 10, 14, 17, 20];
+const GENERATOR_TYPE_MILESTONES: readonly number[] = [2, 5, 10, 14, 17, 21];
 const UPGRADES_OWNED_MILESTONES: readonly number[] = [1, 5, 10, 25, 50, 75, 100, 125, 150];
 /** Achievements about achievements — the milk ladder, one badge per flavour band. */
 const ACHIEVEMENT_COUNT_MILESTONES: readonly number[] = [5, 10, 15, 20, 30, 45, 65, 90, 120, 150];

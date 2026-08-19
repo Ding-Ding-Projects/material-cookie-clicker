@@ -1,4 +1,5 @@
 import { effectiveCps } from "../../shared/game/effective-cps.js";
+import { GENERATOR_DEFINITIONS, isGeneratorUnlocked } from "../../shared/game/generators.js";
 import { applyGameAction, type GameAction, type ReducerCtx } from "../../shared/game/reducer.js";
 import type { BigNum } from "../../shared/game/big-number.js";
 import type { GameState } from "../../shared/game/types.js";
@@ -20,7 +21,7 @@ import type { GameState } from "../../shared/game/types.js";
  *                    achievements arrays, and golden-cookie helpers return the SAME object
  *                    reference when nothing about the golden cookie actually changed) and only
  *                    change on a discrete action (buy, prestige, unlock, golden-cookie spawn/
- *                    collect/despawn). The 14-generator, ~75-upgrade and ~95-achievement lists
+ *                    collect/despawn). The 21-generator, ~75-upgrade and ~95-achievement lists
  *                    subscribe here, so a cookie tick never re-renders them.
  *
  * The brief describes this as "two slices" (fast + slow); splitting `stats` out of what would
@@ -80,7 +81,12 @@ function computeFastSnapshot(state: GameState): FastSnapshot {
 }
 
 function structureChanged(previous: GameState, next: GameState): boolean {
-  return STRUCTURE_KEYS.some((key) => previous[key] !== next[key]);
+  const generatorUnlockChanged = GENERATOR_DEFINITIONS.some(
+    (def) =>
+      isGeneratorUnlocked(def, previous.stats.totalCookiesBaked) !==
+      isGeneratorUnlocked(def, next.stats.totalCookiesBaked),
+  );
+  return STRUCTURE_KEYS.some((key) => previous[key] !== next[key]) || generatorUnlockChanged;
 }
 
 export type DispatchListener = (previous: GameState, next: GameState, action: GameAction) => void;

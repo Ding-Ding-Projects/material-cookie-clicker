@@ -905,9 +905,14 @@ function EventPlate({
           /* The dot is the separator the compressed one-plate layout lost — without it the plate
              printed "6s5 of 5 mice left" (gap-closer finding, same class as the Night Shift38s
              fault in the two-plate layout). */
-          <span className="event-indicator__mice"><span aria-hidden="true"> · </span>
-            {showsEnglish() ? <span>{miceLine.en}</span> : null}
-            {showsCantonese() ? <span lang="zh-HK">{miceLine.yue}</span> : null}
+          <span className="event-indicator__mice">
+            <span className="event-indicator__separator" aria-hidden="true">
+              ·
+            </span>
+            <span className="event-indicator__mice-copy">
+              {showsEnglish() ? <span>{miceLine.en}</span> : null}
+              {showsCantonese() ? <span lang="zh-HK">{miceLine.yue}</span> : null}
+            </span>
           </span>
         ) : null}
       </span>

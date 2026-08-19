@@ -399,7 +399,11 @@ export const COOKIE_SCREEN_COPY = {
   cpsLabel: { en: "Cookies per second", yue: "每秒曲奇產量" },
   goldenAvailable: { en: "Golden cookie available", yue: "金曲奇出現" },
   holdHint: { en: "Hold to click repeatedly", yue: "撳住可以連續撳擊" },
-} as const satisfies Record<string, Bilingual>;
+  nextLookPurchase: (nameEn: string, nameYue: string, price: string): Bilingual => ({
+    en: `Keep clicking. ${nameEn} is the next graphics purchase and costs ${price} cookies. Its purchase button appears here when affordable.`,
+    yue: `繼續撳。下一個圖像購買係${nameYue}，要 ${price} 塊曲奇。夠錢嗰陣，購買掣會喺呢度出現。`,
+  }),
+} as const satisfies Record<string, Bilingual | ((...args: any[]) => Bilingual)>;
 
 /**
  * THE GOLDEN CATCH AND THE OVEN DIAL (GoldenCookieStage.tsx).
@@ -1115,8 +1119,8 @@ export const CONTROL_COPY = {
    * a section inside the panel it prices, so the list can still be read for nothing.
    */
   catalogueFloors: {
-    en: "Two things are never for sale: the close button, and this catalogue with its own search field. You can always quit, and you can always read the price list — this page is its own free button on the console, so nothing on it has to be bought to be read. Everything else has a price, including the Settings panel itself.",
-    yue: "有兩樣嘢永遠唔賣：關閉掣，同埋呢個目錄連佢自己嘅搜尋欄。你永遠走得，亦永遠睇得到個價目表——呢版喺控制台有自己一粒免費掣，睇乜都唔使畀錢。其他全部有價，連設定面板本身都係。",
+    en: "This catalogue and its search field are never sold. Before the cabinet is bought, the cookie names the next graphics price and its purchase button appears when affordable. Once the cabinet exists, this complete list is its own free console button. Everything else has a price, including the Settings panel itself.",
+    yue: "呢個目錄連佢自己嘅搜尋欄永遠唔賣。機櫃未買之前，粒曲奇會講下一個圖像價錢；夠錢嗰陣購買掣就會出現。買咗機櫃之後，呢張完整價目表喺控制台有自己一粒免費掣。其他全部有價，連設定面板本身都係。",
   },
   catalogueSearch: { en: "Search the catalogue…", yue: "搜尋目錄…" },
   catalogueSearchFree: { en: "This search field is free.", yue: "呢個搜尋欄免費。" },

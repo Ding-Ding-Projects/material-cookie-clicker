@@ -8,7 +8,7 @@ import { isEffectActive } from '../shared/game/golden-cookie.js';
 import { computeMultipliers } from '../shared/game/upgrades.js';
 import { computeDisclosure, type ConsoleSurfaceId } from '../shared/game/disclosure.js';
 import { controlRungPrice, isControlUnlocked } from '../shared/game/control-unlocks.js';
-import { LOOK_ATTRIBUTES, lookTierAttributes } from '../shared/game/look-tiers.js';
+import { LOOK_ATTRIBUTES, lookStage, lookTierAttributes } from '../shared/game/look-tiers.js';
 import {
   CATALOGUE_PANEL_ID,
   consolePanelIds,
@@ -375,8 +375,9 @@ function CabinetConsole({
   // identically the moment the panel is open (see tools.ts#gatesApplicationFeature).
   const structure = useStructureSnapshot();
   const disclosure = computeDisclosure(structure);
-  // The prices catalogue and Settings are last in the row and FIRST in time: consolePanelIds
-  // appends both unconditionally, so the console is never empty.
+  // The prices catalogue and Settings are appended unconditionally to the console model. The
+  // pre-cabinet look stage hides that entire console by design; once the cabinet is bought these
+  // are still the first two entries a new save receives.
   //
   // THE SETTINGS EMBLEM IS NOW BOUGHT (control-unlocks.ts#settings.open, 25 cookies, by the
   // owner's decree). Until it is, its position on the console holds a coin-slot plate with that
@@ -384,9 +385,9 @@ function CabinetConsole({
   // wears, in the same place, with the same tab stop, buying itself when pressed. It is a price,
   // not a gate: nothing has to be achieved first, only paid.
   //
-  // The catalogue plate beside it is never sold at any price. That is what keeps this honest —
-  // the entire price list, including the 25 cookies Settings costs, is one free press away on a
-  // save that has never earned a cookie.
+  // The catalogue plate beside it is never sold at any price. Before the cabinet exists, the
+  // cookie describes the next graphics price and its plate appears at affordability; afterwards
+  // this catalogue carries the complete price list for free.
   const visibleIds = consolePanelIds(disclosure);
   const settingsBought = isControlUnlocked(structure, SETTINGS_OPEN_RUNG_ID);
 
@@ -848,6 +849,7 @@ export function App() {
 function LookTierGate({ children }: { children: ReactNode }) {
   const structure = useStructureSnapshot();
   const attributes = lookTierAttributes(structure);
+  const stage = lookStage(structure);
   // The dependency is the VALUES, joined, rather than the object: `lookTierAttributes` builds a
   // fresh object every render, so an identity dependency would re-run on every tick of the game
   // loop for a set of attributes that changes about seven times in a playthrough.
@@ -859,7 +861,8 @@ function LookTierGate({ children }: { children: ReactNode }) {
     LOOK_ATTRIBUTES.forEach((attribute, index) => {
       root.setAttribute(attribute, values[index]);
     });
-  }, [signature]);
+    root.setAttribute('data-look-stage', stage);
+  }, [signature, stage]);
 
   return <>{children}</>;
 }
@@ -912,7 +915,9 @@ function GameShell() {
   // sends the keyboard here rather than opening a panel nobody has paid for yet.
   const settingsSlotRef = useRef<HTMLButtonElement | null>(null);
   const settingsBought = useControlRung(SETTINGS_OPEN_RUNG_ID);
-  const lookAttributes = lookTierAttributes(useStructureSnapshot());
+  const structure = useStructureSnapshot();
+  const lookAttributes = lookTierAttributes(structure);
+  const shellLookStage = lookStage(structure);
   const { notice: offlineNotice, dismiss: dismissOfflineNotice } = useOfflineNotice();
   const milestoneMessage = useMilestoneMessage();
 
@@ -1025,7 +1030,12 @@ function GameShell() {
           the plain layer actually keys off (LookTierGate says why), but the cabinet IS the thing
           being assembled, and a reader inspecting it should be able to see how much of it has
           been bought without walking up to <html>. */}
-      <div className="cabinet" data-panel-open={openSurface ? 'true' : undefined} {...lookAttributes}>
+      <div
+        className="cabinet"
+        data-panel-open={openSurface ? 'true' : undefined}
+        data-look-stage={shellLookStage}
+        {...lookAttributes}
+      >
         <div className="cabinet-head">
           <Hud />
           <CabinetConsole

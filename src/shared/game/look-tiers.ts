@@ -1,4 +1,9 @@
-import { hasControlRung } from "./control-unlocks.js";
+import {
+  canBuyControlRung,
+  controlRungLevel,
+  getControlUnlock,
+  hasControlRung,
+} from "./control-unlocks.js";
 import type { GameState } from "./types.js";
 
 /**
@@ -65,6 +70,45 @@ export const LOOK_RUNG_IDS: readonly string[] = LOOK_TIERS.map((tier) => tier.ru
 
 /** The attribute names, in ladder order. */
 export const LOOK_ATTRIBUTES: readonly string[] = LOOK_TIERS.map((tier) => tier.attribute);
+
+/**
+ * The three structural states of the application shell.
+ *
+ * `cookie-only` is deliberately stronger than "all the colours are grey": the title bar,
+ * counters, cabinet, discovery tickets, shop rail and every decorative stage layer are absent.
+ * `palette-only` keeps that same one-button composition but paints the page with the first bought
+ * tier. The ordinary cabinet composition begins only after its own rung has been bought.
+ */
+export type LookStage = "cookie-only" | "palette-only" | "cabinet";
+
+export interface NextLookPurchase {
+  readonly rungId: string;
+  readonly nameEn: string;
+  readonly nameYue: string;
+  readonly price: number;
+  readonly affordable: boolean;
+}
+
+export function lookStage(state: GameState): LookStage {
+  if (!hasControlRung(state, "look.palette")) return "cookie-only";
+  if (!hasControlRung(state, "look.cabinet")) return "palette-only";
+  return "cabinet";
+}
+
+/** The next graphics rung and whether the current balance can buy it, or null at the top. */
+export function nextLookPurchase(
+  state: GameState,
+): NextLookPurchase | null {
+  const rung = getControlUnlock("look").rungs[controlRungLevel(state, "look")];
+  if (!rung) return null;
+  return {
+    rungId: rung.id,
+    nameEn: rung.nameEn,
+    nameYue: rung.nameYue,
+    price: rung.price,
+    affordable: canBuyControlRung(state, rung.id),
+  };
+}
 
 /**
  * The attribute map for a given save: every tier's attribute, always present, always literally

@@ -11,6 +11,8 @@ trade progress for a permanent multiplier.
 ## Articles
 
 - [Cookie clicking](cookie-clicking.md) — the primary click target and the cookies-per-second loop.
+- [Graphics purchase progression](graphics-progression.md) — the cookie-only fresh state and the
+  seven explicitly purchased visual tiers.
 - [The 21-tier generator ladder](generator-ladder.md) — Cursor through Office Buildings and Shipment up to
   the Wok of the Gods, with the buy-quantity stepper and the prestige-safe 500,000,000-cookie reveal.
 - [Endless Home construction](home-construction.md) — six authored rooms followed by repeatable,

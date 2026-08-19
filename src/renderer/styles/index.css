@@ -12459,22 +12459,144 @@ body[data-eclipse='on'] .cookie-hero::after {
  * These hold in the plain state exactly as they hold in the bought one, and
  * `tests/game/look-tiers.test.ts` asserts each of them:
  *
- *   • AA CONTRAST. Plain is #111 on #ffffff (18.9:1) for body text and #333 on #ffffff (12.6:1)
- *     for secondary text. The one token that needed care is the error role, which the shared
- *     surface-kernel defines: #ba1a1a on white is 5.9:1, so it is kept rather than greyed.
+ *   • THE COOKIE'S ACCESSIBLE NAME. The plain word inside the button is decorative; the same
+ *     bilingual name remains on the button at every tier, with its next-purchase description.
  *   • A VISIBLE FOCUS RING. v2 draws focus with a 3-4px --spark-ring outline. In plain,
  *     --spark-ring is #555555 on white (7.5:1) and every one of those rules keeps working
  *     unchanged, because the ring is a token, not a decoration.
- *   • 44px TARGETS. Nothing in this layer touches width, height, min-height or padding on any
- *     control. Not one rule below changes a hit area.
+ *   • CONTROL HIT AREAS. The structural opening state sizes layout wrappers and a visually hidden
+ *     description, never the cookie or the graphics purchase plate themselves.
  *   • REDUCED MOTION. `look.motion` buys motion; it can never buy motion back from someone who
  *     asked the operating system not to have it. The reduced-motion queries above are untouched,
  *     and the motion-off rule here is a superset of them, so `motion bought + prefers-reduced-
  *     motion` is still, exactly as `motion unbought` is.
- *   • THE ECONOMY STAYS PLAYABLE. Coin-slot plates and their printed prices are plain-state
- *     surfaces first and foremost — that is where every player meets them — so they take the
- *     ordinary text and outline tokens and are never dimmed or de-emphasised here.
+ *   • THE GRAPHICS ECONOMY STAYS PLAYABLE. The cookie names the next rung and price; its ordinary
+ *     coin-slot purchase plate appears beside it precisely when the balance can afford it.
  * ========================================================================================== */
+
+/* ------------------------------------------------------ the literal cookie-only opening state
+ *
+ * A fresh save does not merely repaint a completed interface grey. Until the cabinet rung is
+ * bought, the only visible gameplay control is the plain cookie. The hidden description on that
+ * button names the next graphics purchase; its real coin-slot button joins the cookie only when
+ * the balance can afford it. Thus clicking creates affordability, never ownership.
+ *
+ * The two pre-cabinet stages intentionally share structure. `cookie-only` is the unpainted start;
+ * `palette-only` is what the first purchase changes. The second purchase reveals the ordinary
+ * cabinet composition, including its counters, console, discovery ticket and any gameplay-owned
+ * shop or upgrade surfaces. Accessibility names and the cookie's focus ring remain present.
+ * ---------------------------------------------------------------------------------------- */
+.look-purchase-description {
+  position: absolute;
+  width: 1px;
+  height: 1px;
+  padding: 0;
+  margin: -1px;
+  overflow: hidden;
+  clip: rect(0 0 0 0);
+  clip-path: inset(50%);
+  white-space: nowrap;
+  border: 0;
+}
+
+.look-purchase-slot {
+  display: flex;
+  justify-content: center;
+  width: min(100%, 320px);
+  margin-top: 12px;
+}
+
+:root[data-look-stage='cookie-only'] .title-bar,
+:root[data-look-stage='palette-only'] .title-bar,
+:root[data-look-stage='cookie-only'] .cabinet-head,
+:root[data-look-stage='palette-only'] .cabinet-head,
+:root[data-look-stage='cookie-only'] .discovery-ticket,
+:root[data-look-stage='palette-only'] .discovery-ticket,
+:root[data-look-stage='cookie-only'] .upgrade-shelf,
+:root[data-look-stage='palette-only'] .upgrade-shelf,
+:root[data-look-stage='cookie-only'] .shop-rail,
+:root[data-look-stage='palette-only'] .shop-rail,
+:root[data-look-stage='cookie-only'] .milk-tide,
+:root[data-look-stage='palette-only'] .milk-tide,
+:root[data-look-stage='cookie-only'] .golden-stage,
+:root[data-look-stage='palette-only'] .golden-stage,
+:root[data-look-stage='cookie-only'] .event-stage,
+:root[data-look-stage='palette-only'] .event-stage,
+:root[data-look-stage='cookie-only'] .event-indicator-stack,
+:root[data-look-stage='palette-only'] .event-indicator-stack,
+:root[data-look-stage='cookie-only'] .toast-stack,
+:root[data-look-stage='palette-only'] .toast-stack,
+:root[data-look-stage='cookie-only'] .offline-banner,
+:root[data-look-stage='palette-only'] .offline-banner,
+:root[data-look-stage='cookie-only'] .shell-status,
+:root[data-look-stage='palette-only'] .shell-status,
+:root[data-look-stage='cookie-only'] .click-popup,
+:root[data-look-stage='palette-only'] .click-popup,
+:root[data-look-stage='cookie-only'] .cookie-cps,
+:root[data-look-stage='palette-only'] .cookie-cps,
+:root[data-look-stage='cookie-only'] .cookie-hero__hint,
+:root[data-look-stage='palette-only'] .cookie-hero__hint {
+  display: none;
+}
+
+:root[data-look-stage='cookie-only'] .app-content,
+:root[data-look-stage='palette-only'] .app-content {
+  padding: 0;
+}
+
+:root[data-look-stage='cookie-only'] .cabinet,
+:root[data-look-stage='palette-only'] .cabinet {
+  gap: 0;
+  padding: 0;
+  border: 0;
+  border-radius: 0;
+  background: transparent;
+  box-shadow: none;
+  overflow: visible;
+}
+
+:root[data-look-stage='cookie-only'] .cabinet-body,
+:root[data-look-stage='palette-only'] .cabinet-body,
+:root[data-look-stage='cookie-only'] .stage,
+:root[data-look-stage='palette-only'] .stage,
+:root[data-look-stage='cookie-only'] .stage__hero-column,
+:root[data-look-stage='palette-only'] .stage__hero-column {
+  overflow: visible;
+}
+
+:root[data-look-stage='cookie-only'] .stage,
+:root[data-look-stage='palette-only'] .stage {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr);
+  place-items: center;
+}
+
+:root[data-look-stage='cookie-only'] .stage__hero-column,
+:root[data-look-stage='palette-only'] .stage__hero-column {
+  width: 100%;
+  align-items: center;
+  justify-content: center;
+}
+
+:root[data-look-stage='cookie-only'] .stage__hero-column > .panel.cookie-hero,
+:root[data-look-stage='palette-only'] .stage__hero-column > .panel.cookie-hero {
+  flex: 0 0 auto;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  min-height: 0;
+  padding: 0;
+  border: 0;
+  border-radius: 0;
+  background: transparent;
+  box-shadow: none;
+}
+
+:root[data-look-stage='cookie-only'] .cookie-target-wrap,
+:root[data-look-stage='palette-only'] .cookie-target-wrap {
+  margin: 0;
+}
 
 /* ------------------------------------------------------------------ look.palette — COLOUR
  * Unbought: the application is white, grey and near-black, like an unstyled internal form.
@@ -12730,6 +12852,7 @@ body[data-eclipse='on'] .cookie-hero::after {
 :root[data-look-glow='off'] .cookie-embers,
 :root[data-look-glow='off'] .cookie-crumbs,
 :root[data-look-glow='off'] .golden-rays,
+:root[data-look-glow='off'] .golden-sprite__rays,
 /* The golden-cookie sparkle wash. Built from literal rgba spark colours rather than tokens, so
    the palette layer cannot reach it — and it is the ONE decorative leak a plain save meets
    immediately, because a golden cookie can spawn in the first minute. A soft orange halo around
@@ -12789,6 +12912,21 @@ body[data-eclipse='on'] .cookie-hero::after {
    the only picture on the screen, so it goes and the press-count readout carries the state. */
 :root[data-look-art='off'] .cookie-target-wrap.golden .cookie-btn::after {
   content: none;
+}
+
+/* The home remains named and operable without the art rung, but its doll-house drawings, room
+   plans, furniture silhouettes and analogue dial are graphics and therefore do not appear until
+   that rung is bought. The labels, prices, progress semantics and buy buttons are untouched. */
+:root[data-look-art='off'] .home-room__cutaway,
+:root[data-look-art='off'] .home-room__plan,
+:root[data-look-art='off'] .home-room__scaffold,
+:root[data-look-art='off'] .home-furnishing,
+:root[data-look-art='off'] .home-furniture-row__glyph,
+:root[data-look-art='off'] .home-gauge__arc,
+:root[data-look-art='off'] .home-gauge__fill,
+:root[data-look-art='off'] .home-gauge__needle,
+:root[data-look-art='off'] .home-gauge__hub {
+  display: none;
 }
 
 /* --------------------------------------------------------------------- look.motion — MOTION

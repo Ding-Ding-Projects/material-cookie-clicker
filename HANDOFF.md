@@ -1,5 +1,20 @@
 # Handoff
 
+## Graphics-purchase follow-up (2026-08-19)
+
+A brand-new save now renders only the usable plain cookie. `lookStage` derives the structural
+`cookie-only`, `palette-only`, and `cabinet` states from purchased rungs; cookie production alone
+never advances that state. The next graphics coin slot appears only when its exact price is
+affordable, purchases remain ordered and persistent through the existing control-unlock field,
+and duplicate dispatches deduct nothing. The cabinet purchase gates the title bar, HUD, console,
+discovery and gameplay-owned rails; the glow purchase gates golden rays, and the art purchase
+gates room, furniture and gauge drawings. Existing version-9 grandfathering is unchanged.
+
+Focused verification is in `tests/game/look-tiers.test.ts`, including a deliberate red-then-green
+proof for the no-auto-grant/single-deduction regression. The previous `plain-start.png` is now
+explicitly marked as superseded in public documentation. A corrected built-artifact fresh-state
+capture remains required after integration.
+
 Reconciled 2026-08-19 against the integrated application-tools candidate based on the v0.2.55 release. Every number
 below was read from a real command, not remembered. Where something is
 unverified it says so, and where an earlier version of this file was wrong the

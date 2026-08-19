@@ -42,23 +42,21 @@ import type { GameState } from "./types.js";
  * shows a coin-slot plate carrying that figure exactly where the emblem was.
  *
  * The reason the old floor existed is NOT waved away, it is re-housed. The catalogue is no
- * longer a section that only exists inside Settings: it is its own console plate — a free one,
- * appended to the console unconditionally beside the Settings slot (renderer/game/console-
- * panels.ts#CATALOGUE_PANEL_ID) — and it is still ALSO rendered at the bottom of the Settings
- * panel for anyone who has bought their way in. So "you can always see what things cost" stays
- * literally true on a brand-new save with zero cookies: the price list is one press away, free,
- * and the 25-cookie Settings price is printed inside it like every other price.
+ * longer a section that only exists inside Settings: it is its own free console plate and is
+ * also rendered inside Settings. Before the cabinet exists, the owner's stricter cookie-only
+ * opening deliberately omits that console; the cookie's accessible description names the next
+ * graphics rung and exact price, and the rung's purchase plate appears as soon as it is
+ * affordable. Once the cabinet is bought, the complete catalogue is one free press away.
  *
  * And the distinction that keeps the spirit: `settings.open` is PRICED, never PROGRESS-GATED.
  * There is no condition, no milestone and no tech-tree rung in front of it. A save one second
  * old can buy it as soon as it has clicked 25 cookies out of the cookie, which is under a
  * minute. The joke is a till, not a grind. *
- * And one behavioural floor that is not a table entry at all: an unbought control does NOT
- * disappear. It renders in place as a coin-slot plate with its literal price on it and buys
- * itself when pressed. Discoverability is the entire point — a locked control that vanished
- * would just look like a missing feature. Every control that IS unlocked keeps exactly the
- * keyboard access and screen-reader semantics it always had; buying something never makes it
- * worse than it was.
+ * And one behavioural floor that is not a table entry at all: an ordinary unbought control does
+ * NOT disappear. The graphics ladder is the deliberate exception while the cabinet itself is
+ * absent: its next plate appears beside the cookie only when affordable, with its earlier path
+ * carried by the cookie's accessible description. Every bought control keeps the keyboard and
+ * screen-reader semantics it always had.
  *
  * ────────────────────────────────────────────────────────────────────────────────────────────
  * THE PRICE TABLE
@@ -674,9 +672,9 @@ export const CONTROL_UNLOCKS: readonly ControlUnlockDefinition[] = [
     // cheaply made app with just a cookie". Everything this build looks like — the warm bakery
     // palette, the wooden cabinet frame, the display typography on the marquee, the oven glow
     // and its embers, the illustrated icon set, the press travel under every button, the dark
-    // theme — is now EARNED. A save that has never bought a look rung renders as a plain
-    // white page with system-font text and #ddd buttons, and that plainness is the deliberate
-    // starting state rather than a fallback for a failure.
+    // theme — is now EARNED. A save that has never bought a look rung renders only one usable
+    // grey cookie on a white page. That absence is the deliberate starting state rather than a
+    // fallback for a failure.
     //
     // WHY A LADDER. A look assembles in an order. Painting the cabinet frame before there is a
     // palette to paint it in produces brown wood on a grey page; putting display type on a
@@ -687,9 +685,9 @@ export const CONTROL_UNLOCKS: readonly ControlUnlockDefinition[] = [
     //
     // WHAT EACH RUNG'S ABSENCE LOOKS LIKE is not "broken" — it is a specific, coherent, cheap
     // alternative, listed in styles/index.css under THE PLAIN LAYER. The floors that hold at
-    // every rung including none of them: AA text contrast, a visible focus ring, 44px targets,
-    // reduced-motion respected, and every price legible on its coin-slot plate. The economy has
-    // to be playable from the plain state, because the plain state is where it starts.
+    // every rung including none of them: the cookie's accessible name, a visible focus ring, its
+    // full hit target and reduced-motion respect. The next rung's exact price is carried by the
+    // cookie description until its real purchase plate appears at affordability.
     //
     // WHAT IS DELIBERATELY NOT SOLD HERE: legibility. There is no rung that buys readable text,
     // a focus ring, or a big enough button. Those are floors, and a floor is never a price.

@@ -1,11 +1,13 @@
 import { useEffect, useMemo, useRef, useState, type CSSProperties } from 'react';
 
-import { bnMulScalar } from '../../shared/game/big-number.js';
-import { formatBigNum } from '../../shared/game/format-number.js';
+import { bnFromNumber, bnMulScalar } from '../../shared/game/big-number.js';
+import { formatBigNum, formatExactDigits } from '../../shared/game/format-number.js';
 import { isEffectActive } from '../../shared/game/golden-cookie.js';
 import { computeMultipliers } from '../../shared/game/upgrades.js';
 import { computeDisclosure } from '../../shared/game/disclosure.js';
+import { nextLookPurchase } from '../../shared/game/look-tiers.js';
 import { HeroCookieArt } from '../assets/icons.js';
+import { CoinSlot } from '../components/CoinSlot.js';
 import { showsEnglish, showsCantonese, bilingualText, COOKIE_SCREEN_COPY } from '../game/copy.js';
 import { useFastSnapshot, useGameDispatch, useStructureSnapshot } from '../game/GameProvider.js';
 import { createHoldToClickController } from '../game/hold-to-click.js';
@@ -46,6 +48,8 @@ export function CookieHero() {
   // that teaches it — only after the Steady Hand reveal upgrade is bought.
   const disclosure = computeDisclosure(structure);
   const holdEnabled = disclosure.holdToClick;
+  const nextLook = nextLookPurchase({ ...structure, cookies: fast.cookies });
+  const lookDescriptionId = nextLook ? 'next-look-purchase-description' : undefined;
 
   const currentClickValue = useMemo(() => {
     const multipliers = computeMultipliers(structure);
@@ -156,6 +160,7 @@ export function CookieHero() {
           type="button"
           className="cookie-btn cookie-btn--art cookie-btn--lift"
           aria-label={bilingualText(COOKIE_SCREEN_COPY.clickTarget)}
+          aria-describedby={lookDescriptionId}
           onClick={(event) => {
             // A keyboard-activated click reports 0,0 detail; only a real pointer has a position.
             if (event.detail > 0) recordPoint(event.clientX, event.clientY);
@@ -206,6 +211,28 @@ export function CookieHero() {
           </span>
         ))}
       </div>
+
+      {nextLook ? (
+        <>
+          <span className="look-purchase-description" id={lookDescriptionId}>
+            {bilingualText(
+              COOKIE_SCREEN_COPY.nextLookPurchase(
+                nextLook.nameEn,
+                nextLook.nameYue,
+                formatExactDigits(bnFromNumber(nextLook.price)),
+              ),
+            )}
+          </span>
+          {nextLook.affordable ? (
+            <div className="look-purchase-slot" data-rung-id={nextLook.rungId}>
+              <CoinSlot
+                rungId={nextLook.rungId}
+                onBought={() => requestAnimationFrame(() => buttonRef.current?.focus())}
+              />
+            </div>
+          ) : null}
+        </>
+      ) : null}
 
       {disclosure.perSecondReadout ? (
         <div className="cookie-cps" aria-live="off">

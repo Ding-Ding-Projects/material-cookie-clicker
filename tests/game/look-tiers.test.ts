@@ -17,7 +17,9 @@ import {
   LOOK_RUNG_IDS,
   LOOK_TIERS,
   hasLookTier,
+  lookStage,
   lookTierAttributes,
+  nextLookPurchase,
 } from "../../src/shared/game/look-tiers";
 import { migrateToLatest } from "../../src/shared/game/migrations";
 import { applyGameAction } from "../../src/shared/game/reducer";
@@ -46,6 +48,11 @@ const ctx = { now: () => Date.parse("2026-06-01T00:00:00.000Z"), rng: fixedRng()
 
 const STYLESHEET = readFileSync(
   resolve(import.meta.dirname, "..", "..", "src", "renderer", "styles", "index.css"),
+  "utf8",
+);
+
+const COOKIE_HERO_SOURCE = readFileSync(
+  resolve(import.meta.dirname, "..", "..", "src", "renderer", "screens", "CookieHero.tsx"),
   "utf8",
 );
 
@@ -173,6 +180,49 @@ describe("look tiers: gating", () => {
     const rich = withCookies(10_000_000);
     expect(controlRungLevel(rich, "look")).toBe(0);
     expect(hasLookTier(rich, "look.palette")).toBe(false);
+  });
+
+  it("makes production affordable without owning graphics, then charges exactly once", () => {
+    const earned = freshState({
+      cookies: bnFromNumber(500),
+      lifetimeCookies: bnFromNumber(500),
+    });
+
+    expect(lookStage(earned)).toBe("cookie-only");
+    expect(nextLookPurchase(earned)).toMatchObject({
+      rungId: "look.palette",
+      price: 50,
+      affordable: true,
+    });
+    expect(earned.controlUnlocks?.purchasedRungIds ?? []).toEqual([]);
+
+    const bought = buy(earned, "look.palette");
+    expect(bought.cookies).toEqual(bnFromNumber(450));
+    expect(bought.controlUnlocks?.purchasedRungIds).toEqual(["look.palette"]);
+    expect(lookStage(bought)).toBe("palette-only");
+
+    const duplicate = buy(bought, "look.palette");
+    expect(duplicate).toBe(bought);
+    expect(duplicate.cookies).toEqual(bnFromNumber(450));
+    expect(duplicate.controlUnlocks?.purchasedRungIds).toEqual(["look.palette"]);
+  });
+
+  it("reveals the graphics purchase affordances in ladder order", () => {
+    expect(nextLookPurchase(withCookies(49))).toMatchObject({ rungId: "look.palette", affordable: false });
+    expect(nextLookPurchase(withCookies(50))).toMatchObject({ rungId: "look.palette", affordable: true });
+
+    const earned = withCookies(300);
+    expect(nextLookPurchase(earned)).toMatchObject({ rungId: "look.palette", affordable: true });
+
+    const palette = buy(earned, "look.palette");
+    expect(palette.cookies).toEqual(bnFromNumber(250));
+    expect(nextLookPurchase(palette)).toMatchObject({ rungId: "look.cabinet", affordable: true });
+    expect(lookStage(palette)).toBe("palette-only");
+
+    const cabinet = buy(palette, "look.cabinet");
+    expect(cabinet.cookies).toEqual(bnFromNumber(0));
+    expect(nextLookPurchase(cabinet)).toMatchObject({ rungId: "look.marquee", affordable: false });
+    expect(lookStage(cabinet)).toBe("cabinet");
   });
 
   it("puts the dark theme above the palette, which is what keeps the plain state coherent", () => {
@@ -319,17 +369,14 @@ describe("look tiers: the floors, which are not for sale at any tier", () => {
     expect(PLAIN_LAYER).not.toMatch(/outline:\s*(none|0)/);
   });
 
-  it("never touches a hit area at any tier", () => {
-    // 44px targets are a floor, so nothing in this layer is allowed to change a control's size
-    // or padding — the plain look is achieved entirely with colour, border, radius and shadow.
-    for (const property of ["width:", "height:", "min-height:", "min-width:", "padding:", "gap:"]) {
-      // `width: 1em` on the plain glyph span is the one size in the layer, and it sizes a
-      // decorative character inside an existing slot rather than a control.
-      const offenders = PLAIN_LAYER.split("\n").filter(
-        (line) => line.trim().startsWith(property) && !line.includes("width: 1em"),
-      );
-      expect(offenders, `${property} must not appear in the plain layer`).toEqual([]);
+  it("never shrinks either opening-state control's hit area", () => {
+    // The structural stage now legitimately sizes layout wrappers and the visually hidden
+    // description. The two controls themselves remain the ordinary full-size cookie and slot.
+    const cookieBlock = plainBlock(":root[data-look-cabinet='off'] .cookie-btn");
+    for (const property of ["width:", "height:", "min-height:", "min-width:", "padding:"]) {
+      expect(cookieBlock).not.toContain(property);
     }
+    expect(PLAIN_LAYER).not.toMatch(/^\s*:root[^\n]*\.coin-slot[^\n]*\{/m);
   });
 
   it("cannot buy motion back from someone who asked the system not to have it", () => {
@@ -340,35 +387,67 @@ describe("look tiers: the floors, which are not for sale at any tier", () => {
     expect(PLAIN_LAYER).not.toContain("data-look-motion='on'");
   });
 
-  it("leaves the coin-slot plates and their prices out of the plain layer entirely", () => {
-    // The economy has to be playable from the plain state, because that is where it starts. The
-    // plates therefore take the ordinary text and outline tokens like everything else and are
-    // never dimmed, hidden or de-emphasised by anything sold here.
-    expect(PLAIN_LAYER).not.toContain("coin-slot");
+  it("keeps the affordable graphics purchase slot visible without restyling coin slots", () => {
+    // The opening composition hides the cabinet, not the graphics ladder's own affordable
+    // purchase affordance. No rule in this layer changes a coin slot's target or semantics.
+    expect(PLAIN_LAYER).toContain(".look-purchase-slot");
+    expect(PLAIN_LAYER).not.toMatch(/^\s*:root[^\n]*\.coin-slot[^\n]*\{/m);
     expect(PLAIN_LAYER).not.toContain("controls-catalogue");
   });
 
-  it("never hides a label, only a picture", () => {
-    // Every `display: none` in the plain layer targets a decorative element. If a future edit
-    // hides something that carries text, this list is where it will show up.
-    const hidden = [...PLAIN_LAYER.matchAll(/^(.+?)\s*\{\s*\n\s*display: none;/gm)].flatMap((match) =>
-      match[1].split(",").map((selector) => selector.trim()),
-    );
-    for (const selector of hidden) {
-      expect(
-        selector.includes("__rivet") ||
-          selector.includes("game-icon") ||
-          selector.includes("cookie-btn__plain") ||
-          selector.includes("hero-cookie") ||
-          selector.includes("emblem") ||
-          selector.includes("embers") ||
-          selector.includes("crumbs") ||
-          selector.includes("rays") ||
-          selector.includes("::before") ||
-          selector.includes("::after"),
-        `${selector} is hidden by the plain layer and is not a known decorative element`,
-      ).toBe(true);
+  it("defines the exact fresh render as one cookie and no surrounding graphics", () => {
+    const hiddenUntilCabinet = [
+      ".title-bar",
+      ".cabinet-head",
+      ".discovery-ticket",
+      ".upgrade-shelf",
+      ".shop-rail",
+      ".milk-tide",
+      ".golden-stage",
+      ".event-stage",
+      ".event-indicator-stack",
+      ".toast-stack",
+      ".offline-banner",
+      ".shell-status",
+      ".click-popup",
+      ".cookie-cps",
+      ".cookie-hero__hint",
+    ];
+    for (const selector of hiddenUntilCabinet) {
+      expect(PLAIN_LAYER).toContain(`:root[data-look-stage='cookie-only'] ${selector}`);
+      expect(PLAIN_LAYER).toContain(`:root[data-look-stage='palette-only'] ${selector}`);
     }
+    expect(PLAIN_LAYER).toContain(":root[data-look-stage='cookie-only'] .stage__hero-column > .panel.cookie-hero");
+    expect(PLAIN_LAYER).toContain(":root[data-look-stage='cookie-only'] .cookie-target-wrap");
+    expect(PLAIN_LAYER).not.toContain(":root[data-look-stage='cookie-only'] .cookie-btn");
+  });
+
+  it("holds golden rays and home drawings behind their purchased graphics tiers", () => {
+    expect(PLAIN_LAYER).toContain(":root[data-look-glow='off'] .golden-sprite__rays");
+    for (const selector of [
+      ".home-room__cutaway",
+      ".home-room__plan",
+      ".home-room__scaffold",
+      ".home-furnishing",
+      ".home-furniture-row__glyph",
+      ".home-gauge__arc",
+      ".home-gauge__fill",
+      ".home-gauge__needle",
+      ".home-gauge__hub",
+    ]) {
+      expect(PLAIN_LAYER).toContain(`:root[data-look-art='off'] ${selector}`);
+    }
+  });
+
+  it("keeps the only visible control named and points it at an accessible purchase explanation", () => {
+    expect(COOKIE_HERO_SOURCE).toContain("aria-label={bilingualText(COOKIE_SCREEN_COPY.clickTarget)}");
+    expect(COOKIE_HERO_SOURCE).toContain("aria-describedby={lookDescriptionId}");
+    expect(COOKIE_HERO_SOURCE).toContain('className="look-purchase-description"');
+    expect(COOKIE_HERO_SOURCE).toContain("nextLook.affordable ?");
+    expect(COOKIE_HERO_SOURCE).toContain("requestAnimationFrame(() => buttonRef.current?.focus())");
+    const descriptionBlock = plainBlock(".look-purchase-description");
+    expect(descriptionBlock).not.toContain("display: none");
+    expect(descriptionBlock).toContain("clip-path: inset(50%)");
   });
 });
 

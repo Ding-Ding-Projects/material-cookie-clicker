@@ -12,6 +12,11 @@ popup that rises and fades over the cookie. Independently of clicking, every own
 contributes a fixed cookies-per-second rate, accumulated continuously and reflected in a live
 counter.
 
+A new save renders only this usable plain cookie. Cookie production never unlocks the graphics
+around it. At each graphics price, the next one-time purchase control appears beside the cookie;
+buying it deducts the exact price and reveals the corresponding tier. See
+[Graphics purchase progression](graphics-progression.md).
+
 `design/cookie-surface.html` specifies five interaction states for the cookie itself: rest, hover,
 pressed, focus-visible, and reduced-motion, plus a disabled state for whenever clicking is
 temporarily unavailable (for example, during the prestige gate's destructive-confirmation flow).
@@ -40,12 +45,16 @@ progress and there is nothing to protect it from.
 
 ## Verification
 
-`tests/game/reducer.test.ts`, `effective-cps.test.ts`, and `offline-progress.test.ts` cover the
-domain. `captures/app/fresh-start.png` and `game-progressed.png` show the real built surface.
+`tests/game/reducer.test.ts`, `effective-cps.test.ts`, `offline-progress.test.ts`, and
+`look-tiers.test.ts` cover the domain. The prior `captures/app/fresh-start.png` predates the
+stricter cookie-only composition and must not be used as evidence for it. A new built-artifact
+capture is required after integration; `game-progressed.png` remains evidence for the fully
+purchased surface.
 
 ## Suggested articles
 
 - [The 21-tier generator ladder](generator-ladder.md)
+- [Graphics purchase progression](graphics-progression.md)
 - [Golden-cookie events](golden-cookie-events.md)
 - [Material Design 3 appearance](../interface/material-design-appearance.md)
 - [Contrast and reduced motion](../accessibility/contrast-and-reduced-motion.md)

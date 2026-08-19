@@ -303,7 +303,7 @@ describe("hand-written per-surface completeness inventory", () => {
   });
 
   it("turns red when a required row disappears", () => {
-    const broken = inventory.replace(/^\| desktop-status-hub \|.*\n/m, "");
+    const broken = inventory.replace(/^\| desktop-status-hub \|.*\r?\n/m, "");
     expect(broken).not.toBe(inventory);
     expect(validate(broken)).toContain("Missing required inventory row: desktop-status-hub");
   });
@@ -336,7 +336,7 @@ describe("hand-written per-surface completeness inventory", () => {
   });
 
   it("turns red when a site page row disappears", () => {
-    const broken = inventory.replace(/^\| site-page-home \|.*\n/m, "");
+    const broken = inventory.replace(/^\| site-page-home \|.*\r?\n/m, "");
     expect(broken).not.toBe(inventory);
     expect(validatePages(broken)).toContain("Missing required site page row: site-page-home");
   });

@@ -260,7 +260,7 @@ export function SettingsScreen({ highlightRow = null, openedFrom = null, telepor
       </div>
       ) : (
         <div id="settings-tabpanel-application" role="tabpanel">
-          {applicationMatches ? <ApplicationToolsScreen /> : <p>No setting in Application tools matches this search. The matching result may be on General.</p>}
+          {applicationMatches ? <ApplicationToolsScreen teleportTarget={teleportTarget} /> : <p>No setting in Application tools matches this search. The matching result may be on General.</p>}
         </div>
       )}
     </div>

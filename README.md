@@ -101,6 +101,22 @@ The v0.2.55 release lane later ran the complete local check (`903/903` tests), b
 installer, and exercised the minigame/endless surfaces from the built artifact. A current committed
 minigame capture is still missing, so the completeness inventory records that narrower evidence gap.
 
+## Integrated application tools candidate
+
+The current source candidate mounts the categorized local file converter, a dedicated PDF
+operation surface, the local-model manager shell, identity and per-element appearance controls,
+and security/state tools inside Settings → Application tools. File and PDF operations use
+main-process file-picker grants, the queue persists in private application data, credential
+material is encrypted by the operating-system vault adapter, and local-history writes use an
+isolated Git repository under application data.
+
+The local-model screen performs its runtime recovery check through the privileged process against
+the documented loopback endpoint. The full packaged model catalog, pull, chat, and harness adapters
+are not available in this candidate; those actions report that boundary and never substitute a
+cloud service or fake a success. Built interaction, captures, and installer proof for all newly
+integrated tool surfaces remain pending and are recorded that way in the
+[per-surface inventory](docs/completeness.md).
+
 **Nobody ever pays a penny to use it.** No purchase, no licence, no
 subscription, no feature held behind a paywall.
 
@@ -112,11 +128,12 @@ editor and the rest — also appear inside the game as **tools** you discover an
 unlock by playing, each granting a real gameplay bonus.
 
 **An unlock gates the gameplay bonus and the in-game surfacing only. It never
-gates the feature.** Every feature is reachable from settings and the command
-palette at all times, whether or not its tool has been unlocked. Nobody should
-have to farm cookies to get a regex builder, and this project's completeness
-rules forbid satisfying a feature contract by hiding the feature — so the
-separation is enforced in code and covered by a test, not left as an intention.
+gates the feature.** Integrated tool destinations remain reachable from Settings,
+from each tool card, and from their exact command-palette entries regardless of
+tool progress. A palette teleport also reopens its target tab when the user had
+previously closed it. Nobody should have to farm cookies to get a
+real application feature, so the separation is enforced in code and covered by a
+test rather than left as an intention.
 
 ## Language and settings
 

@@ -29,6 +29,7 @@
     "dist": "npm run build && electron-builder --win squirrel --publish never",
     "prestart": "node scripts/ensure-electron-binary.mjs",
     "pretest": "node scripts/ensure-electron-binary.mjs && npm run build:surface-kernel",
+    "presmoke": "node scripts/ensure-electron-binary.mjs",
     "smoke": "node scripts/smoke-test.mjs"
   },
   "dependencies": {

@@ -11,8 +11,8 @@ trade progress for a permanent multiplier.
 ## Articles
 
 - [Cookie clicking](cookie-clicking.md) — the primary click target and the cookies-per-second loop.
-- [The 20-tier generator ladder](generator-ladder.md) — Cursor up to the Wok of the Gods, and the buy-quantity
-  stepper.
+- [The 21-tier generator ladder](generator-ladder.md) — Cursor through Office Buildings and Shipment up to
+  the Wok of the Gods, with the buy-quantity stepper and the prestige-safe 500,000,000-cookie reveal.
 - [Golden-cookie events](golden-cookie-events.md) — the random bonus overlay.
 - [Minigame events and Lucky Chance](minigame-events.md) — the five persisted minigames, Golden
   Tokens, and the seeded reward drawer.

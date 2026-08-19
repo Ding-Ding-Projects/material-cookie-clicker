@@ -19,10 +19,12 @@ export interface GeneratorDefinition {
   readonly baseCps: number;
   /** Per-unit cost growth ratio; ~1.15 is the genre-standard curve, held constant across every tier. */
   readonly costRatio: number;
+  /** Optional preserved all-time baked-cookie threshold for permanently unlocking this tier. */
+  readonly lifetimeUnlock?: BigNum;
 }
 
 /**
- * The full 20-tier generator ladder. Each tier's baseCost and baseCps are roughly 10x the
+ * The full 21-tier generator ladder. Each tier's baseCost and baseCps are roughly 10x the
  * previous tier's, so the "next tier is worth it" moment recurs at a predictable cadence
  * throughout the run — from a single flicking finger up to something that bends physics.
  * Bilingual names lean into Hong Kong in-jokes rather than literal translation (a Bank earns
@@ -43,6 +45,15 @@ export const GENERATOR_DEFINITIONS: readonly GeneratorDefinition[] = [
     baseCost: 330000000,
     baseCps: 44000,
     costRatio: 1.15,
+  },
+  {
+    id: "officeBuilding",
+    nameEn: "Office Building",
+    nameYue: "寫字樓",
+    baseCost: 1200000000,
+    baseCps: 120000,
+    costRatio: 1.15,
+    lifetimeUnlock: bnFromNumber(500000000),
   },
   {
     id: "shipment",
@@ -146,6 +157,15 @@ export function getGeneratorDefinition(id: string): GeneratorDefinition {
   const def = GENERATOR_DEFINITIONS.find((g) => g.id === id);
   if (!def) throw new RangeError(`Unknown generator id: ${id}`);
   return def;
+}
+
+/**
+ * A generator's explicit milestone gate. The counter supplied here is the preserved all-time
+ * baked-cookie total (GameState.stats.totalCookiesBaked), not the spendable balance and not the
+ * per-run lifetimeCookies value that prestige resets.
+ */
+export function isGeneratorUnlocked(def: GeneratorDefinition, totalCookiesBaked: BigNum): boolean {
+  return def.lifetimeUnlock === undefined || bnCompare(totalCookiesBaked, def.lifetimeUnlock) >= 0;
 }
 
 /** Cost of the (ownedCount + 1)-th unit of this generator. */

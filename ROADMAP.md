@@ -12,7 +12,7 @@ built. Where it is unverified, that is said.
   UTC workflow timing. No workflow runs tests or lint, deliberately.
 - **`v0.1.5`** — first real release. 144 MB `Setup.exe`, `RELEASES`, full
   `.nupkg`, target commit verified.
-- **Game domain.** Twenty generators, twenty tools, 179 upgrades, 201
+- **Game domain.** Twenty-one generators, twenty tools, 179 upgrades, 201
   achievements, milk and the kitten line, the Reborn permanent tree, prestige,
   golden cookies, offline progress, save schema with forward-only migrations,
   and the five persisted minigame events with Golden Tokens and Lucky Chance.
@@ -37,6 +37,11 @@ built. Where it is unverified, that is said.
   keys and bounded amounts. Lucky Chance costs one token, uses five equal
   reward slots, protects against duplicate rewards, and persists the draw
   atomically with the token deduction.
+- **Office Buildings generator tier.** The ladder now places Office Buildings
+  between Wizard Tower and Shipment and permanently reveals it at 500,000,000
+  all-time baked cookies. The documentation records that spending and prestige
+  cannot hide the tier again; tests, captures, and UI-run evidence remain
+  intentionally pending for the expedited lane.
 - **Documentation status.** `README.md`, `HANDOFF.md`, the gameplay index and
   the dedicated gameplay and site articles now describe this expansion. The
   expedited delivery boundary intentionally skipped tests, captures, and UI

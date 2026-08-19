@@ -75,7 +75,7 @@ import {
  * pins so the disagreement cannot happen quietly.
  */
 export const HOME_SUBGAME_ID = "home";
-import { costOfBulk, costOfNext, getGeneratorDefinition, maxAffordable } from "./generators.js";
+import { costOfBulk, costOfNext, getGeneratorDefinition, isGeneratorUnlocked, maxAffordable } from "./generators.js";
 import { computeOfflineProgressWithTools, type OfflineProgressOptions } from "./offline-progress.js";
 import { canPrestige, performPrestige } from "./prestige.js";
 import { canBuyRebornNode, getRebornNodeDefinition, rebornPermanentSlots } from "./reborn.js";
@@ -343,6 +343,9 @@ function handleBuyGeneratorBulk(state: GameState, ctx: ReducerCtx, generatorId: 
   const def = getGeneratorDefinition(generatorId);
   const owned = state.generators.find((g) => g.id === generatorId);
   const ownedCount = owned?.count ?? 0;
+  // The first purchase of a milestone-gated tier must cross its explicit all-time threshold.
+  // Existing ownership remains valid for imported saves; spending cookies can never relock a tier.
+  if (ownedCount === 0 && !isGeneratorUnlocked(def, state.stats.totalCookiesBaked)) return state;
   const discount = totalBuyMaxDiscount(state);
 
   let quantity: number;

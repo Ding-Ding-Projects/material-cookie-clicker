@@ -1,7 +1,7 @@
 /* ------------------------------------------------------------------------------------------
  * The illustrated art set.
  *
- * Every entity the player can see on a shelf — the twenty generators, the upgrade families,
+ * Every entity the player can see on a shelf — the twenty-one generators, the upgrade families,
  * the achievement medals, the tool tiers and their tools, the golden cookie — gets a real
  * little drawing here instead of a stock emoji. The rendering language is the v2 arcade-bakery
  * one used by design/tokens-color.html and design/achievement-badge.html: warm browns and
@@ -42,17 +42,17 @@ const AMETHYST_LIGHT = 'var(--tier3-container, #e6d9ff)';
 const HIGHLIGHT = 'rgba(255, 255, 255, 0.7)';
 
 /**
- * Every drawing shares one canvas and one stroke weight, which is what makes twenty
- * separately-drawn machines read as one set rather than twenty clip-art finds.
+ * Every drawing shares one canvas and one stroke weight, which is what makes twenty-one
+ * separately-drawn machines read as one set rather than twenty-one clip-art finds.
  *
  * IT ALSO EMITS A PLAIN GLYPH BESIDE ITSELF, and exactly one of the two is ever displayed.
  *
  * The illustrated set is a purchase now (control-unlocks.ts, the `look` ladder's `look.art`
  * rung): the owner's decree is that a fresh save is "a purely super plain cheaply made app", and
- * a hand-drawn twenty-machine icon set is not that. Until the rung is bought, `[data-look-art=
+ * a hand-drawn twenty-one-machine icon set is not that. Until the rung is bought, `[data-look-art=
  * 'off']` in THE PLAIN LAYER hides the svg and shows the span, which is a single lifeless
  * `▪` in the text colour — deliberately the same mark for every entity, because a cheap app
- * would not have drawn twenty of them either.
+ * would not have drawn twenty-one of them either.
  *
  * NOTHING A SCREEN READER HEARS CHANGES. Both elements are `aria-hidden`, in both states; the
  * name has always come from the adjacent text or the parent's `aria-label`, and it still does.
@@ -100,7 +100,7 @@ function Base({ d, fill = INK }: { d: string; fill?: string }) {
 }
 
 /* ==========================================================================================
- * Generators — one distinct little illustration per rung of the real twenty-tier ladder in
+ * Generators — one distinct little illustration per rung of the real twenty-one-tier ladder in
  * src/shared/game/generators.ts.
  * ======================================================================================== */
 
@@ -213,6 +213,20 @@ function WizardTowerArt() {
       <path d="M13 17h6v5h-6z" fill={INK} opacity={0.8} />
       <path d="M11 25h10" strokeWidth={1.2} />
       <path d="M16 4.6 17 7l2.4.4-1.8 1.7.5 2.4-2.1-1.2-2.1 1.2.5-2.4L12.6 7 15 6.6z" fill={GOLD} stroke={GOLD_RING} strokeWidth={1} />
+    </Art>
+  );
+}
+
+function OfficeBuildingArt() {
+  return (
+    <Art>
+      <Base d="M4 27h24v2H4z" />
+      <path d="M6 27V7h20v20z" fill={PLATE_DIM} />
+      <path d="M10 27V3h12v24z" fill={AMETHYST_LIGHT} />
+      <path d="M12 6h8M12 10h8M12 14h8M12 18h8M12 22h8" stroke={AMETHYST} strokeWidth={1.2} />
+      <path d="M8 9h2M8 13h2M8 17h2M8 21h2" stroke={GOLD_DEEP} strokeWidth={1.2} />
+      <path d="M14 24h4v5h-4z" fill={CRUST} />
+      <path d="M4 7h24" stroke={GOLD} strokeWidth={1.6} />
     </Art>
   );
 }
@@ -410,6 +424,7 @@ const GENERATOR_ART: Readonly<Record<string, () => ReactElement>> = {
   bank: BankArt,
   temple: TempleArt,
   wizardTower: WizardTowerArt,
+  officeBuilding: OfficeBuildingArt,
   shipment: ShipmentArt,
   alchemyLab: AlchemyLabArt,
   portal: PortalArt,

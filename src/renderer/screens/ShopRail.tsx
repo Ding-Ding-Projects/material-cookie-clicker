@@ -117,7 +117,7 @@ const GeneratorRow = memo(function GeneratorRow({
     <div ref={fxRef} className={`shop-row${selectable ? ' shop-row--selectable' : ''}${owned > 0 ? ' owned' : ''}`}>
       {/* The row checkbox is bought once, for every row at once — so only the FIRST row carries
           the price plate (see the list below), and every other locked row simply has no
-          checkbox. Fourteen identical price tags down one rail would be noise, not an offer. */}
+          checkbox. Twenty-one identical price tags down one rail would be noise, not an offer. */}
       {selectable ? (
         <input
           type="checkbox"

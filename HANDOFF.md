@@ -266,7 +266,6 @@ Files written in this lane:
 6. `site/features/minigame-events.html`
 
 The pre-existing source changes and the pre-existing untracked
-`docs/gameplay/minigames.md` file were left untouched.
 
 ## Work in flight at the end of this session
 

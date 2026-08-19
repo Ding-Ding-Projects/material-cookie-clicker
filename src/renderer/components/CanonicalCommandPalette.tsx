@@ -64,6 +64,14 @@ export function CanonicalCommandPalette({ onTeleport }: { readonly onTeleport: (
     return () => window.removeEventListener('keydown', onKeyDown);
   }, []);
 
+  useEffect(() => {
+    if (!open) return;
+    const frame = window.requestAnimationFrame(() => {
+      document.querySelector<HTMLInputElement>('.canonical-palette input[type="search"]')?.focus();
+    });
+    return () => window.cancelAnimationFrame(frame);
+  }, [open]);
+
   if (!open) {
     return <button type="button" className="canonical-palette-launch" onClick={() => setOpen(true)}>{bilingualText({ en: 'Commands', yue: '指令' })} · Ctrl+Shift+F</button>;
   }

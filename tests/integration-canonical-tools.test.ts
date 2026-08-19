@@ -8,6 +8,7 @@ const app = read('src/renderer/App.tsx');
 const preload = read('src/preload/index.ts');
 const main = read('src/main/main.ts');
 const canonical = read('src/shared/canonical-ipc.ts');
+const palette = read('src/renderer/components/CanonicalCommandPalette.tsx');
 
 describe('canonical application-tools integration', () => {
   it('mounts every concrete product tool and dedicated PDF operations', () => {
@@ -51,5 +52,10 @@ describe('canonical application-tools integration', () => {
     expect(main).toContain('does not yet support ${action}');
     expect(main).toContain('no network, shell, or fake-success fallback was used');
     expect(applicationTools).toContain('if (!result.ok) throw new Error(result.reason)');
+  });
+
+  it('moves focus into the command search after the palette opens', () => {
+    expect(palette).toContain("document.querySelector<HTMLInputElement>('.canonical-palette input[type=\"search\"]')?.focus()");
+    expect(palette).toContain('window.requestAnimationFrame');
   });
 });

@@ -4,17 +4,23 @@ param([switch]$Silent)
 $ErrorActionPreference = 'Stop'
 . (Join-Path $PSScriptRoot 'build-common.ps1')
 
-function Write-ManifestEntry {
+function Write-DependencyEvidence {
   param([Parameter(Mandatory = $true)][string]$Root, [Parameter(Mandatory = $true)]$Tools)
   $manifestPath = Join-Path $Root 'scripts\dependency-manifest.json'
+  $manifest = Get-Content -LiteralPath $manifestPath -Raw | ConvertFrom-Json
+  if ($manifest.schemaVersion -ne 1 -or $manifest.node.version -ne '22.14.0' -or $manifest.node.sha256 -notmatch '^[0-9a-f]{64}$') {
+    throw 'The committed dependency manifest does not contain the expected pinned Node.js version and SHA-256.'
+  }
+  $evidencePath = Join-Path $Root 'node_modules\.material-cookie-clicker-dependency-evidence.json'
   $entry = [ordered]@{
-    schemaVersion = 1
+    schemaVersion = 'material-cookie-clicker.dependency-evidence.v1'
     generatedAt = [DateTimeOffset]::UtcNow.ToString('o')
     node = [ordered]@{ version = $Tools.Version; source = $Tools.Source; executable = $Tools.Node }
+    pinnedManifest = 'scripts/dependency-manifest.json'
     projectDependencies = [ordered]@{ resolvedVia = 'npm ci'; lockfile = 'package-lock.json' }
   }
-  $entry | ConvertTo-Json -Depth 6 | Set-Content -LiteralPath $manifestPath -Encoding UTF8
-  return $manifestPath
+  $entry | ConvertTo-Json -Depth 6 | Set-Content -LiteralPath $evidencePath -Encoding UTF8
+  return $evidencePath
 }
 
 try {
@@ -45,9 +51,9 @@ try {
   }
   Invoke-CheckedTool -Executable $tools.Node -Arguments @((Join-Path $root 'scripts\ensure-electron-binary.mjs')) -Description 'ensure-electron-binary' -WorkingDirectory $root
 
-  $manifestPath = Write-ManifestEntry -Root $root -Tools $tools
+  $evidencePath = Write-DependencyEvidence -Root $root -Tools $tools
   $timer.Stop()
-  Write-Output "All dependencies ready in $([Math]::Round($timer.Elapsed.TotalSeconds, 1)) seconds. Manifest: $manifestPath"
+  Write-Output "All dependencies ready in $([Math]::Round($timer.Elapsed.TotalSeconds, 1)) seconds. Pinned manifest: scripts/dependency-manifest.json. Runtime evidence: $evidencePath"
   exit 0
 } catch {
   Write-Error $_.Exception.Message

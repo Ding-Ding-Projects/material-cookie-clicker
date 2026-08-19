@@ -12,10 +12,15 @@
     "packages/*"
   ],
   "scripts": {
+    "brand:generate": "node scripts/generate-app-icon.mjs --write",
+    "brand:check": "node scripts/generate-app-icon.mjs --check",
+    "build:surface-kernel": "npm run build --workspace @material-cookie-clicker/surface-kernel && node scripts/assert-surface-kernel-ready.mjs",
+    "prebuild": "npm run brand:check && npm run build:surface-kernel",
     "build": "npm run build:renderer && npm run build:main && npm run build:preload",
     "build:renderer": "vite build",
     "build:main": "tsc -p tsconfig.main.json",
     "build:preload": "esbuild src/preload/index.ts --bundle --platform=node --format=cjs --external:electron --outfile=dist/preload/index.cjs",
+    "precheck": "npm run build:surface-kernel",
     "check": "tsc -p tsconfig.renderer.json --noEmit && tsc -p tsconfig.main.json --noEmit && vitest run tests && npm run typecheck --workspaces --if-present && npm run test --workspaces --if-present",
     "count:lines": "node scripts/count-lines.mjs",
     "dev": "npm run build && electron .",
@@ -23,7 +28,7 @@
     "test": "vitest run tests",
     "dist": "npm run build && electron-builder --win squirrel --publish never",
     "prestart": "node scripts/ensure-electron-binary.mjs",
-    "pretest": "node scripts/ensure-electron-binary.mjs",
+    "pretest": "node scripts/ensure-electron-binary.mjs && npm run build:surface-kernel",
     "smoke": "node scripts/smoke-test.mjs"
   },
   "dependencies": {
@@ -74,7 +79,7 @@
     "squirrelWindows": {
       "name": "MaterialCookieClicker",
       "artifactName": "MaterialCookieClicker-Setup.${ext}",
-      "iconUrl": "https://raw.githubusercontent.com/Ding-Ding-Projects/material-cookie-clicker/main/assets/material-cookie-clicker.ico",
+      "iconUrl": "https://raw.githubusercontent.com/Ding-Ding-Projects/material-cookie-clicker/a98e38c07423a7cfb4cb3190412884a404a7245e/assets/material-cookie-clicker.ico",
       "msi": false
     },
     "publish": {

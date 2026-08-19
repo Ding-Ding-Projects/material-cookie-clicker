@@ -148,11 +148,79 @@ function Get-SourceIdentity {
   return [pscustomobject]@{ Commit = $commit; Dirty = $dirty }
 }
 
+function Assert-CleanPinnedSource {
+  param(
+    [Parameter(Mandatory = $true)][string]$Root,
+    [string]$ExpectedCommit
+  )
+  $identity = Get-SourceIdentity -Root $Root
+  if (-not $identity.Commit) { throw 'The build source is not a readable Git commit.' }
+  if ($identity.Dirty) { throw 'The build source is dirty. Commit or preserve every intended change before building release evidence.' }
+  if ($ExpectedCommit) {
+    $normalized = $ExpectedCommit.Trim().ToLowerInvariant()
+    if ($normalized -notmatch '^[0-9a-f]{40}$') { throw 'EXPECTED_SOURCE_COMMIT must be a full lowercase Git commit SHA.' }
+    if ($identity.Commit -ne $normalized) { throw "The build source is $($identity.Commit), expected pinned commit $normalized." }
+  }
+  return [pscustomobject]@{ Commit = $identity.Commit; Dirty = $false }
+}
+
+function Assert-SourceUnchanged {
+  param(
+    [Parameter(Mandatory = $true)][string]$Root,
+    [Parameter(Mandatory = $true)][string]$PinnedCommit
+  )
+  $identity = Get-SourceIdentity -Root $Root
+  if ($identity.Dirty) { throw 'The checkout became dirty while the pinned build was running.' }
+  if ($identity.Commit -ne $PinnedCommit) { throw "The checkout moved from pinned commit $PinnedCommit to $($identity.Commit) while the build was running." }
+  return $identity
+}
+
+function Get-ArtifactRecord {
+  param(
+    [Parameter(Mandatory = $true)][IO.FileInfo]$File,
+    [Parameter(Mandatory = $true)][string]$Root
+  )
+  $rootPrefix = ([IO.Path]::GetFullPath($Root)).TrimEnd('\') + '\'
+  if (-not $File.FullName.StartsWith($rootPrefix, [StringComparison]::OrdinalIgnoreCase)) { throw "Artifact escaped the checkout: $($File.FullName)" }
+  $relative = $File.FullName.Substring($rootPrefix.Length).Replace('\', '/')
+  return [ordered]@{
+    name = $File.Name
+    path = $relative
+    bytes = $File.Length
+    sha256 = (Get-FileHash -LiteralPath $File.FullName -Algorithm SHA256).Hash.ToLowerInvariant()
+  }
+}
+
+function Write-LocalBuildManifest {
+  param(
+    [Parameter(Mandatory = $true)][string]$Root,
+    [Parameter(Mandatory = $true)][string]$PinnedCommit
+  )
+  Assert-SourceUnchanged -Root $Root -PinnedCommit $PinnedCommit | Out-Null
+  $files = @(
+    Get-Item -LiteralPath (Join-Path $Root 'dist\renderer\index.html')
+    Get-Item -LiteralPath (Join-Path $Root 'dist\main\main.js')
+    Get-Item -LiteralPath (Join-Path $Root 'dist\preload\index.cjs')
+  )
+  $manifest = [ordered]@{
+    schemaVersion = 'material-cookie-clicker.local-build.v2'
+    sourceCommit = $PinnedCommit
+    sourceClean = $true
+    sourcePinned = $true
+    generatedAt = [DateTimeOffset]::UtcNow.ToString('o')
+    artifacts = @($files | ForEach-Object { Get-ArtifactRecord -File $_ -Root $Root })
+  }
+  $manifestPath = Join-Path $Root 'dist\local-build-manifest.json'
+  $manifest | ConvertTo-Json -Depth 6 | Set-Content -LiteralPath $manifestPath -Encoding UTF8
+  return $manifestPath
+}
+
 function Invoke-ProjectBuild {
   param([Parameter(Mandatory = $true)][string]$Root, [Parameter(Mandatory = $true)]$Tools)
   if (-not (Test-Path -LiteralPath (Join-Path $Root 'package-lock.json') -PathType Leaf)) { throw 'package-lock.json is required for a reproducible build.' }
   Remove-GeneratedDirectory -Root $Root -Name 'dist'
   Invoke-CheckedTool -Executable $Tools.Npm -Arguments @('ci') -Description 'npm ci' -WorkingDirectory $Root
+  Invoke-CheckedTool -Executable $Tools.Node -Arguments @('scripts/generate-app-icon.mjs', '--check') -Description 'brand derivative verification' -WorkingDirectory $Root
   Invoke-CheckedTool -Executable $Tools.Npm -Arguments @('run', 'build') -Description 'npm run build' -WorkingDirectory $Root
   foreach ($relative in @('dist/renderer/index.html', 'dist/main/main.js', 'dist/preload/index.cjs')) {
     if (-not (Test-Path -LiteralPath (Join-Path $Root $relative) -PathType Leaf)) { throw "The build did not produce $relative." }
@@ -167,10 +235,81 @@ function Assert-UnsignedSquirrelConfiguration {
   }
   $targets = @($package.build.win.target | ForEach-Object { if ($_ -is [string]) { $_ } else { $_.target } })
   if ($targets -notcontains 'squirrel') { throw 'The installer path must use the Squirrel.Windows target.' }
+  $iconUrl = [string]$package.build.squirrelWindows.iconUrl
+  if ($iconUrl -notmatch '^https://raw\.githubusercontent\.com/Ding-Ding-Projects/material-cookie-clicker/[0-9a-f]{40}/assets/material-cookie-clicker\.ico$') {
+    throw 'Squirrel iconUrl must be an immutable full-commit raw URL, never main, latest, or another mutable ref.'
+  }
+}
+
+function Export-ExecutableIconProof {
+  param(
+    [Parameter(Mandatory = $true)][string]$Executable,
+    [Parameter(Mandatory = $true)][string]$OutputRoot,
+    [Parameter(Mandatory = $true)][string]$Label
+  )
+  if (-not (Test-Path -LiteralPath $Executable -PathType Leaf)) { throw "Icon source executable does not exist: $Executable" }
+  if ($Label -notmatch '^[a-z0-9-]+$') { throw 'Icon proof labels may contain only lowercase letters, digits, and hyphens.' }
+  Add-Type -AssemblyName System.Drawing
+  if (-not ('MaterialCookieClicker.IconNative' -as [type])) {
+    Add-Type -TypeDefinition @'
+using System;
+using System.Runtime.InteropServices;
+namespace MaterialCookieClicker {
+  public static class IconNative {
+    [DllImport("user32.dll", CharSet = CharSet.Unicode)]
+    public static extern uint PrivateExtractIcons(string file, int index, int cx, int cy, IntPtr[] handles, uint[] ids, uint count, uint flags);
+    [DllImport("user32.dll")]
+    [return: MarshalAs(UnmanagedType.Bool)]
+    public static extern bool DestroyIcon(IntPtr handle);
+  }
+}
+'@
+  }
+  New-Item -ItemType Directory -Path $OutputRoot -Force | Out-Null
+  $records = @()
+  foreach ($size in @(16, 32)) {
+    $handles = New-Object IntPtr[] 1
+    $ids = New-Object UInt32[] 1
+    $count = [MaterialCookieClicker.IconNative]::PrivateExtractIcons($Executable, 0, $size, $size, $handles, $ids, 1, 0)
+    if ($count -ne 1 -or $handles[0] -eq [IntPtr]::Zero) { throw "Could not extract the ${size}px icon from $Executable." }
+    try {
+      $icon = [System.Drawing.Icon]::FromHandle($handles[0]).Clone()
+      try {
+        $bitmap = $icon.ToBitmap()
+        try {
+          if ($bitmap.Width -ne $size -or $bitmap.Height -ne $size) { throw "The extracted $Label icon is $($bitmap.Width)x$($bitmap.Height), expected ${size}x${size}." }
+          $colors = New-Object 'System.Collections.Generic.HashSet[string]'
+          for ($y = 0; $y -lt $bitmap.Height; $y += [Math]::Max(1, [Math]::Floor($bitmap.Height / 8))) {
+            for ($x = 0; $x -lt $bitmap.Width; $x += [Math]::Max(1, [Math]::Floor($bitmap.Width / 8))) {
+              $pixel = $bitmap.GetPixel($x, $y)
+              if ($pixel.A -gt 0) { $colors.Add("$($pixel.R),$($pixel.G),$($pixel.B)") | Out-Null }
+            }
+          }
+          if ($colors.Count -lt 3) { throw "The extracted $Label ${size}px icon is blank or monochrome." }
+          $output = Join-Path $OutputRoot "$Label-$size.png"
+          $bitmap.Save($output, [System.Drawing.Imaging.ImageFormat]::Png)
+          $file = Get-Item -LiteralPath $output
+          $records += [ordered]@{
+            executable = [IO.Path]::GetFileName($Executable)
+            label = $Label
+            size = $size
+            path = $file.Name
+            bytes = $file.Length
+            sha256 = (Get-FileHash -LiteralPath $file.FullName -Algorithm SHA256).Hash.ToLowerInvariant()
+          }
+        } finally { $bitmap.Dispose() }
+      } finally { $icon.Dispose() }
+    } finally { [MaterialCookieClicker.IconNative]::DestroyIcon($handles[0]) | Out-Null }
+  }
+  return $records
 }
 
 function Invoke-ProjectInstaller {
-  param([Parameter(Mandatory = $true)][string]$Root, [Parameter(Mandatory = $true)]$Tools)
+  param(
+    [Parameter(Mandatory = $true)][string]$Root,
+    [Parameter(Mandatory = $true)]$Tools,
+    [Parameter(Mandatory = $true)][string]$PinnedCommit
+  )
   Assert-UnsignedSquirrelConfiguration -Root $Root
   Remove-GeneratedDirectory -Root $Root -Name 'release'
   Invoke-CheckedTool -Executable $Tools.Npx -Arguments @('electron-builder', '--win', 'squirrel', '--publish', 'never') -Description 'electron-builder Squirrel.Windows packaging' -WorkingDirectory $Root
@@ -180,22 +319,44 @@ function Invoke-ProjectInstaller {
   $releases = Get-ChildItem -LiteralPath $releaseRoot -Recurse -File -Filter 'RELEASES' | Select-Object -First 1
   $nupkg = Get-ChildItem -LiteralPath $releaseRoot -Recurse -File -Filter '*-full.nupkg' | Select-Object -First 1
   if (-not $releases -or -not $nupkg) { throw 'The installer build did not produce RELEASES and a full .nupkg.' }
+  if (-not (Select-String -LiteralPath $releases.FullName -SimpleMatch $nupkg.Name -Quiet)) { throw "RELEASES does not advertise $($nupkg.Name)." }
+  $deltaPackages = @(Get-ChildItem -LiteralPath $releaseRoot -Recurse -File -Filter '*-delta.nupkg')
+  $appExecutable = Get-ChildItem -LiteralPath $releaseRoot -Recurse -File -Filter '*.exe' |
+    Where-Object { $_.FullName -match 'win-unpacked' -and $_.Name -notmatch 'Setup' } |
+    Select-Object -First 1
+  if (-not $appExecutable) { throw 'The installer build did not produce a packaged application executable under win-unpacked.' }
   $signature = Get-AuthenticodeSignature -LiteralPath $setup.FullName
   if ($signature.Status -ne 'NotSigned') { throw "Code signing is prohibited, but Setup.exe reported $($signature.Status)." }
-  $identity = Get-SourceIdentity -Root $Root
-  $rootPrefix = ([IO.Path]::GetFullPath($Root)).TrimEnd('\') + '\'
+  $appSignature = Get-AuthenticodeSignature -LiteralPath $appExecutable.FullName
+  if ($appSignature.Status -ne 'NotSigned') { throw "Code signing is prohibited, but the packaged application reported $($appSignature.Status)." }
+  $identity = Assert-SourceUnchanged -Root $Root -PinnedCommit $PinnedCommit
+  $iconProofRoot = Join-Path $releaseRoot 'icon-proof'
+  $iconProof = @(
+    Export-ExecutableIconProof -Executable $setup.FullName -OutputRoot $iconProofRoot -Label 'setup'
+    Export-ExecutableIconProof -Executable $appExecutable.FullName -OutputRoot $iconProofRoot -Label 'app'
+  )
+  $allArtifacts = @($setup, $releases, $nupkg) + $deltaPackages
   $manifest = [ordered]@{
-    schemaVersion = 'material-cookie-clicker.local-installer.v1'
+    schemaVersion = 'material-cookie-clicker.local-installer.v2'
     sourceCommit = $identity.Commit
-    sourceDirty = $identity.Dirty
+    sourceClean = $true
+    sourcePinned = $true
     signed = $false
+    setupSignature = $signature.Status.ToString()
+    applicationSignature = $appSignature.Status.ToString()
+    squirrel = [ordered]@{
+      setup = $setup.Name
+      releases = $releases.Name
+      fullPackage = $nupkg.Name
+      deltaAvailable = $deltaPackages.Count -gt 0
+      deltaPackages = @($deltaPackages | ForEach-Object { $_.Name })
+      deltaDisclosure = if ($deltaPackages.Count -gt 0) { "$($deltaPackages.Count) delta package(s) were generated." } else { 'No delta package was generated by this build; the full package remains the update asset.' }
+    }
+    iconProof = $iconProof
     generatedAt = [DateTimeOffset]::UtcNow.ToString('o')
-    artifacts = @($setup, $releases, $nupkg | ForEach-Object {
-      $relative = $_.FullName.Substring($rootPrefix.Length).Replace('\', '/')
-      [ordered]@{ name = $_.Name; path = $relative; bytes = $_.Length; sha256 = (Get-FileHash -LiteralPath $_.FullName -Algorithm SHA256).Hash.ToLowerInvariant() }
-    })
+    artifacts = @($allArtifacts | ForEach-Object { Get-ArtifactRecord -File $_ -Root $Root })
   }
   $manifestPath = Join-Path $releaseRoot 'local-installer-manifest.json'
   $manifest | ConvertTo-Json -Depth 6 | Set-Content -LiteralPath $manifestPath -Encoding UTF8
-  return [pscustomobject]@{ Setup = $setup; Releases = $releases; Nupkg = $nupkg; Manifest = $manifestPath; Identity = $identity }
+  return [pscustomobject]@{ Setup = $setup; Releases = $releases; Nupkg = $nupkg; DeltaPackages = $deltaPackages; AppExecutable = $appExecutable; IconProof = $iconProof; Manifest = $manifestPath; Identity = $identity }
 }

@@ -1,0 +1,23 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 512 512" role="img" aria-labelledby="title description">
+  <title id="title">Material Cookie Clicker master logo</title>
+  <desc id="description">A warm caramel cookie with seven dark chocolate chips and a soft golden rim.</desc>
+  <metadata id="material-cookie-clicker-logo-geometry">{"canvas":512,"cookie":{"cx":256,"cy":256,"radius":240,"inner":[214,158,97],"outer":[176,114,58],"rim":[104,70,34]},"chips":[[174,154,38],[307,123,31],[369,236,36],[246,266,28],[154,318,33],[318,359,31],[215,400,26]]}</metadata>
+  <defs>
+    <radialGradient id="cookie" cx="42%" cy="34%" r="68%">
+      <stop offset="0" stop-color="#d69e61"/>
+      <stop offset="1" stop-color="#b0723a"/>
+    </radialGradient>
+  </defs>
+  <circle cx="256" cy="256" r="240" fill="#684622"/>
+  <circle cx="256" cy="256" r="226" fill="url(#cookie)"/>
+  <g fill="#3d2114">
+    <circle cx="174" cy="154" r="38"/>
+    <circle cx="307" cy="123" r="31"/>
+    <circle cx="369" cy="236" r="36"/>
+    <circle cx="246" cy="266" r="28"/>
+    <circle cx="154" cy="318" r="33"/>
+    <circle cx="318" cy="359" r="31"/>
+    <circle cx="215" cy="400" r="26"/>
+  </g>
+</svg>

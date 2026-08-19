@@ -1,86 +1,138 @@
-# Completeness inventory
+# Per-surface completeness inventory
 
-Hand-written on purpose. A guard that only validates the features it can already find in source
-passes cleanly on a project missing all of them; this list exists so a person — not the code being
-audited — decides what should exist, then checks reality against it. Update this file in the same
-change that adds, ships, or removes a feature.
+This inventory is hand-written rather than discovered from source. A source-derived list cannot
+detect a feature that disappeared completely. Every row therefore names its implementation,
+article, localization, persistence, focused tests, bundled proof, built interaction, capture
+evidence, and truthful state independently for each user-facing surface.
 
-Status legend: **built** — implemented, wired into a shipped surface, and verifiable today.
-**logic only** — a real, presumably-tested TypeScript module exists in `packages/`, but it is not
-wired into a shipped renderer or installer, and no end-to-end run has verified it. **not built** —
-no implementation exists anywhere in this repository.
+Evidence baseline: release
+[`v0.2.55`](https://github.com/Ding-Ding-Projects/material-cookie-clicker/releases/tag/v0.2.55),
+commit `a98e38c07423a7cfb4cb3190412884a404a7245e`, published 2026-08-19. It contains an unsigned
+Squirrel.Windows setup executable, `RELEASES`, a full `.nupkg`, and a reconciled changelog
+manifest. Its Release, CI, and Pages workflows completed successfully. Those workflows prove
+build/publication only; by standing project policy they run no tests or lint.
 
-## Gameplay
+States: **Verified** means the surface is implemented, exercised from a built artifact, and has a
+current capture where visible. **Implemented; evidence pending** means the feature is user-facing
+but required interaction or capture evidence is incomplete. **Partial** means only the named part
+exists. **Logic only** means reusable code exists without a usable surface. **Not implemented**
+means the surface has no implementation. Parallel release-completeness lanes remain pending until their
+commits, tests, packaged proof, interactions, and captures actually land; a lane name is not
+evidence.
 
-| Feature | Article | Status |
-| --- | --- | --- |
-| Cookie clicking / CPS loop | [gameplay/cookie-clicking.md](gameplay/cookie-clicking.md) | not built |
-| 20-tier generator ladder | [gameplay/generator-ladder.md](gameplay/generator-ladder.md) | not built |
-| Golden-cookie random events | [gameplay/golden-cookie-events.md](gameplay/golden-cookie-events.md) | not built |
-| Achievements | [gameplay/achievements.md](gameplay/achievements.md) | not built |
-| Prestige (ascend) | [gameplay/prestige.md](gameplay/prestige.md) | not built |
+## Windows desktop application
 
-## Tools (application features that double as in-game unlocks)
+| Inventory ID | Surface | Capability | Implementation | Article | Localization | Persistence | Focused tests | Bundled proof | Built interaction | Capture evidence | Truthful state |
+| --- | --- | --- | --- | --- | --- | --- | --- | --- | --- | --- | --- |
+| desktop-game-core | Desktop app | Cookie click and CPS loop | `src/renderer/screens/CookieHero.tsx`, `src/shared/game/cps.ts`, `src/shared/game/reducer.ts` | [Cookie clicking](gameplay/cookie-clicking.md) | `src/renderer/game/copy.ts` | `src/shared/game/save-codec.ts`, `src/main/game-save-service.ts` | `tests/game/reducer.test.ts`, `tests/game/effective-cps.test.ts`, `tests/game/offline-progress.test.ts` | `package.json` packages the built renderer/domain | `captures/app/fresh-start.png`, `captures/app/game-progressed.png` | `captures/app/fresh-start.png`, `captures/app/game-progressed.png` | Verified |
+| desktop-generator-ladder | Desktop app | Twenty-one generators including Office Building | `src/renderer/screens/ShopRail.tsx`, `src/shared/game/generators.ts` | [Generator ladder](gameplay/generator-ladder.md) | `src/shared/game/generators.ts` bilingual definitions | `src/shared/game/save-codec.ts` | `tests/game/generators.test.ts`, `tests/game/endless-progression.test.ts` | `package.json` packages renderer/domain | `captures/app/ladder-deep.png` proves the pre-Office ladder only | `captures/app/ladder-deep.png` predates v0.2.55 | Implemented; evidence pending |
+| desktop-endless-progression | Desktop app | Uncapped generators, prestige, and Home floors | `src/shared/game/generators.ts`, `src/shared/game/prestige.ts`, `src/shared/game/home-construction.ts`, `src/renderer/screens/HomeScreen.tsx` | [Endless Home construction](gameplay/home-construction.md) | Component/domain bilingual copy | Extension/prestige state in `src/shared/game/save-codec.ts` | `tests/game/endless-progression.test.ts`, `tests/game/home-construction.test.ts`, `tests/game/prestige.test.ts` | `package.json` packages the renderer/domain in v0.2.55 | None — headless interaction was reported outside the repository but no committed record exists | No committed current-release endless-floor capture | Implemented; evidence pending |
+| desktop-golden-random-events | Desktop app | Golden cookies, Oven Dial, random events, Mouse Raids | `src/renderer/screens/GoldenCookieStage.tsx`, `src/renderer/screens/RandomEventStage.tsx`, `src/shared/game/golden-cookie.ts`, `src/shared/game/random-events.ts` | [Golden-cookie events](gameplay/golden-cookie-events.md) | `src/renderer/game/copy.ts` and domain copy records | `src/shared/game/save-codec.ts` | `tests/game/golden-cookie.test.ts`, `tests/game/random-events.test.ts`, `tests/game/stacked-events.test.ts`, `tests/game/raid-consumables.test.ts` | `package.json` packages renderer/domain | `captures/app/golden-spawn.png`, `captures/app/golden-dial.png`, `captures/app/event-sugar-rush.png`, `captures/app/raid.png` | `captures/app/golden-spawn.png`, `captures/app/golden-dial.png`, `captures/app/event-sugar-rush.png`, `captures/app/raid.png` | Verified |
+| desktop-minigame-events | Desktop app | Five minigames, Golden Tokens, Lucky Chance | `src/renderer/screens/MinigameEventsScreen.tsx`, `src/shared/game/minigames.ts`, `src/shared/game/reducer.ts` | [Minigame events](gameplay/minigame-events.md) | `src/renderer/game/minigame-copy.ts` | `src/shared/game/save-codec.ts` | `tests/game/reducer.test.ts`, `tests/game/save-codec.test.ts`; no dedicated UI interaction test | `package.json` packages renderer/domain | None — no committed built-interaction record | None — no committed current-release minigame capture | Implemented; evidence pending |
+| desktop-home | Desktop app | Authored rooms, furnishing, construction clock | `src/renderer/screens/HomeScreen.tsx`, `src/shared/game/home-construction.ts` | [Home construction](gameplay/home-construction.md) | Component/domain bilingual copy | Home state in `src/shared/game/save-codec.ts` | `tests/game/home-construction.test.ts`, `tests/game/narration-home.test.ts` | `package.json` packages renderer/domain | `captures/app/home-building.png`, `captures/app/home-furnished.png`, `captures/app/home-coziness.png` | `captures/app/home-building.png`, `captures/app/home-furnished.png`, `captures/app/home-coziness.png` | Verified |
+| desktop-diesel | Desktop app | Factory, depot, exchange, collapsible depot | `src/renderer/screens/FactoryScreen.tsx`, `src/renderer/screens/DieselDepot.tsx`, `src/shared/game/diesel-factory.ts`, `src/main/diesel-ledger-service.ts` | [Diesel exchange](winforge-diesel-exchange.md) | Component-local bilingual copy | `src/shared/game/save-codec.ts`, ledger service, local collapsed key | `tests/game/diesel-factory.test.ts`, `tests/game/diesel-exchange.test.ts`, `tests/game/endless-progression.test.ts` | `package.json` packages renderer/main/domain | `captures/app/factory-floor.png`, `captures/app/diesel-depot.png`; collapsed interaction record is uncommitted | `captures/app/factory-floor.png`, `captures/app/diesel-depot.png`; no collapsed-state capture | Implemented; evidence pending |
+| desktop-achievements | Desktop app | Achievement collection | `src/renderer/screens/AchievementsScreen.tsx`, `src/shared/game/achievements.ts` | [Achievements](gameplay/achievements.md) | Component/domain bilingual copy | Derived/persisted through `src/shared/game/save-codec.ts` | `tests/game/achievements.test.ts` | `package.json` packages renderer/domain | `captures/app/dialog-achievements.png` | `captures/app/dialog-achievements.png` | Verified |
+| desktop-prestige | Desktop app | Repeatable ascension and two-key confirmation | `src/renderer/screens/PrestigeScreen.tsx`, `src/renderer/components/DestructiveGate.tsx`, `src/shared/game/prestige.ts` | [Prestige](gameplay/prestige.md) | Component-local bilingual copy | `src/shared/game/save-codec.ts` | `tests/game/prestige.test.ts`, `tests/game/endless-progression.test.ts` | `package.json` packages renderer/domain | `captures/app/prestige-gate.png`, `captures/app/dialog-prestige.png` | `captures/app/prestige-gate.png`, `captures/app/dialog-prestige.png` | Verified |
+| desktop-settings | Desktop app | Settings dialog and search | `src/renderer/screens/SettingsScreen.tsx`, `src/renderer/game/app-settings.ts` | [Settings surface](interface/settings-surface.md) | Three language choices in `src/renderer/screens/SettingsScreen.tsx` | Separate local record in `src/renderer/game/app-settings.ts` | `tests/game/settings.test.ts` | `package.json` packages the renderer | `captures/app/dialog-settings.png`, `captures/app/settings-yue.png` | `captures/app/dialog-settings.png`, `captures/app/settings-yue.png` | Verified |
+| desktop-language | Desktop app | English, Cantonese, bilingual | `src/renderer/game/copy.ts`, `src/renderer/game/AppSettingsContext.tsx`, `src/renderer/screens/SettingsScreen.tsx` | [Language modes](localization/language-modes.md) | `src/renderer/game/copy.ts` | `src/renderer/game/app-settings.ts` | `tests/game/settings.test.ts`, `packages/surface-kernel/test/language-facts-invariant.test.ts` | `package.json` packages the renderer | `captures/app/settings-yue.png`, `captures/app/mode-yue.png` | `captures/app/settings-yue.png`, `captures/app/mode-yue.png` | Partial — several accessible names still bypass active mode |
+| desktop-funny-levels | Desktop app | Independent 1–5 sliders | `src/renderer/screens/SettingsScreen.tsx`, `src/renderer/game/app-settings.ts` | [Funny levels](localization/funny-level-sliders.md) | Bilingual labels in `src/renderer/screens/SettingsScreen.tsx` | Both values in `src/renderer/game/app-settings.ts` | `tests/game/settings.test.ts` | `package.json` packages the renderer | `captures/app/settings-sliders.png` | `captures/app/settings-sliders.png` | Partial — values persist but copy variants do not exist |
+| desktop-emoji-dialog-toggle | Desktop app | Dialog emoji toggle | None | [Dialog emoji setting](interface/dialog-emoji-setting.md) | None | None | None | None | None | None | Not implemented |
+| desktop-school-mode | Desktop app | Shared renamable School mode | `packages/surface-kernel/src/preferences.ts`, `packages/surface-kernel/src/storage-keys.ts` only | [School mode](tools/school-mode.md) | No app UI | No app watcher/store integration | None — no app-focused School-mode test | No wired app surface | None | None | Logic only |
+| desktop-narrator | Desktop app | Narration, language, voices, rate/pitch | `src/renderer/game/narration.ts` covers limited Home events | [Narrator](tools/narrator.md) | Limited bilingual utterances in `src/renderer/game/narration.ts` | No complete preference surface | `tests/game/narration-home.test.ts` | `package.json` packages partial renderer logic | None — no complete built interaction | None | Partial |
+| desktop-scheduled-settings | Desktop app | Scheduled/API/Home Assistant settings | `packages/surface-kernel/src/scheduling.ts` only | [Scheduled settings](tools/scheduled-settings.md) | Kernel facts only | Kernel schema only | `packages/surface-kernel/test/scheduling-precedence.test.ts` | No wired surface | None | None | Logic only |
+| desktop-personal-vocabulary | Desktop app | Local JSON vocabulary upload | `packages/surface-kernel/src/vocabulary.ts` only | [Personal vocabulary](tools/personal-vocabulary.md) | No app control | No app cache integration | `packages/surface-kernel/test/vocabulary.test.ts` | No wired surface | None | None | Logic only |
+| desktop-regex-builder | Desktop app | Search-adjacent regex builder | `src/renderer/components/SearchWithRegexBuilder.tsx`, `src/renderer/game/local-regex-search.ts` | [Regex builder](tools/regex-builder.md) | Component-local bilingual copy | Per-component transient state | `tests/game/regex-builder-advanced.test.ts`, `packages/surface-kernel/test/regex-builder.test.ts` | `package.json` packages renderer/workspaces | `captures/app/regex-lab.png` | `captures/app/regex-lab.png` | Partial — not every dropdown/context menu has a builder |
+| desktop-command-palette | Desktop app | Global command palette | `packages/surface-kernel/src/command-registry.ts` only | [Command palette](tools/command-palette.md) | No app UI | None | None — no app-focused test | No wired surface | None | None | Logic only |
+| desktop-notifications | Desktop app | Toasts and notification centre | `src/renderer/components/UpdateNotice.tsx`; `packages/surface-kernel/src/notifications.ts` is unwired | [Notification centre](tools/notification-centre.md) | Update notice copy in `src/renderer/components/UpdateNotice.tsx` | Transient update state | `tests/game/updates.test.ts` | `package.json` packages update UI | `captures/app/update-notice.png` | `captures/app/update-notice.png` | Partial — no general centre/history |
+| desktop-appearance-editor | Desktop app | Theme/fonts/per-element appearance | `src/shared/game/look-tiers.ts`; `packages/surface-kernel/src/appearance.ts` and `color.ts` are unwired | [Appearance editor](tools/appearance-editor.md) | Theme copy in `src/shared/game/look-tiers.ts` | Theme ownership in `src/shared/game/save-codec.ts` | `tests/game/look-tiers.test.ts`, `packages/surface-kernel/test/color-contrast.test.ts` | `package.json` packages theme renderer | `captures/app/game-dark.png`, `captures/app/titlebar-light.png` | `captures/app/game-dark.png`, `captures/app/titlebar-light.png` | Partial — no per-element editor or Word-depth controls |
+| desktop-logo-customization | Desktop app | Logo presets/custom conversion | None at baseline; release-completeness lane pending | [Logo customization](tools/app-logo-customization.md) | None | None | None at baseline | `assets/material-cookie-clicker.ico` is fixed, not customizable | None | None | Not implemented at v0.2.55 baseline |
+| desktop-tabs | Desktop app | Dockable tabs/groups/pins/four searches | `packages/surface-kernel/src/tabs.ts` only; current renderer uses modal navigation | [Tabbed navigation](interface/tabbed-navigation.md) | Some destination labels bilingual | No complete tab persistence | None — no app-focused contract test | No full tab surface | None | None — dialog captures do not prove tabs | Logic only |
+| desktop-toy-locks | Desktop app | Per-element/tab/property locks | `packages/surface-kernel/src/locks.ts` only | [Authenticator and locks](tools/authenticator.md) | No app UI | No credential-vault integration | `packages/surface-kernel/test/totp-rfc6238.test.ts` covers only TOTP math | No wired surface | None | None | Logic only |
+| desktop-authenticator | Desktop app | Built-in TOTP authenticator/QR | `packages/surface-kernel/src/totp.ts`, `packages/surface-kernel/src/qr.ts` only | [Authenticator and locks](tools/authenticator.md) | No app UI | No credential-vault integration | `packages/surface-kernel/test/totp-rfc6238.test.ts` | No wired surface | None | None | Logic only |
+| desktop-unlock-ladder | Desktop app | Lockout ladder | None | [Unlock ladder](tools/unlock-ladder.md) | None | None | None | None | None | None | Not implemented |
+| desktop-support-tickets | Desktop app | Local fictional recovery desk | `packages/surface-kernel/src/support-tickets.ts` only | [Support Tickets](tools/support-tickets.md) | No app UI | No app integration | None | No wired surface | None | None | Logic only |
+| desktop-file-converter | Desktop app | Categorized converter/PDF tools | `packages/surface-kernel/src/converter-registry.ts` only; release-completeness lane pending | [File converter](tools/file-converter.md) | No app UI | No queue/history integration | None — no app-focused baseline tests | No enabled adapter proven packaged in v0.2.55 | None | None | Logic only at v0.2.55 baseline |
+| desktop-ollama | Desktop app | Complete local Ollama manager | `packages/local-ollama/src/index.ts` logic; release-completeness lane pending | [Local model manager](tools/local-model-manager.md) | No app UI | Package data shapes only | `packages/local-ollama/test/catalog-completeness.test.ts` plus six sibling package tests | `packages/local-ollama/package.json` proves source package only, not app interaction | None | None | Logic only at v0.2.55 baseline |
+| desktop-local-history | Desktop app | Git-backed local history | `packages/surface-kernel/src/history.ts` only | [Local history](data/local-version-history.md) | No app UI | Kernel model only | `packages/surface-kernel/test/history-append-only.test.ts` | No wired surface | None | None | Logic only |
+| desktop-exports | Desktop app | Multi-format exports/VS Code | `packages/surface-kernel/src/exports.ts` only | [Exports and privacy](data/exports-and-privacy.md) | No app UI | No export history | `packages/surface-kernel/test/exports-csv.test.ts` | No wired surface | None | None | Logic only |
+| desktop-bulk-actions | Desktop app | Bulk actions on collections | `src/renderer/components/BulkToolbar.tsx`, `src/renderer/components/useSelection.ts` on selected lists | [Bulk actions](tools/bulk-actions.md) | Component-local bilingual copy | Transient selection | None — no full per-list inventory test | `package.json` packages partial renderer | None — no committed exhaustive interaction proof | None — no dedicated capture | Partial |
+| desktop-changelog | Desktop app | Search/filter/export release history | `scripts/generate-release-changelog.mjs` generates release data; no complete viewer source exists | [Changelog viewer](data/changelog-viewer.md) | No complete UI | Generated release manifest only | `scripts/generate-release-changelog.mjs` validates records during release | `package.json` can package generated renderer data; viewer unproven | None | None | Partial |
+| desktop-offline-docs | Desktop app | Bundled offline docs browser | None | [Offline operation](data/offline-and-no-network.md) | None | None | None | None — articles are not bundled into an app browser | None | None | Not implemented |
+| desktop-external-editor | Desktop app | External editor/VS Code handoff | None | [External editor](tools/external-editor.md) | None | None | None | None | None | None | Not implemented |
+| desktop-status-hub | Desktop app | In-app Status Hub/reporting | None | [Status Hub](tools/status-hub.md) | None | None | None | None | None | None | Not implemented |
+| desktop-destructive-confirmation | Desktop app | Two-key slider confirmation | `src/renderer/components/DestructiveGate.tsx` integrated by `src/renderer/screens/PrestigeScreen.tsx` | [Destructive confirmation](interface/destructive-confirmation.md) | Component-local bilingual facts | Transient by design | `tests/game/prestige.test.ts` covers domain behavior | `package.json` packages renderer | `captures/app/prestige-gate.png` | `captures/app/prestige-gate.png` | Partial — not inventoried for every destructive action |
+| desktop-auto-update | Desktop app | Unsigned Squirrel updates | `src/main/update-service.ts`, `src/renderer/components/UpdateNotice.tsx` | [Automatic updates](build-and-release/automatic-updates.md) | Component-local bilingual copy | Squirrel feed and application update state | `tests/game/updates.test.ts` | `package.json` and v0.2.55 Squirrel assets | `captures/app/update-notice.png` proves notice rendering; installed update was recorded in handoff | `captures/app/update-notice.png`; complete failure-state captures absent | Implemented; evidence pending |
+| desktop-download-dialogs | Desktop app | Browser-extension download surfaces | None | [Download dialogs](tools/download-dialogs.md) | None | None | `packages/surface-kernel/test/download-states.test.ts` is not integration | No extension packaged | None | None | Not implemented |
 
-| Feature | Article | Status |
-| --- | --- | --- |
-| Tools tech tree (unlock/bonus layer) | [tools/tools-tech-tree.md](tools/tools-tech-tree.md) | not built |
-| Command palette | [tools/command-palette.md](tools/command-palette.md) | logic only (`command-registry.ts`) |
-| Regex builder | [tools/regex-builder.md](tools/regex-builder.md) | logic only (`regex-builder.ts`); site has its own working port |
-| Authenticator (TOTP) | [tools/authenticator.md](tools/authenticator.md) | logic only (`totp.ts`, `qr.ts`) |
-| File converter | [tools/file-converter.md](tools/file-converter.md) | logic only (`converter-registry.ts`) |
-| Local model manager (Ollama) | [tools/local-model-manager.md](tools/local-model-manager.md) | logic only (`packages/local-ollama`) |
-| Appearance editor | [tools/appearance-editor.md](tools/appearance-editor.md) | logic only (`appearance.ts`); site has a working colour-translator port |
-| Notification centre | [tools/notification-centre.md](tools/notification-centre.md) | logic only (`notifications.ts`) |
-| Local history | [tools/local-history.md](tools/local-history.md) | logic only (`history.ts`) |
-| Scheduled settings | [tools/scheduled-settings.md](tools/scheduled-settings.md) | logic only (`scheduling.ts`) |
-| Narrator (TTS) | [tools/narrator.md](tools/narrator.md) | logic only (`narration.ts`) |
-| Exports | [tools/exports.md](tools/exports.md) | logic only (`exports.ts`) |
-| Bulk actions | [tools/bulk-actions.md](tools/bulk-actions.md) | not built as a standalone module; depends on a real list surface that does not exist yet |
+## Documentation and landing site
 
-## Interface
+The site is a landing, documentation, settings, status, and verified-download surface. It must not
+host the playable runtime; site rows inventory landing-page equivalents.
 
-| Feature | Article | Status |
-| --- | --- | --- |
-| Browser-style tabbed navigation, dockable to any edge | [interface/tabbed-navigation.md](interface/tabbed-navigation.md) | logic only in-app (`tabs.ts`); **built** on the documentation site (`site/assets/tabs.mjs`) |
-| Material Design 3 appearance | [interface/material-design-appearance.md](interface/material-design-appearance.md) | **built** as specs (`design/tokens-*.html`); **built** on the site; not built in-app |
-| Settings surface | [interface/settings-surface.md](interface/settings-surface.md) | logic only in-app (`preferences.ts`); **built** on the site |
+| Inventory ID | Surface | Capability | Implementation | Article | Localization | Persistence | Focused tests | Bundled proof | Built interaction | Capture evidence | Truthful state |
+| --- | --- | --- | --- | --- | --- | --- | --- | --- | --- | --- | --- |
+| site-landing | Documentation site | Landing page/product boundary | `site/index.html` | [Documentation index](README.md) | English-first, selected bilingual copy | None required | `scripts/check-site.mjs` | `site/index.html` deployed by Pages | None — no committed deployed interaction record | No current site capture | Implemented; evidence pending |
+| site-feature-articles | Documentation site | Categorized feature articles | `site/features/index.html`, `docs/README.md` index the hand-written article sets | [Documentation index](README.md) | English-first; selected bilingual copy only | Static files | `scripts/check-site.mjs` | `site/features/index.html`, `site/index.html` | None — no committed navigation interaction record | None — no per-article capture matrix | Partial |
+| site-language | Documentation site | Three language modes | None — feature article is not a settings control | [Language modes](localization/language-modes.md) | None — no site language-mode renderer | None | None | None | None | None | Not implemented |
+| site-funny | Documentation site | Independent funny levels | None — feature article is not a settings control | [Funny levels](localization/funny-level-sliders.md) | None — no site funny-level variants | None | None | None | None | None | Not implemented |
+| site-emoji | Documentation site | Dialog emoji toggle | None | [Dialog emoji setting](interface/dialog-emoji-setting.md) | None | None | None | None | None | None | Not implemented |
+| site-school | Documentation site | Shared School mode | None | [School mode](tools/school-mode.md) | None | None | None | None | None | None | Not implemented |
+| site-narrator | Documentation site | Narrator/voice pickers | None | [Narrator](tools/narrator.md) | None | None | None | None | None | None | Not implemented |
+| site-scheduled | Documentation site | Scheduled/external settings | None | [Scheduled settings](tools/scheduled-settings.md) | None | None | None | None | None | None | Not implemented |
+| site-personal-vocabulary | Documentation site | Local vocabulary upload | None | [Personal vocabulary](tools/personal-vocabulary.md) | None | None | None | None | None | None | Not implemented |
+| site-regex | Documentation site | Search-adjacent regex builder | `site/assets/search.js`, `site/assets/search-ui.js` | [Regex builder](tools/regex-builder.md) | English search UI | Per-page browser state | `scripts/check-site.mjs` | `site/assets/search.js`, `site/assets/search-ui.js` | None — no committed deployed interaction record | None — no current capture | Implemented; evidence pending |
+| site-command-palette | Documentation site | `Ctrl+Shift+F` palette | None — no palette script | [Command palette](tools/command-palette.md) | None | None | None | None | None | None | Not implemented |
+| site-notifications | Documentation site | Toasts/history | None — no notification implementation | [Notification centre](tools/notification-centre.md) | None | None | None | None | None | None | Not implemented |
+| site-appearance | Documentation site | Appearance editor/color translator | None — no site appearance editor implementation | [Appearance editor](tools/appearance-editor.md) | None | None | None | None | None | None | Not implemented |
+| site-logo | Documentation site | Logo customization | None at baseline; release-completeness site lane pending | [Logo customization](tools/app-logo-customization.md) | None | None | None | None | None | None | Not implemented at v0.2.55 baseline |
+| site-tabs | Documentation site | Tabs/groups/pins/four searches | None — no tab script | [Tabbed navigation](interface/tabbed-navigation.md) | None | None | None | None | None | None | Not implemented |
+| site-locks | Documentation site | Per-element toy locks | None | [Authenticator and locks](tools/authenticator.md) | None | None | None | None | None | None | Not implemented |
+| site-authenticator | Documentation site | Browser-local authenticator | None | [Authenticator and locks](tools/authenticator.md) | None | None | None | None | None | None | Not implemented |
+| site-unlock-ladder | Documentation site | Lockout ladder | None | [Unlock ladder](tools/unlock-ladder.md) | None | None | None | None | None | None | Not implemented |
+| site-support-tickets | Documentation site | Local recovery desk | None | [Support Tickets](tools/support-tickets.md) | None | None | None | None | None | None | Not implemented |
+| site-file-converter | Documentation site | Converter equivalent | None at baseline; release-completeness site lane pending | [File converter](tools/file-converter.md) | None | None | None | None | None | None | Not implemented at v0.2.55 baseline |
+| site-ollama | Documentation site | Locally mediated Ollama equivalent | None at baseline; release-completeness site lane pending | [Local model manager](tools/local-model-manager.md) | None | None | None — package tests do not prove site integration | None | None | None | Not implemented at v0.2.55 baseline |
+| site-history | Documentation site | Visitor-state history | None | [Local history](data/local-version-history.md) | None | None | None | None | None | None | Not implemented |
+| site-exports | Documentation site | Export visitor state | None — no site export implementation | [Exports and privacy](data/exports-and-privacy.md) | None | None | None | None | None | None | Not implemented |
+| site-bulk | Documentation site | Bulk actions everywhere | None complete | [Bulk actions](tools/bulk-actions.md) | None | None | None | None | None | None | Not implemented |
+| site-changelog | Documentation site | Search/filter/export changelog | None — no site changelog viewer or generated asset in baseline | [Changelog viewer](data/changelog-viewer.md) | None | None | None | None | None | None | Not implemented |
+| site-status-hub | Documentation site | Site-owned Status Hub | None | [Status Hub](tools/status-hub.md) | None | None | None | None | None | None | Not implemented |
+| site-link-preview | Documentation site | Open Graph product graphic | None — no Open Graph/Twitter metadata or `social-preview.png` | [CI and site workflow](build-and-release/ci-and-release-workflow.md) | None | None | None | None | None | None | Not implemented |
+| site-installer-link | Documentation site | Direct immutable installer download | `site/index.html` links to mutable “/releases/latest”, not the v0.2.55 asset | [Unsigned installer](build-and-release/unsigned-installer-policy.md) | English label | Static mutable URL | `scripts/check-site.mjs` does not prove immutability | `site/index.html` only | None — no immutable-asset interaction | None — no current site capture | Partial — immutable version/platform asset URL absent |
+| site-playable-game-boundary | Documentation site | Site explicitly says it is not playable runtime | `site/index.html` currently says “The game is playable” and lacks the required boundary | [Documentation index](README.md) | English contradiction | Static | `scripts/check-site.mjs` does not enforce boundary | `site/index.html` static page | None | None | Not implemented — current copy contradicts required boundary |
 
-## Localization
+### Hand-written site page inventory
 
-| Feature | Article | Status |
-| --- | --- | --- |
-| Three language modes (English / Cantonese / Bilingual) | [localization/language-modes.md](localization/language-modes.md) | logic only in-app (`preferences.ts`); **built** on the site |
-| Two independent 1–5 funny-level sliders | [localization/funny-level-sliders.md](localization/funny-level-sliders.md) | logic only in-app; **built** on the site; specified in `design/settings-funny-sliders.html` |
+`SITE-CAPABILITY-CONTRACT-V1` means every `site-*` capability row in the table above applies to the
+page independently. Most of those capabilities are currently marked not implemented; this page
+inventory prevents a page from disappearing silently and makes it explicit that a feature added to
+one page is not evidence for its siblings.
 
-## Accessibility
+| Page ID | Local file | Required capability contract | Page-specific evidence state |
+| --- | --- | --- | --- |
+| site-page-home | `site/index.html` | `SITE-CAPABILITY-CONTRACT-V1` | Current source exists; complete per-capability interaction/capture evidence pending |
+| site-page-feature-index | `site/features/index.html` | `SITE-CAPABILITY-CONTRACT-V1` | Current source exists; complete per-capability interaction/capture evidence pending |
+| site-page-achievements | `site/features/achievements.html` | `SITE-CAPABILITY-CONTRACT-V1` | Current source exists; complete per-capability interaction/capture evidence pending |
+| site-page-control-economy | `site/features/control-economy.html` | `SITE-CAPABILITY-CONTRACT-V1` | Current source exists; complete per-capability interaction/capture evidence pending |
+| site-page-cookie-clicking | `site/features/cookie-clicking.html` | `SITE-CAPABILITY-CONTRACT-V1` | Current source exists; complete per-capability interaction/capture evidence pending |
+| site-page-diesel-factory | `site/features/diesel-factory.html` | `SITE-CAPABILITY-CONTRACT-V1` | Current source exists; complete per-capability interaction/capture evidence pending |
+| site-page-generator-ladder | `site/features/generator-ladder.html` | `SITE-CAPABILITY-CONTRACT-V1` | Current source exists; complete per-capability interaction/capture evidence pending |
+| site-page-golden-cookies | `site/features/golden-cookies.html` | `SITE-CAPABILITY-CONTRACT-V1` | Current source exists; complete per-capability interaction/capture evidence pending |
+| site-page-home-construction | `site/features/home-construction.html` | `SITE-CAPABILITY-CONTRACT-V1` | Current source exists; complete per-capability interaction/capture evidence pending |
+| site-page-language-humour | `site/features/language-and-humour.html` | `SITE-CAPABILITY-CONTRACT-V1` | Current source exists; complete per-capability interaction/capture evidence pending |
+| site-page-minigame-events | `site/features/minigame-events.html` | `SITE-CAPABILITY-CONTRACT-V1` | Current source exists; complete per-capability interaction/capture evidence pending |
+| site-page-prestige | `site/features/prestige.html` | `SITE-CAPABILITY-CONTRACT-V1` | Current source exists; complete per-capability interaction/capture evidence pending |
+| site-page-random-events | `site/features/random-events.html` | `SITE-CAPABILITY-CONTRACT-V1` | Current source exists; complete per-capability interaction/capture evidence pending |
+| site-page-statistics | `site/features/statistics.html` | `SITE-CAPABILITY-CONTRACT-V1` | Current source exists; complete per-capability interaction/capture evidence pending |
+| site-page-tools-tree | `site/features/tools-tech-tree.html` | `SITE-CAPABILITY-CONTRACT-V1` | Current source exists; complete per-capability interaction/capture evidence pending |
+| site-page-upgrades | `site/features/upgrades.html` | `SITE-CAPABILITY-CONTRACT-V1` | Current source exists; complete per-capability interaction/capture evidence pending |
 
-| Feature | Article | Status |
-| --- | --- | --- |
-| Keyboard and screen-reader operation | [accessibility/keyboard-and-screen-reader.md](accessibility/keyboard-and-screen-reader.md) | **built** on the site; not built in-app |
-| Contrast and reduced motion | [accessibility/contrast-and-reduced-motion.md](accessibility/contrast-and-reduced-motion.md) | **built** as a verification script (`design/_verify/contrast-check.mjs`) and on the site; not built in-app |
+## Executable negative-regression proof
 
-## Data
-
-| Feature | Article | Status |
-| --- | --- | --- |
-| Local version history | [data/local-version-history.md](data/local-version-history.md) | logic only (`history.ts`) |
-| Exports and privacy | [data/exports-and-privacy.md](data/exports-and-privacy.md) | logic only (`exports.ts`); site export functions are **built** |
-| Offline / no-network guarantee | [data/offline-and-no-network.md](data/offline-and-no-network.md) | **built** on the site (verified by this lane's own grep check); not yet verified in-app |
-
-## Build and release
-
-| Feature | Article | Status |
-| --- | --- | --- |
-| Unsigned installer policy | [build-and-release/unsigned-installer-policy.md](build-and-release/unsigned-installer-policy.md) | policy documented; no installer has been built yet |
-| `build.bat` / `build-installer.bat` / `download-dependencies.bat` | [build-and-release/build-scripts.md](build-and-release/build-scripts.md) | **not present in this repository yet** — the README describes them; they do not exist as files |
-| Dependency bootstrapping | [build-and-release/dependency-bootstrap.md](build-and-release/dependency-bootstrap.md) | not built (depends on the build scripts above) |
-| CI and release workflow | [build-and-release/ci-and-release-workflow.md](build-and-release/ci-and-release-workflow.md) | **built** (`.github/workflows/ci.yml`, `release.yml`, `pages.yml`) |
-
-## Negative-regression note
-
-This inventory is deliberately conservative: several rows above say **not built** for a feature
-whose logic module exists in `packages/surface-kernel`, because "a pure function exists" and "a
-person can use this feature in the shipped application" are different claims, and this table only
-asserts the second. If a later task wires a kernel module into a real renderer, updates this row to
-**built** only after an actual runtime capture proves it, not when the wiring compiles.
+`tests/completeness-inventory.test.ts` owns the exact hand-written capability IDs, page IDs, table
+headers, and feature-article list. It validates this document instead of discovering whatever
+remains in source. Its deliberate in-memory break fixtures remove a required capability/page row,
+blank every required evidence class, point to a missing article, remove each mandatory article
+section, and break same-file/cross-file anchors; each fixture must produce a red result before the
+unchanged inventory is accepted as green. No working-tree mutation is needed, so the red-then-green
+proof cannot silently fail to restore a file.

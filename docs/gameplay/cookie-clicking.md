@@ -1,8 +1,8 @@
 # Cookie clicking
 
-> **Status: not built.** No click handler, cookie counter, or cookies-per-second (CPS) accumulator
-> exists in this repository. This article documents the specified behaviour from
-> `design/cookie-surface.html` so implementation has a single source of truth to build against.
+> **Status: shipped and verified in the v0.2.55 baseline.** The click handler, counter, CPS loop,
+> offline calculation, save path, tests, packaged renderer, built interaction, and current captures
+> all exist. `design/cookie-surface.html` remains a design reference, not the runtime.
 
 ## What it does
 
@@ -20,15 +20,13 @@ visual layer on top of this same surface, not a separate click target.
 
 ## How it is configured
 
-Nothing is configurable yet because nothing is built. Once implemented, the specification requires:
-click power and CPS to be plain numbers the player can inspect (not hidden behind an obscured
+Click power and CPS are plain numbers the player can inspect (not hidden behind an obscured
 counter), the "+N" popup to respect the reduced-motion state, and the disabled state to carry an
 explicit reason a screen reader can announce (never a silently unresponsive button).
 
 ## Failure modes
 
-Not applicable yet — there is no running code to fail. Once built, the two failure modes the
-design anticipates are: a click registering while the cookie is disabled (must be rejected, not
+The two key failure modes are a click registering while the cookie is disabled (it must be rejected, not
 queued), and a CPS accumulator drifting from wall-clock time across a long idle session (must be
 computed from an explicit last-tick timestamp, never from a fixed-interval counter that can lose
 time when the renderer is throttled in the background).
@@ -42,14 +40,12 @@ progress and there is nothing to protect it from.
 
 ## Verification
 
-Not yet verifiable: there is no build, no test suite exercising a click handler, and no capture of
-a running cookie surface. `design/cookie-surface.html` is a standalone, self-contained specification
-file that can be opened directly in a browser today to see every state rendered, which is the only
-verification currently possible.
+`tests/game/reducer.test.ts`, `effective-cps.test.ts`, and `offline-progress.test.ts` cover the
+domain. `captures/app/fresh-start.png` and `game-progressed.png` show the real built surface.
 
 ## Suggested articles
 
-- [The 20-tier generator ladder](generator-ladder.md)
+- [The 21-tier generator ladder](generator-ladder.md)
 - [Golden-cookie events](golden-cookie-events.md)
 - [Material Design 3 appearance](../interface/material-design-appearance.md)
 - [Contrast and reduced motion](../accessibility/contrast-and-reduced-motion.md)

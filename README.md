@@ -1,12 +1,14 @@
 # Material Cookie Clicker
 
-A Material Design 3 cookie clicker for Windows, built with Electron.
+A bakery-arcade cookie clicker for Windows, built with Electron.
 
 > [!NOTE]
-> This project is in early construction. Nothing has been released yet: there is
-> no published release, no verified installer, and no packaged runtime. Do not
-> treat any capability described here as working until a release exists with
-> attached, downloadable assets.
+> The verified published baseline is
+> [`v0.2.55`](https://github.com/Ding-Ding-Projects/material-cookie-clicker/releases/tag/v0.2.55)
+> at commit `a98e38c07423a7cfb4cb3190412884a404a7245e`. It includes an unsigned
+> Squirrel.Windows installer, `RELEASES`, a full `.nupkg`, and a reconciled changelog manifest.
+> The [per-surface completeness inventory](docs/completeness.md) distinguishes shipped behavior
+> from logic-only, partial, unimplemented, or insufficiently evidenced capabilities.
 
 ## Contents
 
@@ -22,10 +24,11 @@ An incremental game: click a cookie, buy generators that bake cookies for you,
 spend upgrades to multiply the rate, unlock achievements, and ascend to trade
 progress for a permanent multiplier.
 
-It is a full desktop application rather than a page — bilingual English and
-Hong Kong Cantonese with independent humour levels per language, Material
-Design 3 throughout, keyboard and screen-reader operable, and it works with the
-network unplugged.
+It is a full desktop application rather than a page, with English, Hong Kong Cantonese, and
+bilingual modes plus independent persisted humour controls. The core game works with the network
+unplugged and its established controls use accessible names and keyboard paths. The
+[per-surface inventory](docs/completeness.md) records the remaining accessibility, localization,
+appearance, and universal-feature gaps instead of presenting them as complete.
 
 ## Office Buildings
 
@@ -94,9 +97,9 @@ an empty reward pool, the state is unchanged.
 
 <span lang="zh-HK">小遊戲事件喺累計焗製 100,000 個曲奇時永久解鎖；呢個數字係全程累計數，轉生後都唔會倒退。1,000,000 個累計焗製曲奇會永久解鎖 Mouse Raid。排程、棋盤、生命週期、金色代幣同幸運機會抽獎結果都會保存，離線期間唔會刷代幣。</span>
 
-This documentation update intentionally records the feature contract without
-claiming built-artifact verification: the expedited delivery boundary skipped
-tests, captures, and UI runs for this lane. Those checks remain separate work.
+The v0.2.55 release lane later ran the complete local check (`903/903` tests), built the unsigned
+installer, and exercised the minigame/endless surfaces from the built artifact. A current committed
+minigame capture is still missing, so the completeness inventory records that narrower evidence gap.
 
 **Nobody ever pays a penny to use it.** No purchase, no licence, no
 subscription, no feature held behind a paywall.
@@ -128,8 +131,9 @@ plainly instead of implying otherwise.
 
 ## Install
 
-No release exists yet. A download button will appear here, and on the
-documentation site, once a verified installer has actually been published.
+[Download Material Cookie Clicker v0.2.55 for Windows](https://github.com/Ding-Ding-Projects/material-cookie-clicker/releases/download/v0.2.55/MaterialCookieClicker-Setup.exe)
+from the immutable published release. The same release also provides `RELEASES`, the full `.nupkg`,
+and the reconciled changelog manifest.
 
 Windows installers from this project are **unsigned** and will trigger the
 operating system's unknown-publisher warning. That is expected, and is stated
@@ -244,7 +248,7 @@ named here and neither is fixed in this release.
 | Settings opened from a progressed save, with every row on it carrying its own price | ![The Settings panel over a dimmed game surface. A LANGUAGE MODE section carries a Language mode switch plate priced at 60 cookies, a note that the setting persists across restarts and applies to every surface including the settings panel itself, and a callout saying English is the default and free forever while Cantonese and bilingual are separate purchases, and that buying a mode does not switch to it. A FUNNY LEVEL section warns these are two separate controls rather than one shared slider, with an English funny slider plate at 35 and a Cantonese funny slider plate at 35 side by side, and a closing note that this build has one voice per language so nothing on screen reads differently yet.](captures/app/dialog-settings.png) |
 | The raid-supplies shelf after two real purchases, showing that the storage cap is one shared ladder | ![The game surface with the raid-supplies shelf changed. The shelf is headed RAID SUPPLIES and carries a highlighted gold Storage 5 chip priced at 25,000,000, then three stock plates: Whack Pass at 1 / 5 with its next price at 4,000,000, Bigger Whack at 0 / 5 at 2,500,000, and a third plate labelled Half-HP whose text runs under the shelf's right edge and is cut off, reading 0 / 5 at 2,500,000. The rest of the surface is unchanged.](captures/app/raid-supplies.png) |
 | A golden cookie spawned as its own sprite on the stage — the hero cookie no longer collects them | ![The full game surface with a small golden cookie sprite standing low and left of centre over the upgrade shelf, drawn inside a pale ray burst. The large hero cookie in the panel above is plainly separate and not gold at all — it is the ordinary baked one. The rest of the surface is unchanged: HUD plates at 40 quintillion cookies and 14,302,000,300 per second, a RAID SUPPLIES shelf, eight console buttons, the upgrade shelf at 68 / 180, and the shop rail with the Diesel Depot card](captures/app/golden-spawn.png) |
-| The Odd Cookie Out puzzle that catching it opens | ![The Odd Cookie Out card open over a dimmed game surface. It is headed Odd Cookie Out, then Round 1 of 3, then the instruction that one cookie is not like the others, press it. Below sits a four-by-four grid of sixteen near-identical pale cookie tiles, each drawn with a scatter of small chocolate chips, one of which differs by a single chip. A wide Let it go button runs along the bottom of the card](captures/app/golden-puzzle.png) |
+| The Oven Dial that catching a golden cookie opens | ![The Oven Dial card over a dimmed game surface, showing round one of three, a half-circle gauge, a golden target band, a moving needle, and a wide Stop the needle button.](captures/app/golden-dial.png) |
 | One random event running on the real surface | ![The game surface with a Sugar Rush running. The HUD has reflowed to two rows: the top row holds COOKIES 40 quintillion, PER SECOND 14,302,000,300, PER CLICK 136.32, then a bright amber event plate carrying a small sun glyph, the words Sugar Rush, a draining bar and a 5s countdown, and beyond it the RAID SUPPLIES shelf, whose three plates and Storage 3 chip are all fully readable in this wider layout. The eight console buttons have wrapped onto a second row of their own. The drawn hero cookie sits below over its oven glow, the upgrade shelf reads 68 / 180, and a card in the bottom right reads Sugar Rush: Every click lands seven times as hard.](captures/app/event-sugar-rush.png) |
 | The update notice, injected through the documented dev-only seam rather than earned — it renders, reads correctly and dims nothing | ![The mid-game surface in the dark theme with a small rounded card in the bottom-right corner over the shop rail's Diesel Depot footer. It is headed Update ready, 0.3.0, restart to install, then a paragraph saying the update is unsigned, that it came over HTTPS from this project's GitHub releases and its package matches the hash listed there, and that nothing proves who built it. A filled Restart button and an outlined Later button close the card. Nothing behind it is dimmed: the HUD still reads 40 quintillion cookies and 14,302,000,300 per second, and the upgrade shelf reads 68 / 180.](captures/app/update-notice.png) |
 | A Mouse Raid actually running, with five mice on the stage as real buttons and the previous raid's outcome card still on screen | ![The game surface mid-raid in the dark theme. A wide red HUD plate carries a mouse-and-crate glyph, the words Mouse Raid, a draining bar and the run-together text 6s5 of 5 mice left. Five round red mouse buttons are scattered over the lower half of the window, one of them paler because the pointer is on it. The COOKIES plate reads 12.8 quadrillion. A red card along the bottom reads 4 of 4 mice got away with 51.2 quadrillion cookies, with the line that the lifetime total is untouched and a Dismiss button.](captures/app/raid.png) |

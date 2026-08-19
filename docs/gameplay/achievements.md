@@ -1,8 +1,8 @@
 # Achievements
 
-> **Status: not built.** No achievement definitions, unlock-condition evaluator, or badge rendering
-> exists in this repository. This article documents the specified badge states from
-> `design/achievement-badge.html`.
+> **Status: shipped and verified.** Achievement definitions, unlock evaluation, renderer badges,
+> focused tests, packaged interaction, and a current built capture exist. The design file remains a
+> reference rather than runtime evidence.
 
 ## What it does
 
@@ -17,13 +17,12 @@ toast is expected to reuse once both are built.
 
 ## How it is configured
 
-Not configurable yet. Once built, the achievement list itself is game-balance data owned by the
-implementation; this article does not enumerate specific achievements because none exist yet, only
-the two-state-plus-toast presentation contract they must follow.
+The achievement list is game-balance data in `src/shared/game/achievements.ts`. Presentation keeps
+locked and unlocked states distinct and searchable.
 
 ## Failure modes
 
-Not applicable yet. Once built, the anticipated failure modes are: an achievement condition that
+Failure modes include an achievement condition that
 is checked only at generator-purchase time and misses a condition satisfied by a passive CPS tick
 (must be evaluated on every relevant state change, not only on discrete player actions), and a
 badge that silently re-locks after being unlocked once (unlocks must be permanent and
@@ -37,13 +36,12 @@ granting every achievement instantly is not a security concern for the same reas
 
 ## Verification
 
-Not yet verifiable beyond opening `design/achievement-badge.html` directly in a browser, which
-renders the locked, unlocked, and toast states against static sample data. There is no running
-unlock-condition evaluator to test.
+`tests/game/achievements.test.ts` covers evaluation and persistence behavior.
+`captures/app/dialog-achievements.png` shows the real built surface at 78 of 201 unlocked.
 
 ## Suggested articles
 
-- [The 20-tier generator ladder](generator-ladder.md)
+- [The 21-tier generator ladder](generator-ladder.md)
 - [Prestige](prestige.md)
 - [Notification centre](../tools/notification-centre.md)
 - [The tools tech tree](../tools/tools-tech-tree.md)

@@ -11761,6 +11761,671 @@ body[data-eclipse='on'] .cookie-hero::after {
 }
 
 /* ============================================================================================
+ * MATERIAL DESIGN 3 EXPRESSIVE PRODUCT CHROME
+ *
+ * The arcade cabinet and gameplay illustrations remain domain art. Everything that behaves like
+ * application chrome below uses Material color roles, shape, elevation, typography, state layers,
+ * motion and focus anatomy. This final cascade intentionally wins over the retained design-v2
+ * reference styling above without repainting cookie, medal, ticket, jewel, diagram or event data.
+ * ========================================================================================== */
+:root {
+  --md-sys-color-primary: var(--primary);
+  --md-sys-color-on-primary: var(--on-primary);
+  --md-sys-color-primary-container: var(--primary-container);
+  --md-sys-color-on-primary-container: var(--on-primary-container);
+  --md-sys-color-secondary: var(--secondary);
+  --md-sys-color-on-secondary: var(--on-secondary);
+  --md-sys-color-secondary-container: var(--secondary-container);
+  --md-sys-color-on-secondary-container: var(--on-secondary-container);
+  --md-sys-color-tertiary: var(--tertiary);
+  --md-sys-color-on-tertiary: var(--on-tertiary);
+  --md-sys-color-error: var(--error);
+  --md-sys-color-on-error: var(--on-error);
+  --md-sys-color-error-container: var(--error-container);
+  --md-sys-color-on-error-container: var(--on-error-container);
+  --md-sys-color-surface: var(--surface);
+  --md-sys-color-surface-container-low: var(--surface-low);
+  --md-sys-color-surface-container: var(--surface-container);
+  --md-sys-color-surface-container-high: var(--surface-high);
+  --md-sys-color-surface-container-highest: var(--surface-highest);
+  --md-sys-color-on-surface: var(--on-surface);
+  --md-sys-color-on-surface-variant: var(--on-surface-variant);
+  --md-sys-color-outline: var(--outline);
+  --md-sys-color-outline-variant: var(--outline-variant);
+  --md-sys-color-scrim: rgba(0, 0, 0, 0.52);
+
+  --md-sys-shape-corner-extra-small: 4px;
+  --md-sys-shape-corner-small: 8px;
+  --md-sys-shape-corner-medium: 12px;
+  --md-sys-shape-corner-large: 16px;
+  --md-sys-shape-corner-extra-large: 28px;
+  --md-sys-shape-corner-full: 9999px;
+
+  --md-sys-elevation-level-0: none;
+  --md-sys-elevation-level-1: 0 1px 2px rgba(0, 0, 0, 0.3), 0 1px 3px 1px rgba(0, 0, 0, 0.15);
+  --md-sys-elevation-level-2: 0 1px 2px rgba(0, 0, 0, 0.3), 0 2px 6px 2px rgba(0, 0, 0, 0.15);
+  --md-sys-elevation-level-3: 0 1px 3px rgba(0, 0, 0, 0.3), 0 4px 8px 3px rgba(0, 0, 0, 0.15);
+
+  --md-sys-state-hover-opacity: 8%;
+  --md-sys-state-focus-opacity: 12%;
+  --md-sys-state-pressed-opacity: 12%;
+  --md-sys-state-disabled-opacity: 38%;
+
+  --md-sys-motion-duration-short2: 100ms;
+  --md-sys-motion-duration-short4: 200ms;
+  --md-sys-motion-duration-medium2: 300ms;
+  --md-sys-motion-easing-standard: cubic-bezier(0.2, 0, 0, 1);
+  --md-sys-motion-easing-emphasized: cubic-bezier(0.2, 0, 0, 1);
+
+  --md-sys-typescale-display-small-font: 400 2.25rem/2.75rem var(--font-en);
+  --md-sys-typescale-headline-small-font: 400 1.5rem/2rem var(--font-en);
+  --md-sys-typescale-title-large-font: 400 1.375rem/1.75rem var(--font-en);
+  --md-sys-typescale-title-medium-font: 500 1rem/1.5rem var(--font-en);
+  --md-sys-typescale-body-large-font: 400 1rem/1.5rem var(--font-en);
+  --md-sys-typescale-body-medium-font: 400 0.875rem/1.25rem var(--font-en);
+  --md-sys-typescale-label-large-font: 500 0.875rem/1.25rem var(--font-en);
+  --md-sys-typescale-label-medium-font: 500 0.75rem/1rem var(--font-en);
+}
+
+/* Material typography for chrome. Numeric game readouts remain untouched as data. */
+:root:root body :is(
+  .panel__title,
+  .settings-block__label,
+  .anchored-panel__title,
+  .canonical-palette > header h2,
+  .screen > h1,
+  .factory-section__title,
+  .home-section__title,
+  .controls-catalogue__group-title,
+  .converter-category-catalog h2,
+  .ollama-card h2,
+  .ollama-card h3
+) {
+  font-family: var(--font-en);
+  font-variant: normal;
+  font-style: normal;
+  font-weight: 500;
+  letter-spacing: 0;
+  line-height: 1.35;
+  text-transform: none;
+  text-shadow: none;
+}
+
+:root:root body :is(.panel__title, .settings-block__label, .factory-section__title, .home-section__title) {
+  font: var(--md-sys-typescale-title-medium-font);
+}
+
+:root:root body :is(.screen > h1, .anchored-panel__title, .canonical-palette > header h2) {
+  font: var(--md-sys-typescale-headline-small-font);
+}
+
+:root:root body :is(button, input, select, textarea) {
+  font-family: var(--font-en);
+}
+
+/* Material cards and content surfaces. Domain-art faces inside these cards keep their own paint. */
+:root:root body :is(
+  .panel,
+  .settings-block,
+  .projection-card,
+  .permanent-shop-card,
+  .canonical-tool-card,
+  .canonical-status-grid > div,
+  .achievement-cell,
+  .building-row,
+  .shop-row,
+  .item-card,
+  .stat-tile,
+  .controls-catalogue__group,
+  .converter-category-catalog,
+  .file-converter-screen > section,
+  .ollama-card,
+  .ollama-hero,
+  .minigame-incoming,
+  .minigame-panel-card,
+  .home-site,
+  .home-coziness,
+  .factory-shop,
+  .factory-tree,
+  .diesel-depot,
+  .raid-supplies
+) {
+  border: 1px solid var(--md-sys-color-outline-variant);
+  border-radius: var(--md-sys-shape-corner-extra-large);
+  background: var(--md-sys-color-surface-container-low);
+  box-shadow: var(--md-sys-elevation-level-1);
+}
+
+:root:root body :is(.panel, .settings-block, .projection-card, .permanent-shop-card, .canonical-tool-card) {
+  padding: 16px;
+}
+
+:root:root body .panel__title::after {
+  border-top: 1px solid var(--md-sys-color-outline-variant);
+  opacity: 1;
+}
+
+/* Filled, tonal, outlined and icon-button anatomy. The hero cookie and other explicitly named
+   gameplay-art buttons are excluded from chrome normalization. */
+:root:root body button:not(.golden-sprite):not(.achievement-badge):not(.mini-ticket):not(.cookie-btn) {
+  min-block-size: 40px;
+  min-inline-size: 40px;
+  max-inline-size: 100%;
+  padding: 10px 24px;
+  border: 0;
+  border-radius: var(--md-sys-shape-corner-full);
+  background-color: var(--md-sys-color-secondary-container);
+  background-image: none;
+  color: var(--md-sys-color-on-secondary-container);
+  box-shadow: var(--md-sys-elevation-level-0);
+  filter: none;
+  font: var(--md-sys-typescale-label-large-font);
+  font-variant: normal;
+  letter-spacing: 0.1px;
+  text-transform: none;
+  text-shadow: none;
+  transform: none;
+  transition:
+    background-color var(--md-sys-motion-duration-short4) var(--md-sys-motion-easing-standard),
+    box-shadow var(--md-sys-motion-duration-short4) var(--md-sys-motion-easing-standard),
+    color var(--md-sys-motion-duration-short4) var(--md-sys-motion-easing-standard);
+}
+
+:root:root body button:not(.golden-sprite):not(.achievement-badge):not(.mini-ticket):not(.cookie-btn):hover:not(:disabled):not([aria-disabled='true']) {
+  background-color: color-mix(
+    in srgb,
+    var(--md-sys-color-on-secondary-container) var(--md-sys-state-hover-opacity),
+    var(--md-sys-color-secondary-container)
+  );
+  box-shadow: var(--md-sys-elevation-level-1);
+  filter: none;
+  transform: none;
+}
+
+:root:root body button:not(.golden-sprite):not(.achievement-badge):not(.mini-ticket):not(.cookie-btn):active:not(:disabled):not([aria-disabled='true']),
+:root:root body button:not(.golden-sprite):not(.achievement-badge):not(.mini-ticket):not(.cookie-btn)[aria-pressed='true'],
+:root:root body button:not(.golden-sprite):not(.achievement-badge):not(.mini-ticket):not(.cookie-btn)[data-open='true'] {
+  background-color: color-mix(
+    in srgb,
+    var(--md-sys-color-on-secondary-container) var(--md-sys-state-pressed-opacity),
+    var(--md-sys-color-secondary-container)
+  );
+  box-shadow: var(--md-sys-elevation-level-0);
+  transform: none;
+}
+
+:root:root body :is(
+  .buy-btn,
+  .item-card__buy,
+  .open-real-feature__button,
+  .diesel-depot__open,
+  .diesel-depot__mint,
+  .raid-supplies__buy,
+  .factory-upgrade .buy-btn,
+  .gate-trigger.tone-prestige,
+  .canonical-palette-launch
+) {
+  background-color: var(--md-sys-color-primary);
+  color: var(--md-sys-color-on-primary);
+  box-shadow: var(--md-sys-elevation-level-0);
+}
+
+:root:root body :is(
+  .buy-btn,
+  .item-card__buy,
+  .open-real-feature__button,
+  .diesel-depot__open,
+  .diesel-depot__mint,
+  .raid-supplies__buy,
+  .factory-upgrade .buy-btn,
+  .gate-trigger.tone-prestige,
+  .canonical-palette-launch
+):hover:not(:disabled):not([aria-disabled='true']) {
+  background-color: color-mix(
+    in srgb,
+    var(--md-sys-color-on-primary) var(--md-sys-state-hover-opacity),
+    var(--md-sys-color-primary)
+  );
+}
+
+:root:root body :is(.gate-trigger.tone-wipe, .super-confirmation__destructive) {
+  background-color: var(--md-sys-color-error);
+  color: var(--md-sys-color-on-error);
+}
+
+:root:root body :is(.anchored-panel__close, .title-bar__button, .canonical-palette > header button, .toast__dismiss) {
+  inline-size: 48px;
+  block-size: 48px;
+  min-inline-size: 48px;
+  min-block-size: 48px;
+  padding: 0;
+  border-radius: var(--md-sys-shape-corner-full);
+  background-color: transparent;
+  color: var(--md-sys-color-on-surface-variant);
+}
+
+/* The cookie illustration remains intact inside a Material large FAB-style click target. */
+:root:root body .cookie-btn {
+  border: 0;
+  background-color: var(--md-sys-color-primary-container);
+  background-image: none;
+  box-shadow: var(--md-sys-elevation-level-3);
+  filter: none;
+  transform: none;
+  transition:
+    background-color var(--md-sys-motion-duration-short4) var(--md-sys-motion-easing-standard),
+    box-shadow var(--md-sys-motion-duration-short4) var(--md-sys-motion-easing-standard);
+}
+
+:root:root body .cookie-btn::before {
+  content: none;
+}
+
+:root:root body .cookie-btn:hover {
+  background-color: color-mix(
+    in srgb,
+    var(--md-sys-color-on-primary-container) var(--md-sys-state-hover-opacity),
+    var(--md-sys-color-primary-container)
+  );
+  box-shadow: var(--md-sys-elevation-level-3);
+  filter: none;
+  transform: none;
+}
+
+:root:root body .cookie-btn:active {
+  background-color: color-mix(
+    in srgb,
+    var(--md-sys-color-on-primary-container) var(--md-sys-state-pressed-opacity),
+    var(--md-sys-color-primary-container)
+  );
+  box-shadow: var(--md-sys-elevation-level-1);
+  transform: none;
+}
+
+:root:root body button:disabled,
+:root:root body button[aria-disabled='true'] {
+  background-color: color-mix(in srgb, var(--md-sys-color-on-surface) 12%, transparent);
+  color: color-mix(in srgb, var(--md-sys-color-on-surface) var(--md-sys-state-disabled-opacity), transparent);
+  box-shadow: none;
+  cursor: not-allowed;
+  opacity: 1;
+}
+
+/* Material text fields and pickers. */
+:root:root body :is(input[type='text'], input[type='search'], input[type='email'], input[type='url'], input[type='number'], input[type='date'], input[type='time'], input[type='password'], select, textarea) {
+  min-block-size: 48px;
+  max-inline-size: 100%;
+  padding: 12px 16px;
+  border: 1px solid var(--md-sys-color-outline);
+  border-radius: var(--md-sys-shape-corner-extra-small);
+  background: var(--md-sys-color-surface);
+  color: var(--md-sys-color-on-surface);
+  box-shadow: none;
+  caret-color: var(--md-sys-color-primary);
+  font: var(--md-sys-typescale-body-large-font);
+  outline: 0;
+  transition:
+    border-color var(--md-sys-motion-duration-short2) var(--md-sys-motion-easing-standard),
+    box-shadow var(--md-sys-motion-duration-short2) var(--md-sys-motion-easing-standard);
+}
+
+:root:root body :is(input[type='text'], input[type='search'], input[type='email'], input[type='url'], input[type='number'], input[type='date'], input[type='time'], input[type='password'], select, textarea):hover:not(:disabled) {
+  border-color: var(--md-sys-color-on-surface);
+}
+
+:root:root body :is(input[type='text'], input[type='search'], input[type='email'], input[type='url'], input[type='number'], input[type='date'], input[type='time'], input[type='password'], select, textarea):focus-visible {
+  border: 2px solid var(--md-sys-color-primary);
+  box-shadow: 0 0 0 2px var(--md-sys-color-primary-container);
+}
+
+:root:root body .search-field {
+  min-block-size: 56px;
+  padding: 4px 4px 4px 16px;
+  border: 1px solid var(--md-sys-color-outline);
+  border-radius: var(--md-sys-shape-corner-extra-small);
+  background: var(--md-sys-color-surface);
+  box-shadow: none;
+}
+
+:root:root body .search-field:focus-within {
+  border: 2px solid var(--md-sys-color-primary);
+  box-shadow: 0 0 0 2px var(--md-sys-color-primary-container);
+}
+
+:root:root body .search-field__input {
+  min-block-size: 44px;
+  padding: 8px 0;
+  border: 0;
+  background: transparent;
+  box-shadow: none;
+}
+
+/* Material tabs and segmented selection. A persistent indicator supplements color. */
+:root:root body :is(.canonical-tabs__rail, .settings-browser-tabs, .ollama-tabs, .settings-modes, .stepper) {
+  gap: 4px;
+  padding: 4px;
+  border: 1px solid var(--md-sys-color-outline-variant);
+  border-radius: var(--md-sys-shape-corner-large);
+  background: var(--md-sys-color-surface-container);
+  box-shadow: none;
+}
+
+:root:root body :is([role='tab'], .settings-modes__button, .stepper button) {
+  min-block-size: 48px;
+  padding: 8px 16px;
+  border: 0;
+  border-radius: var(--md-sys-shape-corner-full);
+  background-color: transparent;
+  color: var(--md-sys-color-on-surface-variant);
+  box-shadow: none;
+  transform: none;
+}
+
+:root:root body :is([role='tab'][aria-selected='true'], .settings-modes__button[aria-pressed='true'], .stepper button.active) {
+  background-color: var(--md-sys-color-secondary-container);
+  color: var(--md-sys-color-on-secondary-container);
+  box-shadow: inset 3px 0 0 var(--md-sys-color-primary);
+  transform: none;
+}
+
+/* Material checkboxes, radios, switches and range controls. */
+:root:root body input[type='checkbox']:not([role='switch']) {
+  appearance: none;
+  inline-size: 20px;
+  block-size: 20px;
+  min-inline-size: 20px;
+  min-block-size: 20px;
+  margin: 0;
+  border: 2px solid var(--md-sys-color-on-surface-variant);
+  border-radius: 2px;
+  background: transparent;
+  display: inline-grid;
+  place-content: center;
+}
+
+:root:root body input[type='checkbox']:not([role='switch'])::after {
+  content: '';
+  inline-size: 10px;
+  block-size: 6px;
+  border: solid var(--md-sys-color-on-primary);
+  border-width: 0 0 2px 2px;
+  opacity: 0;
+  transform: translateY(-1px) rotate(-45deg) scale(0.6);
+  transition: opacity var(--md-sys-motion-duration-short2) linear, transform var(--md-sys-motion-duration-short2) var(--md-sys-motion-easing-standard);
+}
+
+:root:root body input[type='checkbox']:not([role='switch']):checked {
+  border-color: var(--md-sys-color-primary);
+  background: var(--md-sys-color-primary);
+}
+
+:root:root body input[type='checkbox']:not([role='switch']):checked::after {
+  opacity: 1;
+  transform: translateY(-1px) rotate(-45deg) scale(1);
+}
+
+:root:root body input[type='radio'] {
+  appearance: none;
+  inline-size: 20px;
+  block-size: 20px;
+  margin: 0;
+  border: 2px solid var(--md-sys-color-on-surface-variant);
+  border-radius: 50%;
+  background: transparent;
+}
+
+:root:root body input[type='radio']:checked {
+  border: 6px solid var(--md-sys-color-primary);
+}
+
+:root:root body :is([role='switch'], input[type='checkbox'][role='switch']) {
+  appearance: none;
+  position: relative;
+  inline-size: 52px;
+  block-size: 32px;
+  min-inline-size: 52px;
+  min-block-size: 32px;
+  margin: 0;
+  border: 2px solid var(--md-sys-color-outline);
+  border-radius: var(--md-sys-shape-corner-full);
+  background: var(--md-sys-color-surface-container-highest);
+}
+
+:root:root body input[type='checkbox'][role='switch']::after {
+  content: '';
+  position: absolute;
+  inset-block-start: 50%;
+  inset-inline-start: 6px;
+  inline-size: 16px;
+  block-size: 16px;
+  border: 0;
+  border-radius: 50%;
+  background: var(--md-sys-color-outline);
+  opacity: 1;
+  transform: translateY(-50%);
+  transition:
+    inline-size var(--md-sys-motion-duration-short4) var(--md-sys-motion-easing-emphasized),
+    inset-inline-start var(--md-sys-motion-duration-short4) var(--md-sys-motion-easing-emphasized),
+    background-color var(--md-sys-motion-duration-short4) var(--md-sys-motion-easing-standard);
+}
+
+:root:root body input[type='checkbox'][role='switch']:checked {
+  border-color: var(--md-sys-color-primary);
+  background: var(--md-sys-color-primary);
+}
+
+:root:root body input[type='checkbox'][role='switch']:checked::after {
+  inset-inline-start: 24px;
+  inline-size: 24px;
+  block-size: 24px;
+  background: var(--md-sys-color-on-primary);
+}
+
+:root:root body input[type='range'] {
+  appearance: none;
+  inline-size: 100%;
+  min-block-size: 44px;
+  background: transparent;
+}
+
+:root:root body input[type='range']::-webkit-slider-runnable-track {
+  block-size: 16px;
+  border: 0;
+  border-radius: var(--md-sys-shape-corner-full);
+  background: var(--md-sys-color-secondary-container);
+  box-shadow: none;
+}
+
+:root:root body input[type='range']::-webkit-slider-thumb {
+  appearance: none;
+  inline-size: 20px;
+  block-size: 44px;
+  margin-block-start: -14px;
+  border: 0;
+  border-radius: var(--md-sys-shape-corner-full);
+  background: var(--md-sys-color-primary);
+  box-shadow: none;
+}
+
+/* Material dialogs, anchored surfaces, menus and snackbars. */
+:root:root body .overlay-scrim,
+:root:root body .canonical-palette-backdrop {
+  background: var(--md-sys-color-scrim);
+  backdrop-filter: none;
+}
+
+:root:root body :is(
+  dialog,
+  [role='dialog'],
+  .anchored-panel,
+  .regex-popover,
+  .canonical-palette,
+  .canonical-search__builder,
+  .notification-center,
+  .super-confirmation
+) {
+  max-inline-size: calc(100vw - 32px);
+  max-block-size: calc(100vh - 32px);
+  border: 0;
+  border-radius: var(--md-sys-shape-corner-extra-large);
+  background: var(--md-sys-color-surface-container-high);
+  color: var(--md-sys-color-on-surface);
+  box-shadow: var(--md-sys-elevation-level-3);
+}
+
+:root:root body :is([role='menu'], [role='listbox'], .context-menu, .dropdown-menu, .move-group-picker) {
+  max-inline-size: calc(100vw - 24px);
+  max-block-size: min(480px, calc(100vh - 24px));
+  overflow: auto;
+  padding: 8px 0;
+  border: 0;
+  border-radius: var(--md-sys-shape-corner-extra-small);
+  background: var(--md-sys-color-surface-container);
+  color: var(--md-sys-color-on-surface);
+  box-shadow: var(--md-sys-elevation-level-2);
+}
+
+:root:root body :is([role='menuitem'], [role='option']) {
+  min-block-size: 48px;
+  padding: 12px 16px;
+  border-radius: 0;
+}
+
+:root:root body .anchored-panel {
+  overflow: hidden;
+}
+
+:root:root body .anchored-panel__bar {
+  padding: 16px 20px;
+  border-bottom: 1px solid var(--md-sys-color-outline-variant);
+  border-radius: var(--md-sys-shape-corner-extra-large) var(--md-sys-shape-corner-extra-large) 0 0;
+  background: var(--md-sys-color-surface-container-high);
+  box-shadow: none;
+}
+
+:root:root body .anchored-panel__title {
+  color: var(--md-sys-color-on-surface);
+}
+
+:root:root body .anchored-panel__notch,
+:root:root body .anchored-panel__corner {
+  display: none;
+}
+
+:root:root body :is(.achievement-toast, .toast, .update-notice, .canonical-notices > li, .ollama-notice) {
+  border: 0;
+  border-radius: var(--md-sys-shape-corner-extra-small);
+  background: var(--md-sys-color-surface-container-highest);
+  color: var(--md-sys-color-on-surface);
+  box-shadow: var(--md-sys-elevation-level-3);
+}
+
+/* Product-navigation controls become Material icon/tonal buttons while the cabinet frame itself
+   remains gameplay art. */
+:root:root body .console {
+  gap: 8px;
+  padding: 4px;
+  border: 0;
+  border-radius: var(--md-sys-shape-corner-large);
+  background: var(--md-sys-color-surface-container);
+  box-shadow: var(--md-sys-elevation-level-1);
+}
+
+:root:root body .console__button {
+  inline-size: 100px;
+  min-block-size: 56px;
+  padding: 8px 12px;
+  border: 0;
+  border-radius: var(--md-sys-shape-corner-large);
+  background: transparent;
+  color: var(--md-sys-color-on-surface-variant);
+  box-shadow: none;
+  filter: none;
+  transform: none;
+}
+
+:root:root body .console__button::after {
+  content: none;
+}
+
+:root:root body .console__button[data-open='true'] {
+  background: var(--md-sys-color-secondary-container);
+  color: var(--md-sys-color-on-secondary-container);
+  box-shadow: inset 0 -3px 0 var(--md-sys-color-primary);
+}
+
+:root:root body .console__label {
+  font: var(--md-sys-typescale-label-medium-font);
+  letter-spacing: 0.5px;
+  text-transform: none;
+}
+
+:root:root body .title-bar__button::before {
+  border: 0;
+  border-radius: var(--md-sys-shape-corner-full);
+  background: transparent;
+  box-shadow: none;
+  transform: none;
+}
+
+/* One consistent accessible focus indicator for product chrome. Gameplay artwork keeps its own
+   explicitly scoped focus treatment where the ring is part of the interaction illustration. */
+:root:root body :is(
+  button:not(.golden-sprite):not(.achievement-badge):not(.mini-ticket):not(.cookie-btn),
+  input,
+  select,
+  textarea,
+  [tabindex]:not([tabindex='-1']),
+  [role='menuitem'],
+  [role='option'],
+  [role='tab']
+):focus-visible {
+  outline: 3px solid var(--md-sys-color-primary);
+  outline-offset: 3px;
+}
+
+@media (max-width: 700px) {
+  :root:root body :is(dialog, [role='dialog'], .anchored-panel, .canonical-palette, .regex-popover) {
+    inset-inline: 8px;
+    inline-size: auto;
+    max-inline-size: calc(100vw - 16px);
+    max-block-size: calc(100vh - 16px);
+    border-radius: var(--md-sys-shape-corner-large);
+  }
+
+  :root:root body :is(.settings-modes, .canonical-tabs__list, .ollama-tabs) {
+    overflow-x: auto;
+    overscroll-behavior-inline: contain;
+  }
+
+  :root:root body button:not(.golden-sprite):not(.achievement-badge):not(.mini-ticket):not(.cookie-btn) {
+    min-block-size: 48px;
+    white-space: normal;
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  :root:root body :is(
+    button,
+    input,
+    select,
+    textarea,
+    [role='dialog'],
+    [role='menu'],
+    [role='listbox'],
+    .anchored-panel,
+    .regex-popover,
+    .canonical-palette
+  ),
+  :root:root body :is(button, input, select, textarea, [role='dialog'], [role='menu'], [role='listbox'])::before,
+  :root:root body :is(button, input, select, textarea, [role='dialog'], [role='menu'], [role='listbox'])::after {
+    animation: none;
+    scroll-behavior: auto;
+    transition: none;
+  }
+}
+
+/* ============================================================================================
  * THE PLAIN LAYER
  *
  * The owner's decree: "the app should start with a purely super plain cheaply made app with

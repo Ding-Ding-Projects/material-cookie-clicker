@@ -7,6 +7,7 @@ import { evaluateAchievements } from "../src/shared/game/achievements.js";
 import { encodeSave } from "../src/shared/game/save-codec.js";
 import { createInitialGameState } from "../src/shared/game/reducer.js";
 import { UPGRADE_DEFINITIONS, isUpgradeUnlocked } from "../src/shared/game/upgrades.js";
+import { LOOK_RUNG_IDS } from "../src/shared/game/look-tiers.js";
 import type { GameState } from "../src/shared/game/types.js";
 
 /**
@@ -56,6 +57,7 @@ it("seeds a save for the home capture", () => {
   if (stage === "furnished") {
     state = {
       ...state,
+      controlUnlocks: { purchasedRungIds: [...LOOK_RUNG_IDS] },
       // A Parlour six minutes into its five-minute-plus build, so the capture can hold both
       // states at once: two finished rooms with things in them, and a site still working.
       homeConstruction: {
@@ -72,6 +74,7 @@ it("seeds a save for the home capture", () => {
   } else if (stage === "endless") {
     state = {
       ...state,
+      controlUnlocks: { purchasedRungIds: [...LOOK_RUNG_IDS] },
       homeConstruction: {
         blueprintIds: ["kitchen", "pantry", "parlour", "bedroom", "workshop", "garden"],
         rooms: ["kitchen", "pantry", "parlour", "bedroom", "workshop", "garden"].map((roomId) => ({

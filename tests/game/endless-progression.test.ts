@@ -51,4 +51,10 @@ describe("endless progression contract", () => {
     expect(source).toContain('className="diesel-depot__details" hidden={collapsed}');
     expect(source).toContain('type="button"');
   });
+
+  it("keeps furnished and endless Home capture fixtures on the completed look ladder", () => {
+    const source = readFileSync("scripts/capture-seed-home.test.ts", "utf8");
+    expect(source).toContain('import { LOOK_RUNG_IDS } from "../src/shared/game/look-tiers.js";');
+    expect(source.match(/controlUnlocks: \{ purchasedRungIds: \[\.\.\.LOOK_RUNG_IDS\] \}/g)).toHaveLength(2);
+  });
 });

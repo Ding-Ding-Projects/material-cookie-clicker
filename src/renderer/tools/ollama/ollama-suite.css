@@ -1,0 +1,457 @@
+.ollama-suite {
+  --ollama-good: color-mix(in srgb, var(--md-sys-color-tertiary, #006b56) 22%, transparent);
+  --ollama-warning: color-mix(in srgb, var(--md-sys-color-secondary, #6b5e00) 24%, transparent);
+  --ollama-bad: color-mix(in srgb, var(--md-sys-color-error, #ba1a1a) 18%, transparent);
+  display: grid;
+  gap: 16px;
+  min-width: 0;
+  color: var(--md-sys-color-on-surface, #211a15);
+}
+
+.ollama-suite button,
+.ollama-suite input,
+.ollama-suite textarea,
+.ollama-suite progress {
+  font: inherit;
+}
+
+.ollama-suite button {
+  min-block-size: 44px;
+  border: 1px solid var(--md-sys-color-outline, #81756d);
+  border-radius: 999px;
+  padding: 8px 16px;
+  color: var(--md-sys-color-on-surface, #211a15);
+  background: var(--md-sys-color-surface-container, #f6ede6);
+  cursor: pointer;
+}
+
+.ollama-suite button:hover:not(:disabled),
+.ollama-suite button[aria-pressed='true'],
+.ollama-suite button[aria-selected='true'],
+.ollama-suite button[aria-checked='true'] {
+  background: var(--md-sys-color-secondary-container, #f1dfc8);
+}
+
+.ollama-suite button:focus-visible,
+.ollama-suite input:focus-visible,
+.ollama-suite textarea:focus-visible,
+.ollama-suite summary:focus-visible {
+  outline: 3px solid var(--md-sys-color-primary, #765900);
+  outline-offset: 3px;
+}
+
+.ollama-suite button:disabled,
+.ollama-disabled {
+  opacity: 0.58;
+}
+
+.ollama-hero {
+  display: grid;
+  grid-template-columns: minmax(0, 1.4fr) minmax(260px, 0.8fr);
+  gap: 20px;
+  padding: 22px;
+  border-radius: 28px;
+  background: linear-gradient(135deg, var(--md-sys-color-primary-container, #ffdf93), var(--md-sys-color-surface-container-high, #ede4dc));
+  box-shadow: 0 2px 8px color-mix(in srgb, var(--md-sys-color-shadow, #000) 16%, transparent);
+}
+
+.ollama-hero h1,
+.ollama-card h2,
+.ollama-card h3 {
+  margin-block: 0 8px;
+}
+
+.ollama-eyebrow {
+  display: block;
+  margin-block-end: 6px;
+  font-size: 0.78rem;
+  font-weight: 800;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+}
+
+.ollama-runtime {
+  display: grid;
+  align-content: start;
+  gap: 8px;
+  padding: 16px;
+  border: 1px solid var(--md-sys-color-outline-variant, #d1c4ba);
+  border-radius: 20px;
+  background: var(--md-sys-color-surface, #fff8f3);
+}
+
+.ollama-runtime--healthy { border-color: var(--md-sys-color-tertiary, #006b56); }
+.ollama-runtime--unhealthy,
+.ollama-runtime--missing { border-color: var(--md-sys-color-error, #ba1a1a); }
+
+.ollama-tabs {
+  display: flex;
+  gap: 8px;
+  overflow-x: auto;
+  padding: 4px;
+  scrollbar-width: thin;
+}
+
+.ollama-tabs [role='tab'] {
+  flex: 0 0 auto;
+}
+
+.ollama-tabs [role='tab'][aria-selected='true'] {
+  color: var(--md-sys-color-on-primary-container, #251a00);
+  background: var(--md-sys-color-primary-container, #ffdf93);
+}
+
+.ollama-stack {
+  display: grid;
+  gap: 16px;
+}
+
+.ollama-card {
+  min-width: 0;
+  padding: 18px;
+  border: 1px solid var(--md-sys-color-outline-variant, #d1c4ba);
+  border-radius: 24px;
+  background: var(--md-sys-color-surface-container-low, #fbf1e9);
+}
+
+.ollama-status-card {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr) auto;
+  gap: 12px;
+}
+
+.ollama-status-card > dl,
+.ollama-status-card > p {
+  grid-column: 1 / -1;
+}
+
+.ollama-muted {
+  color: var(--md-sys-color-on-surface-variant, #51453e);
+}
+
+.ollama-inline-facts,
+.ollama-fit dl,
+.ollama-preflight dl,
+.ollama-variant-grid dl {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(150px, 1fr));
+  gap: 8px;
+  margin: 12px 0;
+}
+
+.ollama-inline-facts div,
+.ollama-fit dl div,
+.ollama-preflight dl div,
+.ollama-variant-grid dl div {
+  min-width: 0;
+  padding: 8px 10px;
+  border-radius: 12px;
+  background: var(--md-sys-color-surface-container, #f6ede6);
+}
+
+.ollama-suite dt {
+  font-size: 0.78rem;
+  font-weight: 700;
+  color: var(--md-sys-color-on-surface-variant, #51453e);
+}
+
+.ollama-suite dd {
+  margin: 2px 0 0;
+  overflow-wrap: anywhere;
+}
+
+.ollama-chip {
+  display: inline-flex;
+  inline-size: max-content;
+  align-items: center;
+  min-block-size: 28px;
+  padding-inline: 10px;
+  border-radius: 999px;
+  background: var(--md-sys-color-surface-container-highest, #e7ddd4);
+}
+
+.ollama-chip--good { background: var(--ollama-good); }
+.ollama-chip--unknown { background: var(--md-sys-color-surface-container-highest, #e7ddd4); }
+
+.ollama-model-list,
+.ollama-queue-list,
+.ollama-snapshot-list,
+.ollama-variant-grid {
+  display: grid;
+  gap: 12px;
+  margin: 12px 0 0;
+  padding: 0;
+  list-style: none;
+}
+
+.ollama-model-list > li,
+.ollama-queue-list > li,
+.ollama-snapshot-list > li,
+.ollama-variant-grid > li {
+  display: grid;
+  gap: 10px;
+  min-width: 0;
+  padding: 14px;
+  border-radius: 18px;
+  background: var(--md-sys-color-surface, #fff8f3);
+}
+
+.ollama-model-list > li > div:first-child,
+.ollama-queue-list > li > div:first-child,
+.ollama-snapshot-list > li > div:first-child,
+.ollama-variant-heading {
+  display: flex;
+  flex-wrap: wrap;
+  justify-content: space-between;
+  gap: 8px;
+}
+
+.ollama-variant-grid {
+  grid-template-columns: repeat(auto-fill, minmax(min(100%, 310px), 1fr));
+}
+
+.ollama-fit {
+  border-radius: 14px;
+  padding: 8px 10px;
+  background: var(--md-sys-color-surface-container-low, #fbf1e9);
+}
+
+.ollama-fit--good { background: var(--ollama-good); }
+.ollama-fit--warning { background: var(--ollama-warning); }
+.ollama-fit--bad { background: var(--ollama-bad); }
+
+.ollama-fit summary,
+.ollama-facet summary,
+.ollama-model-actions summary {
+  min-block-size: 44px;
+  cursor: pointer;
+}
+
+.ollama-fit summary {
+  display: grid;
+  gap: 2px;
+}
+
+.ollama-toolbar,
+.ollama-actions,
+.ollama-facets {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px;
+  margin-block: 10px;
+}
+
+.ollama-facet {
+  min-width: min(100%, 220px);
+  padding: 8px 12px;
+  border: 1px solid var(--md-sys-color-outline-variant, #d1c4ba);
+  border-radius: 16px;
+  background: var(--md-sys-color-surface, #fff8f3);
+}
+
+.ollama-check-grid {
+  display: grid;
+  gap: 8px;
+  max-block-size: 220px;
+  overflow: auto;
+  padding: 8px 2px;
+}
+
+.ollama-check-grid label,
+.ollama-card > label,
+.ollama-delete-gate label {
+  display: grid;
+  gap: 6px;
+}
+
+.ollama-card input[type='text'],
+.ollama-card textarea {
+  box-sizing: border-box;
+  inline-size: 100%;
+  min-block-size: 44px;
+  border: 1px solid var(--md-sys-color-outline, #81756d);
+  border-radius: 12px;
+  padding: 10px 12px;
+  color: inherit;
+  background: var(--md-sys-color-surface, #fff8f3);
+}
+
+.ollama-card textarea {
+  resize: vertical;
+}
+
+.ollama-empty {
+  padding: 18px;
+  border: 1px dashed var(--md-sys-color-outline, #81756d);
+  border-radius: 16px;
+  text-align: center;
+}
+
+.ollama-errors,
+.ollama-queue-list [role='alert'],
+.ollama-card > [role='alert'] {
+  color: var(--md-sys-color-error, #ba1a1a);
+}
+
+.ollama-queue-list progress,
+.ollama-delete-gate progress {
+  inline-size: 100%;
+  block-size: 10px;
+}
+
+.ollama-choice-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(min(100%, 220px), 1fr));
+  gap: 8px;
+  margin-block: 10px;
+}
+
+.ollama-choice-grid button {
+  display: grid;
+  gap: 4px;
+  border-radius: 16px;
+  text-align: start;
+}
+
+.ollama-transcript {
+  display: grid;
+  gap: 8px;
+  max-block-size: 360px;
+  overflow-y: auto;
+  margin-block: 12px;
+  padding: 10px;
+  border-radius: 18px;
+  background: var(--md-sys-color-surface-container, #f6ede6);
+}
+
+.ollama-message {
+  max-inline-size: 85%;
+  padding: 10px 12px;
+  border-radius: 16px;
+  background: var(--md-sys-color-surface, #fff8f3);
+}
+
+.ollama-message--user {
+  justify-self: end;
+  background: var(--md-sys-color-primary-container, #ffdf93);
+}
+
+.ollama-message p { white-space: pre-wrap; }
+
+.ollama-path-row {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr) auto;
+  align-items: end;
+  gap: 8px;
+}
+
+.ollama-path-row label {
+  min-width: 0;
+}
+
+.ollama-preflight,
+.ollama-delete-gate {
+  margin-block-start: 12px;
+  padding: 14px;
+  border: 2px solid var(--md-sys-color-primary, #765900);
+  border-radius: 18px;
+  background: var(--md-sys-color-surface, #fff8f3);
+}
+
+.ollama-model-actions {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px;
+}
+
+.ollama-model-actions details {
+  flex: 1 1 220px;
+}
+
+.ollama-danger {
+  color: var(--md-sys-color-error, #ba1a1a) !important;
+  border-color: var(--md-sys-color-error, #ba1a1a) !important;
+}
+
+.ollama-troubleshooter-list {
+  display: grid;
+  gap: 10px;
+  margin-block-start: 12px;
+}
+
+.ollama-troubleshooter-list article {
+  padding: 14px;
+  border: 1px solid var(--md-sys-color-outline-variant, #d1c4ba);
+  border-radius: 18px;
+  background: var(--md-sys-color-surface, #fff8f3);
+}
+
+.ollama-troubleshooter-list article.active {
+  border-width: 2px;
+  border-color: var(--md-sys-color-primary, #765900);
+}
+
+.ollama-troubleshooter-list article > div {
+  display: flex;
+  flex-wrap: wrap;
+  justify-content: space-between;
+  gap: 8px;
+}
+
+.ollama-notifications {
+  position: fixed;
+  inset-inline-end: 20px;
+  inset-block-end: 20px;
+  z-index: 30;
+  display: grid;
+  gap: 8px;
+  inline-size: min(360px, calc(100vw - 40px));
+}
+
+.ollama-notice {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 12px;
+  padding: 12px 14px;
+  border-radius: 16px;
+  background: var(--md-sys-color-inverse-surface, #362f2a);
+  color: var(--md-sys-color-inverse-on-surface, #fbeeE4);
+  box-shadow: 0 5px 18px color-mix(in srgb, var(--md-sys-color-shadow, #000) 26%, transparent);
+}
+
+.ollama-notice--error {
+  background: var(--md-sys-color-error-container, #ffdad6);
+  color: var(--md-sys-color-on-error-container, #410002);
+}
+
+.ollama-notice button {
+  min-inline-size: 44px;
+  padding: 4px;
+  color: inherit;
+  background: transparent;
+}
+
+@media (max-width: 760px) {
+  .ollama-hero,
+  .ollama-status-card,
+  .ollama-path-row {
+    grid-template-columns: 1fr;
+  }
+
+  .ollama-status-card > dl,
+  .ollama-status-card > p {
+    grid-column: auto;
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .ollama-suite *,
+  .ollama-suite *::before,
+  .ollama-suite *::after {
+    scroll-behavior: auto !important;
+    transition-duration: 0.01ms !important;
+    animation-duration: 0.01ms !important;
+    animation-iteration-count: 1 !important;
+  }
+}

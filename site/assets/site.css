@@ -871,6 +871,9 @@ mark { background: var(--spark); color: #221B00; border-radius: 4px; padding: 0 
 }
 .control-panel .plate label,
 .control-panel .plate p { color: var(--m3-on-surface); }
+.control-panel h2 { color: var(--m3-on-surface-variant); }
+.control-panel h2::after { border-top-color: var(--m3-outline); }
+.control-panel .switch { color: var(--m3-on-surface); }
 .control-panel[hidden] { display: none; }
 .settings-grid,
 .status-grid,

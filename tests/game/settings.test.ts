@@ -199,7 +199,7 @@ describe("App settings persistence round-trip", () => {
   it("stores and reloads all three values under its own key", () => {
     const storage = memoryStorage();
     const store = createLocalStorageAppSettings(storage);
-    const chosen: AppSettings = { languageMode: "yue", funnyLevelEn: 1, funnyLevelYue: 5 };
+    const chosen: AppSettings = { ...DEFAULT_APP_SETTINGS, languageMode: "yue", funnyLevelEn: 1, funnyLevelYue: 5 };
 
     store.save(chosen);
     expect(storage.map.has(APP_SETTINGS_KEY)).toBe(true);
@@ -227,7 +227,7 @@ describe("App settings persistence round-trip", () => {
 
   it("repairs individual bad fields without discarding the good ones", () => {
     expect(normalizeAppSettings({ languageMode: "klingon", funnyLevelEn: 4, funnyLevelYue: 99 })).toEqual({
-      languageMode: DEFAULT_APP_SETTINGS.languageMode,
+      ...DEFAULT_APP_SETTINGS,
       funnyLevelEn: 4,
       funnyLevelYue: 5,
     });

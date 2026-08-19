@@ -1,6 +1,8 @@
 import path from 'node:path';
 import { fileURLToPath } from 'node:url';
-import { app, BrowserWindow, ipcMain } from 'electron';
+import { mkdir, readFile, rename, unlink, writeFile } from 'node:fs/promises';
+import { unwatchFile, watchFile } from 'node:fs';
+import { app, BrowserWindow, ipcMain, shell } from 'electron';
 import squirrelStartup from 'electron-squirrel-startup';
 
 import { DieselLedgerService } from './diesel-ledger-service.js';
@@ -12,6 +14,13 @@ import {
   type DieselMintResponse,
   type DieselReadResponse,
 } from '../shared/game/ipc-contracts.js';
+import {
+  CANONICAL_IPC_CHANNELS,
+  normalizeCanonicalSharedSettings,
+  type CanonicalReadResult,
+  type CanonicalSharedSettings,
+  type CanonicalWriteResult,
+} from '../shared/canonical-ipc.js';
 
 const PRODUCT_NAME = 'Material Cookie Clicker';
 const PRODUCT_APP_ID = 'org.dingdingprojects.materialcookieclicker';
@@ -99,7 +108,7 @@ void app.whenReady().then(() => {
   ipcMain.on('window:minimize', () => mainWindow?.minimize());
   ipcMain.on('window:toggle-maximize', () => {
     if (!mainWindow) return;
-    // Herng-Ha-App quirk: maximize() on a non-resizable window does not maximize — on Windows it
+    // Electron quirk: maximize() on a non-resizable window does not maximize — on Windows it
     // just moves the window to the top-left corner at its old size (the resize purchase keeps the
     // window non-resizable until bought, so this is the common case). Lift the flag for the
     // operation and put it back, so a bought maximize behaves like a real one without quietly
@@ -143,6 +152,60 @@ void app.whenReady().then(() => {
   // applications agreed on in docs/winforge-diesel-exchange.md. Resolving it HERE, once, is
   // what keeps the path out of the renderer entirely.
   const dieselLedger = new DieselLedgerService(app.getPath('appData'));
+  const sharedDataDirectory = path.join(app.getPath('appData'), 'DingDingProjects', 'shared');
+  const sharedSettingsPath = path.join(sharedDataDirectory, 'application-settings.json');
+
+  const writeSharedSettings = async (value: CanonicalSharedSettings): Promise<CanonicalWriteResult> => {
+    try {
+      await mkdir(sharedDataDirectory, { recursive: true });
+      const normalized = { ...normalizeCanonicalSharedSettings(value), updatedAt: new Date().toISOString() };
+      const temporary = `${sharedSettingsPath}.${process.pid}.${Date.now()}.tmp`;
+      await writeFile(temporary, `${JSON.stringify(normalized, null, 2)}\n`, { encoding: 'utf8', flag: 'wx' });
+      let lastError: unknown = null;
+      for (let attempt = 0; attempt < 6; attempt += 1) {
+        try {
+          await rename(temporary, sharedSettingsPath);
+          return { ok: true };
+        } catch (error) {
+          lastError = error;
+          const code = (error as NodeJS.ErrnoException).code;
+          if (code !== 'EPERM' && code !== 'EACCES' && code !== 'EBUSY') break;
+          await new Promise((resolve) => setTimeout(resolve, 20 * (attempt + 1)));
+        }
+      }
+      await unlink(temporary).catch(() => undefined);
+      throw lastError;
+    } catch (error) {
+      return { ok: false, reason: error instanceof Error ? error.message : 'Shared settings could not be written.' };
+    }
+  };
+
+  const readSharedSettings = async (): Promise<CanonicalReadResult> => {
+    try {
+      const raw = await readFile(sharedSettingsPath, 'utf8');
+      return { ok: true, settings: normalizeCanonicalSharedSettings(JSON.parse(raw) as unknown) };
+    } catch (error) {
+      if ((error as NodeJS.ErrnoException).code === 'ENOENT') {
+        return { ok: true, settings: normalizeCanonicalSharedSettings(null) };
+      }
+      return { ok: false, reason: error instanceof Error ? error.message : 'Shared settings could not be read.' };
+    }
+  };
+  ipcMain.handle(CANONICAL_IPC_CHANNELS.readSharedSettings, readSharedSettings);
+  ipcMain.handle(CANONICAL_IPC_CHANNELS.writeSharedSettings, async (_event, value: CanonicalSharedSettings): Promise<CanonicalWriteResult> => writeSharedSettings(value));
+  ipcMain.handle(CANONICAL_IPC_CHANNELS.openApplicationData, async (): Promise<CanonicalWriteResult> => {
+    await mkdir(sharedDataDirectory, { recursive: true });
+    const reason = await shell.openPath(sharedDataDirectory);
+    return reason ? { ok: false, reason } : { ok: true };
+  });
+  watchFile(sharedSettingsPath, { interval: 1_000 }, () => {
+    void readSharedSettings().then((result) => {
+      if (result.ok && mainWindow && !mainWindow.isDestroyed()) {
+        mainWindow.webContents.send(CANONICAL_IPC_CHANNELS.sharedSettingsChanged, result.settings);
+      }
+    });
+  });
+  app.on('before-quit', () => unwatchFile(sharedSettingsPath));
 
   ipcMain.handle(DIESEL_IPC_CHANNELS.mint, async (_event, request: DieselMintRequest): Promise<DieselMintResponse> => {
     const litres = Number((request as DieselMintRequest | undefined)?.litres);

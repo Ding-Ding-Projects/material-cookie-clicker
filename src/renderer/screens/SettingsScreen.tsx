@@ -1,9 +1,14 @@
-import { bilingualText, SETTINGS_COPY, showsCantonese, showsEnglish } from '../game/copy';
+import { useEffect, useState } from 'react';
+import { createSearchState, matchesSearch } from '@material-cookie-clicker/surface-kernel';
+
+import { bilingualText, funnyLevelPreview, SETTINGS_COPY, showsCantonese, showsEnglish } from '../game/copy';
 import { effectiveLanguageMode, LANGUAGE_MODES, type FunnyLevel, type LanguageMode } from '../game/app-settings';
 import { useAppSettings } from '../game/AppSettingsContext';
 import type { SettingsRowId } from '../game/console-panels';
 import { CoinSlot, useControlRung } from '../components/CoinSlot';
 import { ControlsCatalogue } from './ControlsCatalogue';
+import { ApplicationToolsScreen } from './ApplicationToolsScreen';
+import { CanonicalSearch } from '../components/CanonicalSearch';
 
 /**
  * SETTINGS — the application's own surface (design/settings-funny-sliders.html).
@@ -54,10 +59,13 @@ export interface SettingsScreenProps {
    *  player came from and light up the row that request was closest to. */
   readonly highlightRow?: SettingsRowId | null;
   readonly openedFrom?: { readonly nameEn: string; readonly nameYue: string } | null;
+  readonly teleportTarget?: string | null;
 }
 
-export function SettingsScreen({ highlightRow = null, openedFrom = null }: SettingsScreenProps = {}) {
-  const { settings, setLanguageMode, setFunnyLevel } = useAppSettings();
+export function SettingsScreen({ highlightRow = null, openedFrom = null, teleportTarget = null }: SettingsScreenProps = {}) {
+  const { settings, updateSettings, setLanguageMode, setFunnyLevel } = useAppSettings();
+  const [settingsTab, setSettingsTab] = useState<'general' | 'application'>('general');
+  const [search, setSearch] = useState(() => createSearchState());
   const languageBought = useControlRung('settings.language');
   const ownedModes = {
     yue: useControlRung('settings.language.yue'),
@@ -66,6 +74,29 @@ export function SettingsScreen({ highlightRow = null, openedFrom = null }: Setti
   const activeMode = effectiveLanguageMode(settings.languageMode, ownedModes);
   const funnyEnBought = useControlRung('settings.funny.en');
   const funnyYueBought = useControlRung('settings.funny.yue');
+  const generalMatches = matchesSearch('language funny English Cantonese bilingual emoji School mode display name application rename', search);
+  const applicationMatches = matchesSearch('application tools tabs narrator vocabulary notifications status converter Ollama identity security', search);
+
+  useEffect(() => {
+    if (!teleportTarget) return;
+    const expectedTab = teleportTarget.startsWith('canonical-') ? 'application' : 'general';
+    if (settingsTab !== expectedTab) {
+      setSettingsTab(expectedTab);
+      return;
+    }
+    const timer = window.setTimeout(() => {
+      const target = document.getElementById(teleportTarget);
+      if (!target) return;
+      target.scrollIntoView({ block: 'center', behavior: 'smooth' });
+      target.setAttribute('data-teleport-highlight', 'true');
+      const focusable = target.matches('input,button,select,textarea,[tabindex]')
+        ? target as HTMLElement
+        : target.querySelector<HTMLElement>('input,button,select,textarea,[tabindex]');
+      (focusable ?? target).focus({ preventScroll: true });
+      window.setTimeout(() => target.removeAttribute('data-teleport-highlight'), 1800);
+    }, 0);
+    return () => window.clearTimeout(timer);
+  }, [settingsTab, teleportTarget]);
 
   return (
     <div className="settings-screen">
@@ -75,6 +106,17 @@ export function SettingsScreen({ highlightRow = null, openedFrom = null }: Setti
         </p>
       ) : null}
 
+      <CanonicalSearch label={bilingualText({ en: 'Search settings', yue: '搜尋設定' })} state={search} onChange={setSearch} />
+      <div className="settings-browser-tabs" role="tablist" aria-label={bilingualText({ en: 'Settings sections', yue: '設定分頁' })}>
+        <button type="button" role="tab" aria-selected={settingsTab === 'general'} aria-controls="settings-tabpanel-general" onClick={() => setSettingsTab('general')}>{bilingualText({ en: 'General', yue: '一般' })}</button>
+        <button type="button" role="tab" aria-selected={settingsTab === 'application'} aria-controls="settings-tabpanel-application" onClick={() => setSettingsTab('application')}>{bilingualText({ en: 'Application tools', yue: '應用程式工具' })}</button>
+      </div>
+
+      {settingsTab === 'general' ? (
+      <div id="settings-tabpanel-general" role="tabpanel">
+      {generalMatches ? <>
+
+      {!settings.schoolMode ? <>
       <section
         className="settings-block"
         data-highlight={highlightRow === 'language' ? 'true' : undefined}
@@ -182,12 +224,50 @@ export function SettingsScreen({ highlightRow = null, openedFrom = null }: Setti
 
         <p className="settings-note settings-note--honest">{bilingualText(SETTINGS_COPY.funnyScopeNote)}</p>
         <p className="settings-caption">{bilingualText(SETTINGS_COPY.factsNote)}</p>
+        <div className="settings-funny-preview" role="status">
+          <p id="settings-funny-en">{funnyLevelPreview('en', settings.funnyLevelEn)}</p>
+          {!settings.schoolMode ? <p id="settings-funny-yue">{funnyLevelPreview('yue', settings.funnyLevelYue)}</p> : null}
+        </div>
+      </section>
+
+      </> : <p role="status">{bilingualText({ en: `${settings.schoolModeName} is active. English is forced; language, funny-level, and personal-vocabulary controls are omitted until it is turned off.`, yue: `${settings.schoolModeName} 已開啟。現時強制使用英文；語言、搞笑程度同私人詞彙控制會暫時省略。` })}</p>}
+
+      <section className="settings-block" aria-labelledby="settings-application-label">
+        <h3 className="settings-block__label" id="settings-application-label">{bilingualText({ en: 'Application presentation', yue: '應用程式顯示' })}</h3>
+        <label id="settings-dialog-emoji">
+          <input type="checkbox" checked={settings.dialogEmoji} onChange={(event) => updateSettings({ dialogEmoji: event.target.checked })} />
+          {bilingualText({ en: 'Show emojis in dialogs and message boxes', yue: '喺對話框同訊息框顯示表情符號' })}
+        </label>
+        <label id="settings-school-mode">
+          <input type="checkbox" checked={settings.schoolMode} onChange={(event) => updateSettings({ schoolMode: event.target.checked })} />
+          {settings.schoolModeName}
+        </label>
+        <label>
+          {bilingualText({ en: 'Rename this mode', yue: '重新命名呢個模式' })}
+          <input value={settings.schoolModeName} maxLength={48} onChange={(event) => updateSettings({ schoolModeName: event.target.value })} onBlur={(event) => { if (!event.currentTarget.value.trim()) updateSettings({ schoolModeName: 'School mode' }); }} />
+        </label>
+        <p>{bilingualText({ en: 'When active, this mode forces English and omits Cantonese, funny-level, private-vocabulary, and dim-sum controls while preserving their stored choices.', yue: '開啟後會強制使用英文，省略廣東話、搞笑程度、私人詞彙同點心控制，但會保留之前儲存嘅選擇。' })}</p>
+        <label id="settings-display-name">
+          {bilingualText({ en: 'Application display name', yue: '應用程式顯示名稱' })}
+          <input value={settings.displayName} maxLength={80} onChange={(event) => updateSettings({ displayName: event.target.value })} onBlur={(event) => { if (!event.currentTarget.value.trim()) updateSettings({ displayName: DEFAULT_DISPLAY_NAME }); }} />
+        </label>
+        <button type="button" onClick={() => updateSettings({ displayName: DEFAULT_DISPLAY_NAME })}>{bilingualText({ en: 'Reset display name', yue: '重設顯示名稱' })}</button>
+        <p>{bilingualText({ en: 'Renaming changes presentation only. Package identity, data folders, executable name, installer identity, and update feed do not move.', yue: '改名淨係改顯示。套件身份、資料夾、執行檔名稱、安裝程式身份同更新來源都唔會搬。' })}</p>
       </section>
 
       <ControlsCatalogue />
+      </> : <p>No setting in General matches this search. The matching result may be on Application tools.</p>}
+      </div>
+      ) : (
+        <div id="settings-tabpanel-application" role="tabpanel">
+          {applicationMatches ? <ApplicationToolsScreen /> : <p>No setting in Application tools matches this search. The matching result may be on General.</p>}
+        </div>
+      )}
     </div>
   );
 }
+
+const DEFAULT_DISPLAY_NAME = 'Material Cookie Clicker';
 
 function FunnySlider({
   language,

@@ -10,6 +10,13 @@ import {
   type DieselReadResponse,
 } from '../shared/game/ipc-contracts.js';
 import type { UpdateStatus } from '../shared/game/updates.js';
+import {
+  CANONICAL_IPC_CHANNELS,
+  type CanonicalIpcApi,
+  type CanonicalReadResult,
+  type CanonicalSharedSettings,
+  type CanonicalWriteResult,
+} from '../shared/canonical-ipc.js';
 
 // A deliberately narrow bridge: window-chrome controls, plus the two diesel-exchange calls.
 // The game-state save IPC surface is still not exposed here — the renderer persists to
@@ -43,6 +50,7 @@ export interface MaterialCookieClickerApi {
    * receives is whatever the main process last decided (src/shared/game/updates.ts).
    */
   updates: UpdateIpcApi;
+  canonical: CanonicalIpcApi;
 }
 
 const api: MaterialCookieClickerApi = {
@@ -69,6 +77,19 @@ const api: MaterialCookieClickerApi = {
     },
     requestStatus: () => ipcRenderer.send(UPDATE_IPC_CHANNELS.requestStatus),
     restart: () => ipcRenderer.send(UPDATE_IPC_CHANNELS.restart),
+  },
+  canonical: {
+    readSharedSettings: (): Promise<CanonicalReadResult> =>
+      ipcRenderer.invoke(CANONICAL_IPC_CHANNELS.readSharedSettings) as Promise<CanonicalReadResult>,
+    writeSharedSettings: (settings: CanonicalSharedSettings): Promise<CanonicalWriteResult> =>
+      ipcRenderer.invoke(CANONICAL_IPC_CHANNELS.writeSharedSettings, settings) as Promise<CanonicalWriteResult>,
+    openApplicationData: (): Promise<CanonicalWriteResult> =>
+      ipcRenderer.invoke(CANONICAL_IPC_CHANNELS.openApplicationData) as Promise<CanonicalWriteResult>,
+    onSharedSettings: (listener: (settings: CanonicalSharedSettings) => void): (() => void) => {
+      const handler = (_event: unknown, settings: CanonicalSharedSettings) => listener(settings);
+      ipcRenderer.on(CANONICAL_IPC_CHANNELS.sharedSettingsChanged, handler);
+      return () => { ipcRenderer.off(CANONICAL_IPC_CHANNELS.sharedSettingsChanged, handler); };
+    },
   },
 };
 

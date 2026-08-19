@@ -14,6 +14,7 @@ import type { AppSettings, FunnyLevel, LanguageMode } from './app-settings.js';
  */
 export interface AppSettingsContextValue {
   readonly settings: AppSettings;
+  readonly updateSettings: (patch: Partial<AppSettings>) => void;
   readonly setLanguageMode: (mode: LanguageMode) => void;
   /** Sets ONE language's funny level. There is no combined setter on purpose: the two levels are
    *  independent controls (design/settings-funny-sliders.html), and an API that could set both

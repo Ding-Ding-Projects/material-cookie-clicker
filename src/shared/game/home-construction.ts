@@ -1,4 +1,4 @@
-import { bnFromNumber, type BigNum } from "./big-number.js";
+import { bnFromNumber, bnMul, bnPow, type BigNum } from "./big-number.js";
 import type { GameState } from "./types.js";
 
 /**
@@ -70,11 +70,22 @@ export interface HomeConstructionState {
   readonly build: ActiveBuild | null;
   /** Lifetime cookies spent on blueprints, construction and furniture. */
   readonly cookiesInvested: BigNum;
+  /** Repeatable floors added after the six authored rooms. Unbounded by design. */
+  readonly extensionLevel: number;
 }
 
 export function createInitialHomeState(): HomeConstructionState {
-  return { blueprintIds: [], rooms: [], build: null, cookiesInvested: bnFromNumber(0) };
+  return { blueprintIds: [], rooms: [], build: null, cookiesInvested: bnFromNumber(0), extensionLevel: 0 };
 }
+
+/** Synthetic build target used by the one-site construction clock for every repeatable floor. */
+export const HOME_EXTENSION_ID = "home_extension";
+export const HOME_EXTENSION_BASE_COST = 100_000_000;
+export const HOME_EXTENSION_COST_RATIO = 2;
+export const HOME_EXTENSION_BASE_MS = 1_800_000;
+export const HOME_EXTENSION_MAX_MS = 3_600_000;
+export const HOME_EXTENSION_COZINESS = 12;
+export const HOME_EXTENSION_CPS_FRACTION = 0.02;
 
 // ------------------------------------------------------------------------- the rooms ----
 
@@ -463,6 +474,29 @@ export function canStartConstruction(home: HomeConstructionState, roomId: string
   return def.requiresRoomId === null || isRoomBuilt(home, def.requiresRoomId);
 }
 
+/** The endless house begins only after every authored room has actually been built. */
+export function areAuthoredRoomsComplete(home: HomeConstructionState): boolean {
+  return ROOM_DEFINITIONS.every((room) => isRoomBuilt(home, room.id));
+}
+
+export function canStartHomeExtension(home: HomeConstructionState): boolean {
+  return home.build === null && areAuthoredRoomsComplete(home);
+}
+
+/** Cost of the next repeatable floor. BigNum keeps the sequence meaningful beyond Number limits. */
+export function homeExtensionCost(home: HomeConstructionState): BigNum {
+  return bnMul(
+    bnFromNumber(HOME_EXTENSION_BASE_COST),
+    bnPow(bnFromNumber(HOME_EXTENSION_COST_RATIO), home.extensionLevel),
+  );
+}
+
+/** Construction time grows gently and then plateaus; the number of completed floors never caps. */
+export function homeExtensionBuildMs(home: HomeConstructionState): number {
+  const printed = Math.min(HOME_EXTENSION_MAX_MS, HOME_EXTENSION_BASE_MS + home.extensionLevel * 300_000);
+  return Math.round(printed * (1 - buildSpeedFraction(home)));
+}
+
 // --------------------------------------------------------------------- the build speed ----
 
 /**
@@ -486,6 +520,7 @@ export function buildSpeedFraction(home: HomeConstructionState): number {
 
 /** Milliseconds a build of `roomId` would take if it were started right now. Always a whole ms. */
 export function requiredBuildMs(home: HomeConstructionState, roomId: string): number {
+  if (roomId === HOME_EXTENSION_ID) return homeExtensionBuildMs(home);
   const def = getRoomDefinition(roomId);
   return Math.round(def.buildMs * (1 - buildSpeedFraction(home)));
 }
@@ -500,7 +535,7 @@ export function requiredBuildMs(home: HomeConstructionState, roomId: string): nu
  * of time, or of how long you have been playing. You get it by building and furnishing, full stop.
  */
 export function totalCoziness(home: HomeConstructionState): number {
-  let total = 0;
+  let total = home.extensionLevel * HOME_EXTENSION_COZINESS;
   for (const room of home.rooms) {
     total += getRoomDefinition(room.roomId).baseCoziness;
     for (const id of room.furnitureIds) total += getFurnitureDefinition(id).coziness;
@@ -592,6 +627,10 @@ export function computeHomeBonuses(home: HomeConstructionState): HomeBonuses {
     }
   }
 
+  // Each finished floor is a small permanent production gain. Linear growth makes the house
+  // genuinely endless without allowing one late floor to dwarf the main generator economy.
+  globalCpsMultiplier *= 1 + home.extensionLevel * HOME_EXTENSION_CPS_FRACTION;
+
   return {
     coziness,
     globalCpsMultiplier,
@@ -632,6 +671,16 @@ export function tickHome(state: HomeConstructionState, seconds: number): HomeTic
   }
 
   const roomId = state.build.roomId;
+  if (roomId === HOME_EXTENSION_ID) {
+    return {
+      state: {
+        ...state,
+        build: null,
+        extensionLevel: state.extensionLevel + 1,
+      },
+      completedRoomId: HOME_EXTENSION_ID,
+    };
+  }
   return {
     state: {
       ...state,

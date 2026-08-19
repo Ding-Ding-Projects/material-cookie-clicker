@@ -124,6 +124,7 @@ function MinigameCard({
   onAbandon,
   onMinimize,
   onResume,
+  onRestart,
 }: {
   readonly gameId: MinigameId;
   readonly event?: MinigameEventView;

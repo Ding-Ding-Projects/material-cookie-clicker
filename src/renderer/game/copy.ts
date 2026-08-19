@@ -823,6 +823,8 @@ export const FACTORY_COPY = {
     yue: "憑證上面嗰個曲奇數字，而家係呢批貨攤分建廠成本嘅份額，唔係喺櫃枱畀嘅價錢。",
   },
   openFactory: { en: "Open the Diesel Factory", yue: "打開柴油廠" },
+  expandDepot: { en: "Expand Diesel Depot", yue: "展開柴油補給站" },
+  collapseDepot: { en: "Collapse Diesel Depot", yue: "收起柴油補給站" },
   depotCardHint: {
     en: "The whole depot moved into the Diesel Factory panel. This card is the status light.",
     yue: "成個油庫搬咗入柴油廠面板。呢張卡淨係盞狀態燈。",
@@ -1134,6 +1136,21 @@ export const HOME_COPY = {
     en: "Nothing is being built. Buy a blueprint, then start construction on it.",
     yue: "而家冇嘢起緊。買張圖則，然後開工。",
   },
+  endlessTitle: { en: "Endless extensions", yue: "無限加建" },
+  endlessBody: {
+    en: "All six rooms are complete. Add another floor whenever you like; every floor adds coziness and production, and there is no final floor.",
+    yue: "六間房已經起齊。想幾時加多層都得；每層都加溫馨度同產量，永遠冇最後一層。",
+  },
+  endlessLocked: {
+    en: "Finish all six authored rooms to unlock endless extensions.",
+    yue: "起齊六間原有房間，就會開啟無限加建。",
+  },
+  nextFloor: (level: number): Bilingual => ({
+    en: `Build floor ${level}`,
+    yue: `加建第 ${level} 層`,
+  }),
+  floorsBuiltLabel: { en: "Extension floors", yue: "加建樓層" },
+  noFinalFloor: { en: "No ownership cap · no final floor", yue: "冇持有上限 · 冇最後一層" },
   building: (nameEn: string, nameYue: string): Bilingual => ({
     en: `Building the ${nameEn}`,
     yue: `起緊${nameYue}`,

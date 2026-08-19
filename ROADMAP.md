@@ -16,6 +16,9 @@ built. Where it is unverified, that is said.
   achievements, milk and the kitten line, the Reborn permanent tree, prestige,
   golden cookies, offline progress, save schema with forward-only migrations,
   and the five persisted minigame events with Golden Tokens and Lucky Chance.
+- **Endless progression.** Generator counts and prestige runs remain uncapped; Office Building
+  explicitly has no ownership limit; and the Home adds repeatable, saved extension floors after
+  the six authored rooms, with no final level.
 - **Vendored engines.** Regex builder, command palette, tabs, colour translator,
   notifications, local history, time-based codes and QR, locks, scheduling,
   exports, conversion registry, local model suite. 126 tests.

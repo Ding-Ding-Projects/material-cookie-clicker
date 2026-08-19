@@ -39,6 +39,17 @@ remove it from the save. The existing 100,000 Minigames unlock, 1,000,000 Mouse
 Raid unlock, and 1,000,000,000 / 1,000,000,000,000 prestige thresholds are
 unchanged.
 
+## Endless progression
+
+The cookie economy has no terminal state: generator ownership is uncapped, Office Building is
+explicitly marked uncapped, and prestige can repeat indefinitely. The Home now continues after
+its six authored rooms through **Endless Extensions**. Each new floor uses the same one-site,
+one-crew construction clock, costs twice the previous floor, persists across saves and prestige,
+and adds permanent coziness plus a modest production bonus. There is no final floor.
+
+The Diesel Depot card in the shop rail is also collapsible. Its heading remains visible with the
+current tank amount, the toggle exposes `aria-expanded`, and the chosen state persists locally.
+
 ## Minigame events and Lucky Drawer
 
 At exactly 100,000 lifetime baked cookies, five seeded side-panel minigames

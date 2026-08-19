@@ -7887,6 +7887,51 @@ ul.card-grid {
   overflow: hidden;
 }
 
+.diesel-depot__toggle {
+  width: 100%;
+  min-height: 48px;
+  padding: 0;
+  border: 0;
+  background: transparent;
+  color: inherit;
+  font: inherit;
+  text-align: left;
+  cursor: pointer;
+}
+
+.diesel-depot__toggle:focus-visible {
+  outline: 3px solid var(--secondary);
+  outline-offset: 4px;
+  border-radius: var(--shape-medium);
+}
+
+.diesel-depot__summary {
+  margin-left: auto;
+  font-family: var(--font-display);
+  font-weight: 900;
+  white-space: nowrap;
+}
+
+.diesel-depot__chevron {
+  margin-left: 8px;
+  font-size: 20px;
+  line-height: 1;
+  transition: transform calc(180ms * var(--motion-scale, 1)) ease;
+}
+
+.diesel-depot[data-collapsed] .diesel-depot__chevron {
+  transform: rotate(-90deg);
+}
+
+.diesel-depot__details[hidden] {
+  display: none;
+}
+
+.shop-rail .diesel-depot--status[data-collapsed] {
+  max-height: none;
+  padding-bottom: 10px;
+}
+
 .diesel-depot__bar-fill {
   display: block;
   height: 100%;
@@ -7937,6 +7982,9 @@ ul.card-grid {
   }
   .factory-gauge__fill,
   .diesel-depot__bar-fill {
+    transition: none;
+  }
+  .diesel-depot__chevron {
     transition: none;
   }
   .factory-ship,

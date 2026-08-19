@@ -54,6 +54,7 @@ describe("disclosure: a fresh save shows nothing but the cookie", () => {
       dieselDepot: false,
       dieselFactory: false,
       homeConstruction: false,
+      minigames: false,
       perSecondReadout: false,
       perClickReadout: false,
       consoles: {
@@ -63,6 +64,7 @@ describe("disclosure: a fresh save shows nothing but the cookie", () => {
         prestige: false,
         factory: false,
         home: false,
+        minigames: false,
       },
     });
   });
@@ -99,6 +101,7 @@ describe("disclosure: each reveal upgrade flips exactly its own surface", () => 
       prestige: false,
       factory: false,
       home: false,
+      minigames: false,
     });
     expect(bnToNumber(after.cookies)).toBeCloseTo(0, 6);
   });

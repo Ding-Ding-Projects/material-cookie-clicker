@@ -40,10 +40,12 @@ import { freshState, fixedRng } from "./test-helpers";
 /* ------------------------------------------------------------------------------ helpers */
 
 function producing(cookies = 1e9): GameState {
+  const baseline = freshState();
   return freshState({
     generators: [{ id: "cursor", count: 100 }],
     cookies: bnFromNumber(cookies),
     lifetimeCookies: bnFromNumber(cookies * 2),
+    stats: { ...baseline.stats, totalCookiesBaked: bnFromNumber(Math.max(cookies * 2, 2_000_000)) },
   });
 }
 

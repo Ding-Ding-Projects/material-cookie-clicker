@@ -206,8 +206,15 @@ const HomeConstructionSchema = z
       })
       .nullable(),
     cookiesInvested: BigNumSchema,
+    extensionLevel: z.number().int().nonnegative().default(0),
   })
-  .default({ blueprintIds: [], rooms: [], build: null, cookiesInvested: { mantissa: 0, exponent: 0 } });
+  .default({
+    blueprintIds: [],
+    rooms: [],
+    build: null,
+    cookiesInvested: { mantissa: 0, exponent: 0 },
+    extensionLevel: 0,
+  });
 
 /**
  * Schema for save-format version 6. Adds `controlUnlocks` — the control economy

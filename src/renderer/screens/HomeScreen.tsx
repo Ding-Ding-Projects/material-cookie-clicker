@@ -5,11 +5,16 @@ import { formatExact, formatExactDigits } from '../../shared/game/format-number.
 import {
   buildProgressFraction,
   builtRoom,
+  areAuthoredRoomsComplete,
+  canStartHomeExtension,
   computeHomeBonuses,
   furnitureForRoom,
   getRoomDefinition,
   isBlueprintOffered,
   isRoomBuilt,
+  homeExtensionBuildMs,
+  homeExtensionCost,
+  HOME_EXTENSION_ID,
   MAX_COZINESS,
   ownsBlueprint,
   ownsFurniture,
@@ -67,7 +72,10 @@ function percentText(fraction: number): string {
  */
 function CozinessGauge({ home }: { home: HomeConstructionState }) {
   const bonuses = computeHomeBonuses(home);
-  const fraction = MAX_COZINESS > 0 ? bonuses.coziness / MAX_COZINESS : 0;
+  const displayMax = home.extensionLevel > 0
+    ? MAX_COZINESS + (home.extensionLevel + 1) * 12
+    : MAX_COZINESS;
+  const fraction = displayMax > 0 ? bonuses.coziness / displayMax : 0;
   const bonusPercent = ((bonuses.globalCpsMultiplier - 1) * 100).toFixed(1);
   // -120deg at empty through +120deg at full: a 240-degree sweep, which is what the dial's
   // painted arc covers.
@@ -84,10 +92,10 @@ function CozinessGauge({ home }: { home: HomeConstructionState }) {
           className="home-gauge"
           role="progressbar"
           aria-valuemin={0}
-          aria-valuemax={MAX_COZINESS}
+          aria-valuemax={displayMax}
           aria-valuenow={Math.round(bonuses.coziness)}
           aria-valuetext={bilingualText(
-            HOME_COPY.cozinessMeterLabel(figure(Math.round(bonuses.coziness)), figure(MAX_COZINESS)),
+            HOME_COPY.cozinessMeterLabel(figure(Math.round(bonuses.coziness)), figure(displayMax)),
           )}
           aria-label={bilingualText(HOME_COPY.cozinessTitle)}
         >
@@ -106,8 +114,9 @@ function CozinessGauge({ home }: { home: HomeConstructionState }) {
               : bilingualText(HOME_COPY.cozinessNone)}
           </p>
           <dl className="home-figures">
-            <HomeFigure label={HOME_COPY.cozinessOf} value={`${figure(Math.round(bonuses.coziness))} / ${figure(MAX_COZINESS)}`} />
-            <HomeFigure label={HOME_COPY.roomsBuiltLabel} value={`${figure(home.rooms.length)} / ${figure(ROOM_DEFINITIONS.length)}`} />
+            <HomeFigure label={HOME_COPY.cozinessOf} value={`${figure(Math.round(bonuses.coziness))} / ${figure(displayMax)}`} />
+            <HomeFigure label={HOME_COPY.roomsBuiltLabel} value={`${figure(home.rooms.length)} authored · ∞`} />
+            <HomeFigure label={HOME_COPY.floorsBuiltLabel} value={`${figure(home.extensionLevel)} · ∞`} />
             <HomeFigure
               label={HOME_COPY.furnitureOwnedLabel}
               value={figure(home.rooms.reduce((sum, r) => sum + r.furnitureIds.length, 0))}
@@ -151,9 +160,11 @@ function BuildingSite({ home }: { home: HomeConstructionState }) {
             {/* Both halves get their OWN language's room name. Interpolating the English name
                 into the Cantonese half would be the bilingual helper printing a translation
                 that is half untranslated, which is worse than not translating at all. */}
-            {bilingualText(
-              HOME_COPY.building(getRoomDefinition(build.roomId).nameEn, getRoomDefinition(build.roomId).nameYue),
-            )}
+            {build.roomId === HOME_EXTENSION_ID
+              ? bilingualText(HOME_COPY.nextFloor(home.extensionLevel + 1))
+              : bilingualText(
+                  HOME_COPY.building(getRoomDefinition(build.roomId).nameEn, getRoomDefinition(build.roomId).nameYue),
+                )}
           </p>
           <ProgressBar fraction={fraction} />
           <p className="home-note">
@@ -164,6 +175,46 @@ function BuildingSite({ home }: { home: HomeConstructionState }) {
         <p className="home-note">{bilingualText(HOME_COPY.queueIdle)}</p>
       )}
       <p className="home-note home-note--rule">{bilingualText(HOME_COPY.queueRule)}</p>
+    </section>
+  );
+}
+
+function EndlessExtensions({ home }: { home: HomeConstructionState }) {
+  const dispatch = useGameDispatch();
+  const fast = useFastSnapshot();
+  const unlocked = areAuthoredRoomsComplete(home);
+  const cost = homeExtensionCost(home);
+  const affordable = bnCompare(fast.cookies, cost) >= 0;
+  const allowed = canStartHomeExtension(home);
+  const nextLevel = home.extensionLevel + 1;
+  const reason = !unlocked
+    ? bilingualText(HOME_COPY.endlessLocked)
+    : !allowed
+      ? bilingualText(HOME_COPY.blockedBusy)
+      : !affordable
+        ? bilingualText(HOME_COPY.blockedShortfall(formatExactDigits(bnSub(cost, fast.cookies))))
+        : null;
+
+  return (
+    <section className="home-site home-endless" aria-labelledby="home-endless-title">
+      <h3 className="home-section__title" id="home-endless-title">{bilingualText(HOME_COPY.endlessTitle)}</h3>
+      <p className="home-note">{bilingualText(unlocked ? HOME_COPY.endlessBody : HOME_COPY.endlessLocked)}</p>
+      <dl className="home-figures home-figures--compact">
+        <HomeFigure label={HOME_COPY.floorsBuiltLabel} value={`${figure(home.extensionLevel)} · ∞`} />
+        <HomeFigure label={HOME_COPY.buildCostLabel} value={`🍪 ${formatExact(cost, 'en')}`} />
+        <HomeFigure label={HOME_COPY.buildTimeLabel} value={durationText(homeExtensionBuildMs(home))} />
+      </dl>
+      <button
+        type="button"
+        className="buy-btn buy-btn--build"
+        aria-disabled={Boolean(reason)}
+        aria-describedby={reason ? 'home-extension-why' : undefined}
+        onClick={() => dispatch({ type: 'startHomeExtension' })}
+      >
+        {bilingualText(HOME_COPY.nextFloor(nextLevel))} — 🍪 {formatExact(cost, 'en')}
+      </button>
+      {reason ? <span className="home-why" id="home-extension-why">{reason}</span> : null}
+      <p className="home-note home-note--rule">{bilingualText(HOME_COPY.noFinalFloor)}</p>
     </section>
   );
 }
@@ -653,6 +704,7 @@ export function HomeScreen() {
       <CozinessGauge home={home} />
       <BuildingSite home={home} />
       <Cutaway home={home} />
+      <EndlessExtensions home={home} />
       <FurnitureShop home={home} />
     </div>
   );

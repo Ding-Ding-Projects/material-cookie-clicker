@@ -130,6 +130,7 @@ export function encodeSave(state: GameState): SaveDataOnDisk {
       })),
       build: state.homeConstruction.build ? { ...state.homeConstruction.build } : null,
       cookiesInvested: state.homeConstruction.cookiesInvested,
+      extensionLevel: state.homeConstruction.extensionLevel,
     },
     toolProgressionEnabled: state.toolProgressionEnabled,
     purchasedToolIds: [...state.purchasedToolIds],

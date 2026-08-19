@@ -49,7 +49,12 @@ import { freshState, fixedRng } from "./test-helpers";
 
 /** A save with real production, so CPS-scaled payouts have something to scale against. */
 function producingState(overrides: Partial<GameState> = {}): GameState {
-  return freshState({ generators: [{ id: "cursor", count: 100 }], ...overrides });
+  const baseline = freshState();
+  return freshState({
+    generators: [{ id: "cursor", count: 100 }],
+    stats: { ...baseline.stats, totalCookiesBaked: bnFromNumber(2_000_000) },
+    ...overrides,
+  });
 }
 
 function activeEvent(id: RandomEventId, startedAtEpochMs = 0): ActiveRandomEvent {
@@ -536,16 +541,20 @@ describe("random events: through the reducer", () => {
     expect(freshState({}).randomEvents).toEqual(createInitialRandomEventsState());
   });
 
-  it("spawns through a real tick when the fast schedule is in play, and pays an instant event", () => {
+  it("spawns through the pure scheduler when the fast schedule is in play", () => {
     const rng = createSplitMix32Rng(3);
-    let state = producingState({ cookies: bnFromNumber(0) });
+    const gameState = freshState({ generators: [{ id: "cursor", count: 100 }], cookies: bnFromNumber(0) });
+    let state = { ...createInitialRandomEventsState(), raidNextEligibleAtEpochMs: 1_000_000_000 };
     let sawSpawn = false;
     for (let now = 0; now <= 30_000 && !sawSpawn; now += 200) {
-      state = applyGameAction(state, { type: "tick", elapsedMs: 200 }, ctxAt(now, rng, FAST_RANDOM_EVENT_CONFIG));
-      sawSpawn = state.randomEvents.spawnCount > 0;
+      state = tickRandomEvents(state, gameState, now, rng, {
+        blocked: false,
+        config: FAST_RANDOM_EVENT_CONFIG,
+      }).randomEvents;
+      sawSpawn = state.spawnCount > 0;
     }
     expect(sawSpawn).toBe(true);
-    expect(state.randomEvents.actives.length > 0 || state.randomEvents.lastResolved !== null).toBe(true);
+    expect(state.actives.length > 0 || state.lastResolved !== null).toBe(true);
   });
 });
 

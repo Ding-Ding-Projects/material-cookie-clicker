@@ -20,6 +20,12 @@ alongside a twenty-one-tier generator ladder from Cursor and Grandma through
 Office Buildings and Shipment to Portal, the Time Machine, the Idleverse and
 the Wok of the Gods.
 
+The progression loop is intentionally endless. Generator ownership and prestige runs have no
+terminal cap. After the six authored Home rooms are complete, `startHomeExtension` constructs
+repeatable floors through the existing one-site clock; `homeConstruction.extensionLevel` persists
+the count, and each floor adds coziness and a small production bonus. The shop-rail Diesel Depot
+status card now persists an accessible collapsed/expanded state.
+
 ## Current minigame-events lane
 
 The `feat/minigame-events-lucky-drawer` jer adds the permanently unlocked

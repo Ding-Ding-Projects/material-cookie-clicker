@@ -1,3 +1,5 @@
+import { useEffect, useState } from 'react';
+
 import { computeRatings, shippableLitres } from '../../shared/game/diesel-factory.js';
 import { computeDisclosure } from '../../shared/game/disclosure.js';
 import { DieselCanisterIcon } from '../assets/icons.js';
@@ -19,6 +21,21 @@ import { useFactorySnapshot, useStructureSnapshot } from '../game/GameProvider.j
 export function DieselDepot({ onOpenFactory }: { onOpenFactory?: (button: HTMLButtonElement) => void }) {
   const structure = useStructureSnapshot();
   const factory = useFactorySnapshot();
+  const [collapsed, setCollapsed] = useState(() => {
+    try {
+      return localStorage.getItem('material-cookie-clicker:diesel-depot:collapsed') === '1';
+    } catch {
+      return false;
+    }
+  });
+
+  useEffect(() => {
+    try {
+      localStorage.setItem('material-cookie-clicker:diesel-depot:collapsed', collapsed ? '1' : '0');
+    } catch {
+      // Storage refusal does not make the card inoperable; it only loses restart persistence.
+    }
+  }, [collapsed]);
 
   if (!computeDisclosure(structure).dieselDepot) return null;
 
@@ -28,8 +45,19 @@ export function DieselDepot({ onOpenFactory }: { onOpenFactory?: (button: HTMLBu
   const fillPercent = Math.round(fill * 100);
 
   return (
-    <section className="diesel-depot diesel-depot--status" aria-label={bilingualText(DIESEL_COPY.title)}>
-      <header className="diesel-depot__head">
+    <section
+      className="diesel-depot diesel-depot--status"
+      data-collapsed={collapsed || undefined}
+      aria-label={bilingualText(DIESEL_COPY.title)}
+    >
+      <button
+        type="button"
+        className="diesel-depot__head diesel-depot__toggle"
+        aria-expanded={!collapsed}
+        aria-controls="diesel-depot-details"
+        aria-label={bilingualText(collapsed ? FACTORY_COPY.expandDepot : FACTORY_COPY.collapseDepot)}
+        onClick={() => setCollapsed((value) => !value)}
+      >
         <span className="diesel-depot__icon" aria-hidden="true">
           <DieselCanisterIcon />
         </span>
@@ -37,7 +65,11 @@ export function DieselDepot({ onOpenFactory }: { onOpenFactory?: (button: HTMLBu
           {showsEnglish() ? <span className="diesel-depot__name">{DIESEL_COPY.title.en}</span> : null}
           {showsCantonese() ? <span className="diesel-depot__name-zh">{DIESEL_COPY.title.yue}</span> : null}
         </span>
-      </header>
+        <span className="diesel-depot__summary">{factory.litres.toLocaleString('en-US', { maximumFractionDigits: 1 })} L</span>
+        <span className="diesel-depot__chevron" aria-hidden="true">⌄</span>
+      </button>
+
+      <div id="diesel-depot-details" className="diesel-depot__details" hidden={collapsed}>
 
       {/* The one live figure worth having on the game surface: how full the tanks are. Drawn as
           a real fill fraction, and stated in words beside it so it is never colour-and-length
@@ -77,6 +109,7 @@ export function DieselDepot({ onOpenFactory }: { onOpenFactory?: (button: HTMLBu
       </button>
 
       <p className="diesel-depot__note">{bilingualText(FACTORY_COPY.depotCardHint)}</p>
+      </div>
     </section>
   );
 }

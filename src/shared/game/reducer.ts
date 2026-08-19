@@ -55,6 +55,7 @@ import { computeDisclosure } from "./disclosure.js";
 import { effectiveCps } from "./effective-cps.js";
 import {
   canStartConstruction,
+  canStartHomeExtension,
   createInitialHomeState,
   getFurnitureDefinition,
   getRoomDefinition,
@@ -62,6 +63,9 @@ import {
   isRoomBuilt,
   ownsBlueprint,
   ownsFurniture,
+  homeExtensionBuildMs,
+  homeExtensionCost,
+  HOME_EXTENSION_ID,
   requiredBuildMs,
   tickHome,
 } from "./home-construction.js";
@@ -164,6 +168,8 @@ export type GameAction =
    * that spends cookies while the player is looking somewhere else.
    */
   | { readonly type: "startHomeConstruction"; readonly roomId: string }
+  /** Adds the next repeatable floor after all six authored rooms exist. No maximum level. */
+  | { readonly type: "startHomeExtension" }
   /** Buys one piece of furniture into a room that is actually BUILT. Once each, never twice. */
   | { readonly type: "buyHomeFurniture"; readonly furnitureId: string }
   | { readonly type: "setToolProgression"; readonly enabled: boolean }
@@ -357,6 +363,11 @@ function handleBuyGeneratorBulk(state: GameState, ctx: ReducerCtx, generatorId: 
   } else {
     quantity = Math.max(0, Math.floor(quantityRequested));
   }
+
+  const remainingOwnership = def.ownershipCap === null || def.ownershipCap === undefined
+    ? Number.POSITIVE_INFINITY
+    : Math.max(0, def.ownershipCap - ownedCount);
+  quantity = Math.min(quantity, remainingOwnership);
 
   if (quantity <= 0) return state;
 
@@ -580,6 +591,30 @@ function handleStartHomeConstruction(state: GameState, ctx: ReducerCtx, roomId: 
     homeConstruction: {
       ...state.homeConstruction,
       build: { roomId, elapsedMs: 0, requiredMs },
+      cookiesInvested: bnAdd(state.homeConstruction.cookiesInvested, cost),
+    },
+  };
+
+  return withAchievements(nextState, nowIso(ctx));
+}
+
+function handleStartHomeExtension(state: GameState, ctx: ReducerCtx): GameState {
+  if (!computeDisclosure(state).homeConstruction) return state;
+  if (!canStartHomeExtension(state.homeConstruction)) return state;
+
+  const cost = homeExtensionCost(state.homeConstruction);
+  if (bnCompare(state.cookies, cost) < 0) return state;
+
+  const nextState: GameState = {
+    ...state,
+    cookies: bnClampNonNegative(bnSub(state.cookies, cost)),
+    homeConstruction: {
+      ...state.homeConstruction,
+      build: {
+        roomId: HOME_EXTENSION_ID,
+        elapsedMs: 0,
+        requiredMs: homeExtensionBuildMs(state.homeConstruction),
+      },
       cookiesInvested: bnAdd(state.homeConstruction.cookiesInvested, cost),
     },
   };
@@ -1287,6 +1322,8 @@ export function applyGameAction(state: GameState, action: GameAction, ctx: Reduc
       return withMarketDayRebate(state, handleBuyHomeBlueprint(state, ctx, action.roomId), ctx);
     case "startHomeConstruction":
       return withMarketDayRebate(state, handleStartHomeConstruction(state, ctx, action.roomId), ctx);
+    case "startHomeExtension":
+      return withMarketDayRebate(state, handleStartHomeExtension(state, ctx), ctx);
     case "buyHomeFurniture":
       return withMarketDayRebate(state, handleBuyHomeFurniture(state, ctx, action.furnitureId), ctx);
     case "setFactoryAutoShip":

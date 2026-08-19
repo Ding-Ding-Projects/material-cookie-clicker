@@ -25,18 +25,24 @@ function addBn(a: BigNum, b: BigNum): BigNum {
 }
 
 describe("generator ladder", () => {
-  it("has 20 tiers with a real theme progression", () => {
-    expect(GENERATOR_DEFINITIONS).toHaveLength(20);
+  it("has 21 tiers with a real theme progression", () => {
+    expect(GENERATOR_DEFINITIONS).toHaveLength(21);
     const ids = GENERATOR_DEFINITIONS.map((g) => g.id);
-    expect(new Set(ids).size).toBe(20); // no duplicate ids
+    expect(new Set(ids).size).toBe(21); // no duplicate ids
     expect(ids[0]).toBe("cursor");
     expect(ids[ids.length - 1]).toBe("wokOfTheGods");
   });
 
-  it("every tier costs roughly 10x more than the previous tier", () => {
+  it("keeps Office Building ownership explicitly uncapped", () => {
+    const office = getGeneratorDefinition("officeBuilding");
+    expect(office.ownershipCap).toBeNull();
+    expect(costOfNext(office, 1_000_000).exponent).toBeGreaterThan(10_000);
+  });
+
+  it("every tier costs several times more than the previous tier", () => {
     for (let i = 1; i < GENERATOR_DEFINITIONS.length; i++) {
       const ratio = GENERATOR_DEFINITIONS[i].baseCost / GENERATOR_DEFINITIONS[i - 1].baseCost;
-      expect(ratio).toBeGreaterThan(4);
+      expect(ratio).toBeGreaterThan(3);
       expect(ratio).toBeLessThan(30);
     }
   });

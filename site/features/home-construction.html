@@ -4,7 +4,7 @@
 <meta charset="utf-8" />
 <meta name="viewport" content="width=device-width, initial-scale=1" />
 <title>Building the home — Material Cookie Clicker</title>
-<meta name="description" content="You live over the shop. Buy a blueprint, pay the builders, and wait out a build that takes real minutes — then furnish the room. Six rooms, twenty-six pieces of furniture, and a coziness score that pays a modest multiplier on everything the ovens make." />
+<meta name="description" content="Build and furnish six authored rooms, then keep adding saved extension floors forever. Every floor uses the real construction clock and adds coziness and production." />
 <link rel="stylesheet" href="../assets/site.css" />
 </head>
 <body>
@@ -67,6 +67,10 @@
     </table>
     <p>Costs climb about an order of magnitude a room against a doubling of minutes, so the last room is a genuine project rather than a long till receipt. The whole house is <strong>sixty-eight minutes</strong> of construction, and that is before any of it is furnished.</p>
 
+    <h2>Endless extensions</h2>
+    <p>Finishing the six authored rooms is not the end of the Home. It unlocks a repeatable <strong>Build next floor</strong> card on the same panel. Every extension uses the same one-site, one-crew clock, survives save/reload and prestige, adds 12 coziness and a modest 2% production contribution, and increments a stored extension level with no maximum.</p>
+    <p>The first floor costs 100,000,000 cookies. Each later floor doubles in cost. Build time begins at thirty minutes, grows gently, and plateaus at one hour so the count can remain endless without eventually producing an unusable timer. The panel always prints the next floor, exact price, exact time and the infinity marker; there is no final floor hidden behind a finite list.</p>
+
     <h3>One site, one crew</h3>
     <p>Only one room is ever under construction. Starting a second while the first is up is <strong>refused outright</strong> &mdash; not queued behind it, not silently dropped in its place. The panel says so in words rather than leaving a disabled button to imply it, because a queue nobody asked for is a queue that spends cookies while the player is looking somewhere else.</p>
 
@@ -101,7 +105,7 @@
       </tbody>
     </table>
     <p>Logarithmic deliberately. A linear curve would make the last few pieces &mdash; the ones costing tens of millions &mdash; worth exactly as much as the first ones, which is wrong as an economy and wrong as a feeling: the difference between a bare room and a chair is enormous, and the difference between nine nice things and ten is small.</p>
-    <p>The curve is not the whole of what a furnished house pays. The eleven production pieces multiply to &times;1.3505, and the panel folds both into the single figure it prints, so the honest ceiling is <strong>&times;1.5108 on production</strong> for six rooms, thirty-eight purchases (six blueprints, six constructions, twenty-six pieces of furniture), <strong>405,780,000 cookies</strong> and sixty-eight minutes of building.</p>
+    <p>The curve is not the whole of what a furnished house pays. The eleven production pieces multiply to &times;1.3505. That used to create a finite furnished-house ceiling; extension floors now continue increasing coziness and production after the authored rooms are complete, so the displayed multiplier has no final maximum.</p>
     <p>Half again on production sounds large until you put it beside the main economy. It is deliberately of the same order as <em>one</em> of the cookie side's own global upgrades &mdash; Sturdier Ovens is &times;1.1, Industrial-Grade Yeast &times;1.25 &mdash; and there are a dozen of those, alongside a twenty-tier ladder and a prestige multiplier. Finishing the entire house is worth about as much as one good upgrade, spread across the entire mid-game. That is the point: the main economy stays primary, and stays primary by an enormous margin.</p>
 
     <h2>Nothing unlocks itself</h2>

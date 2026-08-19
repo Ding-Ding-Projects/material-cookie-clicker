@@ -6,6 +6,8 @@ import {
   buildProgressFraction,
   buildSpeedFraction,
   BUILD_SPEED_CAP,
+  areAuthoredRoomsComplete,
+  canStartHomeExtension,
   canStartConstruction,
   computeHomeBonuses,
   cozinessCpsMultiplier,
@@ -16,6 +18,9 @@ import {
   furnitureForRoom,
   getFurnitureDefinition,
   getRoomDefinition,
+  homeExtensionBuildMs,
+  homeExtensionCost,
+  HOME_EXTENSION_ID,
   isBlueprintOffered,
   isRoomBuilt,
   MAX_COZINESS,
@@ -493,6 +498,7 @@ describe("home construction: save round-trip", () => {
         ],
         build: { roomId: "parlour", elapsedMs: 41_500, requiredMs: 300_000 },
         cookiesInvested: bnFromNumber(987_654),
+        extensionLevel: 3,
       },
     });
 
@@ -514,6 +520,41 @@ describe("home construction: save round-trip", () => {
     expect(decoded.state.homeConstruction).toEqual(createInitialHomeState());
     // The default hands out no surface either: the Property Deed is still bought like everything else.
     expect(computeDisclosure(decoded.state).homeConstruction).toBe(false);
+  });
+});
+
+describe("home construction: endless extensions", () => {
+  const finishedRooms = Object.fromEntries(ROOM_DEFINITIONS.map((room) => [room.id, []]));
+
+  it("unlocks after all six authored rooms and never declares a maximum floor", () => {
+    const complete = house(finishedRooms);
+    expect(areAuthoredRoomsComplete(complete)).toBe(true);
+    expect(canStartHomeExtension(complete)).toBe(true);
+
+    const levelOneHundred = { ...complete, extensionLevel: 100 };
+    expect(canStartHomeExtension(levelOneHundred)).toBe(true);
+    expect(homeExtensionCost(levelOneHundred).exponent).toBeGreaterThan(30);
+    expect(homeExtensionBuildMs(levelOneHundred)).toBeLessThanOrEqual(3_600_000);
+  });
+
+  it("uses the normal one-site clock and adds one persistent floor when construction finishes", () => {
+    const complete = house(finishedRooms);
+    const requiredMs = homeExtensionBuildMs(complete);
+    const building = {
+      ...complete,
+      build: { roomId: HOME_EXTENSION_ID, elapsedMs: 0, requiredMs },
+    };
+    const result = tickHome(building, requiredMs / 1000);
+    expect(result.completedRoomId).toBe(HOME_EXTENSION_ID);
+    expect(result.state.extensionLevel).toBe(1);
+    expect(result.state.rooms).toEqual(complete.rooms);
+    expect(result.state.build).toBeNull();
+  });
+
+  it("keeps adding coziness and production instead of reaching the old furnished-house ceiling", () => {
+    const complete = house(finishedRooms, { extensionLevel: 25 });
+    expect(totalCoziness(complete)).toBe(36 + 25 * 12);
+    expect(computeHomeBonuses(complete).globalCpsMultiplier).toBeGreaterThan(1.5);
   });
 });
 

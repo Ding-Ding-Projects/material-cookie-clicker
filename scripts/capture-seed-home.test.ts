@@ -30,7 +30,11 @@ import type { GameState } from "../src/shared/game/types.js";
  *   HOME_CAPTURE_STAGE=before CAPTURE_USER_DATA=<dir> npx vitest run scripts/capture-seed-home.test.ts
  */
 it("seeds a save for the home capture", () => {
-  const stage = process.env.HOME_CAPTURE_STAGE === "furnished" ? "furnished" : "before";
+  const stage = process.env.HOME_CAPTURE_STAGE === "endless"
+    ? "endless"
+    : process.env.HOME_CAPTURE_STAGE === "furnished"
+      ? "furnished"
+      : "before";
   const now = new Date().toISOString();
 
   let state: GameState = {
@@ -62,6 +66,21 @@ it("seeds a save for the home capture", () => {
         ],
         build: { roomId: "parlour", elapsedMs: 246_000, requiredMs: 300_000 },
         cookiesInvested: bnFromNumber(1_060_000),
+        extensionLevel: 0,
+      },
+    };
+  } else if (stage === "endless") {
+    state = {
+      ...state,
+      homeConstruction: {
+        blueprintIds: ["kitchen", "pantry", "parlour", "bedroom", "workshop", "garden"],
+        rooms: ["kitchen", "pantry", "parlour", "bedroom", "workshop", "garden"].map((roomId) => ({
+          roomId,
+          furnitureIds: [],
+        })),
+        build: null,
+        cookiesInvested: bnFromNumber(1e12),
+        extensionLevel: 7,
       },
     };
   }
@@ -70,7 +89,7 @@ it("seeds a save for the home capture", () => {
   // Property Deed is the exception in the "before" stage: leaving it out is the whole point of
   // that stage, because the capture is of somebody buying it.
   const owned = UPGRADE_DEFINITIONS.filter((def) => {
-    if (def.id === "reveal_property_deed") return stage === "furnished";
+    if (def.id === "reveal_property_deed") return stage === "furnished" || stage === "endless";
     return def.effect.kind === "reveal" || (isUpgradeUnlocked(def.unlockCondition, state) && def.cost.exponent < 8);
   }).map((def, i) => ({ id: def.id, purchasedAtTickCount: i }));
   state = { ...state, upgrades: owned };

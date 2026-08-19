@@ -21,6 +21,8 @@ export interface GeneratorDefinition {
   readonly costRatio: number;
   /** Optional preserved all-time baked-cookie threshold for permanently unlocking this tier. */
   readonly lifetimeUnlock?: BigNum;
+  /** Null or omitted means ownership has no maximum. */
+  readonly ownershipCap?: number | null;
 }
 
 /**
@@ -50,10 +52,11 @@ export const GENERATOR_DEFINITIONS: readonly GeneratorDefinition[] = [
     id: "officeBuilding",
     nameEn: "Office Building",
     nameYue: "寫字樓",
-    baseCost: 1200000000,
+    baseCost: 1500000000,
     baseCps: 120000,
     costRatio: 1.15,
     lifetimeUnlock: bnFromNumber(500000000),
+    ownershipCap: null,
   },
   {
     id: "shipment",

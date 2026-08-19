@@ -13,10 +13,23 @@ import type { UpdateStatus } from '../shared/game/updates.js';
 import {
   CANONICAL_IPC_CHANNELS,
   type CanonicalIpcApi,
+  type CanonicalOllamaAction,
   type CanonicalReadResult,
+  type CanonicalSecuritySnapshot,
   type CanonicalSharedSettings,
+  type CanonicalValueResult,
   type CanonicalWriteResult,
+  type CanonicalConverterQueueAction,
+  type CanonicalConverterQueuePage,
+  type CanonicalConverterRequest,
+  type PdfFileOperationOutcome,
+  type PdfFileOperationRequest,
 } from '../shared/canonical-ipc.js';
+import type { ConvertFileOutcome, FileInspection } from '../shared/converter-contracts.js';
+import type { IdentityValidation, LogoMetadata } from '../shared/identity-model.js';
+import type { OllamaSuiteState } from '../shared/ollama-suite-types.js';
+import type { ExtendedScheduleRule } from '../shared/security-scheduling.js';
+import type { TotpImportRequest } from '../shared/security-totp.js';
 
 // A deliberately narrow bridge: window-chrome controls, plus the two diesel-exchange calls.
 // The game-state save IPC surface is still not exposed here — the renderer persists to
@@ -89,6 +102,37 @@ const api: MaterialCookieClickerApi = {
       const handler = (_event: unknown, settings: CanonicalSharedSettings) => listener(settings);
       ipcRenderer.on(CANONICAL_IPC_CHANNELS.sharedSettingsChanged, handler);
       return () => { ipcRenderer.off(CANONICAL_IPC_CHANNELS.sharedSettingsChanged, handler); };
+    },
+    converter: {
+      pickSource: (): Promise<CanonicalValueResult<string | null>> => ipcRenderer.invoke(CANONICAL_IPC_CHANNELS.converterPickSource) as Promise<CanonicalValueResult<string | null>>,
+      pickDestination: (suggestedName: string): Promise<CanonicalValueResult<string | null>> => ipcRenderer.invoke(CANONICAL_IPC_CHANNELS.converterPickDestination, suggestedName) as Promise<CanonicalValueResult<string | null>>,
+      inspect: (sourcePath: string): Promise<CanonicalValueResult<FileInspection>> => ipcRenderer.invoke(CANONICAL_IPC_CHANNELS.converterInspect, sourcePath) as Promise<CanonicalValueResult<FileInspection>>,
+      convert: (request: CanonicalConverterRequest): Promise<CanonicalValueResult<ConvertFileOutcome>> => ipcRenderer.invoke(CANONICAL_IPC_CHANNELS.converterConvert, request) as Promise<CanonicalValueResult<ConvertFileOutcome>>,
+      enqueue: (items: readonly CanonicalConverterRequest[]): Promise<CanonicalWriteResult> => ipcRenderer.invoke(CANONICAL_IPC_CHANNELS.converterEnqueue, items) as Promise<CanonicalWriteResult>,
+      queuePage: (cursor: string | null, limit: number): Promise<CanonicalValueResult<CanonicalConverterQueuePage>> => ipcRenderer.invoke(CANONICAL_IPC_CHANNELS.converterQueuePage, cursor, limit) as Promise<CanonicalValueResult<CanonicalConverterQueuePage>>,
+      queueAction: (action: CanonicalConverterQueueAction): Promise<CanonicalWriteResult> => ipcRenderer.invoke(CANONICAL_IPC_CHANNELS.converterQueueAction, action) as Promise<CanonicalWriteResult>,
+      pdf: (request: PdfFileOperationRequest): Promise<CanonicalValueResult<PdfFileOperationOutcome>> => ipcRenderer.invoke(CANONICAL_IPC_CHANNELS.converterPdf, request) as Promise<CanonicalValueResult<PdfFileOperationOutcome>>,
+    },
+    ollama: {
+      snapshot: (): Promise<CanonicalValueResult<OllamaSuiteState>> => ipcRenderer.invoke(CANONICAL_IPC_CHANNELS.ollamaSnapshot) as Promise<CanonicalValueResult<OllamaSuiteState>>,
+      invoke: (action: CanonicalOllamaAction, args: readonly unknown[]): Promise<CanonicalValueResult<unknown>> => ipcRenderer.invoke(CANONICAL_IPC_CHANNELS.ollamaAction, action, args) as Promise<CanonicalValueResult<unknown>>,
+      onState: (listener: (state: OllamaSuiteState) => void): (() => void) => {
+        const handler = (_event: unknown, state: OllamaSuiteState) => listener(state);
+        ipcRenderer.on(CANONICAL_IPC_CHANNELS.ollamaStateChanged, handler);
+        return () => { ipcRenderer.off(CANONICAL_IPC_CHANNELS.ollamaStateChanged, handler); };
+      },
+    },
+    identity: {
+      inspect: (bytes: Uint8Array): Promise<CanonicalValueResult<IdentityValidation<LogoMetadata>>> => ipcRenderer.invoke(CANONICAL_IPC_CHANNELS.identityInspect, bytes) as Promise<CanonicalValueResult<IdentityValidation<LogoMetadata>>>,
+    },
+    security: {
+      snapshot: (): Promise<CanonicalValueResult<CanonicalSecuritySnapshot>> => ipcRenderer.invoke(CANONICAL_IPC_CHANNELS.securitySnapshot) as Promise<CanonicalValueResult<CanonicalSecuritySnapshot>>,
+      importTotp: (request: TotpImportRequest): Promise<CanonicalWriteResult> => ipcRenderer.invoke(CANONICAL_IPC_CHANNELS.securityImportTotp, request) as Promise<CanonicalWriteResult>,
+      deleteTotp: (ids: readonly string[]): Promise<CanonicalWriteResult> => ipcRenderer.invoke(CANONICAL_IPC_CHANNELS.securityDeleteTotp, ids) as Promise<CanonicalWriteResult>,
+      saveSchedule: (rule: ExtendedScheduleRule): Promise<CanonicalWriteResult> => ipcRenderer.invoke(CANONICAL_IPC_CHANNELS.securitySaveSchedule, rule) as Promise<CanonicalWriteResult>,
+      restoreHistory: (revisionId: string): Promise<CanonicalWriteResult> => ipcRenderer.invoke(CANONICAL_IPC_CHANNELS.securityRestoreHistory, revisionId) as Promise<CanonicalWriteResult>,
+      exportText: (suggestedName: string, markdown: string): Promise<CanonicalWriteResult> => ipcRenderer.invoke(CANONICAL_IPC_CHANNELS.securityExportText, suggestedName, markdown) as Promise<CanonicalWriteResult>,
+      openDataFolder: (): Promise<CanonicalWriteResult> => ipcRenderer.invoke(CANONICAL_IPC_CHANNELS.securityOpenDataFolder) as Promise<CanonicalWriteResult>,
     },
   },
 };

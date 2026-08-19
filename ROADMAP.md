@@ -41,36 +41,36 @@ not implemented; planned work is never phrased as shipped.
 - **Documentation site evidence.** The site is deployed, but the current per-page capture and
   anonymous Open Graph fetch matrix remains incomplete.
 
-## Release-completeness work in progress
+## Integrated source candidate; runtime evidence pending
 
-Independent implementation lanes are working on application foundations, identity/appearance,
-file conversion, the local model manager, security/state tools, design parity, site completeness,
-and build evidence. None is counted as shipped in the
-[per-surface inventory](docs/completeness.md) until its exact commit, focused tests, packaged proof,
-built interactions, and captures land.
+The independent implementation lanes have converged in the current source candidate. Settings →
+Application tools mounts identity/appearance, categorized conversion with dedicated PDF controls,
+local-model recovery, and security/state tools. Main-process file grants, a persistent bounded
+conversion queue, operating-system-vault storage, and local Git history are wired through preload.
+The full packaged local-model catalog/pull/chat/harness adapter remains explicitly unavailable.
+Installed interactions, captures, installer proof, and release proof are still pending, so the
+[per-surface inventory](docs/completeness.md) keeps the affected rows partial or evidence-pending.
 
-## Canonical gaps at the v0.2.55 baseline
+## Remaining canonical gaps after source integration
 
 The hand-written matrix is authoritative; the largest gaps are:
 
-- no desktop or site Status Hub surface;
-- no full app-logo customization workflow;
-- no wired categorized converter/PDF suite;
-- no wired local Ollama manager surface;
-- no complete command palette, dockable tab/group system, or per-element appearance editor;
-- no built-in authenticator, per-element toy locks, unlock ladder, or Support Tickets UI;
-- no complete School mode, personal-vocabulary upload, scheduled settings, or narrator voice UI;
-- no complete local Git history manager, exhaustive exports/VS Code handoff, or offline docs browser;
+- no authenticated external desktop Status Hub reporting and no complete site Status Hub proof;
+- no installed interaction/capture proof for logo customization, converter/PDF, tabs, appearance,
+  authenticator registration, local history, schedules, exports, or local-model recovery;
+- no packaged full Ollama catalog, pull queue, streaming chat, or allowlisted harness runtime;
+- no persisted secret-free authenticator code-view hydration and no authenticated history restore;
+- no complete per-element toy locks, unlock ladder, durable Support Tickets, exhaustive exports/VS
+  Code handoff, or populated offline docs/changelog bundle;
 - no browser-extension Start/Downloading/Complete integration;
 - several application and site capabilities remain partial rather than universally applied.
 
 ## Completion order
 
-1. Land each independent implementation lane with focused evidence.
-2. Reconcile the per-surface matrix against the integrated commit, never against lane intent.
-3. Run the full local suite inventory and built-artifact interaction/capture matrix.
-4. Package and verify the unsigned installer and its original product icon.
-5. Publish exactly one release for the final integrated commit, verify its assets and workflow
+1. Pin the integrated source candidate and keep the per-surface matrix factual.
+2. Run the built-artifact interaction/capture matrix for every newly mounted tool tab.
+3. Package and verify the unsigned installer and its original product icon.
+4. Publish exactly one release for the final integrated commit, verify its assets and workflow
    timing, and leave the repository with only proven, merged work.
 
 ## Standing constraints

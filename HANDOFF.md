@@ -1,6 +1,6 @@
 # Handoff
 
-Reconciled 2026-08-19 against the v0.2.55 repository and release. Every number
+Reconciled 2026-08-19 against the integrated application-tools candidate based on the v0.2.55 release. Every number
 below was read from a real command, not remembered. Where something is
 unverified it says so, and where an earlier version of this file was wrong the
 correction is noted rather than quietly applied.
@@ -43,6 +43,22 @@ the v0.2.55 verification pass: the complete local suite reported `903/903`, the 
 and the minigame flow was exercised from the built artifact. A current committed minigame capture
 is still missing and remains an explicit evidence gap.
 
+## Final application-tools wiring candidate
+
+The four previously optional Settings → Application tools slots now mount real source surfaces:
+the categorized converter plus dedicated PDF operations, the local-model screen through a cached
+privileged proxy, identity plus per-element appearance editing, and security/state tools with
+operating-system-vault and local-Git history adapters. Tool-card actions route to the exact
+application-tools tab. File and PDF requests must use paths granted by the main-process file
+pickers; the renderer receives no filesystem primitive.
+
+The local-model integration is intentionally partial. The main process performs the documented
+loopback runtime recovery probe and reports the missing/stopped/healthy state. Catalog, pull, chat,
+and harness actions remain explicitly unavailable until a fully packaged allowlisted adapter is
+present; no renderer network path, arbitrary shell route, cloud fallback, or fake success was
+introduced. Authenticator registration persists encrypted material through the credential-vault
+adapter, but persisted code-view hydration and authenticated history restore remain pending.
+
 ## The one rule a successor must not erode
 
 **Buying or unlocking a tool buys a gameplay bonus and its in-game surfacing. It
@@ -73,7 +89,7 @@ X yet", that is this contract being eroded.
 
 | Thing | Evidence |
 | --- | --- |
-| Project test suite | **33 files, 785 tests, all passing** (`npm run check`, 2026-08-19) |
+| Project test suite | **56 files, 922 tests, all passing** (`npm run check`, 2026-08-19) |
 | `packages/surface-kernel` | **89 tests passing** (`npm test` in that package) |
 | `packages/local-ollama` | **37 tests passing** — previously unverifiable, now green once the workspace was wired |
 | Completeness negative regression | **8 tests passing** — exact capability/page rows, traceable evidence, article sections and links plus deliberate missing-row, blank-evidence, missing-article/page/section, and broken-anchor red fixtures |
@@ -82,7 +98,7 @@ X yet", that is this contract being eroded.
 | Contrast | All **46** role pairs across light and dark computed against the real sRGB luminance formula (`node design/_verify/contrast-check.mjs`) |
 | Application launches | Photographed from the real build on an off-screen desktop — `captures/app/launch-shell.png` |
 
-The post-documentation `npm run check` total is **911/911 tests**: 785 application tests, 37 local
+The final-wiring `npm run check` total is **1048/1048 tests**: 922 application tests, 37 local
 model package tests, and 89 surface-kernel tests, plus both TypeScript checks.
 
 **Test files run against the source tree, not the built artifact.** That
@@ -147,9 +163,10 @@ standing pipeline.
 - **The completeness inventory now exists** at `docs/completeness.md`, with an executable
   exact-ID negative regression in `tests/completeness-inventory.test.ts`. It intentionally records
   many partial, logic-only, and unimplemented canonical rows rather than presenting the project as complete.
-- **App-logo customization, the file converter, and the local Ollama manager
-  are unimplemented in the app** — canonical features this repository has
-  never had; releases ship without them and say so.
+- **Application-tool sources are now mounted in the source candidate**, including logo/identity,
+  converter/PDF, local-model recovery, appearance, authenticator registration, history, schedules,
+  exports, and local status. Their installed interaction and capture evidence remains pending, and
+  the full packaged local-model adapter is still partial; `docs/completeness.md` is authoritative.
 
 ### Settings, language mode and the funny levels
 
@@ -286,11 +303,11 @@ Files written in this lane:
 
 ## Work in flight at the end of this session
 
-Release-completeness lanes are in progress for application foundations, identity/appearance, file
-conversion, the local model manager, security/state tools, design parity, site completeness, and
-build evidence. This documentation lane adds the per-surface matrix, exact negative regression,
-category indexes, and missing articles. None of the parallel implementation lanes is counted as
-shipped until its commit and evidence land in the integrated default branch.
+The independent release-completeness source lanes have converged into the integration candidate.
+The final wiring lane mounts their application surfaces and supplies the minimum privileged
+adapters described above. Installed UI interaction, capture evidence, and final installer/release
+proof remain separate pending work and must not be inferred from source integration or a green
+build.
 
 ## Layout
 
@@ -348,6 +365,7 @@ unchanged. This is a decision, not an omission — do not "fix" it back.
 
 ## Next owner's most useful first move
 
-After all release-completeness lanes integrate, reconcile `docs/completeness.md` against the exact
-integrated commit. Then run the full local suite and the real built-artifact interaction/capture
-matrix. Do not convert a pending row to verified from a lane report alone.
+Run the real built-artifact interaction/capture matrix for every newly mounted Application tools
+tab, then build and inspect the unsigned installer at the pinned candidate commit. Keep the
+local-model row partial until catalog, queue, chat, and allowlisted harness adapters are packaged
+and exercised. Do not convert a pending row to verified from source or test evidence alone.

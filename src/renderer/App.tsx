@@ -79,7 +79,7 @@ import { UpgradeStrip } from './screens/UpgradeStrip';
 import { MinigameEventsScreen, type MinigameEventView } from './screens/MinigameEventsScreen';
 import { MinigamesScreen as PlayableMinigamesScreen } from './screens/MinigamesScreen';
 import { getMinigameVisibility, MINIGAME_IDS, type MinigameId } from '../shared/game/minigames.js';
-import { CanonicalCommandPalette } from './components/CanonicalCommandPalette.js';
+import { CANONICAL_COMMANDS, CanonicalCommandPalette } from './components/CanonicalCommandPalette.js';
 
 /**
  * The four secondary surfaces. The game surface is NOT in this list, because it is not a
@@ -109,6 +109,43 @@ const SURFACE_LABELS: Readonly<Record<PanelId, Bilingual>> = {
   catalogue: CONTROL_COPY.catalogueConsole,
   settings: SETTINGS_COPY.title,
 };
+
+const APPLICATION_TOOL_TARGETS: Readonly<Record<string, string>> = {
+  commandPalette: 'canonical-navigation',
+  regexBuilder: 'canonical-navigation',
+  tabGroups: 'canonical-navigation',
+  appearanceEditor: 'canonical-appearance',
+  colourTranslator: 'canonical-appearance',
+  notificationCentre: 'canonical-notifications',
+  localHistory: 'canonical-history',
+  authenticator: 'canonical-authenticator',
+  toyLocks: 'canonical-security',
+  supportTickets: 'canonical-security',
+  scheduledSettings: 'canonical-security',
+  fileConverter: 'canonical-converter',
+  localModelManager: 'canonical-ollama',
+  narrator: 'canonical-narrator',
+  personalVocabulary: 'canonical-vocabulary',
+  appLogoCustomization: 'canonical-identity',
+  offlineDocs: 'canonical-security',
+  externalEditor: 'canonical-security',
+  exports: 'canonical-security',
+  bulkActions: 'canonical-security',
+};
+
+const INTEGRATED_TOOL_COMMANDS = [
+  { id: 'tools.converter', label: 'Local file converter', detail: 'Open categorized local conversion and dedicated PDF operations.', surface: 'Application tools', tab: 'Converter', target: 'canonical-converter', kind: 'navigate' as const },
+  { id: 'tools.pdf', label: 'PDF operations', detail: 'Inspect, merge, split, extract, reorder, rotate, or edit PDF metadata.', surface: 'Application tools', tab: 'Converter', target: 'canonical-pdf-tools', kind: 'navigate' as const },
+  { id: 'tools.ollama', label: 'Local model manager', detail: 'Inspect the privileged local-runtime state and recovery route.', surface: 'Application tools', tab: 'Ollama', target: 'canonical-ollama', kind: 'navigate' as const },
+  { id: 'tools.identity', label: 'Application identity', detail: 'Change the display name and local application mark.', surface: 'Application tools', tab: 'Identity', target: 'canonical-identity', kind: 'navigate' as const },
+  { id: 'tools.appearance', label: 'Appearance editor', detail: 'Edit the application-tools panel appearance.', surface: 'Application tools', tab: 'Identity', target: 'canonical-appearance', kind: 'navigate' as const },
+  { id: 'tools.security', label: 'Security and state tools', detail: 'Open vault status, schedules, exports, recovery, and local history.', surface: 'Application tools', tab: 'Security tools', target: 'canonical-security', kind: 'navigate' as const },
+  { id: 'tools.authenticator', label: 'Authenticator registration', detail: 'Register a local TOTP entry through the operating-system vault adapter.', surface: 'Application tools', tab: 'Security tools', target: 'canonical-authenticator', kind: 'navigate' as const },
+  { id: 'tools.history', label: 'Local version history', detail: 'Browse append-only local history and its explicit restore boundary.', surface: 'Application tools', tab: 'Security tools', target: 'canonical-history', kind: 'navigate' as const },
+];
+for (const command of INTEGRATED_TOOL_COMMANDS) {
+  if (!CANONICAL_COMMANDS.some((existing) => existing.id === command.id)) CANONICAL_COMMANDS.push(command);
+}
 
 
 /** Where a panel is allowed to grow from, measured in the viewport, so the open animation and the
@@ -950,6 +987,7 @@ function GameShell() {
         return;
       }
       setSettingsEntry({ row: outcome.row, nameEn: def.nameEn, nameYue: def.nameYue });
+      setPaletteTarget(APPLICATION_TOOL_TARGETS[toolId] ?? 'canonical-navigation');
       const button = buttonRefs.current[outcome.panel];
       if (button) {
         const rect = button.getBoundingClientRect();

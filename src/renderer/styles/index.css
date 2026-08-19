@@ -8123,12 +8123,25 @@ ul.card-grid {
 }
 
 .event-indicator__mice {
-  display: flex;
-  flex-direction: column;
-  gap: 1px;
+  display: inline-grid;
+  grid-template-columns: auto minmax(0, 1fr);
+  align-items: baseline;
+  column-gap: 4px;
+  white-space: nowrap;
   font-size: 11px;
   font-weight: 800;
   color: var(--on-error-container, #3b0a02);
+}
+
+.event-indicator__separator {
+  display: inline-block;
+}
+
+.event-indicator__mice-copy {
+  display: flex;
+  min-width: 0;
+  flex-direction: column;
+  gap: 1px;
 }
 
 /* --- The aftermath card ----------------------------------------------------------------- */
@@ -10975,6 +10988,17 @@ body[data-eclipse='on'] .cookie-hero::after {
   white-space: nowrap;
 }
 
+/* A supply NAME is not expendable metadata. The crowded HUD used the generic rule above to
+   ellipsize "Half-HP Whack" under the shelf edge, leaving the third purchase unreadable. Names
+   may wrap at their real word boundary; stock and price stay single-line and tabular. */
+.raid-supplies__name {
+  overflow: visible;
+  text-overflow: clip;
+  white-space: normal;
+  overflow-wrap: normal;
+  line-height: 1.15;
+}
+
 /* ── CLIPPING AUDIT FIXES (solo pass off the audit lane's measured report) ───────────────────
    Each rule names its measured finding. Decorative escapes (embers, rays, milk surface) and
    screen-reader-only 1px text were excluded as intentional. */
@@ -11255,7 +11279,7 @@ body[data-eclipse='on'] .cookie-hero::after {
      light in BOTH themes, so the hover text is the fixed dark ink the spark swatches were
      AA-verified against. */
   background: var(--spark, #ffc94d);
-  color: #3a2100;
+  color: #241400;
 }
 
 .golden-dial-card__stop:focus-visible,

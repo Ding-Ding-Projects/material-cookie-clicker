@@ -863,6 +863,14 @@ mark { background: var(--spark); color: #221B00; border-radius: 4px; padding: 0 
   color: var(--m3-on-surface);
   box-shadow: 0 1px 3px rgba(0,0,0,.18), 0 4px 12px rgba(0,0,0,.08);
 }
+.control-panel .plate {
+  background: var(--m3-surface-container);
+  color: var(--m3-on-surface);
+  border: 1px solid var(--m3-outline);
+  box-shadow: 0 2px 5px rgba(0, 0, 0, .18);
+}
+.control-panel .plate label,
+.control-panel .plate p { color: var(--m3-on-surface); }
 .control-panel[hidden] { display: none; }
 .settings-grid,
 .status-grid,

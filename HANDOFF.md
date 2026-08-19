@@ -19,6 +19,22 @@ the current design — **buys with cookies**, each granting a gameplay bonus,
 alongside a twenty-tier generator ladder from Cursor and Grandma out to
 Portal, the Time Machine, the Idleverse and the Wok of the Gods.
 
+## Current minigame-events lane
+
+The `feat/minigame-events-lucky-drawer` jer adds the permanently unlocked
+minigame suite at 100,000 lifetime baked cookies and keeps Mouse Raid unlock at
+1,000,000. It adds a seeded 6–12 minute schedule with a final-30-second notice,
+one persisted active board at a time, and a side-panel flow that supports
+minimize, resume, restart, abandon, and reload without pausing the clicker.
+The five boards are Klondike draw-3 Solitaire, Memory Match, Cookie 2048,
+Minesweeper, and Breakout. Golden Tokens and the Lucky Chance drawer use
+duplicate-protected persisted state, with no token generation during offline
+progress.
+
+This lane intentionally has no test, lint, review, audit, capture, or UI-run
+evidence under the speed-delivery boundary. The supported build/package path is
+the remaining allowed release check before commit and publication.
+
 ## The one rule a successor must not erode
 
 **Buying or unlocking a tool buys a gameplay bonus and its in-game surfacing. It
@@ -205,6 +221,52 @@ and a few hardcoded headings (parts of `ShopRail`, `DiscoveryTicket`,
 compose both languages into one string regardless of the mode. They were left
 rather than half-converted; each is a plain `${x.en} · ${x.yue}` template that
 `bilingualText` can absorb.
+
+### Minigame-events expansion — documentation handoff, 2026-08-19
+
+The current minigame-events lane is documented in the six files named below.
+The implementation already defines the contract; this documentation pass did
+not alter its code, styles, tests, captures, or UI surfaces.
+
+- The minigame panel unlocks permanently at exactly **100,000 lifetime baked
+  cookies**, and Mouse Raids unlock permanently at **1,000,000**. Both read the
+  all-time `stats.totalCookiesBaked` counter, which survives prestige. The
+  established prestige tab and action remain at 1B and 1T.
+- A seeded, persisted schedule places the next opportunity 6–12 minutes later,
+  reveals it only in the last 30 seconds, and refuses to overlap an active
+  minigame, random event, or waiting golden cookie. The side panel leaves the
+  clicker and production loop running.
+- The five playable modes are Klondike Solitaire, Memory Match, Cookie 2048,
+  Minesweeper, and Breakout. The active record stores the mode id, status,
+  start/update timestamps, and the complete mode-specific board state. Active,
+  minimized, completed, and abandoned states are saved; minimize, resume,
+  restart, and abandon are explicit lifecycle actions.
+- Golden Tokens are awarded by Oven Dial completion, minigame grades, daily
+  objectives, achievement milestones, and rare chains. Stable source keys
+  prevent duplicate awards; fixed award amounts keep steady income bounded and
+  offline progress cannot farm tokens.
+- Lucky Chance costs one token and rolls five equal 20% reward slots: two
+  cookie bundles, a timed boost, raid supplies, or a rare cosmetic. A duplicate
+  result consumes the draw but does not duplicate the claimed reward. The token
+  deduction, seeded result, draw count, and duplicate state are persisted in one
+  reducer update, while an unavailable token leaves state unchanged.
+
+The documentation-only lane intentionally skipped tests, captures, and UI runs
+under its expedited delivery boundary. No paragraph above is a claim that the
+built artifact has been re-verified; that evidence remains open for a later
+verification pass.
+
+Files written in this lane:
+
+1. `README.md`
+2. `ROADMAP.md`
+3. `HANDOFF.md`
+4. `docs/gameplay/README.md`
+5. `docs/gameplay/minigame-events.md`
+6. `site/features/minigame-events.html`
+
+The pre-existing source changes and the pre-existing untracked
+`docs/gameplay/minigames.md` file were left untouched.
 
 ## Work in flight at the end of this session
 

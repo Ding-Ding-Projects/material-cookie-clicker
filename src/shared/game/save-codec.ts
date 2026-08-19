@@ -7,6 +7,15 @@ import {
 import { SaveDataLatestSchema, SaveVersionProbeSchema, type SaveDataLatest } from "./save-schema.js";
 import type { GameState } from "./types.js";
 import type { RandomEventsState } from "./random-events.js";
+import {
+  EMPTY_GOLDEN_TOKEN_LEDGER,
+  EMPTY_LUCKY_CHANCE_STATE,
+  EMPTY_MINIGAME_STATE,
+  type GoldenTokenLedger,
+  type LuckyChanceState,
+  type MinigameScheduleState,
+  type MinigameState,
+} from "./minigames.js";
 
 /**
  * What actually goes on disk: the versioned schema plus the random-event scheduler's own
@@ -19,7 +28,18 @@ import type { RandomEventsState } from "./random-events.js";
  * fifth schema version for a field whose only honest migration is `createInitialRandomEvents-
  * State()` would be ceremony, not safety.
  */
-export type SaveDataOnDisk = SaveDataLatest & { readonly randomEvents?: RandomEventsSaveData };
+export type MinigamesSaveData = {
+  readonly minigames: MinigameState;
+  readonly minigameSchedule: MinigameScheduleState | null;
+  readonly goldenTokens: GoldenTokenLedger;
+  readonly luckyChance: LuckyChanceState;
+  readonly luckyRewards: readonly string[];
+};
+
+export type SaveDataOnDisk = SaveDataLatest & {
+  readonly randomEvents?: RandomEventsSaveData;
+  readonly minigames?: MinigamesSaveData;
+};
 
 export type DecodeSaveResult =
   | { readonly ok: true; readonly state: GameState }
@@ -51,7 +71,8 @@ export function decodeSave(raw: unknown): DecodeSaveResult {
     // The random-event block rides alongside the validated payload rather than through it:
     // SaveDataLatestSchema is a strict object and would have stripped an unknown key.
     const randomEvents = decodeRandomEvents((migrated.data as { randomEvents?: unknown }).randomEvents);
-    return { ok: true, state: saveDataToGameState(parsed.data, randomEvents) };
+    const minigames = decodeMinigames((migrated.data as { minigames?: unknown }).minigames);
+    return { ok: true, state: saveDataToGameState(parsed.data, randomEvents, minigames) };
   } catch (error) {
     if (error instanceof SaveVersionTooNewError) {
       return {
@@ -73,6 +94,13 @@ export function decodeSave(raw: unknown): DecodeSaveResult {
 export function encodeSave(state: GameState): SaveDataOnDisk {
   return {
     randomEvents: encodeRandomEvents(state.randomEvents),
+    minigames: {
+      minigames: state.minigames,
+      minigameSchedule: state.minigameSchedule,
+      goldenTokens: state.goldenTokens,
+      luckyChance: state.luckyChance,
+      luckyRewards: [...state.luckyRewards],
+    },
     schemaVersion: state.schemaVersion as 9,
     cookies: state.cookies,
     lifetimeCookies: state.lifetimeCookies,
@@ -113,10 +141,38 @@ export function encodeSave(state: GameState): SaveDataOnDisk {
   };
 }
 
-function saveDataToGameState(data: SaveDataLatest, randomEvents: RandomEventsState): GameState {
+function saveDataToGameState(
+  data: SaveDataLatest,
+  randomEvents: RandomEventsState,
+  minigames: MinigamesSaveData,
+): GameState {
   // SaveDataLatest and GameState are structurally identical by construction APART from
   // `randomEvents`, which is decoded separately (see SaveDataOnDisk) and grafted on here. This
   // function stays the single seam where that assumption is asserted, so a future schema/type
   // divergence fails here rather than scattering silent `as GameState` casts everywhere else.
-  return { ...(data as unknown as Omit<GameState, "randomEvents">), randomEvents };
+  return { ...(data as unknown as Omit<GameState, "randomEvents">), randomEvents, ...minigames };
+}
+
+function decodeMinigames(raw: unknown): MinigamesSaveData {
+  if (!raw || typeof raw !== "object") {
+    return {
+      minigames: EMPTY_MINIGAME_STATE,
+      minigameSchedule: null,
+      goldenTokens: EMPTY_GOLDEN_TOKEN_LEDGER,
+      luckyChance: EMPTY_LUCKY_CHANCE_STATE,
+      luckyRewards: [],
+    };
+  }
+  const candidate = raw as Partial<MinigamesSaveData>;
+  return {
+    minigames: candidate.minigames && typeof candidate.minigames === "object"
+      ? candidate.minigames
+      : EMPTY_MINIGAME_STATE,
+    minigameSchedule: candidate.minigameSchedule ?? null,
+    goldenTokens: candidate.goldenTokens ?? EMPTY_GOLDEN_TOKEN_LEDGER,
+    luckyChance: candidate.luckyChance ?? EMPTY_LUCKY_CHANCE_STATE,
+    luckyRewards: Array.isArray(candidate.luckyRewards)
+      ? candidate.luckyRewards.filter((value): value is string => typeof value === "string")
+      : [],
+  };
 }

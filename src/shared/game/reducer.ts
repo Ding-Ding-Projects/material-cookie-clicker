@@ -49,6 +49,7 @@ import {
   createInitialControlUnlocksState,
   findControlRung,
   hasControlRung,
+  areMinigameEventsUnlocked,
 } from "./control-unlocks.js";
 import { computeDisclosure } from "./disclosure.js";
 import { effectiveCps } from "./effective-cps.js";
@@ -82,6 +83,20 @@ import { toolPrice } from "./tool-shop.js";
 import { isToolBonusActive, isToolDiscovered, totalBuyMaxDiscount } from "./tools.js";
 import { computeMultipliers, getUpgradeDefinition, isUpgradeUnlocked } from "./upgrades.js";
 import type { GameState, RngPort } from "./types.js";
+import {
+  applyGoldenTokenAward,
+  createGoldenTokenAward,
+  createSeededRng,
+  EMPTY_GOLDEN_TOKEN_LEDGER,
+  EMPTY_LUCKY_CHANCE_STATE,
+  EMPTY_MINIGAME_STATE,
+  reduceMinigameState,
+  resolveLuckyChance,
+  scheduleMinigame,
+  type MinigameData,
+  type MinigameId,
+  type MinigameScheduleState,
+} from "./minigames.js";
 
 export interface ReducerCtx {
   readonly now: () => number;
@@ -238,6 +253,15 @@ export type GameAction =
    * slot — and reversible, because a slot is a slot rather than a commitment.
    */
   | { readonly type: "setPermanentUpgrade"; readonly upgradeId: string; readonly pinned: boolean }
+  | { readonly type: "minigameStart"; readonly id: MinigameId }
+  | { readonly type: "minigameMinimize" }
+  | { readonly type: "minigameResume" }
+  | { readonly type: "minigameRestart" }
+  | { readonly type: "minigameAbandon" }
+  | { readonly type: "minigameComplete"; readonly grade?: number }
+  | { readonly type: "minigameUpdate"; readonly data: MinigameData }
+  | { readonly type: "minigameDailyObjective" }
+  | { readonly type: "luckyChanceDraw" }
   | {
       readonly type: "importSave";
       readonly savedState: GameState;
@@ -249,15 +273,20 @@ function nowIso(ctx: ReducerCtx): string {
   return new Date(ctx.now()).toISOString();
 }
 
-function withAchievements(state: GameState, nowIsoString: string): GameState {
+function withAchievements(state: GameState, nowIsoString: string, awardGoldenTokens = true): GameState {
   const newlyUnlocked = evaluateAchievements(state);
   if (newlyUnlocked.length === 0) return state;
+  let goldenTokens = state.goldenTokens ?? EMPTY_GOLDEN_TOKEN_LEDGER;
+  if (awardGoldenTokens) newlyUnlocked.forEach((id) => {
+    goldenTokens = applyGoldenTokenAward(goldenTokens, createGoldenTokenAward("achievement_milestone", id, 1));
+  });
   return {
     ...state,
     achievements: [
       ...state.achievements,
       ...newlyUnlocked.map((id) => ({ id, unlockedAtIso: nowIsoString })),
     ],
+    goldenTokens: awardGoldenTokens ? goldenTokens : state.goldenTokens,
   };
 }
 
@@ -583,6 +612,223 @@ function handleSetToolProgression(state: GameState, enabled: boolean): GameState
   return { ...state, toolProgressionEnabled: enabled };
 }
 
+const MINIGAME_IDS: readonly MinigameId[] = [
+  "klondike",
+  "memory_match",
+  "cookie_2048",
+  "minesweeper",
+  "breakout",
+];
+
+function shuffle<T>(items: readonly T[], rng: RngPort): T[] {
+  const next = [...items];
+  for (let index = next.length - 1; index > 0; index -= 1) {
+    const swap = Math.floor(rng.next() * (index + 1));
+    [next[index], next[swap]] = [next[swap], next[index]];
+  }
+  return next;
+}
+
+function initialMinigameData(id: MinigameId, rng: RngPort): MinigameData {
+  if (id === "klondike") {
+    const suits = ["C", "D", "H", "S"] as const;
+    const deck = shuffle(
+      suits.flatMap((suit) => Array.from({ length: 13 }, (_, rank) => `${suit}${rank + 1}`)),
+      rng,
+    );
+    const tableau: string[][] = [];
+    const faceUp: boolean[][] = [];
+    let cursor = 0;
+    for (let column = 0; column < 7; column += 1) {
+      const cards = deck.slice(cursor, cursor + column + 1);
+      cursor += column + 1;
+      tableau.push(cards);
+      faceUp.push(cards.map((_, index) => index === cards.length - 1));
+    }
+    return {
+      kind: "klondike",
+      stock: deck.slice(cursor),
+      waste: [],
+      foundations: { C: [], D: [], H: [], S: [] },
+      tableau,
+      faceUp,
+      drawCount: 3,
+    };
+  }
+
+  if (id === "memory_match") {
+    const cards = shuffle(
+      Array.from({ length: 8 }, (_, index) => [`cookie-${index}`, `cookie-${index}`]).flat(),
+      rng,
+    );
+    return { kind: "memory_match", cards, revealed: [], matched: [], attempts: 0 };
+  }
+
+  if (id === "cookie_2048") {
+    const board = Array.from({ length: 4 }, () => Array.from({ length: 4 }, () => 0));
+    board[0][0] = 2;
+    board[3][3] = 2;
+    return { kind: "cookie_2048", board, score: 0, bestTile: 2, moves: 0, won: false };
+  }
+
+  if (id === "minesweeper") {
+    const cells = shuffle(Array.from({ length: 64 }, (_, index) => index), rng);
+    return {
+      kind: "minesweeper",
+      width: 8,
+      height: 8,
+      mineCount: 10,
+      mines: cells.slice(0, 10),
+      revealed: [],
+      flagged: [],
+      started: false,
+    };
+  }
+
+  return {
+    kind: "breakout",
+    paddleX: 0.5,
+    ball: { x: 0.5, y: 0.8, vx: 0.012, vy: -0.014 },
+    bricks: Array.from({ length: 40 }, () => true),
+    score: 0,
+    lives: 3,
+    paused: false,
+  };
+}
+
+function minigameUnlocked(state: GameState): boolean {
+  return areMinigameEventsUnlocked(state);
+}
+
+function scheduleForNextMinigame(state: GameState, nowMs: number, rng: RngPort): MinigameScheduleState {
+  const existing = state.minigameSchedule;
+  if (existing && existing.next.startsAtEpochMs > nowMs) return existing;
+  if (existing) {
+    const next = scheduleMinigame(nowMs, createSeededRng(existing.rngSeed, existing.occurrence + 1));
+    return { ...existing, next, occurrence: existing.occurrence + 1 };
+  }
+  const seed = Math.floor(rng.next() * 0x1_0000_0000) >>> 0;
+  return { rngSeed: seed, occurrence: 0, next: scheduleMinigame(nowMs, createSeededRng(seed)) };
+}
+
+function startScheduledMinigame(state: GameState, ctx: ReducerCtx, nowMs: number): GameState {
+  if (!minigameUnlocked(state)) return state;
+  if (state.goldenCookie.isSpawned || state.randomEvents.actives.length > 0) return state;
+  if (state.minigames.active && (state.minigames.active.status === "active" || state.minigames.active.status === "minimized")) return state;
+  const schedule = state.minigameSchedule;
+  if (!schedule || nowMs < schedule.next.startsAtEpochMs) return state;
+  const rng = createSeededRng(schedule.rngSeed, schedule.occurrence);
+  const id = MINIGAME_IDS[Math.floor(rng.next() * MINIGAME_IDS.length)] ?? MINIGAME_IDS[0];
+  const games = reduceMinigameState(state.minigames, {
+    type: "start",
+    id,
+    data: initialMinigameData(id, rng),
+    nowEpochMs: nowMs,
+  });
+  return {
+    ...state,
+    minigames: games,
+    minigameSchedule: scheduleForNextMinigame(state, nowMs, ctx.rng),
+  };
+}
+
+function handleMinigameStart(state: GameState, ctx: ReducerCtx, id: MinigameId): GameState {
+  if (!minigameUnlocked(state) || (state.minigames.active && ["active", "minimized"].includes(state.minigames.active.status))) return state;
+  const nowMs = ctx.now();
+  const rng = createSeededRng(Math.floor(ctx.rng.next() * 0x1_0000_0000) >>> 0);
+  return {
+    ...state,
+    minigames: reduceMinigameState(state.minigames, {
+      type: "start",
+      id,
+      data: initialMinigameData(id, rng),
+      nowEpochMs: nowMs,
+    }),
+    minigameSchedule: scheduleForNextMinigame(state, nowMs, ctx.rng),
+  };
+}
+
+function handleMinigameLifecycle(state: GameState, ctx: ReducerCtx, action: GameAction): GameState {
+  if (!minigameUnlocked(state)) return state;
+  const nowMs = ctx.now();
+  const current = state.minigames.active;
+  if (action.type === "minigameUpdate") {
+    if (!current || current.id !== action.data.kind) return state;
+    return { ...state, minigames: reduceMinigameState(state.minigames, { type: "update", data: action.data, nowEpochMs: nowMs }) };
+  }
+  if (action.type === "minigameMinimize" || action.type === "minigameResume" || action.type === "minigameAbandon") {
+    const type = action.type === "minigameMinimize" ? "minimize" : action.type === "minigameResume" ? "resume" : "abandon";
+    return {
+      ...state,
+      minigames: reduceMinigameState(state.minigames, { type, nowEpochMs: nowMs } as never),
+      ...(action.type === "minigameAbandon" ? { minigameSchedule: scheduleForNextMinigame(state, nowMs, ctx.rng) } : {}),
+    };
+  }
+  if (action.type === "minigameRestart") {
+    if (!current) return state;
+    const rng = createSeededRng(current.startedAtEpochMs >>> 0, current.lastUpdatedAtEpochMs >>> 0);
+    return { ...state, minigames: reduceMinigameState(state.minigames, { type: "restart", data: initialMinigameData(current.id, rng), nowEpochMs: nowMs }) };
+  }
+  if (action.type === "minigameComplete") {
+    if (!current) return state;
+    const games = reduceMinigameState(state.minigames, { type: "complete", nowEpochMs: nowMs });
+    const grade = Math.max(1, Math.min(5, Math.floor(action.grade ?? 1)));
+    let goldenTokens = applyGoldenTokenAward(state.goldenTokens, createGoldenTokenAward("minigame_grade", `${current.id}:${nowMs}`, grade));
+    if (games.completed.length > 0 && games.completed.length % 3 === 0) {
+      goldenTokens = applyGoldenTokenAward(goldenTokens, createGoldenTokenAward("rare_chain", `three:${games.completed.length}`, 2));
+    }
+    return { ...state, minigames: games, goldenTokens, minigameSchedule: scheduleForNextMinigame(state, nowMs, ctx.rng) };
+  }
+  return state;
+}
+
+function handleDailyObjective(state: GameState): GameState {
+  if (!minigameUnlocked(state)) return state;
+  const day = new Date().toISOString().slice(0, 10);
+  const goldenTokens = applyGoldenTokenAward(state.goldenTokens, createGoldenTokenAward("daily_objective", day, 2));
+  return goldenTokens === state.goldenTokens ? state : { ...state, goldenTokens };
+}
+
+function handleLuckyChanceDraw(state: GameState, ctx: ReducerCtx): GameState {
+  const rewards = ["cookie_bundle_small", "cookie_bundle_large", "timed_boost", "raid_supplies", "rare_cosmetic"];
+  const resolution = resolveLuckyChance(
+    { ...state.luckyChance, tokens: state.goldenTokens.balance },
+    Math.floor(ctx.rng.next() * 0x1_0000_0000) >>> 0,
+    rewards,
+  );
+  if (resolution.result.kind === "insufficient_tokens" || resolution.result.kind === "empty_pool") return state;
+  let nextState: GameState = {
+    ...state,
+    luckyChance: { ...resolution.state, lastResult: resolution.result },
+    goldenTokens: { ...state.goldenTokens, balance: resolution.state.tokens },
+  };
+  if (resolution.result.kind === "win" && resolution.result.rewardId) {
+    const rewardId = resolution.result.rewardId;
+    nextState = { ...nextState, luckyRewards: [...state.luckyRewards, rewardId] };
+    if (rewardId === "cookie_bundle_small") nextState = addCookies(nextState, bnFromNumber(10_000));
+    if (rewardId === "cookie_bundle_large") nextState = addCookies(nextState, bnFromNumber(100_000));
+    if (rewardId === "timed_boost") {
+      nextState = {
+        ...nextState,
+        goldenCookie: { ...nextState.goldenCookie, activeEffect: { kind: "frenzy", multiplier: 2, expiresAtEpochMs: ctx.now() + 15 * 60 * 1000 } },
+      };
+    }
+    if (rewardId === "raid_supplies") {
+      nextState = {
+        ...nextState,
+        randomEvents: {
+          ...nextState.randomEvents,
+          consumables: {
+            ...nextState.randomEvents.consumables,
+            whack_pass: { ...nextState.randomEvents.consumables.whack_pass, stock: nextState.randomEvents.consumables.whack_pass.stock + 1 },
+          },
+        },
+      };
+    }
+  }
+  return nextState;
+}
+
 /**
  * ONE TICK, FOUR ECONOMIES, AND A STATED ORDER.
  *
@@ -637,7 +883,7 @@ function handleTick(state: GameState, ctx: ReducerCtx, elapsedMs: number): GameS
   // The random-event scheduler advances on the SAME tick, off the same clock and the same
   // RngPort, and is told whether a golden cookie is currently holding the stage.
   const eventResult = tickRandomEvents(nextState.randomEvents, nextState, nowMs, ctx.rng, {
-    blocked: goldenCookie.isSpawned,
+    blocked: goldenCookie.isSpawned || nextState.minigames.active !== null,
     hidden: ctx.windowHidden ?? false,
     config: ctx.randomEventConfig ?? DEFAULT_RANDOM_EVENT_CONFIG,
   });
@@ -687,6 +933,14 @@ function handleTick(state: GameState, ctx: ReducerCtx, elapsedMs: number): GameS
     homeConstruction: tickHome(nextState.homeConstruction, (elapsedMs / 1000) * buildSpeed).state,
   };
 
+  // The minigame suite gets its own seeded schedule. It never shares the random-event active
+  // slot, so opening a side panel leaves the clicker and its existing events running normally.
+  if (minigameUnlocked(nextState)) {
+    const minigameSchedule = nextState.minigameSchedule ?? scheduleForNextMinigame(nextState, nowMs, ctx.rng);
+    nextState = { ...nextState, minigameSchedule };
+    nextState = startScheduledMinigame(nextState, ctx, nowMs);
+  }
+
   return withAchievements(nextState, nowIso(ctx));
 }
 
@@ -731,7 +985,14 @@ function handleGoldenDialPress(state: GameState, ctx: ReducerCtx): GameState {
   const config = ctx.goldenCookieConfig ?? DEFAULT_GOLDEN_COOKIE_CONFIG;
   const collected = collectGoldenCookiePure(result.goldenCookie, state, nowMs, ctx.rng, config);
 
-  let nextState: GameState = { ...state, goldenCookie: collected.goldenCookie };
+  let nextState: GameState = {
+    ...state,
+    goldenCookie: collected.goldenCookie,
+    goldenTokens: applyGoldenTokenAward(
+      state.goldenTokens,
+      createGoldenTokenAward("oven_dial", `oven:${state.goldenCookie.spawnedAtEpochMs ?? nowMs}`, 1),
+    ),
+  };
   if (collected.instantBonus.mantissa !== 0) {
     nextState = addCookies(nextState, collected.instantBonus);
   }
@@ -977,7 +1238,7 @@ function handleImportSave(action: Extract<GameAction, { type: "importSave" }>, c
     lastTickAtIso: action.nowIso,
   };
 
-  return withAchievements(nextState, action.nowIso);
+  return withAchievements(nextState, action.nowIso, false);
 }
 
 /** The ONLY mutation seam in the domain. Every state transition flows through this function. */
@@ -1052,6 +1313,19 @@ export function applyGameAction(state: GameState, action: GameAction, ctx: Reduc
       return handleBuyRebornNode(state, ctx, action.nodeId);
     case "setPermanentUpgrade":
       return handleSetPermanentUpgrade(state, action.upgradeId, action.pinned);
+    case "minigameStart":
+      return handleMinigameStart(state, ctx, action.id);
+    case "minigameMinimize":
+    case "minigameResume":
+    case "minigameRestart":
+    case "minigameAbandon":
+    case "minigameComplete":
+    case "minigameUpdate":
+      return handleMinigameLifecycle(state, ctx, action);
+    case "minigameDailyObjective":
+      return handleDailyObjective(state);
+    case "luckyChanceDraw":
+      return handleLuckyChanceDraw(state, ctx);
     case "importSave":
       return handleImportSave(action, ctx);
   }
@@ -1077,6 +1351,11 @@ export function createInitialGameState(nowIsoString: string): GameState {
     dieselDepot: { litresMinted: 0, vouchersMinted: 0, cookiesSpent: zero },
     dieselFactory: createInitialFactoryState(),
     homeConstruction: createInitialHomeState(),
+    minigames: EMPTY_MINIGAME_STATE,
+    minigameSchedule: null,
+    goldenTokens: EMPTY_GOLDEN_TOKEN_LEDGER,
+    luckyChance: EMPTY_LUCKY_CHANCE_STATE,
+    luckyRewards: [],
     toolProgressionEnabled: true,
     purchasedToolIds: [],
     // A fresh save owns NO control. The window will not move, the sliders will not slide and

@@ -281,6 +281,21 @@ export function PriceTagEmblem({ className }: EmblemProps) {
   );
 }
 
+/** MINIGAMES — a golden token over a five-pip play tile. */
+export function MinigameEmblem({ className }: EmblemProps) {
+  return (
+    <svg {...frame(className)}>
+      <rect x="4" y="6" width="24" height="20" rx="4" fill="var(--tier2-container)" stroke="var(--spark-ring)" strokeWidth="1.6" />
+      <circle cx="16" cy="16" r="7.2" fill="var(--spark)" stroke="var(--spark-ring)" strokeWidth="1.5" />
+      <circle cx="13.2" cy="13.4" r="1.1" fill="var(--surface-lowest)" />
+      <circle cx="18.8" cy="13.4" r="1.1" fill="var(--surface-lowest)" />
+      <circle cx="13.2" cy="18.6" r="1.1" fill="var(--surface-lowest)" />
+      <circle cx="18.8" cy="18.6" r="1.1" fill="var(--surface-lowest)" />
+      <path d="M9 4.4h14" stroke="var(--metal-hi)" strokeWidth="1.6" strokeLinecap="round" opacity="0.65" />
+    </svg>
+  );
+}
+
 /** Decorative rivets/brackets for the panel header plate — chrome, never content. */
 export function PanelCorner({ className }: EmblemProps) {
   return (
@@ -300,4 +315,5 @@ export const CONSOLE_EMBLEMS = {
   prestige: AscensionEmblem,
   catalogue: PriceTagEmblem,
   settings: GearEmblem,
+  minigames: MinigameEmblem,
 } as const;

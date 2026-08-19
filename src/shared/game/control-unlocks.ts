@@ -878,6 +878,36 @@ export function needsPurchaseConfirmation(state: GameState, rungId: string): boo
 }
 
 /* ────────────────────────────────────────────────────────────────────────────────────────────
+ * LIFETIME MINIGAME UNLOCKS
+ * ──────────────────────────────────────────────────────────────────────────────────────────── */
+
+/**
+ * Lifetime baked-cookie thresholds for the minigame surfaces.
+ *
+ * These are derived from `stats.totalCookiesBaked`, not the run-local `lifetimeCookies` balance.
+ * The statistics counter is preserved by prestige, so reaching either threshold is permanent
+ * without adding another persisted field or asking migrations to copy derived state.
+ */
+export const MINIGAME_EVENTS_UNLOCK_LIFETIME_BAKED_COOKIES = 100_000;
+export const MOUSE_RAIDS_UNLOCK_LIFETIME_BAKED_COOKIES = 1_000_000;
+
+/** True once the general minigame event pool is permanently unlocked. */
+export function areMinigameEventsUnlocked(state: Pick<GameState, "stats">): boolean {
+  return bnCompare(
+    state.stats.totalCookiesBaked,
+    bnFromNumber(MINIGAME_EVENTS_UNLOCK_LIFETIME_BAKED_COOKIES),
+  ) >= 0;
+}
+
+/** True once Mouse Raids are permanently unlocked. */
+export function areMouseRaidsUnlocked(state: Pick<GameState, "stats">): boolean {
+  return bnCompare(
+    state.stats.totalCookiesBaked,
+    bnFromNumber(MOUSE_RAIDS_UNLOCK_LIFETIME_BAKED_COOKIES),
+  ) >= 0;
+}
+
+/* ────────────────────────────────────────────────────────────────────────────────────────────
  * THE MIGRATION POLICY
  * ──────────────────────────────────────────────────────────────────────────────────────────── */
 

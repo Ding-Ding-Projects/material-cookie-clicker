@@ -1,6 +1,7 @@
 import { useEffect, useRef, useState, type CSSProperties } from 'react';
 
-import { bnCompare, bnFromNumber, type BigNum } from '../../shared/game/big-number.js';
+import { bnCompare, type BigNum } from '../../shared/game/big-number.js';
+import { areMouseRaidsUnlocked } from '../../shared/game/control-unlocks.js';
 import { formatExact, formatExactDigits } from '../../shared/game/format-number.js';
 import {
   BIGGER_WHACK_RADIUS_PX,
@@ -767,10 +768,9 @@ export function RaidSuppliesShelf() {
   const level = structure.randomEvents.whackStorageLevel;
   const cap = whackStorageCap(level);
 
-  // The shelf appears once a save is rich enough to be raided at all (the same thousand-cookie
-  // floor the raid itself uses) or once one raid has happened, so a fresh game is never shown a
-  // shop for a mechanic it has not met.
-  const met = structure.randomEvents.raidCount > 0 || bnCompare(structure.cookies, bnFromNumber(1_000)) >= 0;
+  // The shelf follows the permanent lifetime-baked unlock, not the current balance, so prestige
+  // cannot hide a mechanic the player already earned.
+  const met = structure.randomEvents.raidCount > 0 || areMouseRaidsUnlocked(structure);
   if (!met) return null;
 
   return (

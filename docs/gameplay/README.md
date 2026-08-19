@@ -5,10 +5,8 @@ golden-cookie events for temporary bonuses, unlock achievements, and ascend thro
 trade progress for a permanent multiplier.
 
 > [!NOTE]
-> None of the articles in this category describe a shipped feature. No generator ladder, click
-> handler, achievement engine, or prestige system exists anywhere in this repository yet — only
-> `design/` specification files for how these surfaces must look and behave once built. Every
-> article below says so explicitly rather than describing gameplay as though it runs today.
+> The minigame article documents the current minigame and Lucky Chance flow. The older gameplay
+> articles retain their historical scope notes where they describe specification-only surfaces.
 
 ## Articles
 
@@ -16,6 +14,8 @@ trade progress for a permanent multiplier.
 - [The 20-tier generator ladder](generator-ladder.md) — Cursor up to the Wok of the Gods, and the buy-quantity
   stepper.
 - [Golden-cookie events](golden-cookie-events.md) — the random bonus overlay.
+- [Minigame events and Lucky Chance](minigame-events.md) — the five persisted minigames, Golden
+  Tokens, and the seeded reward drawer.
 - [Achievements](achievements.md) — unlock conditions and the locked/unlocked badge states.
 - [Prestige](prestige.md) — the destructive-action super-confirmation gate that trades progress for
   a permanent multiplier.

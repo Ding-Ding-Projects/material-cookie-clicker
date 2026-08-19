@@ -47,6 +47,11 @@ const STRUCTURE_KEYS = [
   // (see random-events.ts#tickRandomEvents), so the stage does not re-render five times a
   // second just because the scheduler was asked whether anything should happen.
   "randomEvents",
+  "minigames",
+  "minigameSchedule",
+  "goldenTokens",
+  "luckyChance",
+  "luckyRewards",
   "toolProgressionEnabled",
   // Buying a tool early changes which console emblems progressive disclosure shows (see
   // disclosure.ts#hasDiscoveredATool), so it has to wake the structural slice like any other

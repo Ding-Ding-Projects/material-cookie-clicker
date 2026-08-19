@@ -10309,6 +10309,265 @@ body[data-eclipse='on'] .cookie-hero::after {
   }
 }
 
+/* ---------------------------------------------------------------------------------------- *
+ * MINIGAME EVENTS — responsive lucky-drawer surface.
+ *
+ * The event screen uses the same bakery cabinet roles as the rest of the game. The layout is
+ * intentionally content-driven: cards and schedule fields can grow without forcing a fixed
+ * viewport, while the active drawer collapses to one readable column on narrow windows.
+ * ---------------------------------------------------------------------------------------- */
+.minigame-events-screen {
+  display: flex;
+  flex: 1;
+  min-width: 0;
+  min-height: 0;
+  flex-direction: column;
+  gap: 16px;
+  max-width: 1240px;
+  margin: 0 auto;
+  padding: 18px;
+  overflow: auto;
+  color: var(--on-surface);
+}
+
+.minigame-events__header {
+  display: flex;
+  align-items: flex-start;
+  justify-content: space-between;
+  gap: 16px;
+  flex-wrap: wrap;
+  padding: 16px 18px;
+  border: var(--border-fat) solid var(--outline);
+  border-radius: var(--shape-lg);
+  background: linear-gradient(180deg, var(--surface-high), var(--surface-highest));
+  box-shadow: var(--press-2), inset 0 4px 0 0 var(--bevel-hi);
+}
+
+.minigame-events__schedule {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
+  gap: 12px;
+  padding: 14px;
+  border: var(--border-thick) solid var(--outline);
+  border-radius: var(--shape-md);
+  background: var(--panel-inset);
+  box-shadow: inset 0 4px 0 -2px var(--bevel-lo);
+}
+
+.minigame-events__cards {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(min(100%, 230px), 1fr));
+  gap: 14px;
+  min-width: 0;
+}
+
+.minigame-events__card {
+  display: flex;
+  min-width: 0;
+  min-height: 154px;
+  flex-direction: column;
+  gap: 12px;
+  padding: 16px;
+  border: var(--border-thick) solid var(--outline);
+  border-radius: var(--shape-lg);
+  background: linear-gradient(180deg, var(--surface-high), var(--surface-container));
+  box-shadow: var(--press-1), inset 0 3px 0 0 var(--bevel-hi);
+  color: var(--on-surface);
+  transition: transform 110ms ease, box-shadow 110ms ease, border-color 110ms ease;
+}
+
+.minigame-events__card:hover {
+  transform: translateY(-2px);
+  border-color: var(--primary);
+  box-shadow: var(--press-2), inset 0 3px 0 0 var(--bevel-hi);
+}
+
+.minigame-events__active {
+  display: grid;
+  grid-template-columns: minmax(0, 1.25fr) minmax(260px, 0.75fr);
+  gap: 16px;
+  min-width: 0;
+  padding: 16px;
+  border: var(--border-fat) solid var(--primary);
+  border-radius: var(--shape-lg);
+  background: linear-gradient(135deg, var(--primary-container), var(--surface-high));
+  box-shadow: var(--press-3), inset 0 4px 0 0 var(--bevel-hi);
+}
+
+.minigame-events__toolbar {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 10px;
+  flex-wrap: wrap;
+  min-width: 0;
+  padding: 10px 12px;
+  border: var(--border-thick) solid var(--outline);
+  border-radius: var(--shape-md);
+  background: var(--surface-container);
+}
+
+.minigame-events__drawer {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(180px, 1fr));
+  gap: 12px;
+  min-width: 0;
+  padding: 14px;
+  border: var(--border-thick) solid var(--outline);
+  border-radius: var(--shape-md);
+  background: linear-gradient(180deg, var(--surface-highest), var(--surface-container));
+  box-shadow: inset 0 4px 0 -2px var(--bevel-lo);
+}
+
+.minigame-events__odds {
+  display: grid;
+  gap: 8px;
+  min-width: 0;
+  padding: 12px;
+  border: var(--border-thick) solid var(--tertiary);
+  border-radius: var(--shape-md);
+  background: var(--tertiary-container);
+  color: var(--on-tertiary-container);
+  font-variant-numeric: tabular-nums;
+}
+
+.minigame-events__result {
+  display: grid;
+  gap: 8px;
+  min-width: 0;
+  padding: 12px;
+  border: var(--border-thick) solid var(--secondary);
+  border-radius: var(--shape-md);
+  background: var(--secondary-container);
+  color: var(--on-secondary-container);
+}
+
+.minigame-events__board {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(56px, 1fr));
+  gap: 10px;
+  min-width: 0;
+  padding: 14px;
+  border: var(--border-fat) solid var(--outline);
+  border-radius: var(--shape-lg);
+  background: var(--panel-inset);
+  box-shadow: inset 0 5px 0 -2px var(--bevel-lo);
+}
+
+.minigame-events__cell {
+  display: grid;
+  min-width: 0;
+  min-height: 64px;
+  place-items: center;
+  aspect-ratio: 1;
+  padding: 8px;
+  border: var(--border-thick) solid var(--outline);
+  border-radius: var(--shape-md);
+  background: linear-gradient(180deg, var(--surface-high), var(--surface-highest));
+  color: var(--on-surface);
+  font-variant-numeric: tabular-nums;
+  transition: transform 110ms ease, background-color 110ms ease, border-color 110ms ease;
+}
+
+.minigame-events__cell:hover {
+  transform: translateY(-2px);
+  border-color: var(--spark-ring);
+  background: var(--primary-container);
+}
+
+.minigame-events__cell:focus-visible {
+  outline: 4px solid var(--spark-ring);
+  outline-offset: 2px;
+}
+
+.minigame-events__controls {
+  display: flex;
+  align-items: center;
+  justify-content: flex-end;
+  gap: 10px;
+  flex-wrap: wrap;
+  min-width: 0;
+}
+
+.minigame-events__minimized {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 12px;
+  flex-wrap: wrap;
+  min-width: 0;
+  padding: 12px 14px;
+  border: var(--border-thick) solid var(--outline);
+  border-radius: var(--shape-md);
+  background: var(--surface-container);
+  color: var(--on-surface-variant);
+}
+
+@media (max-width: 860px) {
+  .minigame-events-screen {
+    padding: 14px;
+  }
+
+  .minigame-events__active {
+    grid-template-columns: minmax(0, 1fr);
+  }
+
+  .minigame-events__drawer {
+    grid-template-columns: repeat(auto-fit, minmax(160px, 1fr));
+  }
+}
+
+@media (max-width: 560px) {
+  .minigame-events-screen {
+    gap: 12px;
+    padding: 10px;
+  }
+
+  .minigame-events__header,
+  .minigame-events__active,
+  .minigame-events__drawer,
+  .minigame-events__board {
+    padding: 12px;
+  }
+
+  .minigame-events__schedule,
+  .minigame-events__cards,
+  .minigame-events__drawer {
+    grid-template-columns: minmax(0, 1fr);
+  }
+
+  .minigame-events__toolbar,
+  .minigame-events__controls,
+  .minigame-events__minimized {
+    align-items: stretch;
+  }
+
+  .minigame-events__toolbar,
+  .minigame-events__controls {
+    justify-content: stretch;
+  }
+
+  .minigame-events__board {
+    gap: 8px;
+  }
+
+  .minigame-events__cell {
+    min-height: 52px;
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .minigame-events__card,
+  .minigame-events__cell {
+    transition: none;
+  }
+
+  .minigame-events__card:hover,
+  .minigame-events__cell:hover {
+    transform: none;
+  }
+}
+
 @media (prefers-reduced-motion: reduce) {
   .toast-stack > .event-toast,
   .toast-stack > .raid-aftermath {
@@ -11901,3 +12160,37 @@ body[data-eclipse='on'] .cookie-hero::after {
  * None of them touches a floor: no text contrast, no focus ring, no hit area and no motion
  * preference depends on any of them.
  * ========================================================================================== */
+/* ---------------------------------------------------------------- MINIGAME EVENTS / LUCKY DRAWER */
+.minigames-screen { gap: 16px; }
+.minigame-incoming,
+.minigame-panel-card { background: var(--panel-inset); border: 2px solid var(--outline); border-radius: 16px; padding: 16px; box-shadow: var(--elevation-2, 0 4px 12px rgba(0,0,0,.18)); }
+.minigame-incoming { display: grid; gap: 4px; border-color: var(--spark-ring); }
+.minigame-panel-card__header { display: flex; justify-content: space-between; align-items: center; gap: 12px; flex-wrap: wrap; }
+.minigame-picker, .minigame-actions { display: flex; flex-wrap: wrap; gap: 8px; }
+.minigame-picker button, .minigame-actions button, .lucky-chance-card button { min-height: 44px; }
+.minigame-status { color: var(--on-surface-variant); }
+.token-badge { padding: 6px 10px; border-radius: 999px; background: var(--tier2-container); color: var(--on-tier2-container); font-variant-numeric: tabular-nums; }
+.minigame-board { margin: 12px 0; padding: 12px; border-radius: 12px; background: var(--surface-lowest); }
+.minigame-board--cards { display: grid; gap: 12px; }
+.minigame-tableau { display: grid; grid-template-columns: repeat(7, minmax(40px, 1fr)); gap: 6px; }
+.minigame-column { min-height: 92px; display: grid; align-content: start; gap: 3px; }
+.minigame-card { display: grid; place-items: center; min-height: 36px; border: 1px solid var(--outline); border-radius: 6px; background: var(--surface-highest); font-variant-numeric: tabular-nums; }
+.minigame-board--memory { display: grid; grid-template-columns: repeat(4, minmax(44px, 1fr)); gap: 8px; }
+.minigame-memory-card, .minigame-mine-cell { min-width: 44px; min-height: 44px; }
+.minigame-board--2048 { display: grid; gap: 10px; }
+.minigame-2048-grid { display: grid; grid-template-columns: repeat(4, minmax(44px, 1fr)); gap: 6px; }
+.minigame-2048-cell { min-height: 44px; display: grid; place-items: center; border-radius: 8px; background: var(--tier1-container); color: var(--on-tier1-container); font-weight: 700; }
+.minigame-board--mines { display: grid; grid-template-columns: repeat(8, minmax(28px, 1fr)); gap: 3px; }
+.minigame-mine-cell { min-width: 28px; min-height: 32px; padding: 0; }
+.breakout-field { position: relative; min-height: 220px; overflow: hidden; border: 1px solid var(--outline); border-radius: 8px; background: var(--surface-high); }
+.breakout-bricks { display: grid; grid-template-columns: repeat(8, 1fr); gap: 3px; padding: 10px; }
+.breakout-bricks span { min-height: 16px; border-radius: 3px; background: var(--tier1); }
+.breakout-bricks span.is-cleared { opacity: 0; }
+.breakout-ball, .breakout-paddle { position: absolute; display: block; transform: translate(-50%, -50%); }
+.breakout-ball { width: 14px; height: 14px; border-radius: 50%; background: var(--spark); }
+.breakout-paddle { bottom: 12px; width: 72px; height: 10px; border-radius: 999px; background: var(--tier2); transform: translateX(-50%); }
+.lucky-chance-card { display: grid; gap: 10px; }
+@media (max-width: 620px) {
+  .minigame-tableau { grid-template-columns: repeat(4, minmax(40px, 1fr)); }
+  .minigame-board--mines { grid-template-columns: repeat(8, minmax(24px, 1fr)); }
+}

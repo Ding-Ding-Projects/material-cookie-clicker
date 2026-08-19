@@ -27,6 +27,54 @@ Hong Kong Cantonese with independent humour levels per language, Material
 Design 3 throughout, keyboard and screen-reader operable, and it works with the
 network unplugged.
 
+## Minigame events and Lucky Drawer
+
+At exactly 100,000 lifetime baked cookies, five seeded side-panel minigames
+unlock permanently: Klondike draw-3 Solitaire, Memory Match, Cookie 2048,
+Minesweeper, and Breakout. The check uses the all-time baked counter, not the
+current run balance, so prestige does not take the unlock away. Mouse Raids
+unlock permanently at 1,000,000 lifetime baked cookies; the existing prestige
+tab and action remain at their 1B and 1T thresholds.
+
+A persisted seeded schedule selects the next minigame 6–12 minutes after the
+previous opportunity. The notice stays hidden until the final 30 seconds. It
+does not overlap an active minigame, a random event, or a waiting golden
+cookie, and opening the side panel does not stop clicking, production, or the
+rest of the cookie loop. The save records the seed, occurrence, scheduled
+timestamps, delay, active mode, lifecycle status, start/update timestamps, and
+the mode-specific board data.
+
+The active event can be minimized, resumed, restarted from fresh seeded data,
+or abandoned. The exact saved board returns after reload: Klondike stores its
+draw-three stock, waste, foundations, tableau, and face-up cards; Memory Match
+stores its shuffled cards, revealed and matched positions, and attempts;
+Cookie 2048 stores its board, score, best tile, moves, and win state;
+Minesweeper stores its dimensions, mine layout, revealed cells, flags, and
+started state; and Breakout stores its paddle, ball vector, bricks, score,
+lives, and pause state.
+
+Golden Tokens come from Oven Dial completion, minigame grades, daily objectives,
+achievement milestones, and rare chains. Each award has a stable source key,
+so replaying the same action cannot mint another award. The steady awards are
+bounded: a minigame grade is clamped to 1–5 tokens, a daily objective grants 2
+tokens once per UTC day, an achievement milestone grants 1 token once, and
+each three-minigame rare chain grants 2 tokens once. Tokens are action-based
+and are never farmed by offline progress.
+
+The Lucky Chance drawer costs exactly one Golden Token per draw. Its five reward
+slots have equal 20% odds: a 10,000-cookie bundle, a 100,000-cookie bundle, a
+timed boost, raid supplies, or a rare cosmetic. The seeded roll, token
+deduction, draw count, result, and claimed-reward list are persisted together.
+A duplicate reward still consumes the one-token draw and is reported as a
+duplicate; it is not added to the claimed reward list again. With no token or
+an empty reward pool, the state is unchanged.
+
+<span lang="zh-HK">小遊戲事件喺累計焗製 100,000 個曲奇時永久解鎖；呢個數字係全程累計數，轉生後都唔會倒退。1,000,000 個累計焗製曲奇會永久解鎖 Mouse Raid。排程、棋盤、生命週期、金色代幣同幸運機會抽獎結果都會保存，離線期間唔會刷代幣。</span>
+
+This documentation update intentionally records the feature contract without
+claiming built-artifact verification: the expedited delivery boundary skipped
+tests, captures, and UI runs for this lane. Those checks remain separate work.
+
 **Nobody ever pays a penny to use it.** No purchase, no licence, no
 subscription, no feature held behind a paywall.
 

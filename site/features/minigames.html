@@ -1,0 +1,34 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1" />
+<title>Minigame events and Lucky Drawer — Material Cookie Clicker</title>
+<meta name="description" content="Five persisted minigames, Golden Tokens, and the seeded Lucky Chance drawer." />
+<link rel="stylesheet" href="../assets/site.css" />
+</head>
+<body>
+<a class="skip-link" href="#main">Skip to main content</a>
+<header class="site-head"><div class="wrap"><a class="brand" href="../index.html"><span aria-hidden="true">&#127850;</span> Material Cookie Clicker</a><nav class="site-nav" aria-label="Primary"><ul><li><a href="../index.html">Home</a></li><li><a href="index.html" aria-current="page">Features</a></li><li><a href="../index.html#download">Download</a></li></ul></nav></div></header>
+<main id="main" class="wrap">
+  <p><a href="index.html">All features</a> / Minigames</p>
+  <article class="plate">
+    <h1>Minigame events and Lucky Drawer</h1>
+    <p class="lede">At 100,000 lifetime baked cookies, a seeded side-panel schedule begins offering five minigames without pausing the clicker.</p>
+    <h2>Unlocks and timing</h2>
+    <p>The minigame panel unlocks permanently at 100,000 lifetime baked cookies. Mouse Raids unlock permanently at 1,000,000 lifetime baked cookies. Prestige keeps both thresholds because the baked-cookie history is preserved. The prestige tab remains at 1B and the prestige action remains at 1T.</p>
+    <p>The schedule chooses a start 6–12 minutes after the previous opportunity. Its notice is hidden until the final 30 seconds. There is one active minigame at a time, and the cookie loop continues while its anchored panel is open.</p>
+    <h2>Five persisted boards</h2>
+    <ul><li><strong>Klondike Solitaire:</strong> draw-three stock, waste, tableau, foundations, and face-up state.</li><li><strong>Memory Match:</strong> shuffled pairs, revealed cards, matches, and attempts.</li><li><strong>Cookie 2048:</strong> board, score, best tile, moves, and win state.</li><li><strong>Minesweeper:</strong> seeded mine layout, revealed cells, flags, and dimensions.</li><li><strong>Breakout:</strong> paddle, ball vector, bricks, score, lives, and pause state.</li></ul>
+    <p>Minimize, resume, restart, and abandon are persisted lifecycle operations. A reload returns to the exact saved board rather than generating a replacement.</p>
+    <h2>Golden Tokens and Lucky Chance</h2>
+    <p>Golden Tokens come from Oven Dial completion, minigame grades, daily objectives, achievement milestones, and rare chains. The ledger is duplicate-protected and action-based, so offline progress cannot farm tokens.</p>
+    <p>The Lucky Chance drawer costs one Golden Token. It discloses five equal reward slots and can grant cookie bundles, timed boosts, raid supplies, or rare cosmetics. The seeded roll, token deduction, result, and duplicate-protection state are persisted together.</p>
+    <h2>Failure and recovery</h2>
+    <p>Older saves without the minigame sidecar load with an empty suite. The sidecar carries the active board and reward ledgers separately from the versioned core save, so the clicker remains recoverable if no minigame progress exists.</p>
+    <p><strong>Suggested articles:</strong> <a href="golden-cookies.html">Golden-cookie events</a>, <a href="achievements.html">Achievements</a>, and <a href="prestige.html">Prestige</a>.</p>
+  </article>
+</main>
+<footer class="site-foot"><div class="wrap"><p>Material Cookie Clicker is free, unsigned by permanent policy, and self-contained.</p><p><a href="../index.html">Home</a> · <a href="index.html">All features</a></p></div></footer>
+</body>
+</html>

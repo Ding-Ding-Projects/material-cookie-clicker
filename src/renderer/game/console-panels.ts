@@ -18,6 +18,7 @@ export const GAME_SURFACE_IDS: readonly ConsoleSurfaceId[] = [
   // in its own right rather than a report on the game, and it is bought outright (with the
   // Property Deed) rather than reached.
   "home",
+  "minigames",
   "achievements",
   "tools",
   "statistics",

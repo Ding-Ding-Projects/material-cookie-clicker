@@ -82,6 +82,7 @@ export const TAB_COPY = {
   prestige: { en: "Prestige", yue: "轉生" },
   factory: { en: "Diesel Factory", yue: "柴油廠" },
   home: { en: "The Home", yue: "住家" },
+  minigames: { en: "Minigames", yue: "小遊戲" },
 } as const satisfies Record<string, Bilingual>;
 
 /**
@@ -449,6 +450,44 @@ export const DISCLOSURE_COPY = {
     yue: "買咗上面嗰層，就知呢個係咩。",
   },
 } as const satisfies Record<string, Bilingual>;
+
+export const MINIGAME_COPY = {
+  title: { en: "Lucky Drawer & Minigames", yue: "幸運抽屜同小遊戲" },
+  locked: { en: "Reach 100,000 lifetime baked cookies to unlock this panel.", yue: "累積焗過十萬粒曲奇先會解鎖呢塊板。" },
+  incoming: { en: "A minigame is incoming", yue: "小遊戲就嚟到" },
+  finalWindow: { en: "Final 30 seconds — open the drawer to play.", yue: "最後三十秒——打開抽屜就可以玩。" },
+  active: { en: "Active minigame", yue: "進行中小遊戲" },
+  minimize: { en: "Minimize", yue: "縮細" },
+  resume: { en: "Resume", yue: "繼續" },
+  restart: { en: "Restart", yue: "重新開始" },
+  abandon: { en: "Abandon", yue: "放棄" },
+  complete: { en: "Complete", yue: "完成" },
+  start: { en: "Start", yue: "開始" },
+  goldenTokens: { en: "Golden Tokens", yue: "金色代幣" },
+  dailyObjective: { en: "Claim today's objective", yue: "領取今日目標" },
+  luckyChance: { en: "Lucky Chance drawer", yue: "幸運抽屜" },
+  luckyOdds: { en: "Odds: five equal reward slots. One Golden Token per pull. Duplicates are protected.", yue: "機率：五格獎勵平均分配。每次抽一粒金色代幣。重複獎勵會受保護。" },
+  draw: { en: "Draw one reward", yue: "抽一份獎勵" },
+  insufficient: { en: "You need one Golden Token.", yue: "要有一粒金色代幣先得。" },
+  reward: (id: string): Bilingual => ({ en: `Reward: ${id}`, yue: `獎勵：${id}` }),
+  noOffline: { en: "Golden Tokens come from actions played here; offline time never farms them.", yue: "金色代幣要喺度親手玩先有；離線時間唔會幫你刷代幣。" },
+  klondike: { en: "Klondike Solitaire · draw 3", yue: "Klondike 紙牌 · 每次抽三張" },
+  memory: { en: "Memory Match", yue: "記憶配對" },
+  cookie2048: { en: "Cookie 2048", yue: "曲奇 2048" },
+  minesweeper: { en: "Minesweeper", yue: "掃雷" },
+  breakout: { en: "Breakout", yue: "打磚塊" },
+  drawCards: { en: "Draw three", yue: "抽三張" },
+  move: { en: "Move", yue: "移動" },
+  reveal: { en: "Reveal", yue: "揭開" },
+  flag: { en: "Flag", yue: "標記" },
+  advance: { en: "Advance ball", yue: "推進波波" },
+  stock: (count: number): Bilingual => ({ en: `${count} stock`, yue: `牌堆仲有 ${count} 張` }),
+  waste: (card: string): Bilingual => ({ en: `Waste ${card}`, yue: `棄牌 ${card}` }),
+  score: (value: number): Bilingual => ({ en: `Score ${value}`, yue: `分數 ${value}` }),
+  bestTile: (value: number): Bilingual => ({ en: `Best tile ${value}`, yue: `最高曲奇 ${value}` }),
+  lives: (value: number): Bilingual => ({ en: `Lives ${value}`, yue: `生命 ${value}` }),
+  column: (value: number): Bilingual => ({ en: `Column ${value}`, yue: `第 ${value} 欄` }),
+} as const;
 
 export const LIST_COPY = {
   searchPlaceholderGenerators: { en: "Search generators…", yue: "搜尋生產建築…" },

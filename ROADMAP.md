@@ -1,6 +1,6 @@
 # Roadmap
 
-Status as of 2026-08-16. Nothing here is aspirational phrasing dressed as
+Status as of 2026-08-19. Nothing here is aspirational phrasing dressed as
 progress: a thing is either shipped and verified, shipped and unverified, or not
 built. Where it is unverified, that is said.
 
@@ -14,7 +14,8 @@ built. Where it is unverified, that is said.
   `.nupkg`, target commit verified.
 - **Game domain.** Twenty generators, twenty tools, 179 upgrades, 201
   achievements, milk and the kitten line, the Reborn permanent tree, prestige,
-  golden cookies, offline progress, save schema with forward-only migrations.
+  golden cookies, offline progress, save schema with forward-only migrations,
+  and the five persisted minigame events with Golden Tokens and Lucky Chance.
 - **Vendored engines.** Regex builder, command palette, tabs, colour translator,
   notifications, local history, time-based codes and QR, locks, scheduling,
   exports, conversion registry, local model suite. 126 tests.
@@ -24,9 +25,27 @@ built. Where it is unverified, that is said.
   `build-installer.bat`, all with silent modes that exit non-zero on first real
   failure.
 
+## Implemented, verification pending
+
+- **Minigame events and Lucky Chance.** The current expansion defines the exact
+  100,000 lifetime-baked unlock, the 1,000,000 Mouse Raid unlock, prestige-safe
+  all-time baked statistics, a persisted seeded 6–12 minute schedule with its
+  30-second reveal and no-overlap rules, five persisted playable modes, and
+  minimize/resume/restart/abandon lifecycle state.
+- **Golden Tokens and reward drawer.** Oven Dial completion, minigame grades,
+  daily objectives, achievement milestones, and rare chains use stable award
+  keys and bounded amounts. Lucky Chance costs one token, uses five equal
+  reward slots, protects against duplicate rewards, and persists the draw
+  atomically with the token deduction.
+- **Documentation status.** `README.md`, `HANDOFF.md`, the gameplay index and
+  the dedicated gameplay and site articles now describe this expansion. The
+  expedited delivery boundary intentionally skipped tests, captures, and UI
+  runs, so this item is not presented as built-artifact verification.
+
 ## In flight
 
-- **Game screens** — six tabbed destinations plus the tools tech tree.
+- **Game screens** — six tabbed destinations plus the tools tech tree and the
+  permanently unlocked Minigames panel.
 - **Documentation and site** — categorized articles and the Pages site.
 
 ## Not built yet

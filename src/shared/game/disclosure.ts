@@ -1,5 +1,6 @@
 import { GENERATOR_DEFINITIONS } from "./generators.js";
 import { evaluateNewlyUnlockedTools } from "./tools.js";
+import { areMinigameEventsUnlocked } from "./control-unlocks.js";
 import { REVEAL_UPGRADE_DEFINITIONS, type RevealSurface, type UpgradeDefinition } from "./upgrades.js";
 import type { GameState } from "./types.js";
 
@@ -51,7 +52,7 @@ import type { GameState } from "./types.js";
  */
 export const PRESTIGE_CONSOLE_ACHIEVEMENT_ID = "lifetime_1000000000";
 
-export type ConsoleSurfaceId = "achievements" | "tools" | "statistics" | "prestige" | "factory" | "home";
+export type ConsoleSurfaceId = "achievements" | "tools" | "statistics" | "prestige" | "factory" | "home" | "minigames";
 
 export interface Disclosure {
   /** The generator shop rail. Bought with Shop Sign. */
@@ -80,6 +81,8 @@ export interface Disclosure {
    * surface this could take away.
    */
   readonly homeConstruction: boolean;
+  /** The minigame events panel, permanently reached at 100,000 lifetime baked cookies. */
+  readonly minigames: boolean;
   /** The per-second HUD readout and the hero's CPS line. Reached with the first generator. */
   readonly perSecondReadout: boolean;
   /** The per-click HUD readout. Reached with Steady Hand, which is when a click gains nuance. */
@@ -146,6 +149,7 @@ export function computeDisclosure(state: GameState): Disclosure {
     dieselDepot: ownsUpgrade(state, "reveal_fuel_contract"),
     dieselFactory: ownsUpgrade(state, "reveal_fuel_contract"),
     homeConstruction: ownsUpgrade(state, "reveal_property_deed"),
+    minigames: areMinigameEventsUnlocked(state),
     perSecondReadout: generatorsOwned > 0 || ascended,
     perClickReadout: holdToClick,
     consoles: {
@@ -160,6 +164,7 @@ export function computeDisclosure(state: GameState): Disclosure {
       // The second bought emblem, on the same terms: the Property Deed puts the house on the
       // cabinet, and nothing else ever does.
       home: ownsUpgrade(state, "reveal_property_deed"),
+      minigames: areMinigameEventsUnlocked(state),
     },
   };
 }

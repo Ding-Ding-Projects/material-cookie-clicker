@@ -3,6 +3,12 @@ import type { RandomEventsState } from "./random-events.js";
 import type { ControlUnlocksState } from "./control-unlocks.js";
 import type { DieselFactoryState } from "./diesel-factory.js";
 import type { HomeConstructionState } from "./home-construction.js";
+import type {
+  GoldenTokenLedger,
+  LuckyChanceState,
+  MinigameScheduleState,
+  MinigameState,
+} from "./minigames.js";
 
 /** Small discrete counters use plain `number` — see big-number.ts header comment for why. */
 
@@ -180,6 +186,14 @@ export interface GameState {
    * `computeMultipliers` seam like every other multiplier in the game.
    */
   readonly homeConstruction: HomeConstructionState;
+
+  /** The permanently unlocked minigame suite and its seeded, persisted incoming schedule. */
+  readonly minigames: MinigameState;
+  readonly minigameSchedule: MinigameScheduleState | null;
+  readonly goldenTokens: GoldenTokenLedger;
+  readonly luckyChance: LuckyChanceState;
+  /** Reward ids already granted by the Lucky Chance drawer (cosmetics, boosts, supplies). */
+  readonly luckyRewards: readonly string[];
 
   /**
    * Player-facing switch for the Tools tech tree's progression gate (see tools.ts). When

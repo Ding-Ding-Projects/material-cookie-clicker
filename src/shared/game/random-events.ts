@@ -42,6 +42,7 @@
 import { z } from "zod";
 
 import { bnAdd, bnCompare, bnFromNumber, bnMulScalar, type BigNum } from "./big-number.js";
+import { areMouseRaidsUnlocked } from "./control-unlocks.js";
 import { totalCps } from "./cps.js";
 import { isEffectActive } from "./golden-cookie.js";
 import { computeMultipliers } from "./upgrades.js";
@@ -2545,7 +2546,9 @@ export function tickRandomEvents(
   }
 
   if (nowEpochMs >= state.raidNextEligibleAtEpochMs) {
-    const richEnough = bnCompare(gameState.cookies, bnFromNumber(config.raidMinCookies)) >= 0;
+    const richEnough =
+      areMouseRaidsUnlocked(gameState) &&
+      bnCompare(gameState.cookies, bnFromNumber(config.raidMinCookies)) >= 0;
     // Both guards DEFER rather than re-roll: the raid stays due and lands on the first tick
     // where the window is visible and the counter is worth raiding.
     if (!options.hidden && richEnough) {

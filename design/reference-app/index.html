@@ -1,0 +1,45 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <title>Material Cookie Clicker design-reference app</title>
+    <link rel="stylesheet" href="./app.css" />
+  </head>
+  <body>
+    <header class="top-app-bar">
+      <div>
+        <p class="eyebrow">Developer evidence tool</p>
+        <h1>Design-reference app</h1>
+      </div>
+      <output id="route-status" class="status" aria-live="polite">Loading route…</output>
+    </header>
+
+    <main>
+      <section class="controls" aria-labelledby="route-heading">
+        <h2 id="route-heading">Deterministic route</h2>
+        <label>
+          Inventory row
+          <select id="row-select"></select>
+        </label>
+        <dl class="tuple" id="tuple"></dl>
+        <a class="filled-button" id="canonical-link" href="#">Open canonical route</a>
+      </section>
+
+      <section class="reference-stage" aria-labelledby="reference-heading">
+        <div class="stage-heading">
+          <div>
+            <p class="eyebrow">Checked-in source, rendered in place</p>
+            <h2 id="reference-heading">Reference</h2>
+          </div>
+          <code id="reference-path"></code>
+        </div>
+        <div id="viewport-shell" class="viewport-shell">
+          <iframe id="reference-frame" title="Checked-in design reference"></iframe>
+        </div>
+      </section>
+    </main>
+
+    <script type="module" src="./app.js"></script>
+  </body>
+</html>

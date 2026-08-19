@@ -1,0 +1,25 @@
+{
+  "schemaVersion": 1,
+  "rowId": "game-layout--main",
+  "breaks": [
+    { "id": "inventory-row-removed", "mutation": "remove-row", "expectedCode": "REFERENCE_ROW_MISSING" },
+    { "id": "required-reference-removed", "mutation": "remove-required-reference", "expectedCode": "REFERENCE_SET_MISMATCH" },
+    { "id": "reference-route-missing", "mutation": "delete-reference-route", "expectedCode": "REFERENCE_ROUTE_MISSING" },
+    { "id": "product-route-missing", "mutation": "delete-product-route", "expectedCode": "PRODUCT_ROUTE_MISSING" },
+    { "id": "declared-states-missing", "mutation": "delete-declared-states", "expectedCode": "DECLARED_STATES_INVALID" },
+    { "id": "tuple-screen-missing", "mutation": "delete-tuple-screen", "expectedCode": "TUPLE_SCREEN_MISSING" },
+    { "id": "tuple-state-missing", "mutation": "delete-tuple-state", "expectedCode": "TUPLE_STATE_MISSING" },
+    { "id": "tuple-theme-missing", "mutation": "delete-tuple-theme", "expectedCode": "TUPLE_THEME_MISSING" },
+    { "id": "tuple-width-missing", "mutation": "delete-tuple-width", "expectedCode": "TUPLE_WIDTH_MISSING" },
+    { "id": "tuple-height-missing", "mutation": "delete-tuple-height", "expectedCode": "TUPLE_HEIGHT_MISSING" },
+    { "id": "tuple-scale-missing", "mutation": "delete-tuple-scale", "expectedCode": "TUPLE_SCALE_MISSING" },
+    { "id": "tuple-locale-missing", "mutation": "delete-tuple-locale", "expectedCode": "TUPLE_LOCALE_MISSING" },
+    { "id": "material-audit-missing", "mutation": "delete-material-audit", "expectedCode": "M3_AUDIT_MISSING" },
+    { "id": "reference-raw-missing", "mutation": "delete-reference-raw", "expectedCode": "EVIDENCE_REFERENCE_RAW_MISSING" },
+    { "id": "product-raw-missing", "mutation": "delete-product-raw", "expectedCode": "EVIDENCE_PRODUCT_RAW_MISSING" },
+    { "id": "comparison-missing", "mutation": "delete-comparison", "expectedCode": "EVIDENCE_COMPARISON_MISSING" },
+    { "id": "diff-missing", "mutation": "delete-diff", "expectedCode": "EVIDENCE_DIFF_MISSING" },
+    { "id": "deviation-reason-missing", "mutation": "add-deviation-without-reason", "expectedCode": "DEVIATION_REASON_MISSING" },
+    { "id": "deviation-approval-missing", "mutation": "add-deviation-without-approval", "expectedCode": "DEVIATION_APPROVAL_MISSING" }
+  ]
+}

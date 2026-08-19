@@ -8,13 +8,17 @@ from the root of `https://ding-ding-projects.github.io/material-cookie-clicker/`
 
 | Path | What it is |
 | --- | --- |
-| `index.html` | Landing page: game identity, bilingual blurb, download section, feature overview. |
+| `index.html` | Landing page: product identity, explicit non-playable-site boundary, verified download, feature overview and Open Graph metadata. |
+| `control-center.html` | The site-owned settings, appearance, privacy, local-tool, status and tab-management surface. |
 | `features/index.html` | Feature index plus the client-side search. |
 | `features/*.html` | One article per feature area, each with behaviour, configuration and related links. |
 | `assets/captures/*.png` | Screenshots of the real running application. Sixteen of them are the current set, shown in the landing page's capture matrix and in the matching articles; the rest are superseded images from earlier lanes, kept on disk because a true photograph of a build that shipped is not deleted, and simply no longer referenced by any page. |
 | `assets/site.css` | The site's only stylesheet. Tokens copied verbatim from the `design/` v2 specs. |
 | `assets/search.js` | The search index (baked in at authoring time) and the matcher. |
 | `assets/search-ui.js` | The small module that wires the matcher to the search field. |
+| `assets/site-shell.js` | The persistent browser-style site tab strip, tab groups, pin/close controls, context-menu filter and command palette. |
+| `assets/control-center.js` | Local persistence and interactions for site settings, narration, schedules, logo preview, toy locks, support tickets, authenticator, converter, status, history and exports. |
+| `social-preview.png` | Byte-identical copy of the real progressed-application capture used by the deployed page's Open Graph metadata. |
 
 The deploy workflow additionally writes `assets/generated-changelog.mjs` into this directory at
 deploy time from the real GitHub release inventory. It is generated, not committed, and no page
@@ -26,9 +30,13 @@ here depends on it.
   any kind. Every graphic is either drawn in CSS or a PNG committed in `assets/captures/`. The only
   external addresses anywhere in the tree are the GitHub repository and release URLs, and both are
   links a person clicks, never fetched resources.
-- **The v2 "arcade cabinet" design system**, not Material Design 3 — see `design/README.md`. Radial
-  oven-glow backgrounds, marquee headings on bevelled plates, solid offset shadows with no blur,
-  2–7px borders, 10–40px radii, and light/dark driven from the same custom properties.
+- **Material Design 3 interactive controls over the project artwork.** The retained arcade-cabinet
+  illustration and captures identify the product; interactive site chrome uses Material colour
+  roles, state layers, shape, elevation, touch targets, focus states and reduced-motion behavior.
+- **A project site, never a playable substitute.** The visible boundary statement says that the
+  game runs only in the installed Windows application. Browser-only equivalents state their limits:
+  the converter exposes only bounded browser-native transforms, and the Ollama guide never claims a
+  live loopback connection, model inventory, pull or chat.
 - **Accessible.** Semantic landmarks, ordered headings, visible 4px focus rings, 44px minimum touch
   targets, `prefers-reduced-motion` equivalents, AA-verified colour pairs only, responsive from
   320px with no sideways body scroll (wide tables scroll inside their own container).

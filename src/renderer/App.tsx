@@ -1,5 +1,7 @@
 import { useCallback, useEffect, useLayoutEffect, useRef, useState, type CSSProperties, type ReactNode } from 'react';
 
+import './styles/canonical-tools.css';
+
 import { bnMulScalar } from '../shared/game/big-number.js';
 import { formatExact, formatExactDigits } from '../shared/game/format-number.js';
 import { isEffectActive } from '../shared/game/golden-cookie.js';
@@ -35,6 +37,8 @@ import {
   GAME_SURFACE_COPY,
   SETTINGS_COPY,
   setActiveLanguageMode,
+  setActiveFunnyLevels,
+  setActiveVocabulary,
   SHELL_COPY,
   showsCantonese,
   showsEnglish,
@@ -50,7 +54,7 @@ import {
   type FunnyLevel,
   type LanguageMode,
 } from './game/app-settings';
-import { AppSettingsProvider, type AppSettingsContextValue } from './game/AppSettingsContext';
+import { AppSettingsProvider, useAppSettings, type AppSettingsContextValue } from './game/AppSettingsContext';
 import { SettingsScreen } from './screens/SettingsScreen';
 import { ControlsCatalogue } from './screens/ControlsCatalogue';
 import { AchievementsScreen, AchievementUnlockToast } from './screens/AchievementsScreen';
@@ -75,6 +79,7 @@ import { UpgradeStrip } from './screens/UpgradeStrip';
 import { MinigameEventsScreen, type MinigameEventView } from './screens/MinigameEventsScreen';
 import { MinigamesScreen as PlayableMinigamesScreen } from './screens/MinigamesScreen';
 import { getMinigameVisibility, MINIGAME_IDS, type MinigameId } from '../shared/game/minigames.js';
+import { CanonicalCommandPalette } from './components/CanonicalCommandPalette.js';
 
 /**
  * The four secondary surfaces. The game surface is NOT in this list, because it is not a
@@ -423,6 +428,7 @@ function AnchoredPanel({
   onClose: () => void;
   children: ReactNode;
 }) {
+  const { settings } = useAppSettings();
   const panelRef = useRef<HTMLDivElement | null>(null);
   const closeRef = useRef<HTMLButtonElement | null>(null);
   const titleId = `panel-title-${surfaceId}`;
@@ -541,6 +547,7 @@ function AnchoredPanel({
             <ConsoleEmblem id={surfaceId} />
           </span>
           <h2 className="anchored-panel__title" id={titleId}>
+            {settings.dialogEmoji ? <span aria-hidden="true">🍪</span> : null}
             {showsEnglish() ? <span>{label.en}</span> : null}
             {showsCantonese() ? <span className="anchored-panel__title-zh">{label.yue}</span> : null}
           </h2>
@@ -574,6 +581,7 @@ function AnchoredPanel({
  * layout, the drag region or the window's own geometry moved.
  */
 function TitleBar() {
+  const { settings } = useAppSettings();
   const dragBought = useControlRung('chrome.drag');
   const closeBought = useControlRung('chrome.close');
   const minimizeBought = useControlRung('chrome.minimize');
@@ -618,7 +626,7 @@ function TitleBar() {
           toggle maximize still work anywhere that is not one of the three caps. */}
       <span className="title-bar__marquee">
         <span className="title-bar__rivet" aria-hidden="true" />
-        <span className="title-bar__label">Material Cookie Clicker</span>
+        <span className="title-bar__label">{settings.displayName}</span>
         <span className="title-bar__rivet" aria-hidden="true" />
       </span>
       {/* Until dragging is bought the bar carries its price instead of its drag region, so the
@@ -705,9 +713,49 @@ export function App() {
     },
     [settingsStore],
   );
+  const sharedSettingsHydrated = useRef(false);
+
+  useEffect(() => {
+    let cancelled = false;
+    void window.materialCookieClicker?.canonical.readSharedSettings().then((result) => {
+      if (cancelled) return;
+      if (result.ok) {
+        setSettings((current) => {
+          const next = { ...current, schoolMode: result.settings.schoolMode, schoolModeName: result.settings.schoolModeName };
+          settingsStore.save(next);
+          return next;
+        });
+      }
+      sharedSettingsHydrated.current = true;
+    }).catch(() => { sharedSettingsHydrated.current = true; });
+    return () => { cancelled = true; };
+  }, [settingsStore]);
+
+  useEffect(() => window.materialCookieClicker?.canonical.onSharedSettings((shared) => {
+    setSettings((current) => {
+      if (current.schoolMode === shared.schoolMode && current.schoolModeName === shared.schoolModeName) return current;
+      const next = { ...current, schoolMode: shared.schoolMode, schoolModeName: shared.schoolModeName };
+      settingsStore.save(next);
+      return next;
+    });
+  }), [settingsStore]);
+
+  useEffect(() => {
+    if (!sharedSettingsHydrated.current) return;
+    void window.materialCookieClicker?.canonical.writeSharedSettings({
+      version: 1,
+      schoolMode: settings.schoolMode,
+      schoolModeName: settings.schoolModeName,
+      updatedAt: new Date().toISOString(),
+    });
+  }, [settings.schoolMode, settings.schoolModeName]);
 
   const settingsContext: AppSettingsContextValue = {
     settings,
+    updateSettings: useCallback(
+      (patch: Partial<AppSettings>) => commit({ ...settings, ...patch }),
+      [commit, settings],
+    ),
     setLanguageMode: useCallback(
       (languageMode: LanguageMode) => commit({ ...settings, languageMode }),
       [commit, settings],
@@ -729,7 +777,7 @@ export function App() {
     <AppSettingsProvider value={settingsContext}>
       <GameProvider>
         <LookTierGate>
-          <LanguageModeGate stored={settings.languageMode}>
+          <LanguageModeGate settings={settings}>
             <TitleBar />
             <GameShell />
           </LanguageModeGate>
@@ -791,15 +839,17 @@ function LookTierGate({ children }: { children: ReactNode }) {
  * It lives inside GameProvider because the second input is the save, and above every consumer
  * because copy.ts's mode is module-level state that must already be correct when children render.
  */
-function LanguageModeGate({ stored, children }: { stored: LanguageMode; children: ReactNode }) {
+function LanguageModeGate({ settings, children }: { settings: AppSettings; children: ReactNode }) {
   const structure = useStructureSnapshot();
-  const mode = effectiveLanguageMode(stored, {
+  const mode = effectiveLanguageMode(settings.schoolMode ? 'en' : settings.languageMode, {
     yue: isControlUnlocked(structure, 'settings.language.yue'),
     both: isControlUnlocked(structure, 'settings.language.both'),
   });
   setActiveLanguageMode(mode);
+  setActiveFunnyLevels(settings.funnyLevelEn, settings.funnyLevelYue);
+  setActiveVocabulary(settings.schoolMode ? null : settings.personalVocabulary?.replacements ?? null);
   return (
-    <div className="app-shell" data-language-mode={mode}>
+    <div className="app-shell" data-language-mode={mode} data-school-mode={settings.schoolMode ? 'true' : undefined}>
       {children}
     </div>
   );
@@ -818,6 +868,7 @@ function GameShell() {
     nameEn: string;
     nameYue: string;
   } | null>(null);
+  const [paletteTarget, setPaletteTarget] = useState<string | null>(null);
   const statusTimerRef = useRef<ReturnType<typeof setTimeout> | null>(null);
   const buttonRefs = useRef<Partial<Record<PanelId, HTMLButtonElement | null>>>({});
   // The Settings coin-slot plate on the console, while Settings is unbought. "Open it now"
@@ -844,6 +895,7 @@ function GameShell() {
       return null;
     });
     setSettingsEntry(null);
+    setPaletteTarget(null);
   }, []);
 
   /** The depot status card in the shop rail's footer is a door into the factory panel: it opens
@@ -909,8 +961,25 @@ function GameShell() {
     [announce, settingsBought],
   );
 
+  const openCanonicalTarget = useCallback((targetId: string) => {
+    if (!settingsBought) {
+      announce(SETTINGS_COPY.featureNeedsPurchase(formatExactDigits(controlRungPrice(SETTINGS_OPEN_RUNG_ID))));
+      settingsSlotRef.current?.focus();
+      return;
+    }
+    const button = buttonRefs.current.settings;
+    if (button) {
+      const rect = button.getBoundingClientRect();
+      setAnchor({ x: rect.left + rect.width / 2, y: rect.bottom, button });
+    }
+    setSettingsEntry(null);
+    setPaletteTarget(targetId);
+    setOpenSurface('settings');
+  }, [announce, settingsBought]);
+
   return (
     <main className="app-content" id="root-content">
+      <CanonicalCommandPalette onTeleport={openCanonicalTarget} />
       {/* One cabinet, one surface. The HUD is pinned to its top with the console cluster bolted
           on beside it, and the game fills the rest — permanently. Secondary surfaces are panels
           that grow out of a console button on top of it; the tick loop keeps running behind. */}
@@ -957,6 +1026,7 @@ function GameShell() {
             <SettingsScreen
               highlightRow={settingsEntry?.row ?? null}
               openedFrom={settingsEntry ? { nameEn: settingsEntry.nameEn, nameYue: settingsEntry.nameYue } : null}
+              teleportTarget={paletteTarget}
             />
           )}
         </AnchoredPanel>

@@ -15,7 +15,8 @@
  * every screen already funnels its labels through — delegates to it against the currently
  * active mode. That is why a screen does not have to know the setting exists to obey it.
  */
-import type { LanguageMode } from "./app-settings.js";
+import { applyVocabulary, compileReplacements, type CompiledVocabulary } from "@material-cookie-clicker/surface-kernel";
+import type { FunnyLevel, LanguageMode } from "./app-settings.js";
 
 export interface Bilingual {
   readonly en: string;
@@ -48,6 +49,9 @@ export function formatBilingual(text: Bilingual, mode: LanguageMode): string {
  * mode. Nothing else in the app is allowed to write it.
  */
 let activeLanguageMode: LanguageMode = "both";
+let activeFunnyLevelEn: FunnyLevel = 3;
+let activeFunnyLevelYue: FunnyLevel = 3;
+let activeVocabulary: CompiledVocabulary | null = null;
 
 export function setActiveLanguageMode(mode: LanguageMode): void {
   activeLanguageMode = mode;
@@ -55,6 +59,15 @@ export function setActiveLanguageMode(mode: LanguageMode): void {
 
 export function getActiveLanguageMode(): LanguageMode {
   return activeLanguageMode;
+}
+
+export function setActiveFunnyLevels(english: FunnyLevel, cantonese: FunnyLevel): void {
+  activeFunnyLevelEn = english;
+  activeFunnyLevelYue = cantonese;
+}
+
+export function setActiveVocabulary(replacements: Readonly<Record<string, string>> | null): void {
+  activeVocabulary = replacements ? compileReplacements({ ...replacements }) : null;
 }
 
 /** True when English text should be rendered at all, for the paired-span layouts that keep the
@@ -69,7 +82,32 @@ export function showsCantonese(mode: LanguageMode = activeLanguageMode): boolean
 }
 
 export function bilingualText(text: Bilingual): string {
-  return formatBilingual(text, activeLanguageMode);
+  const rendered = formatBilingual(text, activeLanguageMode);
+  return activeVocabulary
+    ? applyVocabulary(rendered, activeVocabulary, { immutableSpans: [] })
+    : rendered;
+}
+
+const FUNNY_PREVIEW_EN: readonly [string, string, string, string, string] = [
+  "Settings saved.",
+  "Settings saved — everything is in order.",
+  "Settings saved — the switches are behaving themselves.",
+  "Settings saved — the control panel has stopped arguing.",
+  "Settings saved — every switch saluted and the panel returned to biscuit duty.",
+];
+
+const FUNNY_PREVIEW_YUE: readonly [string, string, string, string, string] = [
+  "設定已儲存。",
+  "設定已儲存，一切正常。",
+  "設定已儲存，啲掣都有乖乖排隊。",
+  "設定已儲存，控制台終於唔再駁嘴。",
+  "設定已儲存，全部掣敬完禮返去焗曲奇。",
+];
+
+/** A real five-level copy family used by Settings and notification previews. */
+export function funnyLevelPreview(language: "en" | "yue", level?: FunnyLevel): string {
+  const selected = level ?? (language === "en" ? activeFunnyLevelEn : activeFunnyLevelYue);
+  return (language === "en" ? FUNNY_PREVIEW_EN : FUNNY_PREVIEW_YUE)[selected - 1];
 }
 
 export const TAB_COPY = {

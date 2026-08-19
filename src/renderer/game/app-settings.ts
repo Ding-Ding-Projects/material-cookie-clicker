@@ -1,3 +1,5 @@
+import { validateVocabularyDocument } from "@material-cookie-clicker/surface-kernel";
+
 /**
  * APPLICATION settings — language mode and the two funny levels.
  *
@@ -31,6 +33,35 @@ export const LANGUAGE_MODES: readonly LanguageMode[] = ["en", "yue", "both"];
  */
 export type FunnyLevel = 1 | 2 | 3 | 4 | 5;
 
+export type DockEdge = "left" | "top" | "right" | "bottom";
+export type NarratorLanguage = "en" | "yue" | "both";
+export type PaletteSize = "card" | "window";
+
+export interface PersonalVocabularyCache {
+  readonly version: 1;
+  readonly replacements: Readonly<Record<string, string>>;
+}
+
+export interface NarratorSettings {
+  readonly enabled: boolean;
+  readonly language: NarratorLanguage;
+  readonly englishVoiceId: string | null;
+  readonly cantoneseVoiceId: string | null;
+  readonly rate: number;
+  readonly pitch: number;
+}
+
+export interface CanonicalTabSettings {
+  readonly dock: DockEdge;
+  readonly pinnedIds: readonly string[];
+  readonly orderIds: readonly string[];
+  readonly closedIds: readonly string[];
+  readonly groupById: Readonly<Record<string, string>>;
+  readonly groupNames: Readonly<Record<string, string>>;
+  readonly groupAccents: Readonly<Record<string, string>>;
+  readonly collapsedGroupIds: readonly string[];
+}
+
 export const FUNNY_LEVEL_MIN = 1;
 export const FUNNY_LEVEL_MAX = 5;
 
@@ -41,6 +72,14 @@ export interface AppSettings {
   readonly funnyLevelEn: FunnyLevel;
   /** The Cantonese funny level. Independent of `funnyLevelEn`. */
   readonly funnyLevelYue: FunnyLevel;
+  readonly dialogEmoji: boolean;
+  readonly schoolMode: boolean;
+  readonly schoolModeName: string;
+  readonly displayName: string;
+  readonly personalVocabulary: PersonalVocabularyCache | null;
+  readonly narrator: NarratorSettings;
+  readonly tabs: CanonicalTabSettings;
+  readonly paletteSize: PaletteSize;
 }
 
 /**
@@ -57,6 +96,30 @@ export const DEFAULT_APP_SETTINGS: AppSettings = {
   languageMode: "en",
   funnyLevelEn: 3,
   funnyLevelYue: 3,
+  dialogEmoji: true,
+  schoolMode: false,
+  schoolModeName: "School mode",
+  displayName: "Material Cookie Clicker",
+  personalVocabulary: null,
+  narrator: {
+    enabled: false,
+    language: "en",
+    englishVoiceId: null,
+    cantoneseVoiceId: null,
+    rate: 1,
+    pitch: 1,
+  },
+  tabs: {
+    dock: "left",
+    pinnedIds: ["general"],
+    orderIds: [],
+    closedIds: [],
+    groupById: {},
+    groupNames: {},
+    groupAccents: {},
+    collapsedGroupIds: [],
+  },
+  paletteSize: "card",
 };
 
 /** Which non-English modes a save has bought. English is never in here — it is free. */
@@ -81,7 +144,8 @@ export function effectiveLanguageMode(stored: LanguageMode, owned: OwnedLanguage
   return "en";
 }
 
-export const APP_SETTINGS_KEY = "material-cookie-clicker:settings:v1";
+export const APP_SETTINGS_KEY = "material-cookie-clicker:settings:v2";
+export const LEGACY_APP_SETTINGS_KEY = "material-cookie-clicker:settings:v1";
 
 export function isLanguageMode(value: unknown): value is LanguageMode {
   return value === "en" || value === "yue" || value === "both";
@@ -103,11 +167,92 @@ export function coerceFunnyLevel(value: unknown, fallback: FunnyLevel): FunnyLev
 export function normalizeAppSettings(raw: unknown): AppSettings {
   if (typeof raw !== "object" || raw === null) return DEFAULT_APP_SETTINGS;
   const record = raw as Record<string, unknown>;
+  const narrator = readRecord(record.narrator);
+  const tabs = readRecord(record.tabs);
   return {
     languageMode: isLanguageMode(record.languageMode) ? record.languageMode : DEFAULT_APP_SETTINGS.languageMode,
     funnyLevelEn: coerceFunnyLevel(record.funnyLevelEn, DEFAULT_APP_SETTINGS.funnyLevelEn),
     funnyLevelYue: coerceFunnyLevel(record.funnyLevelYue, DEFAULT_APP_SETTINGS.funnyLevelYue),
+    dialogEmoji: record.dialogEmoji !== false,
+    schoolMode: record.schoolMode === true,
+    schoolModeName: boundedString(record.schoolModeName, DEFAULT_APP_SETTINGS.schoolModeName, 48),
+    displayName: boundedString(record.displayName, DEFAULT_APP_SETTINGS.displayName, 80),
+    personalVocabulary: normalizeVocabularyCache(record.personalVocabulary),
+    narrator: {
+      enabled: narrator.enabled === true,
+      language: isNarratorLanguage(narrator.language) ? narrator.language : DEFAULT_APP_SETTINGS.narrator.language,
+      englishVoiceId: nullableBoundedString(narrator.englishVoiceId, 160),
+      cantoneseVoiceId: nullableBoundedString(narrator.cantoneseVoiceId, 160),
+      rate: boundedNumber(narrator.rate, 0.5, 2, DEFAULT_APP_SETTINGS.narrator.rate),
+      pitch: boundedNumber(narrator.pitch, 0.5, 2, DEFAULT_APP_SETTINGS.narrator.pitch),
+    },
+    tabs: {
+      dock: isDockEdge(tabs.dock) ? tabs.dock : DEFAULT_APP_SETTINGS.tabs.dock,
+      pinnedIds: boundedStringArray(tabs.pinnedIds, 32, DEFAULT_APP_SETTINGS.tabs.pinnedIds),
+      orderIds: boundedStringArray(tabs.orderIds, 32, DEFAULT_APP_SETTINGS.tabs.orderIds),
+      closedIds: boundedStringArray(tabs.closedIds, 32, DEFAULT_APP_SETTINGS.tabs.closedIds),
+      groupById: boundedStringRecord(tabs.groupById, 32),
+      groupNames: boundedStringRecord(tabs.groupNames, 16),
+      groupAccents: boundedStringRecord(tabs.groupAccents, 16),
+      collapsedGroupIds: boundedStringArray(tabs.collapsedGroupIds, 16, DEFAULT_APP_SETTINGS.tabs.collapsedGroupIds),
+    },
+    paletteSize: record.paletteSize === "window" ? "window" : "card",
   };
+}
+
+function readRecord(value: unknown): Record<string, unknown> {
+  return typeof value === "object" && value !== null && !Array.isArray(value)
+    ? value as Record<string, unknown>
+    : {};
+}
+
+function boundedString(value: unknown, fallback: string, max: number): string {
+  if (typeof value !== "string") return fallback;
+  const trimmed = value.trim();
+  return trimmed.length > 0 ? trimmed.slice(0, max) : fallback;
+}
+
+function nullableBoundedString(value: unknown, max: number): string | null {
+  return typeof value === "string" && value.length > 0 ? value.slice(0, max) : null;
+}
+
+function boundedNumber(value: unknown, min: number, max: number, fallback: number): number {
+  return typeof value === "number" && Number.isFinite(value)
+    ? Math.min(max, Math.max(min, value))
+    : fallback;
+}
+
+function boundedStringArray(value: unknown, maxEntries: number, fallback: readonly string[] = []): string[] {
+  if (!Array.isArray(value)) return [...fallback];
+  return [...new Set(value.filter((item): item is string => typeof item === "string" && item.length > 0)
+    .map((item) => item.slice(0, 80)))]
+    .slice(0, maxEntries);
+}
+
+function boundedStringRecord(value: unknown, maxEntries: number): Record<string, string> {
+  const source = readRecord(value);
+  const result: Record<string, string> = {};
+  for (const [key, entry] of Object.entries(source).slice(0, maxEntries)) {
+    if (typeof entry === "string" && key.length > 0 && entry.length > 0) {
+      result[key.slice(0, 80)] = entry.slice(0, 80);
+    }
+  }
+  return result;
+}
+
+function isDockEdge(value: unknown): value is DockEdge {
+  return value === "left" || value === "top" || value === "right" || value === "bottom";
+}
+
+function isNarratorLanguage(value: unknown): value is NarratorLanguage {
+  return value === "en" || value === "yue" || value === "both";
+}
+
+function normalizeVocabularyCache(value: unknown): PersonalVocabularyCache | null {
+  const record = readRecord(value);
+  if (record.version !== 1) return null;
+  const verdict = validateVocabularyDocument(JSON.stringify(record));
+  return verdict.ok ? { version: 1, replacements: verdict.replacements } : null;
 }
 
 /** The narrow subset of the Web Storage API this module needs, for test injection. */
@@ -126,7 +271,7 @@ export function createLocalStorageAppSettings(storage: SettingsStorageLike): App
     load(): AppSettings {
       let raw: string | null = null;
       try {
-        raw = storage.getItem(APP_SETTINGS_KEY);
+        raw = storage.getItem(APP_SETTINGS_KEY) ?? storage.getItem(LEGACY_APP_SETTINGS_KEY);
       } catch {
         return DEFAULT_APP_SETTINGS;
       }

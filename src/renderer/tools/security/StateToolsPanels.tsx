@@ -285,6 +285,7 @@ export function OfflineDocsPanel(props: { bundle: OfflineDocsBundle | null }): R
 }
 
 export function SecurityStateToolsPanel(props: {
+  showAuthenticator?: boolean;
   localDataPath: string;
   timeZone: string;
   history: readonly HistoryRecord[];
@@ -296,7 +297,7 @@ export function SecurityStateToolsPanel(props: {
   onExport(markdown: string): void;
 }): ReactNode {
   return <div className="security-state-tools">
-    <TotpAuthenticatorPanel />
+    {props.showAuthenticator === false ? null : <TotpAuthenticatorPanel />}
     <SupportTicketsPanel localDataPath={props.localDataPath} onOpenFolder={props.onOpenFolder} />
     <ScheduleEditorPanel timeZone={props.timeZone} onSave={props.onSaveSchedule} />
     <HistoryPanel records={props.history} onRestore={props.onRestore} />

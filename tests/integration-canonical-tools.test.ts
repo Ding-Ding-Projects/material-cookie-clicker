@@ -10,6 +10,7 @@ const main = read('src/main/main.ts');
 const canonical = read('src/shared/canonical-ipc.ts');
 const palette = read('src/renderer/components/CanonicalCommandPalette.tsx');
 const canonicalStyles = read('src/renderer/styles/canonical-tools.css');
+const securityPanels = read('src/renderer/tools/security/StateToolsPanels.tsx');
 
 describe('canonical application-tools integration', () => {
   it('mounts every concrete product tool and dedicated PDF operations', () => {
@@ -63,5 +64,10 @@ describe('canonical application-tools integration', () => {
   it('gives every application tab label a full row above its management actions', () => {
     expect(canonicalStyles).toContain(".canonical-tab > [role='tab'] { grid-column: 1 / -1; width: 100%; text-align: start; }");
     expect(canonicalStyles).toContain(".canonical-tab > button:not([role='tab']) { min-width: 0; padding-inline: 6px; }");
+  });
+
+  it('mounts only the privileged authenticator when the composite security panel is integrated', () => {
+    expect(applicationTools).toContain('<SecurityStateToolsPanel showAuthenticator={false}');
+    expect(securityPanels).toContain('props.showAuthenticator === false ? null : <TotpAuthenticatorPanel />');
   });
 });

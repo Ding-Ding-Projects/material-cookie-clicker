@@ -1,9 +1,9 @@
 # The 21-tier generator ladder
 
-> **Status: implemented; verification pending.** The Office Buildings lane adds the
-> twenty-first generator definition and its permanent lifetime-cookie reveal. This article records
-> the ladder and row behaviour from `design/building-row.html`, including the ordering contract;
-> tests, captures, and UI-run evidence remain intentionally pending for the expedited lane.
+> **Status: shipped in v0.2.55, with narrow capture evidence pending.** The twenty-one definitions,
+> permanent Office reveal, uncapped ownership, purchases, save behavior, and focused tests exist.
+> The built ladder has been exercised, but the committed deep-ladder capture predates Office
+> Building, so the Office-specific capture row remains pending.
 
 ## What it does
 
@@ -53,14 +53,13 @@ application features to begin with.
 
 ## How it is configured
 
-Not configurable yet. Once built, each tier's cost curve, base CPS, and unlock threshold become the
-implementation's own data, and this article's numbered list is the ordering contract that data must
+Each tier's cost curve, base CPS, and unlock threshold are implementation data, and this article's numbered list is the ordering contract that data must
 follow — reordering, renaming, or removing a tier here requires updating this article in the same
 change, per this project's documentation-currency rule.
 
 ## Failure modes
 
-Not applicable yet. Once built, the anticipated failure modes are: a cost curve that produces a
+Failure modes include a cost curve that produces a
 non-integer or negative price at some owned count (must be validated), a "Max" buy action that
 silently buys fewer than it could afford (must report the real affordable quantity), and a locked
 row that is fully invisible rather than shown-and-locked (violates the specification's
@@ -75,9 +74,9 @@ protect a purely cosmetic number from.
 
 ## Verification
 
-Not yet verifiable beyond opening `design/building-row.html` directly in a browser, which renders
-every row state (affordable, unaffordable, locked) against static sample data. There is no running
-purchase logic to test yet.
+`tests/game/generators.test.ts` and `endless-progression.test.ts` cover ordering, reveal, purchase,
+and uncapped ownership. `captures/app/ladder-deep.png` proves the built deep ladder before the Office
+addition; a current Office-row capture is still required.
 
 ## Suggested articles
 

@@ -1,6 +1,6 @@
 # Handoff
 
-Rewritten 2026-08-16 against the repository as it actually is. Every number
+Reconciled 2026-08-19 against the v0.2.55 repository and release. Every number
 below was read from a real command, not remembered. Where something is
 unverified it says so, and where an earlier version of this file was wrong the
 correction is noted rather than quietly applied.
@@ -26,9 +26,9 @@ repeatable floors through the existing one-site clock; `homeConstruction.extensi
 the count, and each floor adds coziness and a small production bonus. The shop-rail Diesel Depot
 status card now persists an accessible collapsed/expanded state.
 
-## Current minigame-events lane
+## Current minigame-events release state
 
-The `feat/minigame-events-lucky-drawer` jer adds the permanently unlocked
+The minigame-events work on `main` adds the permanently unlocked
 minigame suite at 100,000 lifetime baked cookies and keeps Mouse Raid unlock at
 1,000,000. It adds a seeded 6–12 minute schedule with a final-30-second notice,
 one persisted active board at a time, and a side-panel flow that supports
@@ -38,9 +38,10 @@ Minesweeper, and Breakout. Golden Tokens and the Lucky Chance drawer use
 duplicate-protected persisted state, with no token generation during offline
 progress.
 
-This lane intentionally has no test, lint, review, audit, capture, or UI-run
-evidence under the speed-delivery boundary. The supported build/package path is
-the remaining allowed release check before commit and publication.
+The original expedited lane skipped tests and captures. That historical boundary is superseded by
+the v0.2.55 verification pass: the complete local suite reported `903/903`, the installer was built,
+and the minigame flow was exercised from the built artifact. A current committed minigame capture
+is still missing and remains an explicit evidence gap.
 
 ## The one rule a successor must not erode
 
@@ -72,13 +73,17 @@ X yet", that is this contract being eroded.
 
 | Thing | Evidence |
 | --- | --- |
-| Project test suite | **31 files, 770 tests, all passing** (`npx vitest run tests`) |
+| Project test suite | **33 files, 785 tests, all passing** (`npm run check`, 2026-08-19) |
 | `packages/surface-kernel` | **89 tests passing** (`npm test` in that package) |
 | `packages/local-ollama` | **37 tests passing** — previously unverifiable, now green once the workspace was wired |
+| Completeness negative regression | **8 tests passing** — exact capability/page rows, traceable evidence, article sections and links plus deliberate missing-row, blank-evidence, missing-article/page/section, and broken-anchor red fixtures |
 | Smoke test | **7/7** (`npm run smoke`) |
 | Build | `npm run build` exits 0, emitting `dist/main`, `dist/preload`, `dist/renderer`, `dist/shared` |
 | Contrast | All **46** role pairs across light and dark computed against the real sRGB luminance formula (`node design/_verify/contrast-check.mjs`) |
 | Application launches | Photographed from the real build on an off-screen desktop — `captures/app/launch-shell.png` |
+
+The post-documentation `npm run check` total is **911/911 tests**: 785 application tests, 37 local
+model package tests, and 89 surface-kernel tests, plus both TypeScript checks.
 
 **Test files run against the source tree, not the built artifact.** That
 distinction matters here: a unit test that injects the bridge proves the screen
@@ -88,25 +93,15 @@ expects. `npm run smoke` exists precisely to cover that seam — it reads
 
 ### The published baseline
 
-**Latest release at the time of the 2026-08-18 update is `v0.2.51`, target
-`1dffc14`, verified by hand (tag, target, runs green)** — but check
-`gh release view` rather than trusting this line; this file has gone stale on
-exactly this fact three times now, because every push to main ships one. The last hand-audited release remains `v0.1.5`;
-everything after ships automatically through the same proven pipeline. An
-earlier baseline, `v0.1.7`, non-draft, target commit `37c967b`, carried a
-144,166,912-byte `MaterialCookieClicker-Setup.exe`, a full `.nupkg`, `RELEASES`
-and `release-changelog.json`.
-
-**Be precise about what was actually verified.** `v0.1.5` is the release whose
-assets, target commit, notes, line-count table, dim sum code name and unsigned
-status were each checked by hand. `v0.1.6` and `v0.1.7` shipped automatically
-from later pushes through the same pipeline and were **not** individually
-audited. The pipeline is proven; those two specific releases are trusted by
-inheritance, which is a weaker claim and is stated as one.
-
-An earlier version of this file named `v0.1.5` as "the release". That was true
-when written and is now stale by two — exactly the failure mode this file warns
-about.
+**The verified published baseline is `v0.2.55`, target
+`a98e38c07423a7cfb4cb3190412884a404a7245e`.** The non-draft release was read
+back through the GitHub CLI after publication. It contains a 144,457,728-byte
+`MaterialCookieClicker-Setup.exe`, a 143,481,570-byte full `.nupkg`, a 93-byte
+`RELEASES`, and a 29,631-byte `release-changelog.json`. The Release, CI, and
+Pages workflows for that exact commit completed successfully. Local verification
+for the same source reported `903/903` tests green and the built desktop was
+exercised on an off-screen Windows desktop. The workflows themselves deliberately
+run no tests or lint; their green state proves build/publication, not local test quality.
 
 ### Newly verified in the 2026-08-16 pass
 
@@ -149,7 +144,9 @@ standing pipeline.
   `data-theme="dark"` on the built renderer root) and it renders correctly.
 - Narrow-width drawer behaviour was verified only by patching the breakpoint
   in built CSS, not by resizing a real window.
-- **The completeness inventory and its negative regression guard do not exist.**
+- **The completeness inventory now exists** at `docs/completeness.md`, with an executable
+  exact-ID negative regression in `tests/completeness-inventory.test.ts`. It intentionally records
+  many partial, logic-only, and unimplemented canonical rows rather than presenting the project as complete.
 - **App-logo customization, the file converter, and the local Ollama manager
   are unimplemented in the app** — canonical features this repository has
   never had; releases ship without them and say so.
@@ -258,10 +255,9 @@ not alter its code, styles, tests, captures, or UI surfaces.
   deduction, seeded result, draw count, and duplicate state are persisted in one
   reducer update, while an unavailable token leaves state unchanged.
 
-The documentation-only lane intentionally skipped tests, captures, and UI runs
-under its expedited delivery boundary. No paragraph above is a claim that the
-built artifact has been re-verified; that evidence remains open for a later
-verification pass.
+The original documentation-only lane skipped tests, captures, and UI runs. The later v0.2.55 pass
+ran the complete local suite and exercised the built flow; the remaining gap is a committed current-
+release minigame capture, not absence of implementation or tests.
 
 ### Office Buildings expansion — documentation handoff, 2026-08-19
 
@@ -274,9 +270,9 @@ does not hide the row again and prestige does not remove it from the save.
 
 The established thresholds remain unchanged: Minigames at **100,000** lifetime
 baked cookies, Mouse Raids at **1,000,000**, prestige visible at
-**1,000,000,000**, and prestige usable at **1,000,000,000,000**. This lane changed
-only the directly related public documentation; tests, captures, reviews, and UI
-runs were intentionally not performed under the expedited delivery boundary.
+**1,000,000,000**, and prestige usable at **1,000,000,000,000**. The original expedited lane
+changed only implementation and related records. The later v0.2.55 pass tested and exercised the
+integrated build; a committed Office-row-specific capture remains pending.
 
 Files written in this lane:
 
@@ -290,11 +286,11 @@ Files written in this lane:
 
 ## Work in flight at the end of this session
 
-All lanes were completed and integrated into `main` in the 2026-08-16 pass:
-the seven screens exist, the shell mounts them, the core loop was restructured
-onto a single game surface, the v2 design bundle landed, and the Pages site
-was added. The old lane branches were recorded as merged and removed after
-ancestry proof.
+Release-completeness lanes are in progress for application foundations, identity/appearance, file
+conversion, the local model manager, security/state tools, design parity, site completeness, and
+build evidence. This documentation lane adds the per-surface matrix, exact negative regression,
+category indexes, and missing articles. None of the parallel implementation lanes is counted as
+shipped until its commit and evidence land in the integrated default branch.
 
 ## Layout
 
@@ -352,6 +348,6 @@ unchanged. This is a decision, not an omission — do not "fix" it back.
 
 ## Next owner's most useful first move
 
-Finish `lane/game-screens`, then launch the built artifact and photograph every
-surface. The pipeline is proven and the interface is not, and that gap is where
-the next real defect is.
+After all release-completeness lanes integrate, reconcile `docs/completeness.md` against the exact
+integrated commit. Then run the full local suite and the real built-artifact interaction/capture
+matrix. Do not convert a pending row to verified from a lane report alone.

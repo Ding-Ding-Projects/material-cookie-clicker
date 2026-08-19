@@ -1,8 +1,8 @@
 # Prestige (ascend)
 
-> **Status: not built.** No prestige calculation, reset logic, or gate implementation exists in
-> this repository. This article documents the specified destructive-action gate from
-> `design/prestige-gate.html`.
+> **Status: shipped and verified.** Prestige calculation/reset, repeatable runs, the two-key gate,
+> focused tests, packaged interaction, and built captures exist. The design file remains a
+> reference rather than runtime evidence.
 
 ## What it does
 
@@ -18,15 +18,13 @@ destructive, and visually distinguished with the `error` colour role rather than
 
 ## How it is configured
 
-Not configurable yet. Once built, the permanent-multiplier formula is the implementation's own
-balance decision. The gate's own behaviour is not meant to be configurable at all — softening a
+The permanent-multiplier formula is game-balance data. The gate's own behaviour is not configurable — softening a
 destructive-action confirmation defeats its purpose — so this article does not describe any
 user-facing setting for it.
 
 ## Failure modes
 
-Not applicable yet. Once built, the anticipated failure modes mirror this project's general
-destructive-action contract: the slider must not be operable by keyboard focus alone without both
+Failure modes mirror the general destructive-action contract: the slider must not be operable by keyboard focus alone without both
 keys first being toggled, Escape and the Emergency exit must both cancel from any partial state
 without applying the reset, and focus must return to the control that opened the gate afterward
 (either on cancel or on completion) rather than being left stranded inside a closed dialog.
@@ -42,14 +40,12 @@ do not merge the two concepts.
 
 ## Verification
 
-Not yet verifiable beyond opening `design/prestige-gate.html` directly in a browser, which renders
-both the prestige and full-wipe variants through every gate state (untouched, one key, both keys,
-partial slider, full slider, cancel, completion) against static sample data. There is no running
-reset logic to test.
+`tests/game/prestige.test.ts` and `endless-progression.test.ts` cover calculation, reset, and
+repeatability. `captures/app/prestige-gate.png` and `dialog-prestige.png` show the built UI.
 
 ## Suggested articles
 
 - [Achievements](achievements.md)
-- [The 20-tier generator ladder](generator-ladder.md)
+- [The 21-tier generator ladder](generator-ladder.md)
 - [Local history](../tools/local-history.md)
 - [Material Design 3 appearance](../interface/material-design-appearance.md)

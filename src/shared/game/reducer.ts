@@ -91,10 +91,12 @@ import {
   EMPTY_LUCKY_CHANCE_STATE,
   EMPTY_MINIGAME_STATE,
   reduceMinigameState,
+  applyMinigameMove,
   resolveLuckyChance,
   scheduleMinigame,
   type MinigameData,
   type MinigameId,
+  type MinigameMove,
   type MinigameScheduleState,
 } from "./minigames.js";
 
@@ -260,6 +262,7 @@ export type GameAction =
   | { readonly type: "minigameAbandon" }
   | { readonly type: "minigameComplete"; readonly grade?: number }
   | { readonly type: "minigameUpdate"; readonly data: MinigameData }
+  | { readonly type: "minigameMove"; readonly move: MinigameMove }
   | { readonly type: "minigameDailyObjective" }
   | { readonly type: "luckyChanceDraw" }
   | {
@@ -752,6 +755,12 @@ function handleMinigameLifecycle(state: GameState, ctx: ReducerCtx, action: Game
   if (!minigameUnlocked(state)) return state;
   const nowMs = ctx.now();
   const current = state.minigames.active;
+  if (action.type === "minigameMove") {
+    if (!current || current.status !== "active") return state;
+    const data = applyMinigameMove(current.data, action.move, ctx.rng);
+    if (data === current.data) return state;
+    return { ...state, minigames: reduceMinigameState(state.minigames, { type: "update", data, nowEpochMs: nowMs }) };
+  }
   if (action.type === "minigameUpdate") {
     if (!current || current.id !== action.data.kind) return state;
     return { ...state, minigames: reduceMinigameState(state.minigames, { type: "update", data: action.data, nowEpochMs: nowMs }) };
@@ -795,6 +804,7 @@ function handleLuckyChanceDraw(state: GameState, ctx: ReducerCtx): GameState {
     { ...state.luckyChance, tokens: state.goldenTokens.balance },
     Math.floor(ctx.rng.next() * 0x1_0000_0000) >>> 0,
     rewards,
+    ctx.now(),
   );
   if (resolution.result.kind === "insufficient_tokens" || resolution.result.kind === "empty_pool") return state;
   let nextState: GameState = {
@@ -1321,6 +1331,7 @@ export function applyGameAction(state: GameState, action: GameAction, ctx: Reduc
     case "minigameAbandon":
     case "minigameComplete":
     case "minigameUpdate":
+    case "minigameMove":
       return handleMinigameLifecycle(state, ctx, action);
     case "minigameDailyObjective":
       return handleDailyObjective(state);

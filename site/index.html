@@ -5,6 +5,18 @@
 <meta name="viewport" content="width=device-width, initial-scale=1" />
 <title>Material Cookie Clicker — a bilingual arcade bakery for Windows</title>
 <meta name="description" content="A bilingual English and Hong Kong Cantonese cookie clicker for Windows, where the application’s own features are the game’s tech tree." />
+<meta property="og:title" content="Material Cookie Clicker" />
+<meta property="og:description" content="A bilingual cookie clicker for Windows with endless homes, offices, minigames and a local-first project site." />
+<meta property="og:url" content="https://ding-ding-projects.github.io/material-cookie-clicker/" />
+<meta property="og:type" content="website" />
+<meta property="og:site_name" content="Material Cookie Clicker" />
+<meta property="og:image" content="https&#58;//ding-ding-projects.github.io/material-cookie-clicker/social-preview.png" />
+<meta property="og:image:width" content="2604" />
+<meta property="og:image:height" content="1562" />
+<meta property="og:image:alt" content="The real Material Cookie Clicker desktop application showing its cookie, upgrade shelf, shop and status controls." />
+<meta name="twitter:card" content="summary_large_image" />
+<meta name="theme-color" content="#7a4a1d" />
+<link rel="icon" href="favicon.svg" type="image/svg+xml" />
 <link rel="stylesheet" href="assets/site.css" />
 </head>
 <body>
@@ -16,17 +28,19 @@
       <ul>
         <li><a href="index.html" aria-current="page">Home</a></li>
         <li><a href="features/index.html">Features</a></li>
+        <li><a href="control-center.html">Control centre</a></li>
         <li><a href="index.html#download">Download</a></li>
       </ul>
     </nav>
   </div>
 </header>
 <main id="main" class="wrap">
+  <div class="boundary-callout" role="note"><strong>This website is not the game.</strong> It is the project&rsquo;s landing, documentation, download, settings and status surface. The playable game runs only in the installed Windows application.</div>
   <section class="plate hero" aria-labelledby="hero-heading">
     <div class="hero-copy">
       <h1 id="hero-heading">Material Cookie Clicker</h1>
       <p class="lede">A cookie clicker for Windows where the application's own features &mdash; the command palette, the regex builder, the authenticator, the file converter &mdash; are the game's tech tree. Free, unsigned by policy, offline by design, and bilingual in English and Hong Kong Cantonese.</p>
-      <p><a class="btn btn--primary" href="#download">Download</a> <a class="btn" href="features/index.html">Browse the features</a></p>
+      <p><a class="btn btn--primary" href="#download">Download v0.2.55 for Windows</a> <a class="btn" href="features/index.html">Browse the features</a> <a class="btn" href="control-center.html">Open site controls</a></p>
     </div>
     <div class="hero-art">
       <div class="cookie" role="img" aria-label="A chocolate-chip cookie drawn in CSS, seated on an arcade button base"></div>
@@ -219,7 +233,7 @@
 
   <h2>How this site is built</h2>
   <div class="plate">
-    <p>This site follows the same design system as the game &mdash; the v2 &ldquo;arcade cabinet&rdquo; specs in <code>design/</code>: radial oven-glow backgrounds, marquee headings on bevelled plates, solid offset shadows with no blur anywhere, 2&ndash;7px borders, and the same colour tokens in light and dark. It is explicitly <em>not</em> Material Design 3; the role names (primary, surface, outline) are kept as vocabulary only.</p>
+    <p>The project artwork keeps its arcade-cabinet identity, while the site&rsquo;s interactive controls now use Material Design 3 component anatomy, colour roles, focus states, shape, elevation and responsive motion. The result is an accessible project surface rather than a browser-hosted imitation of the game.</p>
     <p>It is also entirely self-contained. There is no CDN, no remote font, no remote image, no analytics and no network request of any kind: the hero cookie is drawn with CSS gradients, the capture matrix loads PNG files committed alongside these pages, the search index is baked into a local module, and the only external addresses anywhere in this site are the two GitHub links, which you have to click.</p>
   </div>
 </main>
@@ -229,5 +243,6 @@
     <p><a href="https://github.com/Ding-Ding-Projects/material-cookie-clicker">Source code on GitHub</a> &middot; <a href="features/index.html">All feature articles</a></p>
   </div>
 </footer>
+<script type="module" src="assets/site-shell.js"></script>
 </body>
 </html>

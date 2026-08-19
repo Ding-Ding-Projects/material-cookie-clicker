@@ -1,0 +1,125 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1" />
+<title>Site control centre — Material Cookie Clicker</title>
+<meta name="description" content="Local settings, status, privacy tools and documentation controls for the Material Cookie Clicker site." />
+<meta property="og:title" content="Material Cookie Clicker site control centre" />
+<meta property="og:description" content="Local settings, status and documentation tools for the project site." />
+<meta property="og:url" content="https&#58;//ding-ding-projects.github.io/material-cookie-clicker/control-center.html" />
+<meta property="og:type" content="website" />
+<meta property="og:site_name" content="Material Cookie Clicker" />
+<meta property="og:image" content="https&#58;//ding-ding-projects.github.io/material-cookie-clicker/social-preview.png" />
+<meta property="og:image:width" content="2604" />
+<meta property="og:image:height" content="1562" />
+<meta property="og:image:alt" content="The real Material Cookie Clicker desktop application showing its cookie, upgrade shelf, shop and status controls." />
+<meta name="twitter:card" content="summary_large_image" />
+<meta name="theme-color" content="#7a4a1d" />
+<link rel="icon" href="favicon.svg" type="image/svg+xml" />
+<link rel="stylesheet" href="assets/site.css" />
+</head>
+<body>
+<a class="skip-link" href="#main">Skip to main content</a>
+<header class="site-head"><div class="wrap"><a class="brand" href="index.html"><span aria-hidden="true">🍪</span> Material Cookie Clicker</a><nav class="site-nav" aria-label="Primary"><ul><li><a href="index.html">Home</a></li><li><a href="features/index.html">Features</a></li><li><a href="control-center.html" aria-current="page">Control centre</a></li></ul></nav></div></header>
+<main id="main" class="wrap control-centre">
+  <h1>Site control centre</h1>
+  <div class="boundary-callout" role="note"><strong>This website is not the game.</strong> It is a landing, documentation, download, settings and status surface. Gameplay is available only in the installed Windows application.</div>
+  <nav class="control-tabs" aria-label="Control centre sections" role="tablist" aria-orientation="horizontal">
+    <button role="tab" aria-selected="true" aria-controls="settings" id="tab-settings">Settings</button>
+    <button role="tab" aria-selected="false" aria-controls="appearance" id="tab-appearance">Appearance &amp; logo</button>
+    <button role="tab" aria-selected="false" aria-controls="privacy" id="tab-privacy">Privacy &amp; access</button>
+    <button role="tab" aria-selected="false" aria-controls="tools" id="tab-tools">Local tools</button>
+    <button role="tab" aria-selected="false" aria-controls="status" id="tab-status">Status</button>
+    <button role="tab" aria-selected="false" aria-controls="tabs" id="tab-tabs">Tabs</button>
+  </nav>
+
+  <section id="settings" role="tabpanel" aria-labelledby="tab-settings" class="control-panel">
+    <h2>Language, tone and narration</h2>
+    <div class="site-search-combo"><label for="settings-search">Search these settings</label><input id="settings-search" type="search" /><button type="button" data-regex-for="settings-search" aria-label="Open regex builder for settings search">.*</button></div>
+    <div class="settings-grid" data-filter-list="settings-search">
+      <article class="setting-card"><label for="language">Language mode</label><select id="language"><option value="en">English</option><option value="yue">Hong Kong Cantonese</option><option value="both">Bilingual</option></select><details><summary>What this does and where the value came from</summary><p>Changes this site’s supplied interface labels. Default: English, compiled into the site. Cantonese text is always marked with its language for assistive technology.</p></details></article>
+      <article class="setting-card"><label for="funny-en">English funny level <output for="funny-en">3</output></label><input id="funny-en" type="range" min="1" max="5" value="3" /><details><summary>Explanation and default</summary><p>Styles all site messages, including warnings, without changing facts. Default: 3 from the compiled site settings.</p></details></article>
+      <article class="setting-card"><label for="funny-yue">Cantonese funny level <output for="funny-yue">3</output></label><input id="funny-yue" type="range" min="1" max="5" value="3" /><details><summary>Explanation and default</summary><p>Independent from English. Default: 3 from the compiled site settings.</p></details></article>
+      <article class="setting-card"><label class="switch"><input id="dialog-emoji" type="checkbox" checked /> Show emojis in dialogs and messages</label><details><summary>Explanation and default</summary><p>Adds non-semantic decoration to message bodies only. Buttons, labels and accessible names stay factual. Default: on.</p></details></article>
+      <article class="setting-card"><label class="switch"><input id="school-mode" type="checkbox" /> School mode</label><input id="school-name" type="text" value="School mode" aria-label="Display name for School mode" /><details><summary>Explanation and reset boundary</summary><p>Forces English and removes humour, personal vocabulary and dim-sum presentation from this visitor’s site state. This is a local experience setting, not a security boundary; clearing this site’s storage resets it.</p></details></article>
+      <article class="setting-card"><label for="vocabulary-file">Personal vocabulary JSON</label><input id="vocabulary-file" type="file" accept="application/json,.json" /><p id="vocabulary-status" role="status">No file loaded. Original site wording is active.</p><button id="clear-vocabulary" type="button">Clear local vocabulary</button><details><summary>Local-only contract</summary><p>The complete file is validated before use, stays in this browser only, is never uploaded, and is omitted from exports and history.</p></details></article>
+      <article class="setting-card"><label class="switch"><input id="narrator-enabled" type="checkbox" /> Narrate site events</label><label for="narrator-language">Narration language</label><select id="narrator-language"><option value="en">English</option><option value="yue">Cantonese</option><option value="both">Both, serialized</option></select><label for="voice-en">English voice</label><select id="voice-en"><option value="">Choose automatically</option></select><label for="voice-yue">Cantonese voice</label><select id="voice-yue"><option value="">Choose automatically</option></select><label for="narrator-rate">Rate</label><input id="narrator-rate" type="range" min="0.5" max="2" step="0.1" value="1" /><label for="narrator-pitch">Pitch</label><input id="narrator-pitch" type="range" min="0" max="2" step="0.1" value="1" /><p id="voice-status" role="status">Voice list is loading from this browser.</p><button id="test-narrator" type="button">Test narrator</button></article>
+    </div>
+    <h2>Scheduled settings</h2>
+    <form id="schedule-form" class="plate settings-grid"><label>Rule label <input id="schedule-label" required maxlength="60" value="Evening theme" /></label><label>Start date <input id="schedule-start-date" type="date" /></label><label>End date <input id="schedule-end-date" type="date" /></label><label>Start time <input id="schedule-start-time" type="time" value="18:00" /></label><label>End time <input id="schedule-end-time" type="time" value="23:00" /></label><label>Weekdays <select id="schedule-days" multiple><option value="1">Monday</option><option value="2">Tuesday</option><option value="3">Wednesday</option><option value="4">Thursday</option><option value="5">Friday</option><option value="6">Saturday</option><option value="0">Sunday</option></select></label><label>Theme <select id="schedule-theme"><option value="dark">Dark</option><option value="light">Light</option><option value="system">System</option></select></label><button type="submit">Add local schedule</button><p>Times use <span id="timezone"></span>. Later matching rules win. Cross-midnight windows continue into the next day.</p></form>
+    <ul id="schedule-list" class="record-list" aria-label="Scheduled setting rules"></ul>
+  </section>
+
+  <section id="appearance" role="tabpanel" aria-labelledby="tab-appearance" class="control-panel" hidden>
+    <h2>Appearance and app-logo preview</h2>
+    <p>These controls customize this visitor’s website only. They do not rename the installed application, package identity, data directory or update feed.</p>
+    <div class="settings-grid">
+      <article class="setting-card"><label for="theme">Theme</label><select id="theme"><option value="system">System</option><option value="light">Light</option><option value="dark">Dark</option></select><label for="density">Density</label><select id="density"><option value="comfortable">Comfortable</option><option value="compact">Compact</option><option value="spacious">Spacious</option></select><label for="accent">Accent colour</label><input id="accent" type="color" value="#7a4a1d" /><label for="accent-text">HEX</label><input id="accent-text" value="#7a4a1d" pattern="#[0-9a-fA-F]{6}" /><label class="switch"><input id="rainbow" type="checkbox" /> Animated rainbow sentinel</label><label for="rainbow-speed">Rainbow speed level</label><input id="rainbow-speed" type="range" min="1" max="5" value="3" /><p id="contrast-status" role="status"></p></article>
+      <article class="setting-card"><label for="font-family">Interface font</label><select id="font-family"><option>Segoe UI</option><option>Arial</option><option>Georgia</option><option>Microsoft JhengHei</option><option>monospace</option></select><label for="font-scale">Font size scale</label><input id="font-scale" type="range" min="0.8" max="1.5" step="0.05" value="1" /><label for="font-weight">Weight</label><input id="font-weight" type="number" min="100" max="900" step="100" value="400" /><div class="type-preview">Live sample · <span lang="zh-HK">即時預覽</span></div></article>
+      <article class="setting-card"><fieldset><legend>Shipped logo preset</legend><label><input type="radio" name="logo" value="cookie" checked /> Cookie</label><label><input type="radio" name="logo" value="oven" /> Oven</label><label><input type="radio" name="logo" value="factory" /> Factory</label></fieldset><label for="logo-file">Custom local logo</label><input id="logo-file" type="file" accept="image/png,image/jpeg,image/webp,image/svg+xml" /><label for="logo-fit">Fit</label><select id="logo-fit"><option>contain</option><option>cover</option><option>fill</option></select><label for="logo-x">Focal point X</label><input id="logo-x" type="range" min="0" max="100" value="50" /><label for="logo-y">Focal point Y</label><input id="logo-y" type="range" min="0" max="100" value="50" /><div id="logo-preview" class="logo-preview" role="img" aria-label="Current site logo preview">🍪</div><p id="logo-status" role="status">Shipped Cookie preset is active.</p><button id="reset-logo" type="button">Reset shipped logo</button></article>
+    </div>
+    <button id="export-appearance" type="button">Export appearance JSON</button> <button id="reset-appearance" type="button">Reset appearance</button>
+  </section>
+
+  <section id="privacy" role="tabpanel" aria-labelledby="tab-privacy" class="control-panel" hidden>
+    <h2>Toy locks and local support desk</h2>
+    <div class="boundary-callout"><strong>Toy locks are not security or encryption.</strong> They are local speed bumps. Clear this site’s storage to reset every lock.</div>
+    <form id="lock-form" class="plate settings-grid"><label>Element <select id="lock-target"><option value="settings">Settings tab</option><option value="appearance">Appearance tab</option><option value="tools">Local tools tab</option><option value="status">Status tab</option></select></label><label>Method <select id="lock-method"><option value="password">Password hash</option><option value="totp">TOTP</option></select></label><label>Unlock duration <select id="lock-duration"><option value="surface">This surface only</option><option value="10">10 minutes</option><option value="session">Until the browser closes</option></select></label><button type="submit">Create local toy lock…</button></form>
+    <ul id="lock-list" class="record-list" aria-label="Local toy locks"></ul>
+    <h2>Support Tickets</h2>
+    <p class="plain-disclosure">Nothing is sent anywhere. No ticket exists outside this browser, no network request is made, no data is collected, and nobody is reading it.</p>
+    <form id="ticket-form" class="plate settings-grid"><label>Category <select id="ticket-category"><option>Forgotten toy-lock credential</option><option>Site setting</option><option>Local tool</option></select></label><label>Description <textarea id="ticket-description" required maxlength="500"></textarea></label><button type="submit">Create local ticket</button></form>
+    <ul id="ticket-list" class="record-list" aria-label="Local support tickets"></ul>
+    <h2>Built-in authenticator</h2>
+    <p>This browser-only equivalent stores secrets in this visitor’s local browser storage because a static site cannot access an operating-system credential vault. It makes no network request. Ordinary exports omit secrets and say so.</p>
+    <form id="totp-form" class="plate settings-grid"><label>Issuer <input id="totp-issuer" required maxlength="80" /></label><label>Account <input id="totp-account" required maxlength="120" /></label><label>Manual Base32 secret <input id="totp-secret" required autocomplete="off" /></label><label>Digits <select id="totp-digits"><option>6</option><option>7</option><option>8</option></select></label><label>Period <input id="totp-period" type="number" min="1" max="300" value="30" /></label><label>Algorithm <select id="totp-algorithm"><option>SHA-1</option><option>SHA-256</option><option>SHA-512</option></select></label><button type="submit">Register local entry</button></form>
+    <ul id="totp-list" class="record-list" aria-label="Authenticator entries"></ul>
+    <h2>Local history, notifications and export</h2>
+    <div class="selection-toolbar"><button id="select-all-history" type="button">Select this page</button><button id="invert-history" type="button">Invert selection</button><button id="export-history" type="button">Export selected history</button><button id="delete-history" type="button">Delete selected…</button></div>
+    <ul id="history-list" class="record-list" aria-label="Local version history and notifications"></ul>
+  </section>
+
+  <section id="tools" role="tabpanel" aria-labelledby="tab-tools" class="control-panel" hidden>
+    <h2>Local file converter</h2>
+    <div class="boundary-callout"><strong>Browser boundary:</strong> this static site can demonstrate byte-signature detection and safe browser-native transforms only. It does not claim bundled desktop converters, PDF rewriting, unrestricted file-system access or constant-memory unlimited queues. Those belong to the installed application.</div>
+    <label for="convert-file">Source file</label><input id="convert-file" type="file" />
+    <div class="converter-categories" role="tablist" aria-label="Converter categories">
+      <button role="tab" aria-selected="true">Documents/PDF</button><button role="tab">Images</button><button role="tab">Audio</button><button role="tab">Video</button><button role="tab">Archives</button><button role="tab">Structured Data/Spreadsheets</button><button role="tab">Code/Text</button><button role="tab">Binary Encodings</button>
+    </div>
+    <div class="site-search-combo"><label for="adapter-search">Search adapter catalogue</label><input id="adapter-search" type="search" /><button type="button" data-regex-for="adapter-search" aria-label="Open regex builder for adapter search">.*</button></div>
+    <ul id="adapter-list" class="record-list"></ul>
+    <p id="convert-status" role="status">Choose a local file. No bytes leave this browser.</p>
+    <button id="convert-base64" type="button" disabled>Encode selected file as Base64 text</button> <button id="cancel-conversion" type="button" disabled>Cancel</button>
+    <h2>Local Ollama suite manager</h2>
+    <div class="boundary-callout"><strong>Browser boundary:</strong> a static HTTPS page cannot safely call a visitor’s loopback Ollama API without cross-origin permission. This site keeps an offline explanatory catalogue and local profile editor only; it never claims runtime health, installed models, pulls or chat without a verified local connection.</div>
+    <div class="site-search-combo"><label for="model-search">Search the offline model guide</label><input id="model-search" type="search" /><button type="button" data-regex-for="model-search" aria-label="Open regex builder for model search">.*</button></div>
+    <ul id="model-list" class="record-list"></ul>
+    <form id="ollama-profile" class="plate settings-grid"><label>Local API base <input value="127.0.0.1 · port 11434" readonly /></label><label>Model tag <input id="model-tag" placeholder="Choose from a verified local runtime in the installed app" disabled /></label><label>Context <input type="number" min="256" max="131072" value="4096" /></label><label>Temperature <input type="number" min="0" max="2" step="0.1" value="0.7" /></label><button type="button" disabled title="The static site has no verified local runtime connection">Start local chat</button></form>
+  </section>
+
+  <section id="status" role="tabpanel" aria-labelledby="tab-status" class="control-panel" hidden>
+    <h2>Project status</h2>
+    <p>Last updated from the shipped-site baseline: <time datetime="2026-08-19T22:00:00Z">2026-08-19</time>. This static surface is bundled evidence, not a live GitHub API client.</p>
+    <div class="status-grid"><article><span class="status-chip status-chip--verified">Verified</span><h3>Released baseline</h3><p><strong>v0.2.55</strong> · commit <code>a98e38c</code></p><a href="https://github.com/Ding-Ding-Projects/material-cookie-clicker/releases/latest">Open latest verified release</a></article><article><span class="status-chip status-chip--verified">Verified</span><h3>Local checks</h3><p>903 of 903 checks passed for the endless progression and collapsible Diesel Depot release.</p></article><article><span class="status-chip status-chip--waiting">Static</span><h3>Status Hub boundary</h3><p>This page reports its bundled release facts. It does not impersonate a live Status Hub connection or invent current workflow state.</p></article></div>
+    <h2>Notification centre</h2><div class="selection-toolbar"><button type="button" id="dismiss-notifications">Dismiss all visible notifications</button><button type="button" id="export-notifications">Export notifications</button></div><ul id="notification-list" class="record-list"></ul>
+  </section>
+
+  <section id="tabs" role="tabpanel" aria-labelledby="tab-tabs" class="control-panel" hidden>
+    <h2>Browser-style tab management</h2>
+    <label for="dock-edge">Dock edge</label><select id="dock-edge"><option value="left">Left</option><option value="right">Right</option><option value="top">Top</option><option value="bottom">Bottom</option></select>
+    <div class="tab-search-grid">
+      <div class="site-search-combo"><label for="current-strip-search">Current strip search</label><input id="current-strip-search" type="search" /><button type="button" data-regex-for="current-strip-search">.*</button></div>
+      <div class="site-search-combo"><label for="group-tab-search">Current group tab search</label><input id="group-tab-search" type="search" /><button type="button" data-regex-for="group-tab-search">.*</button></div>
+      <div class="site-search-combo"><label for="group-search">Tab group search</label><input id="group-search" type="search" /><button type="button" data-regex-for="group-search">.*</button></div>
+      <div class="site-search-combo"><label for="master-tab-search">Master tab search</label><input id="master-tab-search" type="search" /><button type="button" data-regex-for="master-tab-search">.*</button></div>
+    </div>
+    <p id="tab-search-status" role="status">All searches are local and keep independent state.</p>
+    <fieldset><legend>Bulk close preview</legend><div class="site-search-combo"><label for="bulk-tab-query">Visible label text</label><input id="bulk-tab-query" /><button type="button" data-regex-for="bulk-tab-query" aria-label="Open regex builder for bulk tab close">.*</button></div><label><input type="radio" name="bulk-mode" value="contains" checked /> Close tabs containing text</label><label><input type="radio" name="bulk-mode" value="not" /> Close tabs not containing text</label><label><input id="include-pinned" type="checkbox" /> Include pinned tabs</label><button id="preview-bulk-tabs" type="button">Preview affected tabs</button><button id="run-bulk-tabs" type="button" disabled>Close previewed tabs</button><ul id="bulk-tab-preview"></ul></fieldset>
+  </section>
+</main>
+<footer class="site-foot"><div class="wrap"><p>This website is a local-first project guide, not the playable application. No analytics, remote fonts or CDN assets are used.</p><p><a href="https://github.com/Ding-Ding-Projects/material-cookie-clicker">Source code on GitHub</a> · <a href="features/index.html">Feature articles</a></p></div></footer>
+<script type="module" src="assets/site-shell.js"></script>
+<script type="module" src="assets/control-center.js"></script>
+</body>
+</html>

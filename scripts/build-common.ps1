@@ -16,6 +16,17 @@ if (Test-Path -LiteralPath $systemUtilityModule -PathType Leaf) {
   Import-Module -Name $systemUtilityModule -Force -ErrorAction SilentlyContinue
 }
 
+# Import the Windows PowerShell Security module from its System32 manifest too.
+# The installer is deliberately launched by powershell.exe, but a pwsh parent
+# can still prepend Core-edition module paths to PSModulePath.  In that state
+# Get-AuthenticodeSignature is discoverable by name while its auto-import can
+# resolve an incompatible module and fail.  Pinning the inbox manifest keeps
+# the unsigned-artifact check reliable without invoking any signing capability.
+$systemSecurityModule = Join-Path $env:SystemRoot 'System32\WindowsPowerShell\v1.0\Modules\Microsoft.PowerShell.Security\Microsoft.PowerShell.Security.psd1'
+if (Test-Path -LiteralPath $systemSecurityModule -PathType Leaf) {
+  Import-Module -Name $systemSecurityModule -Force -ErrorAction SilentlyContinue
+}
+
 function Get-RepositoryRoot {
   param([Parameter(Mandatory = $true)][string]$ScriptRoot)
   $root = (Resolve-Path -LiteralPath (Join-Path $ScriptRoot '..')).Path

@@ -73,31 +73,73 @@ Because the background is now a *gradient*, text sits on a **range** of colours 
 Every stop of that range is contrast-checked, in both schemes — that is the single most important
 difference between v2's verification and v1's.
 
-## This project deliberately does not follow Material Design 3 — and v2 moves further away
+## Material Design 3 is the product-chrome target
 
-Material Cookie Clicker's specs originally conformed strictly to Material Design 3. The owner
-made an explicit decision to change that, and then repeated it more forcefully for v2: **the
-theme should fit a game, not a settings panel — and not a website either.** M3 is retained *only*
-as a naming convention: the files still say `primary`, `secondary`, `tertiary`, `surface`,
-`outline`, `error`, because a shared role vocabulary is genuinely useful and the underlying warm
-hues were already appetising. Nothing else about M3 survives, and this is a decision, not an
-omission — nobody forgot to finish an M3 pass, the owner asked for the opposite of one, twice.
+The checked-in v2 references preserve useful game-specific art and information hierarchy, but
+their product chrome is not the final conformance target. Buttons, fields, menus, tabs, dialogs,
+navigation, selection controls, typography, shape, elevation, state layers, focus and motion must
+use Material Design 3 primitives and anatomy. A cookie illustration, achievement medal, upgrade
+ticket cut, tier jewel, chart series or progress datum may keep the colour and geometry required to
+communicate game data; that exception does not extend to the button, card, dialog or navigation
+surface around it.
 
-Point by point, what M3 prescribes and what v2 does instead:
+The hand-written inventory at `parity/inventory.json` records the current state without laundering
+the older cabinet styling into an approved deviation. Its primitive audits currently mark the
+solid press bases, bevelled frames, all-caps marquee type and bespoke selection controls as open
+defects. Those defects must be migrated to Material components before a parity row can become a
+release verdict. The following boundary is deliberate:
 
-| M3 | v2 |
+| Retain as game data or art | Migrate as product chrome |
 | --- | --- |
-| Soft tonal elevation, blurred shadows | Solid offset bases 4–10px tall; a control travels its whole base and bottoms out. No blur anywhere. |
-| 1px outlines, restrained 4–28px radii | 2–7px borders, 10–40px radii. Hairlines are banned. |
-| Flat tonal surfaces | Deep radial oven-glow backgrounds, bevelled raised plates, recessed inset bezels. |
-| Restrained type, sentence case | 28–50px all-caps letter-spaced display headings on marquee plates; 38–54px tabular counters. |
-| Navigation rail / tabs organise features | The core loop is one screen with no navigation; tabs are for secondary surfaces only. |
-| Neutral, calm, productivity-shaped | A cabinet: wood, glow, metal, gems, tickets, marquee bulbs. |
+| Cookie illustration and golden-cookie effect | Click target container and interaction state layers |
+| Achievement medal artwork | Achievement card, toast and dismiss action |
+| Upgrade ticket cuts and item illustration | Purchase button, card surface and focus/pressed states |
+| Tool-tier jewels, progress and graph edges | Search field, cards, panels, toggles and navigation |
+| Production figures, trends and chart colours | Typography scale, cards, menus and dialogs |
+
+The one-screen core loop remains a product requirement, not an excuse for custom controls. Material
+components can share one game surface while still preserving the hierarchy, speed and visibility
+that the loop needs.
 
 **Nothing about accessibility, contrast, focus, touch targets, reduced motion, or the
 fully-self-contained/offline requirement changed.** Those rules apply exactly as strictly as they
 did before — more strictly in practice, because a deeper, more saturated palette on a gradient is
 exactly where contrast quietly fails if nobody computes it.
+
+## Deterministic design-reference application and parity guard
+
+The dedicated reference application renders the real checked-in HTML files directly from this
+directory. It does not copy or transcribe them. Start its loopback-only server with:
+
+```powershell
+node design/reference-app/server.mjs
+```
+
+Then open a route recorded verbatim in `parity/inventory.json`, for example:
+
+```text
+http://127.0.0.1:4174/design/reference-app/index.html?row=game-layout--main&theme=light&width=1280&height=800&scale=1&state=main&locale=en-HK&capture=1
+```
+
+The route refuses tuple drift, sizes the iframe to the declared CSS viewport, validates the device
+scale, renders the referenced file in place, freezes animation and transitions, fixes the random
+seed and scroll position, and blocks all non-loopback content through the server's content-security
+policy. Capture tooling still owns the real display scale, process isolation and raw PNG receipt.
+
+Run the structural and deliberate negative checks with:
+
+```powershell
+node design/_verify/design-parity-guard.mjs --structure
+node design/_verify/design-parity-guard.mjs --negative
+node design/_verify/design-parity-guard.mjs --release
+```
+
+`--structure` proves that every checked-in reference appears exactly once with routes, tuple,
+deterministic inputs, primitive audit and explicit evidence targets. `--negative` removes each
+asserted boundary in turn, observes a failure, restores the inventory and observes green.
+`--release` is intentionally stricter: it remains red while a raw reference capture, matching raw
+product capture, labelled comparison, diff record, hash, or approved Material audit is pending.
+No filename-only or source-preview substitute can make that mode green.
 
 ### Why the display face is a system stack, not a bundled font
 
@@ -139,9 +181,9 @@ between files. It is also not shipped to the app.
 
 | File | Specifies |
 | --- | --- |
-| `tokens-color.html` | The v2 arcade-cabinet colour system: the M3-named role set (kept, deepened, AA-verified), the cabinet-chrome roles (oven-glow stops, inset bezel face, bevels, metal, frame, track), the arcade spark accent, and the three-rung jewel tier ladder — all with live-computed WCAG ratios on every text-bearing swatch. |
+| `tokens-color.html` | The current colour reference: semantic roles and AA-verified pairs, plus legacy cabinet-only roles that remain inventoried for migration. Domain jewel and progress colours may remain data encodings; product chrome uses Material roles. |
 | `tokens-type.html` | The type system: the display face, marquee labels (all-caps, 0.20–0.24em tracking), huge tabular counters, and the full type scale against English and Traditional Chinese (Hong Kong) samples side by side. |
-| `tokens-shape-elevation.html` | Corner radii (10–40px) and the paired depth system — `--drop-N` travel lengths and `--press-N` solid shadows — that replaces M3's tonal elevation. Click the demo cards to feel the compress-on-press behaviour, including its reduced-motion equivalent. |
+| `tokens-shape-elevation.html` | The legacy 10–40px radii and paired solid press bases. This is retained as an explicit migration input, not an approved product-chrome target; Material shape, elevation and state layers replace it. |
 
 ### Game Surfaces
 

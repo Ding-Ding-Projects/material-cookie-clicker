@@ -144,22 +144,46 @@ jobs:
         env:
           RELEASE_VERSION: ${{ needs.prepare.outputs.version }}
         run: |
+          . ./scripts/build-common.ps1
+          Assert-UnsignedSquirrelConfiguration -Root $PWD
           $setup = Get-ChildItem -Path release -Recurse -Filter '*Setup.exe' | Select-Object -First 1
           if (-not $setup) { throw 'No Setup.exe was produced by electron-builder.' }
           $releases = Get-ChildItem -Path $setup.DirectoryName -Filter 'RELEASES' | Select-Object -First 1
           $nupkg = Get-ChildItem -Path $setup.DirectoryName -Filter '*-full.nupkg' | Select-Object -First 1
+          $deltas = @(Get-ChildItem -Path $setup.DirectoryName -Filter '*-delta.nupkg')
+          $appExecutable = Get-ChildItem -Path release -Recurse -Filter '*.exe' | Where-Object { $_.FullName -match 'win-unpacked' -and $_.Name -notmatch 'Setup' } | Select-Object -First 1
           if (-not $releases -or -not $nupkg) { throw 'Squirrel did not produce RELEASES and a full .nupkg beside Setup.exe.' }
+          if (-not $appExecutable) { throw 'Squirrel did not leave a packaged application executable under win-unpacked.' }
           $expectedPackageName = "MaterialCookieClicker-$env:RELEASE_VERSION-full.nupkg"
           if ($nupkg.Name -ne $expectedPackageName) { throw "Squirrel produced $($nupkg.Name), expected $expectedPackageName." }
           if (-not (Select-String -LiteralPath $releases.FullName -SimpleMatch $expectedPackageName -Quiet)) { throw "RELEASES does not advertise $expectedPackageName." }
           $signature = Get-AuthenticodeSignature -FilePath $setup.FullName
           if ($signature.Status -ne 'NotSigned') { throw "Code signing is prohibited, but Setup.exe reported $($signature.Status)." }
+          $appSignature = Get-AuthenticodeSignature -FilePath $appExecutable.FullName
+          if ($appSignature.Status -ne 'NotSigned') { throw "Code signing is prohibited, but the packaged application reported $($appSignature.Status)." }
           New-Item -ItemType Directory -Path release-stage -Force | Out-Null
+          $iconProof = @(
+            Export-ExecutableIconProof -Executable $setup.FullName -OutputRoot 'release-stage/icon-proof' -Label 'setup'
+            Export-ExecutableIconProof -Executable $appExecutable.FullName -OutputRoot 'release-stage/icon-proof' -Label 'app'
+          )
           Copy-Item -LiteralPath $setup.FullName -Destination 'release-stage/MaterialCookieClicker-Setup.exe'
           Copy-Item -LiteralPath $releases.FullName -Destination 'release-stage/RELEASES'
           Copy-Item -LiteralPath $nupkg.FullName -Destination (Join-Path 'release-stage' $expectedPackageName)
+          foreach ($delta in $deltas) { Copy-Item -LiteralPath $delta.FullName -Destination (Join-Path 'release-stage' $delta.Name) }
           Copy-Item -LiteralPath 'release-changelog.pending.json' -Destination 'release-stage/release-changelog.pending.json'
           Copy-Item -LiteralPath 'release-dish.json' -Destination 'release-stage/release-dish.json'
+          $evidence = [ordered]@{
+            schemaVersion = 'material-cookie-clicker.workflow-installer.v1'
+            sourceCommit = $env:GITHUB_SHA
+            setupSignature = $signature.Status.ToString()
+            applicationSignature = $appSignature.Status.ToString()
+            fullPackage = $nupkg.Name
+            deltaAvailable = $deltas.Count -gt 0
+            deltaPackages = @($deltas | ForEach-Object { $_.Name })
+            deltaDisclosure = if ($deltas.Count -gt 0) { "$($deltas.Count) delta package(s) were generated." } else { 'No delta package was generated; the full package remains the update asset.' }
+            iconProof = $iconProof
+          }
+          $evidence | ConvertTo-Json -Depth 8 | Set-Content -LiteralPath 'release-stage/installer-evidence.json' -Encoding utf8
       - name: Produce reproducible line-count table
         shell: pwsh
         run: npm run count:lines | Out-File -FilePath release-stage/line-count.md -Encoding utf8
@@ -168,7 +192,7 @@ jobs:
         continue-on-error: true
         with:
           name: windows-release-${{ github.run_id }}-${{ github.run_attempt }}
-          path: release-stage/*
+          path: release-stage/**
           if-no-files-found: warn
           retention-days: 7
 
@@ -202,6 +226,10 @@ jobs:
           $setup = Resolve-Path 'release-stage/MaterialCookieClicker-Setup.exe'
           $releases = Resolve-Path 'release-stage/RELEASES'
           $nupkg = Resolve-Path "release-stage/MaterialCookieClicker-$env:RELEASE_VERSION-full.nupkg"
+          $deltas = @(Get-ChildItem -LiteralPath release-stage -Filter '*-delta.nupkg')
+          $iconProofAssets = @(Get-ChildItem -LiteralPath 'release-stage/icon-proof' -Filter '*.png')
+          $installerEvidence = Resolve-Path 'release-stage/installer-evidence.json'
+          $installerEvidenceData = Get-Content -LiteralPath $installerEvidence -Raw | ConvertFrom-Json
           $lineCount = Resolve-Path 'release-stage/line-count.md'
           $dish = Get-Content -LiteralPath 'release-stage/release-dish.json' -Raw | ConvertFrom-Json
           $title = "Material Cookie Clicker $env:RELEASE_TAG"
@@ -218,7 +246,9 @@ jobs:
               "- Public dish photo: [$($dish.assetName)]($($dish.photoUrl))"
             )
           }
-          gh release create $env:RELEASE_TAG $setup $releases $nupkg --repo $env:GITHUB_REPOSITORY --target $env:GITHUB_SHA --title $title --notes ($initialNotes -join "`n") --draft
+          if ($iconProofAssets.Count -ne 4) { throw "Expected four extracted icon proof images, received $($iconProofAssets.Count)." }
+          $initialAssets = @($setup, $releases, $nupkg, $installerEvidence) + $deltas + $iconProofAssets
+          gh release create $env:RELEASE_TAG @initialAssets --repo $env:GITHUB_REPOSITORY --target $env:GITHUB_SHA --title $title --notes ($initialNotes -join "`n") --draft
           gh release edit $env:RELEASE_TAG --repo $env:GITHUB_REPOSITORY --draft=false
           $publishedRef = gh api "repos/$env:GITHUB_REPOSITORY/git/ref/tags/$env:RELEASE_TAG" | ConvertFrom-Json
           $publishedSha = if ($publishedRef.object.type -eq 'tag') { gh api "repos/$env:GITHUB_REPOSITORY/git/tags/$($publishedRef.object.sha)" --jq .object.sha } else { $publishedRef.object.sha }
@@ -238,6 +268,9 @@ jobs:
           $notes = @(
             'Unsigned Squirrel.Windows release. Code signing is permanently prohibited; Setup.exe was verified as NotSigned before publication.'
             ''
+            "- Squirrel full package: $($installerEvidenceData.fullPackage)"
+            "- Squirrel delta packages: $($installerEvidenceData.deltaDisclosure)"
+            "- Packaged icon proof: Setup.exe and the application executable were extracted and validated at 16px and 32px; machine-readable evidence is attached as [installer-evidence.json]($env:GITHUB_SERVER_URL/$env:GITHUB_REPOSITORY/releases/download/$env:RELEASE_TAG/installer-evidence.json)."
             $(if ($dish.available) { "- Dim sum code name: $($dish.codeName)" } else { '- Dim sum code name: unavailable; the release was not blocked.' })
             $(if ($dish.available) { "- Public dish photo: [$($dish.assetName)]($($dish.photoUrl))" } else { "- Public dish photo: unavailable ($($dish.reason))" })
             "- Source commit: ``$env:GITHUB_SHA``"

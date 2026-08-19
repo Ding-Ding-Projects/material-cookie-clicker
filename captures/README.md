@@ -21,6 +21,45 @@ Every capture is opened and looked at afterwards. A capture tool reporting that
 a render succeeded is the tool's claim about itself, not evidence about the
 pixels.
 
+## Release capture inventory and isolated launcher
+
+`scripts/release-capture-inventory.json` is the hand-written release evidence
+list. It distinguishes existing current-build images from pending evidence;
+pending rows do not carry an image path and therefore cannot accidentally pass
+because an older, similarly named capture happens to exist.
+
+`scripts/prepare-release-capture-plan.mjs` prepares a launch plan for the
+approved cheap Lowlevel named hidden-desktop route. It does not launch a window
+itself. The plan gives the caller a task-only profile, debugging port, exact
+renderer URL and the complete state inventory. `scripts/cdp-isolated-session.mjs`
+then refuses to inspect or drive the app unless `/json/list` contains exactly
+one target, that target is a page, its normalized URL exactly equals the plan,
+and its debugger socket is on the requested loopback port. The capture helpers
+use synchronous evaluations and explicit deadlines; they do not use the
+`awaitPromise` mode that hangs on the affected Windows/Node combination.
+
+`scripts/validate-release-capture-evidence.mjs` validates the final evidence
+record against the inventory, exact source commit and method. A verified row
+must point to a real PNG and record the dynamically resolved window title and
+`Chrome_WidgetWin_1` class. A blocked row must name the exact blocker. This lane
+created the harness but deliberately did not launch any UI, so the following
+current release states remain **pending** rather than being inferred from older
+images:
+
+- the current minigame-events dashboard and each of its five playable boards;
+- the Lucky Chance drawer with a real token draw;
+- the Office Building row at and beyond its unlock threshold;
+- the endless Home extension card;
+- the collapsed Diesel Depot persisted across a reload;
+- installed-executable launch and the unsigned update-ready banner.
+
+The same inventory carries the pre-existing gaps already documented later in
+this file: remaining event-pool images, a milk-focused composition, late Home
+rooms, an Oven Dial miss, keyed prestige states, reduced-motion Factory and
+Mouse Raid, the not-yet-implemented command palette and appearance editor, and
+a genuinely narrow application window. No image was fabricated to make those
+rows look complete.
+
 ## `app/` — the built application
 
 ### The current set

@@ -15,46 +15,24 @@
  * below, each with the reason written next to it, so an exclusion is a decision on the record
  * rather than a filter that quietly swallows a real defect.
  *
- * Usage: node scripts/clipping-audit.mjs <port> [outfile]
+ * Usage: node scripts/clipping-audit.mjs <port> <expected-page-url> [outfile]
  */
 import { readFileSync, writeFileSync, mkdirSync } from 'node:fs';
 import { dirname } from 'node:path';
+import { openIsolatedCdpSession } from './cdp-isolated-session.mjs';
 
 const port = process.argv[2] ?? '9741';
-const outfile = process.argv[3] ?? 'captures/tmp/clipping/report.json';
+const expectedUrl = process.argv[3];
+const outfile = process.argv[4] ?? 'captures/tmp/clipping/report.json';
+if (!expectedUrl) throw new Error('expected-page-url is required to prove capture isolation');
 
 /* ----------------------------------------------------------------- CDP plumbing */
 
-const targets = await (await fetch(`http://127.0.0.1:${port}/json/list`)).json();
-const page = targets.find((t) => t.type === 'page');
-if (!page) throw new Error('no page target');
-if (!page.url.includes('material-cookie-clicker-clip')) {
-  throw new Error(`wrong worktree on this port: ${page.url}`);
-}
-const socket = new WebSocket(page.webSocketDebuggerUrl);
-let nextId = 1;
-const pending = new Map();
-socket.addEventListener('message', (event) => {
-  const message = JSON.parse(event.data);
-  const resolve = pending.get(message.id);
-  if (resolve) {
-    pending.delete(message.id);
-    resolve(message);
-  }
-});
-function send(method, params) {
-  const id = nextId++;
-  socket.send(JSON.stringify({ id, method, params }));
-  return new Promise((resolve) => pending.set(id, resolve));
-}
-await new Promise((resolve) => socket.addEventListener('open', resolve));
+const session = await openIsolatedCdpSession({ port, expectedUrl });
+const send = (method, params) => session.send(method, params);
 
 async function evaluate(expression) {
-  const res = await send('Runtime.evaluate', { expression, returnByValue: true, awaitPromise: true });
-  if (res.result?.exceptionDetails) {
-    throw new Error(JSON.stringify(res.result.exceptionDetails.exception?.description ?? res.result.exceptionDetails));
-  }
-  return res.result?.result?.value;
+  return session.evaluate(expression);
 }
 const sleep = (ms) => new Promise((r) => setTimeout(r, ms));
 
@@ -528,4 +506,4 @@ for (const block of report) {
   }
 }
 console.log(JSON.stringify({ totals, byKind, blocks: report.length }, null, 2));
-socket.close();
+session.close();

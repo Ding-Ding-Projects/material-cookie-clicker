@@ -1,10 +1,11 @@
 [CmdletBinding()]
-param([switch]$Silent)
+param([switch]$Silent, [string]$ExpectedSourceCommit = $env:EXPECTED_SOURCE_COMMIT)
 
 $ErrorActionPreference = 'Stop'
 . (Join-Path $PSScriptRoot 'build-common.ps1')
 
 $root = Get-RepositoryRoot -ScriptRoot $PSScriptRoot
+$source = Assert-CleanPinnedSource -Root $root -ExpectedCommit $ExpectedSourceCommit
 $timer = [Diagnostics.Stopwatch]::StartNew()
 Write-Output "Build root: $root"
 Write-Output 'Resolving Node.js 22 and npm from the declared project path.'
@@ -12,10 +13,9 @@ $tools = Resolve-NodeToolchain -Root $root
 Write-Output "Node.js $($tools.Version) ready ($($tools.Source))."
 Write-Output 'Installing the locked project dependencies.'
 Invoke-ProjectBuild -Root $root -Tools $tools
+$manifest = Write-LocalBuildManifest -Root $root -PinnedCommit $source.Commit
 $timer.Stop()
-$identity = Get-SourceIdentity -Root $root
-$commitText = if ($identity.Commit) { $identity.Commit } else { 'unavailable' }
-Write-Output "Build complete in $([Math]::Round($timer.Elapsed.TotalSeconds, 1)) seconds. Source commit: $commitText; dirty checkout: $($identity.Dirty)."
+Write-Output "Build complete in $([Math]::Round($timer.Elapsed.TotalSeconds, 1)) seconds. Pinned clean source commit: $($source.Commit). Manifest: $manifest"
 
 if (-not $Silent) {
   $answer = Read-Host 'Build succeeded. Run the built app now? [y/N]'

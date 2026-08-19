@@ -1,0 +1,32 @@
+{
+  "schemaVersion": "material-cookie-clicker.release-captures.v1",
+  "requiredMethod": "lowlevel-cheap-headless",
+  "builtArtifact": "dist",
+  "states": [
+    { "id": "fresh-start", "status": "existing", "image": "captures/app/plain-start.png", "surface": "Fresh installed launch", "proof": "Fresh profile and built renderer" },
+    { "id": "progressed-game", "status": "existing", "image": "captures/app/game-progressed.png", "surface": "Progressed main game", "proof": "Progressed save loaded by the built renderer" },
+    { "id": "dark-game", "status": "existing", "image": "captures/app/game-dark.png", "surface": "Dark theme", "proof": "Progressed built renderer in the dark theme" },
+    { "id": "minigame-events", "status": "pending", "surface": "Current minigame events dashboard", "proof": "Five current game cards, unlock threshold, schedule and lifecycle states" },
+    { "id": "minigame-klondike", "status": "pending", "surface": "Playable Klondike", "proof": "Real dealt board and one legal move" },
+    { "id": "minigame-memory", "status": "pending", "surface": "Playable Memory Match", "proof": "Real board and one revealed pair" },
+    { "id": "minigame-2048", "status": "pending", "surface": "Playable Cookie 2048", "proof": "Real board after one move" },
+    { "id": "minigame-minesweeper", "status": "pending", "surface": "Playable Minesweeper", "proof": "Real board after one reveal" },
+    { "id": "minigame-breakout", "status": "pending", "surface": "Playable Breakout", "proof": "Real active board" },
+    { "id": "lucky-chance-drawer", "status": "pending", "surface": "Lucky Chance drawer", "proof": "Drawer open with token cost and one recorded result" },
+    { "id": "office-building", "status": "pending", "surface": "Office Building generator", "proof": "Generator row at and beyond the 500 million cookie threshold" },
+    { "id": "home-endless", "status": "pending", "surface": "Endless Home extension", "proof": "Seven finished extension floors with the next floor available" },
+    { "id": "diesel-depot-collapsed", "status": "pending", "surface": "Collapsed Diesel Depot", "proof": "Collapsed summary and persisted state after reload" },
+    { "id": "update-ready", "status": "pending", "surface": "Installed update-ready banner", "proof": "Unsigned Squirrel update, version, release link, Later and Restart actions" },
+    { "id": "installed-launch", "status": "pending", "surface": "Installed executable launch", "proof": "Installed executable launched on a named hidden desktop with packaged icon visible" },
+    { "id": "event-pool-remaining", "status": "pending", "surface": "Remaining event pool", "proof": "Eighteen events that lack current-build photographs" },
+    { "id": "milk-focus", "status": "pending", "surface": "High milk level", "proof": "Composition focused on the milk tide rather than incidental background evidence" },
+    { "id": "home-late-rooms", "status": "pending", "surface": "Late authored Home rooms", "proof": "Bedroom, Workshop and Garden build/furnishing states" },
+    { "id": "golden-dial-miss", "status": "pending", "surface": "Missed Oven Dial press", "proof": "Miss copy and shake state" },
+    { "id": "prestige-keyed", "status": "pending", "surface": "Prestige super-confirmation", "proof": "One-key, sliding and completed states" },
+    { "id": "factory-reduced-motion", "status": "pending", "surface": "Factory reduced motion", "proof": "Stopped pipe and derrick motion" },
+    { "id": "raid-reduced-motion", "status": "pending", "surface": "Mouse Raid reduced motion", "proof": "Non-scurrying accessible raid state" },
+    { "id": "command-palette", "status": "pending", "surface": "Command palette", "proof": "Feature is not yet implemented; evidence cannot exist" },
+    { "id": "appearance-editor", "status": "pending", "surface": "Appearance editor", "proof": "Feature is not yet implemented; evidence cannot exist" },
+    { "id": "narrow-window", "status": "pending", "surface": "Genuinely narrow application window", "proof": "Real window resize, not only device emulation" }
+  ]
+}

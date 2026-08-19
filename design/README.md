@@ -83,13 +83,17 @@ ticket cut, tier jewel, chart series or progress datum may keep the colour and g
 communicate game data; that exception does not extend to the button, card, dialog or navigation
 surface around it.
 
-The hand-written inventory at `parity/inventory.json` records the current state without laundering
-the older cabinet styling into an approved deviation. Its primitive audits currently mark the
-solid press bases, bevelled frames, all-caps marquee type and bespoke selection controls as open
-defects. Those defects must be migrated to Material components before a parity row can become a
-release verdict. The following boundary is deliberate:
+The hand-written inventory at `parity/inventory.json` records the source-level migration without
+laundering the older checked-in references into product chrome. The final cascade in
+`src/renderer/styles/index.css` now supplies Material system colour aliases, type, shape, tonal
+elevation, state layers, focus, reduced-motion behavior, and component anatomy for buttons,
+fields, tabs, dialogs, menus, selection controls, cards, navigation and snackbars. The retained
+references remain migration inputs. Every parity row still has pending reference/product captures,
+comparison images and diff evidence, so this source audit is not a visual release verdict.
 
-| Retain as game data or art | Migrate as product chrome |
+The following boundary is deliberate and now enforced by the focused source-style test:
+
+| Retained as game data or art | Material product chrome now applied to |
 | --- | --- |
 | Cookie illustration and golden-cookie effect | Click target container and interaction state layers |
 | Achievement medal artwork | Achievement card, toast and dismiss action |

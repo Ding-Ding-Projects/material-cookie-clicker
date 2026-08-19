@@ -80,6 +80,7 @@ import { MinigameEventsScreen, type MinigameEventView } from './screens/Minigame
 import { MinigamesScreen as PlayableMinigamesScreen } from './screens/MinigamesScreen';
 import { getMinigameVisibility, MINIGAME_IDS, type MinigameId } from '../shared/game/minigames.js';
 import { CANONICAL_COMMANDS, CanonicalCommandPalette } from './components/CanonicalCommandPalette.js';
+import { DesignParityRoute, resolveDesignParityRequest } from './DesignParityRoute.js';
 
 /**
  * The four secondary surfaces. The game surface is NOT in this list, because it is not a
@@ -720,6 +721,11 @@ function TitleBar() {
 }
 
 export function App() {
+  const parityRequest = resolveDesignParityRequest(window.location.search);
+  return parityRequest ? <DesignParityRoute request={parityRequest} /> : <GameApp />;
+}
+
+function GameApp() {
   // The settings STORE is resolved once and kept in a ref: it is a backend, not state, and
   // re-resolving it on every render would re-read localStorage for nothing.
   const settingsStoreRef = useRef<ReturnType<typeof resolveAppSettingsStore> | null>(null);

@@ -9,6 +9,7 @@ const preload = read('src/preload/index.ts');
 const main = read('src/main/main.ts');
 const canonical = read('src/shared/canonical-ipc.ts');
 const palette = read('src/renderer/components/CanonicalCommandPalette.tsx');
+const canonicalStyles = read('src/renderer/styles/canonical-tools.css');
 
 describe('canonical application-tools integration', () => {
   it('mounts every concrete product tool and dedicated PDF operations', () => {
@@ -57,5 +58,10 @@ describe('canonical application-tools integration', () => {
   it('moves focus into the command search after the palette opens', () => {
     expect(palette).toContain("document.querySelector<HTMLInputElement>('.canonical-palette input[type=\"search\"]')?.focus()");
     expect(palette).toContain('window.requestAnimationFrame');
+  });
+
+  it('gives every application tab label a full row above its management actions', () => {
+    expect(canonicalStyles).toContain(".canonical-tab > [role='tab'] { grid-column: 1 / -1; width: 100%; text-align: start; }");
+    expect(canonicalStyles).toContain(".canonical-tab > button:not([role='tab']) { min-width: 0; padding-inline: 6px; }");
   });
 });

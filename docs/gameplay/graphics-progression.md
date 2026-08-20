@@ -58,6 +58,18 @@ single deduction, duplicate refusal, persistence attributes, golden-ray boundary
 boundary, and the grandfather migration. Its purchase regression is also exercised red then green
 by temporarily inverting the expected fresh stage.
 
+`design/parity/evidence/graphics-progression/receipt.json` records three states reported by the
+cheap headless route: before the first purchase, after it becomes affordable, and after it is
+bought. The completeness completion validator requires the receipt source commit to remain an
+ancestor of the current checkout and fails when any implementation path named by the inventory row,
+including an uncommitted edit, has changed since that capture.
+
+Unlike the design-parity raw receipts, this graphics receipt has no build-receipt path or artifact
+hash. Its source and image hashes are current, but it cannot independently prove which packaged
+artifact produced the pixels. Completion therefore remains red until that binding exists. The
+documentation site also shows an explicitly superseded baseline image, so its current deployed
+interaction and capture evidence remain pending.
+
 ## Suggested articles
 
 - [Cookie clicking](cookie-clicking.md)

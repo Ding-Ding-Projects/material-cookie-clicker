@@ -591,3 +591,105 @@
   font-size: 24px;
   font-weight: 700;
 }
+
+/* Exact shared reference-frame alignment. Keep this block shared because every parity row uses
+   the same header and section anatomy. The specificity intentionally beats the product-wide
+   button normalization at the end of index.css. */
+:root:root body .design-parity-route .parity-theme-toggle {
+  min-block-size: 44px;
+  font: 400 16px/24px var(--font-en);
+  letter-spacing: normal;
+}
+
+:root:root body .design-parity-route .parity-spec-section > h2 {
+  gap: 16px;
+}
+
+/* Stat-tile reference contract. These selectors are route-scoped so the deterministic product
+   fixture can match the checked-in reference without changing the ordinary statistics screen. */
+:root:root body .design-parity-route .parity-stat-grid {
+  grid-template-columns: repeat(4, minmax(0, 1fr));
+  gap: 22px;
+}
+
+:root:root body .design-parity-route .parity-stat-tile {
+  min-height: 162px;
+  display: block;
+  padding: 20px;
+  border: 1px solid var(--md-sys-color-outline-variant);
+  border-top: 8px solid var(--md-sys-color-tertiary);
+  border-radius: var(--md-sys-shape-corner-extra-large);
+  background: var(--md-sys-color-surface-container-low);
+  box-shadow: var(--md-sys-elevation-level-1);
+}
+
+:root:root body .design-parity-route .parity-stat-tile::before {
+  content: none;
+  display: none;
+}
+
+:root:root body .design-parity-route .parity-stat-tile .stat-tile__label-en,
+:root:root body .design-parity-route .parity-stat-tile .stat-tile__label-zh {
+  display: block;
+  font-size: 16px;
+  line-height: 24px;
+  font-weight: 400;
+  letter-spacing: normal;
+  text-transform: none;
+}
+
+:root:root body .design-parity-route .parity-stat-tile .stat-tile__label-en {
+  color: var(--md-sys-color-on-surface);
+  font-family: var(--font-en);
+}
+
+:root:root body .design-parity-route .parity-stat-tile .stat-tile__label-zh {
+  color: var(--md-sys-color-on-surface-variant);
+  font-family: var(--font-zh);
+}
+
+:root:root body .design-parity-route .parity-stat-reading {
+  display: block;
+}
+
+:root:root body .design-parity-route .parity-stat-tile .stat-tile__value {
+  margin: 0;
+  color: var(--md-sys-color-on-surface);
+  font: 700 28px/36px var(--font-en);
+  font-variant-numeric: tabular-nums;
+}
+
+:root:root body .design-parity-route .parity-stat-tile .stat-tile__trend {
+  display: inline;
+  margin: 0;
+  font: 400 16px/24px var(--font-en);
+  font-variant-numeric: tabular-nums;
+}
+
+:root:root body .design-parity-route .parity-stat-tile .stat-tile__trend.up {
+  color: #176b36;
+}
+
+:root:root body .design-parity-route .parity-stat-tile .stat-tile__trend.down {
+  color: #9d2828;
+}
+
+:root:root body .design-parity-route .parity-goal-tile {
+  width: min(310px, 100%);
+  min-height: 218px;
+  display: grid;
+  align-content: start;
+  gap: 28px;
+}
+
+:root:root body .design-parity-route .parity-goal-tile__title,
+:root:root body .design-parity-route .parity-goal-tile__detail {
+  color: var(--md-sys-color-on-surface);
+  font: 400 16px/24px var(--font-en);
+}
+
+:root:root body .design-parity-route .parity-goal-tile__progress {
+  width: 100%;
+  height: 10px;
+  accent-color: var(--md-sys-color-primary);
+}

@@ -1,0 +1,215 @@
+/*
+ * The upgrade parity route keeps real product shelf primitives and product-authored SVGs, but it
+ * presents each deterministic state as a full card. Every selector is scoped to the exact route:
+ * the ordinary shelf stays compact, while this comparison surface cannot inherit its 22px owned
+ * stamp or the application-wide full-radius button normalization.
+ */
+
+:root:root[data-design-parity='upgrade-card--gallery'] body .design-parity-route .parity-upgrade-scene__panel {
+  display: grid;
+  align-content: start;
+  gap: 28px;
+  inline-size: 100%;
+  min-inline-size: 0;
+  padding: 20px;
+  border: 1px solid var(--md-sys-color-outline-variant);
+  border-radius: var(--md-sys-shape-corner-extra-large);
+  background: var(--md-sys-color-surface-container-low);
+  box-shadow: var(--md-sys-elevation-level-1);
+}
+
+:root:root[data-design-parity='upgrade-card--gallery'] body .design-parity-route .parity-upgrade-scene__title {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  margin: 0;
+  color: var(--md-sys-color-on-surface);
+  font: 500 18px/24px var(--font-en);
+  letter-spacing: 0;
+  text-transform: none;
+}
+
+:root:root[data-design-parity='upgrade-card--gallery'] body .design-parity-route .parity-upgrade-scene__count {
+  display: inline-flex;
+  align-items: center;
+  min-block-size: 32px;
+  padding: 6px 12px;
+  border-radius: var(--md-sys-shape-corner-small);
+  background: var(--md-sys-color-secondary-container);
+  color: var(--md-sys-color-on-secondary-container);
+  font: 500 13px/20px var(--font-en);
+  font-variant-numeric: tabular-nums;
+}
+
+:root:root[data-design-parity='upgrade-card--gallery'] body .design-parity-route .parity-upgrade-scene__grid {
+  display: grid;
+  grid-template-columns: repeat(3, minmax(0, 1fr));
+  align-items: stretch;
+  gap: 22px;
+  min-inline-size: 0;
+}
+
+:root:root[data-design-parity='upgrade-card--gallery'] body .design-parity-route .parity-upgrade-scene .parity-upgrade-card {
+  box-sizing: border-box;
+  display: grid;
+  align-items: stretch;
+  align-content: start;
+  justify-content: stretch;
+  justify-items: stretch;
+  gap: 12px;
+  width: auto;
+  height: auto;
+  inline-size: auto;
+  block-size: auto;
+  min-inline-size: 0;
+  min-block-size: 220px;
+  max-inline-size: none;
+  padding: 20px;
+  border: 1px dashed var(--md-sys-color-outline-variant);
+  border-radius: var(--md-sys-shape-corner-extra-large);
+  background-color: var(--md-sys-color-surface-container-low);
+  background-image: none;
+  color: var(--md-sys-color-on-surface);
+  box-shadow: var(--md-sys-elevation-level-1);
+  opacity: 1;
+  overflow: visible;
+  filter: none;
+  font: 400 16px/24px var(--font-en);
+  font-variant: normal;
+  letter-spacing: 0;
+  text-align: left;
+  text-transform: none;
+  text-shadow: none;
+  transform: none;
+}
+
+/* This selector deliberately outranks the generic Material button selector in index.css. */
+:root:root[data-design-parity='upgrade-card--gallery'] body .design-parity-route[data-design-parity-row='upgrade-card--gallery'] .parity-upgrade-scene .parity-upgrade-scene__grid button.parity-upgrade-card.parity-upgrade-card--buyable {
+  display: grid;
+  align-items: stretch;
+  align-content: start;
+  justify-content: stretch;
+  justify-items: stretch;
+  gap: 12px;
+  width: auto;
+  height: auto;
+  inline-size: auto;
+  block-size: auto;
+  min-inline-size: 0;
+  min-block-size: 220px;
+  max-inline-size: none;
+  padding: 20px;
+  border: 1px dashed var(--md-sys-color-outline-variant);
+  border-radius: var(--md-sys-shape-corner-extra-large);
+  background-color: var(--md-sys-color-surface-container-low);
+  background-image: none;
+  color: var(--md-sys-color-on-surface);
+  box-shadow: var(--md-sys-elevation-level-1);
+  opacity: 1;
+  overflow: visible;
+  filter: none;
+  font: 400 16px/24px var(--font-en);
+  font-variant: normal;
+  letter-spacing: 0;
+  text-align: left;
+  text-transform: none;
+  text-shadow: none;
+  transform: none;
+}
+
+:root:root[data-design-parity='upgrade-card--gallery'] body .design-parity-route[data-design-parity-row='upgrade-card--gallery'] .parity-upgrade-scene .parity-upgrade-scene__grid button.parity-upgrade-card.parity-upgrade-card--buyable:hover {
+  background-color: color-mix(
+    in srgb,
+    var(--md-sys-color-on-surface) var(--md-sys-state-hover-opacity),
+    var(--md-sys-color-surface-container-low)
+  );
+  box-shadow: var(--md-sys-elevation-level-2);
+}
+
+:root:root[data-design-parity='upgrade-card--gallery'] body .design-parity-route[data-design-parity-row='upgrade-card--gallery'] .parity-upgrade-scene .parity-upgrade-scene__grid button.parity-upgrade-card.parity-upgrade-card--buyable:active {
+  background-color: color-mix(
+    in srgb,
+    var(--md-sys-color-on-surface) var(--md-sys-state-pressed-opacity),
+    var(--md-sys-color-surface-container-low)
+  );
+  box-shadow: var(--md-sys-elevation-level-0);
+}
+
+:root:root[data-design-parity='upgrade-card--gallery'] body .design-parity-route[data-design-parity-row='upgrade-card--gallery'] .parity-upgrade-scene .parity-upgrade-scene__grid button.parity-upgrade-card.parity-upgrade-card--buyable:focus-visible {
+  outline: 3px solid var(--md-sys-color-primary);
+  outline-offset: 3px;
+}
+
+:root:root[data-design-parity='upgrade-card--gallery'] body .design-parity-route .parity-upgrade-scene .parity-upgrade-card--locked {
+  background-color: var(--md-sys-color-surface-container-low);
+  opacity: 0.58;
+}
+
+/* Reset the live shelf's 22px stamp box and its translucent history treatment. */
+:root:root[data-design-parity='upgrade-card--gallery'] body .design-parity-route .parity-upgrade-scene .shelf-stamp.parity-upgrade-card--owned {
+  width: auto;
+  height: auto;
+  inline-size: auto;
+  block-size: auto;
+  min-inline-size: 0;
+  min-block-size: 220px;
+  opacity: 1;
+  border-color: var(--tertiary);
+  background-color: var(--tertiary-container);
+  color: var(--on-tertiary-container);
+}
+
+:root:root[data-design-parity='upgrade-card--gallery'] body .design-parity-route .parity-upgrade-scene .parity-upgrade-card__art {
+  display: grid;
+  place-items: center;
+  width: 100%;
+  height: auto;
+  inline-size: 100%;
+  min-block-size: 64px;
+  opacity: 1;
+  font-size: 44px;
+}
+
+:root:root[data-design-parity='upgrade-card--gallery'] body .design-parity-route .parity-upgrade-scene .parity-upgrade-card__art .game-icon {
+  width: 44px;
+  height: 44px;
+  inline-size: 44px;
+  block-size: 44px;
+  margin: 0;
+}
+
+:root:root[data-design-parity='upgrade-card--gallery'] body .design-parity-route .parity-upgrade-scene .parity-upgrade-card__copy {
+  display: contents;
+}
+
+:root:root[data-design-parity='upgrade-card--gallery'] body .design-parity-route .parity-upgrade-scene .parity-upgrade-card__name,
+:root:root[data-design-parity='upgrade-card--gallery'] body .design-parity-route .parity-upgrade-scene .parity-upgrade-card__name-zh {
+  overflow: visible;
+  color: inherit;
+  font: 500 18px/24px var(--font-en);
+  text-overflow: clip;
+  white-space: normal;
+}
+
+:root:root[data-design-parity='upgrade-card--gallery'] body .design-parity-route .parity-upgrade-scene .parity-upgrade-card__name-zh {
+  font-family: var(--font-zh);
+}
+
+:root:root[data-design-parity='upgrade-card--gallery'] body .design-parity-route .parity-upgrade-scene .parity-upgrade-card__description {
+  min-inline-size: 0;
+  overflow: visible;
+  color: inherit;
+  font: 400 16px/24px var(--font-en);
+  text-overflow: clip;
+  white-space: normal;
+}
+
+:root:root[data-design-parity='upgrade-card--gallery'] body .design-parity-route .parity-upgrade-scene .parity-upgrade-card__state {
+  align-self: end;
+  margin-block-start: auto;
+  overflow: visible;
+  color: inherit;
+  font: 700 16px/24px var(--font-en);
+  text-overflow: clip;
+  white-space: normal;
+}

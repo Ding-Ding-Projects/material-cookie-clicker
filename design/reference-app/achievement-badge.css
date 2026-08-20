@@ -1,0 +1,113 @@
+/* Achievement-only geometry. Common reference chrome remains owned by material-reference.css. */
+.achievement-grid-ref {
+  display: grid;
+  grid-template-columns: repeat(2, 150px);
+  gap: 20px;
+}
+
+.achievement-card-ref {
+  /* 90 + 16 + 14 rows, two 4px gaps, 12px padding, and the shared 2px border = 142px. */
+  width: 150px;
+  height: 142px;
+  min-height: 142px;
+  max-height: 142px;
+  grid-template-rows: 90px 16px 14px;
+  align-content: start;
+  gap: 4px;
+  padding: 6px;
+}
+
+.achievement-card-ref .art {
+  height: 90px;
+  min-height: 0;
+}
+
+.achievement-card-ref .medal {
+  width: 90px;
+  height: 90px;
+}
+
+.achievement-card-ref h3 {
+  overflow: hidden;
+  font-family: var(--font-en);
+  font-size: 14px;
+  line-height: 16px;
+  font-weight: 900;
+  text-align: center;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.achievement-card-ref .bilingual {
+  overflow: hidden;
+  font-family: var(--font-zh);
+  font-size: 12px;
+  line-height: 14px;
+  font-weight: 700;
+  text-align: center;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.achievement-toast-ref {
+  /* The shared 2px border and 16px padding leave two exact 27px content rows inside 72px. */
+  position: fixed;
+  right: 24px;
+  bottom: 24px;
+  width: 320px;
+  min-width: 320px;
+  max-width: 320px;
+  height: 72px;
+  min-height: 72px;
+  max-height: 72px;
+  grid-template-columns: 44px minmax(0, 1fr) 48px;
+  grid-template-rows: 27px 27px;
+  gap: 0 12px;
+  padding: 8px;
+  font-size: 13px;
+  line-height: 18px;
+}
+
+.achievement-toast-ref .toast-medal-ref {
+  grid-column: 1;
+  grid-row: 1 / 3;
+  align-self: center;
+  width: 44px;
+  height: 44px;
+}
+
+.achievement-toast-ref strong {
+  grid-column: 2;
+  grid-row: 1;
+  align-self: end;
+  overflow: hidden;
+  font-family: var(--font-en);
+  font-size: 14px;
+  line-height: 18px;
+  font-weight: 700;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.achievement-toast-ref > span:not(.toast-medal-ref) {
+  grid-column: 2;
+  grid-row: 2;
+  align-self: start;
+  overflow: hidden;
+  font-size: 13px;
+  line-height: 18px;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.achievement-toast-ref .achievement-toast-dismiss-ref {
+  grid-column: 3;
+  grid-row: 1 / 3;
+  align-self: center;
+  justify-self: end;
+  width: 48px;
+  height: 48px;
+  min-width: 48px;
+  min-inline-size: 48px;
+  padding: 0;
+}

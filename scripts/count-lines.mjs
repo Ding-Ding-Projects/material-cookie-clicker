@@ -5,9 +5,23 @@ import path from 'node:path';
 const root = path.resolve(import.meta.dirname, '..');
 const textExtensions = new Set(['.c', '.cc', '.cpp', '.css', '.h', '.hpp', '.html', '.js', '.json', '.jsonl', '.md', '.mjs', '.ps1', '.sh', '.toml', '.ts', '.tsx', '.txt', '.xml', '.yaml', '.yml']);
 const agentIdentity = /(anthropic|claude|codex|openai|automation|\[bot\]|agent)/i;
+export const GIT_OUTPUT_MAX_BYTES = 64 * 1024 * 1024;
+
+function processFailure(error) {
+  const code = typeof error?.code === 'string' ? error.code : 'unknown';
+  const status = Number.isInteger(error?.status) ? String(error.status) : 'none';
+  const signal = typeof error?.signal === 'string' ? error.signal : 'none';
+  return `code=${code}, status=${status}, signal=${signal}`;
+}
 
 function git(args, options = {}) {
-  return execFileSync('git', args, { cwd: root, encoding: 'utf8', stdio: ['ignore', 'pipe', 'ignore'], ...options });
+  return execFileSync('git', args, {
+    cwd: root,
+    encoding: 'utf8',
+    maxBuffer: GIT_OUTPUT_MAX_BYTES,
+    stdio: ['ignore', 'pipe', 'ignore'],
+    ...options,
+  });
 }
 
 function trackedFiles() {
@@ -47,8 +61,8 @@ function isAgentCommit(commit) {
   try {
     const metadata = git(['show', '-s', '--format=%an%n%ae%n%B', commit]);
     agent = agentIdentity.test(metadata) || /co-authored-by:.*(anthropic|claude|codex|openai|agent)/i.test(metadata);
-  } catch {
-    agent = false;
+  } catch (error) {
+    throw new Error(`Could not read attribution metadata for commit ${commit} (${processFailure(error)}).`);
   }
   commitAgentCache.set(commit, agent);
   return agent;
@@ -59,10 +73,13 @@ function attribution(file, expectedLines) {
   let porcelain;
   try {
     porcelain = git(['blame', '--line-porcelain', '--', file]);
-  } catch {
-    return { agent: 0, people: 0, uncommitted: expectedLines };
+  } catch (error) {
+    throw new Error(`Could not attribute ${file} with git blame (${processFailure(error)}).`);
   }
   const commits = porcelain.match(/^[0-9a-f]{40} \d+ \d+(?: \d+)?$/gm)?.map((line) => line.slice(0, 40)) ?? [];
+  if (commits.length !== expectedLines) {
+    throw new Error(`Attribution line mismatch for ${file}: blame reported ${commits.length}, file contains ${expectedLines}.`);
+  }
   const result = { agent: 0, people: 0, uncommitted: 0 };
   for (const commit of commits) {
     const authoredByAgent = isAgentCommit(commit);
@@ -70,8 +87,6 @@ function attribution(file, expectedLines) {
     else if (authoredByAgent) result.agent += 1;
     else result.people += 1;
   }
-  const missing = expectedLines - commits.length;
-  if (missing > 0) result.uncommitted += missing;
   return result;
 }
 
@@ -104,6 +119,9 @@ const grand = { files: sum(ordered, 'files'), total: sum(ordered, 'total'), nonb
 
 if (project.agent + project.people + project.uncommitted !== project.total) {
   throw new Error(`Attribution arithmetic mismatch: ${project.agent} + ${project.people} + ${project.uncommitted} != ${project.total}`);
+}
+if (process.argv.includes('--require-committed') && project.uncommitted !== 0) {
+  throw new Error(`Release line attribution requires a committed checkout; received ${project.uncommitted} uncommitted line(s).`);
 }
 
 const report = { schemaVersion: 1, rows: ordered, project, grand, exclusions: ['dependency/vendor directories', 'build output', 'lockfiles from the project total'] };

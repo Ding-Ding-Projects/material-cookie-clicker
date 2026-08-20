@@ -1,4 +1,48 @@
 <!-- @dsCard group="Game Surfaces" -->
-<!doctype html><html lang="en-HK"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1"><title>Material Cookie Clicker · Achievement badge</title><link rel="stylesheet" href="./reference-app/material-reference.css"></head>
-<body data-scheme="light"><main class="spec-shell"><header class="spec-intro"><h1>Achievement badge · 成就徽章</h1><p>Locked medals conceal their identity; unlocked medals use the same minted product artwork and the unlock notification remains non-blocking. · 未解鎖獎牌會收埋身份；解鎖後用產品同一套鑄幣圖案，提示亦唔會阻住操作。</p><button class="theme-toggle" onclick="document.body.dataset.scheme=document.body.dataset.scheme==='dark'?'light':'dark'">🌗 Toggle light / dark · 切換淺色 / 深色</button></header>
-<section class="spec-section"><h2 class="section-title">Locked vs unlocked · 未解鎖 / 已解鎖</h2><div class="gallery"><div class="achievement-grid-ref"><article class="card state-card achievement-card-ref"><div class="art"><span class="medal locked" role="img" aria-label="Locked achievement · 未解鎖成就"></span></div><h3>???</h3><p class="muted bilingual">未解鎖</p></article><article class="card state-card achievement-card-ref"><div class="art"><span class="medal" role="img" aria-label="Hundred Bakeries · 百間麵包店"></span></div><h3>Hundred Bakeries</h3><p class="muted bilingual">百間麵包店</p></article></div><aside class="notice achievement-toast-ref" aria-label="Achievement unlocked notification"><span class="medal toast-medal-ref" aria-hidden="true"></span><strong>Achievement unlocked · 成就解鎖</strong><span>Hundred Bakeries · 百間麵包店</span><button class="icon-button" aria-label="Dismiss achievement notification">×</button></aside></div></section></main></body></html>
+<!doctype html>
+<html lang="en-HK">
+  <head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width,initial-scale=1">
+    <title>Material Cookie Clicker · Achievement badge</title>
+    <link rel="stylesheet" href="./reference-app/material-reference.css">
+    <link rel="stylesheet" href="./reference-app/achievement-badge.css">
+  </head>
+  <body data-scheme="light">
+    <main class="spec-shell">
+      <header class="spec-intro"><h1>Achievement badge · 成就徽章</h1>
+        <p>Locked medals conceal their identity; unlocked medals use the same minted product artwork and the unlock notification remains non-blocking. · 未解鎖獎牌會收埋身份；解鎖後用產品同一套鑄幣圖案，提示亦唔會阻住操作。</p>
+        <button type="button" class="theme-toggle" onclick="document.body.dataset.scheme=document.body.dataset.scheme==='dark'?'light':'dark'">🌗 Toggle light / dark · 切換淺色 / 深色</button>
+      </header>
+      <section class="spec-section">
+        <h2 class="section-title">Locked vs unlocked · 未解鎖 / 已解鎖</h2>
+        <div class="gallery">
+          <div class="achievement-grid-ref">
+            <article class="card state-card achievement-card-ref" data-achievement-state="locked">
+              <div class="art"><span class="medal locked" role="img" aria-label="Locked achievement · 未解鎖成就"></span></div>
+              <h3>???</h3>
+              <p class="muted bilingual">未解鎖</p>
+            </article>
+            <article class="card state-card achievement-card-ref" data-achievement-state="unlocked">
+              <div class="art"><span class="medal" role="img" aria-label="Hundred Bakeries · 百間麵包店"></span></div>
+              <h3>Hundred Bakeries</h3>
+              <p class="muted bilingual">百間麵包店</p>
+            </article>
+          </div>
+          <aside class="notice achievement-toast-ref" role="status" aria-live="polite" aria-atomic="true" aria-label="Achievement unlocked notification · 成就解鎖通知">
+            <span class="medal toast-medal-ref" aria-hidden="true"></span>
+            <strong>Achievement unlocked · 成就解鎖</strong>
+            <span>Hundred Bakeries · 百間麵包店</span>
+            <button
+              type="button"
+              class="icon-button achievement-toast-dismiss-ref"
+              data-action="dismiss-achievement-toast"
+              aria-label="Dismiss achievement notification · 關閉成就通知"
+              onclick="this.closest('.achievement-toast-ref').hidden = true"
+            >×</button>
+          </aside>
+        </div>
+      </section>
+    </main>
+  </body>
+</html>

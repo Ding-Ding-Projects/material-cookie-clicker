@@ -8,7 +8,7 @@ from pathlib import Path
 
 from PIL import Image, ImageChops, ImageDraw
 
-SOURCE_COMMIT = "13e09369a3b6f9336d4604f7b8eade652276a4e5"
+SOURCE_COMMIT = "7cf30ae5ab93349790c674647fe9fe3e64a01af7"
 
 
 def digest(path: Path) -> str:
@@ -101,8 +101,8 @@ def main() -> None:
 
         receipt_paths = {}
         for side, image_path, run_receipt, pid, hwnd in (
-            ("referenceRaw", reference, reference_receipts[row_id], 67144, 11930650),
-            ("productRaw", product, product_receipts[row_id], 17204, 855042),
+            ("referenceRaw", reference, reference_receipts[row_id], 58468, 7539508),
+            ("productRaw", product, product_receipts[row_id], 40152, 44435480),
         ):
             interaction_path = target / f"{side}-interaction.json"
             interaction = {"version": 1, "rowId": row_id, "side": side, "route": run_receipt["logicalRoute"], "state": run_receipt["state"], "cleanupCompleted": True}

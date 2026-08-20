@@ -3,22 +3,22 @@
   "id": "tokens-type--scale--product",
   "route": "cheap-lowlevel-headless",
   "source": {
-    "startCommit": "13e09369a3b6f9336d4604f7b8eade652276a4e5",
-    "endCommit": "13e09369a3b6f9336d4604f7b8eade652276a4e5",
+    "startCommit": "7cf30ae5ab93349790c674647fe9fe3e64a01af7",
+    "endCommit": "7cf30ae5ab93349790c674647fe9fe3e64a01af7",
     "artifactPath": "dist/renderer/assets/index-BQyFOhDT.js",
     "artifactSha256": "4663d6eaeafea4f1291311a86691fffc4e24ced846e32bcbd4405b5dd8b79198",
     "buildReceiptPath": "design/parity/evidence/build-receipt.json",
-    "buildReceiptSha256": "e78ea118e5a71516fdd91ef11f1f3426316e41b31d99d295b954211b84ef4d79",
-    "artifactBuiltAt": "2026-08-20T01:35:50.414Z"
+    "buildReceiptSha256": "858f0c822df7fddfd40542d6e4584a0045f01ce7fc94a5abfb13b6b7527e2b50",
+    "artifactBuiltAt": "2026-08-20T02:04:08.708Z"
   },
   "capture": {
-    "rawPath": "C:\\Users\\cntow\\AppData\\Local\\Temp\\mcc-parity-13e0936-20260819-2135\\output\\product-rows\\tokens-type--scale\\product.png",
+    "rawPath": "C:\\Users\\cntow\\AppData\\Local\\Temp\\mcc-parity-7cf30ae-20260819-2200\\output\\product-rows\\tokens-type--scale\\product.png",
     "promotedPath": "design/parity/evidence/tokens-type--scale/product.png",
     "sha256": "45d794c723f32546015e36bfd0e0c8e1c3015b3ee90f1655f188727d37def5c3",
     "rawSha256": "45d794c723f32546015e36bfd0e0c8e1c3015b3ee90f1655f188727d37def5c3",
     "mimeType": "image/png",
-    "startedAt": "2026-08-20T01:35:50.414Z",
-    "capturedAt": "2026-08-20T01:35:50.568Z",
+    "startedAt": "2026-08-20T02:04:08.708Z",
+    "capturedAt": "2026-08-20T02:04:08.864Z",
     "width": 1280,
     "height": 800
   },
@@ -59,8 +59,8 @@
     "reviewer": "automated parity capture review"
   },
   "runtime": {
-    "launchPid": 17204,
-    "hwnd": "855042",
+    "launchPid": 40152,
+    "hwnd": "44435480",
     "hwndResolvedLive": true,
     "consoleErrorCount": 0,
     "pageErrorCount": 0,

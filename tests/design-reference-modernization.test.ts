@@ -111,11 +111,11 @@ describe('modern Material design references', () => {
     };
     expect(inventory.rows).toHaveLength(16);
     for (const row of inventory.rows) {
-      expect(row.sourceCommit).toBe('pending-recapture-after-reference-fine-alignment');
+      expect(row.sourceCommit).toBe('7cf30ae5ab93349790c674647fe9fe3e64a01af7');
       expect(Object.keys(row.evidence).sort()).toEqual(['comparison', 'diff', 'productRaw', 'referenceRaw']);
       for (const evidence of Object.values(row.evidence)) {
-        expect(evidence.status).toBe('pending');
-        expect(evidence.reason?.trim().length).toBeGreaterThan(20);
+        expect(evidence.status).toBe('verified');
+        expect(evidence.reason).toBeUndefined();
       }
     }
   });

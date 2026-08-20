@@ -12,13 +12,14 @@ import { mkdir, readFile, writeFile } from 'node:fs/promises';
 import path from 'node:path';
 import { fileURLToPath } from 'node:url';
 
-const root = path.resolve(path.dirname(fileURLToPath(import.meta.url)), '..');
+const scriptPath = fileURLToPath(import.meta.url);
+const root = path.resolve(path.dirname(scriptPath), '..');
 const masterPath = path.join(root, 'assets', 'material-cookie-clicker-logo-master.svg');
 const iconPath = path.join(root, 'assets', 'material-cookie-clicker.ico');
 const socialPath = path.join(root, 'social-preview.png');
-const SIZES = [16, 32, 48, 256];
+export const BRAND_ICON_SIZES = Object.freeze([16, 32, 48, 256]);
 
-function parseMaster(svg) {
+export function parseMaster(svg) {
   const match = svg.match(/<metadata id="material-cookie-clicker-logo-geometry">([^<]+)<\/metadata>/);
   if (!match) throw new Error('The SVG master is missing its bounded logo geometry metadata.');
   const geometry = JSON.parse(match[1]);
@@ -57,7 +58,7 @@ function blendChannel(inner, outer, t) {
   return Math.round(inner * (1 - t) + outer * t);
 }
 
-function renderLogo(size, geometry) {
+export function renderLogo(size, geometry) {
   const pixels = createPixels(size, size);
   const scale = size / geometry.canvas;
   const cx = geometry.cookie.cx * scale;
@@ -118,8 +119,8 @@ function renderIcoFrame(size, geometry) {
   return Buffer.concat([dib, bgraBottomUp, Buffer.alloc(andBytes)]);
 }
 
-function makeIco(geometry) {
-  const frames = SIZES.map((size) => ({ size, data: renderIcoFrame(size, geometry) }));
+export function makeIco(geometry) {
+  const frames = BRAND_ICON_SIZES.map((size) => ({ size, data: renderIcoFrame(size, geometry) }));
   const directory = Buffer.alloc(6);
   directory.writeUInt16LE(0, 0);
   directory.writeUInt16LE(1, 2);
@@ -239,7 +240,7 @@ function chunk(type, data) {
   return output;
 }
 
-function encodePng(width, height, pixels) {
+export function encodePng(width, height, pixels) {
   const header = Buffer.alloc(13);
   header.writeUInt32BE(width, 0);
   header.writeUInt32BE(height, 4);
@@ -261,20 +262,28 @@ async function assertCurrent(filePath, expected, label) {
   if (!actual.equals(expected)) throw new Error(`${label} is stale; run node scripts/generate-app-icon.mjs --write.`);
 }
 
-const svg = await readFile(masterPath, 'utf8');
-const geometry = parseMaster(svg);
-const icon = makeIco(geometry);
-const social = makeSocialPreview(geometry);
-const mode = process.argv[2] ?? '--write';
-if (mode === '--check') {
-  await assertCurrent(iconPath, icon, 'assets/material-cookie-clicker.ico');
-  await assertCurrent(socialPath, social, 'social-preview.png');
-  process.stdout.write(`Brand derivatives are current: ICO ${SIZES.join(', ')} px; social preview 1280x640.\n`);
-} else if (mode === '--write') {
-  await mkdir(path.dirname(iconPath), { recursive: true });
-  await writeFile(iconPath, icon);
-  await writeFile(socialPath, social);
-  process.stdout.write(`Wrote assets/material-cookie-clicker.ico (${icon.length} bytes) and social-preview.png (${social.length} bytes).\n`);
-} else {
-  throw new Error(`Unknown mode ${mode}; use --write or --check.`);
+export async function createBrandArtifacts() {
+  const svg = await readFile(masterPath, 'utf8');
+  const geometry = parseMaster(svg);
+  return { svg, geometry, icon: makeIco(geometry), social: makeSocialPreview(geometry) };
+}
+
+export async function runBrandGenerator(mode = '--write') {
+  const { icon, social } = await createBrandArtifacts();
+  if (mode === '--check') {
+    await assertCurrent(iconPath, icon, 'assets/material-cookie-clicker.ico');
+    await assertCurrent(socialPath, social, 'social-preview.png');
+    process.stdout.write(`Brand derivatives are current: ICO ${BRAND_ICON_SIZES.join(', ')} px; social preview 1280x640.\n`);
+  } else if (mode === '--write') {
+    await mkdir(path.dirname(iconPath), { recursive: true });
+    await writeFile(iconPath, icon);
+    await writeFile(socialPath, social);
+    process.stdout.write(`Wrote assets/material-cookie-clicker.ico (${icon.length} bytes) and social-preview.png (${social.length} bytes).\n`);
+  } else {
+    throw new Error(`Unknown mode ${mode}; use --write or --check.`);
+  }
+}
+
+if (process.argv[1] && path.resolve(process.argv[1]) === scriptPath) {
+  await runBrandGenerator(process.argv[2] ?? '--write');
 }

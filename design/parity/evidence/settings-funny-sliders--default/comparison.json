@@ -1,0 +1,23 @@
+{
+  "schemaVersion": 1,
+  "rowId": "settings-funny-sliders--default",
+  "tuple": {
+    "screen": "settings-funny-sliders",
+    "state": "default",
+    "theme": "light",
+    "viewport": {
+      "width": 1280,
+      "height": 800
+    },
+    "scale": 1,
+    "locale": "en-HK"
+  },
+  "labels": [
+    "REFERENCE",
+    "BUILT PRODUCT"
+  ],
+  "inputs": {
+    "referenceSha256": "f32ac9af1b8ff0a18f55c5848f294acc30fbb0b1dca7c08ed5bc12701c48180d",
+    "productSha256": "cebcb05ee983c4b1e8af73d5e5988363d99bbee4c8d185ecfd537de3d165ac52"
+  }
+}

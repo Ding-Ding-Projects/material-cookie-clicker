@@ -1,0 +1,18 @@
+{
+  "version": 1,
+  "rowId": "narrator-toast--gallery",
+  "side": "productRaw",
+  "route": "app://material-cookie-clicker/?designParity=narrator-toast--gallery&surface=game&toast=milestone&theme=light&width=1280&height=800&scale=1&state=gallery&locale=en-HK",
+  "state": {
+    "row": "narrator-toast--gallery",
+    "fixture": "narrator-toast-v1",
+    "width": 1280,
+    "height": 800,
+    "scale": 1,
+    "lang": "en-HK",
+    "theme": "light",
+    "network": "blocked",
+    "motion": "paused"
+  },
+  "cleanupCompleted": true
+}

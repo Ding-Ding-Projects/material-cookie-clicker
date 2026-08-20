@@ -7,6 +7,7 @@ const here = dirname(fileURLToPath(import.meta.url));
 export const designRoot = resolve(here, '..');
 export const inventoryPath = join(designRoot, 'parity', 'inventory.json');
 export const negativeFixturePath = join(designRoot, 'parity', 'negative-proof-fixture.json');
+const repositoryRoot = resolve(designRoot, '..');
 
 const REQUIRED_PRIMITIVES = [
   'buttons', 'fields', 'menus', 'tabs', 'dialogs', 'navigation', 'selectionControls',
@@ -41,6 +42,45 @@ export function loadNegativeFixture() {
 
 function sha256(path) {
   return createHash('sha256').update(readFileSync(path)).digest('hex');
+}
+
+function evidencePath(relative, code, label) {
+  const absolute = resolve(repositoryRoot, relative);
+  if (absolute !== repositoryRoot && !absolute.startsWith(`${repositoryRoot}\\`) && !absolute.startsWith(`${repositoryRoot}/`)) {
+    fail(code, `${label} escapes the repository`);
+  }
+  return absolute;
+}
+
+function readJsonEvidence(relative, expectedHash, code, label) {
+  const path = evidencePath(relative, code, label);
+  if (!existsSync(path)) fail(code, `${label} is absent`);
+  if (sha256(path) !== expectedHash) fail(code, `${label} hash is stale`);
+  try { return JSON.parse(readFileSync(path, 'utf8')); }
+  catch { fail(code, `${label} is not valid JSON`); }
+}
+
+function assertPng(path, code, label, width = 1280, height = 800) {
+  const bytes = readFileSync(path);
+  if (bytes.length < 24 || bytes.subarray(0, 8).toString('hex') !== '89504e470d0a1a0a') fail(code, `${label} is not a PNG`);
+  if (bytes.readUInt32BE(16) !== width || bytes.readUInt32BE(20) !== height) fail(code, `${label} dimensions are not ${width}x${height}`);
+}
+
+function assertRawReceipt(row, key, evidence) {
+  requireText(evidence.receiptPath, 'EVIDENCE_RECEIPT_MISSING', `${row.id} ${key} receipt path`);
+  requireText(evidence.receiptSha256, 'EVIDENCE_RECEIPT_HASH_MISSING', `${row.id} ${key} receipt hash`);
+  const receipt = readJsonEvidence(evidence.receiptPath, evidence.receiptSha256, 'EVIDENCE_RECEIPT_INVALID', `${row.id} ${key} receipt`);
+  const expectedId = `${row.id}--${key === 'referenceRaw' ? 'reference' : 'product'}`;
+  if (receipt.version !== 1 || receipt.id !== expectedId || receipt.route !== 'cheap-lowlevel-headless') fail('EVIDENCE_RECEIPT_INVALID', `${row.id} ${key} receipt identity/route is invalid`);
+  if (receipt.source?.startCommit !== row.sourceCommit || receipt.source?.endCommit !== row.sourceCommit) fail('EVIDENCE_SOURCE_MISMATCH', `${row.id} ${key} source commit mismatch`);
+  if (JSON.stringify({screen:receipt.state?.screen,state:receipt.state?.state,theme:receipt.state?.theme,viewport:receipt.state?.viewport,scale:receipt.state?.scale,locale:receipt.state?.locale}) !== JSON.stringify(row.tuple)) fail('EVIDENCE_TUPLE_MISMATCH', `${row.id} ${key} tuple mismatch`);
+  if (receipt.capture?.sha256 !== evidence.sha256 || receipt.capture?.rawSha256 !== evidence.sha256 || receipt.capture?.promotedPath !== evidence.path || receipt.capture?.width !== 1280 || receipt.capture?.height !== 800 || receipt.capture?.mimeType !== 'image/png') fail('EVIDENCE_CAPTURE_MISMATCH', `${row.id} ${key} capture binding mismatch`);
+  for (const name of ['visibleDesktopUntouched','expectedSurfaceOnly','sensitiveDataReviewed']) if (receipt.privacy?.[name] !== true) fail('EVIDENCE_PRIVACY_INVALID', `${row.id} ${key} privacy.${name} is not true`);
+  for (const name of ['unrelatedTargetsObserved','mocked','handEdited']) if (receipt.privacy?.[name] !== false) fail('EVIDENCE_PRIVACY_INVALID', `${row.id} ${key} privacy.${name} is not false`);
+  for (const name of ['decoded','pixelsInspected','targetVisible','expectedStateVisible']) if (receipt.inspection?.[name] !== true) fail('EVIDENCE_INSPECTION_INVALID', `${row.id} ${key} inspection.${name} is not true`);
+  for (const name of ['hwndResolvedLive','cleanupCompleted','cleanupOwnedOnly']) if (receipt.runtime?.[name] !== true) fail('EVIDENCE_RUNTIME_INVALID', `${row.id} ${key} runtime.${name} is not true`);
+  for (const proof of [['interactionReceiptPath','interactionReceiptSha256'],['privacyScanPath','privacyScanSha256']]) readJsonEvidence(receipt.runtime[proof[0]], receipt.runtime[proof[1]], 'EVIDENCE_RUNTIME_INVALID', `${row.id} ${key} ${proof[0]}`);
+  readJsonEvidence(receipt.source.buildReceiptPath, receipt.source.buildReceiptSha256, 'EVIDENCE_BUILD_INVALID', `${row.id} ${key} build receipt`);
 }
 
 function requireText(value, code, label) {
@@ -87,6 +127,7 @@ function assertRouteMatchesTuple(row) {
 }
 
 export function validateInventory(inventory, { mode = 'structure', verifyHashes = true } = {}) {
+  const evidenceMode = mode === 'release' || mode === 'evidence';
   if (inventory.schemaVersion !== 1) fail('SCHEMA_VERSION_UNSUPPORTED', 'schemaVersion must be 1');
   if (inventory.inventoryPolicy !== 'hand-written-exact-reference-set') {
     fail('INVENTORY_POLICY_INVALID', 'inventory must declare the hand-written exact-reference policy');
@@ -134,6 +175,8 @@ export function validateInventory(inventory, { mode = 'structure', verifyHashes 
     requireNumber(row.tuple?.viewport?.height, 'TUPLE_HEIGHT_MISSING', `${row.id} tuple height`);
     requireNumber(row.tuple?.scale, 'TUPLE_SCALE_MISSING', `${row.id} tuple scale`);
     requireText(row.tuple?.locale, 'TUPLE_LOCALE_MISSING', `${row.id} tuple locale`);
+    if (row.screen !== row.tuple.screen) fail('ROW_SCREEN_MISMATCH', `${row.id} screen does not equal tuple.screen`);
+    if (!row.declaredStates.includes(row.tuple.state)) fail('ROW_STATE_UNDECLARED', `${row.id} tuple state is not declared`);
     assertRouteMatchesTuple(row);
 
     for (const key of ['fixture', 'time', 'motion', 'fonts', 'network']) {
@@ -153,6 +196,8 @@ export function validateInventory(inventory, { mode = 'structure', verifyHashes 
         fail('M3_PRIMITIVE_DEVIATION_UNAPPROVED', `${row.id} ${primitive} deviation needs reason and approval`);
       }
     }
+    const expectedAuditStatus = REQUIRED_PRIMITIVES.some((primitive) => audit.primitives[primitive].status === 'defect') ? 'defect' : 'conforming';
+    if (audit.status !== expectedAuditStatus) fail('M3_AUDIT_SUMMARY_MISMATCH', `${row.id} audit summary ${audit.status} contradicts primitive status ${expectedAuditStatus}`);
     if (mode === 'release') {
       const defects = REQUIRED_PRIMITIVES.filter((primitive) => audit.primitives[primitive].status === 'defect');
       if (audit.status === 'defect' || defects.length > 0) {
@@ -166,12 +211,23 @@ export function validateInventory(inventory, { mode = 'structure', verifyHashes 
       if (!evidence || typeof evidence.path !== 'string' || evidence.path.trim() === '') {
         fail(code, `${row.id} ${key} evidence path is missing`);
       }
-      if (mode === 'release') {
+      if (evidenceMode) {
         if (evidence.status !== 'verified') fail('EVIDENCE_PENDING', `${row.id} ${key} is ${evidence.status ?? 'missing'}`);
         requireText(evidence.sha256, 'EVIDENCE_HASH_MISSING', `${row.id} ${key} hash`);
-        const evidencePath = resolve(designRoot, '..', evidence.path);
-        if (!existsSync(evidencePath)) fail('EVIDENCE_FILE_ABSENT', `${row.id} ${key} file is absent`);
-        if (sha256(evidencePath) !== evidence.sha256) fail('EVIDENCE_HASH_STALE', `${row.id} ${key} hash is stale`);
+        const filePath = evidencePath(evidence.path, 'EVIDENCE_PATH_ESCAPE', `${row.id} ${key}`);
+        if (!existsSync(filePath)) fail('EVIDENCE_FILE_ABSENT', `${row.id} ${key} file is absent`);
+        if (sha256(filePath) !== evidence.sha256) fail('EVIDENCE_HASH_STALE', `${row.id} ${key} hash is stale`);
+        if (key !== 'diff') assertPng(filePath, 'EVIDENCE_PNG_INVALID', `${row.id} ${key}`, key === 'comparison' ? 2560 : 1280, key === 'comparison' ? 840 : 800);
+        if (key === 'referenceRaw' || key === 'productRaw') assertRawReceipt(row, key, evidence);
+        if (key === 'comparison') {
+          const manifest = readJsonEvidence(evidence.manifestPath, evidence.manifestSha256, 'COMPARISON_MANIFEST_INVALID', `${row.id} comparison manifest`);
+          if (manifest.rowId !== row.id || JSON.stringify(manifest.tuple) !== JSON.stringify(row.tuple) || JSON.stringify(manifest.labels) !== JSON.stringify(['REFERENCE','BUILT PRODUCT']) || manifest.inputs?.referenceSha256 !== row.evidence.referenceRaw.sha256 || manifest.inputs?.productSha256 !== row.evidence.productRaw.sha256) fail('COMPARISON_BINDING_MISMATCH', `${row.id} comparison binding mismatch`);
+        }
+        if (key === 'diff') {
+          const diff = readJsonEvidence(evidence.path, evidence.sha256, 'DIFF_INVALID', `${row.id} diff`);
+          if (diff.schemaVersion !== 1 || diff.rowId !== row.id || JSON.stringify(diff.tuple) !== JSON.stringify(row.tuple) || diff.inputs?.reference?.sha256 !== row.evidence.referenceRaw.sha256 || diff.inputs?.product?.sha256 !== row.evidence.productRaw.sha256 || diff.dimensions?.width !== 1280 || diff.dimensions?.height !== 800 || !Number.isFinite(diff.metrics?.changedPixels) || !Number.isFinite(diff.metrics?.changedRatio) || !diff.tool?.name || !diff.tool?.version) fail('DIFF_BINDING_MISMATCH', `${row.id} diff binding/provenance mismatch`);
+          if (mode === 'release' && diff.review?.verdict === 'defect') fail('DIFF_REVIEW_DEFECT', `${row.id} has unapproved visual differences`);
+        }
       } else if (evidence.status === 'pending') {
         requireText(evidence.reason, 'EVIDENCE_PENDING_REASON_MISSING', `${row.id} ${key} pending reason`);
       } else if (evidence.status !== 'verified') {
@@ -250,6 +306,7 @@ function main() {
     for (const result of results) console.log(`- ${result.id}: red=${result.red}; restore=${result.restored}`);
     return;
   }
+  if (modeArg !== '--structure' && modeArg !== '--release') fail('MODE_UNKNOWN', `unknown mode ${modeArg}`);
   const mode = modeArg === '--release' ? 'release' : 'structure';
   const result = validateInventory(loadInventory(), { mode });
   console.log(`Design parity ${mode}: ${result.rowCount} hand-written rows cover ${result.referenceCount} references.`);

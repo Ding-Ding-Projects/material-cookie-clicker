@@ -1,0 +1,18 @@
+{
+  "version": 1,
+  "rowId": "settings-funny-sliders--default",
+  "side": "productRaw",
+  "route": "app://material-cookie-clicker/?designParity=settings-funny-sliders--default&panel=settings&focus=language&theme=light&width=1280&height=800&scale=1&state=default&locale=en-HK",
+  "state": {
+    "row": "settings-funny-sliders--default",
+    "fixture": "settings-default-v1",
+    "width": 1280,
+    "height": 800,
+    "scale": 1,
+    "lang": "en-HK",
+    "theme": "light",
+    "network": "blocked",
+    "motion": "paused"
+  },
+  "cleanupCompleted": true
+}

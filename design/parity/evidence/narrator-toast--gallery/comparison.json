@@ -1,0 +1,23 @@
+{
+  "schemaVersion": 1,
+  "rowId": "narrator-toast--gallery",
+  "tuple": {
+    "screen": "narrator-toast",
+    "state": "gallery",
+    "theme": "light",
+    "viewport": {
+      "width": 1280,
+      "height": 800
+    },
+    "scale": 1,
+    "locale": "en-HK"
+  },
+  "labels": [
+    "REFERENCE",
+    "BUILT PRODUCT"
+  ],
+  "inputs": {
+    "referenceSha256": "09d03d58ccfed1381b1ca16e128fbead71b30874cc40697d15d3faf412df0576",
+    "productSha256": "fb98ca0fc2f3ce1e09fae73b5239bc12407041fdfcc6c54b09cf8badc9a100b8"
+  }
+}

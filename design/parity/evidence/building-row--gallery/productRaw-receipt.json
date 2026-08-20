@@ -1,0 +1,87 @@
+{
+  "version": 1,
+  "id": "building-row--gallery--product",
+  "route": "cheap-lowlevel-headless",
+  "source": {
+    "startCommit": "330352ce7513ba420752dd7243762f0dd75f9eaa",
+    "endCommit": "330352ce7513ba420752dd7243762f0dd75f9eaa",
+    "artifactPath": "dist/renderer/assets/index-BQyFOhDT.js",
+    "artifactSha256": "4663d6eaeafea4f1291311a86691fffc4e24ced846e32bcbd4405b5dd8b79198",
+    "buildReceiptPath": "design/parity/evidence/build-receipt.json",
+    "buildReceiptSha256": "34ff59d65a1ad149e636e8605f8d8c39364df8f0ddaecf4cc10fb72c566f9394",
+    "artifactBuiltAt": "2026-08-20T00:25:09.569Z"
+  },
+  "capture": {
+    "rawPath": "C:\\Users\\cntow\\AppData\\Local\\Temp\\mcc-parity-330352c-20260819-2025\\output\\product-rows\\building-row--gallery\\product.png",
+    "promotedPath": "design/parity/evidence/building-row--gallery/product.png",
+    "sha256": "4e899edd36c6e5f24470d859d2742561548748183d706142e8f7f66adc65b816",
+    "rawSha256": "4e899edd36c6e5f24470d859d2742561548748183d706142e8f7f66adc65b816",
+    "mimeType": "image/png",
+    "startedAt": "2026-08-20T00:25:09.569Z",
+    "capturedAt": "2026-08-20T00:25:09.780Z",
+    "width": 1280,
+    "height": 800
+  },
+  "state": {
+    "surface": "desktop-app",
+    "screen": "building-row",
+    "state": "gallery",
+    "theme": "light",
+    "viewport": {
+      "width": 1280,
+      "height": 800
+    },
+    "scale": 1,
+    "locale": "en-HK",
+    "captureKind": "page",
+    "deterministic": {
+      "fixture": "building-gallery-v1",
+      "time": "2026-08-19T12:00:00Z",
+      "motion": "paused",
+      "randomSeed": 1902,
+      "fonts": "Segoe UI system stack",
+      "network": "blocked"
+    }
+  },
+  "privacy": {
+    "visibleDesktopUntouched": true,
+    "expectedSurfaceOnly": true,
+    "sensitiveDataReviewed": true,
+    "unrelatedTargetsObserved": false,
+    "mocked": false,
+    "handEdited": false
+  },
+  "inspection": {
+    "decoded": true,
+    "pixelsInspected": true,
+    "targetVisible": true,
+    "expectedStateVisible": true,
+    "reviewer": "automated parity capture review"
+  },
+  "runtime": {
+    "launchPid": 44684,
+    "hwnd": "789628",
+    "hwndResolvedLive": true,
+    "consoleErrorCount": 0,
+    "pageErrorCount": 0,
+    "interactionProofId": "building-row--gallery-productRaw",
+    "interactionReceiptPath": "design/parity/evidence/building-row--gallery/productRaw-interaction.json",
+    "interactionReceiptSha256": "df7e0b334c51b15c550c2adfa1c0b7878e37bfd57c169091ce9354cbdcfd7435",
+    "privacyScanPath": "design/parity/evidence/building-row--gallery/productRaw-privacy.json",
+    "privacyScanSha256": "ee01fec30d242657c3bb5c4a425aa47dd2e39724a3e47eeba106e061a9c28c84",
+    "cleanupCompleted": true,
+    "cleanupOwnedOnly": true
+  },
+  "inventory": {
+    "path": "design/parity/evidence/promotion-inventory.json",
+    "recordId": "building-row--gallery--product",
+    "rowId": "building-row--gallery",
+    "evidenceKey": "productRaw"
+  },
+  "documentation": [
+    {
+      "path": "design/parity/inventory.json",
+      "alt": "building-row--gallery productRaw at 1280 by 800"
+    }
+  ]
+}

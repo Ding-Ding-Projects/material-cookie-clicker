@@ -1,0 +1,23 @@
+{
+  "schemaVersion": 1,
+  "rowId": "building-row--gallery",
+  "tuple": {
+    "screen": "building-row",
+    "state": "gallery",
+    "theme": "light",
+    "viewport": {
+      "width": 1280,
+      "height": 800
+    },
+    "scale": 1,
+    "locale": "en-HK"
+  },
+  "labels": [
+    "REFERENCE",
+    "BUILT PRODUCT"
+  ],
+  "inputs": {
+    "referenceSha256": "c581ccf8d00d99ea9db7e7451bde57f344f09844cd085f2091dc88845a218a4c",
+    "productSha256": "4e899edd36c6e5f24470d859d2742561548748183d706142e8f7f66adc65b816"
+  }
+}

@@ -1,0 +1,18 @@
+{
+  "version": 1,
+  "rowId": "tokens-color--roles",
+  "side": "productRaw",
+  "route": "app://material-cookie-clicker/?designParity=tokens-color--roles&surface=appearance&theme=light&width=1280&height=800&scale=1&state=roles&locale=en-HK",
+  "state": {
+    "row": "tokens-color--roles",
+    "fixture": "color-roles-v1",
+    "width": 1280,
+    "height": 800,
+    "scale": 1,
+    "lang": "en-HK",
+    "theme": "light",
+    "network": "blocked",
+    "motion": "paused"
+  },
+  "cleanupCompleted": true
+}

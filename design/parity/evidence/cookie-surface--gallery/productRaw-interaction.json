@@ -1,0 +1,18 @@
+{
+  "version": 1,
+  "rowId": "cookie-surface--gallery",
+  "side": "productRaw",
+  "route": "app://material-cookie-clicker/?designParity=cookie-surface--gallery&surface=game&focus=cookie&theme=light&width=1280&height=800&scale=1&state=gallery&locale=en-HK",
+  "state": {
+    "row": "cookie-surface--gallery",
+    "fixture": "cookie-gallery-v1",
+    "width": 1280,
+    "height": 800,
+    "scale": 1,
+    "lang": "en-HK",
+    "theme": "light",
+    "network": "blocked",
+    "motion": "paused"
+  },
+  "cleanupCompleted": true
+}

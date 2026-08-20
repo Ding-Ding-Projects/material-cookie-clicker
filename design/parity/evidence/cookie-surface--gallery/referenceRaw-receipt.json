@@ -1,0 +1,87 @@
+{
+  "version": 1,
+  "id": "cookie-surface--gallery--reference",
+  "route": "cheap-lowlevel-headless",
+  "source": {
+    "startCommit": "330352ce7513ba420752dd7243762f0dd75f9eaa",
+    "endCommit": "330352ce7513ba420752dd7243762f0dd75f9eaa",
+    "artifactPath": "dist/renderer/assets/index-BQyFOhDT.js",
+    "artifactSha256": "4663d6eaeafea4f1291311a86691fffc4e24ced846e32bcbd4405b5dd8b79198",
+    "buildReceiptPath": "design/parity/evidence/build-receipt.json",
+    "buildReceiptSha256": "34ff59d65a1ad149e636e8605f8d8c39364df8f0ddaecf4cc10fb72c566f9394",
+    "artifactBuiltAt": "2026-08-20T00:26:08.765Z"
+  },
+  "capture": {
+    "rawPath": "C:\\Users\\cntow\\AppData\\Local\\Temp\\mcc-parity-330352c-20260819-2025\\output\\reference-rows-current\\cookie-surface--gallery\\reference.png",
+    "promotedPath": "design/parity/evidence/cookie-surface--gallery/reference.png",
+    "sha256": "689111ece09896f3e917ecdbda7e7f120bc64ae16adaaea74e58c4fdf111377a",
+    "rawSha256": "689111ece09896f3e917ecdbda7e7f120bc64ae16adaaea74e58c4fdf111377a",
+    "mimeType": "image/png",
+    "startedAt": "2026-08-20T00:26:08.765Z",
+    "capturedAt": "2026-08-20T00:26:09.137Z",
+    "width": 1280,
+    "height": 800
+  },
+  "state": {
+    "surface": "design-reference-app",
+    "screen": "cookie-surface",
+    "state": "gallery",
+    "theme": "light",
+    "viewport": {
+      "width": 1280,
+      "height": 800
+    },
+    "scale": 1,
+    "locale": "en-HK",
+    "captureKind": "page",
+    "deterministic": {
+      "fixture": "cookie-gallery-v1",
+      "time": "2026-08-19T12:00:00Z",
+      "motion": "paused",
+      "randomSeed": 1904,
+      "fonts": "Segoe UI system stack",
+      "network": "blocked"
+    }
+  },
+  "privacy": {
+    "visibleDesktopUntouched": true,
+    "expectedSurfaceOnly": true,
+    "sensitiveDataReviewed": true,
+    "unrelatedTargetsObserved": false,
+    "mocked": false,
+    "handEdited": false
+  },
+  "inspection": {
+    "decoded": true,
+    "pixelsInspected": true,
+    "targetVisible": true,
+    "expectedStateVisible": true,
+    "reviewer": "automated parity capture review"
+  },
+  "runtime": {
+    "launchPid": 51504,
+    "hwnd": "15468902",
+    "hwndResolvedLive": true,
+    "consoleErrorCount": 0,
+    "pageErrorCount": 0,
+    "interactionProofId": "cookie-surface--gallery-referenceRaw",
+    "interactionReceiptPath": "design/parity/evidence/cookie-surface--gallery/referenceRaw-interaction.json",
+    "interactionReceiptSha256": "3766f2ebde1ebf3fc7d6343ba6a182cb90aa6e30779f86a172ca555534f199c3",
+    "privacyScanPath": "design/parity/evidence/cookie-surface--gallery/referenceRaw-privacy.json",
+    "privacyScanSha256": "ee01fec30d242657c3bb5c4a425aa47dd2e39724a3e47eeba106e061a9c28c84",
+    "cleanupCompleted": true,
+    "cleanupOwnedOnly": true
+  },
+  "inventory": {
+    "path": "design/parity/evidence/promotion-inventory.json",
+    "recordId": "cookie-surface--gallery--reference",
+    "rowId": "cookie-surface--gallery",
+    "evidenceKey": "referenceRaw"
+  },
+  "documentation": [
+    {
+      "path": "design/parity/inventory.json",
+      "alt": "cookie-surface--gallery referenceRaw at 1280 by 800"
+    }
+  ]
+}

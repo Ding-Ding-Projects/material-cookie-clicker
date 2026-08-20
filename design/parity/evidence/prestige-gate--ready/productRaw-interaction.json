@@ -1,0 +1,18 @@
+{
+  "version": 1,
+  "rowId": "prestige-gate--ready",
+  "side": "productRaw",
+  "route": "app://material-cookie-clicker/?designParity=prestige-gate--ready&panel=prestige&gate=ready&theme=light&width=1280&height=800&scale=1&state=ready&locale=en-HK",
+  "state": {
+    "row": "prestige-gate--ready",
+    "fixture": "prestige-ready-v1",
+    "width": 1280,
+    "height": 800,
+    "scale": 1,
+    "lang": "en-HK",
+    "theme": "light",
+    "network": "blocked",
+    "motion": "paused"
+  },
+  "cleanupCompleted": true
+}

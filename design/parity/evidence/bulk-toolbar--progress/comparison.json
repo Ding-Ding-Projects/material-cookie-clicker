@@ -1,0 +1,23 @@
+{
+  "schemaVersion": 1,
+  "rowId": "bulk-toolbar--progress",
+  "tuple": {
+    "screen": "bulk-toolbar",
+    "state": "progress",
+    "theme": "light",
+    "viewport": {
+      "width": 1280,
+      "height": 800
+    },
+    "scale": 1,
+    "locale": "en-HK"
+  },
+  "labels": [
+    "REFERENCE",
+    "BUILT PRODUCT"
+  ],
+  "inputs": {
+    "referenceSha256": "d618440bf6a2daf6c91acecd836a9f4901626a23367eb6aedb82db7e7281e84e",
+    "productSha256": "49b1999e52853ec74f8b315e710677c4f96af1193a7cf3f965a2404ae59d2197"
+  }
+}

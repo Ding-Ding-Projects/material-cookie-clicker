@@ -1,0 +1,11 @@
+{
+  "version": 1,
+  "id": "achievement-badge--gallery",
+  "route": "cheap-lowlevel-headless",
+  "sourceCommit": "330352ce7513ba420752dd7243762f0dd75f9eaa",
+  "reviewer": "automated parity capture review",
+  "rawReceiptPaths": [
+    "design/parity/evidence/achievement-badge--gallery/referenceRaw-receipt.json",
+    "design/parity/evidence/achievement-badge--gallery/productRaw-receipt.json"
+  ]
+}

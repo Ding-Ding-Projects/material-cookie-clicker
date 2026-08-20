@@ -1,0 +1,22 @@
+{
+  "version": 1,
+  "rowId": "settings-funny-sliders--default",
+  "side": "referenceRaw",
+  "route": "/design/reference-app/index.html?row=settings-funny-sliders--default&theme=light&width=1280&height=800&scale=1&state=default&locale=en-HK&capture=1",
+  "state": {
+    "file": "settings-funny-sliders.html",
+    "width": 1280,
+    "height": 800,
+    "scale": 1,
+    "lang": "en-HK",
+    "theme": "light",
+    "state": "default",
+    "rect": {
+      "x": 0,
+      "y": 0,
+      "width": 1280,
+      "height": 800
+    }
+  },
+  "cleanupCompleted": true
+}

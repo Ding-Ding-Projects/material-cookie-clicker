@@ -1,0 +1,18 @@
+{
+  "version": 1,
+  "rowId": "game-layout--main",
+  "side": "productRaw",
+  "route": "app://material-cookie-clicker/?designParity=game-layout--main&surface=game&theme=light&width=1280&height=800&scale=1&state=main&locale=en-HK",
+  "state": {
+    "row": "game-layout--main",
+    "fixture": "main-game-v1",
+    "width": 1280,
+    "height": 800,
+    "scale": 1,
+    "lang": "en-HK",
+    "theme": "light",
+    "network": "blocked",
+    "motion": "paused"
+  },
+  "cleanupCompleted": true
+}

@@ -1,0 +1,23 @@
+{
+  "schemaVersion": 1,
+  "rowId": "tokens-color--roles",
+  "tuple": {
+    "screen": "tokens-color",
+    "state": "roles",
+    "theme": "light",
+    "viewport": {
+      "width": 1280,
+      "height": 800
+    },
+    "scale": 1,
+    "locale": "en-HK"
+  },
+  "labels": [
+    "REFERENCE",
+    "BUILT PRODUCT"
+  ],
+  "inputs": {
+    "referenceSha256": "a925627ee8224c94ffc267cf81b7be971925875a43df640e29a351abe0f4b1d5",
+    "productSha256": "2a4f3739750e35e3becb308ca9f6511f21843a513b7370f6d7fd176341078735"
+  }
+}

@@ -1,0 +1,18 @@
+{
+  "version": 1,
+  "rowId": "search-regex-builder--open",
+  "side": "productRaw",
+  "route": "app://material-cookie-clicker/?designParity=search-regex-builder--open&panel=tools&regexBuilder=open&theme=light&width=1280&height=800&scale=1&state=open&locale=en-HK",
+  "state": {
+    "row": "search-regex-builder--open",
+    "fixture": "regex-builder-open-v1",
+    "width": 1280,
+    "height": 800,
+    "scale": 1,
+    "lang": "en-HK",
+    "theme": "light",
+    "network": "blocked",
+    "motion": "paused"
+  },
+  "cleanupCompleted": true
+}

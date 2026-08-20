@@ -1,0 +1,22 @@
+{
+  "version": 1,
+  "rowId": "tools-tree--mixed",
+  "side": "referenceRaw",
+  "route": "/design/reference-app/index.html?row=tools-tree--mixed&theme=light&width=1280&height=800&scale=1&state=mixed&locale=en-HK&capture=1",
+  "state": {
+    "file": "tools-tree.html",
+    "width": 1280,
+    "height": 800,
+    "scale": 1,
+    "lang": "en-HK",
+    "theme": "light",
+    "state": "mixed",
+    "rect": {
+      "x": 0,
+      "y": 0,
+      "width": 1280,
+      "height": 800
+    }
+  },
+  "cleanupCompleted": true
+}

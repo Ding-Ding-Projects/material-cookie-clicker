@@ -1,0 +1,43 @@
+{
+  "schemaVersion": 1,
+  "rowId": "tokens-color--roles",
+  "tuple": {
+    "screen": "tokens-color",
+    "state": "roles",
+    "theme": "light",
+    "viewport": {
+      "width": 1280,
+      "height": 800
+    },
+    "scale": 1,
+    "locale": "en-HK"
+  },
+  "inputs": {
+    "reference": {
+      "path": "design/parity/evidence/tokens-color--roles/reference.png",
+      "sha256": "a925627ee8224c94ffc267cf81b7be971925875a43df640e29a351abe0f4b1d5"
+    },
+    "product": {
+      "path": "design/parity/evidence/tokens-color--roles/product.png",
+      "sha256": "2a4f3739750e35e3becb308ca9f6511f21843a513b7370f6d7fd176341078735"
+    }
+  },
+  "dimensions": {
+    "width": 1280,
+    "height": 800
+  },
+  "metrics": {
+    "changedPixels": 685087,
+    "totalPixels": 1024000,
+    "changedRatio": 0.6690302734375,
+    "rgbRmse": 92.08630569356696
+  },
+  "tool": {
+    "name": "Pillow ImageChops.difference",
+    "version": "12.3.0"
+  },
+  "review": {
+    "verdict": "defect",
+    "reason": "Visible deltas remain unapproved; metrics prioritize human review and do not waive differences."
+  }
+}

@@ -1,0 +1,87 @@
+{
+  "version": 1,
+  "id": "prestige-gate--ready--product",
+  "route": "cheap-lowlevel-headless",
+  "source": {
+    "startCommit": "330352ce7513ba420752dd7243762f0dd75f9eaa",
+    "endCommit": "330352ce7513ba420752dd7243762f0dd75f9eaa",
+    "artifactPath": "dist/renderer/assets/index-BQyFOhDT.js",
+    "artifactSha256": "4663d6eaeafea4f1291311a86691fffc4e24ced846e32bcbd4405b5dd8b79198",
+    "buildReceiptPath": "design/parity/evidence/build-receipt.json",
+    "buildReceiptSha256": "34ff59d65a1ad149e636e8605f8d8c39364df8f0ddaecf4cc10fb72c566f9394",
+    "artifactBuiltAt": "2026-08-20T00:25:11.037Z"
+  },
+  "capture": {
+    "rawPath": "C:\\Users\\cntow\\AppData\\Local\\Temp\\mcc-parity-330352c-20260819-2025\\output\\product-rows\\prestige-gate--ready\\product.png",
+    "promotedPath": "design/parity/evidence/prestige-gate--ready/product.png",
+    "sha256": "8215a7f4dfd0ea183a078da692827e305ec404a0be67dc8b52512b28328bdef7",
+    "rawSha256": "8215a7f4dfd0ea183a078da692827e305ec404a0be67dc8b52512b28328bdef7",
+    "mimeType": "image/png",
+    "startedAt": "2026-08-20T00:25:11.037Z",
+    "capturedAt": "2026-08-20T00:25:11.274Z",
+    "width": 1280,
+    "height": 800
+  },
+  "state": {
+    "surface": "desktop-app",
+    "screen": "prestige-gate",
+    "state": "ready",
+    "theme": "light",
+    "viewport": {
+      "width": 1280,
+      "height": 800
+    },
+    "scale": 1,
+    "locale": "en-HK",
+    "captureKind": "page",
+    "deterministic": {
+      "fixture": "prestige-ready-v1",
+      "time": "2026-08-19T12:00:00Z",
+      "motion": "paused",
+      "randomSeed": 1907,
+      "fonts": "Segoe UI system stack",
+      "network": "blocked"
+    }
+  },
+  "privacy": {
+    "visibleDesktopUntouched": true,
+    "expectedSurfaceOnly": true,
+    "sensitiveDataReviewed": true,
+    "unrelatedTargetsObserved": false,
+    "mocked": false,
+    "handEdited": false
+  },
+  "inspection": {
+    "decoded": true,
+    "pixelsInspected": true,
+    "targetVisible": true,
+    "expectedStateVisible": true,
+    "reviewer": "automated parity capture review"
+  },
+  "runtime": {
+    "launchPid": 44684,
+    "hwnd": "789628",
+    "hwndResolvedLive": true,
+    "consoleErrorCount": 0,
+    "pageErrorCount": 0,
+    "interactionProofId": "prestige-gate--ready-productRaw",
+    "interactionReceiptPath": "design/parity/evidence/prestige-gate--ready/productRaw-interaction.json",
+    "interactionReceiptSha256": "d3593c79f468fd3ccfd8ea129043f994cbe0b218578c651e4901f75f62d4be07",
+    "privacyScanPath": "design/parity/evidence/prestige-gate--ready/productRaw-privacy.json",
+    "privacyScanSha256": "ee01fec30d242657c3bb5c4a425aa47dd2e39724a3e47eeba106e061a9c28c84",
+    "cleanupCompleted": true,
+    "cleanupOwnedOnly": true
+  },
+  "inventory": {
+    "path": "design/parity/evidence/promotion-inventory.json",
+    "recordId": "prestige-gate--ready--product",
+    "rowId": "prestige-gate--ready",
+    "evidenceKey": "productRaw"
+  },
+  "documentation": [
+    {
+      "path": "design/parity/inventory.json",
+      "alt": "prestige-gate--ready productRaw at 1280 by 800"
+    }
+  ]
+}

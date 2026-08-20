@@ -21,103 +21,328 @@
   ],
   "auditRecords": {
     "m3-foundations-v1": {
-      "status": "defect",
+      "status": "conforming",
       "primitives": {
-        "buttons": { "status": "conforming", "note": "The product theme switch now uses shared Material tonal-button anatomy and state layers." },
-        "fields": { "status": "conforming", "note": "No editable field is present in the declared foundation state." },
-        "menus": { "status": "conforming", "note": "No menu is present in the declared foundation state." },
-        "tabs": { "status": "conforming", "note": "No tab strip is present in the declared foundation state." },
-        "dialogs": { "status": "conforming", "note": "No dialog is present in the declared foundation state." },
-        "navigation": { "status": "conforming", "note": "No navigation control is present in the declared foundation state." },
-        "selectionControls": { "status": "conforming", "note": "No selection control is present in the declared foundation state." },
-        "typography": { "status": "conforming", "note": "Product chrome now uses the Material type scale without changing factual game readouts." },
-        "colorRoles": { "status": "conforming", "note": "Semantic role naming and contrast pairs remain compatible with Material roles." },
-        "shape": { "status": "conforming", "note": "Product chrome now uses the Material shape scale; cabinet artwork remains domain art." },
-        "elevation": { "status": "conforming", "note": "Product chrome now uses Material tonal surfaces and elevation levels instead of solid press bases." },
-        "stateLayers": { "status": "conforming", "note": "Product controls now use Material hover, focus, pressed, selected, and disabled state layers." },
-        "motion": { "status": "conforming", "note": "Motion is bounded and has a reduced-motion equivalent." },
-        "focus": { "status": "conforming", "note": "Interactive controls expose a visible focus indicator." },
-        "accessibility": { "status": "conforming", "note": "The product retains semantic controls, contrast, touch targets, and reduced-motion handling." }
+        "buttons": {
+          "status": "conforming",
+          "note": "The product theme switch now uses shared Material tonal-button anatomy and state layers."
+        },
+        "fields": {
+          "status": "conforming",
+          "note": "No editable field is present in the declared foundation state."
+        },
+        "menus": {
+          "status": "conforming",
+          "note": "No menu is present in the declared foundation state."
+        },
+        "tabs": {
+          "status": "conforming",
+          "note": "No tab strip is present in the declared foundation state."
+        },
+        "dialogs": {
+          "status": "conforming",
+          "note": "No dialog is present in the declared foundation state."
+        },
+        "navigation": {
+          "status": "conforming",
+          "note": "No navigation control is present in the declared foundation state."
+        },
+        "selectionControls": {
+          "status": "conforming",
+          "note": "No selection control is present in the declared foundation state."
+        },
+        "typography": {
+          "status": "conforming",
+          "note": "Product chrome now uses the Material type scale without changing factual game readouts."
+        },
+        "colorRoles": {
+          "status": "conforming",
+          "note": "Semantic role naming and contrast pairs remain compatible with Material roles."
+        },
+        "shape": {
+          "status": "conforming",
+          "note": "Product chrome now uses the Material shape scale; cabinet artwork remains domain art."
+        },
+        "elevation": {
+          "status": "conforming",
+          "note": "Product chrome now uses Material tonal surfaces and elevation levels instead of solid press bases."
+        },
+        "stateLayers": {
+          "status": "conforming",
+          "note": "Product controls now use Material hover, focus, pressed, selected, and disabled state layers."
+        },
+        "motion": {
+          "status": "conforming",
+          "note": "Motion is bounded and has a reduced-motion equivalent."
+        },
+        "focus": {
+          "status": "conforming",
+          "note": "Interactive controls expose a visible focus indicator."
+        },
+        "accessibility": {
+          "status": "conforming",
+          "note": "The product retains semantic controls, contrast, touch targets, and reduced-motion handling."
+        }
       }
     },
     "m3-game-surface-v1": {
-      "status": "defect",
+      "status": "conforming",
       "primitives": {
-        "buttons": { "status": "conforming", "note": "Purchase and action controls now use Material filled, tonal, icon-button, and large-FAB anatomy." },
-        "fields": { "status": "conforming", "note": "Visible fields use Material outlined-field anatomy with programmatic labels." },
-        "menus": { "status": "conforming", "note": "Any menu in the product uses the shared bounded Material menu surface." },
-        "tabs": { "status": "conforming", "note": "Core-loop controls remain on one surface and product tabs use Material selected indicators." },
-        "dialogs": { "status": "conforming", "note": "Confirmation and anchored surfaces now use Material dialog shape, elevation, scrim, and containment." },
-        "navigation": { "status": "conforming", "note": "Navigation uses Material tonal controls without hiding the primary click, purchase, or upgrade loop." },
-        "selectionControls": { "status": "conforming", "note": "Segmented controls, checkboxes, radios, switches, and ranges now use Material selection anatomy." },
-        "typography": { "status": "conforming", "note": "Product headings and labels use the Material type scale; gameplay data typography remains functional data." },
-        "colorRoles": { "status": "conforming", "note": "Product chrome uses named semantic roles; domain data colours remain separately identified." },
-        "shape": { "status": "conforming", "note": "Product cards use Material outline, shape, and tonal surfaces; ticket cuts remain scoped domain art." },
-        "elevation": { "status": "conforming", "note": "Product surfaces use the Material elevation scale without solid offset bases." },
-        "stateLayers": { "status": "conforming", "note": "Product controls use Material hover, focus, pressed, selected, and disabled state layers." },
-        "motion": { "status": "conforming", "note": "Motion communicates state and has a reduced-motion path." },
-        "focus": { "status": "conforming", "note": "Interactive controls retain a high-contrast visible focus indicator." },
-        "accessibility": { "status": "conforming", "note": "Control names, states, contrast, touch targets, and reduced motion remain explicit." }
+        "buttons": {
+          "status": "conforming",
+          "note": "Purchase and action controls now use Material filled, tonal, icon-button, and large-FAB anatomy."
+        },
+        "fields": {
+          "status": "conforming",
+          "note": "Visible fields use Material outlined-field anatomy with programmatic labels."
+        },
+        "menus": {
+          "status": "conforming",
+          "note": "Any menu in the product uses the shared bounded Material menu surface."
+        },
+        "tabs": {
+          "status": "conforming",
+          "note": "Core-loop controls remain on one surface and product tabs use Material selected indicators."
+        },
+        "dialogs": {
+          "status": "conforming",
+          "note": "Confirmation and anchored surfaces now use Material dialog shape, elevation, scrim, and containment."
+        },
+        "navigation": {
+          "status": "conforming",
+          "note": "Navigation uses Material tonal controls without hiding the primary click, purchase, or upgrade loop."
+        },
+        "selectionControls": {
+          "status": "conforming",
+          "note": "Segmented controls, checkboxes, radios, switches, and ranges now use Material selection anatomy."
+        },
+        "typography": {
+          "status": "conforming",
+          "note": "Product headings and labels use the Material type scale; gameplay data typography remains functional data."
+        },
+        "colorRoles": {
+          "status": "conforming",
+          "note": "Product chrome uses named semantic roles; domain data colours remain separately identified."
+        },
+        "shape": {
+          "status": "conforming",
+          "note": "Product cards use Material outline, shape, and tonal surfaces; ticket cuts remain scoped domain art."
+        },
+        "elevation": {
+          "status": "conforming",
+          "note": "Product surfaces use the Material elevation scale without solid offset bases."
+        },
+        "stateLayers": {
+          "status": "conforming",
+          "note": "Product controls use Material hover, focus, pressed, selected, and disabled state layers."
+        },
+        "motion": {
+          "status": "conforming",
+          "note": "Motion communicates state and has a reduced-motion path."
+        },
+        "focus": {
+          "status": "conforming",
+          "note": "Interactive controls retain a high-contrast visible focus indicator."
+        },
+        "accessibility": {
+          "status": "conforming",
+          "note": "Control names, states, contrast, touch targets, and reduced motion remain explicit."
+        }
       }
     },
     "m3-list-controls-v1": {
-      "status": "defect",
+      "status": "conforming",
       "primitives": {
-        "buttons": { "status": "conforming", "note": "Toolbar actions use Material filled and tonal button anatomy." },
-        "fields": { "status": "conforming", "note": "Search and editable fields use Material outlined-field anatomy and focus treatment." },
-        "menus": { "status": "conforming", "note": "Menu and listbox surfaces use bounded Material menu anatomy." },
-        "tabs": { "status": "conforming", "note": "Any product tabs use Material selected indicators and tonal containers." },
-        "dialogs": { "status": "conforming", "note": "The regex builder popover uses a bounded Material elevated surface." },
-        "navigation": { "status": "conforming", "note": "No navigation control is present in the declared state." },
-        "selectionControls": { "status": "conforming", "note": "Regex mode controls use Material segmented and selection-control anatomy." },
-        "typography": { "status": "conforming", "note": "List and field chrome uses Material label and body typography." },
-        "colorRoles": { "status": "conforming", "note": "Semantic role naming and contrast remain compatible with Material roles." },
-        "shape": { "status": "conforming", "note": "List chrome uses the Material shape scale and one-pixel outline roles." },
-        "elevation": { "status": "conforming", "note": "List surfaces use Material elevation levels instead of solid bases." },
-        "stateLayers": { "status": "conforming", "note": "List controls use Material hover, focus, pressed, and selected state layers." },
-        "motion": { "status": "conforming", "note": "Progress and disclosure motion is bounded and reduced-motion aware." },
-        "focus": { "status": "conforming", "note": "Fields and actions retain visible focus." },
-        "accessibility": { "status": "conforming", "note": "Labels, result counts, keyboard paths, and live progress remain explicit." }
+        "buttons": {
+          "status": "conforming",
+          "note": "Toolbar actions use Material filled and tonal button anatomy."
+        },
+        "fields": {
+          "status": "conforming",
+          "note": "Search and editable fields use Material outlined-field anatomy and focus treatment."
+        },
+        "menus": {
+          "status": "conforming",
+          "note": "Menu and listbox surfaces use bounded Material menu anatomy."
+        },
+        "tabs": {
+          "status": "conforming",
+          "note": "Any product tabs use Material selected indicators and tonal containers."
+        },
+        "dialogs": {
+          "status": "conforming",
+          "note": "The regex builder popover uses a bounded Material elevated surface."
+        },
+        "navigation": {
+          "status": "conforming",
+          "note": "No navigation control is present in the declared state."
+        },
+        "selectionControls": {
+          "status": "conforming",
+          "note": "Regex mode controls use Material segmented and selection-control anatomy."
+        },
+        "typography": {
+          "status": "conforming",
+          "note": "List and field chrome uses Material label and body typography."
+        },
+        "colorRoles": {
+          "status": "conforming",
+          "note": "Semantic role naming and contrast remain compatible with Material roles."
+        },
+        "shape": {
+          "status": "conforming",
+          "note": "List chrome uses the Material shape scale and one-pixel outline roles."
+        },
+        "elevation": {
+          "status": "conforming",
+          "note": "List surfaces use Material elevation levels instead of solid bases."
+        },
+        "stateLayers": {
+          "status": "conforming",
+          "note": "List controls use Material hover, focus, pressed, and selected state layers."
+        },
+        "motion": {
+          "status": "conforming",
+          "note": "Progress and disclosure motion is bounded and reduced-motion aware."
+        },
+        "focus": {
+          "status": "conforming",
+          "note": "Fields and actions retain visible focus."
+        },
+        "accessibility": {
+          "status": "conforming",
+          "note": "Labels, result counts, keyboard paths, and live progress remain explicit."
+        }
       }
     },
     "m3-settings-v1": {
-      "status": "defect",
+      "status": "conforming",
       "primitives": {
-        "buttons": { "status": "conforming", "note": "Settings actions use Material filled and tonal button anatomy." },
-        "fields": { "status": "conforming", "note": "Settings fields use the shared Material outlined-field anatomy." },
-        "menus": { "status": "conforming", "note": "Settings menus use the shared bounded Material menu surface." },
-        "tabs": { "status": "conforming", "note": "Settings tabs use Material selected indicators and tonal containers." },
-        "dialogs": { "status": "conforming", "note": "Settings dialogs use the shared Material dialog surface." },
-        "navigation": { "status": "conforming", "note": "Settings navigation uses Material tonal controls." },
-        "selectionControls": { "status": "conforming", "note": "Language segments, switches, checkboxes, radios, and sliders use Material selection anatomy." },
-        "typography": { "status": "conforming", "note": "Settings headings, labels, and body copy use the Material type scale." },
-        "colorRoles": { "status": "conforming", "note": "Semantic role naming and contrast remain compatible with Material roles." },
-        "shape": { "status": "conforming", "note": "Settings cards and control groups use the Material shape scale." },
-        "elevation": { "status": "conforming", "note": "Settings surfaces use Material tonal elevation without solid bases." },
-        "stateLayers": { "status": "conforming", "note": "Settings controls use Material hover, focus, pressed, selected, and disabled state layers." },
-        "motion": { "status": "conforming", "note": "Motion is bounded and reduced-motion aware." },
-        "focus": { "status": "conforming", "note": "Settings controls expose visible focus." },
-        "accessibility": { "status": "conforming", "note": "Labels, values, keyboard operation, and touch targets remain explicit." }
+        "buttons": {
+          "status": "conforming",
+          "note": "Settings actions use Material filled and tonal button anatomy."
+        },
+        "fields": {
+          "status": "conforming",
+          "note": "Settings fields use the shared Material outlined-field anatomy."
+        },
+        "menus": {
+          "status": "conforming",
+          "note": "Settings menus use the shared bounded Material menu surface."
+        },
+        "tabs": {
+          "status": "conforming",
+          "note": "Settings tabs use Material selected indicators and tonal containers."
+        },
+        "dialogs": {
+          "status": "conforming",
+          "note": "Settings dialogs use the shared Material dialog surface."
+        },
+        "navigation": {
+          "status": "conforming",
+          "note": "Settings navigation uses Material tonal controls."
+        },
+        "selectionControls": {
+          "status": "conforming",
+          "note": "Language segments, switches, checkboxes, radios, and sliders use Material selection anatomy."
+        },
+        "typography": {
+          "status": "conforming",
+          "note": "Settings headings, labels, and body copy use the Material type scale."
+        },
+        "colorRoles": {
+          "status": "conforming",
+          "note": "Semantic role naming and contrast remain compatible with Material roles."
+        },
+        "shape": {
+          "status": "conforming",
+          "note": "Settings cards and control groups use the Material shape scale."
+        },
+        "elevation": {
+          "status": "conforming",
+          "note": "Settings surfaces use Material tonal elevation without solid bases."
+        },
+        "stateLayers": {
+          "status": "conforming",
+          "note": "Settings controls use Material hover, focus, pressed, selected, and disabled state layers."
+        },
+        "motion": {
+          "status": "conforming",
+          "note": "Motion is bounded and reduced-motion aware."
+        },
+        "focus": {
+          "status": "conforming",
+          "note": "Settings controls expose visible focus."
+        },
+        "accessibility": {
+          "status": "conforming",
+          "note": "Labels, values, keyboard operation, and touch targets remain explicit."
+        }
       }
     },
     "m3-feedback-v1": {
-      "status": "defect",
+      "status": "conforming",
       "primitives": {
-        "buttons": { "status": "conforming", "note": "Dismiss actions use Material icon-button anatomy with a 48px target." },
-        "fields": { "status": "conforming", "note": "No field is present in the declared state." },
-        "menus": { "status": "conforming", "note": "No menu is present in the declared state." },
-        "tabs": { "status": "conforming", "note": "No tab strip is present in the declared state." },
-        "dialogs": { "status": "conforming", "note": "The feedback surface is non-modal and does not claim dialog semantics." },
-        "navigation": { "status": "conforming", "note": "No navigation control is present in the declared state." },
-        "selectionControls": { "status": "conforming", "note": "No selection control is present in the declared state." },
-        "typography": { "status": "conforming", "note": "Feedback surfaces use Material snackbar title, label, and body typography." },
-        "colorRoles": { "status": "conforming", "note": "Semantic success, warning, and error roles remain explicit and contrast-safe." },
-        "shape": { "status": "conforming", "note": "Feedback surfaces use Material snackbar shape and tonal surface anatomy." },
-        "elevation": { "status": "conforming", "note": "Feedback surfaces use Material elevation level 3 without solid bases." },
-        "stateLayers": { "status": "conforming", "note": "Dismiss controls use Material hover, focus, pressed, and disabled state layers." },
-        "motion": { "status": "conforming", "note": "Arrival and dismissal motion is bounded and reduced-motion aware." },
-        "focus": { "status": "conforming", "note": "Dismiss actions expose visible focus." },
-        "accessibility": { "status": "conforming", "note": "The surface remains non-blocking, named, dismissible, and screen-reader announced." }
+        "buttons": {
+          "status": "conforming",
+          "note": "Dismiss actions use Material icon-button anatomy with a 48px target."
+        },
+        "fields": {
+          "status": "conforming",
+          "note": "No field is present in the declared state."
+        },
+        "menus": {
+          "status": "conforming",
+          "note": "No menu is present in the declared state."
+        },
+        "tabs": {
+          "status": "conforming",
+          "note": "No tab strip is present in the declared state."
+        },
+        "dialogs": {
+          "status": "conforming",
+          "note": "The feedback surface is non-modal and does not claim dialog semantics."
+        },
+        "navigation": {
+          "status": "conforming",
+          "note": "No navigation control is present in the declared state."
+        },
+        "selectionControls": {
+          "status": "conforming",
+          "note": "No selection control is present in the declared state."
+        },
+        "typography": {
+          "status": "conforming",
+          "note": "Feedback surfaces use Material snackbar title, label, and body typography."
+        },
+        "colorRoles": {
+          "status": "conforming",
+          "note": "Semantic success, warning, and error roles remain explicit and contrast-safe."
+        },
+        "shape": {
+          "status": "conforming",
+          "note": "Feedback surfaces use Material snackbar shape and tonal surface anatomy."
+        },
+        "elevation": {
+          "status": "conforming",
+          "note": "Feedback surfaces use Material elevation level 3 without solid bases."
+        },
+        "stateLayers": {
+          "status": "conforming",
+          "note": "Dismiss controls use Material hover, focus, pressed, and disabled state layers."
+        },
+        "motion": {
+          "status": "conforming",
+          "note": "Arrival and dismissal motion is bounded and reduced-motion aware."
+        },
+        "focus": {
+          "status": "conforming",
+          "note": "Dismiss actions expose visible focus."
+        },
+        "accessibility": {
+          "status": "conforming",
+          "note": "The surface remains non-blocking, named, dismissible, and screen-reader announced."
+        }
       }
     }
   },
@@ -125,210 +350,1212 @@
     {
       "id": "achievement-badge--gallery",
       "screen": "achievement-badge",
-      "declaredStates": ["gallery", "locked", "unlocked", "unlock-toast"],
-      "reference": { "file": "achievement-badge.html", "sha256": "740ab2387f53a6d6ce39fbef0e6bf6f56d27dde497bf29d3f4ac54e8ceae4f6f", "route": "/design/reference-app/index.html?row=achievement-badge--gallery&theme=light&width=1280&height=800&scale=1&state=gallery&locale=en-HK&capture=1" },
-      "product": { "route": "app://material-cookie-clicker/?designParity=achievement-badge--gallery&panel=achievements&theme=light&width=1280&height=800&scale=1&state=gallery&locale=en-HK" },
-      "tuple": { "screen": "achievement-badge", "state": "gallery", "theme": "light", "viewport": { "width": 1280, "height": 800 }, "scale": 1, "locale": "en-HK" },
-      "deterministic": { "fixture": "achievement-gallery-v1", "time": "2026-08-19T12:00:00Z", "motion": "paused", "randomSeed": 1901, "fonts": "Segoe UI system stack", "network": "blocked" },
+      "declaredStates": [
+        "gallery",
+        "locked",
+        "unlocked",
+        "unlock-toast"
+      ],
+      "reference": {
+        "file": "achievement-badge.html",
+        "sha256": "740ab2387f53a6d6ce39fbef0e6bf6f56d27dde497bf29d3f4ac54e8ceae4f6f",
+        "route": "/design/reference-app/index.html?row=achievement-badge--gallery&theme=light&width=1280&height=800&scale=1&state=gallery&locale=en-HK&capture=1"
+      },
+      "product": {
+        "route": "app://material-cookie-clicker/?designParity=achievement-badge--gallery&panel=achievements&theme=light&width=1280&height=800&scale=1&state=gallery&locale=en-HK"
+      },
+      "tuple": {
+        "screen": "achievement-badge",
+        "state": "gallery",
+        "theme": "light",
+        "viewport": {
+          "width": 1280,
+          "height": 800
+        },
+        "scale": 1,
+        "locale": "en-HK"
+      },
+      "deterministic": {
+        "fixture": "achievement-gallery-v1",
+        "time": "2026-08-19T12:00:00Z",
+        "motion": "paused",
+        "randomSeed": 1901,
+        "fonts": "Segoe UI system stack",
+        "network": "blocked"
+      },
       "materialDesign3AuditId": "m3-game-surface-v1",
-      "materialDesign3Notes": "Medal artwork remains domain data art; the surrounding card, toast, and controls use the shared Material product-chrome layer. Capture evidence remains pending.",
-      "evidence": { "referenceRaw": { "path": "design/parity/evidence/achievement-badge--gallery/reference.png", "status": "pending", "reason": "No cheap-headless reference capture has been made." }, "productRaw": { "path": "design/parity/evidence/achievement-badge--gallery/product.png", "status": "pending", "reason": "No matching built-app capture has been made." }, "comparison": { "path": "design/parity/evidence/achievement-badge--gallery/comparison.png", "status": "pending", "reason": "Both raw captures are required first." }, "diff": { "path": "design/parity/evidence/achievement-badge--gallery/diff.json", "status": "pending", "reason": "Both raw captures are required first." } },
-      "intentionalDeviations": []
+      "materialDesign3Notes": "Medal artwork remains domain data art; the surrounding card, toast, and controls use the shared Material product-chrome layer. Capture evidence is recorded; unapproved visual deltas remain defects.",
+      "evidence": {
+        "referenceRaw": {
+          "path": "design/parity/evidence/achievement-badge--gallery/reference.png",
+          "status": "verified",
+          "sha256": "78877661ea44de52dbda4c77400c307cb8b8b41fe43fc0ec0a5c7ec3caa791b1",
+          "receiptPath": "design/parity/evidence/achievement-badge--gallery/referenceRaw-receipt.json",
+          "receiptSha256": "ce8e72929af08c5c5f6ceb0ac860f9c939a4a378998cfb5d7248b48564edb3e1"
+        },
+        "productRaw": {
+          "path": "design/parity/evidence/achievement-badge--gallery/product.png",
+          "status": "verified",
+          "sha256": "5457f5f65e3281ac3568e854ded3f028fdafeb768a5bc889bbb35ea478a481d8",
+          "receiptPath": "design/parity/evidence/achievement-badge--gallery/productRaw-receipt.json",
+          "receiptSha256": "e3f6d2d577df83e1bbe7c4525ac5f53e1a4d3bb19efca4bd3caba541d0415d34"
+        },
+        "comparison": {
+          "path": "design/parity/evidence/achievement-badge--gallery/comparison.png",
+          "status": "verified",
+          "sha256": "3bb7dce387a374dbb3bf69311c9c73fde6e49ac6ab358493e7be52e05761fabb",
+          "manifestPath": "design/parity/evidence/achievement-badge--gallery/comparison.json",
+          "manifestSha256": "3718e5a190d39350aee33b40b4b7e00c9d75618383cdf05566604440165f597d"
+        },
+        "diff": {
+          "path": "design/parity/evidence/achievement-badge--gallery/diff.json",
+          "status": "verified",
+          "sha256": "8482c0d6dd59550fd3d5f15f89362f3d750df2d5b2757b6e9dd0d1db81502a39"
+        }
+      },
+      "intentionalDeviations": [],
+      "sourceCommit": "330352ce7513ba420752dd7243762f0dd75f9eaa",
+      "captureProvenance": {
+        "route": "cheap-lowlevel-headless",
+        "sourceCommit": "330352ce7513ba420752dd7243762f0dd75f9eaa",
+        "buildReceiptPath": "design/parity/evidence/build-receipt.json",
+        "buildReceiptSha256": "34ff59d65a1ad149e636e8605f8d8c39364df8f0ddaecf4cc10fb72c566f9394"
+      }
     },
     {
       "id": "building-row--gallery",
       "screen": "building-row",
-      "declaredStates": ["gallery", "affordable", "unaffordable", "locked"],
-      "reference": { "file": "building-row.html", "sha256": "c69adceb766d7c8cefe4f649f5680e935f3fbedf0bd1cfe353ecb2e419bc596b", "route": "/design/reference-app/index.html?row=building-row--gallery&theme=light&width=1280&height=800&scale=1&state=gallery&locale=en-HK&capture=1" },
-      "product": { "route": "app://material-cookie-clicker/?designParity=building-row--gallery&surface=game&focus=shop&theme=light&width=1280&height=800&scale=1&state=gallery&locale=en-HK" },
-      "tuple": { "screen": "building-row", "state": "gallery", "theme": "light", "viewport": { "width": 1280, "height": 800 }, "scale": 1, "locale": "en-HK" },
-      "deterministic": { "fixture": "building-gallery-v1", "time": "2026-08-19T12:00:00Z", "motion": "paused", "randomSeed": 1902, "fonts": "Segoe UI system stack", "network": "blocked" },
+      "declaredStates": [
+        "gallery",
+        "affordable",
+        "unaffordable",
+        "locked"
+      ],
+      "reference": {
+        "file": "building-row.html",
+        "sha256": "c69adceb766d7c8cefe4f649f5680e935f3fbedf0bd1cfe353ecb2e419bc596b",
+        "route": "/design/reference-app/index.html?row=building-row--gallery&theme=light&width=1280&height=800&scale=1&state=gallery&locale=en-HK&capture=1"
+      },
+      "product": {
+        "route": "app://material-cookie-clicker/?designParity=building-row--gallery&surface=game&focus=shop&theme=light&width=1280&height=800&scale=1&state=gallery&locale=en-HK"
+      },
+      "tuple": {
+        "screen": "building-row",
+        "state": "gallery",
+        "theme": "light",
+        "viewport": {
+          "width": 1280,
+          "height": 800
+        },
+        "scale": 1,
+        "locale": "en-HK"
+      },
+      "deterministic": {
+        "fixture": "building-gallery-v1",
+        "time": "2026-08-19T12:00:00Z",
+        "motion": "paused",
+        "randomSeed": 1902,
+        "fonts": "Segoe UI system stack",
+        "network": "blocked"
+      },
       "materialDesign3AuditId": "m3-game-surface-v1",
-      "materialDesign3Notes": "Generator icons and production figures remain domain data; row chrome, steppers, and purchase controls use the shared Material product-chrome layer. Capture evidence remains pending.",
-      "evidence": { "referenceRaw": { "path": "design/parity/evidence/building-row--gallery/reference.png", "status": "pending", "reason": "No cheap-headless reference capture has been made." }, "productRaw": { "path": "design/parity/evidence/building-row--gallery/product.png", "status": "pending", "reason": "No matching built-app capture has been made." }, "comparison": { "path": "design/parity/evidence/building-row--gallery/comparison.png", "status": "pending", "reason": "Both raw captures are required first." }, "diff": { "path": "design/parity/evidence/building-row--gallery/diff.json", "status": "pending", "reason": "Both raw captures are required first." } },
-      "intentionalDeviations": []
+      "materialDesign3Notes": "Generator icons and production figures remain domain data; row chrome, steppers, and purchase controls use the shared Material product-chrome layer. Capture evidence is recorded; unapproved visual deltas remain defects.",
+      "evidence": {
+        "referenceRaw": {
+          "path": "design/parity/evidence/building-row--gallery/reference.png",
+          "status": "verified",
+          "sha256": "c581ccf8d00d99ea9db7e7451bde57f344f09844cd085f2091dc88845a218a4c",
+          "receiptPath": "design/parity/evidence/building-row--gallery/referenceRaw-receipt.json",
+          "receiptSha256": "c5a27d132f953ec1f457a21c369f45296dc67310016e6ba065cfdedfdca90c72"
+        },
+        "productRaw": {
+          "path": "design/parity/evidence/building-row--gallery/product.png",
+          "status": "verified",
+          "sha256": "4e899edd36c6e5f24470d859d2742561548748183d706142e8f7f66adc65b816",
+          "receiptPath": "design/parity/evidence/building-row--gallery/productRaw-receipt.json",
+          "receiptSha256": "dc31b4d03bec8a9f68ebc72c5ff1cd1e5e8e192a9556517f2f8329846715bd0f"
+        },
+        "comparison": {
+          "path": "design/parity/evidence/building-row--gallery/comparison.png",
+          "status": "verified",
+          "sha256": "7e193f960f5f716a654b3c6361ab94aa031ddcce016e1f0fe923c473e707a31a",
+          "manifestPath": "design/parity/evidence/building-row--gallery/comparison.json",
+          "manifestSha256": "e7330517f8ae4222dd6a9d9fe761626fdc8bf1ce1a9e315cef3effdb2c2e6606"
+        },
+        "diff": {
+          "path": "design/parity/evidence/building-row--gallery/diff.json",
+          "status": "verified",
+          "sha256": "087393e6c15228035bb1f7c9899426dada8841ac7e622fc0b1598e44aa6042e3"
+        }
+      },
+      "intentionalDeviations": [],
+      "sourceCommit": "330352ce7513ba420752dd7243762f0dd75f9eaa",
+      "captureProvenance": {
+        "route": "cheap-lowlevel-headless",
+        "sourceCommit": "330352ce7513ba420752dd7243762f0dd75f9eaa",
+        "buildReceiptPath": "design/parity/evidence/build-receipt.json",
+        "buildReceiptSha256": "34ff59d65a1ad149e636e8605f8d8c39364df8f0ddaecf4cc10fb72c566f9394"
+      }
     },
     {
       "id": "bulk-toolbar--progress",
       "screen": "bulk-toolbar",
-      "declaredStates": ["progress", "selected", "in-flight", "partial-result"],
-      "reference": { "file": "bulk-toolbar.html", "sha256": "945a4dfaf007310375cfcc852fdeaa0101bf8ffea3b5ad111ae87e52bf973ef0", "route": "/design/reference-app/index.html?row=bulk-toolbar--progress&theme=light&width=1280&height=800&scale=1&state=progress&locale=en-HK&capture=1" },
-      "product": { "route": "app://material-cookie-clicker/?designParity=bulk-toolbar--progress&panel=catalogue&theme=light&width=1280&height=800&scale=1&state=progress&locale=en-HK" },
-      "tuple": { "screen": "bulk-toolbar", "state": "progress", "theme": "light", "viewport": { "width": 1280, "height": 800 }, "scale": 1, "locale": "en-HK" },
-      "deterministic": { "fixture": "bulk-progress-v1", "time": "2026-08-19T12:00:00Z", "motion": "paused", "randomSeed": 1903, "fonts": "Segoe UI system stack", "network": "blocked" },
+      "declaredStates": [
+        "progress",
+        "selected",
+        "in-flight",
+        "partial-result"
+      ],
+      "reference": {
+        "file": "bulk-toolbar.html",
+        "sha256": "945a4dfaf007310375cfcc852fdeaa0101bf8ffea3b5ad111ae87e52bf973ef0",
+        "route": "/design/reference-app/index.html?row=bulk-toolbar--progress&theme=light&width=1280&height=800&scale=1&state=progress&locale=en-HK&capture=1"
+      },
+      "product": {
+        "route": "app://material-cookie-clicker/?designParity=bulk-toolbar--progress&panel=catalogue&theme=light&width=1280&height=800&scale=1&state=progress&locale=en-HK"
+      },
+      "tuple": {
+        "screen": "bulk-toolbar",
+        "state": "progress",
+        "theme": "light",
+        "viewport": {
+          "width": 1280,
+          "height": 800
+        },
+        "scale": 1,
+        "locale": "en-HK"
+      },
+      "deterministic": {
+        "fixture": "bulk-progress-v1",
+        "time": "2026-08-19T12:00:00Z",
+        "motion": "paused",
+        "randomSeed": 1903,
+        "fonts": "Segoe UI system stack",
+        "network": "blocked"
+      },
       "materialDesign3AuditId": "m3-list-controls-v1",
-      "materialDesign3Notes": "Selection counts remain data; toolbar actions and progress containers use the shared Material product-chrome layer. Capture evidence remains pending.",
-      "evidence": { "referenceRaw": { "path": "design/parity/evidence/bulk-toolbar--progress/reference.png", "status": "pending", "reason": "No cheap-headless reference capture has been made." }, "productRaw": { "path": "design/parity/evidence/bulk-toolbar--progress/product.png", "status": "pending", "reason": "No matching built-app capture has been made." }, "comparison": { "path": "design/parity/evidence/bulk-toolbar--progress/comparison.png", "status": "pending", "reason": "Both raw captures are required first." }, "diff": { "path": "design/parity/evidence/bulk-toolbar--progress/diff.json", "status": "pending", "reason": "Both raw captures are required first." } },
-      "intentionalDeviations": []
+      "materialDesign3Notes": "Selection counts remain data; toolbar actions and progress containers use the shared Material product-chrome layer. Capture evidence is recorded; unapproved visual deltas remain defects.",
+      "evidence": {
+        "referenceRaw": {
+          "path": "design/parity/evidence/bulk-toolbar--progress/reference.png",
+          "status": "verified",
+          "sha256": "d618440bf6a2daf6c91acecd836a9f4901626a23367eb6aedb82db7e7281e84e",
+          "receiptPath": "design/parity/evidence/bulk-toolbar--progress/referenceRaw-receipt.json",
+          "receiptSha256": "751394e9e282a57803e40ea55c63ebbe0f7cbf457228098d5a4bbf6105be6a22"
+        },
+        "productRaw": {
+          "path": "design/parity/evidence/bulk-toolbar--progress/product.png",
+          "status": "verified",
+          "sha256": "49b1999e52853ec74f8b315e710677c4f96af1193a7cf3f965a2404ae59d2197",
+          "receiptPath": "design/parity/evidence/bulk-toolbar--progress/productRaw-receipt.json",
+          "receiptSha256": "7d8626a9a3f8e733c33e4ddf6d8998a0d1c437af4253f51f11d2f09c2628fe8c"
+        },
+        "comparison": {
+          "path": "design/parity/evidence/bulk-toolbar--progress/comparison.png",
+          "status": "verified",
+          "sha256": "1e1698aa9ebc800c5a197df5ddf88315a46e72e2d26f19d477ee146cc99e9d15",
+          "manifestPath": "design/parity/evidence/bulk-toolbar--progress/comparison.json",
+          "manifestSha256": "5037dc1ea705f19fccf22e88e21da0a7f5a0efc6b732ddec312c4013c1cf3c36"
+        },
+        "diff": {
+          "path": "design/parity/evidence/bulk-toolbar--progress/diff.json",
+          "status": "verified",
+          "sha256": "27e243b1fee876090f993101d484cbd83cc06024b3254e3bc69f5001ca857706"
+        }
+      },
+      "intentionalDeviations": [],
+      "sourceCommit": "330352ce7513ba420752dd7243762f0dd75f9eaa",
+      "captureProvenance": {
+        "route": "cheap-lowlevel-headless",
+        "sourceCommit": "330352ce7513ba420752dd7243762f0dd75f9eaa",
+        "buildReceiptPath": "design/parity/evidence/build-receipt.json",
+        "buildReceiptSha256": "34ff59d65a1ad149e636e8605f8d8c39364df8f0ddaecf4cc10fb72c566f9394"
+      }
     },
     {
       "id": "cookie-surface--gallery",
       "screen": "cookie-surface",
-      "declaredStates": ["gallery", "rest", "hover", "pressed", "focus-visible", "reduced-motion", "disabled", "value-popup", "golden-cookie"],
-      "reference": { "file": "cookie-surface.html", "sha256": "496a9bf6f3a4b3a2c1fac1f192aa9947b0d9c464c8e4c27a3c247d25b477b775", "route": "/design/reference-app/index.html?row=cookie-surface--gallery&theme=light&width=1280&height=800&scale=1&state=gallery&locale=en-HK&capture=1" },
-      "product": { "route": "app://material-cookie-clicker/?designParity=cookie-surface--gallery&surface=game&focus=cookie&theme=light&width=1280&height=800&scale=1&state=gallery&locale=en-HK" },
-      "tuple": { "screen": "cookie-surface", "state": "gallery", "theme": "light", "viewport": { "width": 1280, "height": 800 }, "scale": 1, "locale": "en-HK" },
-      "deterministic": { "fixture": "cookie-gallery-v1", "time": "2026-08-19T12:00:00Z", "motion": "paused", "randomSeed": 1904, "fonts": "Segoe UI system stack", "network": "blocked" },
+      "declaredStates": [
+        "gallery",
+        "rest",
+        "hover",
+        "pressed",
+        "focus-visible",
+        "reduced-motion",
+        "disabled",
+        "value-popup",
+        "golden-cookie"
+      ],
+      "reference": {
+        "file": "cookie-surface.html",
+        "sha256": "496a9bf6f3a4b3a2c1fac1f192aa9947b0d9c464c8e4c27a3c247d25b477b775",
+        "route": "/design/reference-app/index.html?row=cookie-surface--gallery&theme=light&width=1280&height=800&scale=1&state=gallery&locale=en-HK&capture=1"
+      },
+      "product": {
+        "route": "app://material-cookie-clicker/?designParity=cookie-surface--gallery&surface=game&focus=cookie&theme=light&width=1280&height=800&scale=1&state=gallery&locale=en-HK"
+      },
+      "tuple": {
+        "screen": "cookie-surface",
+        "state": "gallery",
+        "theme": "light",
+        "viewport": {
+          "width": 1280,
+          "height": 800
+        },
+        "scale": 1,
+        "locale": "en-HK"
+      },
+      "deterministic": {
+        "fixture": "cookie-gallery-v1",
+        "time": "2026-08-19T12:00:00Z",
+        "motion": "paused",
+        "randomSeed": 1904,
+        "fonts": "Segoe UI system stack",
+        "network": "blocked"
+      },
       "materialDesign3AuditId": "m3-game-surface-v1",
-      "materialDesign3Notes": "The illustrated cookie remains domain data art inside a Material large-FAB-style target with Material elevation and state layers. Capture evidence remains pending.",
-      "evidence": { "referenceRaw": { "path": "design/parity/evidence/cookie-surface--gallery/reference.png", "status": "pending", "reason": "No cheap-headless reference capture has been made." }, "productRaw": { "path": "design/parity/evidence/cookie-surface--gallery/product.png", "status": "pending", "reason": "No matching built-app capture has been made." }, "comparison": { "path": "design/parity/evidence/cookie-surface--gallery/comparison.png", "status": "pending", "reason": "Both raw captures are required first." }, "diff": { "path": "design/parity/evidence/cookie-surface--gallery/diff.json", "status": "pending", "reason": "Both raw captures are required first." } },
-      "intentionalDeviations": []
+      "materialDesign3Notes": "The illustrated cookie remains domain data art inside a Material large-FAB-style target with Material elevation and state layers. Capture evidence is recorded; unapproved visual deltas remain defects.",
+      "evidence": {
+        "referenceRaw": {
+          "path": "design/parity/evidence/cookie-surface--gallery/reference.png",
+          "status": "verified",
+          "sha256": "689111ece09896f3e917ecdbda7e7f120bc64ae16adaaea74e58c4fdf111377a",
+          "receiptPath": "design/parity/evidence/cookie-surface--gallery/referenceRaw-receipt.json",
+          "receiptSha256": "fb39c83382effac7a64f0a98c391a7e83cb0d9e6d845f5bad3ab8ea114c28670"
+        },
+        "productRaw": {
+          "path": "design/parity/evidence/cookie-surface--gallery/product.png",
+          "status": "verified",
+          "sha256": "417825f373ebc52160a8a55cceb102be563ea60dac473f1f94234322510a09f4",
+          "receiptPath": "design/parity/evidence/cookie-surface--gallery/productRaw-receipt.json",
+          "receiptSha256": "37937f4f39d8d09268c8e7131fe80f1413d0e8c58eae9037b18ac2697554f30e"
+        },
+        "comparison": {
+          "path": "design/parity/evidence/cookie-surface--gallery/comparison.png",
+          "status": "verified",
+          "sha256": "e38c2e129c4d2218d93793794a8d65e99c3338cdfc6ec95dc08fdc222319ea5b",
+          "manifestPath": "design/parity/evidence/cookie-surface--gallery/comparison.json",
+          "manifestSha256": "a0a4c8c27e4c4b2df219ed9fb71b5263ab435d85994e91d5d0c5c00c072639f5"
+        },
+        "diff": {
+          "path": "design/parity/evidence/cookie-surface--gallery/diff.json",
+          "status": "verified",
+          "sha256": "728d987efde7a744b2a344492ba41b7e8df09f7d9173db9367ce0b988a22b756"
+        }
+      },
+      "intentionalDeviations": [],
+      "sourceCommit": "330352ce7513ba420752dd7243762f0dd75f9eaa",
+      "captureProvenance": {
+        "route": "cheap-lowlevel-headless",
+        "sourceCommit": "330352ce7513ba420752dd7243762f0dd75f9eaa",
+        "buildReceiptPath": "design/parity/evidence/build-receipt.json",
+        "buildReceiptSha256": "34ff59d65a1ad149e636e8605f8d8c39364df8f0ddaecf4cc10fb72c566f9394"
+      }
     },
     {
       "id": "game-layout--main",
       "screen": "game-layout",
-      "declaredStates": ["main", "wide-shop-rail", "narrow-shop-drawer"],
-      "reference": { "file": "game-layout.html", "sha256": "dd003628658478f211757f6699f98acb797693a6dbe82df7f6978cd14a5db5d5", "route": "/design/reference-app/index.html?row=game-layout--main&theme=light&width=1280&height=800&scale=1&state=main&locale=en-HK&capture=1" },
-      "product": { "route": "app://material-cookie-clicker/?designParity=game-layout--main&surface=game&theme=light&width=1280&height=800&scale=1&state=main&locale=en-HK" },
-      "tuple": { "screen": "game-layout", "state": "main", "theme": "light", "viewport": { "width": 1280, "height": 800 }, "scale": 1, "locale": "en-HK" },
-      "deterministic": { "fixture": "main-game-v1", "time": "2026-08-19T12:00:00Z", "motion": "paused", "randomSeed": 1905, "fonts": "Segoe UI system stack", "network": "blocked" },
+      "declaredStates": [
+        "main",
+        "wide-shop-rail",
+        "narrow-shop-drawer"
+      ],
+      "reference": {
+        "file": "game-layout.html",
+        "sha256": "dd003628658478f211757f6699f98acb797693a6dbe82df7f6978cd14a5db5d5",
+        "route": "/design/reference-app/index.html?row=game-layout--main&theme=light&width=1280&height=800&scale=1&state=main&locale=en-HK&capture=1"
+      },
+      "product": {
+        "route": "app://material-cookie-clicker/?designParity=game-layout--main&surface=game&theme=light&width=1280&height=800&scale=1&state=main&locale=en-HK"
+      },
+      "tuple": {
+        "screen": "game-layout",
+        "state": "main",
+        "theme": "light",
+        "viewport": {
+          "width": 1280,
+          "height": 800
+        },
+        "scale": 1,
+        "locale": "en-HK"
+      },
+      "deterministic": {
+        "fixture": "main-game-v1",
+        "time": "2026-08-19T12:00:00Z",
+        "motion": "paused",
+        "randomSeed": 1905,
+        "fonts": "Segoe UI system stack",
+        "network": "blocked"
+      },
       "materialDesign3AuditId": "m3-game-surface-v1",
-      "materialDesign3Notes": "The one-screen gameplay hierarchy and cabinet art are retained; console controls, panels, and shop chrome use the shared Material product-chrome layer. Capture evidence remains pending.",
-      "evidence": { "referenceRaw": { "path": "design/parity/evidence/game-layout--main/reference.png", "status": "pending", "reason": "No cheap-headless reference capture has been made." }, "productRaw": { "path": "design/parity/evidence/game-layout--main/product.png", "status": "pending", "reason": "No matching built-app capture has been made." }, "comparison": { "path": "design/parity/evidence/game-layout--main/comparison.png", "status": "pending", "reason": "Both raw captures are required first." }, "diff": { "path": "design/parity/evidence/game-layout--main/diff.json", "status": "pending", "reason": "Both raw captures are required first." } },
-      "intentionalDeviations": []
+      "materialDesign3Notes": "The one-screen gameplay hierarchy and cabinet art are retained; console controls, panels, and shop chrome use the shared Material product-chrome layer. Capture evidence is recorded; unapproved visual deltas remain defects.",
+      "evidence": {
+        "referenceRaw": {
+          "path": "design/parity/evidence/game-layout--main/reference.png",
+          "status": "verified",
+          "sha256": "0f880415783f5c0a8a765bf6ad7a8f62996cdcef5d1e3909bf1b2719d41e46fc",
+          "receiptPath": "design/parity/evidence/game-layout--main/referenceRaw-receipt.json",
+          "receiptSha256": "1de7f11eaa0bd7414c6dc87d58fda3be012e2790cf71092bf4e6551084a73eb6"
+        },
+        "productRaw": {
+          "path": "design/parity/evidence/game-layout--main/product.png",
+          "status": "verified",
+          "sha256": "d9010a5abfbbbbef41bd27408b38034d772e1e268903519e7d4cdd0e840ff639",
+          "receiptPath": "design/parity/evidence/game-layout--main/productRaw-receipt.json",
+          "receiptSha256": "835a1023af8a4dcd83b0fea40c0eae96d48012de3e00d334f24015bc082097eb"
+        },
+        "comparison": {
+          "path": "design/parity/evidence/game-layout--main/comparison.png",
+          "status": "verified",
+          "sha256": "81bdd2574ce21ed9b0cef1bc291c0d66a358c6dd9c4f205f8c3680ed92319932",
+          "manifestPath": "design/parity/evidence/game-layout--main/comparison.json",
+          "manifestSha256": "26d769656d371ff4ee0274811f0b1f438e246a4d3143a55b87146966f4d5cfcf"
+        },
+        "diff": {
+          "path": "design/parity/evidence/game-layout--main/diff.json",
+          "status": "verified",
+          "sha256": "fb70f0226f67869b936b998f546995df6239108fd8bead574d2036e129200401"
+        }
+      },
+      "intentionalDeviations": [],
+      "sourceCommit": "330352ce7513ba420752dd7243762f0dd75f9eaa",
+      "captureProvenance": {
+        "route": "cheap-lowlevel-headless",
+        "sourceCommit": "330352ce7513ba420752dd7243762f0dd75f9eaa",
+        "buildReceiptPath": "design/parity/evidence/build-receipt.json",
+        "buildReceiptSha256": "34ff59d65a1ad149e636e8605f8d8c39364df8f0ddaecf4cc10fb72c566f9394"
+      }
     },
     {
       "id": "narrator-toast--gallery",
       "screen": "narrator-toast",
-      "declaredStates": ["gallery", "auto-dismiss", "persistent-until-dismissed"],
-      "reference": { "file": "narrator-toast.html", "sha256": "dbb5f76687cde4b9a90f692e9873ef20adecaf44215bb533836f848cf939d18e", "route": "/design/reference-app/index.html?row=narrator-toast--gallery&theme=light&width=1280&height=800&scale=1&state=gallery&locale=en-HK&capture=1" },
-      "product": { "route": "app://material-cookie-clicker/?designParity=narrator-toast--gallery&surface=game&toast=milestone&theme=light&width=1280&height=800&scale=1&state=gallery&locale=en-HK" },
-      "tuple": { "screen": "narrator-toast", "state": "gallery", "theme": "light", "viewport": { "width": 1280, "height": 800 }, "scale": 1, "locale": "en-HK" },
-      "deterministic": { "fixture": "narrator-toast-v1", "time": "2026-08-19T12:00:00Z", "motion": "paused", "randomSeed": 1906, "fonts": "Segoe UI system stack", "network": "blocked" },
+      "declaredStates": [
+        "gallery",
+        "auto-dismiss",
+        "persistent-until-dismissed"
+      ],
+      "reference": {
+        "file": "narrator-toast.html",
+        "sha256": "dbb5f76687cde4b9a90f692e9873ef20adecaf44215bb533836f848cf939d18e",
+        "route": "/design/reference-app/index.html?row=narrator-toast--gallery&theme=light&width=1280&height=800&scale=1&state=gallery&locale=en-HK&capture=1"
+      },
+      "product": {
+        "route": "app://material-cookie-clicker/?designParity=narrator-toast--gallery&surface=game&toast=milestone&theme=light&width=1280&height=800&scale=1&state=gallery&locale=en-HK"
+      },
+      "tuple": {
+        "screen": "narrator-toast",
+        "state": "gallery",
+        "theme": "light",
+        "viewport": {
+          "width": 1280,
+          "height": 800
+        },
+        "scale": 1,
+        "locale": "en-HK"
+      },
+      "deterministic": {
+        "fixture": "narrator-toast-v1",
+        "time": "2026-08-19T12:00:00Z",
+        "motion": "paused",
+        "randomSeed": 1906,
+        "fonts": "Segoe UI system stack",
+        "network": "blocked"
+      },
       "materialDesign3AuditId": "m3-feedback-v1",
-      "materialDesign3Notes": "Milestone content and status colours are retained; toast surfaces and dismiss actions use Material snackbar and icon-button anatomy. Capture evidence remains pending.",
-      "evidence": { "referenceRaw": { "path": "design/parity/evidence/narrator-toast--gallery/reference.png", "status": "pending", "reason": "No cheap-headless reference capture has been made." }, "productRaw": { "path": "design/parity/evidence/narrator-toast--gallery/product.png", "status": "pending", "reason": "No matching built-app capture has been made." }, "comparison": { "path": "design/parity/evidence/narrator-toast--gallery/comparison.png", "status": "pending", "reason": "Both raw captures are required first." }, "diff": { "path": "design/parity/evidence/narrator-toast--gallery/diff.json", "status": "pending", "reason": "Both raw captures are required first." } },
-      "intentionalDeviations": []
+      "materialDesign3Notes": "Milestone content and status colours are retained; toast surfaces and dismiss actions use Material snackbar and icon-button anatomy. Capture evidence is recorded; unapproved visual deltas remain defects.",
+      "evidence": {
+        "referenceRaw": {
+          "path": "design/parity/evidence/narrator-toast--gallery/reference.png",
+          "status": "verified",
+          "sha256": "09d03d58ccfed1381b1ca16e128fbead71b30874cc40697d15d3faf412df0576",
+          "receiptPath": "design/parity/evidence/narrator-toast--gallery/referenceRaw-receipt.json",
+          "receiptSha256": "77e8e47d12dcc3cbd2f49ff6be1c6473edc850ae08ef3233e3b0b1a3af8b391b"
+        },
+        "productRaw": {
+          "path": "design/parity/evidence/narrator-toast--gallery/product.png",
+          "status": "verified",
+          "sha256": "fb98ca0fc2f3ce1e09fae73b5239bc12407041fdfcc6c54b09cf8badc9a100b8",
+          "receiptPath": "design/parity/evidence/narrator-toast--gallery/productRaw-receipt.json",
+          "receiptSha256": "980a45a7dd231e3da701f839b19594ceabad9064e76b3ae45a33dcb77f8208c1"
+        },
+        "comparison": {
+          "path": "design/parity/evidence/narrator-toast--gallery/comparison.png",
+          "status": "verified",
+          "sha256": "2fd4cc1ac4dc8db1f29df459386156d5373fab16a336d7999b6c17c3322d6370",
+          "manifestPath": "design/parity/evidence/narrator-toast--gallery/comparison.json",
+          "manifestSha256": "a517e73b3199fe8c1ee26adbb805c40fb3b33551b613eef5be1b74724b6061fd"
+        },
+        "diff": {
+          "path": "design/parity/evidence/narrator-toast--gallery/diff.json",
+          "status": "verified",
+          "sha256": "80b96f538d0ffd17e7b5067c9d00f13d45ffa55658483b37721e7727e5267e88"
+        }
+      },
+      "intentionalDeviations": [],
+      "sourceCommit": "330352ce7513ba420752dd7243762f0dd75f9eaa",
+      "captureProvenance": {
+        "route": "cheap-lowlevel-headless",
+        "sourceCommit": "330352ce7513ba420752dd7243762f0dd75f9eaa",
+        "buildReceiptPath": "design/parity/evidence/build-receipt.json",
+        "buildReceiptSha256": "34ff59d65a1ad149e636e8605f8d8c39364df8f0ddaecf4cc10fb72c566f9394"
+      }
     },
     {
       "id": "prestige-gate--ready",
       "screen": "prestige-gate",
-      "declaredStates": ["ready", "untouched", "one-key", "both-keys", "slider-partial", "slider-complete", "emergency-exit", "prestige-variant", "wipe-variant"],
-      "reference": { "file": "prestige-gate.html", "sha256": "405bef4d152ec40ac261ad57cfd86ea1c84b37f94a6675720b771c0dad3a75f0", "route": "/design/reference-app/index.html?row=prestige-gate--ready&theme=light&width=1280&height=800&scale=1&state=ready&locale=en-HK&capture=1" },
-      "product": { "route": "app://material-cookie-clicker/?designParity=prestige-gate--ready&panel=prestige&gate=ready&theme=light&width=1280&height=800&scale=1&state=ready&locale=en-HK" },
-      "tuple": { "screen": "prestige-gate", "state": "ready", "theme": "light", "viewport": { "width": 1280, "height": 800 }, "scale": 1, "locale": "en-HK" },
-      "deterministic": { "fixture": "prestige-ready-v1", "time": "2026-08-19T12:00:00Z", "motion": "paused", "randomSeed": 1907, "fonts": "Segoe UI system stack", "network": "blocked" },
+      "declaredStates": [
+        "ready",
+        "untouched",
+        "one-key",
+        "both-keys",
+        "slider-partial",
+        "slider-complete",
+        "emergency-exit",
+        "prestige-variant",
+        "wipe-variant"
+      ],
+      "reference": {
+        "file": "prestige-gate.html",
+        "sha256": "405bef4d152ec40ac261ad57cfd86ea1c84b37f94a6675720b771c0dad3a75f0",
+        "route": "/design/reference-app/index.html?row=prestige-gate--ready&theme=light&width=1280&height=800&scale=1&state=ready&locale=en-HK&capture=1"
+      },
+      "product": {
+        "route": "app://material-cookie-clicker/?designParity=prestige-gate--ready&panel=prestige&gate=ready&theme=light&width=1280&height=800&scale=1&state=ready&locale=en-HK"
+      },
+      "tuple": {
+        "screen": "prestige-gate",
+        "state": "ready",
+        "theme": "light",
+        "viewport": {
+          "width": 1280,
+          "height": 800
+        },
+        "scale": 1,
+        "locale": "en-HK"
+      },
+      "deterministic": {
+        "fixture": "prestige-ready-v1",
+        "time": "2026-08-19T12:00:00Z",
+        "motion": "paused",
+        "randomSeed": 1907,
+        "fonts": "Segoe UI system stack",
+        "network": "blocked"
+      },
       "materialDesign3AuditId": "m3-game-surface-v1",
-      "materialDesign3Notes": "The two-key and slider safety flow is retained; its dialog, selection controls, and progress chrome use the shared Material layer. Capture evidence remains pending.",
-      "evidence": { "referenceRaw": { "path": "design/parity/evidence/prestige-gate--ready/reference.png", "status": "pending", "reason": "No cheap-headless reference capture has been made." }, "productRaw": { "path": "design/parity/evidence/prestige-gate--ready/product.png", "status": "pending", "reason": "No matching built-app capture has been made." }, "comparison": { "path": "design/parity/evidence/prestige-gate--ready/comparison.png", "status": "pending", "reason": "Both raw captures are required first." }, "diff": { "path": "design/parity/evidence/prestige-gate--ready/diff.json", "status": "pending", "reason": "Both raw captures are required first." } },
-      "intentionalDeviations": []
+      "materialDesign3Notes": "The two-key and slider safety flow is retained; its dialog, selection controls, and progress chrome use the shared Material layer. Capture evidence is recorded; unapproved visual deltas remain defects.",
+      "evidence": {
+        "referenceRaw": {
+          "path": "design/parity/evidence/prestige-gate--ready/reference.png",
+          "status": "verified",
+          "sha256": "c76af92f980a1f6a2adbfb278c720e83d850339ab81b35472d2bbd1852516daa",
+          "receiptPath": "design/parity/evidence/prestige-gate--ready/referenceRaw-receipt.json",
+          "receiptSha256": "a8eb2016291913b44b75ed18e1f8dae6fdc767f5b6da1eeb6a643e0e28ec7723"
+        },
+        "productRaw": {
+          "path": "design/parity/evidence/prestige-gate--ready/product.png",
+          "status": "verified",
+          "sha256": "8215a7f4dfd0ea183a078da692827e305ec404a0be67dc8b52512b28328bdef7",
+          "receiptPath": "design/parity/evidence/prestige-gate--ready/productRaw-receipt.json",
+          "receiptSha256": "6537579c50b651568c29a2fb363fb4ab0ed7e90e7699d24e2f156ce6dcc3968c"
+        },
+        "comparison": {
+          "path": "design/parity/evidence/prestige-gate--ready/comparison.png",
+          "status": "verified",
+          "sha256": "fe06d112166e2bfae15e87728237b534f178732ba13730ad1c4c082840fa80d5",
+          "manifestPath": "design/parity/evidence/prestige-gate--ready/comparison.json",
+          "manifestSha256": "070e7be30f6864fdd931a066a9a669b924da810efbae19e9a03a809cf5b165ac"
+        },
+        "diff": {
+          "path": "design/parity/evidence/prestige-gate--ready/diff.json",
+          "status": "verified",
+          "sha256": "9f60561d4c0513b9255ff6daa99c5b6620dadabc1e6b3f4a0c2ac958f2326bd1"
+        }
+      },
+      "intentionalDeviations": [],
+      "sourceCommit": "330352ce7513ba420752dd7243762f0dd75f9eaa",
+      "captureProvenance": {
+        "route": "cheap-lowlevel-headless",
+        "sourceCommit": "330352ce7513ba420752dd7243762f0dd75f9eaa",
+        "buildReceiptPath": "design/parity/evidence/build-receipt.json",
+        "buildReceiptSha256": "34ff59d65a1ad149e636e8605f8d8c39364df8f0ddaecf4cc10fb72c566f9394"
+      }
     },
     {
       "id": "search-regex-builder--open",
       "screen": "search-regex-builder",
-      "declaredStates": ["open", "plain-text", "regex-active"],
-      "reference": { "file": "search-regex-builder.html", "sha256": "3d70b97bcd2dbe97d7b7294fe5e22a24bd44df153d27d39487206ffec554c288", "route": "/design/reference-app/index.html?row=search-regex-builder--open&theme=light&width=1280&height=800&scale=1&state=open&locale=en-HK&capture=1" },
-      "product": { "route": "app://material-cookie-clicker/?designParity=search-regex-builder--open&panel=tools&regexBuilder=open&theme=light&width=1280&height=800&scale=1&state=open&locale=en-HK" },
-      "tuple": { "screen": "search-regex-builder", "state": "open", "theme": "light", "viewport": { "width": 1280, "height": 800 }, "scale": 1, "locale": "en-HK" },
-      "deterministic": { "fixture": "regex-builder-open-v1", "time": "2026-08-19T12:00:00Z", "motion": "paused", "randomSeed": 1908, "fonts": "Segoe UI system stack", "network": "blocked" },
+      "declaredStates": [
+        "open",
+        "plain-text",
+        "regex-active"
+      ],
+      "reference": {
+        "file": "search-regex-builder.html",
+        "sha256": "3d70b97bcd2dbe97d7b7294fe5e22a24bd44df153d27d39487206ffec554c288",
+        "route": "/design/reference-app/index.html?row=search-regex-builder--open&theme=light&width=1280&height=800&scale=1&state=open&locale=en-HK&capture=1"
+      },
+      "product": {
+        "route": "app://material-cookie-clicker/?designParity=search-regex-builder--open&panel=tools&regexBuilder=open&theme=light&width=1280&height=800&scale=1&state=open&locale=en-HK"
+      },
+      "tuple": {
+        "screen": "search-regex-builder",
+        "state": "open",
+        "theme": "light",
+        "viewport": {
+          "width": 1280,
+          "height": 800
+        },
+        "scale": 1,
+        "locale": "en-HK"
+      },
+      "deterministic": {
+        "fixture": "regex-builder-open-v1",
+        "time": "2026-08-19T12:00:00Z",
+        "motion": "paused",
+        "randomSeed": 1908,
+        "fonts": "Segoe UI system stack",
+        "network": "blocked"
+      },
       "materialDesign3AuditId": "m3-list-controls-v1",
-      "materialDesign3Notes": "Regex matches and capture groups remain functional data; the field, mode control, and anchored surface use Material anatomy. Capture evidence remains pending.",
-      "evidence": { "referenceRaw": { "path": "design/parity/evidence/search-regex-builder--open/reference.png", "status": "pending", "reason": "No cheap-headless reference capture has been made." }, "productRaw": { "path": "design/parity/evidence/search-regex-builder--open/product.png", "status": "pending", "reason": "No matching built-app capture has been made." }, "comparison": { "path": "design/parity/evidence/search-regex-builder--open/comparison.png", "status": "pending", "reason": "Both raw captures are required first." }, "diff": { "path": "design/parity/evidence/search-regex-builder--open/diff.json", "status": "pending", "reason": "Both raw captures are required first." } },
-      "intentionalDeviations": []
+      "materialDesign3Notes": "Regex matches and capture groups remain functional data; the field, mode control, and anchored surface use Material anatomy. Capture evidence is recorded; unapproved visual deltas remain defects.",
+      "evidence": {
+        "referenceRaw": {
+          "path": "design/parity/evidence/search-regex-builder--open/reference.png",
+          "status": "verified",
+          "sha256": "d8ed116b7ab1c45dd29bd604883e1dce9383b90f052211ada7a79d039309f35c",
+          "receiptPath": "design/parity/evidence/search-regex-builder--open/referenceRaw-receipt.json",
+          "receiptSha256": "07f5cc2c176e849ef0992e4b1ae3658409d6debb0341851e289cf607d5666bc8"
+        },
+        "productRaw": {
+          "path": "design/parity/evidence/search-regex-builder--open/product.png",
+          "status": "verified",
+          "sha256": "26f7e93506b4d82ba410da8d659e9e8ddd995c34e549b07e9f77f9cd9a75fffb",
+          "receiptPath": "design/parity/evidence/search-regex-builder--open/productRaw-receipt.json",
+          "receiptSha256": "2d0a553298dde9ec6aafaa58a78b936cbce35ffe5ea58f2b6cc58809afdf7a91"
+        },
+        "comparison": {
+          "path": "design/parity/evidence/search-regex-builder--open/comparison.png",
+          "status": "verified",
+          "sha256": "0144a56e8b62aaafa0e61a6b107e24515990c5530c7ee6f233df354d014ec809",
+          "manifestPath": "design/parity/evidence/search-regex-builder--open/comparison.json",
+          "manifestSha256": "d3306cb2e29e514618ab71dfc996a5f452ee1fb3691855042407c1f5c541bf83"
+        },
+        "diff": {
+          "path": "design/parity/evidence/search-regex-builder--open/diff.json",
+          "status": "verified",
+          "sha256": "b197ee7929dc5eaba598f5e8404a3671b1cda7bbc068d6229de2bec0ab23d939"
+        }
+      },
+      "intentionalDeviations": [],
+      "sourceCommit": "330352ce7513ba420752dd7243762f0dd75f9eaa",
+      "captureProvenance": {
+        "route": "cheap-lowlevel-headless",
+        "sourceCommit": "330352ce7513ba420752dd7243762f0dd75f9eaa",
+        "buildReceiptPath": "design/parity/evidence/build-receipt.json",
+        "buildReceiptSha256": "34ff59d65a1ad149e636e8605f8d8c39364df8f0ddaecf4cc10fb72c566f9394"
+      }
     },
     {
       "id": "settings-funny-sliders--default",
       "screen": "settings-funny-sliders",
-      "declaredStates": ["default", "language-english", "language-cantonese", "language-bilingual", "independent-funny-levels"],
-      "reference": { "file": "settings-funny-sliders.html", "sha256": "bde8c1f737430c7eaec77dd17b6ae1b406b41c43438e369a63fe6d334a84f608", "route": "/design/reference-app/index.html?row=settings-funny-sliders--default&theme=light&width=1280&height=800&scale=1&state=default&locale=en-HK&capture=1" },
-      "product": { "route": "app://material-cookie-clicker/?designParity=settings-funny-sliders--default&panel=settings&focus=language&theme=light&width=1280&height=800&scale=1&state=default&locale=en-HK" },
-      "tuple": { "screen": "settings-funny-sliders", "state": "default", "theme": "light", "viewport": { "width": 1280, "height": 800 }, "scale": 1, "locale": "en-HK" },
-      "deterministic": { "fixture": "settings-default-v1", "time": "2026-08-19T12:00:00Z", "motion": "paused", "randomSeed": 1909, "fonts": "Segoe UI system stack", "network": "blocked" },
+      "declaredStates": [
+        "default",
+        "language-english",
+        "language-cantonese",
+        "language-bilingual",
+        "independent-funny-levels"
+      ],
+      "reference": {
+        "file": "settings-funny-sliders.html",
+        "sha256": "bde8c1f737430c7eaec77dd17b6ae1b406b41c43438e369a63fe6d334a84f608",
+        "route": "/design/reference-app/index.html?row=settings-funny-sliders--default&theme=light&width=1280&height=800&scale=1&state=default&locale=en-HK&capture=1"
+      },
+      "product": {
+        "route": "app://material-cookie-clicker/?designParity=settings-funny-sliders--default&panel=settings&focus=language&theme=light&width=1280&height=800&scale=1&state=default&locale=en-HK"
+      },
+      "tuple": {
+        "screen": "settings-funny-sliders",
+        "state": "default",
+        "theme": "light",
+        "viewport": {
+          "width": 1280,
+          "height": 800
+        },
+        "scale": 1,
+        "locale": "en-HK"
+      },
+      "deterministic": {
+        "fixture": "settings-default-v1",
+        "time": "2026-08-19T12:00:00Z",
+        "motion": "paused",
+        "randomSeed": 1909,
+        "fonts": "Segoe UI system stack",
+        "network": "blocked"
+      },
       "materialDesign3AuditId": "m3-settings-v1",
-      "materialDesign3Notes": "The three language modes and independent sliders are retained with Material segmented-control and range anatomy. Capture evidence remains pending.",
-      "evidence": { "referenceRaw": { "path": "design/parity/evidence/settings-funny-sliders--default/reference.png", "status": "pending", "reason": "No cheap-headless reference capture has been made." }, "productRaw": { "path": "design/parity/evidence/settings-funny-sliders--default/product.png", "status": "pending", "reason": "No matching built-app capture has been made." }, "comparison": { "path": "design/parity/evidence/settings-funny-sliders--default/comparison.png", "status": "pending", "reason": "Both raw captures are required first." }, "diff": { "path": "design/parity/evidence/settings-funny-sliders--default/diff.json", "status": "pending", "reason": "Both raw captures are required first." } },
-      "intentionalDeviations": []
+      "materialDesign3Notes": "The three language modes and independent sliders are retained with Material segmented-control and range anatomy. Capture evidence is recorded; unapproved visual deltas remain defects.",
+      "evidence": {
+        "referenceRaw": {
+          "path": "design/parity/evidence/settings-funny-sliders--default/reference.png",
+          "status": "verified",
+          "sha256": "f32ac9af1b8ff0a18f55c5848f294acc30fbb0b1dca7c08ed5bc12701c48180d",
+          "receiptPath": "design/parity/evidence/settings-funny-sliders--default/referenceRaw-receipt.json",
+          "receiptSha256": "b2e81b9d68c9f3bad75a7d3b80b190a55b8f288919469c7b956fceb22d8891e1"
+        },
+        "productRaw": {
+          "path": "design/parity/evidence/settings-funny-sliders--default/product.png",
+          "status": "verified",
+          "sha256": "cebcb05ee983c4b1e8af73d5e5988363d99bbee4c8d185ecfd537de3d165ac52",
+          "receiptPath": "design/parity/evidence/settings-funny-sliders--default/productRaw-receipt.json",
+          "receiptSha256": "8e9f515521b6b6b8f03a50f719b59e9fa0390603637bfef09cffa98b852a532c"
+        },
+        "comparison": {
+          "path": "design/parity/evidence/settings-funny-sliders--default/comparison.png",
+          "status": "verified",
+          "sha256": "98fabf735946cfbc728e1f9c0c1671985db2a2e7e5aa0558a522a00e09304b0a",
+          "manifestPath": "design/parity/evidence/settings-funny-sliders--default/comparison.json",
+          "manifestSha256": "b90ce6bcc6482cdd928147e5ca2d77ec2107cb7cd1d473ffa8c4af10686a6dec"
+        },
+        "diff": {
+          "path": "design/parity/evidence/settings-funny-sliders--default/diff.json",
+          "status": "verified",
+          "sha256": "94e8b95cf5151c48bda3d718e465595706ae79448c1dff5874ffa8ad750cad0a"
+        }
+      },
+      "intentionalDeviations": [],
+      "sourceCommit": "330352ce7513ba420752dd7243762f0dd75f9eaa",
+      "captureProvenance": {
+        "route": "cheap-lowlevel-headless",
+        "sourceCommit": "330352ce7513ba420752dd7243762f0dd75f9eaa",
+        "buildReceiptPath": "design/parity/evidence/build-receipt.json",
+        "buildReceiptSha256": "34ff59d65a1ad149e636e8605f8d8c39364df8f0ddaecf4cc10fb72c566f9394"
+      }
     },
     {
       "id": "stat-tile--gallery",
       "screen": "stat-tile",
-      "declaredStates": ["gallery", "counter", "trend", "goal-progress"],
-      "reference": { "file": "stat-tile.html", "sha256": "751fccf7f957de994bfd0c1f330b5567e94c06507233ea475a9fb710c30056c5", "route": "/design/reference-app/index.html?row=stat-tile--gallery&theme=light&width=1280&height=800&scale=1&state=gallery&locale=en-HK&capture=1" },
-      "product": { "route": "app://material-cookie-clicker/?designParity=stat-tile--gallery&panel=statistics&theme=light&width=1280&height=800&scale=1&state=gallery&locale=en-HK" },
-      "tuple": { "screen": "stat-tile", "state": "gallery", "theme": "light", "viewport": { "width": 1280, "height": 800 }, "scale": 1, "locale": "en-HK" },
-      "deterministic": { "fixture": "statistics-gallery-v1", "time": "2026-08-19T12:00:00Z", "motion": "paused", "randomSeed": 1910, "fonts": "Segoe UI system stack", "network": "blocked" },
+      "declaredStates": [
+        "gallery",
+        "counter",
+        "trend",
+        "goal-progress"
+      ],
+      "reference": {
+        "file": "stat-tile.html",
+        "sha256": "751fccf7f957de994bfd0c1f330b5567e94c06507233ea475a9fb710c30056c5",
+        "route": "/design/reference-app/index.html?row=stat-tile--gallery&theme=light&width=1280&height=800&scale=1&state=gallery&locale=en-HK&capture=1"
+      },
+      "product": {
+        "route": "app://material-cookie-clicker/?designParity=stat-tile--gallery&panel=statistics&theme=light&width=1280&height=800&scale=1&state=gallery&locale=en-HK"
+      },
+      "tuple": {
+        "screen": "stat-tile",
+        "state": "gallery",
+        "theme": "light",
+        "viewport": {
+          "width": 1280,
+          "height": 800
+        },
+        "scale": 1,
+        "locale": "en-HK"
+      },
+      "deterministic": {
+        "fixture": "statistics-gallery-v1",
+        "time": "2026-08-19T12:00:00Z",
+        "motion": "paused",
+        "randomSeed": 1910,
+        "fonts": "Segoe UI system stack",
+        "network": "blocked"
+      },
       "materialDesign3AuditId": "m3-game-surface-v1",
-      "materialDesign3Notes": "Counters, trends, and progress remain data encodings; tile chrome and labels use the shared Material product-chrome layer. Capture evidence remains pending.",
-      "evidence": { "referenceRaw": { "path": "design/parity/evidence/stat-tile--gallery/reference.png", "status": "pending", "reason": "No cheap-headless reference capture has been made." }, "productRaw": { "path": "design/parity/evidence/stat-tile--gallery/product.png", "status": "pending", "reason": "No matching built-app capture has been made." }, "comparison": { "path": "design/parity/evidence/stat-tile--gallery/comparison.png", "status": "pending", "reason": "Both raw captures are required first." }, "diff": { "path": "design/parity/evidence/stat-tile--gallery/diff.json", "status": "pending", "reason": "Both raw captures are required first." } },
-      "intentionalDeviations": []
+      "materialDesign3Notes": "Counters, trends, and progress remain data encodings; tile chrome and labels use the shared Material product-chrome layer. Capture evidence is recorded; unapproved visual deltas remain defects.",
+      "evidence": {
+        "referenceRaw": {
+          "path": "design/parity/evidence/stat-tile--gallery/reference.png",
+          "status": "verified",
+          "sha256": "dd567d8ec81f0a053150939f304c78215b73e11100496b0e0d105fa66dca42ba",
+          "receiptPath": "design/parity/evidence/stat-tile--gallery/referenceRaw-receipt.json",
+          "receiptSha256": "b24ec52de52e5d15ba986bfeed2704c2bd4aaf4bf1352d16eb26ebae5ec777ea"
+        },
+        "productRaw": {
+          "path": "design/parity/evidence/stat-tile--gallery/product.png",
+          "status": "verified",
+          "sha256": "a73a2189e3e0fcce83de0a7ee914ecd4be9c5eca4f5bfac0217d408e23c7ab79",
+          "receiptPath": "design/parity/evidence/stat-tile--gallery/productRaw-receipt.json",
+          "receiptSha256": "697eb162b8585e9ac229a45d1e4e3e92a8159edadfe39d2f0bd842e26aff4bbe"
+        },
+        "comparison": {
+          "path": "design/parity/evidence/stat-tile--gallery/comparison.png",
+          "status": "verified",
+          "sha256": "cdcd7ced042aaf39c6d717ddc5c74c8ebd85368debecfbf92161ec41a3a31770",
+          "manifestPath": "design/parity/evidence/stat-tile--gallery/comparison.json",
+          "manifestSha256": "139889b20fa476683f5cc337eabd7fdb3d408c03128719ae2c6e3e1f3b8bbdf7"
+        },
+        "diff": {
+          "path": "design/parity/evidence/stat-tile--gallery/diff.json",
+          "status": "verified",
+          "sha256": "00ff5253602c9000650d3d3958d5df68459f952c7ad69ed4c5977b05b8849886"
+        }
+      },
+      "intentionalDeviations": [],
+      "sourceCommit": "330352ce7513ba420752dd7243762f0dd75f9eaa",
+      "captureProvenance": {
+        "route": "cheap-lowlevel-headless",
+        "sourceCommit": "330352ce7513ba420752dd7243762f0dd75f9eaa",
+        "buildReceiptPath": "design/parity/evidence/build-receipt.json",
+        "buildReceiptSha256": "34ff59d65a1ad149e636e8605f8d8c39364df8f0ddaecf4cc10fb72c566f9394"
+      }
     },
     {
       "id": "tokens-color--roles",
       "screen": "tokens-color",
-      "declaredStates": ["roles", "light", "dark", "contrast-results"],
-      "reference": { "file": "tokens-color.html", "sha256": "c2878166bbf52893d02a1ff6b952a4a9728fc46787929369762384bdea0c7b18", "route": "/design/reference-app/index.html?row=tokens-color--roles&theme=light&width=1280&height=800&scale=1&state=roles&locale=en-HK&capture=1" },
-      "product": { "route": "app://material-cookie-clicker/?designParity=tokens-color--roles&surface=appearance&theme=light&width=1280&height=800&scale=1&state=roles&locale=en-HK" },
-      "tuple": { "screen": "tokens-color", "state": "roles", "theme": "light", "viewport": { "width": 1280, "height": 800 }, "scale": 1, "locale": "en-HK" },
-      "deterministic": { "fixture": "color-roles-v1", "time": "2026-08-19T12:00:00Z", "motion": "paused", "randomSeed": 1911, "fonts": "Segoe UI system stack", "network": "blocked" },
+      "declaredStates": [
+        "roles",
+        "light",
+        "dark",
+        "contrast-results"
+      ],
+      "reference": {
+        "file": "tokens-color.html",
+        "sha256": "c2878166bbf52893d02a1ff6b952a4a9728fc46787929369762384bdea0c7b18",
+        "route": "/design/reference-app/index.html?row=tokens-color--roles&theme=light&width=1280&height=800&scale=1&state=roles&locale=en-HK&capture=1"
+      },
+      "product": {
+        "route": "app://material-cookie-clicker/?designParity=tokens-color--roles&surface=appearance&theme=light&width=1280&height=800&scale=1&state=roles&locale=en-HK"
+      },
+      "tuple": {
+        "screen": "tokens-color",
+        "state": "roles",
+        "theme": "light",
+        "viewport": {
+          "width": 1280,
+          "height": 800
+        },
+        "scale": 1,
+        "locale": "en-HK"
+      },
+      "deterministic": {
+        "fixture": "color-roles-v1",
+        "time": "2026-08-19T12:00:00Z",
+        "motion": "paused",
+        "randomSeed": 1911,
+        "fonts": "Segoe UI system stack",
+        "network": "blocked"
+      },
       "materialDesign3AuditId": "m3-foundations-v1",
-      "materialDesign3Notes": "Semantic colours feed explicit Material system role aliases; arcade-only colours remain confined to functional data art. Capture evidence remains pending.",
-      "evidence": { "referenceRaw": { "path": "design/parity/evidence/tokens-color--roles/reference.png", "status": "pending", "reason": "No cheap-headless reference capture has been made." }, "productRaw": { "path": "design/parity/evidence/tokens-color--roles/product.png", "status": "pending", "reason": "No matching built-app capture has been made." }, "comparison": { "path": "design/parity/evidence/tokens-color--roles/comparison.png", "status": "pending", "reason": "Both raw captures are required first." }, "diff": { "path": "design/parity/evidence/tokens-color--roles/diff.json", "status": "pending", "reason": "Both raw captures are required first." } },
-      "intentionalDeviations": []
+      "materialDesign3Notes": "Semantic colours feed explicit Material system role aliases; arcade-only colours remain confined to functional data art. Capture evidence is recorded; unapproved visual deltas remain defects.",
+      "evidence": {
+        "referenceRaw": {
+          "path": "design/parity/evidence/tokens-color--roles/reference.png",
+          "status": "verified",
+          "sha256": "a925627ee8224c94ffc267cf81b7be971925875a43df640e29a351abe0f4b1d5",
+          "receiptPath": "design/parity/evidence/tokens-color--roles/referenceRaw-receipt.json",
+          "receiptSha256": "26e1a06ff1968b4d3fe27efb01e46d34edc8381731be3e5c94db7a167d335f5b"
+        },
+        "productRaw": {
+          "path": "design/parity/evidence/tokens-color--roles/product.png",
+          "status": "verified",
+          "sha256": "2a4f3739750e35e3becb308ca9f6511f21843a513b7370f6d7fd176341078735",
+          "receiptPath": "design/parity/evidence/tokens-color--roles/productRaw-receipt.json",
+          "receiptSha256": "2316755f6e328e26d6e66a11877401f50b4aaf36c6a245fd586027401a7cf7dc"
+        },
+        "comparison": {
+          "path": "design/parity/evidence/tokens-color--roles/comparison.png",
+          "status": "verified",
+          "sha256": "6dab5dc08a69d43547f1d67633d7e4fe611392422614340baf4f4670d7cf6605",
+          "manifestPath": "design/parity/evidence/tokens-color--roles/comparison.json",
+          "manifestSha256": "ee1e172c2c2ee007bddf9e902b36cae71e5a029fe8c6288e5876fdc9a354fc5e"
+        },
+        "diff": {
+          "path": "design/parity/evidence/tokens-color--roles/diff.json",
+          "status": "verified",
+          "sha256": "cfcea65e179e1fbf91f6fe81efc7406cebff815fd475c1669ae56ce6daa65dd8"
+        }
+      },
+      "intentionalDeviations": [],
+      "sourceCommit": "330352ce7513ba420752dd7243762f0dd75f9eaa",
+      "captureProvenance": {
+        "route": "cheap-lowlevel-headless",
+        "sourceCommit": "330352ce7513ba420752dd7243762f0dd75f9eaa",
+        "buildReceiptPath": "design/parity/evidence/build-receipt.json",
+        "buildReceiptSha256": "34ff59d65a1ad149e636e8605f8d8c39364df8f0ddaecf4cc10fb72c566f9394"
+      }
     },
     {
       "id": "tokens-shape-elevation--scale",
       "screen": "tokens-shape-elevation",
-      "declaredStates": ["scale", "shape-scale", "elevation-scale", "pressed", "reduced-motion"],
-      "reference": { "file": "tokens-shape-elevation.html", "sha256": "9ad4ce0c9a3b172ac4f878dad2006aaad62dd55445ebe80b2923bf084f939a15", "route": "/design/reference-app/index.html?row=tokens-shape-elevation--scale&theme=light&width=1280&height=800&scale=1&state=scale&locale=en-HK&capture=1" },
-      "product": { "route": "app://material-cookie-clicker/?designParity=tokens-shape-elevation--scale&surface=appearance&focus=shape&theme=light&width=1280&height=800&scale=1&state=scale&locale=en-HK" },
-      "tuple": { "screen": "tokens-shape-elevation", "state": "scale", "theme": "light", "viewport": { "width": 1280, "height": 800 }, "scale": 1, "locale": "en-HK" },
-      "deterministic": { "fixture": "shape-elevation-v1", "time": "2026-08-19T12:00:00Z", "motion": "paused", "randomSeed": 1912, "fonts": "Segoe UI system stack", "network": "blocked" },
+      "declaredStates": [
+        "scale",
+        "shape-scale",
+        "elevation-scale",
+        "pressed",
+        "reduced-motion"
+      ],
+      "reference": {
+        "file": "tokens-shape-elevation.html",
+        "sha256": "9ad4ce0c9a3b172ac4f878dad2006aaad62dd55445ebe80b2923bf084f939a15",
+        "route": "/design/reference-app/index.html?row=tokens-shape-elevation--scale&theme=light&width=1280&height=800&scale=1&state=scale&locale=en-HK&capture=1"
+      },
+      "product": {
+        "route": "app://material-cookie-clicker/?designParity=tokens-shape-elevation--scale&surface=appearance&focus=shape&theme=light&width=1280&height=800&scale=1&state=scale&locale=en-HK"
+      },
+      "tuple": {
+        "screen": "tokens-shape-elevation",
+        "state": "scale",
+        "theme": "light",
+        "viewport": {
+          "width": 1280,
+          "height": 800
+        },
+        "scale": 1,
+        "locale": "en-HK"
+      },
+      "deterministic": {
+        "fixture": "shape-elevation-v1",
+        "time": "2026-08-19T12:00:00Z",
+        "motion": "paused",
+        "randomSeed": 1912,
+        "fonts": "Segoe UI system stack",
+        "network": "blocked"
+      },
       "materialDesign3AuditId": "m3-foundations-v1",
-      "materialDesign3Notes": "The retained reference shows the migration input; product chrome now uses Material shape and elevation tokens without solid arcade bases. Capture evidence remains pending.",
-      "evidence": { "referenceRaw": { "path": "design/parity/evidence/tokens-shape-elevation--scale/reference.png", "status": "pending", "reason": "No cheap-headless reference capture has been made." }, "productRaw": { "path": "design/parity/evidence/tokens-shape-elevation--scale/product.png", "status": "pending", "reason": "No matching built-app capture has been made." }, "comparison": { "path": "design/parity/evidence/tokens-shape-elevation--scale/comparison.png", "status": "pending", "reason": "Both raw captures are required first." }, "diff": { "path": "design/parity/evidence/tokens-shape-elevation--scale/diff.json", "status": "pending", "reason": "Both raw captures are required first." } },
-      "intentionalDeviations": []
+      "materialDesign3Notes": "The retained reference shows the migration input; product chrome now uses Material shape and elevation tokens without solid arcade bases. Capture evidence is recorded; unapproved visual deltas remain defects.",
+      "evidence": {
+        "referenceRaw": {
+          "path": "design/parity/evidence/tokens-shape-elevation--scale/reference.png",
+          "status": "verified",
+          "sha256": "885e9741d0425e59aa47947f5c7a1314480afef026f09556bddd7ec7150080e4",
+          "receiptPath": "design/parity/evidence/tokens-shape-elevation--scale/referenceRaw-receipt.json",
+          "receiptSha256": "1514cad595672836c7e1bf8917285b145f4d49d825aa6986689f36e17ecd015a"
+        },
+        "productRaw": {
+          "path": "design/parity/evidence/tokens-shape-elevation--scale/product.png",
+          "status": "verified",
+          "sha256": "7913afa1c8db6d84fc2cb4326eff7f84456993f48d0a8f3ba469c3da622661a7",
+          "receiptPath": "design/parity/evidence/tokens-shape-elevation--scale/productRaw-receipt.json",
+          "receiptSha256": "caed39ffbaa746a75453ffceb1c557e64a48ab44ecc90f92a374f04e98513247"
+        },
+        "comparison": {
+          "path": "design/parity/evidence/tokens-shape-elevation--scale/comparison.png",
+          "status": "verified",
+          "sha256": "e309c25983ab72d793b509408d6494b1f8935b017e3e8c19deb338bc85fbebe6",
+          "manifestPath": "design/parity/evidence/tokens-shape-elevation--scale/comparison.json",
+          "manifestSha256": "60765c63574cfa0c6654a317a9da89983406f5a2da4be18f5e34e56df1c1c7cc"
+        },
+        "diff": {
+          "path": "design/parity/evidence/tokens-shape-elevation--scale/diff.json",
+          "status": "verified",
+          "sha256": "a580b52d29b8857f23d55998952699d60dd32f50a526a40fb9d3a6b9b116ed20"
+        }
+      },
+      "intentionalDeviations": [],
+      "sourceCommit": "330352ce7513ba420752dd7243762f0dd75f9eaa",
+      "captureProvenance": {
+        "route": "cheap-lowlevel-headless",
+        "sourceCommit": "330352ce7513ba420752dd7243762f0dd75f9eaa",
+        "buildReceiptPath": "design/parity/evidence/build-receipt.json",
+        "buildReceiptSha256": "34ff59d65a1ad149e636e8605f8d8c39364df8f0ddaecf4cc10fb72c566f9394"
+      }
     },
     {
       "id": "tokens-type--scale",
       "screen": "tokens-type",
-      "declaredStates": ["scale", "english", "traditional-chinese", "bilingual"],
-      "reference": { "file": "tokens-type.html", "sha256": "ec62777f1f8dc88c5ddb79c85319fdfb98c4db07a3947c9ba3a5fb9a004326d4", "route": "/design/reference-app/index.html?row=tokens-type--scale&theme=light&width=1280&height=800&scale=1&state=scale&locale=en-HK&capture=1" },
-      "product": { "route": "app://material-cookie-clicker/?designParity=tokens-type--scale&surface=appearance&focus=typography&theme=light&width=1280&height=800&scale=1&state=scale&locale=en-HK" },
-      "tuple": { "screen": "tokens-type", "state": "scale", "theme": "light", "viewport": { "width": 1280, "height": 800 }, "scale": 1, "locale": "en-HK" },
-      "deterministic": { "fixture": "type-scale-v1", "time": "2026-08-19T12:00:00Z", "motion": "paused", "randomSeed": 1913, "fonts": "Segoe UI system stack", "network": "blocked" },
+      "declaredStates": [
+        "scale",
+        "english",
+        "traditional-chinese",
+        "bilingual"
+      ],
+      "reference": {
+        "file": "tokens-type.html",
+        "sha256": "ec62777f1f8dc88c5ddb79c85319fdfb98c4db07a3947c9ba3a5fb9a004326d4",
+        "route": "/design/reference-app/index.html?row=tokens-type--scale&theme=light&width=1280&height=800&scale=1&state=scale&locale=en-HK&capture=1"
+      },
+      "product": {
+        "route": "app://material-cookie-clicker/?designParity=tokens-type--scale&surface=appearance&focus=typography&theme=light&width=1280&height=800&scale=1&state=scale&locale=en-HK"
+      },
+      "tuple": {
+        "screen": "tokens-type",
+        "state": "scale",
+        "theme": "light",
+        "viewport": {
+          "width": 1280,
+          "height": 800
+        },
+        "scale": 1,
+        "locale": "en-HK"
+      },
+      "deterministic": {
+        "fixture": "type-scale-v1",
+        "time": "2026-08-19T12:00:00Z",
+        "motion": "paused",
+        "randomSeed": 1913,
+        "fonts": "Segoe UI system stack",
+        "network": "blocked"
+      },
       "materialDesign3AuditId": "m3-foundations-v1",
-      "materialDesign3Notes": "Bilingual text samples remain; product chrome now uses the Material type scale while factual game data keeps its functional typography. Capture evidence remains pending.",
-      "evidence": { "referenceRaw": { "path": "design/parity/evidence/tokens-type--scale/reference.png", "status": "pending", "reason": "No cheap-headless reference capture has been made." }, "productRaw": { "path": "design/parity/evidence/tokens-type--scale/product.png", "status": "pending", "reason": "No matching built-app capture has been made." }, "comparison": { "path": "design/parity/evidence/tokens-type--scale/comparison.png", "status": "pending", "reason": "Both raw captures are required first." }, "diff": { "path": "design/parity/evidence/tokens-type--scale/diff.json", "status": "pending", "reason": "Both raw captures are required first." } },
-      "intentionalDeviations": []
+      "materialDesign3Notes": "Bilingual text samples remain; product chrome now uses the Material type scale while factual game data keeps its functional typography. Capture evidence is recorded; unapproved visual deltas remain defects.",
+      "evidence": {
+        "referenceRaw": {
+          "path": "design/parity/evidence/tokens-type--scale/reference.png",
+          "status": "verified",
+          "sha256": "0f10f645927f9ba53ed0ee88b87f2c2a2ddc8acbada90c3022bbc1a0753bd15d",
+          "receiptPath": "design/parity/evidence/tokens-type--scale/referenceRaw-receipt.json",
+          "receiptSha256": "fed58e915d2450dff5072f411922437e562aa60bb67bc13febd9d2b021f9bc02"
+        },
+        "productRaw": {
+          "path": "design/parity/evidence/tokens-type--scale/product.png",
+          "status": "verified",
+          "sha256": "54882e386e530af1e26206051ef743bd744c2382de974d7ffca01fa92844e3ec",
+          "receiptPath": "design/parity/evidence/tokens-type--scale/productRaw-receipt.json",
+          "receiptSha256": "2c72b5fb1eb212f752b48927403cf490dd0380f4e1b20abbf668d48b1e01b443"
+        },
+        "comparison": {
+          "path": "design/parity/evidence/tokens-type--scale/comparison.png",
+          "status": "verified",
+          "sha256": "6ec1cd84686c926d470a48b65daa1eba9827afcf267740058b49cbfb14676bd7",
+          "manifestPath": "design/parity/evidence/tokens-type--scale/comparison.json",
+          "manifestSha256": "c8500b2b9f2da052b0f839e9928a85b79d3b71a970fbc348bf249ff7961dc60c"
+        },
+        "diff": {
+          "path": "design/parity/evidence/tokens-type--scale/diff.json",
+          "status": "verified",
+          "sha256": "accabf2ce1f86e7ae19a9be905b0d3ba667fae85309d2a773daf98c2eafbef70"
+        }
+      },
+      "intentionalDeviations": [],
+      "sourceCommit": "330352ce7513ba420752dd7243762f0dd75f9eaa",
+      "captureProvenance": {
+        "route": "cheap-lowlevel-headless",
+        "sourceCommit": "330352ce7513ba420752dd7243762f0dd75f9eaa",
+        "buildReceiptPath": "design/parity/evidence/build-receipt.json",
+        "buildReceiptSha256": "34ff59d65a1ad149e636e8605f8d8c39364df8f0ddaecf4cc10fb72c566f9394"
+      }
     },
     {
       "id": "tool-card--gallery",
       "screen": "tool-card",
-      "declaredStates": ["gallery", "undiscovered", "discovered-locked", "unlockable-now", "unlocked"],
-      "reference": { "file": "tool-card.html", "sha256": "3d891f7d5f07e0fa28c30385eb6e4131b1198c31b73b3f5b3cd7060cacd4b8b0", "route": "/design/reference-app/index.html?row=tool-card--gallery&theme=light&width=1280&height=800&scale=1&state=gallery&locale=en-HK&capture=1" },
-      "product": { "route": "app://material-cookie-clicker/?designParity=tool-card--gallery&panel=tools&focus=cards&theme=light&width=1280&height=800&scale=1&state=gallery&locale=en-HK" },
-      "tuple": { "screen": "tool-card", "state": "gallery", "theme": "light", "viewport": { "width": 1280, "height": 800 }, "scale": 1, "locale": "en-HK" },
-      "deterministic": { "fixture": "tool-card-gallery-v1", "time": "2026-08-19T12:00:00Z", "motion": "paused", "randomSeed": 1914, "fonts": "Segoe UI system stack", "network": "blocked" },
+      "declaredStates": [
+        "gallery",
+        "undiscovered",
+        "discovered-locked",
+        "unlockable-now",
+        "unlocked"
+      ],
+      "reference": {
+        "file": "tool-card.html",
+        "sha256": "3d891f7d5f07e0fa28c30385eb6e4131b1198c31b73b3f5b3cd7060cacd4b8b0",
+        "route": "/design/reference-app/index.html?row=tool-card--gallery&theme=light&width=1280&height=800&scale=1&state=gallery&locale=en-HK&capture=1"
+      },
+      "product": {
+        "route": "app://material-cookie-clicker/?designParity=tool-card--gallery&panel=tools&focus=cards&theme=light&width=1280&height=800&scale=1&state=gallery&locale=en-HK"
+      },
+      "tuple": {
+        "screen": "tool-card",
+        "state": "gallery",
+        "theme": "light",
+        "viewport": {
+          "width": 1280,
+          "height": 800
+        },
+        "scale": 1,
+        "locale": "en-HK"
+      },
+      "deterministic": {
+        "fixture": "tool-card-gallery-v1",
+        "time": "2026-08-19T12:00:00Z",
+        "motion": "paused",
+        "randomSeed": 1914,
+        "fonts": "Segoe UI system stack",
+        "network": "blocked"
+      },
       "materialDesign3AuditId": "m3-game-surface-v1",
-      "materialDesign3Notes": "Tool icons and progression state remain domain data; cards, callouts, and buttons use the shared Material product-chrome layer. Capture evidence remains pending.",
-      "evidence": { "referenceRaw": { "path": "design/parity/evidence/tool-card--gallery/reference.png", "status": "pending", "reason": "No cheap-headless reference capture has been made." }, "productRaw": { "path": "design/parity/evidence/tool-card--gallery/product.png", "status": "pending", "reason": "No matching built-app capture has been made." }, "comparison": { "path": "design/parity/evidence/tool-card--gallery/comparison.png", "status": "pending", "reason": "Both raw captures are required first." }, "diff": { "path": "design/parity/evidence/tool-card--gallery/diff.json", "status": "pending", "reason": "Both raw captures are required first." } },
-      "intentionalDeviations": []
+      "materialDesign3Notes": "Tool icons and progression state remain domain data; cards, callouts, and buttons use the shared Material product-chrome layer. Capture evidence is recorded; unapproved visual deltas remain defects.",
+      "evidence": {
+        "referenceRaw": {
+          "path": "design/parity/evidence/tool-card--gallery/reference.png",
+          "status": "verified",
+          "sha256": "75ae0464c4633fb63ad9489d70cdc8a29d9309cec6d9d4cd6aadead1ecde01b2",
+          "receiptPath": "design/parity/evidence/tool-card--gallery/referenceRaw-receipt.json",
+          "receiptSha256": "f136c2541135d9f9d1a580c37cb0cd9b772cb44085ac784804d729843cf51e29"
+        },
+        "productRaw": {
+          "path": "design/parity/evidence/tool-card--gallery/product.png",
+          "status": "verified",
+          "sha256": "f79847ece59a4cd1b6738291856d8f8f00068fd8bf3ac8e81a65afc5a0ff2097",
+          "receiptPath": "design/parity/evidence/tool-card--gallery/productRaw-receipt.json",
+          "receiptSha256": "0491a9601469cf94f14c2a96e2c1039d33cfdfc0b2a1799e6a6defb205eec1f5"
+        },
+        "comparison": {
+          "path": "design/parity/evidence/tool-card--gallery/comparison.png",
+          "status": "verified",
+          "sha256": "58ec6f1b60a496f94730ee619f804cf003a9b59e6d11c913d20120ad095ea7e4",
+          "manifestPath": "design/parity/evidence/tool-card--gallery/comparison.json",
+          "manifestSha256": "9ed02bcc9c3a7695dfb7c8d76ad3d4344f302ea321816796f893acbb5df2f204"
+        },
+        "diff": {
+          "path": "design/parity/evidence/tool-card--gallery/diff.json",
+          "status": "verified",
+          "sha256": "7e7b2e98d0b71880adacad342a8d7072a48a1c656c8731ffccdb5ae3af3560db"
+        }
+      },
+      "intentionalDeviations": [],
+      "sourceCommit": "330352ce7513ba420752dd7243762f0dd75f9eaa",
+      "captureProvenance": {
+        "route": "cheap-lowlevel-headless",
+        "sourceCommit": "330352ce7513ba420752dd7243762f0dd75f9eaa",
+        "buildReceiptPath": "design/parity/evidence/build-receipt.json",
+        "buildReceiptSha256": "34ff59d65a1ad149e636e8605f8d8c39364df8f0ddaecf4cc10fb72c566f9394"
+      }
     },
     {
       "id": "tools-tree--mixed",
       "screen": "tools-tree",
-      "declaredStates": ["mixed", "progression-on", "progression-off", "search-builder-open"],
-      "reference": { "file": "tools-tree.html", "sha256": "5cde2e489e669db1c15358689aa7a2b87dcc3d9d4a82001cf0c085bd97cf8763", "route": "/design/reference-app/index.html?row=tools-tree--mixed&theme=light&width=1280&height=800&scale=1&state=mixed&locale=en-HK&capture=1" },
-      "product": { "route": "app://material-cookie-clicker/?designParity=tools-tree--mixed&panel=tools&theme=light&width=1280&height=800&scale=1&state=mixed&locale=en-HK" },
-      "tuple": { "screen": "tools-tree", "state": "mixed", "theme": "light", "viewport": { "width": 1280, "height": 800 }, "scale": 1, "locale": "en-HK" },
-      "deterministic": { "fixture": "tools-tree-mixed-v1", "time": "2026-08-19T12:00:00Z", "motion": "paused", "randomSeed": 1915, "fonts": "Segoe UI system stack", "network": "blocked" },
+      "declaredStates": [
+        "mixed",
+        "progression-on",
+        "progression-off",
+        "search-builder-open"
+      ],
+      "reference": {
+        "file": "tools-tree.html",
+        "sha256": "5cde2e489e669db1c15358689aa7a2b87dcc3d9d4a82001cf0c085bd97cf8763",
+        "route": "/design/reference-app/index.html?row=tools-tree--mixed&theme=light&width=1280&height=800&scale=1&state=mixed&locale=en-HK&capture=1"
+      },
+      "product": {
+        "route": "app://material-cookie-clicker/?designParity=tools-tree--mixed&panel=tools&theme=light&width=1280&height=800&scale=1&state=mixed&locale=en-HK"
+      },
+      "tuple": {
+        "screen": "tools-tree",
+        "state": "mixed",
+        "theme": "light",
+        "viewport": {
+          "width": 1280,
+          "height": 800
+        },
+        "scale": 1,
+        "locale": "en-HK"
+      },
+      "deterministic": {
+        "fixture": "tools-tree-mixed-v1",
+        "time": "2026-08-19T12:00:00Z",
+        "motion": "paused",
+        "randomSeed": 1915,
+        "fonts": "Segoe UI system stack",
+        "network": "blocked"
+      },
       "materialDesign3AuditId": "m3-game-surface-v1",
-      "materialDesign3Notes": "Jewel tiers, edges, and progress remain domain data; search, cards, toggles, and panels use Material product chrome. Capture evidence remains pending.",
-      "evidence": { "referenceRaw": { "path": "design/parity/evidence/tools-tree--mixed/reference.png", "status": "pending", "reason": "No cheap-headless reference capture has been made." }, "productRaw": { "path": "design/parity/evidence/tools-tree--mixed/product.png", "status": "pending", "reason": "No matching built-app capture has been made." }, "comparison": { "path": "design/parity/evidence/tools-tree--mixed/comparison.png", "status": "pending", "reason": "Both raw captures are required first." }, "diff": { "path": "design/parity/evidence/tools-tree--mixed/diff.json", "status": "pending", "reason": "Both raw captures are required first." } },
-      "intentionalDeviations": []
+      "materialDesign3Notes": "Jewel tiers, edges, and progress remain domain data; search, cards, toggles, and panels use Material product chrome. Capture evidence is recorded; unapproved visual deltas remain defects.",
+      "evidence": {
+        "referenceRaw": {
+          "path": "design/parity/evidence/tools-tree--mixed/reference.png",
+          "status": "verified",
+          "sha256": "613193d9ebf25e82d326f4f4397ad827580489c5de9a886f3f9c41e13b7d9f89",
+          "receiptPath": "design/parity/evidence/tools-tree--mixed/referenceRaw-receipt.json",
+          "receiptSha256": "0dcd12118a8d1cf863f2e4ccb1c769f2bae5928c84cce8295e894393aa55591e"
+        },
+        "productRaw": {
+          "path": "design/parity/evidence/tools-tree--mixed/product.png",
+          "status": "verified",
+          "sha256": "e24beb2fa79579c8da18827141d172c0977fe9f85aca1bb3cb8d3e55681c4ce3",
+          "receiptPath": "design/parity/evidence/tools-tree--mixed/productRaw-receipt.json",
+          "receiptSha256": "b02e4f55da0f6f5ffded72c9c54b029ffa2c1c6661f2912831d4a4e73094bd21"
+        },
+        "comparison": {
+          "path": "design/parity/evidence/tools-tree--mixed/comparison.png",
+          "status": "verified",
+          "sha256": "c46592420e070a2d5c17be70dffda9cc630f37452a4945aa7bd7ee7683fcb126",
+          "manifestPath": "design/parity/evidence/tools-tree--mixed/comparison.json",
+          "manifestSha256": "adf479b7522969ce129d5112d69bc0260a1717c2b6b559e1435bb96c47c62182"
+        },
+        "diff": {
+          "path": "design/parity/evidence/tools-tree--mixed/diff.json",
+          "status": "verified",
+          "sha256": "9e231041492e9849c5dbabf12b786c679d2fcffedbbcba736a65714f41b7e913"
+        }
+      },
+      "intentionalDeviations": [],
+      "sourceCommit": "330352ce7513ba420752dd7243762f0dd75f9eaa",
+      "captureProvenance": {
+        "route": "cheap-lowlevel-headless",
+        "sourceCommit": "330352ce7513ba420752dd7243762f0dd75f9eaa",
+        "buildReceiptPath": "design/parity/evidence/build-receipt.json",
+        "buildReceiptSha256": "34ff59d65a1ad149e636e8605f8d8c39364df8f0ddaecf4cc10fb72c566f9394"
+      }
     },
     {
       "id": "upgrade-card--gallery",
       "screen": "upgrade-card",
-      "declaredStates": ["gallery", "locked", "unlocked-buyable", "owned"],
-      "reference": { "file": "upgrade-card.html", "sha256": "2e1d7e5e67f3e7d4e3168ba4e3c318881bd49e55fb9661628d376ec2975612bd", "route": "/design/reference-app/index.html?row=upgrade-card--gallery&theme=light&width=1280&height=800&scale=1&state=gallery&locale=en-HK&capture=1" },
-      "product": { "route": "app://material-cookie-clicker/?designParity=upgrade-card--gallery&surface=game&focus=upgrades&theme=light&width=1280&height=800&scale=1&state=gallery&locale=en-HK" },
-      "tuple": { "screen": "upgrade-card", "state": "gallery", "theme": "light", "viewport": { "width": 1280, "height": 800 }, "scale": 1, "locale": "en-HK" },
-      "deterministic": { "fixture": "upgrade-gallery-v1", "time": "2026-08-19T12:00:00Z", "motion": "paused", "randomSeed": 1916, "fonts": "Segoe UI system stack", "network": "blocked" },
+      "declaredStates": [
+        "gallery",
+        "locked",
+        "unlocked-buyable",
+        "owned"
+      ],
+      "reference": {
+        "file": "upgrade-card.html",
+        "sha256": "2e1d7e5e67f3e7d4e3168ba4e3c318881bd49e55fb9661628d376ec2975612bd",
+        "route": "/design/reference-app/index.html?row=upgrade-card--gallery&theme=light&width=1280&height=800&scale=1&state=gallery&locale=en-HK&capture=1"
+      },
+      "product": {
+        "route": "app://material-cookie-clicker/?designParity=upgrade-card--gallery&surface=game&focus=upgrades&theme=light&width=1280&height=800&scale=1&state=gallery&locale=en-HK"
+      },
+      "tuple": {
+        "screen": "upgrade-card",
+        "state": "gallery",
+        "theme": "light",
+        "viewport": {
+          "width": 1280,
+          "height": 800
+        },
+        "scale": 1,
+        "locale": "en-HK"
+      },
+      "deterministic": {
+        "fixture": "upgrade-gallery-v1",
+        "time": "2026-08-19T12:00:00Z",
+        "motion": "paused",
+        "randomSeed": 1916,
+        "fonts": "Segoe UI system stack",
+        "network": "blocked"
+      },
       "materialDesign3AuditId": "m3-game-surface-v1",
-      "materialDesign3Notes": "Ticket cuts and upgrade imagery remain domain data art; purchase controls and surrounding card chrome use Material anatomy. Capture evidence remains pending.",
-      "evidence": { "referenceRaw": { "path": "design/parity/evidence/upgrade-card--gallery/reference.png", "status": "pending", "reason": "No cheap-headless reference capture has been made." }, "productRaw": { "path": "design/parity/evidence/upgrade-card--gallery/product.png", "status": "pending", "reason": "No matching built-app capture has been made." }, "comparison": { "path": "design/parity/evidence/upgrade-card--gallery/comparison.png", "status": "pending", "reason": "Both raw captures are required first." }, "diff": { "path": "design/parity/evidence/upgrade-card--gallery/diff.json", "status": "pending", "reason": "Both raw captures are required first." } },
-      "intentionalDeviations": []
+      "materialDesign3Notes": "Ticket cuts and upgrade imagery remain domain data art; purchase controls and surrounding card chrome use Material anatomy. Capture evidence is recorded; unapproved visual deltas remain defects.",
+      "evidence": {
+        "referenceRaw": {
+          "path": "design/parity/evidence/upgrade-card--gallery/reference.png",
+          "status": "verified",
+          "sha256": "fdc7750b74790de25b90877a282cfadaf7aaa3d3a7ea956c4b72c10ca84c957a",
+          "receiptPath": "design/parity/evidence/upgrade-card--gallery/referenceRaw-receipt.json",
+          "receiptSha256": "4bba9704afe69d2973d6410929e30e8d4e53802853ac8ab47cad5be211d25044"
+        },
+        "productRaw": {
+          "path": "design/parity/evidence/upgrade-card--gallery/product.png",
+          "status": "verified",
+          "sha256": "d649a1896bbe235faf6d393a8f5f4dd85b99b1d87eb2933bd95f2e4df45d47dc",
+          "receiptPath": "design/parity/evidence/upgrade-card--gallery/productRaw-receipt.json",
+          "receiptSha256": "3f12f391bac8a3a2722f069683b9a1260180050f13a74f0a041c64424f1bf47b"
+        },
+        "comparison": {
+          "path": "design/parity/evidence/upgrade-card--gallery/comparison.png",
+          "status": "verified",
+          "sha256": "b687679c84da75a10da13c9f6fa875b4accf03769b203ffce26efdeb8c6b9eb2",
+          "manifestPath": "design/parity/evidence/upgrade-card--gallery/comparison.json",
+          "manifestSha256": "e4b08c19f49a798dd351ebf0c7f935e84e7518488a0ebd6032566a6f9b38e7ae"
+        },
+        "diff": {
+          "path": "design/parity/evidence/upgrade-card--gallery/diff.json",
+          "status": "verified",
+          "sha256": "387510491cc5ca23ac90f2a7fa11562c2f030e44ed625a116e879ddc798b34ff"
+        }
+      },
+      "intentionalDeviations": [],
+      "sourceCommit": "330352ce7513ba420752dd7243762f0dd75f9eaa",
+      "captureProvenance": {
+        "route": "cheap-lowlevel-headless",
+        "sourceCommit": "330352ce7513ba420752dd7243762f0dd75f9eaa",
+        "buildReceiptPath": "design/parity/evidence/build-receipt.json",
+        "buildReceiptSha256": "34ff59d65a1ad149e636e8605f8d8c39364df8f0ddaecf4cc10fb72c566f9394"
+      }
     }
   ]
 }

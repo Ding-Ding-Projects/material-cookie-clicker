@@ -1,0 +1,87 @@
+{
+  "version": 1,
+  "id": "achievement-badge--gallery--reference",
+  "route": "cheap-lowlevel-headless",
+  "source": {
+    "startCommit": "330352ce7513ba420752dd7243762f0dd75f9eaa",
+    "endCommit": "330352ce7513ba420752dd7243762f0dd75f9eaa",
+    "artifactPath": "dist/renderer/assets/index-BQyFOhDT.js",
+    "artifactSha256": "4663d6eaeafea4f1291311a86691fffc4e24ced846e32bcbd4405b5dd8b79198",
+    "buildReceiptPath": "design/parity/evidence/build-receipt.json",
+    "buildReceiptSha256": "34ff59d65a1ad149e636e8605f8d8c39364df8f0ddaecf4cc10fb72c566f9394",
+    "artifactBuiltAt": "2026-08-20T00:26:07.892Z"
+  },
+  "capture": {
+    "rawPath": "C:\\Users\\cntow\\AppData\\Local\\Temp\\mcc-parity-330352c-20260819-2025\\output\\reference-rows-current\\achievement-badge--gallery\\reference.png",
+    "promotedPath": "design/parity/evidence/achievement-badge--gallery/reference.png",
+    "sha256": "78877661ea44de52dbda4c77400c307cb8b8b41fe43fc0ec0a5c7ec3caa791b1",
+    "rawSha256": "78877661ea44de52dbda4c77400c307cb8b8b41fe43fc0ec0a5c7ec3caa791b1",
+    "mimeType": "image/png",
+    "startedAt": "2026-08-20T00:26:07.892Z",
+    "capturedAt": "2026-08-20T00:26:08.205Z",
+    "width": 1280,
+    "height": 800
+  },
+  "state": {
+    "surface": "design-reference-app",
+    "screen": "achievement-badge",
+    "state": "gallery",
+    "theme": "light",
+    "viewport": {
+      "width": 1280,
+      "height": 800
+    },
+    "scale": 1,
+    "locale": "en-HK",
+    "captureKind": "page",
+    "deterministic": {
+      "fixture": "achievement-gallery-v1",
+      "time": "2026-08-19T12:00:00Z",
+      "motion": "paused",
+      "randomSeed": 1901,
+      "fonts": "Segoe UI system stack",
+      "network": "blocked"
+    }
+  },
+  "privacy": {
+    "visibleDesktopUntouched": true,
+    "expectedSurfaceOnly": true,
+    "sensitiveDataReviewed": true,
+    "unrelatedTargetsObserved": false,
+    "mocked": false,
+    "handEdited": false
+  },
+  "inspection": {
+    "decoded": true,
+    "pixelsInspected": true,
+    "targetVisible": true,
+    "expectedStateVisible": true,
+    "reviewer": "automated parity capture review"
+  },
+  "runtime": {
+    "launchPid": 51504,
+    "hwnd": "15468902",
+    "hwndResolvedLive": true,
+    "consoleErrorCount": 0,
+    "pageErrorCount": 0,
+    "interactionProofId": "achievement-badge--gallery-referenceRaw",
+    "interactionReceiptPath": "design/parity/evidence/achievement-badge--gallery/referenceRaw-interaction.json",
+    "interactionReceiptSha256": "5f10c1d22a2681df7489c1005edd3b62707929837b4296ee4f9384286061d448",
+    "privacyScanPath": "design/parity/evidence/achievement-badge--gallery/referenceRaw-privacy.json",
+    "privacyScanSha256": "ee01fec30d242657c3bb5c4a425aa47dd2e39724a3e47eeba106e061a9c28c84",
+    "cleanupCompleted": true,
+    "cleanupOwnedOnly": true
+  },
+  "inventory": {
+    "path": "design/parity/evidence/promotion-inventory.json",
+    "recordId": "achievement-badge--gallery--reference",
+    "rowId": "achievement-badge--gallery",
+    "evidenceKey": "referenceRaw"
+  },
+  "documentation": [
+    {
+      "path": "design/parity/inventory.json",
+      "alt": "achievement-badge--gallery referenceRaw at 1280 by 800"
+    }
+  ]
+}

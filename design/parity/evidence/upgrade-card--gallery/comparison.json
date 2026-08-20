@@ -1,0 +1,23 @@
+{
+  "schemaVersion": 1,
+  "rowId": "upgrade-card--gallery",
+  "tuple": {
+    "screen": "upgrade-card",
+    "state": "gallery",
+    "theme": "light",
+    "viewport": {
+      "width": 1280,
+      "height": 800
+    },
+    "scale": 1,
+    "locale": "en-HK"
+  },
+  "labels": [
+    "REFERENCE",
+    "BUILT PRODUCT"
+  ],
+  "inputs": {
+    "referenceSha256": "fdc7750b74790de25b90877a282cfadaf7aaa3d3a7ea956c4b72c10ca84c957a",
+    "productSha256": "d649a1896bbe235faf6d393a8f5f4dd85b99b1d87eb2933bd95f2e4df45d47dc"
+  }
+}

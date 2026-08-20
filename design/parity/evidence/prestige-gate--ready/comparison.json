@@ -1,0 +1,23 @@
+{
+  "schemaVersion": 1,
+  "rowId": "prestige-gate--ready",
+  "tuple": {
+    "screen": "prestige-gate",
+    "state": "ready",
+    "theme": "light",
+    "viewport": {
+      "width": 1280,
+      "height": 800
+    },
+    "scale": 1,
+    "locale": "en-HK"
+  },
+  "labels": [
+    "REFERENCE",
+    "BUILT PRODUCT"
+  ],
+  "inputs": {
+    "referenceSha256": "c76af92f980a1f6a2adbfb278c720e83d850339ab81b35472d2bbd1852516daa",
+    "productSha256": "8215a7f4dfd0ea183a078da692827e305ec404a0be67dc8b52512b28328bdef7"
+  }
+}

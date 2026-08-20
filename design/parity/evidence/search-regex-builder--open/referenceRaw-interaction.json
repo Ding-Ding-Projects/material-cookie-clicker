@@ -1,0 +1,22 @@
+{
+  "version": 1,
+  "rowId": "search-regex-builder--open",
+  "side": "referenceRaw",
+  "route": "/design/reference-app/index.html?row=search-regex-builder--open&theme=light&width=1280&height=800&scale=1&state=open&locale=en-HK&capture=1",
+  "state": {
+    "file": "search-regex-builder.html",
+    "width": 1280,
+    "height": 800,
+    "scale": 1,
+    "lang": "en-HK",
+    "theme": "light",
+    "state": "open",
+    "rect": {
+      "x": 0,
+      "y": 0,
+      "width": 1280,
+      "height": 800
+    }
+  },
+  "cleanupCompleted": true
+}

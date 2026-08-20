@@ -2,7 +2,7 @@
   "version": 1,
   "id": "stat-tile--gallery",
   "route": "cheap-lowlevel-headless",
-  "sourceCommit": "13e09369a3b6f9336d4604f7b8eade652276a4e5",
+  "sourceCommit": "7cf30ae5ab93349790c674647fe9fe3e64a01af7",
   "reviewer": "automated parity capture review",
   "rawReceiptPaths": [
     "design/parity/evidence/stat-tile--gallery/referenceRaw-receipt.json",

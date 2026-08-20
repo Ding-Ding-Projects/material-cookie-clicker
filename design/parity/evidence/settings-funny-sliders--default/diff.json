@@ -15,7 +15,7 @@
   "inputs": {
     "reference": {
       "path": "design/parity/evidence/settings-funny-sliders--default/reference.png",
-      "sha256": "d26ddcac4140ca929102df3f8e83160404f673098a535045da0cb2101554f9cc"
+      "sha256": "53fb93362d8615915122e13dca518dad8de275a358cfb5fecfe6e460c9458326"
     },
     "product": {
       "path": "design/parity/evidence/settings-funny-sliders--default/product.png",
@@ -27,10 +27,10 @@
     "height": 800
   },
   "metrics": {
-    "changedPixels": 400951,
+    "changedPixels": 396902,
     "totalPixels": 1024000,
-    "changedRatio": 0.3915537109375,
-    "rgbRmse": 42.248944405575585
+    "changedRatio": 0.387599609375,
+    "rgbRmse": 39.28734165756484
   },
   "tool": {
     "name": "Pillow ImageChops.difference",

@@ -344,7 +344,28 @@ function SettingsFunnySliders() {
 
 function StatGallery() {
   const stats = [['Total cookies baked', '總共烤咗嘅曲奇', '4.82 Qa', '', 'flat'], ['Cookies per second', '每秒曲奇產量', '18,420', '+6.2% this session · 呢節升咗 6.2%', 'up'], ['Click power', '每擊力量', '312', '−3.1% since last prestige · 由上次轉生跌咗 3.1%', 'down'], ['Prestige runs', '轉生次數', '7', '', 'flat']] as const;
-  return <GalleryFrame label="Statistic tile product gallery"><div className="stat-grid">{stats.map(([en, yue, value, trend, direction]) => <div className="stat-tile" key={en}><span className="stat-tile__label-en">{en}</span><span className="stat-tile__label-zh">{yue}</span><span className="stat-tile__value">{value}</span>{trend ? <span className={`stat-tile__trend ${direction}`}>{direction === 'down' ? '▼' : '▲'} {trend}</span> : null}</div>)}</div><div className="stat-tile parity-goal-tile"><span className="stat-tile__label-en">Next prestige level</span><span className="stat-tile__label-zh">下一個轉生等級</span><span className="stat-tile__value">Lv 12</span><progress value="68" max="100">68%</progress><span>68% · 6.8e12 / 1.0e13 Lv 13</span></div></GalleryFrame>;
+  return (
+    <GalleryFrame label="Statistic tile product gallery">
+      <div className="stat-grid parity-stat-grid">
+        {stats.map(([en, yue, value, trend, direction]) => (
+          <article className="stat-tile parity-stat-tile" key={en}>
+            <span className="stat-tile__label-en">{en}</span>
+            <span className="stat-tile__label-zh">{yue}</span>
+            <span className="parity-stat-reading">
+              <strong className="stat-tile__value">{value}</strong>
+              {trend ? <span className={`stat-tile__trend ${direction}`}>{direction === 'down' ? '▼' : '▲'} {trend}</span> : null}
+            </span>
+          </article>
+        ))}
+      </div>
+      <article className="stat-tile parity-stat-tile parity-goal-tile">
+        <span className="parity-goal-tile__title">Next prestige level · 下一個轉生等級</span>
+        <strong className="stat-tile__value">Lv 12</strong>
+        <progress className="parity-goal-tile__progress" value="68" max="100" aria-label="Next prestige level progress: 68%">68%</progress>
+        <span className="parity-goal-tile__detail">68% · 6.8e12 / 1.0e13 Lv 13</span>
+      </article>
+    </GalleryFrame>
+  );
 }
 
 const COLOR_ROLES = [

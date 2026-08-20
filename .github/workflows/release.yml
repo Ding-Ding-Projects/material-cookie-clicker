@@ -196,9 +196,16 @@ jobs:
           $appSignature = Get-AuthenticodeSignature -FilePath $appExecutable.FullName
           if ($appSignature.Status -ne 'NotSigned') { throw "Code signing is prohibited, but the packaged application reported $($appSignature.Status)." }
           New-Item -ItemType Directory -Path release-stage -Force | Out-Null
+          # -SourceIcon is a MANDATORY parameter of Export-ExecutableIconProof and was
+          # missing here, so every run reached packaging and then died with
+          #   Cannot process command because of one or more missing mandatory parameters: SourceIcon.
+          # scripts/build-common.ps1 has always called it correctly; only this caller
+          # was left behind. Same committed icon, same derivation, one source of truth.
+          $sourceIcon = Join-Path $PWD 'assets/material-cookie-clicker.ico'
+          if (-not (Test-Path -LiteralPath $sourceIcon -PathType Leaf)) { throw "Committed icon source is missing: $sourceIcon" }
           $iconProof = @(
-            Export-ExecutableIconProof -Executable $setup.FullName -OutputRoot 'release-stage/icon-proof' -Label 'setup'
-            Export-ExecutableIconProof -Executable $appExecutable.FullName -OutputRoot 'release-stage/icon-proof' -Label 'app'
+            Export-ExecutableIconProof -Executable $setup.FullName -SourceIcon $sourceIcon -OutputRoot 'release-stage/icon-proof' -Label 'setup'
+            Export-ExecutableIconProof -Executable $appExecutable.FullName -SourceIcon $sourceIcon -OutputRoot 'release-stage/icon-proof' -Label 'app'
           )
           Copy-Item -LiteralPath $setup.FullName -Destination 'release-stage/MaterialCookieClicker-Setup.exe'
           Copy-Item -LiteralPath $releases.FullName -Destination 'release-stage/RELEASES'

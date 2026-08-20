@@ -1,0 +1,475 @@
+<!-- @dsCard group="Foundations" -->
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1" />
+<title>Material Cookie Clicker · Type Tokens · Display Face + Tabular Figures (EN + 中文)</title>
+<style>
+  :root {
+    /* ============================================================================
+       MATERIAL COOKIE CLICKER — v2 "ARCADE CABINET" TOKENS · LIGHT = BAKERY DAYTIME
+       Warm browns/golds kept from v1 (they were right); everything is deepened and a
+       cabinet-chrome layer is added on top: radial oven-glow backgrounds, inset HUD
+       bezels, metallic bevels, jewel tiers. Every text-bearing pair below — including
+       BOTH ends of the background gradient — is verified by design/_verify/contrast-check.mjs.
+       ============================================================================ */
+
+    /* --- role colours (M3 naming kept as vocabulary only; see README) --- */
+    --md-primary: #7A4A1D;
+    --md-on-primary: #FFFFFF;
+    --md-primary-container: #FFDCB8;
+    --md-on-primary-container: #3A2100;
+    --md-primary-shadow: #3C2107;      /* solid "3D base" under a pressable button — never a blur */
+    --md-secondary: #6B4C3F;
+    --md-on-secondary: #FFFFFF;
+    --md-secondary-container: #FFDBCB;
+    --md-on-secondary-container: #2C160B;
+    --md-secondary-shadow: #35211A;
+    --md-tertiary: #5C4E00;            /* golden-cookie role — never ordinary chrome */
+    --md-on-tertiary: #FFFFFF;
+    --md-tertiary-container: #F8E287;
+    --md-on-tertiary-container: #221B00;
+    --md-tertiary-shadow: #332900;
+    --md-error: #BA1A1A;
+    --md-on-error: #FFFFFF;
+    --md-error-container: #FFDAD6;
+    --md-on-error-container: #410002;
+    --md-error-shadow: #6E0000;
+
+    /* --- surfaces: deeper and warmer than v1's near-white cream --- */
+    --md-surface: #FFF3E6;
+    --md-on-surface: #1E1610;
+    --md-surface-variant: #F0DCC4;
+    --md-on-surface-variant: #4A3D2E;
+    --md-outline: #75634E;
+    --md-surface-container-lowest: #FFFFFF;
+    --md-surface-container-low: #FFF0DE;
+    --md-surface-container: #FBE8D2;
+    --md-surface-container-high: #F5DFC4;
+    --md-surface-container-highest: #EED5B4;
+    --md-shadow: #000000;
+
+    /* --- v2 cabinet chrome --- */
+    --bg-core: #FFF6EC;                /* centre of the radial oven glow */
+    --bg-mid: #FAECDA;
+    --bg-edge: #EFDCC0;                /* rim of the cabinet, where the glow falls off */
+    --panel-inset: #FFFBF4;            /* recessed HUD readout face behind a bezel */
+    --bevel-hi: rgba(255, 255, 255, 0.85);  /* top inner bevel highlight (non-text) */
+    --bevel-lo: rgba(90, 58, 24, 0.28);     /* bottom inner bevel shade (non-text) */
+    --metal-hi: #FFF0C4;               /* medal/badge metallic sweep, decorative only */
+    --metal-lo: #B98A2E;
+    --cabinet-frame: #6A4522;          /* the wooden counter / cabinet body, non-text */
+    --cabinet-frame-dark: #43290F;
+    --track: #E4CDAE;                  /* XP-bar / progress trough, non-text */
+
+    /* --- arcade spark accent. --spark and --spark-glow are DECORATIVE ONLY (blurred
+           glows and gradient fills) and never carry text. --spark-ring is the only
+           spark role allowed on text or a UI boundary, and is AA-verified. --- */
+    --spark: #FFC94D;
+    --spark-glow: #FF8A00;
+    --spark-ring: #9C4B00;
+
+    /* --- jewel tool-tier ladder: bronze -> emerald -> amethyst --- */
+    --tier1: #8A4E12;
+    --on-tier1: #FFFFFF;
+    --tier1-container: #FFDCBA;
+    --on-tier1-container: #2E1600;
+    --tier2: #1F6337;
+    --on-tier2: #FFFFFF;
+    --tier2-container: #B8F0C4;
+    --on-tier2-container: #04210D;
+    --tier3: #533593;
+    --on-tier3: #FFFFFF;
+    --tier3-container: #E6D9FF;
+    --on-tier3-container: #20004D;
+    --tier-accent: var(--tier1);
+    --on-tier-accent: var(--on-tier1);
+    --tier-accent-container: var(--tier1-container);
+    --on-tier-accent-container: var(--on-tier1-container);
+
+    /* --- type --- */
+    --font-en: -apple-system, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
+    --font-zh: "Segoe UI", "Microsoft JhengHei", var(--font-en);
+    --font-display: "Segoe UI Black", "Arial Black", "Segoe UI", var(--font-en);
+
+    /* --- shape: v2 goes fatter again (v1 was 8-34, v2 is 10-40) --- */
+    --shape-none: 0px;
+    --shape-xs: 10px;
+    --shape-sm: 16px;
+    --shape-md: 22px;
+    --shape-lg: 28px;
+    --shape-xl: 34px;
+    --shape-2xl: 40px;
+    --shape-full: 999px;
+
+    /* --- borders: hairlines are banned in this theme --- */
+    --border-thin: 2px;
+    --border-thick: 3px;
+    --border-chunky: 4px;
+    --border-fat: 5px;
+
+    /* --- pressable depth. Two paired families, deliberately kept separate:
+           --drop-N is the LENGTH a control travels when pressed (also the height of
+           its solid base), --press-N is the ready-made box-shadow built from it.
+           Solid offsets only; a blurred drop shadow is not used anywhere in v2.
+           v2 deepens v1's 3-4px travel to 4-10px. --- */
+    --drop-1: 4px;
+    --drop-2: 6px;
+    --drop-3: 8px;
+    --drop-4: 10px;
+    --press-0: none;
+    --press-1: 0 var(--drop-1) 0 0 var(--md-outline);
+    --press-2: 0 var(--drop-2) 0 0 var(--md-outline);
+    --press-3: 0 var(--drop-3) 0 0 var(--md-outline);
+    --press-4: 0 var(--drop-4) 0 0 var(--cabinet-frame-dark);
+  }
+  [data-scheme="dark"] {
+    /* ============================================================================
+       DARK = ARCADE NIGHT. Not "the light theme with the lights off": the cabinet is
+       lit from inside, so the background glow gets BRIGHTER toward its centre while
+       the rim goes to near-black. Both ends are contrast-verified.
+       ============================================================================ */
+    --md-primary: #FFB876;
+    --md-on-primary: #4A2800;
+    --md-primary-container: #693C00;
+    --md-on-primary-container: #FFDCB8;
+    --md-primary-shadow: #2A1600;
+    --md-secondary: #E6BEAC;
+    --md-on-secondary: #44291E;
+    --md-secondary-container: #5D3F32;
+    --md-on-secondary-container: #FFDBCB;
+    --md-secondary-shadow: #24140D;
+    --md-tertiary: #DBC66E;
+    --md-on-tertiary: #383000;
+    --md-tertiary-container: #514600;
+    --md-on-tertiary-container: #F8E287;
+    --md-tertiary-shadow: #201C00;
+    --md-error: #FFB4AB;
+    --md-on-error: #690005;
+    --md-error-container: #93000A;
+    --md-on-error-container: #FFDAD6;
+    --md-error-shadow: #4A0004;
+
+    --md-surface: #120C08;
+    --md-on-surface: #F2E4D6;
+    --md-surface-variant: #453A2E;
+    --md-on-surface-variant: #D8C8B4;
+    --md-outline: #A08D78;
+    --md-surface-container-lowest: #0A0603;
+    --md-surface-container-low: #1A120B;
+    --md-surface-container: #221810;
+    --md-surface-container-high: #2C2016;
+    --md-surface-container-highest: #382A1E;
+    --md-shadow: #000000;
+
+    --bg-core: #2A1A0A;
+    --bg-mid: #1A1008;
+    --bg-edge: #0A0705;
+    --panel-inset: #0B0704;
+    --bevel-hi: rgba(255, 214, 160, 0.30);
+    --bevel-lo: rgba(0, 0, 0, 0.72);
+    --metal-hi: #FFE7A8;
+    --metal-lo: #8A6318;
+    --cabinet-frame: #3A2410;
+    --cabinet-frame-dark: #150C05;
+    --track: #2E2419;
+
+    --spark: #FFD97A;
+    --spark-glow: #FFA326;
+    --spark-ring: #FFC24D;
+
+    --tier1: #F2B27A;
+    --on-tier1: #3A1E00;
+    --tier1-container: #5A3208;
+    --on-tier1-container: #FFDCBA;
+    --tier2: #8FE3A6;
+    --on-tier2: #0C3018;
+    --tier2-container: #1B4A28;
+    --on-tier2-container: #B8F0C4;
+    --tier3: #CFBCFF;
+    --on-tier3: #2A0A5C;
+    --tier3-container: #3B2465;
+    --on-tier3-container: #E6D9FF;
+  }
+  * { box-sizing: border-box; }
+  h2 { font-size: 20px; margin: 32px 0 12px; border-bottom: 2px solid var(--md-outline); padding-bottom: 8px; }
+  p.lede { color: var(--md-on-surface-variant); max-width: 74ch; }
+  @media (prefers-reduced-motion: reduce) { button.scheme-toggle:active { transform: none; } }
+  .row { border-bottom: 1px solid var(--md-outline); padding: 20px 0; display: grid; grid-template-columns: 220px 1fr; gap: 16px; align-items: baseline; }
+  .row .meta { font-size: 13px; color: var(--md-on-surface-variant); font-family: "Cascadia Code", Consolas, monospace; }
+  .sample-en { font-family: var(--font-en); }
+  .sample-zh { font-family: var(--font-zh); margin-top: 6px; }
+  .caption { font-size: 13px; color: var(--md-on-surface-variant); margin-top: 6px; max-width: 60ch; }
+  .fallback-note {
+    background: var(--md-surface-container); border-radius: 18px; padding: 16px; margin-top: 16px;
+    font-size: 14px; border: 2px solid var(--md-outline);
+  }
+  code { font-family: "Cascadia Code", Consolas, monospace; background: var(--md-surface-container); padding: 2px 6px; border-radius: 6px; }
+  .display-demo { display: flex; flex-direction: column; gap: 10px; margin-top: 16px; }
+  .display-demo .headline { font-family: var(--font-display); font-size: 42px; line-height: 1.05; }
+  .display-demo .headline-zh { font-family: var(--font-zh); font-weight: 700; font-size: 30px; }
+  .tabular-demo { display: grid; grid-template-columns: repeat(auto-fill, minmax(160px, 1fr)); gap: 12px; margin-top: 12px; }
+  .tabular-demo .num-card {
+    background: var(--md-surface-container); border-radius: 12px; border: 2px solid var(--md-outline);
+    padding: 12px; font-size: 20px; font-weight: 700; font-variant-numeric: tabular-nums;
+  }
+  .tabular-demo .num-card .label { display: block; font-size: 11px; font-weight: 600; color: var(--md-on-surface-variant); margin-bottom: 4px; font-variant-numeric: normal; }
+  /* ==========================================================================
+     v2 SHARED CABINET CHROME — identical in every spec file so the bundle reads
+     as one machine. Radial oven-glow page, marquee headings, arcade toggle.
+     ========================================================================== */
+  body {
+    margin: 0;
+    padding: 28px clamp(16px, 4vw, 44px) 72px;
+    min-height: 100vh;
+    font-family: var(--font-en);
+    color: var(--md-on-surface);
+    background:
+      radial-gradient(ellipse 130% 95% at 50% -12%,
+        var(--bg-core) 0%, var(--bg-mid) 42%, var(--bg-edge) 100%),
+      var(--bg-edge);
+    background-attachment: fixed;
+  }
+  h1 {
+    font-family: var(--font-display);
+    font-weight: 900;
+    font-size: clamp(28px, 5vw, 50px);
+    line-height: 1.04;
+    letter-spacing: 0.045em;
+    text-transform: uppercase;
+    margin: 0 0 14px;
+    padding: 18px 22px;
+    color: var(--md-on-surface);
+    border: var(--border-fat) solid var(--md-outline);
+    border-radius: var(--shape-lg);
+    background:
+      linear-gradient(180deg, var(--md-surface-container-high) 0%, var(--md-surface-container-highest) 100%);
+    box-shadow: var(--press-4), inset 0 4px 0 0 var(--bevel-hi), inset 0 -4px 0 0 var(--bevel-lo);
+  }
+  h2 {
+    font-family: var(--font-display);
+    font-weight: 900;
+    font-size: 15px;
+    letter-spacing: 0.22em;
+    text-transform: uppercase;
+    color: var(--md-on-surface-variant);
+    margin: 40px 0 12px;
+    display: flex;
+    align-items: center;
+    gap: 12px;
+  }
+  h2::after {
+    content: "";
+    flex: 1;
+    height: 0;
+    border-top: var(--border-thick) solid var(--md-outline);
+    opacity: 0.55;
+  }
+  h3 {
+    font-family: var(--font-display);
+    font-size: 13px;
+    letter-spacing: 0.16em;
+    text-transform: uppercase;
+    color: var(--md-on-surface-variant);
+  }
+  p.lede, p.caption { color: var(--md-on-surface-variant); max-width: 74ch; line-height: 1.55; }
+  p.lede { font-size: 15px; }
+  button.scheme-toggle {
+    font-family: var(--font-display);
+    font-size: 13px;
+    letter-spacing: 0.14em;
+    text-transform: uppercase;
+    padding: 12px 26px;
+    min-height: 48px;
+    border-radius: var(--shape-full);
+    border: var(--border-chunky) solid var(--md-outline);
+    background: linear-gradient(180deg, var(--md-surface-container-low), var(--md-surface-container-highest));
+    color: var(--md-on-surface);
+    cursor: pointer;
+    margin: 18px 0 26px;
+    box-shadow: var(--press-2), inset 0 3px 0 0 var(--bevel-hi);
+    transition: transform 90ms ease, box-shadow 90ms ease;
+  }
+  button.scheme-toggle:active {
+    transform: translateY(5px);
+    box-shadow: none;
+  }
+  button.scheme-toggle:focus-visible { outline: 4px solid var(--spark-ring); outline-offset: 3px; }
+  @media (prefers-reduced-motion: reduce) {
+    button.scheme-toggle { transition: none; }
+    button.scheme-toggle:active { transform: none; box-shadow: inset 0 4px 0 0 var(--bevel-lo); }
+  }
+
+  /* --- reusable HUD idioms (see README "Game HUD idioms") --- */
+  .v2-marquee {
+    font-family: var(--font-display);
+    font-size: 12px;
+    letter-spacing: 0.24em;
+    text-transform: uppercase;
+    color: var(--md-on-surface-variant);
+  }
+  .v2-bezel {
+    border: var(--border-chunky) solid var(--md-outline);
+    border-radius: var(--shape-md);
+    background: var(--panel-inset);
+    box-shadow: inset 0 5px 0 0 var(--bevel-lo), inset 0 -3px 0 0 var(--bevel-hi);
+  }
+  .v2-counter {
+    font-family: var(--font-display);
+    font-weight: 900;
+    font-variant-numeric: tabular-nums;
+    letter-spacing: -0.01em;
+    line-height: 1;
+  }
+</style>
+</head>
+<body data-scheme="light">
+  <h1>Material Cookie Clicker design tokens · 設計標記 — Type</h1>
+  <p class="lede">
+    Two type families doing two different jobs: a bold, blocky <strong>display face</strong> for
+    headings and big milestone numbers (character, confidence, arcade-poster energy), and a
+    highly legible <strong>body face</strong> for every reading-heavy surface and every factual
+    figure, always with tabular numerals so digits align in a column. Full M3-derived type scale
+    below (display / headline / title / body / label, each large/medium/small), every row shown
+    against English AND Traditional Chinese (Hong Kong) so the CJK line-height difference is
+    visible rather than assumed.
+    <span style="font-family:var(--font-zh); display:block; margin-top:4px;">
+      兩種字體各有分工：粗體、有性格嘅標題字用喺標題同大數字度，清楚易讀嘅內文字就用喺所有講緊嘅內容同數字度，數字一律用等寬對齊。
+    </span>
+  </p>
+  <button class="scheme-toggle" onclick="document.body.dataset.scheme = document.body.dataset.scheme === 'dark' ? 'light' : 'dark'">
+    🌗 Toggle light / dark · 切換淺色／深色
+  </button>
+
+  <h2>Display face · 標題字型 — character, without a network request</h2>
+  <p class="caption">
+    <code>--font-display</code> stacks <code>"Segoe UI Black"</code> (bundled with every supported
+    Windows release, this project's active delivery scope) then <code>"Arial Black"</code>
+    (near-universal cross-platform fallback with the same chunky letterform weight) before
+    dropping to the ordinary body stack. No <code>.woff</code>/<code>.ttf</code> is bundled and no
+    remote font service is used — a bold system face already gives headings the "confident,
+    arcade-poster" character this theme wants, and adding a network dependency for one heading
+    face was judged not worth breaking the fully-self-contained, offline requirement.
+  </p>
+  <div class="display-demo">
+    <div class="headline">Material Cookie Clicker</div>
+    <div class="headline-zh">橡奇曲奇</div>
+    <div class="headline" style="font-size:28px;">4.82Qa cookies baked</div>
+  </div>
+
+  <h2>Marquee labels &amp; huge counters · v2 嘅招牌字同大數字</h2>
+  <p class="caption">
+    v2 gave the type two jobs it did not have before. <strong>Marquee labels</strong> are the
+    all-caps, heavily letter-spaced (0.20-0.24em) display-face runs used for every section heading,
+    panel title, button face and state chip - the lettering an arcade cabinet paints on its bezel.
+    <strong>Counters</strong> go the other way: display face, weight 900, tight tracking, always
+    <code>tabular-nums</code>, at 38-54px in a stat tile and up to 50px for a page title. A number
+    the player watches tick is the largest thing on its panel, on purpose.
+  </p>
+  <div style="display:flex; flex-direction:column; gap:18px; margin-bottom:26px;">
+    <div style="font-family:var(--font-display); font-size:12px; font-weight:900; letter-spacing:0.24em; text-transform:uppercase; color:var(--md-on-surface-variant);">
+      Cookies per second &middot; Score panel &middot; Prestige
+    </div>
+    <div style="font-family:var(--font-display); font-weight:900; font-size:54px; line-height:1; letter-spacing:-0.02em; font-variant-numeric:tabular-nums;">
+      18,420,933
+    </div>
+    <div style="font-family:var(--font-zh); font-size:15px; color:var(--md-on-surface-variant);">
+      招牌字用全大階同好闊嘅字距；數字就用最粗嘅字重、緊字距同等寬數字，喺面板入面最大最搶眼。
+    </div>
+  </div>
+
+  <h2>Tabular figures · 數字對齊</h2>
+  <p class="caption">
+    Every place a number appears repeatedly in a fixed-width context — stat tiles, building costs,
+    CPS deltas, tool-tree progress fractions — sets <code>font-variant-numeric: tabular-nums</code>
+    so digits occupy equal width and align in a column instead of jittering as the value updates.
+    This applies in the body face; no separate monospace font is needed.
+  </p>
+  <div class="tabular-demo">
+    <div class="num-card"><span class="label">CPS</span>18,420</div>
+    <div class="num-card"><span class="label">CPS (updated)</span>118,420</div>
+    <div class="num-card"><span class="label">Click power</span>312</div>
+    <div class="num-card"><span class="label">Cost</span>🍪 88,500</div>
+  </div>
+
+  <div class="fallback-note">
+    <strong>Body/CJK-safe fallback stack · 內文／中文字型後備堆疊：</strong>
+    <code>"Segoe UI", "Microsoft JhengHei", "PMingLiU", "MingLiU", -apple-system, "Segoe UI", Roboto, Helvetica, Arial, sans-serif</code>
+    <p class="caption" style="margin-top:8px;">
+      Microsoft JhengHei is the Traditional-Chinese-native face bundled with every supported
+      Windows release, so Cantonese copy renders in a purpose-built CJK face rather than a Latin
+      font's fallback glyphs. Segoe UI leads for Latin text so English stays crisp; JhengHei only
+      engages for CJK code points thanks to normal font-fallback substitution. The display face
+      above is Latin/heading-only — Cantonese headings still render in the bold weight of this
+      body/CJK stack, since "Segoe UI Black" has no CJK glyph coverage to fall back on safely.
+    </p>
+  </div>
+
+  <div id="scale"></div>
+
+<script>
+  const scale = [
+    ['display-large', '57px', '64px', '-0.25px', 900, true],
+    ['display-medium', '45px', '52px', '0px', 900, true],
+    ['display-small', '36px', '44px', '0px', 700, true],
+    ['headline-large', '32px', '40px', '0px', 700, true],
+    ['headline-medium', '28px', '36px', '0px', 700, true],
+    ['headline-small', '24px', '32px', '0px', 700, false],
+    ['title-large', '22px', '28px', '0px', 700, false],
+    ['title-medium', '16px', '24px', '0.15px', 600, false],
+    ['title-small', '14px', '20px', '0.1px', 600, false],
+    ['body-large', '16px', '24px', '0.5px', 400, false],
+    ['body-medium', '14px', '20px', '0.25px', 400, false],
+    ['body-small', '12px', '16px', '0.4px', 400, false],
+    ['label-large', '14px', '20px', '0.1px', 700, false],
+    ['label-medium', '12px', '16px', '0.5px', 700, false],
+    ['label-small', '11px', '16px', '0.5px', 700, false],
+  ];
+  const enSamples = {
+    'display': 'Material Cookie Clicker',
+    'headline': 'Sweet Cookie Empire',
+    'title': 'Buy Grandma\'s Bakery',
+    'body': 'Every click earns you crumbs toward your next golden cookie.',
+    'label': 'BUY ×10',
+  };
+  const zhSamples = {
+    'display': '橡奇曲奇',
+    'headline': '甜蜜曲奇帝國',
+    'title': '購買嫲嫲嘅麵包店',
+    'body': '每一下click都會為你賺緊碎屑，儲夠就有金色曲奇。',
+    'label': '買 ×10',
+  };
+  const container = document.getElementById('scale');
+  for (const [name, size, lineHeight, tracking, weight, useDisplay] of scale) {
+    const bucket = name.split('-')[0];
+    const row = document.createElement('div');
+    row.className = 'row';
+    const fontVar = useDisplay ? 'var(--font-display)' : 'var(--font-en)';
+    row.innerHTML = `
+      <div class="meta">
+        <div><strong>${name}</strong></div>
+        <div>${size} / ${lineHeight}</div>
+        <div>tracking ${tracking}, weight ${weight}${useDisplay ? ', display face' : ''}</div>
+      </div>
+      <div>
+        <div class="sample-en" style="font-family:${fontVar}; font-size:${size}; line-height:${lineHeight}; letter-spacing:${tracking}; font-weight:${weight};">
+          ${enSamples[bucket]}
+        </div>
+        <div class="sample-zh" style="font-size:${size}; line-height:${lineHeight}; letter-spacing:${tracking}; font-weight:${Math.min(weight, 700)};">
+          ${zhSamples[bucket]}
+        </div>
+        <div class="caption">
+          English sample uses ${size} tracked at ${tracking}${useDisplay ? ' in the display face' : ' in the body face'};
+          the Traditional Chinese sample uses the same numeric size in the body/CJK stack (capped
+          at weight 700, since the display face has no CJK glyphs) and visually needs less negative
+          tracking to read comfortably at small sizes, since CJK glyphs are full-width and do not
+          kern the way Latin letterforms do — the fallback stack above intentionally applies the
+          same tracking value to both, and this row is where you can see whether that still holds.
+        </div>
+      </div>`;
+    container.appendChild(row);
+  }
+</script>
+</body>
+</html>

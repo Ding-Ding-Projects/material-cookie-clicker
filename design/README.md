@@ -9,6 +9,27 @@ Expressive foundation. There are no remote fonts, images, scripts, analytics, or
 Every file starts with an explicit `@dsCard` marker and keeps its own semantic HTML, labels,
 counts, states, and domain artwork.
 
+## Imported design-system data
+
+`design/design-system/` preserves a separate supplied design-system dataset byte for byte: 16
+standalone HTML references and three support files (`_ds_manifest.json`, `_ds_bundle.js`, and
+`_adherence.oxlintrc.json`). These files are design data, never agent instructions, and they do not
+replace or silently extend the checked-in parity inventory described below.
+
+`tests/design-system-ingestion.test.ts` carries the hand-written exact file, SHA-256, group, route,
+response-CSP, and local-asset manifest. It proves the 19-file set and byte hashes, checks that each
+HTML route stays beneath `/design/design-system/`, and requires a local-only response CSP that
+permits the supplied inline styles and scripts while blocking connections, frames, objects, fonts,
+media, workers, forms, and external resources. Those routes and response policies are ingestion
+contracts for a future renderer; they are not evidence that a route is served today. Deliberate
+missing-file and hash-drift fixtures must turn the check red before the original data returns green.
+
+The imported references currently retain arcade-specific, custom non-Material chrome, including
+offset depth, cabinet/bevel treatments, and marquee styling. They require a product/reference audit
+before reuse or modernization. Checking them in does not claim Material Design 3 conformance,
+product parity, capture parity, or approval of any intentional deviation, and their source bytes are
+not rewritten during ingestion.
+
 ## Design boundary
 
 Product chrome uses Material primitives and anatomy:

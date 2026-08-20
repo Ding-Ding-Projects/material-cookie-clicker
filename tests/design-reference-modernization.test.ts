@@ -105,17 +105,56 @@ describe('modern Material design references', () => {
     expect(() => assertCommonMetrics(css)).not.toThrow();
   });
 
+  it('locks the residual structural parity contracts', () => {
+    const css = readFileSync(resolve('design/reference-app/material-reference.css'), 'utf8');
+    const building = readFileSync(resolve('design/building-row.html'), 'utf8');
+    const type = readFileSync(resolve('design/tokens-type.html'), 'utf8');
+    const shape = readFileSync(resolve('design/tokens-shape-elevation.html'), 'utf8');
+    const achievement = readFileSync(resolve('design/achievement-badge.html'), 'utf8');
+    const tool = readFileSync(resolve('design/tool-card.html'), 'utf8');
+    expect(css).toContain('grid-template-columns: 64px minmax(220px, 1fr) 64px minmax(520px, 1.6fr)');
+    expect(css).not.toContain('grid-template: auto auto / 64px');
+    expect(building.match(/<article class="card row">/g)).toHaveLength(2);
+    expect(building.match(/<article class="card row disabled">/g)).toHaveLength(1);
+    for (const family of ['display', 'headline', 'title', 'body', 'label']) {
+      expect(type).toContain(`class="type-${family} scale-medium"`);
+      expect(type).toContain(`class="type-${family} scale-small"`);
+    }
+    expect(css).toContain('padding-block: 8px 18px');
+    expect(shape.match(/class="card shape-sample"/g)).toHaveLength(6);
+    expect(css).toContain('.shape-sample { min-height: 190px;');
+    expect(css).toContain('background: var(--md-sys-color-surface-container); text-align: center;');
+    expect(achievement).toContain('class="medal toast-medal-ref"');
+    expect(css).toContain('width: 322px; height: 74px; min-height: 74px');
+    expect(css).toContain('.notice .icon-button { background: var(--md-sys-color-secondary-container)');
+    expect(tool).toContain('class="card tool-card locked-ref"');
+    expect(tool.match(/class="progress" value="100" max="100"/g)).toHaveLength(2);
+    expect(css).toContain('.tool-card { height: 390px; min-height: 390px;');
+    expect(css).toContain('.tool-card .chip { min-height: 22px;');
+    expect(css).toContain('.tool-card .progress { height: 6px; }');
+  });
+
+  it('turns red when the building flow regresses to two CSS rows and green after restore', () => {
+    const css = readFileSync(resolve('design/reference-app/material-reference.css'), 'utf8');
+    const broken = css.replace(
+      'grid-template-columns: 64px minmax(220px, 1fr) 64px minmax(520px, 1.6fr)',
+      'grid-template: auto auto / 64px minmax(0, 1fr) auto',
+    );
+    expect(broken).not.toContain('grid-template-columns: 64px minmax(220px, 1fr) 64px minmax(520px, 1.6fr)');
+    expect(css).toContain('grid-template-columns: 64px minmax(220px, 1fr) 64px minmax(520px, 1.6fr)');
+  });
+
   it('keeps every prior evidence item stale after fine-alignment source changes', () => {
     const inventory = JSON.parse(readFileSync(resolve('design/parity/inventory.json'), 'utf8')) as {
       rows: Array<{ sourceCommit: string; evidence: Record<string, { status: string; reason?: string }> }>;
     };
     expect(inventory.rows).toHaveLength(16);
     for (const row of inventory.rows) {
-      expect(row.sourceCommit).toBe('7cf30ae5ab93349790c674647fe9fe3e64a01af7');
+      expect(row.sourceCommit).toBe('pending-recapture-after-structural-residual-repair');
       expect(Object.keys(row.evidence).sort()).toEqual(['comparison', 'diff', 'productRaw', 'referenceRaw']);
       for (const evidence of Object.values(row.evidence)) {
-        expect(evidence.status).toBe('verified');
-        expect(evidence.reason).toBeUndefined();
+        expect(evidence.status).toBe('pending');
+        expect(evidence.reason?.trim().length).toBeGreaterThan(20);
       }
     }
   });

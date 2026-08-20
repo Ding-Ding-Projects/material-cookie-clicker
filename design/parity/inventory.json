@@ -358,7 +358,7 @@
       ],
       "reference": {
         "file": "achievement-badge.html",
-        "sha256": "2179eb4ca6a1bd89d95a2be417ed922ea72ee280be107ce98d90e117a716c336",
+        "sha256": "549bab03f8f20749285d854a7e15aa668a708fcc942f1205f67104effb4cfdb5",
         "route": "/design/reference-app/index.html?row=achievement-badge--gallery&theme=light&width=1280&height=800&scale=1&state=gallery&locale=en-HK&capture=1"
       },
       "product": {
@@ -388,33 +388,37 @@
       "evidence": {
         "referenceRaw": {
           "path": "design/parity/evidence/achievement-badge--gallery/reference.png",
-          "status": "verified",
+          "status": "pending",
           "sha256": "126a1ea6d6360b3568ffb31e05557ff58d038a98ff8aadfcc16b6126ec49a690",
           "receiptPath": "design/parity/evidence/achievement-badge--gallery/referenceRaw-receipt.json",
-          "receiptSha256": "b8a23181a953ef36003eafd924b9a9a33a649addbd9975310a1263e678173c2c"
+          "receiptSha256": "b8a23181a953ef36003eafd924b9a9a33a649addbd9975310a1263e678173c2c",
+          "reason": "Reference source or shared structural styling changed; the existing raw capture is historical and must be recaptured."
         },
         "productRaw": {
           "path": "design/parity/evidence/achievement-badge--gallery/product.png",
-          "status": "verified",
+          "status": "pending",
           "sha256": "10cd9e7246bff7e02753ac5cf004cadc5183bc505fec8efba12bcd057523d8ff",
           "receiptPath": "design/parity/evidence/achievement-badge--gallery/productRaw-receipt.json",
-          "receiptSha256": "a81cf830f292fadef91b8e6802b053a5e24786f070c3d5963dd33d1b68197a80"
+          "receiptSha256": "a81cf830f292fadef91b8e6802b053a5e24786f070c3d5963dd33d1b68197a80",
+          "reason": "Reference source or shared structural styling changed; the matching built-product capture must be recaptured at the same source commit."
         },
         "comparison": {
           "path": "design/parity/evidence/achievement-badge--gallery/comparison.png",
-          "status": "verified",
+          "status": "pending",
           "sha256": "5841a5162d5920873cfdabe565459a50e23b369d058f51680d3453582c97bfc8",
           "manifestPath": "design/parity/evidence/achievement-badge--gallery/comparison.json",
-          "manifestSha256": "0f76e4d63d730ce2e45c05f34b6ce7be2f494f60ad29a00623b584cda4525aa8"
+          "manifestSha256": "0f76e4d63d730ce2e45c05f34b6ce7be2f494f60ad29a00623b584cda4525aa8",
+          "reason": "Both raw captures must be regenerated before the labelled comparison is current."
         },
         "diff": {
           "path": "design/parity/evidence/achievement-badge--gallery/diff.json",
-          "status": "verified",
-          "sha256": "c1ea3e5c60591d6bec465e7a7407c2c63c8274202977e9f3e4439253c42e752f"
+          "status": "pending",
+          "sha256": "c1ea3e5c60591d6bec465e7a7407c2c63c8274202977e9f3e4439253c42e752f",
+          "reason": "Both raw captures must be regenerated before the visual diff is current."
         }
       },
       "intentionalDeviations": [],
-      "sourceCommit": "7cf30ae5ab93349790c674647fe9fe3e64a01af7",
+      "sourceCommit": "pending-recapture-after-structural-residual-repair",
       "captureProvenance": {
         "route": "cheap-lowlevel-headless",
         "sourceCommit": "7cf30ae5ab93349790c674647fe9fe3e64a01af7",
@@ -433,7 +437,7 @@
       ],
       "reference": {
         "file": "building-row.html",
-        "sha256": "05bf75d2302a7ec94a8bfb59d2a628ff9accdfec6fdac212f665d28b2bd53cca",
+        "sha256": "14db6507ed161d15abc5678af66092ae334022d16b812c3d226f9b5a90f9b142",
         "route": "/design/reference-app/index.html?row=building-row--gallery&theme=light&width=1280&height=800&scale=1&state=gallery&locale=en-HK&capture=1"
       },
       "product": {
@@ -463,33 +467,37 @@
       "evidence": {
         "referenceRaw": {
           "path": "design/parity/evidence/building-row--gallery/reference.png",
-          "status": "verified",
+          "status": "pending",
           "sha256": "c81631a08b7f9ee4a1a69eac385543593736a39ab3f720bad3fa8886f33b198d",
           "receiptPath": "design/parity/evidence/building-row--gallery/referenceRaw-receipt.json",
-          "receiptSha256": "77665e992316dda2c1a0b7d74fcebe164538021108f7cf055dc243566bbf8096"
+          "receiptSha256": "77665e992316dda2c1a0b7d74fcebe164538021108f7cf055dc243566bbf8096",
+          "reason": "Reference source or shared structural styling changed; the existing raw capture is historical and must be recaptured."
         },
         "productRaw": {
           "path": "design/parity/evidence/building-row--gallery/product.png",
-          "status": "verified",
+          "status": "pending",
           "sha256": "d889e386a5e99cde492ae8169d796a90c92d02ab1cc583ada679da357086735c",
           "receiptPath": "design/parity/evidence/building-row--gallery/productRaw-receipt.json",
-          "receiptSha256": "32ea1d76247564585465bacc5d0ac330d1beb0cba1731a78b6ad479caf8b7598"
+          "receiptSha256": "32ea1d76247564585465bacc5d0ac330d1beb0cba1731a78b6ad479caf8b7598",
+          "reason": "Reference source or shared structural styling changed; the matching built-product capture must be recaptured at the same source commit."
         },
         "comparison": {
           "path": "design/parity/evidence/building-row--gallery/comparison.png",
-          "status": "verified",
+          "status": "pending",
           "sha256": "7d9d7dcbd9bcaa734345cadf3ff32a9bf5ea0a463e477fc88beafa5c5c0d6700",
           "manifestPath": "design/parity/evidence/building-row--gallery/comparison.json",
-          "manifestSha256": "a300ce121d45921f80872da19594e4167bc265624be1a910ad2e02cd76b28f59"
+          "manifestSha256": "a300ce121d45921f80872da19594e4167bc265624be1a910ad2e02cd76b28f59",
+          "reason": "Both raw captures must be regenerated before the labelled comparison is current."
         },
         "diff": {
           "path": "design/parity/evidence/building-row--gallery/diff.json",
-          "status": "verified",
-          "sha256": "200b16e5ff2bd1f48a6f080ccaf6845e11df944aac755a25ebccdc55bba14051"
+          "status": "pending",
+          "sha256": "200b16e5ff2bd1f48a6f080ccaf6845e11df944aac755a25ebccdc55bba14051",
+          "reason": "Both raw captures must be regenerated before the visual diff is current."
         }
       },
       "intentionalDeviations": [],
-      "sourceCommit": "7cf30ae5ab93349790c674647fe9fe3e64a01af7",
+      "sourceCommit": "pending-recapture-after-structural-residual-repair",
       "captureProvenance": {
         "route": "cheap-lowlevel-headless",
         "sourceCommit": "7cf30ae5ab93349790c674647fe9fe3e64a01af7",
@@ -508,7 +516,7 @@
       ],
       "reference": {
         "file": "bulk-toolbar.html",
-        "sha256": "4a03b0c14a933c030dc1da49afe614415af2106a274486d8055f68e3747a54bf",
+        "sha256": "5d06cab3eb82442dd1b1176bd879acc84dda4cae96e11283d4ef22fb94acbd3c",
         "route": "/design/reference-app/index.html?row=bulk-toolbar--progress&theme=light&width=1280&height=800&scale=1&state=progress&locale=en-HK&capture=1"
       },
       "product": {
@@ -538,33 +546,37 @@
       "evidence": {
         "referenceRaw": {
           "path": "design/parity/evidence/bulk-toolbar--progress/reference.png",
-          "status": "verified",
+          "status": "pending",
           "sha256": "9665c8e221a0d2150fd3c90fe4951266623921dc08d7424af74da6a7314f9288",
           "receiptPath": "design/parity/evidence/bulk-toolbar--progress/referenceRaw-receipt.json",
-          "receiptSha256": "0ceff200bc72c740df8dfa5204856ddc1695fdab7e75e2974c6eba4046281190"
+          "receiptSha256": "0ceff200bc72c740df8dfa5204856ddc1695fdab7e75e2974c6eba4046281190",
+          "reason": "Reference source or shared structural styling changed; the existing raw capture is historical and must be recaptured."
         },
         "productRaw": {
           "path": "design/parity/evidence/bulk-toolbar--progress/product.png",
-          "status": "verified",
+          "status": "pending",
           "sha256": "872b047f218afe3eab5b7be02c59c00f2698f0f0af9513ae98160b397368c5f0",
           "receiptPath": "design/parity/evidence/bulk-toolbar--progress/productRaw-receipt.json",
-          "receiptSha256": "90e6c0263f9541f0db1810be2b9c562a6ebbbb9c014709fd7d2076db62633e3d"
+          "receiptSha256": "90e6c0263f9541f0db1810be2b9c562a6ebbbb9c014709fd7d2076db62633e3d",
+          "reason": "Reference source or shared structural styling changed; the matching built-product capture must be recaptured at the same source commit."
         },
         "comparison": {
           "path": "design/parity/evidence/bulk-toolbar--progress/comparison.png",
-          "status": "verified",
+          "status": "pending",
           "sha256": "86695c8a89dfb0162a77432d8db1e2f9c45215cf384e075070fde2d5c383565c",
           "manifestPath": "design/parity/evidence/bulk-toolbar--progress/comparison.json",
-          "manifestSha256": "a08f70946bbcb0ac2f37fc9fea9412e7593b36e7275d2f415890c7d1194c80e8"
+          "manifestSha256": "a08f70946bbcb0ac2f37fc9fea9412e7593b36e7275d2f415890c7d1194c80e8",
+          "reason": "Both raw captures must be regenerated before the labelled comparison is current."
         },
         "diff": {
           "path": "design/parity/evidence/bulk-toolbar--progress/diff.json",
-          "status": "verified",
-          "sha256": "a189e3cf72a2fe9d41eb536ca40e4714d8b45d352bcbe6dd1e51e387ce3fe791"
+          "status": "pending",
+          "sha256": "a189e3cf72a2fe9d41eb536ca40e4714d8b45d352bcbe6dd1e51e387ce3fe791",
+          "reason": "Both raw captures must be regenerated before the visual diff is current."
         }
       },
       "intentionalDeviations": [],
-      "sourceCommit": "7cf30ae5ab93349790c674647fe9fe3e64a01af7",
+      "sourceCommit": "pending-recapture-after-structural-residual-repair",
       "captureProvenance": {
         "route": "cheap-lowlevel-headless",
         "sourceCommit": "7cf30ae5ab93349790c674647fe9fe3e64a01af7",
@@ -588,7 +600,7 @@
       ],
       "reference": {
         "file": "cookie-surface.html",
-        "sha256": "a5e1b725129142cf2635f00409a0676048870a37307389c76d5225822abf06e3",
+        "sha256": "80a830bb7c11484d154b61c7ef13e4d185203ae6b1911bda403dc33c106b5d19",
         "route": "/design/reference-app/index.html?row=cookie-surface--gallery&theme=light&width=1280&height=800&scale=1&state=gallery&locale=en-HK&capture=1"
       },
       "product": {
@@ -618,33 +630,37 @@
       "evidence": {
         "referenceRaw": {
           "path": "design/parity/evidence/cookie-surface--gallery/reference.png",
-          "status": "verified",
+          "status": "pending",
           "sha256": "d7ab305b1255b04b8e9b40240d9f0be2f1290caa9ba7dd4c8e744c835eef5dbb",
           "receiptPath": "design/parity/evidence/cookie-surface--gallery/referenceRaw-receipt.json",
-          "receiptSha256": "68a2021af7791ea6ae13c92ae98867581a0e1470b69994b35576f5e42e3482b9"
+          "receiptSha256": "68a2021af7791ea6ae13c92ae98867581a0e1470b69994b35576f5e42e3482b9",
+          "reason": "Reference source or shared structural styling changed; the existing raw capture is historical and must be recaptured."
         },
         "productRaw": {
           "path": "design/parity/evidence/cookie-surface--gallery/product.png",
-          "status": "verified",
+          "status": "pending",
           "sha256": "b72875e3f865a5b7fee39211f4011c278f45006fc28917df00d3f415e15689ae",
           "receiptPath": "design/parity/evidence/cookie-surface--gallery/productRaw-receipt.json",
-          "receiptSha256": "8ed000d0fe037e3c7cf6546ed31ca961e6cb9b1b4a6fa77ea34651cced01c4c7"
+          "receiptSha256": "8ed000d0fe037e3c7cf6546ed31ca961e6cb9b1b4a6fa77ea34651cced01c4c7",
+          "reason": "Reference source or shared structural styling changed; the matching built-product capture must be recaptured at the same source commit."
         },
         "comparison": {
           "path": "design/parity/evidence/cookie-surface--gallery/comparison.png",
-          "status": "verified",
+          "status": "pending",
           "sha256": "b9497fee6d94c686572d87abfa2b5a0cca3517b40181cae00fd3e89eea3d7e66",
           "manifestPath": "design/parity/evidence/cookie-surface--gallery/comparison.json",
-          "manifestSha256": "98e716b618d0a5b380253ffca2cabd5a10f7175aecf532021ff48e84ac465ed4"
+          "manifestSha256": "98e716b618d0a5b380253ffca2cabd5a10f7175aecf532021ff48e84ac465ed4",
+          "reason": "Both raw captures must be regenerated before the labelled comparison is current."
         },
         "diff": {
           "path": "design/parity/evidence/cookie-surface--gallery/diff.json",
-          "status": "verified",
-          "sha256": "ebd88a56ecffb193b66b706580c78f92eecd86e26d76bf0ef28c31fafd710e47"
+          "status": "pending",
+          "sha256": "ebd88a56ecffb193b66b706580c78f92eecd86e26d76bf0ef28c31fafd710e47",
+          "reason": "Both raw captures must be regenerated before the visual diff is current."
         }
       },
       "intentionalDeviations": [],
-      "sourceCommit": "7cf30ae5ab93349790c674647fe9fe3e64a01af7",
+      "sourceCommit": "pending-recapture-after-structural-residual-repair",
       "captureProvenance": {
         "route": "cheap-lowlevel-headless",
         "sourceCommit": "7cf30ae5ab93349790c674647fe9fe3e64a01af7",
@@ -662,7 +678,7 @@
       ],
       "reference": {
         "file": "game-layout.html",
-        "sha256": "c54c5efd76f4be8e63ef927613e394f3ef316025dbb2b95e82da0c1e7810dead",
+        "sha256": "d8461b56336fc35df70a24477a6d6edab9c57c0d5085665a2ed6b05fef4fabb7",
         "route": "/design/reference-app/index.html?row=game-layout--main&theme=light&width=1280&height=800&scale=1&state=main&locale=en-HK&capture=1"
       },
       "product": {
@@ -692,33 +708,37 @@
       "evidence": {
         "referenceRaw": {
           "path": "design/parity/evidence/game-layout--main/reference.png",
-          "status": "verified",
+          "status": "pending",
           "sha256": "984ff6c8dfa921f5e8071df06a6a4ddefcdf9a1c8cd1d4469db23a90d72fd21b",
           "receiptPath": "design/parity/evidence/game-layout--main/referenceRaw-receipt.json",
-          "receiptSha256": "156953b479c3481fb80571856a8e5d024e5aa3763be070da42dc7f7400f396d8"
+          "receiptSha256": "156953b479c3481fb80571856a8e5d024e5aa3763be070da42dc7f7400f396d8",
+          "reason": "Reference source or shared structural styling changed; the existing raw capture is historical and must be recaptured."
         },
         "productRaw": {
           "path": "design/parity/evidence/game-layout--main/product.png",
-          "status": "verified",
+          "status": "pending",
           "sha256": "3fc63fa36fb2a5de6fdcd3fc9a412a7b2f7384e973ead5779e957358a888b04d",
           "receiptPath": "design/parity/evidence/game-layout--main/productRaw-receipt.json",
-          "receiptSha256": "0453dc03cdb98f507fb99f0577301802950ff7bfcfe49c0de344273b9f7c14a3"
+          "receiptSha256": "0453dc03cdb98f507fb99f0577301802950ff7bfcfe49c0de344273b9f7c14a3",
+          "reason": "Reference source or shared structural styling changed; the matching built-product capture must be recaptured at the same source commit."
         },
         "comparison": {
           "path": "design/parity/evidence/game-layout--main/comparison.png",
-          "status": "verified",
+          "status": "pending",
           "sha256": "3a66628934eee47f56c3be7ea4475291644437965c03913a2f4e80b9a8d4e913",
           "manifestPath": "design/parity/evidence/game-layout--main/comparison.json",
-          "manifestSha256": "1c6134cf98f3597524ef4b7022e681a449c2b4ad5674c14e30dad6153d779742"
+          "manifestSha256": "1c6134cf98f3597524ef4b7022e681a449c2b4ad5674c14e30dad6153d779742",
+          "reason": "Both raw captures must be regenerated before the labelled comparison is current."
         },
         "diff": {
           "path": "design/parity/evidence/game-layout--main/diff.json",
-          "status": "verified",
-          "sha256": "ec7c2bdf291c93fae899339c6c032cdfb1709f1e60a287c8e333849a91875421"
+          "status": "pending",
+          "sha256": "ec7c2bdf291c93fae899339c6c032cdfb1709f1e60a287c8e333849a91875421",
+          "reason": "Both raw captures must be regenerated before the visual diff is current."
         }
       },
       "intentionalDeviations": [],
-      "sourceCommit": "7cf30ae5ab93349790c674647fe9fe3e64a01af7",
+      "sourceCommit": "pending-recapture-after-structural-residual-repair",
       "captureProvenance": {
         "route": "cheap-lowlevel-headless",
         "sourceCommit": "7cf30ae5ab93349790c674647fe9fe3e64a01af7",
@@ -736,7 +756,7 @@
       ],
       "reference": {
         "file": "narrator-toast.html",
-        "sha256": "ede2035ce5776dc50558da7372780eca2c5d0cc2f9f2f6854a186296ac5f9bd2",
+        "sha256": "00c5e0bf7e91114abe84ddb8c650eb6ad38406f1f5acb2f1ae0893007ee8e808",
         "route": "/design/reference-app/index.html?row=narrator-toast--gallery&theme=light&width=1280&height=800&scale=1&state=gallery&locale=en-HK&capture=1"
       },
       "product": {
@@ -766,33 +786,37 @@
       "evidence": {
         "referenceRaw": {
           "path": "design/parity/evidence/narrator-toast--gallery/reference.png",
-          "status": "verified",
+          "status": "pending",
           "sha256": "04d0634041b0e1ff246d9dfb83ac4c3a369a6fc12a74934c14954a02b647c2e4",
           "receiptPath": "design/parity/evidence/narrator-toast--gallery/referenceRaw-receipt.json",
-          "receiptSha256": "aee076301f7bd6ef04df19e63cf6e3141f85b8a50df6bd9f76ce82b3e4658a21"
+          "receiptSha256": "aee076301f7bd6ef04df19e63cf6e3141f85b8a50df6bd9f76ce82b3e4658a21",
+          "reason": "Reference source or shared structural styling changed; the existing raw capture is historical and must be recaptured."
         },
         "productRaw": {
           "path": "design/parity/evidence/narrator-toast--gallery/product.png",
-          "status": "verified",
+          "status": "pending",
           "sha256": "dbdd4c9be778075861a43840176d59fed26ee00bce4f31c1103c368587b8a1b2",
           "receiptPath": "design/parity/evidence/narrator-toast--gallery/productRaw-receipt.json",
-          "receiptSha256": "c55d75610bf6dbd69e76a5d25008d3b6dffded02ead92887c11fbcc8d75c3097"
+          "receiptSha256": "c55d75610bf6dbd69e76a5d25008d3b6dffded02ead92887c11fbcc8d75c3097",
+          "reason": "Reference source or shared structural styling changed; the matching built-product capture must be recaptured at the same source commit."
         },
         "comparison": {
           "path": "design/parity/evidence/narrator-toast--gallery/comparison.png",
-          "status": "verified",
+          "status": "pending",
           "sha256": "04c3febf65ef4b765bd170547cc5140a813b0cc1f34a91cc5a604a165b966dfb",
           "manifestPath": "design/parity/evidence/narrator-toast--gallery/comparison.json",
-          "manifestSha256": "9e68feb11551dd39526abcb424803c0bc688070df249d8c732975816b5e702ea"
+          "manifestSha256": "9e68feb11551dd39526abcb424803c0bc688070df249d8c732975816b5e702ea",
+          "reason": "Both raw captures must be regenerated before the labelled comparison is current."
         },
         "diff": {
           "path": "design/parity/evidence/narrator-toast--gallery/diff.json",
-          "status": "verified",
-          "sha256": "4029fc360664db56d79883f53876e9d301b3d9e20bc0e4602faf65375eb067dd"
+          "status": "pending",
+          "sha256": "4029fc360664db56d79883f53876e9d301b3d9e20bc0e4602faf65375eb067dd",
+          "reason": "Both raw captures must be regenerated before the visual diff is current."
         }
       },
       "intentionalDeviations": [],
-      "sourceCommit": "7cf30ae5ab93349790c674647fe9fe3e64a01af7",
+      "sourceCommit": "pending-recapture-after-structural-residual-repair",
       "captureProvenance": {
         "route": "cheap-lowlevel-headless",
         "sourceCommit": "7cf30ae5ab93349790c674647fe9fe3e64a01af7",
@@ -816,7 +840,7 @@
       ],
       "reference": {
         "file": "prestige-gate.html",
-        "sha256": "6accfc275dfe1b4ed51a0bc0715f43055593e0c1ff1379c0f2c4652a7c4fadbb",
+        "sha256": "4f5dcc06f504207f55d5c78b4b44cf8dfb8f249397d52e12af85ce44dd00ac3a",
         "route": "/design/reference-app/index.html?row=prestige-gate--ready&theme=light&width=1280&height=800&scale=1&state=ready&locale=en-HK&capture=1"
       },
       "product": {
@@ -846,33 +870,37 @@
       "evidence": {
         "referenceRaw": {
           "path": "design/parity/evidence/prestige-gate--ready/reference.png",
-          "status": "verified",
+          "status": "pending",
           "sha256": "9d85716fcec5d8cebf6b75fc2682e4b75dd45e691a15e6e1a4ebf09c0d28a51b",
           "receiptPath": "design/parity/evidence/prestige-gate--ready/referenceRaw-receipt.json",
-          "receiptSha256": "69969ac2e968cff5f1ebaf1987c53e31f4c2ab6565a90c25f4bd713322c941e2"
+          "receiptSha256": "69969ac2e968cff5f1ebaf1987c53e31f4c2ab6565a90c25f4bd713322c941e2",
+          "reason": "Reference source or shared structural styling changed; the existing raw capture is historical and must be recaptured."
         },
         "productRaw": {
           "path": "design/parity/evidence/prestige-gate--ready/product.png",
-          "status": "verified",
+          "status": "pending",
           "sha256": "caca4fe8585680f768d6c576e7735178ac6278054005df8a8afba9c936c15be6",
           "receiptPath": "design/parity/evidence/prestige-gate--ready/productRaw-receipt.json",
-          "receiptSha256": "f3861ac325480fb7588123316f7c297b926d718b973e26af9f0b12f392876e70"
+          "receiptSha256": "f3861ac325480fb7588123316f7c297b926d718b973e26af9f0b12f392876e70",
+          "reason": "Reference source or shared structural styling changed; the matching built-product capture must be recaptured at the same source commit."
         },
         "comparison": {
           "path": "design/parity/evidence/prestige-gate--ready/comparison.png",
-          "status": "verified",
+          "status": "pending",
           "sha256": "c3d7c70bf20e25d4a21722334099c9e2df20466c1937d94068f8a67466b2daf9",
           "manifestPath": "design/parity/evidence/prestige-gate--ready/comparison.json",
-          "manifestSha256": "5881ef9cc589377b3f741be4864f709bc9a9f53f514e24b52ad58e36d9229382"
+          "manifestSha256": "5881ef9cc589377b3f741be4864f709bc9a9f53f514e24b52ad58e36d9229382",
+          "reason": "Both raw captures must be regenerated before the labelled comparison is current."
         },
         "diff": {
           "path": "design/parity/evidence/prestige-gate--ready/diff.json",
-          "status": "verified",
-          "sha256": "d8da97969660b61e5e3536842b7edefa5fe09986db04c354046667a0d73a24c2"
+          "status": "pending",
+          "sha256": "d8da97969660b61e5e3536842b7edefa5fe09986db04c354046667a0d73a24c2",
+          "reason": "Both raw captures must be regenerated before the visual diff is current."
         }
       },
       "intentionalDeviations": [],
-      "sourceCommit": "7cf30ae5ab93349790c674647fe9fe3e64a01af7",
+      "sourceCommit": "pending-recapture-after-structural-residual-repair",
       "captureProvenance": {
         "route": "cheap-lowlevel-headless",
         "sourceCommit": "7cf30ae5ab93349790c674647fe9fe3e64a01af7",
@@ -890,7 +918,7 @@
       ],
       "reference": {
         "file": "search-regex-builder.html",
-        "sha256": "52a11cd27f95341cf4a7e2f60548df678e9787d669daa290bdf021378e495390",
+        "sha256": "42f0b4db4535b7b84b93b80b062662fd42dbeb5cc5954c34d6a93dbfdea975f7",
         "route": "/design/reference-app/index.html?row=search-regex-builder--open&theme=light&width=1280&height=800&scale=1&state=open&locale=en-HK&capture=1"
       },
       "product": {
@@ -920,33 +948,37 @@
       "evidence": {
         "referenceRaw": {
           "path": "design/parity/evidence/search-regex-builder--open/reference.png",
-          "status": "verified",
+          "status": "pending",
           "sha256": "a703356a0dced52ea2eac51aac76d7ca45edb6afdfe67570d327caa3f8021384",
           "receiptPath": "design/parity/evidence/search-regex-builder--open/referenceRaw-receipt.json",
-          "receiptSha256": "34f0721d016d505f2b9f919a415e0ff3256eae655ca93c297db64222693ec6cf"
+          "receiptSha256": "34f0721d016d505f2b9f919a415e0ff3256eae655ca93c297db64222693ec6cf",
+          "reason": "Reference source or shared structural styling changed; the existing raw capture is historical and must be recaptured."
         },
         "productRaw": {
           "path": "design/parity/evidence/search-regex-builder--open/product.png",
-          "status": "verified",
+          "status": "pending",
           "sha256": "ab6d03ee4e934202be986314fe8c18b18c63652c77a564a3d2a95d4e07fb4013",
           "receiptPath": "design/parity/evidence/search-regex-builder--open/productRaw-receipt.json",
-          "receiptSha256": "50cee99e7ba1229173768c0f6e76363b4ddf5905c9f5b05a60c02f1d0f0e5df6"
+          "receiptSha256": "50cee99e7ba1229173768c0f6e76363b4ddf5905c9f5b05a60c02f1d0f0e5df6",
+          "reason": "Reference source or shared structural styling changed; the matching built-product capture must be recaptured at the same source commit."
         },
         "comparison": {
           "path": "design/parity/evidence/search-regex-builder--open/comparison.png",
-          "status": "verified",
+          "status": "pending",
           "sha256": "6fee1467c7e39032d848496fe3a10a6384cc12578694e6235f1c4d35733437e7",
           "manifestPath": "design/parity/evidence/search-regex-builder--open/comparison.json",
-          "manifestSha256": "8a98e8bbbc8f2e93bce8b56af683d6b6880f24de50aec2327aaa8591fae8e3e8"
+          "manifestSha256": "8a98e8bbbc8f2e93bce8b56af683d6b6880f24de50aec2327aaa8591fae8e3e8",
+          "reason": "Both raw captures must be regenerated before the labelled comparison is current."
         },
         "diff": {
           "path": "design/parity/evidence/search-regex-builder--open/diff.json",
-          "status": "verified",
-          "sha256": "487edb1364d5938bcb4178bb7225c388425d52c5b42ec88fb4c7cea92f28b79f"
+          "status": "pending",
+          "sha256": "487edb1364d5938bcb4178bb7225c388425d52c5b42ec88fb4c7cea92f28b79f",
+          "reason": "Both raw captures must be regenerated before the visual diff is current."
         }
       },
       "intentionalDeviations": [],
-      "sourceCommit": "7cf30ae5ab93349790c674647fe9fe3e64a01af7",
+      "sourceCommit": "pending-recapture-after-structural-residual-repair",
       "captureProvenance": {
         "route": "cheap-lowlevel-headless",
         "sourceCommit": "7cf30ae5ab93349790c674647fe9fe3e64a01af7",
@@ -966,7 +998,7 @@
       ],
       "reference": {
         "file": "settings-funny-sliders.html",
-        "sha256": "9c70f903bc9cc1cbc7d198142879f84df9198b777ad5107b57787bfc910fe943",
+        "sha256": "845c42bbb1b0ce9328ebf800e8054e2ccc44b6e4b3787840e3054d027247be65",
         "route": "/design/reference-app/index.html?row=settings-funny-sliders--default&theme=light&width=1280&height=800&scale=1&state=default&locale=en-HK&capture=1"
       },
       "product": {
@@ -996,33 +1028,37 @@
       "evidence": {
         "referenceRaw": {
           "path": "design/parity/evidence/settings-funny-sliders--default/reference.png",
-          "status": "verified",
+          "status": "pending",
           "sha256": "53fb93362d8615915122e13dca518dad8de275a358cfb5fecfe6e460c9458326",
           "receiptPath": "design/parity/evidence/settings-funny-sliders--default/referenceRaw-receipt.json",
-          "receiptSha256": "2762e9444573a4be75b75e7864ef79993402719b5bcb7fa318b2e5571566255a"
+          "receiptSha256": "2762e9444573a4be75b75e7864ef79993402719b5bcb7fa318b2e5571566255a",
+          "reason": "Reference source or shared structural styling changed; the existing raw capture is historical and must be recaptured."
         },
         "productRaw": {
           "path": "design/parity/evidence/settings-funny-sliders--default/product.png",
-          "status": "verified",
+          "status": "pending",
           "sha256": "09cb4e617dcb6748d6886ab49713e0f15e947974a47b21a0bde10ce6129b1ed3",
           "receiptPath": "design/parity/evidence/settings-funny-sliders--default/productRaw-receipt.json",
-          "receiptSha256": "e559df8d6c2e9d21f769d3170db0e4678e836c93b1465f6bb6d093e55bf14a73"
+          "receiptSha256": "e559df8d6c2e9d21f769d3170db0e4678e836c93b1465f6bb6d093e55bf14a73",
+          "reason": "Reference source or shared structural styling changed; the matching built-product capture must be recaptured at the same source commit."
         },
         "comparison": {
           "path": "design/parity/evidence/settings-funny-sliders--default/comparison.png",
-          "status": "verified",
+          "status": "pending",
           "sha256": "9ded5f0e870720f69b849e5ec23ee0a8dd7a7a0e80716834073c0b3566a6ddf7",
           "manifestPath": "design/parity/evidence/settings-funny-sliders--default/comparison.json",
-          "manifestSha256": "ba7ee898ad58bb177a6f8b1b96dcf20779eccb7b51566c36601e93b006d5b8af"
+          "manifestSha256": "ba7ee898ad58bb177a6f8b1b96dcf20779eccb7b51566c36601e93b006d5b8af",
+          "reason": "Both raw captures must be regenerated before the labelled comparison is current."
         },
         "diff": {
           "path": "design/parity/evidence/settings-funny-sliders--default/diff.json",
-          "status": "verified",
-          "sha256": "71396bc91ade1425d1e84038229555818e195305fd1b4637aebb4b9c627be178"
+          "status": "pending",
+          "sha256": "71396bc91ade1425d1e84038229555818e195305fd1b4637aebb4b9c627be178",
+          "reason": "Both raw captures must be regenerated before the visual diff is current."
         }
       },
       "intentionalDeviations": [],
-      "sourceCommit": "7cf30ae5ab93349790c674647fe9fe3e64a01af7",
+      "sourceCommit": "pending-recapture-after-structural-residual-repair",
       "captureProvenance": {
         "route": "cheap-lowlevel-headless",
         "sourceCommit": "7cf30ae5ab93349790c674647fe9fe3e64a01af7",
@@ -1041,7 +1077,7 @@
       ],
       "reference": {
         "file": "stat-tile.html",
-        "sha256": "1b112c1dc161d7855da2bc2ca2f0dcd1ceedd3bef2423a52e5ce70e0557e125f",
+        "sha256": "8591e79d86dde16123be41986e8e76d17e4160680f95885524ce1359661110ed",
         "route": "/design/reference-app/index.html?row=stat-tile--gallery&theme=light&width=1280&height=800&scale=1&state=gallery&locale=en-HK&capture=1"
       },
       "product": {
@@ -1071,33 +1107,37 @@
       "evidence": {
         "referenceRaw": {
           "path": "design/parity/evidence/stat-tile--gallery/reference.png",
-          "status": "verified",
+          "status": "pending",
           "sha256": "e4c71d77d683f7ae79d500db793752bb76320e8ff2bf8673cbd3f0d0b52b04a0",
           "receiptPath": "design/parity/evidence/stat-tile--gallery/referenceRaw-receipt.json",
-          "receiptSha256": "f96f095cd043fcfa9600287eee594877072a49940fd5a8faf7f4f2ba5cb1ac90"
+          "receiptSha256": "f96f095cd043fcfa9600287eee594877072a49940fd5a8faf7f4f2ba5cb1ac90",
+          "reason": "Reference source or shared structural styling changed; the existing raw capture is historical and must be recaptured."
         },
         "productRaw": {
           "path": "design/parity/evidence/stat-tile--gallery/product.png",
-          "status": "verified",
+          "status": "pending",
           "sha256": "b1eb7a10ccd4b4832af715ead28160f57964824a6f739074b7c87fd9a349406c",
           "receiptPath": "design/parity/evidence/stat-tile--gallery/productRaw-receipt.json",
-          "receiptSha256": "91c9deb8fa41abca3bec145579ada12c0fab3eafeab09b135b8cf3ec8d424874"
+          "receiptSha256": "91c9deb8fa41abca3bec145579ada12c0fab3eafeab09b135b8cf3ec8d424874",
+          "reason": "Reference source or shared structural styling changed; the matching built-product capture must be recaptured at the same source commit."
         },
         "comparison": {
           "path": "design/parity/evidence/stat-tile--gallery/comparison.png",
-          "status": "verified",
+          "status": "pending",
           "sha256": "2ddc597c80f0b20cb4cff496e4bddc16694415ddc9c6db8ea680e17f7511797d",
           "manifestPath": "design/parity/evidence/stat-tile--gallery/comparison.json",
-          "manifestSha256": "c9361ba66bfff97699659ed52d52a162fd325e74252bf4f0f63f1439ccd72ea4"
+          "manifestSha256": "c9361ba66bfff97699659ed52d52a162fd325e74252bf4f0f63f1439ccd72ea4",
+          "reason": "Both raw captures must be regenerated before the labelled comparison is current."
         },
         "diff": {
           "path": "design/parity/evidence/stat-tile--gallery/diff.json",
-          "status": "verified",
-          "sha256": "82b8175fcb74c0abe34530b85f071524cd9520cacaa235be35e0829febf1c356"
+          "status": "pending",
+          "sha256": "82b8175fcb74c0abe34530b85f071524cd9520cacaa235be35e0829febf1c356",
+          "reason": "Both raw captures must be regenerated before the visual diff is current."
         }
       },
       "intentionalDeviations": [],
-      "sourceCommit": "7cf30ae5ab93349790c674647fe9fe3e64a01af7",
+      "sourceCommit": "pending-recapture-after-structural-residual-repair",
       "captureProvenance": {
         "route": "cheap-lowlevel-headless",
         "sourceCommit": "7cf30ae5ab93349790c674647fe9fe3e64a01af7",
@@ -1116,7 +1156,7 @@
       ],
       "reference": {
         "file": "tokens-color.html",
-        "sha256": "cf47b1db08c25597a18831cad712307b8a3ddbb02ac58af0fb240ff4b54a4349",
+        "sha256": "4b9386b1dfcb896d2dabdfa6213d1a4829bdf81ceb333b082ab6394180bfa08e",
         "route": "/design/reference-app/index.html?row=tokens-color--roles&theme=light&width=1280&height=800&scale=1&state=roles&locale=en-HK&capture=1"
       },
       "product": {
@@ -1146,33 +1186,37 @@
       "evidence": {
         "referenceRaw": {
           "path": "design/parity/evidence/tokens-color--roles/reference.png",
-          "status": "verified",
+          "status": "pending",
           "sha256": "4fb91a3c7f4454a17fb4d01da1d78188e281f4e2fcd5468b68d174643d0a767a",
           "receiptPath": "design/parity/evidence/tokens-color--roles/referenceRaw-receipt.json",
-          "receiptSha256": "f488b82fee6e2be4bf5f0c290f65e1881e728d950665f6796eb7f59ee06cc7dd"
+          "receiptSha256": "f488b82fee6e2be4bf5f0c290f65e1881e728d950665f6796eb7f59ee06cc7dd",
+          "reason": "Reference source or shared structural styling changed; the existing raw capture is historical and must be recaptured."
         },
         "productRaw": {
           "path": "design/parity/evidence/tokens-color--roles/product.png",
-          "status": "verified",
+          "status": "pending",
           "sha256": "9eb8ac8f9d18fab80b62d157a98c8f2aaa402d9286954c39ad5143faa72b53ea",
           "receiptPath": "design/parity/evidence/tokens-color--roles/productRaw-receipt.json",
-          "receiptSha256": "ac2c9da41bbcc142a43fb64b9e9524a1d5a42800ab5bef37f3913b01f2f44b00"
+          "receiptSha256": "ac2c9da41bbcc142a43fb64b9e9524a1d5a42800ab5bef37f3913b01f2f44b00",
+          "reason": "Reference source or shared structural styling changed; the matching built-product capture must be recaptured at the same source commit."
         },
         "comparison": {
           "path": "design/parity/evidence/tokens-color--roles/comparison.png",
-          "status": "verified",
+          "status": "pending",
           "sha256": "079d390e503a08db146b77c103c5f3506409d6a2c9d1db054c551df99a53dad1",
           "manifestPath": "design/parity/evidence/tokens-color--roles/comparison.json",
-          "manifestSha256": "0aa2c29919062b1cc080d143aa7b80f6c2e09904ebb3c14c5d2f5a66fd119ba1"
+          "manifestSha256": "0aa2c29919062b1cc080d143aa7b80f6c2e09904ebb3c14c5d2f5a66fd119ba1",
+          "reason": "Both raw captures must be regenerated before the labelled comparison is current."
         },
         "diff": {
           "path": "design/parity/evidence/tokens-color--roles/diff.json",
-          "status": "verified",
-          "sha256": "6f8f1cd9e6c565bd574602739f0476d51273d4ee24e1aabffda9c35f5bc93ceb"
+          "status": "pending",
+          "sha256": "6f8f1cd9e6c565bd574602739f0476d51273d4ee24e1aabffda9c35f5bc93ceb",
+          "reason": "Both raw captures must be regenerated before the visual diff is current."
         }
       },
       "intentionalDeviations": [],
-      "sourceCommit": "7cf30ae5ab93349790c674647fe9fe3e64a01af7",
+      "sourceCommit": "pending-recapture-after-structural-residual-repair",
       "captureProvenance": {
         "route": "cheap-lowlevel-headless",
         "sourceCommit": "7cf30ae5ab93349790c674647fe9fe3e64a01af7",
@@ -1192,7 +1236,7 @@
       ],
       "reference": {
         "file": "tokens-shape-elevation.html",
-        "sha256": "affc1a9229d67af83037a2beb006ed43545108f6cf94b9ba9355bdca10f1f1b5",
+        "sha256": "9639ec70e98e84105a1fba159998adbcdbdadd5177eb2298270696bc318eb283",
         "route": "/design/reference-app/index.html?row=tokens-shape-elevation--scale&theme=light&width=1280&height=800&scale=1&state=scale&locale=en-HK&capture=1"
       },
       "product": {
@@ -1222,33 +1266,37 @@
       "evidence": {
         "referenceRaw": {
           "path": "design/parity/evidence/tokens-shape-elevation--scale/reference.png",
-          "status": "verified",
+          "status": "pending",
           "sha256": "f0d010a9c802b558c8d968dfea052a50dcb58fdbecb3a651b30d58f902a2a836",
           "receiptPath": "design/parity/evidence/tokens-shape-elevation--scale/referenceRaw-receipt.json",
-          "receiptSha256": "c785fd0ca09e8ea32371fd1217297a61368f88d26213d71e81c82cf40350d9dc"
+          "receiptSha256": "c785fd0ca09e8ea32371fd1217297a61368f88d26213d71e81c82cf40350d9dc",
+          "reason": "Reference source or shared structural styling changed; the existing raw capture is historical and must be recaptured."
         },
         "productRaw": {
           "path": "design/parity/evidence/tokens-shape-elevation--scale/product.png",
-          "status": "verified",
+          "status": "pending",
           "sha256": "8d474c6139751c3f2d45af0372757d0d6467ad1f24a13a19255ea7f40ceb348a",
           "receiptPath": "design/parity/evidence/tokens-shape-elevation--scale/productRaw-receipt.json",
-          "receiptSha256": "939db3104bb6fc737b81b13b0a0df84d46b80c15cc53fd34d9b83253571fd49b"
+          "receiptSha256": "939db3104bb6fc737b81b13b0a0df84d46b80c15cc53fd34d9b83253571fd49b",
+          "reason": "Reference source or shared structural styling changed; the matching built-product capture must be recaptured at the same source commit."
         },
         "comparison": {
           "path": "design/parity/evidence/tokens-shape-elevation--scale/comparison.png",
-          "status": "verified",
+          "status": "pending",
           "sha256": "1b589c1bde8219eb11f1d0ee0982cce871b40801ca0c82e6a617fe656ce5a68c",
           "manifestPath": "design/parity/evidence/tokens-shape-elevation--scale/comparison.json",
-          "manifestSha256": "d953885f8ac30f6830e3a4a4cf7d57be733b981cf7cfea7cd8380625f23f0d31"
+          "manifestSha256": "d953885f8ac30f6830e3a4a4cf7d57be733b981cf7cfea7cd8380625f23f0d31",
+          "reason": "Both raw captures must be regenerated before the labelled comparison is current."
         },
         "diff": {
           "path": "design/parity/evidence/tokens-shape-elevation--scale/diff.json",
-          "status": "verified",
-          "sha256": "8415b4caef4934ab626e5fb2d775732832fe16d22988d533c285de70ec60c96c"
+          "status": "pending",
+          "sha256": "8415b4caef4934ab626e5fb2d775732832fe16d22988d533c285de70ec60c96c",
+          "reason": "Both raw captures must be regenerated before the visual diff is current."
         }
       },
       "intentionalDeviations": [],
-      "sourceCommit": "7cf30ae5ab93349790c674647fe9fe3e64a01af7",
+      "sourceCommit": "pending-recapture-after-structural-residual-repair",
       "captureProvenance": {
         "route": "cheap-lowlevel-headless",
         "sourceCommit": "7cf30ae5ab93349790c674647fe9fe3e64a01af7",
@@ -1267,7 +1315,7 @@
       ],
       "reference": {
         "file": "tokens-type.html",
-        "sha256": "1afa7724e6654b3502ea50eecde0cdcc93889958ae310802d5c146c93214574e",
+        "sha256": "5d722682c909636bc1f8e0f28e3249338b112f723f7a45a86404335c0114f429",
         "route": "/design/reference-app/index.html?row=tokens-type--scale&theme=light&width=1280&height=800&scale=1&state=scale&locale=en-HK&capture=1"
       },
       "product": {
@@ -1297,33 +1345,37 @@
       "evidence": {
         "referenceRaw": {
           "path": "design/parity/evidence/tokens-type--scale/reference.png",
-          "status": "verified",
+          "status": "pending",
           "sha256": "82abd49025dbeaa5b4c54ecfe0413627c577dc4786328a98fc5ca8edfecb78b1",
           "receiptPath": "design/parity/evidence/tokens-type--scale/referenceRaw-receipt.json",
-          "receiptSha256": "aff99bf16802117e0d851f7665a4e8beeedf35800de7c46dc4578175ff0884d7"
+          "receiptSha256": "aff99bf16802117e0d851f7665a4e8beeedf35800de7c46dc4578175ff0884d7",
+          "reason": "Reference source or shared structural styling changed; the existing raw capture is historical and must be recaptured."
         },
         "productRaw": {
           "path": "design/parity/evidence/tokens-type--scale/product.png",
-          "status": "verified",
+          "status": "pending",
           "sha256": "45d794c723f32546015e36bfd0e0c8e1c3015b3ee90f1655f188727d37def5c3",
           "receiptPath": "design/parity/evidence/tokens-type--scale/productRaw-receipt.json",
-          "receiptSha256": "fb0dbb0cfdb0e5d6d81fdda1dc97a016255f4d923194e6533f3d8a282e91f757"
+          "receiptSha256": "fb0dbb0cfdb0e5d6d81fdda1dc97a016255f4d923194e6533f3d8a282e91f757",
+          "reason": "Reference source or shared structural styling changed; the matching built-product capture must be recaptured at the same source commit."
         },
         "comparison": {
           "path": "design/parity/evidence/tokens-type--scale/comparison.png",
-          "status": "verified",
+          "status": "pending",
           "sha256": "22926020ea77b2ba80ca55f042f31e31974f819bf83acfa649bd3ef089f85f21",
           "manifestPath": "design/parity/evidence/tokens-type--scale/comparison.json",
-          "manifestSha256": "dfd4774518fe5c2eafe1d28f6c5870b304c778081823c40d9096f136f202a85c"
+          "manifestSha256": "dfd4774518fe5c2eafe1d28f6c5870b304c778081823c40d9096f136f202a85c",
+          "reason": "Both raw captures must be regenerated before the labelled comparison is current."
         },
         "diff": {
           "path": "design/parity/evidence/tokens-type--scale/diff.json",
-          "status": "verified",
-          "sha256": "27bd8bbdc33832686938b506d55b9cb22d45098206b71568334267a6195b1070"
+          "status": "pending",
+          "sha256": "27bd8bbdc33832686938b506d55b9cb22d45098206b71568334267a6195b1070",
+          "reason": "Both raw captures must be regenerated before the visual diff is current."
         }
       },
       "intentionalDeviations": [],
-      "sourceCommit": "7cf30ae5ab93349790c674647fe9fe3e64a01af7",
+      "sourceCommit": "pending-recapture-after-structural-residual-repair",
       "captureProvenance": {
         "route": "cheap-lowlevel-headless",
         "sourceCommit": "7cf30ae5ab93349790c674647fe9fe3e64a01af7",
@@ -1343,7 +1395,7 @@
       ],
       "reference": {
         "file": "tool-card.html",
-        "sha256": "55e377a9e1fa7a6387e123c0dfe3cb933ad2cb1d442bfed2b2684f803c9b497b",
+        "sha256": "7158eba026b8b0310cd3e36d6347ddac1f888894a01d28f2e355bb90bdcf2fd6",
         "route": "/design/reference-app/index.html?row=tool-card--gallery&theme=light&width=1280&height=800&scale=1&state=gallery&locale=en-HK&capture=1"
       },
       "product": {
@@ -1373,33 +1425,37 @@
       "evidence": {
         "referenceRaw": {
           "path": "design/parity/evidence/tool-card--gallery/reference.png",
-          "status": "verified",
+          "status": "pending",
           "sha256": "7c0decab15ac17c409ad0ec0a033b49729b1dcf7f7afb69d045a4cfc93650824",
           "receiptPath": "design/parity/evidence/tool-card--gallery/referenceRaw-receipt.json",
-          "receiptSha256": "dcf83a5da25eb84961e55a53b4c81e3a4f31876b19101cd39fb470803a33c78f"
+          "receiptSha256": "dcf83a5da25eb84961e55a53b4c81e3a4f31876b19101cd39fb470803a33c78f",
+          "reason": "Reference source or shared structural styling changed; the existing raw capture is historical and must be recaptured."
         },
         "productRaw": {
           "path": "design/parity/evidence/tool-card--gallery/product.png",
-          "status": "verified",
+          "status": "pending",
           "sha256": "92474ff3b98c2ba9b712baabff1df27da05e1f17a061918d410a31de0813d717",
           "receiptPath": "design/parity/evidence/tool-card--gallery/productRaw-receipt.json",
-          "receiptSha256": "d239f3d89b9873296574cbb7ba5ba6867ca18f73f717a5db8ad056da349beb19"
+          "receiptSha256": "d239f3d89b9873296574cbb7ba5ba6867ca18f73f717a5db8ad056da349beb19",
+          "reason": "Reference source or shared structural styling changed; the matching built-product capture must be recaptured at the same source commit."
         },
         "comparison": {
           "path": "design/parity/evidence/tool-card--gallery/comparison.png",
-          "status": "verified",
+          "status": "pending",
           "sha256": "7cb7a9afbe8cb2b95cf60c623e5acfc8bd312f7b35d0413cdd5f2399216b2339",
           "manifestPath": "design/parity/evidence/tool-card--gallery/comparison.json",
-          "manifestSha256": "59a1584f887e952f26e3aed5a16ca251a0fd13a457eea60eda1044ccbcd2aa2e"
+          "manifestSha256": "59a1584f887e952f26e3aed5a16ca251a0fd13a457eea60eda1044ccbcd2aa2e",
+          "reason": "Both raw captures must be regenerated before the labelled comparison is current."
         },
         "diff": {
           "path": "design/parity/evidence/tool-card--gallery/diff.json",
-          "status": "verified",
-          "sha256": "aebc8d25f7d480d237b616089b1c308ea2dfe2ef898172e4f13c2a41365d7a4f"
+          "status": "pending",
+          "sha256": "aebc8d25f7d480d237b616089b1c308ea2dfe2ef898172e4f13c2a41365d7a4f",
+          "reason": "Both raw captures must be regenerated before the visual diff is current."
         }
       },
       "intentionalDeviations": [],
-      "sourceCommit": "7cf30ae5ab93349790c674647fe9fe3e64a01af7",
+      "sourceCommit": "pending-recapture-after-structural-residual-repair",
       "captureProvenance": {
         "route": "cheap-lowlevel-headless",
         "sourceCommit": "7cf30ae5ab93349790c674647fe9fe3e64a01af7",
@@ -1418,7 +1474,7 @@
       ],
       "reference": {
         "file": "tools-tree.html",
-        "sha256": "24694630b46f652e59ec0e0f1ea5b18b097e1daf7d270f653a79dce0c220dd6b",
+        "sha256": "96aed8f1fe50877395aa4a34a08fcd743564ec7bd56f0b13559dbe20a0fcba0b",
         "route": "/design/reference-app/index.html?row=tools-tree--mixed&theme=light&width=1280&height=800&scale=1&state=mixed&locale=en-HK&capture=1"
       },
       "product": {
@@ -1448,33 +1504,37 @@
       "evidence": {
         "referenceRaw": {
           "path": "design/parity/evidence/tools-tree--mixed/reference.png",
-          "status": "verified",
+          "status": "pending",
           "sha256": "daacca0f513fe9fe78ed1f04d75b87f597dfc32c6584d10c567fbde0bec59ad7",
           "receiptPath": "design/parity/evidence/tools-tree--mixed/referenceRaw-receipt.json",
-          "receiptSha256": "15ed1f926f8681ab66e538980ed7522b1229476b025fa365b85deb78c33ffd6d"
+          "receiptSha256": "15ed1f926f8681ab66e538980ed7522b1229476b025fa365b85deb78c33ffd6d",
+          "reason": "Reference source or shared structural styling changed; the existing raw capture is historical and must be recaptured."
         },
         "productRaw": {
           "path": "design/parity/evidence/tools-tree--mixed/product.png",
-          "status": "verified",
+          "status": "pending",
           "sha256": "1e48e230056f42a9a4fd46b5ee8054e9e03350be5d185098338fb64d54e2288d",
           "receiptPath": "design/parity/evidence/tools-tree--mixed/productRaw-receipt.json",
-          "receiptSha256": "35f86f25124aff893a428a584bb87642540580b9ca991a25a4e0407aade5d895"
+          "receiptSha256": "35f86f25124aff893a428a584bb87642540580b9ca991a25a4e0407aade5d895",
+          "reason": "Reference source or shared structural styling changed; the matching built-product capture must be recaptured at the same source commit."
         },
         "comparison": {
           "path": "design/parity/evidence/tools-tree--mixed/comparison.png",
-          "status": "verified",
+          "status": "pending",
           "sha256": "f558f0dee6d7afdbf29b1985a6320191af4cacdd4d87ccf56777596e5572588d",
           "manifestPath": "design/parity/evidence/tools-tree--mixed/comparison.json",
-          "manifestSha256": "6f29f8c4b78b58da9c0167bc6f96e28105e9f613e936cb6f933cee72115acba9"
+          "manifestSha256": "6f29f8c4b78b58da9c0167bc6f96e28105e9f613e936cb6f933cee72115acba9",
+          "reason": "Both raw captures must be regenerated before the labelled comparison is current."
         },
         "diff": {
           "path": "design/parity/evidence/tools-tree--mixed/diff.json",
-          "status": "verified",
-          "sha256": "beafc674e3751a7f1e711d805413d983eb95185e510acb3f429717538aadbc64"
+          "status": "pending",
+          "sha256": "beafc674e3751a7f1e711d805413d983eb95185e510acb3f429717538aadbc64",
+          "reason": "Both raw captures must be regenerated before the visual diff is current."
         }
       },
       "intentionalDeviations": [],
-      "sourceCommit": "7cf30ae5ab93349790c674647fe9fe3e64a01af7",
+      "sourceCommit": "pending-recapture-after-structural-residual-repair",
       "captureProvenance": {
         "route": "cheap-lowlevel-headless",
         "sourceCommit": "7cf30ae5ab93349790c674647fe9fe3e64a01af7",
@@ -1493,7 +1553,7 @@
       ],
       "reference": {
         "file": "upgrade-card.html",
-        "sha256": "576c8fe99724a9750e3250ea7b658fe41e43a98002dde406672aad16823893ac",
+        "sha256": "79a387ee56d2d47f1c4fb806481449fa5e8c02a00d453b06b4bf75b8f031b673",
         "route": "/design/reference-app/index.html?row=upgrade-card--gallery&theme=light&width=1280&height=800&scale=1&state=gallery&locale=en-HK&capture=1"
       },
       "product": {
@@ -1523,33 +1583,37 @@
       "evidence": {
         "referenceRaw": {
           "path": "design/parity/evidence/upgrade-card--gallery/reference.png",
-          "status": "verified",
+          "status": "pending",
           "sha256": "4ddcff21b3f85edfa60f60684b28762a2fea32a53bbe04825230a201953aac10",
           "receiptPath": "design/parity/evidence/upgrade-card--gallery/referenceRaw-receipt.json",
-          "receiptSha256": "71f9817ffdac06caf3922c0716df871dd60fdecc38c2e0877618faded52dd20c"
+          "receiptSha256": "71f9817ffdac06caf3922c0716df871dd60fdecc38c2e0877618faded52dd20c",
+          "reason": "Reference source or shared structural styling changed; the existing raw capture is historical and must be recaptured."
         },
         "productRaw": {
           "path": "design/parity/evidence/upgrade-card--gallery/product.png",
-          "status": "verified",
+          "status": "pending",
           "sha256": "def6893b305b848c87a935fe53b01fd2426c1eb4455ea00a896779116edb1a1a",
           "receiptPath": "design/parity/evidence/upgrade-card--gallery/productRaw-receipt.json",
-          "receiptSha256": "76b87117bbc435254024cd702e5c79906809e3df55c6c394ebf647a064e767e6"
+          "receiptSha256": "76b87117bbc435254024cd702e5c79906809e3df55c6c394ebf647a064e767e6",
+          "reason": "Reference source or shared structural styling changed; the matching built-product capture must be recaptured at the same source commit."
         },
         "comparison": {
           "path": "design/parity/evidence/upgrade-card--gallery/comparison.png",
-          "status": "verified",
+          "status": "pending",
           "sha256": "0698c3c412ece6ec51926b6b170f2691bf2ab8d8a7d95ab530ca9083b3b4d6c6",
           "manifestPath": "design/parity/evidence/upgrade-card--gallery/comparison.json",
-          "manifestSha256": "2fe45bacd17b6161153b235c3d5f9cbe09d5e779800b10472f6adefc75a3d29b"
+          "manifestSha256": "2fe45bacd17b6161153b235c3d5f9cbe09d5e779800b10472f6adefc75a3d29b",
+          "reason": "Both raw captures must be regenerated before the labelled comparison is current."
         },
         "diff": {
           "path": "design/parity/evidence/upgrade-card--gallery/diff.json",
-          "status": "verified",
-          "sha256": "6b0f9af5c4d03cad828813dcae1ed7219196691104e8b6ddedaa85276ca00950"
+          "status": "pending",
+          "sha256": "6b0f9af5c4d03cad828813dcae1ed7219196691104e8b6ddedaa85276ca00950",
+          "reason": "Both raw captures must be regenerated before the visual diff is current."
         }
       },
       "intentionalDeviations": [],
-      "sourceCommit": "7cf30ae5ab93349790c674647fe9fe3e64a01af7",
+      "sourceCommit": "pending-recapture-after-structural-residual-repair",
       "captureProvenance": {
         "route": "cheap-lowlevel-headless",
         "sourceCommit": "7cf30ae5ab93349790c674647fe9fe3e64a01af7",

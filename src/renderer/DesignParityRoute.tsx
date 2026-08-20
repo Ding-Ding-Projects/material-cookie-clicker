@@ -2,6 +2,7 @@ import { useLayoutEffect, type ReactNode } from 'react';
 
 import { AchievementMedal, GeneratorIcon, HeroCookieArt, ToolIcon, ToolTierGem, UpgradeIcon } from './assets/icons.js';
 import { BulkToolbar } from './components/BulkToolbar.js';
+import { UpgradeParityScene } from './parity/UpgradeParityScene.js';
 import './styles/design-parity-route.css';
 
 export const DESIGN_PARITY_NETWORK_POLICY = 'blocked' as const;
@@ -440,10 +441,6 @@ function UpgradeTickets({ compact = false }: { readonly compact?: boolean }) {
   return <div className={`shelf-grid parity-upgrade-grid${compact ? ' parity-upgrade-grid--compact' : ''}`}>{upgrades.map((upgrade) => <button type="button" className="shelf-ticket shelf-ticket--affordable" key={upgrade.name}><span className="shelf-ticket__glyph"><UpgradeIcon family={upgrade.family} /></span><span className="shelf-ticket__body"><span className="shelf-ticket__name">{upgrade.name}</span><span className="shelf-ticket__name-zh">{upgrade.yue}</span><span className="shelf-ticket__effect">{upgrade.effect}</span><span className="shelf-ticket__cost">🍪 {upgrade.cost}</span></span></button>)}</div>;
 }
 
-function UpgradeGallery() {
-  return <GalleryFrame label="Upgrade card product gallery"><section className="panel upgrade-shelf parity-upgrade-shelf"><div className="panel__header"><h2 className="panel__title">Upgrades <span className="panel__title-zh">升級</span><span className="panel__title-count">1 / 3</span></h2></div><div className="parity-upgrade-states"><div className="shelf-locked parity-upgrade-state"><span className="shelf-locked__glyph"><UpgradeIcon family="locked" /></span><span className="shelf-locked__text"><span className="shelf-locked__name">Reinforced Rolling Pin · 加固擀麵杖</span><span className="shelf-locked__requirement">Doubles Grandma's Bakery CPS. Requires 50 owned. · 令嫲嫲嘅麵包店產量加倍，需要擁有 50 間。</span></span><span className="shelf-locked__counter">Locked · 未解鎖 (12 / 50)</span></div><button type="button" className="shelf-ticket shelf-ticket--affordable parity-upgrade-state"><span className="shelf-ticket__glyph"><UpgradeIcon family="click" /></span><span className="shelf-ticket__body"><span className="shelf-ticket__name">Golden Whisk</span><span className="shelf-ticket__name-zh">金打蛋器</span><span className="shelf-ticket__effect">+15% click power · 每一擊力量增加 15%</span><span className="shelf-ticket__cost">Buy · 買 — 🍪 5,000</span></span></button><span className="shelf-stamp parity-upgrade-state" role="img" aria-label="Butter Blessing owned"><span className="shelf-ticket__glyph"><UpgradeIcon family="golden" /></span><span className="shelf-ticket__body"><span className="shelf-ticket__name">Butter Blessing</span><span className="shelf-ticket__name-zh">牛油祝福</span><span className="shelf-ticket__effect">Permanently +10% global CPS · 永久令全局每秒產量增加 10%</span><span className="shelf-ticket__cost">Already owned · 已經買咗</span></span></span></div></section></GalleryFrame>;
-}
-
 const ROUTE_RENDERERS: Readonly<Record<DesignParityRowId, () => ReactNode>> = {
   'achievement-badge--gallery': AchievementGallery,
   'building-row--gallery': BuildingGallery,
@@ -460,7 +457,7 @@ const ROUTE_RENDERERS: Readonly<Record<DesignParityRowId, () => ReactNode>> = {
   'tokens-type--scale': TypeScale,
   'tool-card--gallery': ToolCards,
   'tools-tree--mixed': ToolsTree,
-  'upgrade-card--gallery': UpgradeGallery,
+  'upgrade-card--gallery': UpgradeParityScene,
 };
 
 assertDesignParityCoverage(Object.keys(ROUTE_RENDERERS));

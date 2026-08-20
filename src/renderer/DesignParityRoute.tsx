@@ -348,7 +348,7 @@ function StatGallery() {
 }
 
 const COLOR_ROLES = [
-  ['Primary', '--primary', '--on-primary'], ['Primary container', '--primary-container', '--on-primary-container'], ['Secondary', '--secondary', '--on-secondary'], ['Tertiary', '--tertiary', '--on-tertiary'], ['Surface', '--surface', '--on-surface'], ['Surface high', '--surface-high', '--on-surface'], ['Error', '--error', '--on-error'], ['Outline', '--outline', '--surface'],
+  ['Primary', '--md-sys-color-primary', '--md-sys-color-on-primary'], ['Primary container', '--md-sys-color-primary-container', '--md-sys-color-on-primary-container'], ['Secondary', '--md-sys-color-secondary', '--md-sys-color-on-secondary'], ['Tertiary', '--md-sys-color-tertiary', '--md-sys-color-on-tertiary'], ['Surface', '--md-sys-color-surface', '--md-sys-color-on-surface'], ['Surface high', '--md-sys-color-surface-container-high', '--md-sys-color-on-surface'], ['Error', '--md-sys-color-error', '--md-sys-color-on-error'], ['Outline', '--md-sys-color-outline', '--md-sys-color-surface'],
 ] as const;
 
 function ColorRoles() {
@@ -356,7 +356,7 @@ function ColorRoles() {
 }
 
 function ShapeElevationScale() {
-  const shapes = [['Extra small', '--shape-xs', '--elevation-1'], ['Small', '--shape-sm', '--elevation-1'], ['Medium', '--shape-md', '--elevation-2'], ['Large', '--shape-lg', '--elevation-3'], ['Extra large', '--shape-xl', '--elevation-4'], ['Full', '--shape-full', '--elevation-5']] as const;
+  const shapes = [['Extra small', '--md-sys-shape-corner-extra-small', '--md-sys-elevation-level-1'], ['Small', '--md-sys-shape-corner-small', '--md-sys-elevation-level-1'], ['Medium', '--md-sys-shape-corner-medium', '--md-sys-elevation-level-2'], ['Large', '--md-sys-shape-corner-large', '--md-sys-elevation-level-3'], ['Extra large', '--md-sys-shape-corner-extra-large', '--md-sys-elevation-level-3'], ['Full', '--md-sys-shape-corner-full', '--md-sys-elevation-level-1']] as const;
   return <GalleryFrame label="Live product shape and elevation scale"><div className="parity-shape-grid">{shapes.map(([name, shape, elevation]) => <div className="parity-shape" key={name} style={{ borderRadius: `var(${shape})`, boxShadow: `var(${elevation})` }}><strong>{name}</strong><code>{shape}</code><code>{elevation}</code></div>)}</div></GalleryFrame>;
 }
 

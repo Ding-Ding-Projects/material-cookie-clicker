@@ -38,6 +38,6 @@
   },
   "review": {
     "verdict": "defect",
-    "reason": "Visible deltas remain unapproved; metrics prioritize human review and do not waive differences."
+    "reason": "Unapproved differences remain in independent cookie/upgrade artwork, panel geometry, spacing, typography, and visible content framing."
   }
 }

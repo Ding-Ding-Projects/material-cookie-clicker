@@ -8,7 +8,26 @@ from pathlib import Path
 
 from PIL import Image, ImageChops, ImageDraw
 
-SOURCE_COMMIT = "7cf30ae5ab93349790c674647fe9fe3e64a01af7"
+SOURCE_COMMIT = "6f878d9fc1dc6246a7a078ce33aa9b12531fe775"
+
+REVIEW_REASONS = {
+    "achievement-badge--gallery": "Unapproved differences remain in independent medal artwork, card geometry, typography, and toast placement/anatomy.",
+    "building-row--gallery": "Unapproved differences remain in independent generator artwork, row/control geometry, typography, and wrapping.",
+    "bulk-toolbar--progress": "Unapproved differences remain in toolbar/control geometry, borders, spacing, and text rendering.",
+    "cookie-surface--gallery": "Unapproved differences remain in independent cookie artwork, interaction-state sizing, halo geometry, and label placement.",
+    "game-layout--main": "Unapproved differences remain in independent cookie/upgrade artwork, panel geometry, spacing, typography, and visible content framing.",
+    "narrator-toast--gallery": "Unapproved differences remain in toast width and placement, close-control anatomy, spacing, and text wrapping.",
+    "prestige-gate--ready": "Unapproved differences remain in panel/dialog geometry, spacing, typography, and visible content framing.",
+    "search-regex-builder--open": "Unapproved differences remain in field/popover geometry, control anatomy, spacing, and typography.",
+    "settings-funny-sliders--default": "Unapproved differences remain in card and slider geometry, borders, spacing, and typography.",
+    "stat-tile--gallery": "Unapproved differences remain in tile geometry, spacing, typography, and progress-control anatomy.",
+    "tokens-color--roles": "Unapproved differences remain in swatch geometry, outline/background colour treatment, spacing, and text rendering.",
+    "tokens-shape-elevation--scale": "Unapproved differences remain in shape/elevation geometry, border/shadow rendering, spacing, and text rasterization.",
+    "tokens-type--scale": "Unapproved differences remain in typography sizing/placement, row geometry, spacing, and visible content framing.",
+    "tool-card--gallery": "Unapproved differences remain in independent tool artwork, card/control geometry, spacing, typography, and progress anatomy.",
+    "tools-tree--mixed": "Unapproved differences remain in independent tool/tier artwork, progress/header geometry, card layout, spacing, and typography.",
+    "upgrade-card--gallery": "Unapproved differences remain in independent upgrade artwork, card geometry, spacing, typography, and truncation/content framing.",
+}
 
 
 def digest(path: Path) -> str:
@@ -93,7 +112,7 @@ def main() -> None:
             "tool": {"name": "Pillow ImageChops.difference", "version": Image.__version__},
             "review": {
                 "verdict": "defect" if changed else "conforming",
-                "reason": "Visible deltas remain unapproved; metrics prioritize human review and do not waive differences." if changed else "Raw captures are pixel-identical.",
+                "reason": REVIEW_REASONS[row_id] if changed else "Raw captures are pixel-identical.",
             },
         }
         diff_path = target / "diff.json"
@@ -101,8 +120,8 @@ def main() -> None:
 
         receipt_paths = {}
         for side, image_path, run_receipt, pid, hwnd in (
-            ("referenceRaw", reference, reference_receipts[row_id], 58468, 7539508),
-            ("productRaw", product, product_receipts[row_id], 40152, 44435480),
+            ("referenceRaw", reference, reference_receipts[row_id], 40616, 656522),
+            ("productRaw", product, product_receipts[row_id], 50120, 5048816),
         ):
             interaction_path = target / f"{side}-interaction.json"
             interaction = {"version": 1, "rowId": row_id, "side": side, "route": run_receipt["logicalRoute"], "state": run_receipt["state"], "cleanupCompleted": True}

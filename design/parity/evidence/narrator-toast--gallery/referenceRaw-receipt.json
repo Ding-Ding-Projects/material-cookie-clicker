@@ -3,22 +3,22 @@
   "id": "narrator-toast--gallery--reference",
   "route": "cheap-lowlevel-headless",
   "source": {
-    "startCommit": "7cf30ae5ab93349790c674647fe9fe3e64a01af7",
-    "endCommit": "7cf30ae5ab93349790c674647fe9fe3e64a01af7",
+    "startCommit": "6f878d9fc1dc6246a7a078ce33aa9b12531fe775",
+    "endCommit": "6f878d9fc1dc6246a7a078ce33aa9b12531fe775",
     "artifactPath": "dist/renderer/assets/index-BQyFOhDT.js",
     "artifactSha256": "4663d6eaeafea4f1291311a86691fffc4e24ced846e32bcbd4405b5dd8b79198",
     "buildReceiptPath": "design/parity/evidence/build-receipt.json",
-    "buildReceiptSha256": "858f0c822df7fddfd40542d6e4584a0045f01ce7fc94a5abfb13b6b7527e2b50",
-    "artifactBuiltAt": "2026-08-20T02:05:17.095Z"
+    "buildReceiptSha256": "f7ce8b13e1e8de02d0f9fa4db35846089a171b74a81ea13b46f1648e6a03b382",
+    "artifactBuiltAt": "2026-08-20T02:25:40.843Z"
   },
   "capture": {
-    "rawPath": "C:\\Users\\cntow\\AppData\\Local\\Temp\\mcc-parity-7cf30ae-20260819-2200\\output\\reference-rows-current\\narrator-toast--gallery\\reference.png",
+    "rawPath": "C:\\Users\\cntow\\AppData\\Local\\Temp\\mcc-parity-6f878d9\\output\\reference-rows-current\\narrator-toast--gallery\\reference.png",
     "promotedPath": "design/parity/evidence/narrator-toast--gallery/reference.png",
-    "sha256": "04d0634041b0e1ff246d9dfb83ac4c3a369a6fc12a74934c14954a02b647c2e4",
-    "rawSha256": "04d0634041b0e1ff246d9dfb83ac4c3a369a6fc12a74934c14954a02b647c2e4",
+    "sha256": "d5cc773b46d1f9c0d95eb0d8e366ac692862a306436953ad6d550f33a0f30b94",
+    "rawSha256": "d5cc773b46d1f9c0d95eb0d8e366ac692862a306436953ad6d550f33a0f30b94",
     "mimeType": "image/png",
-    "startedAt": "2026-08-20T02:05:17.095Z",
-    "capturedAt": "2026-08-20T02:05:17.289Z",
+    "startedAt": "2026-08-20T02:25:40.843Z",
+    "capturedAt": "2026-08-20T02:25:41.027Z",
     "width": 1280,
     "height": 800
   },
@@ -59,8 +59,8 @@
     "reviewer": "automated parity capture review"
   },
   "runtime": {
-    "launchPid": 58468,
-    "hwnd": "7539508",
+    "launchPid": 40616,
+    "hwnd": "656522",
     "hwndResolvedLive": true,
     "consoleErrorCount": 0,
     "pageErrorCount": 0,

@@ -15,7 +15,7 @@
   "inputs": {
     "reference": {
       "path": "design/parity/evidence/narrator-toast--gallery/reference.png",
-      "sha256": "04d0634041b0e1ff246d9dfb83ac4c3a369a6fc12a74934c14954a02b647c2e4"
+      "sha256": "d5cc773b46d1f9c0d95eb0d8e366ac692862a306436953ad6d550f33a0f30b94"
     },
     "product": {
       "path": "design/parity/evidence/narrator-toast--gallery/product.png",
@@ -27,10 +27,10 @@
     "height": 800
   },
   "metrics": {
-    "changedPixels": 102414,
+    "changedPixels": 101548,
     "totalPixels": 1024000,
-    "changedRatio": 0.100013671875,
-    "rgbRmse": 22.346369965858923
+    "changedRatio": 0.09916796875,
+    "rgbRmse": 22.345478553475964
   },
   "tool": {
     "name": "Pillow ImageChops.difference",
@@ -38,6 +38,6 @@
   },
   "review": {
     "verdict": "defect",
-    "reason": "Visible deltas remain unapproved; metrics prioritize human review and do not waive differences."
+    "reason": "Unapproved differences remain in toast width and placement, close-control anatomy, spacing, and text wrapping."
   }
 }

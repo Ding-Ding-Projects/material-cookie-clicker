@@ -144,17 +144,17 @@ describe('modern Material design references', () => {
     expect(css).toContain('grid-template-columns: 64px minmax(220px, 1fr) 64px minmax(520px, 1.6fr)');
   });
 
-  it('keeps every prior evidence item stale after fine-alignment source changes', () => {
+  it('binds every refreshed evidence item to the domain-art isolation source', () => {
     const inventory = JSON.parse(readFileSync(resolve('design/parity/inventory.json'), 'utf8')) as {
       rows: Array<{ sourceCommit: string; evidence: Record<string, { status: string; reason?: string }> }>;
     };
     expect(inventory.rows).toHaveLength(16);
     for (const row of inventory.rows) {
-      expect(row.sourceCommit).toBe('pending-recapture-after-structural-residual-repair');
+      expect(row.sourceCommit).toBe('6f878d9fc1dc6246a7a078ce33aa9b12531fe775');
       expect(Object.keys(row.evidence).sort()).toEqual(['comparison', 'diff', 'productRaw', 'referenceRaw']);
       for (const evidence of Object.values(row.evidence)) {
-        expect(evidence.status).toBe('pending');
-        expect(evidence.reason?.trim().length).toBeGreaterThan(20);
+        expect(evidence.status).toBe('verified');
+        expect(evidence.reason).toBeUndefined();
       }
     }
   });

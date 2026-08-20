@@ -3,11 +3,14 @@ import { existsSync, readFileSync, readdirSync } from 'node:fs';
 import { dirname, join, resolve } from 'node:path';
 import { fileURLToPath } from 'node:url';
 
+import { validatePromotionInventory } from '../../scripts/promotion-receipt-contract.mjs';
+
 const here = dirname(fileURLToPath(import.meta.url));
 export const designRoot = resolve(here, '..');
 export const inventoryPath = join(designRoot, 'parity', 'inventory.json');
 export const negativeFixturePath = join(designRoot, 'parity', 'negative-proof-fixture.json');
 const repositoryRoot = resolve(designRoot, '..');
+export const promotionInventoryPath = join(designRoot, 'parity', 'evidence', 'promotion-inventory.json');
 
 const REQUIRED_PRIMITIVES = [
   'buttons', 'fields', 'menus', 'tabs', 'dialogs', 'navigation', 'selectionControls',
@@ -40,6 +43,10 @@ export function loadNegativeFixture() {
   return JSON.parse(readFileSync(negativeFixturePath, 'utf8'));
 }
 
+export function loadPromotionInventory() {
+  return JSON.parse(readFileSync(promotionInventoryPath, 'utf8'));
+}
+
 function sha256(path) {
   return createHash('sha256').update(readFileSync(path)).digest('hex');
 }
@@ -66,21 +73,38 @@ function assertPng(path, code, label, width = 1280, height = 800) {
   if (bytes.readUInt32BE(16) !== width || bytes.readUInt32BE(20) !== height) fail(code, `${label} dimensions are not ${width}x${height}`);
 }
 
-function assertRawReceipt(row, key, evidence) {
-  requireText(evidence.receiptPath, 'EVIDENCE_RECEIPT_MISSING', `${row.id} ${key} receipt path`);
-  requireText(evidence.receiptSha256, 'EVIDENCE_RECEIPT_HASH_MISSING', `${row.id} ${key} receipt hash`);
-  const receipt = readJsonEvidence(evidence.receiptPath, evidence.receiptSha256, 'EVIDENCE_RECEIPT_INVALID', `${row.id} ${key} receipt`);
+function assertPromotionRecord(row, key, evidence, promotionInventory) {
   const expectedId = `${row.id}--${key === 'referenceRaw' ? 'reference' : 'product'}`;
-  if (receipt.version !== 1 || receipt.id !== expectedId || receipt.route !== 'cheap-lowlevel-headless') fail('EVIDENCE_RECEIPT_INVALID', `${row.id} ${key} receipt identity/route is invalid`);
-  if (receipt.source?.startCommit !== row.sourceCommit || receipt.source?.endCommit !== row.sourceCommit) fail('EVIDENCE_SOURCE_MISMATCH', `${row.id} ${key} source commit mismatch`);
-  if (JSON.stringify({screen:receipt.state?.screen,state:receipt.state?.state,theme:receipt.state?.theme,viewport:receipt.state?.viewport,scale:receipt.state?.scale,locale:receipt.state?.locale}) !== JSON.stringify(row.tuple)) fail('EVIDENCE_TUPLE_MISMATCH', `${row.id} ${key} tuple mismatch`);
-  if (receipt.capture?.sha256 !== evidence.sha256 || receipt.capture?.rawSha256 !== evidence.sha256 || receipt.capture?.promotedPath !== evidence.path || receipt.capture?.width !== 1280 || receipt.capture?.height !== 800 || receipt.capture?.mimeType !== 'image/png') fail('EVIDENCE_CAPTURE_MISMATCH', `${row.id} ${key} capture binding mismatch`);
-  for (const name of ['visibleDesktopUntouched','expectedSurfaceOnly','sensitiveDataReviewed']) if (receipt.privacy?.[name] !== true) fail('EVIDENCE_PRIVACY_INVALID', `${row.id} ${key} privacy.${name} is not true`);
-  for (const name of ['unrelatedTargetsObserved','mocked','handEdited']) if (receipt.privacy?.[name] !== false) fail('EVIDENCE_PRIVACY_INVALID', `${row.id} ${key} privacy.${name} is not false`);
-  for (const name of ['decoded','pixelsInspected','targetVisible','expectedStateVisible']) if (receipt.inspection?.[name] !== true) fail('EVIDENCE_INSPECTION_INVALID', `${row.id} ${key} inspection.${name} is not true`);
-  for (const name of ['hwndResolvedLive','cleanupCompleted','cleanupOwnedOnly']) if (receipt.runtime?.[name] !== true) fail('EVIDENCE_RUNTIME_INVALID', `${row.id} ${key} runtime.${name} is not true`);
-  for (const proof of [['interactionReceiptPath','interactionReceiptSha256'],['privacyScanPath','privacyScanSha256']]) readJsonEvidence(receipt.runtime[proof[0]], receipt.runtime[proof[1]], 'EVIDENCE_RUNTIME_INVALID', `${row.id} ${key} ${proof[0]}`);
-  readJsonEvidence(receipt.source.buildReceiptPath, receipt.source.buildReceiptSha256, 'EVIDENCE_BUILD_INVALID', `${row.id} ${key} build receipt`);
+  requireText(evidence.promotionRecordId, 'EVIDENCE_PROMOTION_RECORD_MISSING', `${row.id} ${key} promotion record id`);
+  requireText(evidence.receiptSha256, 'EVIDENCE_RECEIPT_HASH_MISSING', `${row.id} ${key} receipt hash`);
+  if (evidence.promotionRecordId !== expectedId) fail('EVIDENCE_PROMOTION_RECORD_INVALID', `${row.id} ${key} promotion record identity is invalid`);
+  const records = promotionInventory.records.filter((record) => record.id === expectedId && record.active === true);
+  if (records.length !== 1) fail('EVIDENCE_PROMOTION_RECORD_INVALID', `${row.id} ${key} needs exactly one active promotion record`);
+  const record = records[0];
+  const expectedArtifact = key === 'referenceRaw'
+    ? row.captureProvenance?.referenceArtifactSha256
+    : row.captureProvenance?.productArtifactSha256;
+  const expected = {
+    rowId: row.id,
+    evidenceKey: key,
+    receiptSha256: evidence.receiptSha256,
+    path: evidence.path,
+    sourceCommit: row.sourceCommit,
+    artifactSha256: expectedArtifact,
+    captureSha256: evidence.sha256,
+    screen: row.tuple.screen,
+    state: row.tuple.state,
+    theme: row.tuple.theme,
+    viewportWidth: row.tuple.viewport.width,
+    viewportHeight: row.tuple.viewport.height,
+    scale: row.tuple.scale,
+    inspectionStatus: 'inspected',
+  };
+  for (const [field, expectedValue] of Object.entries(expected)) {
+    if (record[field] !== expectedValue) fail('EVIDENCE_PROMOTION_RECORD_INVALID', `${row.id} ${key} promotion field ${field} does not match`);
+  }
+  requireText(record.interactionProofId, 'EVIDENCE_PROMOTION_RECORD_INVALID', `${row.id} ${key} interaction proof id`);
+  requireText(record.interactionReceiptSha256, 'EVIDENCE_PROMOTION_RECORD_INVALID', `${row.id} ${key} interaction proof hash`);
 }
 
 function requireText(value, code, label) {
@@ -126,7 +150,11 @@ function assertRouteMatchesTuple(row) {
   }
 }
 
-export function validateInventory(inventory, { mode = 'structure', verifyHashes = true } = {}) {
+export function validateInventory(inventory, {
+  mode = 'structure',
+  verifyHashes = true,
+  promotionInventory = loadPromotionInventory(),
+} = {}) {
   const evidenceMode = mode === 'release' || mode === 'evidence';
   if (inventory.schemaVersion !== 1) fail('SCHEMA_VERSION_UNSUPPORTED', 'schemaVersion must be 1');
   if (inventory.inventoryPolicy !== 'hand-written-exact-reference-set') {
@@ -142,6 +170,11 @@ export function validateInventory(inventory, { mode = 'structure', verifyHashes 
   }
 
   if (!Array.isArray(inventory.rows)) fail('ROWS_MISSING', 'rows must be an array');
+  try {
+    validatePromotionInventory(promotionInventory);
+  } catch (error) {
+    fail('PROMOTION_INVENTORY_INVALID', error instanceof Error ? error.message : String(error));
+  }
   const ids = new Set();
   const files = new Set();
   for (const row of inventory.rows) {
@@ -218,7 +251,7 @@ export function validateInventory(inventory, { mode = 'structure', verifyHashes 
         if (!existsSync(filePath)) fail('EVIDENCE_FILE_ABSENT', `${row.id} ${key} file is absent`);
         if (sha256(filePath) !== evidence.sha256) fail('EVIDENCE_HASH_STALE', `${row.id} ${key} hash is stale`);
         if (key !== 'diff') assertPng(filePath, 'EVIDENCE_PNG_INVALID', `${row.id} ${key}`, key === 'comparison' ? 2560 : 1280, key === 'comparison' ? 840 : 800);
-        if (key === 'referenceRaw' || key === 'productRaw') assertRawReceipt(row, key, evidence);
+        if (key === 'referenceRaw' || key === 'productRaw') assertPromotionRecord(row, key, evidence, promotionInventory);
         if (key === 'comparison') {
           const manifest = readJsonEvidence(evidence.manifestPath, evidence.manifestSha256, 'COMPARISON_MANIFEST_INVALID', `${row.id} comparison manifest`);
           if (manifest.rowId !== row.id || JSON.stringify(manifest.tuple) !== JSON.stringify(row.tuple) || JSON.stringify(manifest.labels) !== JSON.stringify(['REFERENCE','BUILT PRODUCT']) || manifest.inputs?.referenceSha256 !== row.evidence.referenceRaw.sha256 || manifest.inputs?.productSha256 !== row.evidence.productRaw.sha256) fail('COMPARISON_BINDING_MISMATCH', `${row.id} comparison binding mismatch`);
@@ -245,6 +278,12 @@ export function validateInventory(inventory, { mode = 'structure', verifyHashes 
   const missingRows = requiredFiles.filter((file) => !files.has(file));
   if (missingRows.length > 0) fail('REFERENCE_ROW_MISSING', `references without rows: ${missingRows.join(', ')}`);
   if (files.size !== requiredFiles.length) fail('REFERENCE_ROW_COUNT_MISMATCH', 'every reference must appear exactly once');
+  const promotionIds = inventory.rows.flatMap((row) => [`${row.id}--reference`, `${row.id}--product`]);
+  try {
+    validatePromotionInventory(promotionInventory, { expectedIds: promotionIds });
+  } catch (error) {
+    fail('PROMOTION_INVENTORY_INVALID', error instanceof Error ? error.message : String(error));
+  }
   return { rowCount: inventory.rows.length, referenceCount: requiredFiles.length, mode };
 }
 

@@ -58,11 +58,12 @@ try {
   if (!mutableRefused) throw new Error('verification plan accepted the mutable public latest feed');
 
   const powershell = `${process.env.SystemRoot}\\System32\\WindowsPowerShell\\v1.0\\powershell.exe`;
-  for (const relative of ['scripts/build-common.ps1', 'scripts/build-installer.ps1', 'scripts/verify-squirrel-artifacts.ps1', 'scripts/verify-installed-release-evidence.ps1', 'scripts/test-verify-squirrel-artifacts.ps1']) {
+  for (const relative of ['scripts/build-common.ps1', 'scripts/build-installer.ps1', 'scripts/verify-squirrel-artifacts.ps1', 'scripts/verify-installed-release-evidence.ps1', 'scripts/test-verify-squirrel-artifacts.ps1', 'scripts/test-packaging-process-exit.ps1']) {
     const command = `$errors=$null;[System.Management.Automation.Language.Parser]::ParseFile('${path.join(root, relative).replaceAll("'", "''")}',[ref]$null,[ref]$errors)|Out-Null;if($errors.Count){$errors|ForEach-Object{Write-Error $_};exit 1}`;
     run(powershell, ['-NoProfile', '-ExecutionPolicy', 'Bypass', '-Command', command], `PowerShell syntax ${relative}`);
   }
   run(powershell, ['-NoProfile', '-ExecutionPolicy', 'Bypass', '-File', path.join(root, 'scripts', 'test-verify-squirrel-artifacts.ps1')], 'Squirrel artifact red-green test');
+  run(powershell, ['-NoProfile', '-ExecutionPolicy', 'Bypass', '-File', path.join(root, 'scripts', 'test-packaging-process-exit.ps1')], 'packaging process exit red-green test');
   run(process.execPath, [path.join(root, 'scripts', 'test-validate-squirrel-runtime-receipt.mjs')], 'runtime receipt red-green test');
 
   const common = readFileSync(path.join(root, 'scripts', 'build-common.ps1'), 'utf8');

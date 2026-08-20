@@ -535,3 +535,17 @@ per the hard rule that a guard nobody has watched fail proves nothing, and per t
 instruction to fix the real cause rather than loosen the check. Issue #3 remains open. No release has
 shipped in this session, and this session did not run the installer build, the installed-interaction
 matrix, or any capture/promotion workflow.
+
+### Installer child-exit repair
+
+The packaging wrapper no longer relies on `Start-Process` returning a usable nullable exit value
+after the audited Squirrel process completes. It now launches the same reviewed Node command with
+`System.Diagnostics.Process`, drains both redirected streams asynchronously, waits for termination,
+and converts the child exit code to an integer before deciding success. The signer-process audit and
+the persisted packaging log remain in the same boundary.
+
+Focused evidence: `powershell.exe -NoProfile -ExecutionPolicy Bypass -File
+scripts/test-packaging-process-exit.ps1` proves exit `0` succeeds, exit `7` fails with the exact code,
+and both outputs reach their logs. `node scripts/test-installer-contract.mjs` invokes that red/green
+probe as part of the installer contract. This repair does not resolve the separately recorded icon
+fidelity blocker, does not publish a release, and does not claim installed-runtime evidence.

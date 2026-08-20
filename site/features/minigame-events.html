@@ -4,7 +4,7 @@
 <meta charset="utf-8" />
 <meta name="viewport" content="width=device-width, initial-scale=1" />
 <title>Minigame events and Lucky Drawer — Material Cookie Clicker</title>
-<meta name="description" content="Five persisted minigames, Golden Tokens, and the seeded Lucky Chance drawer." />
+<meta name="description" content="The mounted five-board Minigames panel, its 100,000-cookie unlock, Golden Tokens, Lucky Chance results, and current evidence boundary." />
 <link rel="stylesheet" href="../assets/site.css" />
 </head>
 <body>
@@ -14,22 +14,49 @@
   <p><a href="index.html">All features</a> / Minigames</p>
   <article class="plate">
     <h1>Minigame events and Lucky Drawer</h1>
-    <p class="lede">At 100,000 lifetime baked cookies, a seeded side-panel schedule begins offering five minigames without pausing the clicker.</p>
-    <h2>Unlocks and timing</h2>
-    <p>The minigame panel unlocks permanently at 100,000 lifetime baked cookies. Mouse Raids unlock permanently at 1,000,000 lifetime baked cookies. Prestige keeps both thresholds because baked-cookie history is preserved. The prestige tab remains at 1B and the prestige action remains at 1T.</p>
-    <p>The schedule chooses a start 6–12 minutes after the previous opportunity. Its notice is hidden until the final 30 seconds. There is one active minigame at a time, and the cookie loop continues while its anchored panel is open.</p>
-    <h2>Five persisted boards</h2>
-    <ul><li><strong>Klondike Solitaire:</strong> draw-three stock, legal tableau/foundation moves, recycling, and face-up state.</li><li><strong>Memory Match:</strong> shuffled pairs, safe reveal/match transitions, and attempts.</li><li><strong>Cookie 2048:</strong> directional merges, seeded tile spawning, score, and win state.</li><li><strong>Minesweeper:</strong> safe first reveal, flood reveal, flags, chords, and win/loss state.</li><li><strong>Breakout:</strong> paddle, ball vector, bricks, score, lives, pause, and win state.</li></ul>
-    <p>Minimize, resume, restart, and abandon are persisted lifecycle operations. A reload returns to the exact saved board rather than generating a replacement.</p>
-    <h2>Golden Tokens and Lucky Chance</h2>
-    <p>Golden Tokens come from Oven Dial completion, minigame grades, daily objectives, achievement milestones, and rare chains. The ledger is duplicate-protected and action-based, so offline progress cannot farm tokens.</p>
-    <p>The Lucky Chance drawer costs one Golden Token. It discloses five equal reward slots and can grant cookie bundles, timed boosts, raid supplies, or rare cosmetics. The seeded roll, injected timestamp, token deduction, result, and duplicate-protection state are persisted together.</p>
-    <h2>Failure and recovery</h2>
-    <p>Older saves without the minigame sidecar load with an empty suite. The sidecar carries the active board and reward ledgers separately from the versioned core save, so the clicker remains recoverable if no minigame progress exists.</p>
-    <p>This expedited release intentionally has no new test, capture, or UI-run evidence; that verification remains pending.</p>
+    <p class="lede">The installed desktop application mounts five board controls in its Minigames panel after 100,000 lifetime baked cookies. This documentation page explains that surface; it does not host, emulate, or embed playable minigames.</p>
+
+    <h2>The surface that is actually mounted</h2>
+    <p><code>src/renderer/App.tsx</code> imports <code>src/renderer/screens/MinigamesScreen.tsx</code> as <code>PlayableMinigamesScreen</code> and mounts it in the anchored <code>minigames</code> panel. A separate <code>MinigameEventsScreen</code> adapter exists in source but is not the rendered route described here.</p>
+    <p>The console button and the panel both use the permanent 100,000-lifetime-cookie unlock. The seeded schedule chooses an opportunity 6–12 minutes ahead. Its 30-second clock is the incoming notice window before the scheduled start, not a 30-second round limit. With no active board, the panel also offers a Start button for every board.</p>
+
+    <h2>Five mounted boards</h2>
+    <ul>
+      <li><strong>Klondike Solitaire · draw 3:</strong> displays the seven-column deal, face-up state, stock, and waste; its mounted buttons draw/recycle and attempt a waste-to-foundation move. Tableau moves are not wired on this screen.</li>
+      <li><strong>Memory Match:</strong> reveals the sixteen persisted cards, records pairs, and counts attempts.</li>
+      <li><strong>Cookie 2048:</strong> provides four direction buttons, merges a changed board, places the next tile in the first empty cell, and records score, best tile, moves, and win state.</li>
+      <li><strong>Minesweeper:</strong> displays an 8×8 board with ten mines; click reveals one cell and right-click toggles a flag. The richer shared flood/chord/first-click helpers are not wired to this mounted screen.</li>
+      <li><strong>Breakout:</strong> advances one ball step per press and moves the paddle left or right while persisting the ball vector, bricks, score, lives, and paddle.</li>
+    </ul>
+
+    <h2>Lifecycle and save behavior</h2>
+    <p>Start, Minimize, Resume, Restart, Abandon, and Complete dispatch the persisted lifecycle. Only one board can remain active or minimized. Complete records the board, passes grade 3, awards Golden Tokens, and schedules the next opportunity; Abandon records the board without a completion result.</p>
+    <p>The active board, schedule, Golden Token ledger, Lucky Chance state, and reward ids live in one optional compatibility block inside the ordinary save JSON. Older saves with no block load empty minigame state instead of invented progress.</p>
+
+    <h2>Golden Token sources</h2>
+    <table>
+      <thead><tr><th scope="col">Source</th><th scope="col">Amount</th><th scope="col">Duplicate protection</th></tr></thead>
+      <tbody>
+        <tr><td>Successful Oven Dial redemption</td><td>1</td><td>Golden-cookie spawn timestamp</td></tr>
+        <tr><td>Complete on this mounted panel</td><td>3</td><td>Board id plus completion timestamp</td></tr>
+        <tr><td>New achievement milestone</td><td>1</td><td>Achievement id</td></tr>
+        <tr><td>Claim today&rsquo;s objective</td><td>2</td><td>Current UTC date</td></tr>
+        <tr><td>Rare chain</td><td>2</td><td>Completed-board count at each multiple of three</td></tr>
+      </tbody>
+    </table>
+    <p>With five board ids, the first reachable rare-chain award is the third distinct completed board. Offline time dispatches none of these source actions.</p>
+
+    <h2>Lucky Chance results</h2>
+    <p>Each draw costs one Golden Token. Its five seeded slots add 10,000 cookies, add 100,000 cookies, start a ×2 production effect for 15 minutes, add one <code>whack_pass</code> raid consumable, or record the <code>rare_cosmetic</code> reward id. Unclaimed ids are selected before repeats; after all five have been claimed, a duplicate result can spend a token. With no token, the reducer leaves the existing state unchanged.</p>
+
+    <h2>Checks and evidence boundary</h2>
+    <p>The scoped local checks are <code>node scripts/check-site.mjs</code> plus focused runs of <code>tests/completeness-inventory.test.ts</code>, <code>tests/game/disclosure.test.ts</code>, and <code>tests/build-evidence.test.ts</code>. They cover the documentation/site inventory and links, the 100,000-cookie disclosure, and the capture-inventory contract. They do not exercise all mounted board interactions.</p>
+    <p>Six release-capture rows remain pending: the overall panel plus Klondike, Memory Match, Cookie 2048, Minesweeper, and Breakout. The design-parity promotion inventory has no minigame receipt. Until a later approved built-artifact run supplies those records, this page claims source mounting and scoped local checks only—not a real current screenshot, packaged interaction, or promoted reference/product comparison.</p>
+
     <p><strong>Suggested articles:</strong> <a href="golden-cookies.html">Golden-cookie events</a>, <a href="achievements.html">Achievements</a>, and <a href="prestige.html">Prestige</a>.</p>
   </article>
 </main>
+<footer class="site-foot"><div class="wrap"><p>Material Cookie Clicker is free, unsigned by permanent policy, and nobody ever pays anything to use it. This documentation site is a landing, documentation, download, status, settings, and link surface only. The playable application remains the installed desktop product.</p><p><a href="https://github.com/Ding-Ding-Projects/material-cookie-clicker">Source code on GitHub</a> &middot; <a href="index.html">All feature articles</a></p></div></footer>
 <script type="module" src="../assets/site-shell.js"></script>
 </body>
 </html>

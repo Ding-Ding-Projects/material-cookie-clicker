@@ -545,6 +545,19 @@ function validateDesignParityRelease(
   }
 }
 
+function validateDesignParityStructure(
+  inventory = loadDesignParityInventory(),
+  structureValidator: DesignParityReleaseValidator = (candidate) => validateDesignParityInventory(candidate, { mode: "structure" }),
+): string[] {
+  try {
+    structureValidator(inventory);
+    return [];
+  } catch (error) {
+    if (error instanceof ParityGuardError) return [`Design parity structure verdict is red: ${error.code}`];
+    throw error;
+  }
+}
+
 function validateCompletion(markdown: string): string[] {
   const errors = [
     ...validate(markdown),
@@ -552,6 +565,7 @@ function validateCompletion(markdown: string): string[] {
     ...validateMountedMinigames(markdown, sourceReader, true),
     ...validateGraphicsCompletion(markdown),
     ...validateDesignParityRegistration(markdown),
+    ...validateDesignParityStructure(),
     ...validateDesignParityRelease(),
   ];
   for (const row of parseRows(markdown).rows) {
@@ -713,12 +727,17 @@ describe("hand-written per-surface completeness inventory", () => {
   });
 
   it("records the actual parity release-red verdict and proves the cross-check wrapper restores", () => {
+    expect(validateDesignParityStructure()).toEqual(["Design parity structure verdict is red: REFERENCE_HASH_STALE"]);
     expect(validateDesignParityRelease()).toEqual(["Design parity release verdict is red: DIFF_REVIEW_DEFECT"]);
     const candidate = loadDesignParityInventory();
     const redFixture: DesignParityReleaseValidator = () => {
       throw new ParityGuardError("DIFF_REVIEW_DEFECT", "fixture-only visual difference");
     };
     const greenFixture: DesignParityReleaseValidator = () => ({ mode: "release" });
+    expect(validateDesignParityStructure(candidate, redFixture)).toEqual([
+      "Design parity structure verdict is red: DIFF_REVIEW_DEFECT",
+    ]);
+    expect(validateDesignParityStructure(candidate, greenFixture)).toEqual([]);
     expect(validateDesignParityRelease(candidate, redFixture)).toEqual([
       "Design parity release verdict is red: DIFF_REVIEW_DEFECT",
     ]);
@@ -729,6 +748,7 @@ describe("hand-written per-surface completeness inventory", () => {
   it("keeps honest structural rows green while completion mode reports exact open blockers", () => {
     expect(validate(inventory)).toEqual([]);
     const blockers = validateCompletion(inventory);
+    expect(blockers).toContain("Design parity structure verdict is red: REFERENCE_HASH_STALE");
     expect(blockers).toContain("Design parity release verdict is red: DIFF_REVIEW_DEFECT");
     expect(blockers).toContain("App.tsx still contains the obsolete unmounted MinigameEventsScreen adapter.");
     expect(blockers).toContain("Graphics progression receipt has no build-artifact hash binding.");

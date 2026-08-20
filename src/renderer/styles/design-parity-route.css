@@ -1360,7 +1360,10 @@
   display: block;
   padding: 20px;
   border: 1px solid var(--md-sys-color-outline-variant);
-  border-top: 8px solid #176b36;
+  /* The reference .stat-card-ref uses the tertiary role, which resolves to the same
+     olive on both sides. A hard-coded green here was a real parity divergence, and the
+     test that caught it had never run because the file did not parse. */
+  border-top: 8px solid var(--md-sys-color-tertiary);
   border-radius: var(--md-sys-shape-corner-extra-large);
   background: var(--md-sys-color-surface-container-low);
   box-shadow: var(--md-sys-elevation-level-1);

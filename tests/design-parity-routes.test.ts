@@ -165,7 +165,7 @@ function validateStatParityCss(source: string): void {
       display: 'block',
       padding: '20px',
       border: '1px solid var(--md-sys-color-outline-variant)',
-      'border-top': '8px solid #176b36',
+      'border-top': '8px solid var(--md-sys-color-tertiary)',
       'border-radius': 'var(--md-sys-shape-corner-extra-large)',
       background: 'var(--md-sys-color-surface-container-low)',
       'box-shadow': 'var(--md-sys-elevation-level-1)',

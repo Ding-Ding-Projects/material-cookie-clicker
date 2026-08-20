@@ -22,6 +22,63 @@ interface InventoryRow {
 
 const inventory = JSON.parse(readFileSync(resolve('design/parity/inventory.json'), 'utf8')) as { rows: InventoryRow[] };
 
+const ALLOWED_DESIGN_ROUTE_TOKENS = [
+  '--font-en',
+  '--md-sys-color-error',
+  '--md-sys-color-on-error',
+  '--md-sys-color-on-primary',
+  '--md-sys-color-on-primary-container',
+  '--md-sys-color-on-secondary',
+  '--md-sys-color-on-secondary-container',
+  '--md-sys-color-on-surface',
+  '--md-sys-color-on-surface-variant',
+  '--md-sys-color-on-tertiary',
+  '--md-sys-color-outline',
+  '--md-sys-color-outline-variant',
+  '--md-sys-color-primary',
+  '--md-sys-color-primary-container',
+  '--md-sys-color-secondary',
+  '--md-sys-color-secondary-container',
+  '--md-sys-color-surface',
+  '--md-sys-color-surface-container',
+  '--md-sys-color-surface-container-high',
+  '--md-sys-color-surface-container-low',
+  '--md-sys-color-tertiary',
+  '--md-sys-elevation-level-0',
+  '--md-sys-elevation-level-1',
+  '--md-sys-elevation-level-2',
+  '--md-sys-elevation-level-3',
+  '--md-sys-shape-corner-extra-large',
+  '--md-sys-shape-corner-extra-small',
+  '--md-sys-shape-corner-full',
+  '--md-sys-shape-corner-large',
+  '--md-sys-shape-corner-medium',
+  '--md-sys-shape-corner-small',
+  '--on-tertiary-container',
+  '--tertiary-container',
+] as const;
+
+const FORBIDDEN_DESIGN_ROUTE_TOKENS = [
+  '--elevation-1', '--elevation-2', '--elevation-3', '--elevation-4', '--elevation-5',
+  '--font-display', '--oven-glow', '--panel-inset',
+  '--shape-full', '--shape-lg', '--shape-md', '--shape-sm', '--shape-xl', '--shape-xs',
+] as const;
+
+function collectDesignRouteTokens(source: string): string[] {
+  return [...new Set([...source.matchAll(/var\((--[a-z0-9-]+)/g)].map((match) => match[1]))].sort();
+}
+
+function validateDesignRouteTokenSet(source: string): void {
+  const actual = collectDesignRouteTokens(source);
+  const expected = [...ALLOWED_DESIGN_ROUTE_TOKENS].sort();
+  if (actual.length !== expected.length || actual.some((token, index) => token !== expected[index])) {
+    throw new Error(`Design route token set mismatch: expected ${expected.join(', ')}, received ${actual.join(', ')}`);
+  }
+  for (const forbidden of FORBIDDEN_DESIGN_ROUTE_TOKENS) {
+    if (source.includes(`var(${forbidden})`)) throw new Error(`Forbidden design route token: ${forbidden}`);
+  }
+}
+
 describe('built-product design parity routes', () => {
   it('covers every hand-written inventory row exactly once with the exact product URL tuple', () => {
     const inventoryIds = inventory.rows.map((row) => row.id);
@@ -116,5 +173,33 @@ describe('built-product design parity routes', () => {
     expect(appSource).toMatch(/^\s*const parityRequest = resolveDesignParityRequest\(window\.location\.search\);$/m);
     expect(appSource).toMatch(/^\s*return parityRequest \? <DesignParityRoute request=\{parityRequest\} \/> : <GameApp \/>;$/m);
     expect(routeSource).not.toMatch(/design\/reference-app|\.\.\/\.\.\/design|dangerouslySetInnerHTML|fetch\s*\(/);
+  });
+
+  it('uses the exact current design-route token set and proves legacy tokens turn the guard red', () => {
+    const css = readFileSync(resolve('src/renderer/styles/design-parity-route.css'), 'utf8');
+    const liveTokens = readFileSync(resolve('src/renderer/styles/index.css'), 'utf8');
+    const referenceTokens = readFileSync(resolve('design/reference-app/material-reference.css'), 'utf8');
+    const tokenMarkup = ['tokens-color--roles', 'tokens-shape-elevation--scale'].map((rowId) => {
+      const row = inventory.rows.find((candidate) => candidate.id === rowId);
+      if (!row) throw new Error(`Missing inventory row ${rowId}`);
+      const request = resolveDesignParityRequest(new URL(row.product.route).searchParams);
+      if (!request) throw new Error(`Missing request for ${rowId}`);
+      return renderToStaticMarkup(createElement(DesignParityRoute, { request }));
+    }).join('\n');
+    const current = `${css}\n${tokenMarkup}`;
+
+    expect(() => validateDesignRouteTokenSet(`${current}\n.broken { box-shadow: var(--elevation-4); }`)).toThrow(/token set mismatch|forbidden/i);
+    expect(() => validateDesignRouteTokenSet(current)).not.toThrow();
+    for (const forbidden of FORBIDDEN_DESIGN_ROUTE_TOKENS) expect(current).not.toContain(`var(${forbidden})`);
+    for (const token of ALLOWED_DESIGN_ROUTE_TOKENS) {
+      expect(liveTokens, `${token} must be defined by the live renderer`).toContain(`${token}:`);
+      if (token === '--tertiary-container') {
+        expect(referenceTokens).toContain('--md-sys-color-tertiary-container:');
+      } else if (token === '--on-tertiary-container') {
+        expect(referenceTokens).toContain('--md-sys-color-on-tertiary-container:');
+      } else {
+        expect(referenceTokens, `${token} must be defined by the modern reference`).toContain(`${token}:`);
+      }
+    }
   });
 });

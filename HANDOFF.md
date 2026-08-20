@@ -1,5 +1,69 @@
 # Handoff
 
+## Current integration handoff (2026-08-19)
+
+The active integration candidate is
+`43d2174bc2172d31e572d9668282764438e4d904`. It is **61 commits ahead of** the verified
+published baseline `v0.2.55` (`a98e38c07423a7cfb4cb3190412884a404a7245e`) and has not been
+published. Do not describe the candidate as a release, and do not transfer the release's installed
+interaction evidence to source changes that landed afterward.
+
+### Current checks at the candidate
+
+| Check | Exact result at `43d2174` |
+| --- | --- |
+| `npm run check` | Renderer and main TypeScript checks passed; **59 application test files / 998 tests**, **37 local-model package tests**, and **89 surface-kernel tests** passed — **1,124/1,124 tests** in aggregate. The checkout stayed clean and at the same commit for the full run. |
+| Completeness inventory | **8/8** focused tests passed, including deliberate missing-row, blank-evidence, missing-article/page/section, and broken-anchor cases. |
+| Contrast | **78/78** light/dark role pairs passed at pinned `43d2174`. |
+| Design-parity structure | **16/16** hand-written rows cover the **16/16** checked-in references. |
+| Design-parity negative proof | **19/19** exact deliberate breaks turned red and restored green. |
+| Design-parity release check | **RED.** All **16/16** visual-diff reviews remain `defect`; the first reported failure is `DIFF_REVIEW_DEFECT` for `achievement-badge--gallery`. Changed-pixel ratios range from 0.10 to 0.57. |
+
+The aggregate check above is source and package evidence, not installed-runtime or capture evidence.
+The current candidate's smoke test, installer, installed interaction matrix, capture matrix, remote
+workflows, and release have **not** been run by this documentation lane.
+
+### Evidence-promotion blocker
+
+The design-parity files currently committed under `design/parity/evidence/` are not eligible for
+release promotion under the generic evidence-promotion contract. They are being invalidated until
+a fresh compliant run exists:
+
+- capture, build, interaction, and privacy records were written inside the repository rather than
+  retained under one task run root;
+- the 32-row promotion inventory omits 13 fields required by the generic promotion record;
+- no staged promotion transaction or pre-promotion backups exist; and
+- `scripts/design-parity-evidence.py` hard-codes the source commit, process identifiers, and window
+  handles instead of deriving them from the inspected run.
+
+The receipts name capture source `6f878d9fc1dc6246a7a078ce33aa9b12531fe775`; the current integration
+tip is `43d2174`. The minigame-button source worktree also contained uncommitted changes at the
+capture source, so those pixels cannot be promoted as evidence for the committed candidate. A
+fresh, clean, task-rooted capture and promotion run is required even after the 16 visual defects are
+resolved. The structural and negative checks remain useful, but they do not make the release check
+green and do not repair the promotion provenance.
+
+### Implemented scope, without evidence inflation
+
+- **Graphics progression:** source and focused tests implement a cookie-only fresh state and seven
+  ordered, explicit visual purchases. Production alone does not grant a look rung. No current
+  promotion-compliant fresh-state capture exists.
+- **Minigames and Lucky Chance:** the five persisted boards, schedule, Golden Tokens, and atomic
+  drawer reducer are implemented and included in the passing aggregate suite. The inventory still
+  has no dedicated installed UI interaction test or current promotable capture for this surface.
+- **Office and endless play:** the generator ladder has twenty-one tiers, with Office Building at
+  tier nine and a permanent reveal at 500,000,000 lifetime baked cookies. Generator ownership and
+  prestige remain uncapped; Home continues through persisted extension floors after six authored
+  rooms. The Office row and endless-floor state still lack current committed interaction/capture
+  evidence.
+- **Canonical application tools:** the candidate mounts identity/logo/appearance, converter/PDF,
+  local-model recovery, authenticator registration, local history, schedules, exports, changelog,
+  offline-docs, notifications, tabs, command palette, School mode, vocabulary, narrator, and local
+  status surfaces. The per-surface inventory remains authoritative: several are partial,
+  English-first, missing packaged adapters or data, or missing installed interaction and capture
+  proof. The complete local-model catalog/pull/chat/harness runtime, per-element toy locks, unlock
+  ladder, external-editor handoff, and browser-extension download flow are not complete.
+
 ## Graphics-purchase follow-up (2026-08-19)
 
 A brand-new save now renders only the usable plain cookie. `lookStage` derives the structural
@@ -11,11 +75,12 @@ discovery and gameplay-owned rails; the glow purchase gates golden rays, and the
 gates room, furniture and gauge drawings. Existing version-9 grandfathering is unchanged.
 
 Focused verification is in `tests/game/look-tiers.test.ts`, including a deliberate red-then-green
-proof for the no-auto-grant/single-deduction regression. The previous `plain-start.png` is now
-explicitly marked as superseded in public documentation. A corrected built-artifact fresh-state
-capture remains required after integration.
+proof for the no-auto-grant/single-deduction regression. The previous `plain-start.png` is
+superseded. The later parity captures are also not promotion-compliant for the reasons recorded
+above, so a fresh clean-source capture and promotion run remains required.
 
-Reconciled 2026-08-19 against the integrated application-tools candidate based on the v0.2.55 release. Every number
+Reconciled 2026-08-19 against integration candidate `43d2174`, which descends from the v0.2.55
+release. Every number
 below was read from a real command, not remembered. Where something is
 unverified it says so, and where an earlier version of this file was wrong the
 correction is noted rather than quietly applied.
@@ -41,9 +106,9 @@ repeatable floors through the existing one-site clock; `homeConstruction.extensi
 the count, and each floor adds coziness and a small production bonus. The shop-rail Diesel Depot
 status card now persists an accessible collapsed/expanded state.
 
-## Current minigame-events release state
+## Current minigame-events state
 
-The minigame-events work on `main` adds the permanently unlocked
+The v0.2.55 baseline and the current candidate include the permanently unlocked
 minigame suite at 100,000 lifetime baked cookies and keeps Mouse Raid unlock at
 1,000,000. It adds a seeded 6–12 minute schedule with a final-30-second notice,
 one persisted active board at a time, and a side-panel flow that supports
@@ -53,10 +118,11 @@ Minesweeper, and Breakout. Golden Tokens and the Lucky Chance drawer use
 duplicate-protected persisted state, with no token generation during offline
 progress.
 
-The original expedited lane skipped tests and captures. That historical boundary is superseded by
-the v0.2.55 verification pass: the complete local suite reported `903/903`, the installer was built,
-and the minigame flow was exercised from the built artifact. A current committed minigame capture
-is still missing and remains an explicit evidence gap.
+The original expedited lane skipped tests and captures. The v0.2.55 pass later reported `903/903`
+local tests and exercised the built flow. At candidate `43d2174`, the aggregate source/package
+check is now `1,124/1,124`; this still does not supply the missing dedicated installed UI test or a
+current promotion-compliant minigame capture. The capture-source worktree was not clean, so its
+output must not be promoted as evidence for the committed candidate.
 
 ## Final application-tools wiring candidate
 
@@ -100,21 +166,21 @@ X yet", that is this contract being eroded.
 
 ## State, with real numbers
 
-### Verified
+### Recorded verification (scope named per row)
 
 | Thing | Evidence |
 | --- | --- |
-| Project test suite | **56 files, 922 tests, all passing** (`npm run check`, 2026-08-19) |
+| Project test suite | **59 files, 998 tests, all passing** in the application suite (`npm run check` at `43d2174`, 2026-08-19) |
 | `packages/surface-kernel` | **89 tests passing** (`npm test` in that package) |
 | `packages/local-ollama` | **37 tests passing** — previously unverifiable, now green once the workspace was wired |
 | Completeness negative regression | **8 tests passing** — exact capability/page rows, traceable evidence, article sections and links plus deliberate missing-row, blank-evidence, missing-article/page/section, and broken-anchor red fixtures |
-| Smoke test | **7/7** (`npm run smoke`) |
-| Build | `npm run build` exits 0, emitting `dist/main`, `dist/preload`, `dist/renderer`, `dist/shared` |
-| Contrast | All **46** role pairs across light and dark computed against the real sRGB luminance formula (`node design/_verify/contrast-check.mjs`) |
-| Application launches | Photographed from the real build on an off-screen desktop — `captures/app/launch-shell.png` |
+| Smoke test | **7/7** on the previously recorded built candidate; not rerun at `43d2174` by this documentation lane |
+| Build | A previous candidate's `npm run build` exited 0 and emitted `dist/main`, `dist/preload`, `dist/renderer`, `dist/shared`; no current-candidate build was run by this lane |
+| Contrast | **78/78** light/dark role pairs passed at pinned `43d2174` (`node design/_verify/contrast-check.mjs`) |
+| Application launches | `captures/app/launch-shell.png` is historical built evidence; it is not a current-candidate interaction record |
 
-The final-wiring `npm run check` total is **1048/1048 tests**: 922 application tests, 37 local
-model package tests, and 89 surface-kernel tests, plus both TypeScript checks.
+The current candidate's `npm run check` total is **1,124/1,124 tests**: 998 application tests, 37
+local-model package tests, and 89 surface-kernel tests, plus both TypeScript checks.
 
 **Test files run against the source tree, not the built artifact.** That
 distinction matters here: a unit test that injects the bridge proves the screen
@@ -155,7 +221,8 @@ run no tests or lint; their green state proves build/publication, not local test
 
 ### The 2026-08-17/18 run, in one paragraph
 
-The game is now a full incremental: progressive disclosure from a deliberately
+The game systems delivered in that 2026-08-17/18 release run form a full incremental: progressive
+disclosure from a deliberately
 plain app (the entire look is bought in seven tiers), total commodification
 (41+ control rungs including the one-cookie exit, priced Settings, priced
 languages, the priced "Open it now" shortcut), 21 generators / 180 upgrades /
@@ -164,10 +231,11 @@ exporting to WinForge through the voucher ledger, a home-construction subgame,
 22 random events with rare double/triple stacks and a 30-60-minute Mouse Raid
 with buyable consumables and storage, a wandering golden cookie redeemed
 through the Oven Dial timing minigame, Squirrel auto-updates (proven by a real
-installed update), and a 26-row real-capture evidence matrix. Every system was
+installed update), and a 26-row real-capture evidence matrix. Every system in that release scope was
 built in its own lane, gate-checked (typecheck, vitest, build, smoke,
 check-site), captured from the running build, merged, and released through the
-standing pipeline.
+standing pipeline. This is historical evidence for that game-system scope; it does not verify the
+later canonical Application tools candidate or the currently red parity/promotion evidence.
 
 ### Still not verified — do not describe these as working
 
@@ -288,8 +356,9 @@ not alter its code, styles, tests, captures, or UI surfaces.
   reducer update, while an unavailable token leaves state unchanged.
 
 The original documentation-only lane skipped tests, captures, and UI runs. The later v0.2.55 pass
-ran the complete local suite and exercised the built flow; the remaining gap is a committed current-
-release minigame capture, not absence of implementation or tests.
+ran the then-current local suite and exercised the built flow. The candidate aggregate suite now
+passes 1,124 tests, but there is still no dedicated installed minigame UI test or current
+promotion-compliant capture; the capture-source worktree was not clean.
 
 ### Office Buildings expansion — documentation handoff, 2026-08-19
 
@@ -304,7 +373,8 @@ The established thresholds remain unchanged: Minigames at **100,000** lifetime
 baked cookies, Mouse Raids at **1,000,000**, prestige visible at
 **1,000,000,000**, and prestige usable at **1,000,000,000,000**. The original expedited lane
 changed only implementation and related records. The later v0.2.55 pass tested and exercised the
-integrated build; a committed Office-row-specific capture remains pending.
+integrated build, and the current candidate's aggregate checks pass. A committed
+Office-row-specific interaction record and capture remain pending.
 
 Files written in this lane:
 
@@ -318,11 +388,12 @@ Files written in this lane:
 
 ## Work in flight at the end of this session
 
-The independent release-completeness source lanes have converged into the integration candidate.
-The final wiring lane mounts their application surfaces and supplies the minimum privileged
-adapters described above. Installed UI interaction, capture evidence, and final installer/release
-proof remain separate pending work and must not be inferred from source integration or a green
-build.
+The independent release-completeness source lanes have converged into candidate `43d2174`. The
+final wiring lane mounts their application surfaces and supplies the minimum privileged adapters
+described above. Installed UI interaction, capture evidence, and final installer/release proof
+remain separate pending work and must not be inferred from source integration or a green build.
+Design parity is additionally red for all 16 rows, and the current promotion records are invalid
+under the generic provenance contract pending a fresh compliant run.
 
 ## Layout
 
@@ -368,11 +439,12 @@ to nobody.
 directory had not landed. Node's `writeFile` does not create parents, so the
 error named the file and said nothing about the directory.
 
-**The theme is deliberately not Material Design 3.** The standing rules require
-M3 conformance on every user-facing surface; the owner explicitly overrode that
-here, because a game deserves a game's aesthetic. Every accessibility, contrast,
-focus, target-size, reduced-motion and offline rule continues to apply
-unchanged. This is a decision, not an omission — do not "fix" it back.
+**Application chrome now uses Material Design 3; gameplay art remains bakery-arcade.** Candidate
+`43d2174` carries Material roles, typography, shape, elevation, state layers, focus, motion, and
+component anatomy in product controls, while cookie, generator, achievement, and tool artwork keeps
+its game-specific visual identity. That distinction is not a conformance exemption: the release
+parity check is still red for all 16 rows, and accessibility, contrast, focus, target-size,
+reduced-motion, and offline requirements still apply.
 
 ## Open issues
 
@@ -380,7 +452,9 @@ unchanged. This is a decision, not an omission — do not "fix" it back.
 
 ## Next owner's most useful first move
 
-Run the real built-artifact interaction/capture matrix for every newly mounted Application tools
-tab, then build and inspect the unsigned installer at the pinned candidate commit. Keep the
-local-model row partial until catalog, queue, chat, and allowlisted harness adapters are packaged
-and exercised. Do not convert a pending row to verified from source or test evidence alone.
+First replace the invalidated parity/promotion evidence with a clean task-rooted run and resolve all
+16 unapproved visual differences. Then run the real built-artifact interaction/capture matrix for
+every newly mounted Application tools tab, build and inspect the unsigned installer at the pinned
+candidate commit, and verify publication separately. Keep the local-model row partial until
+catalog, queue, chat, and allowlisted harness adapters are packaged and exercised. Do not convert a
+pending row to verified from source or test evidence alone.

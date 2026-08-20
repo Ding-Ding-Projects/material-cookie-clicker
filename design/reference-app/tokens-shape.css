@@ -1,0 +1,87 @@
+html {
+  overflow-y: auto;
+  scrollbar-color: auto;
+  scrollbar-width: auto;
+}
+
+.tokens-shape-page .theme-toggle {
+  min-block-size: 40px;
+  padding: 10px 24px;
+  border: 0;
+  border-radius: var(--md-sys-shape-corner-full);
+  background: var(--md-sys-color-secondary-container);
+  color: var(--md-sys-color-on-secondary-container);
+  box-shadow: var(--md-sys-elevation-level-0);
+  font: 500 16px/24px var(--font-en);
+  letter-spacing: normal;
+}
+
+.tokens-shape-page .spec-section {
+  gap: 22px;
+  margin-top: 58px;
+}
+
+.tokens-shape-page .section-title {
+  gap: 16px;
+  font: 400 22px/28px var(--font-en);
+}
+
+.tokens-shape-page .section-title::after {
+  min-width: 64px;
+  height: 1px;
+  background: var(--md-sys-color-outline-variant);
+}
+
+.tokens-shape-page .shape-grid {
+  grid-template-columns: repeat(3, minmax(0, 1fr));
+  gap: 32px;
+}
+
+.tokens-shape-page .shape-sample {
+  min-height: 190px;
+  display: grid;
+  place-content: center;
+  gap: 10px;
+  padding: 24px;
+  border: 1px solid var(--md-sys-color-outline-variant);
+  background: var(--md-sys-color-surface-container);
+  text-align: center;
+}
+
+.tokens-shape-page .shape-sample > strong {
+  font: 700 16px/24px var(--font-en);
+}
+
+.tokens-shape-page .shape-sample > code {
+  font: 600 13px/1.4 ui-monospace, Consolas, monospace;
+}
+
+.tokens-shape-page .shape-sample[data-shape-sample="extra-small"] {
+  border-radius: var(--md-sys-shape-corner-extra-small);
+  box-shadow: var(--md-sys-elevation-level-1);
+}
+
+.tokens-shape-page .shape-sample[data-shape-sample="small"] {
+  border-radius: var(--md-sys-shape-corner-small);
+  box-shadow: var(--md-sys-elevation-level-1);
+}
+
+.tokens-shape-page .shape-sample[data-shape-sample="medium"] {
+  border-radius: var(--md-sys-shape-corner-medium);
+  box-shadow: var(--md-sys-elevation-level-2);
+}
+
+.tokens-shape-page .shape-sample[data-shape-sample="large"] {
+  border-radius: var(--md-sys-shape-corner-large);
+  box-shadow: var(--md-sys-elevation-level-3);
+}
+
+.tokens-shape-page .shape-sample[data-shape-sample="extra-large"] {
+  border-radius: var(--md-sys-shape-corner-extra-large);
+  box-shadow: var(--md-sys-elevation-level-3);
+}
+
+.tokens-shape-page .shape-sample[data-shape-sample="full"] {
+  border-radius: var(--md-sys-shape-corner-full);
+  box-shadow: var(--md-sys-elevation-level-1);
+}

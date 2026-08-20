@@ -1,0 +1,560 @@
+<!-- @dsCard group="Game Surfaces" -->
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1" />
+<title>Material Cookie Clicker · Prestige / Wipe Destructive Gate</title>
+<style>
+  :root {
+  /* ==== v2 PRESTIGE GATE: the heaviest plate in the cabinet ====
+     Deliberately rendered heavier than everything else: the fattest border, the
+     deepest base, and a recessed face, so the destructive gate never reads as an
+     ordinary panel. Nothing about its two-key logic or its always-available exit
+     changed - only its weight. */
+  .gate {
+    border-radius: var(--shape-xl); padding: 24px;
+    border: 7px solid var(--md-outline);
+    background: linear-gradient(180deg, var(--md-surface-container-high), var(--md-surface-container-highest));
+    box-shadow: var(--press-4), inset 0 5px 0 0 var(--bevel-hi), inset 0 -5px 0 0 var(--bevel-lo);
+  }
+  .gate.wipe { border-color: var(--md-error); box-shadow: var(--press-4), inset 0 5px 0 0 var(--bevel-hi), 0 0 30px 2px var(--md-error); }
+  .gate h4 { font-family: var(--font-display); font-size: 22px; letter-spacing: 0.06em; text-transform: uppercase; }
+  .gate .impact {
+    border: var(--border-chunky) solid var(--md-outline); border-radius: var(--shape-md);
+    background: var(--panel-inset); box-shadow: inset 0 5px 0 -2px var(--bevel-lo);
+    padding: 14px 16px;
+  }
+  .key {
+    border: var(--border-chunky) solid var(--md-outline); border-radius: var(--shape-md);
+    background: var(--panel-inset); box-shadow: inset 0 5px 0 -2px var(--bevel-lo);
+    padding: 14px;
+  }
+  .key .key-label { font-family: var(--font-display); font-size: 11px; letter-spacing: 0.18em; text-transform: uppercase; }
+  .key button.toggle:focus-visible { outline: 4px solid var(--spark-ring); outline-offset: 3px; }
+  .anim-track {
+    height: 22px; background: var(--track);
+    border: var(--border-thick) solid var(--md-outline); border-radius: var(--shape-full);
+    box-shadow: inset 0 5px 0 -1px var(--bevel-lo);
+  }
+  .anim-fill { box-shadow: inset 0 3px 0 0 rgba(255,255,255,0.32); }
+  .completion {
+    border: var(--border-chunky) solid var(--md-outline); border-radius: var(--shape-md);
+    box-shadow: inset 0 4px 0 0 var(--bevel-hi);
+  }
+  .exit-btn {
+    font-family: var(--font-display); font-size: 12px; letter-spacing: 0.12em;
+    text-transform: uppercase; min-height: 52px; border-radius: var(--shape-sm);
+    border: var(--border-chunky) solid var(--md-outline);
+    box-shadow: var(--press-1);
+  }
+  .exit-btn:active { transform: translateY(var(--drop-1)); box-shadow: none; }
+  .exit-btn:focus-visible { outline: 4px solid var(--spark-ring); outline-offset: 3px; }
+  @media (prefers-reduced-motion: reduce) { .exit-btn:active { transform: none; box-shadow: inset 0 3px 0 0 var(--bevel-lo); } }
+  input[type="range"] { height: 44px; }
+  input[type="range"]:focus-visible { outline: 4px solid var(--spark-ring); outline-offset: 3px; }
+    /* ============================================================================
+       MATERIAL COOKIE CLICKER — v2 "ARCADE CABINET" TOKENS · LIGHT = BAKERY DAYTIME
+       Warm browns/golds kept from v1 (they were right); everything is deepened and a
+       cabinet-chrome layer is added on top: radial oven-glow backgrounds, inset HUD
+       bezels, metallic bevels, jewel tiers. Every text-bearing pair below — including
+       BOTH ends of the background gradient — is verified by design/_verify/contrast-check.mjs.
+       ============================================================================ */
+
+    /* --- role colours (M3 naming kept as vocabulary only; see README) --- */
+    --md-primary: #7A4A1D;
+    --md-on-primary: #FFFFFF;
+    --md-primary-container: #FFDCB8;
+    --md-on-primary-container: #3A2100;
+    --md-primary-shadow: #3C2107;      /* solid "3D base" under a pressable button — never a blur */
+    --md-secondary: #6B4C3F;
+    --md-on-secondary: #FFFFFF;
+    --md-secondary-container: #FFDBCB;
+    --md-on-secondary-container: #2C160B;
+    --md-secondary-shadow: #35211A;
+    --md-tertiary: #5C4E00;            /* golden-cookie role — never ordinary chrome */
+    --md-on-tertiary: #FFFFFF;
+    --md-tertiary-container: #F8E287;
+    --md-on-tertiary-container: #221B00;
+    --md-tertiary-shadow: #332900;
+    --md-error: #BA1A1A;
+    --md-on-error: #FFFFFF;
+    --md-error-container: #FFDAD6;
+    --md-on-error-container: #410002;
+    --md-error-shadow: #6E0000;
+
+    /* --- surfaces: deeper and warmer than v1's near-white cream --- */
+    --md-surface: #FFF3E6;
+    --md-on-surface: #1E1610;
+    --md-surface-variant: #F0DCC4;
+    --md-on-surface-variant: #4A3D2E;
+    --md-outline: #75634E;
+    --md-surface-container-lowest: #FFFFFF;
+    --md-surface-container-low: #FFF0DE;
+    --md-surface-container: #FBE8D2;
+    --md-surface-container-high: #F5DFC4;
+    --md-surface-container-highest: #EED5B4;
+    --md-shadow: #000000;
+
+    /* --- v2 cabinet chrome --- */
+    --bg-core: #FFF6EC;                /* centre of the radial oven glow */
+    --bg-mid: #FAECDA;
+    --bg-edge: #EFDCC0;                /* rim of the cabinet, where the glow falls off */
+    --panel-inset: #FFFBF4;            /* recessed HUD readout face behind a bezel */
+    --bevel-hi: rgba(255, 255, 255, 0.85);  /* top inner bevel highlight (non-text) */
+    --bevel-lo: rgba(90, 58, 24, 0.28);     /* bottom inner bevel shade (non-text) */
+    --metal-hi: #FFF0C4;               /* medal/badge metallic sweep, decorative only */
+    --metal-lo: #B98A2E;
+    --cabinet-frame: #6A4522;          /* the wooden counter / cabinet body, non-text */
+    --cabinet-frame-dark: #43290F;
+    --track: #E4CDAE;                  /* XP-bar / progress trough, non-text */
+
+    /* --- arcade spark accent. --spark and --spark-glow are DECORATIVE ONLY (blurred
+           glows and gradient fills) and never carry text. --spark-ring is the only
+           spark role allowed on text or a UI boundary, and is AA-verified. --- */
+    --spark: #FFC94D;
+    --spark-glow: #FF8A00;
+    --spark-ring: #9C4B00;
+
+    /* --- jewel tool-tier ladder: bronze -> emerald -> amethyst --- */
+    --tier1: #8A4E12;
+    --on-tier1: #FFFFFF;
+    --tier1-container: #FFDCBA;
+    --on-tier1-container: #2E1600;
+    --tier2: #1F6337;
+    --on-tier2: #FFFFFF;
+    --tier2-container: #B8F0C4;
+    --on-tier2-container: #04210D;
+    --tier3: #533593;
+    --on-tier3: #FFFFFF;
+    --tier3-container: #E6D9FF;
+    --on-tier3-container: #20004D;
+    --tier-accent: var(--tier1);
+    --on-tier-accent: var(--on-tier1);
+    --tier-accent-container: var(--tier1-container);
+    --on-tier-accent-container: var(--on-tier1-container);
+
+    /* --- type --- */
+    --font-en: -apple-system, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
+    --font-zh: "Segoe UI", "Microsoft JhengHei", var(--font-en);
+    --font-display: "Segoe UI Black", "Arial Black", "Segoe UI", var(--font-en);
+
+    /* --- shape: v2 goes fatter again (v1 was 8-34, v2 is 10-40) --- */
+    --shape-none: 0px;
+    --shape-xs: 10px;
+    --shape-sm: 16px;
+    --shape-md: 22px;
+    --shape-lg: 28px;
+    --shape-xl: 34px;
+    --shape-2xl: 40px;
+    --shape-full: 999px;
+
+    /* --- borders: hairlines are banned in this theme --- */
+    --border-thin: 2px;
+    --border-thick: 3px;
+    --border-chunky: 4px;
+    --border-fat: 5px;
+
+    /* --- pressable depth. Two paired families, deliberately kept separate:
+           --drop-N is the LENGTH a control travels when pressed (also the height of
+           its solid base), --press-N is the ready-made box-shadow built from it.
+           Solid offsets only; a blurred drop shadow is not used anywhere in v2.
+           v2 deepens v1's 3-4px travel to 4-10px. --- */
+    --drop-1: 4px;
+    --drop-2: 6px;
+    --drop-3: 8px;
+    --drop-4: 10px;
+    --press-0: none;
+    --press-1: 0 var(--drop-1) 0 0 var(--md-outline);
+    --press-2: 0 var(--drop-2) 0 0 var(--md-outline);
+    --press-3: 0 var(--drop-3) 0 0 var(--md-outline);
+    --press-4: 0 var(--drop-4) 0 0 var(--cabinet-frame-dark);
+  }
+  [data-scheme="dark"] {
+    /* ============================================================================
+       DARK = ARCADE NIGHT. Not "the light theme with the lights off": the cabinet is
+       lit from inside, so the background glow gets BRIGHTER toward its centre while
+       the rim goes to near-black. Both ends are contrast-verified.
+       ============================================================================ */
+    --md-primary: #FFB876;
+    --md-on-primary: #4A2800;
+    --md-primary-container: #693C00;
+    --md-on-primary-container: #FFDCB8;
+    --md-primary-shadow: #2A1600;
+    --md-secondary: #E6BEAC;
+    --md-on-secondary: #44291E;
+    --md-secondary-container: #5D3F32;
+    --md-on-secondary-container: #FFDBCB;
+    --md-secondary-shadow: #24140D;
+    --md-tertiary: #DBC66E;
+    --md-on-tertiary: #383000;
+    --md-tertiary-container: #514600;
+    --md-on-tertiary-container: #F8E287;
+    --md-tertiary-shadow: #201C00;
+    --md-error: #FFB4AB;
+    --md-on-error: #690005;
+    --md-error-container: #93000A;
+    --md-on-error-container: #FFDAD6;
+    --md-error-shadow: #4A0004;
+
+    --md-surface: #120C08;
+    --md-on-surface: #F2E4D6;
+    --md-surface-variant: #453A2E;
+    --md-on-surface-variant: #D8C8B4;
+    --md-outline: #A08D78;
+    --md-surface-container-lowest: #0A0603;
+    --md-surface-container-low: #1A120B;
+    --md-surface-container: #221810;
+    --md-surface-container-high: #2C2016;
+    --md-surface-container-highest: #382A1E;
+    --md-shadow: #000000;
+
+    --bg-core: #2A1A0A;
+    --bg-mid: #1A1008;
+    --bg-edge: #0A0705;
+    --panel-inset: #0B0704;
+    --bevel-hi: rgba(255, 214, 160, 0.30);
+    --bevel-lo: rgba(0, 0, 0, 0.72);
+    --metal-hi: #FFE7A8;
+    --metal-lo: #8A6318;
+    --cabinet-frame: #3A2410;
+    --cabinet-frame-dark: #150C05;
+    --track: #2E2419;
+
+    --spark: #FFD97A;
+    --spark-glow: #FFA326;
+    --spark-ring: #FFC24D;
+
+    --tier1: #F2B27A;
+    --on-tier1: #3A1E00;
+    --tier1-container: #5A3208;
+    --on-tier1-container: #FFDCBA;
+    --tier2: #8FE3A6;
+    --on-tier2: #0C3018;
+    --tier2-container: #1B4A28;
+    --on-tier2-container: #B8F0C4;
+    --tier3: #CFBCFF;
+    --on-tier3: #2A0A5C;
+    --tier3-container: #3B2465;
+    --on-tier3-container: #E6D9FF;
+  }
+  * { box-sizing: border-box; }
+  h3 { font-size: 15px; margin: 24px 0 8px; }
+
+  .gate {
+    border-radius: var(--shape-xl);
+    padding: 26px;
+    max-width: 480px;
+    display: flex; flex-direction: column; gap: 16px;
+    border: var(--border-chunky) solid var(--md-outline);
+    box-shadow: 0 7px 0 0 var(--md-outline);
+  }
+  .gate.prestige { background: var(--md-tertiary-container); color: var(--md-on-tertiary-container); border-color: var(--md-tertiary); box-shadow: 0 7px 0 0 var(--md-tertiary-shadow); }
+  .gate.wipe { background: var(--md-error-container); color: var(--md-on-error-container); border-color: var(--md-error); box-shadow: 0 7px 0 0 var(--md-error-shadow); }
+  .gate h4 { margin: 0; font-family: var(--font-display); font-size: 20px; }
+  .gate .impact { font-size: 14px; line-height: 1.5; }
+  .gate .impact strong { display: block; }
+
+  .keys { display: flex; gap: 16px; }
+  .key {
+    flex: 1;
+    display: flex; flex-direction: column; align-items: center; gap: 6px;
+    padding: 12px;
+    border-radius: var(--shape-md);
+    border: var(--border-thin) solid rgba(0,0,0,0.15);
+    background: rgba(255,255,255,0.4);
+  }
+  [data-scheme="dark"] .key { background: rgba(0,0,0,0.28); border-color: rgba(255,255,255,0.15); }
+  .key button.toggle {
+    width: 72px; height: 40px; border-radius: var(--shape-full); border: var(--border-chunky) solid var(--md-outline);
+    background: var(--md-surface); position: relative; cursor: pointer;
+    box-shadow: inset 0 2px 0 0 rgba(0,0,0,0.08);
+  }
+  .key button.toggle::after {
+    content: ""; position: absolute; top: 3px; left: 3px; width: 30px; height: 30px; border-radius: var(--shape-full);
+    background: var(--md-outline); transition: transform 150ms ease, background 150ms ease;
+    box-shadow: 0 2px 0 0 rgba(0,0,0,0.25);
+  }
+  @media (prefers-reduced-motion: reduce) { .key button.toggle::after { transition: none; } }
+  .key button.toggle[aria-pressed="true"] { border-color: var(--md-primary); }
+  .key button.toggle[aria-pressed="true"]::after { transform: translateX(30px); background: var(--md-primary); }
+  .key button.toggle:focus-visible { outline: 3px solid var(--md-primary); outline-offset: 3px; }
+  .key .key-label { font-size: 12px; font-weight: 700; text-align: center; }
+
+  .slider-wrap { display: flex; flex-direction: column; gap: 6px; }
+  input[type="range"] { width: 100%; height: 44px; accent-color: var(--md-primary); }
+  input[type="range"]:disabled { opacity: 0.45; }
+  input[type="range"]:focus-visible { outline: 3px solid var(--md-primary); outline-offset: 2px; }
+  .slider-hint { font-size: 12px; font-weight: 600; }
+
+  .anim-track { height: 14px; border-radius: var(--shape-full); background: rgba(0,0,0,0.18); overflow: hidden; border: var(--border-thin) solid rgba(0,0,0,0.2); }
+  .anim-fill { height: 100%; background: var(--md-primary); width: 0%; transition: width 120ms linear; }
+  @media (prefers-reduced-motion: reduce) { .anim-fill { transition: none; } }
+  .gate.wipe .anim-fill { background: var(--md-error); }
+
+  .completion { display: none; font-family: var(--font-display); font-weight: 900; text-align: center; padding: 12px; border-radius: var(--shape-md); font-size: 16px; }
+  .completion.show { display: block; }
+  .gate.prestige .completion { background: var(--md-primary); color: var(--md-on-primary); box-shadow: 0 3px 0 0 var(--md-primary-shadow); }
+  .gate.wipe .completion { background: var(--md-error); color: var(--md-on-error); box-shadow: 0 3px 0 0 var(--md-error-shadow); }
+
+  .exit-btn {
+    font: inherit; font-weight: 800; min-height: 44px; padding: 0 18px; border-radius: var(--shape-full); border: var(--border-thick) solid var(--md-outline);
+    background: transparent; cursor: pointer; align-self: center;
+  }
+  .exit-btn:focus-visible { outline: 3px solid var(--md-primary); outline-offset: 2px; }
+
+  .state-caption { font-size: 12px; opacity: 0.9; }
+  /* ==========================================================================
+     v2 SHARED CABINET CHROME — identical in every spec file so the bundle reads
+     as one machine. Radial oven-glow page, marquee headings, arcade toggle.
+     ========================================================================== */
+  body {
+    margin: 0;
+    padding: 28px clamp(16px, 4vw, 44px) 72px;
+    min-height: 100vh;
+    font-family: var(--font-en);
+    color: var(--md-on-surface);
+    background:
+      radial-gradient(ellipse 130% 95% at 50% -12%,
+        var(--bg-core) 0%, var(--bg-mid) 42%, var(--bg-edge) 100%),
+      var(--bg-edge);
+    background-attachment: fixed;
+  }
+  h1 {
+    font-family: var(--font-display);
+    font-weight: 900;
+    font-size: clamp(28px, 5vw, 50px);
+    line-height: 1.04;
+    letter-spacing: 0.045em;
+    text-transform: uppercase;
+    margin: 0 0 14px;
+    padding: 18px 22px;
+    color: var(--md-on-surface);
+    border: var(--border-fat) solid var(--md-outline);
+    border-radius: var(--shape-lg);
+    background:
+      linear-gradient(180deg, var(--md-surface-container-high) 0%, var(--md-surface-container-highest) 100%);
+    box-shadow: var(--press-4), inset 0 4px 0 0 var(--bevel-hi), inset 0 -4px 0 0 var(--bevel-lo);
+  }
+  h2 {
+    font-family: var(--font-display);
+    font-weight: 900;
+    font-size: 15px;
+    letter-spacing: 0.22em;
+    text-transform: uppercase;
+    color: var(--md-on-surface-variant);
+    margin: 40px 0 12px;
+    display: flex;
+    align-items: center;
+    gap: 12px;
+  }
+  h2::after {
+    content: "";
+    flex: 1;
+    height: 0;
+    border-top: var(--border-thick) solid var(--md-outline);
+    opacity: 0.55;
+  }
+  h3 {
+    font-family: var(--font-display);
+    font-size: 13px;
+    letter-spacing: 0.16em;
+    text-transform: uppercase;
+    color: var(--md-on-surface-variant);
+  }
+  p.lede, p.caption { color: var(--md-on-surface-variant); max-width: 74ch; line-height: 1.55; }
+  p.lede { font-size: 15px; }
+  button.scheme-toggle {
+    font-family: var(--font-display);
+    font-size: 13px;
+    letter-spacing: 0.14em;
+    text-transform: uppercase;
+    padding: 12px 26px;
+    min-height: 48px;
+    border-radius: var(--shape-full);
+    border: var(--border-chunky) solid var(--md-outline);
+    background: linear-gradient(180deg, var(--md-surface-container-low), var(--md-surface-container-highest));
+    color: var(--md-on-surface);
+    cursor: pointer;
+    margin: 18px 0 26px;
+    box-shadow: var(--press-2), inset 0 3px 0 0 var(--bevel-hi);
+    transition: transform 90ms ease, box-shadow 90ms ease;
+  }
+  button.scheme-toggle:active {
+    transform: translateY(5px);
+    box-shadow: none;
+  }
+  button.scheme-toggle:focus-visible { outline: 4px solid var(--spark-ring); outline-offset: 3px; }
+  @media (prefers-reduced-motion: reduce) {
+    button.scheme-toggle { transition: none; }
+    button.scheme-toggle:active { transform: none; box-shadow: inset 0 4px 0 0 var(--bevel-lo); }
+  }
+
+  /* --- reusable HUD idioms (see README "Game HUD idioms") --- */
+  .v2-marquee {
+    font-family: var(--font-display);
+    font-size: 12px;
+    letter-spacing: 0.24em;
+    text-transform: uppercase;
+    color: var(--md-on-surface-variant);
+  }
+  .v2-bezel {
+    border: var(--border-chunky) solid var(--md-outline);
+    border-radius: var(--shape-md);
+    background: var(--panel-inset);
+    box-shadow: inset 0 5px 0 0 var(--bevel-lo), inset 0 -3px 0 0 var(--bevel-hi);
+  }
+  .v2-counter {
+    font-family: var(--font-display);
+    font-weight: 900;
+    font-variant-numeric: tabular-nums;
+    letter-spacing: -0.01em;
+    line-height: 1;
+  }
+</style>
+</head>
+<body data-scheme="light">
+  <h1>Prestige / wipe gate · 轉生／清空閘門 — super-confirmation</h1>
+  <p class="lede">
+    The destructive-action gate. Two independently operated key toggles, both required before the
+    confirmation slider unlocks; a dramatic non-blocking progress fill while dragging; a distinct
+    completion state; and an always-available Emergency exit. Rendered chunkier than a settings
+    dialog on purpose — this is the one moment the game wants to feel weighty and deliberate rather
+    than quick. This page's gates are live and interactive — drag the sliders yourself once both
+    keys are on to see the disabled state actually enforced.
+    <span style="font-family:var(--font-zh); display:block; margin-top:4px;">
+      危險動作嘅雙重確認閘門：兩條獨立嘅開關掣要一齊開先可以郁到確認滑桿，仲有隨時可以撳嘅緊急退出掣。
+    </span>
+  </p>
+  <button class="scheme-toggle" onclick="document.body.dataset.scheme = document.body.dataset.scheme === 'dark' ? 'light' : 'dark'">
+    🌗 Toggle light / dark · 切換淺色／深色
+  </button>
+
+  <h2>Variant 1 — Prestige (recoverable) · 轉生（可以再賺返）</h2>
+  <p class="caption">
+    Copy names exactly what resets and what carries forward. Prestige is a normal, expected,
+    repeatable action — not "as severe" as a wipe — so it uses the tertiary/primary palette
+    rather than error.
+  </p>
+  <div class="gate prestige" id="gatePrestige">
+    <h4>Prestige now? · 而家轉生？</h4>
+    <div class="impact">
+      <strong>This will reset · 呢個會清空:</strong>
+      All buildings, upgrades, and current cookie count back to zero.
+      所有建築物、升級同埋而家嘅曲奇數量會歸零。
+      <strong style="margin-top:8px;">This carries forward · 呢個會保留:</strong>
+      42 Golden Chips (permanent CPS bonus), all unlocked achievements.
+      42 粒金曲奇碎（永久產量加成）、全部已解鎖成就。
+    </div>
+    <div class="keys">
+      <div class="key">
+        <button class="toggle" data-gate="gatePrestige" data-key="1" aria-pressed="false" aria-label="Key 1 · 鎖匙一">Key 1 · 鎖匙一</button>
+        <span class="key-label">Confirm intent · 確認意向</span>
+      </div>
+      <div class="key">
+        <button class="toggle" data-gate="gatePrestige" data-key="2" aria-pressed="false" aria-label="Key 2 · 鎖匙二">Key 2 · 鎖匙二</button>
+        <span class="key-label">Confirm you read the impact · 確認睇咗影響</span>
+      </div>
+    </div>
+    <div class="slider-wrap">
+      <input type="range" min="0" max="100" value="0" disabled data-slider="gatePrestige" aria-label="Slide fully right to prestige · 拉到盡右邊確認轉生" />
+      <div class="anim-track"><div class="anim-fill" data-fill="gatePrestige"></div></div>
+      <span class="slider-hint" data-hint="gatePrestige">Both keys required before this slider unlocks · 要開晒兩條鎖匙先可以郁滑桿</span>
+    </div>
+    <div class="completion" data-completion="gatePrestige">✅ Prestiged! · 轉生完成！ Golden Chips awarded: +6 · 獲得金曲奇碎 +6</div>
+    <button class="exit-btn" data-reset="gatePrestige">🚪 Emergency exit · 緊急退出</button>
+  </div>
+
+  <h2>Variant 2 — Full wipe (severe) · 完全清空（嚴重）</h2>
+  <p class="caption">
+    Nothing carries forward from a full wipe, so the copy says exactly that and the gate uses
+    the error role throughout rather than tertiary/primary.
+  </p>
+  <div class="gate wipe" id="gateWipe">
+    <h4>Delete all save data? · 刪除全部存檔？</h4>
+    <div class="impact">
+      <strong>This will permanently delete · 呢個會永久刪除:</strong>
+      Every building, upgrade, achievement, Golden Chip, and prestige run. There is no undo and
+      no recovery route once this completes.
+      每一個建築物、升級、成就、金曲奇碎同轉生紀錄。完成之後無得反悔，無得復原。
+    </div>
+    <div class="keys">
+      <div class="key">
+        <button class="toggle" data-gate="gateWipe" data-key="1" aria-pressed="false" aria-label="Key 1 · 鎖匙一">Key 1 · 鎖匙一</button>
+        <span class="key-label">Confirm intent · 確認意向</span>
+      </div>
+      <div class="key">
+        <button class="toggle" data-gate="gateWipe" data-key="2" aria-pressed="false" aria-label="Key 2 · 鎖匙二">Key 2 · 鎖匙二</button>
+        <span class="key-label">Confirm you understand this is permanent · 確認明白呢個係永久性</span>
+      </div>
+    </div>
+    <div class="slider-wrap">
+      <input type="range" min="0" max="100" value="0" disabled data-slider="gateWipe" aria-label="Slide fully right to delete everything · 拉到盡右邊確認刪除全部" />
+      <div class="anim-track"><div class="anim-fill" data-fill="gateWipe"></div></div>
+      <span class="slider-hint" data-hint="gateWipe">Both keys required before this slider unlocks · 要開晒兩條鎖匙先可以郁滑桿</span>
+    </div>
+    <div class="completion" data-completion="gateWipe">🗑️ All save data deleted · 全部存檔已刪除</div>
+    <button class="exit-btn" data-reset="gateWipe">🚪 Emergency exit · 緊急退出</button>
+  </div>
+
+  <h2>Reference states (static) · 靜態狀態參考</h2>
+  <p class="caption">
+    Below are frozen screenshots-in-markup of every intermediate state for documentation, in
+    case the live demo above has already been interacted with.
+  </p>
+  <div style="display:grid; grid-template-columns: repeat(auto-fill, minmax(200px,1fr)); gap:12px; font-size:13px;">
+    <div class="caption"><strong>Untouched</strong>: both keys off, slider disabled at 0.</div>
+    <div class="caption"><strong>One key</strong>: one toggle on, slider still disabled.</div>
+    <div class="caption"><strong>Both keys</strong>: both toggles on, slider becomes enabled at 0.</div>
+    <div class="caption"><strong>Slider partial</strong>: dragged partway; progress fill animates but action has not fired.</div>
+    <div class="caption"><strong>Slider complete</strong>: reaches 100; completion banner replaces the slider row.</div>
+  </div>
+
+<script>
+  function wire(gateId) {
+    const keys = document.querySelectorAll(`button.toggle[data-gate="${gateId}"]`);
+    const slider = document.querySelector(`input[data-slider="${gateId}"]`);
+    const fill = document.querySelector(`div[data-fill="${gateId}"]`);
+    const hint = document.querySelector(`span[data-hint="${gateId}"]`);
+    const completion = document.querySelector(`div[data-completion="${gateId}"]`);
+    const resetBtn = document.querySelector(`button[data-reset="${gateId}"]`);
+
+    function bothOn() {
+      return Array.from(keys).every(k => k.getAttribute('aria-pressed') === 'true');
+    }
+    function updateSlider() {
+      const enabled = bothOn();
+      slider.disabled = !enabled;
+      hint.textContent = enabled
+        ? 'Drag fully right to confirm · 拉到盡右邊確認'
+        : 'Both keys required before this slider unlocks · 要開晒兩條鎖匙先可以郁滑桿';
+    }
+    keys.forEach(k => {
+      k.addEventListener('click', () => {
+        const pressed = k.getAttribute('aria-pressed') === 'true';
+        k.setAttribute('aria-pressed', String(!pressed));
+        updateSlider();
+      });
+    });
+    slider.addEventListener('input', () => {
+      fill.style.width = slider.value + '%';
+      if (Number(slider.value) >= 100) {
+        completion.classList.add('show');
+        slider.parentElement.style.display = 'none';
+      }
+    });
+    resetBtn.addEventListener('click', () => {
+      keys.forEach(k => k.setAttribute('aria-pressed', 'false'));
+      slider.value = 0;
+      fill.style.width = '0%';
+      completion.classList.remove('show');
+      slider.parentElement.style.display = '';
+      updateSlider();
+    });
+    updateSlider();
+  }
+  wire('gatePrestige');
+  wire('gateWipe');
+</script>
+</body>
+</html>

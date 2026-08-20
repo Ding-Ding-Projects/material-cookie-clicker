@@ -1,0 +1,686 @@
+<!-- @dsCard group="Game Surfaces" -->
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1" />
+<title>Material Cookie Clicker · Game Layout</title>
+<style>
+  :root {
+    /* ============================================================================
+       MATERIAL COOKIE CLICKER — v2 "ARCADE CABINET" TOKENS · LIGHT = BAKERY DAYTIME
+       Warm browns/golds kept from v1 (they were right); everything is deepened and a
+       cabinet-chrome layer is added on top: radial oven-glow backgrounds, inset HUD
+       bezels, metallic bevels, jewel tiers. Every text-bearing pair below — including
+       BOTH ends of the background gradient — is verified by design/_verify/contrast-check.mjs.
+       ============================================================================ */
+
+    /* --- role colours (M3 naming kept as vocabulary only; see README) --- */
+    --md-primary: #7A4A1D;
+    --md-on-primary: #FFFFFF;
+    --md-primary-container: #FFDCB8;
+    --md-on-primary-container: #3A2100;
+    --md-primary-shadow: #3C2107;      /* solid "3D base" under a pressable button — never a blur */
+    --md-secondary: #6B4C3F;
+    --md-on-secondary: #FFFFFF;
+    --md-secondary-container: #FFDBCB;
+    --md-on-secondary-container: #2C160B;
+    --md-secondary-shadow: #35211A;
+    --md-tertiary: #5C4E00;            /* golden-cookie role — never ordinary chrome */
+    --md-on-tertiary: #FFFFFF;
+    --md-tertiary-container: #F8E287;
+    --md-on-tertiary-container: #221B00;
+    --md-tertiary-shadow: #332900;
+    --md-error: #BA1A1A;
+    --md-on-error: #FFFFFF;
+    --md-error-container: #FFDAD6;
+    --md-on-error-container: #410002;
+    --md-error-shadow: #6E0000;
+
+    /* --- surfaces: deeper and warmer than v1's near-white cream --- */
+    --md-surface: #FFF3E6;
+    --md-on-surface: #1E1610;
+    --md-surface-variant: #F0DCC4;
+    --md-on-surface-variant: #4A3D2E;
+    --md-outline: #75634E;
+    --md-surface-container-lowest: #FFFFFF;
+    --md-surface-container-low: #FFF0DE;
+    --md-surface-container: #FBE8D2;
+    --md-surface-container-high: #F5DFC4;
+    --md-surface-container-highest: #EED5B4;
+    --md-shadow: #000000;
+
+    /* --- v2 cabinet chrome --- */
+    --bg-core: #FFF6EC;                /* centre of the radial oven glow */
+    --bg-mid: #FAECDA;
+    --bg-edge: #EFDCC0;                /* rim of the cabinet, where the glow falls off */
+    --panel-inset: #FFFBF4;            /* recessed HUD readout face behind a bezel */
+    --bevel-hi: rgba(255, 255, 255, 0.85);  /* top inner bevel highlight (non-text) */
+    --bevel-lo: rgba(90, 58, 24, 0.28);     /* bottom inner bevel shade (non-text) */
+    --metal-hi: #FFF0C4;               /* medal/badge metallic sweep, decorative only */
+    --metal-lo: #B98A2E;
+    --cabinet-frame: #6A4522;          /* the wooden counter / cabinet body, non-text */
+    --cabinet-frame-dark: #43290F;
+    --track: #E4CDAE;                  /* XP-bar / progress trough, non-text */
+
+    /* --- arcade spark accent. --spark and --spark-glow are DECORATIVE ONLY (blurred
+           glows and gradient fills) and never carry text. --spark-ring is the only
+           spark role allowed on text or a UI boundary, and is AA-verified. --- */
+    --spark: #FFC94D;
+    --spark-glow: #FF8A00;
+    --spark-ring: #9C4B00;
+
+    /* --- jewel tool-tier ladder: bronze -> emerald -> amethyst --- */
+    --tier1: #8A4E12;
+    --on-tier1: #FFFFFF;
+    --tier1-container: #FFDCBA;
+    --on-tier1-container: #2E1600;
+    --tier2: #1F6337;
+    --on-tier2: #FFFFFF;
+    --tier2-container: #B8F0C4;
+    --on-tier2-container: #04210D;
+    --tier3: #533593;
+    --on-tier3: #FFFFFF;
+    --tier3-container: #E6D9FF;
+    --on-tier3-container: #20004D;
+    --tier-accent: var(--tier1);
+    --on-tier-accent: var(--on-tier1);
+    --tier-accent-container: var(--tier1-container);
+    --on-tier-accent-container: var(--on-tier1-container);
+
+    /* --- type --- */
+    --font-en: -apple-system, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
+    --font-zh: "Segoe UI", "Microsoft JhengHei", var(--font-en);
+    --font-display: "Segoe UI Black", "Arial Black", "Segoe UI", var(--font-en);
+
+    /* --- shape: v2 goes fatter again (v1 was 8-34, v2 is 10-40) --- */
+    --shape-none: 0px;
+    --shape-xs: 10px;
+    --shape-sm: 16px;
+    --shape-md: 22px;
+    --shape-lg: 28px;
+    --shape-xl: 34px;
+    --shape-2xl: 40px;
+    --shape-full: 999px;
+
+    /* --- borders: hairlines are banned in this theme --- */
+    --border-thin: 2px;
+    --border-thick: 3px;
+    --border-chunky: 4px;
+    --border-fat: 5px;
+
+    /* --- pressable depth. Two paired families, deliberately kept separate:
+           --drop-N is the LENGTH a control travels when pressed (also the height of
+           its solid base), --press-N is the ready-made box-shadow built from it.
+           Solid offsets only; a blurred drop shadow is not used anywhere in v2.
+           v2 deepens v1's 3-4px travel to 4-10px. --- */
+    --drop-1: 4px;
+    --drop-2: 6px;
+    --drop-3: 8px;
+    --drop-4: 10px;
+    --press-0: none;
+    --press-1: 0 var(--drop-1) 0 0 var(--md-outline);
+    --press-2: 0 var(--drop-2) 0 0 var(--md-outline);
+    --press-3: 0 var(--drop-3) 0 0 var(--md-outline);
+    --press-4: 0 var(--drop-4) 0 0 var(--cabinet-frame-dark);
+  }
+  [data-scheme="dark"] {
+    /* ============================================================================
+       DARK = ARCADE NIGHT. Not "the light theme with the lights off": the cabinet is
+       lit from inside, so the background glow gets BRIGHTER toward its centre while
+       the rim goes to near-black. Both ends are contrast-verified.
+       ============================================================================ */
+    --md-primary: #FFB876;
+    --md-on-primary: #4A2800;
+    --md-primary-container: #693C00;
+    --md-on-primary-container: #FFDCB8;
+    --md-primary-shadow: #2A1600;
+    --md-secondary: #E6BEAC;
+    --md-on-secondary: #44291E;
+    --md-secondary-container: #5D3F32;
+    --md-on-secondary-container: #FFDBCB;
+    --md-secondary-shadow: #24140D;
+    --md-tertiary: #DBC66E;
+    --md-on-tertiary: #383000;
+    --md-tertiary-container: #514600;
+    --md-on-tertiary-container: #F8E287;
+    --md-tertiary-shadow: #201C00;
+    --md-error: #FFB4AB;
+    --md-on-error: #690005;
+    --md-error-container: #93000A;
+    --md-on-error-container: #FFDAD6;
+    --md-error-shadow: #4A0004;
+
+    --md-surface: #120C08;
+    --md-on-surface: #F2E4D6;
+    --md-surface-variant: #453A2E;
+    --md-on-surface-variant: #D8C8B4;
+    --md-outline: #A08D78;
+    --md-surface-container-lowest: #0A0603;
+    --md-surface-container-low: #1A120B;
+    --md-surface-container: #221810;
+    --md-surface-container-high: #2C2016;
+    --md-surface-container-highest: #382A1E;
+    --md-shadow: #000000;
+
+    --bg-core: #2A1A0A;
+    --bg-mid: #1A1008;
+    --bg-edge: #0A0705;
+    --panel-inset: #0B0704;
+    --bevel-hi: rgba(255, 214, 160, 0.30);
+    --bevel-lo: rgba(0, 0, 0, 0.72);
+    --metal-hi: #FFE7A8;
+    --metal-lo: #8A6318;
+    --cabinet-frame: #3A2410;
+    --cabinet-frame-dark: #150C05;
+    --track: #2E2419;
+
+    --spark: #FFD97A;
+    --spark-glow: #FFA326;
+    --spark-ring: #FFC24D;
+
+    --tier1: #F2B27A;
+    --on-tier1: #3A1E00;
+    --tier1-container: #5A3208;
+    --on-tier1-container: #FFDCBA;
+    --tier2: #8FE3A6;
+    --on-tier2: #0C3018;
+    --tier2-container: #1B4A28;
+    --on-tier2-container: #B8F0C4;
+    --tier3: #CFBCFF;
+    --on-tier3: #2A0A5C;
+    --tier3-container: #3B2465;
+    --on-tier3-container: #E6D9FF;
+  }
+  * { box-sizing: border-box; }
+
+  /* ============================================================================
+     THE ONE SCREEN. The moment-to-moment loop — click the cookie, buy a generator,
+     buy an upgrade — happens entirely on this one surface, with no navigation
+     between those three things. The cookie is the hero, the shop is docked to it as
+     a right rail, and upgrades are a compact horizontal strip on the same surface.
+     Nothing in that loop is ever a separate page or tab.
+     ============================================================================ */
+  .cabinet {
+    border: 7px solid var(--md-outline);
+    border-radius: var(--shape-2xl);
+    background:
+      radial-gradient(ellipse 90% 70% at 30% 0%, var(--bg-core) 0%, var(--bg-mid) 55%, var(--bg-edge) 100%),
+      var(--bg-edge);
+    box-shadow: var(--press-4), inset 0 5px 0 0 var(--bevel-hi);
+    padding: 14px;
+    overflow: hidden;
+  }
+
+  /* --- top HUD strip: the live counters, always visible, never scrolls away --- */
+  .hud {
+    display: flex; align-items: stretch; gap: 12px; flex-wrap: wrap;
+    margin-bottom: 14px;
+  }
+  .hud .readout {
+    flex: 1 1 180px; min-width: 160px;
+    border-radius: var(--shape-md); padding: 12px 16px;
+    background: var(--panel-inset);
+    border: var(--border-chunky) solid var(--md-outline);
+    box-shadow: inset 0 5px 0 -2px var(--bevel-lo);
+  }
+  .hud .readout .k {
+    font-family: var(--font-display); font-size: 10px; font-weight: 900;
+    letter-spacing: 0.24em; text-transform: uppercase; color: var(--md-on-surface-variant);
+    display: block; margin-bottom: 4px;
+  }
+  .hud .readout .v {
+    font-family: var(--font-display); font-weight: 900; font-variant-numeric: tabular-nums;
+    font-size: clamp(24px, 3.6vw, 40px); line-height: 1; letter-spacing: -0.02em;
+  }
+
+  /* --- the composite: hero on the left, shop rail on the right --- */
+  .stage { display: grid; grid-template-columns: minmax(0, 1fr) 340px; gap: 14px; align-items: start; }
+
+  .panel {
+    border-radius: var(--shape-lg);
+    border: var(--border-fat) solid var(--md-outline);
+    background: linear-gradient(180deg, var(--md-surface-container-high), var(--md-surface-container-highest));
+    box-shadow: var(--press-2), inset 0 4px 0 0 var(--bevel-hi);
+    padding: 16px;
+  }
+  .panel > .panel-title {
+    font-family: var(--font-display); font-size: 11px; font-weight: 900;
+    letter-spacing: 0.24em; text-transform: uppercase; color: var(--md-on-surface-variant);
+    display: flex; align-items: center; gap: 10px; margin-bottom: 12px;
+  }
+  .panel > .panel-title::after { content: ""; flex: 1; border-top: var(--border-thick) solid var(--md-outline); opacity: 0.5; }
+
+  /* hero */
+  .hero { display: flex; flex-direction: column; align-items: center; gap: 14px; padding: 26px 16px; }
+  .cookie-btn {
+    position: relative; width: 168px; height: 168px; border-radius: var(--shape-full);
+    border: var(--border-fat) solid var(--md-primary-shadow); cursor: pointer;
+    background: radial-gradient(circle at 34% 26%, var(--md-primary-container) 0%, var(--md-primary) 62%, var(--md-primary-shadow) 100%);
+    box-shadow:
+      0 var(--drop-4) 0 0 var(--md-primary-shadow),
+      0 var(--drop-4) 0 5px var(--cabinet-frame-dark),
+      inset 0 10px 0 -4px rgba(255, 255, 255, 0.38),
+      inset 0 -14px 18px rgba(0, 0, 0, 0.30);
+    display: flex; align-items: center; justify-content: center; font-size: 62px;
+    transition: transform 110ms ease, box-shadow 110ms ease;
+  }
+  .cookie-btn::after {
+    content: ""; position: absolute; left: 18%; top: 12%; width: 42%; height: 28%;
+    border-radius: var(--shape-full);
+    background: linear-gradient(180deg, rgba(255,255,255,0.55), rgba(255,255,255,0));
+    pointer-events: none;
+  }
+  .cookie-btn:active {
+    transform: translateY(var(--drop-4)) scale(0.965);
+    box-shadow: 0 0 0 5px var(--cabinet-frame-dark), inset 0 8px 14px rgba(0, 0, 0, 0.45);
+  }
+  .cookie-btn:focus-visible { outline: 4px solid var(--spark-ring); outline-offset: 6px; }
+  @media (prefers-reduced-motion: reduce) {
+    .cookie-btn { transition: none; }
+    .cookie-btn:active { transform: none; box-shadow: 0 0 0 5px var(--cabinet-frame-dark), inset 0 8px 14px rgba(0,0,0,0.45); }
+  }
+  .hero .hero-cps { font-family: var(--font-display); font-size: 14px; letter-spacing: 0.14em; text-transform: uppercase; color: var(--md-on-surface-variant); }
+
+  /* upgrade strip — same surface, never a page */
+  .upgrade-strip { display: flex; gap: 12px; overflow-x: auto; padding: 4px 2px 10px; }
+  .mini-ticket {
+    flex: 0 0 auto; width: 132px; position: relative;
+    border-radius: var(--shape-sm); padding: 12px;
+    background: linear-gradient(180deg, var(--md-surface-container-low), var(--md-surface-container-highest));
+    border: var(--border-chunky) solid var(--md-outline);
+    box-shadow: var(--press-1), inset 0 3px 0 0 var(--bevel-hi);
+    cursor: pointer; text-align: left; color: inherit; font: inherit;
+    display: flex; flex-direction: column; gap: 6px; min-height: 116px;
+  }
+  .mini-ticket::before, .mini-ticket::after {
+    content: ""; position: absolute; top: 58px; width: 14px; height: 14px;
+    border-radius: var(--shape-full); background: var(--md-surface-container-high);
+    border: var(--border-thin) solid var(--md-outline);
+  }
+  .mini-ticket::before { left: -9px; }
+  .mini-ticket::after { right: -9px; }
+  .mini-ticket .g { font-size: 22px; line-height: 1; }
+  .mini-ticket .n { font-family: var(--font-display); font-size: 12px; font-weight: 900; line-height: 1.15; }
+  .mini-ticket .c { margin-top: auto; font-family: var(--font-display); font-size: 12px; font-variant-numeric: tabular-nums; letter-spacing: 0.06em; color: var(--md-on-surface-variant); }
+  .mini-ticket:active { transform: translateY(var(--drop-1)); box-shadow: none; }
+  .mini-ticket:focus-visible { outline: 4px solid var(--spark-ring); outline-offset: 3px; }
+  .mini-ticket.owned { border-color: var(--metal-lo); background: var(--md-tertiary-container); color: var(--md-on-tertiary-container); }
+  .mini-ticket.owned .c { color: var(--md-on-tertiary-container); }
+  @media (prefers-reduced-motion: reduce) { .mini-ticket:active { transform: none; box-shadow: inset 0 3px 0 0 var(--bevel-lo); } }
+
+  /* shop rail */
+  .shop-list { display: flex; flex-direction: column; gap: 10px; max-height: 460px; overflow-y: auto; padding-right: 4px; }
+  .shop-row {
+    display: grid; grid-template-columns: 44px 1fr auto; gap: 12px; align-items: center;
+    width: 100%; text-align: left; font: inherit; color: inherit; cursor: pointer;
+    border-radius: var(--shape-sm); padding: 10px 12px; min-height: 64px;
+    background: var(--panel-inset);
+    border: var(--border-thick) solid var(--md-outline);
+    box-shadow: inset 0 4px 0 -1px var(--bevel-lo);
+  }
+  .shop-row .ico { font-size: 24px; }
+  .shop-row .nm { font-family: var(--font-display); font-size: 14px; font-weight: 900; line-height: 1.15; }
+  .shop-row .sub { font-size: 11px; color: var(--md-on-surface-variant); font-variant-numeric: tabular-nums; }
+  .shop-row .own { font-family: var(--font-display); font-size: 22px; font-weight: 900; font-variant-numeric: tabular-nums; }
+  .shop-row:focus-visible { outline: 4px solid var(--spark-ring); outline-offset: 3px; }
+  .shop-row[disabled] { opacity: 0.55; cursor: not-allowed; }
+
+  /* --- the ONLY navigation on the cabinet: secondary surfaces --- */
+  .secondary-tabs { display: flex; gap: 10px; flex-wrap: wrap; margin-top: 14px; }
+  .secondary-tabs button {
+    font-family: var(--font-display); font-size: 11px; font-weight: 900;
+    letter-spacing: 0.14em; text-transform: uppercase;
+    min-height: 44px; padding: 0 16px; border-radius: var(--shape-sm); cursor: pointer;
+    background: var(--md-surface-container-high); color: var(--md-on-surface);
+    border: var(--border-thick) solid var(--md-outline);
+    box-shadow: var(--press-1);
+  }
+  .secondary-tabs button:active { transform: translateY(var(--drop-1)); box-shadow: none; }
+  .secondary-tabs button:focus-visible { outline: 4px solid var(--spark-ring); outline-offset: 3px; }
+  @media (prefers-reduced-motion: reduce) { .secondary-tabs button:active { transform: none; box-shadow: inset 0 3px 0 0 var(--bevel-lo); } }
+
+  /* --- callouts naming each region --- */
+  .tag {
+    display: inline-block; font-family: var(--font-display); font-size: 10px; font-weight: 900;
+    letter-spacing: 0.2em; text-transform: uppercase;
+    background: var(--md-primary-container); color: var(--md-on-primary-container);
+    border: var(--border-thin) solid var(--md-primary);
+    border-radius: var(--shape-xs); padding: 4px 10px; margin-bottom: 10px;
+  }
+
+  /* ============================================================================
+     NARROW WIDTH. The shop does NOT become another page. It collapses into a
+     bottom-sheet drawer anchored to the same surface: the cookie stays on screen
+     behind it, the HUD stays pinned, and dismissing the sheet is not navigation.
+     ============================================================================ */
+  .narrow-frame {
+    width: 380px; max-width: 100%;
+    border: var(--border-fat) solid var(--md-outline);
+    border-radius: var(--shape-xl); overflow: hidden;
+    box-shadow: var(--press-3);
+  }
+  .narrow-frame .cabinet { border: none; border-radius: 0; box-shadow: none; padding: 12px; }
+  .narrow-frame .stage { grid-template-columns: 1fr; }
+  .narrow-frame .hud .readout { flex: 1 1 100%; }
+  .narrow-body { position: relative; min-height: 430px; }
+  .sheet {
+    position: absolute; left: 0; right: 0; bottom: 0;
+    border-top-left-radius: var(--shape-xl); border-top-right-radius: var(--shape-xl);
+    border: var(--border-fat) solid var(--md-outline); border-bottom: none;
+    background: linear-gradient(180deg, var(--md-surface-container-high), var(--md-surface-container-highest));
+    box-shadow: 0 -8px 0 0 var(--cabinet-frame-dark);
+    padding: 10px 14px 16px;
+  }
+  .sheet .handle {
+    width: 72px; height: 8px; border-radius: var(--shape-full);
+    background: var(--md-outline); margin: 2px auto 12px;
+  }
+  .sheet .shop-list { max-height: 190px; }
+
+  .swatch-note {
+    border: var(--border-chunky) solid var(--md-primary);
+    border-radius: var(--shape-md);
+    background: var(--md-primary-container); color: var(--md-on-primary-container);
+    padding: 16px 18px; max-width: 78ch; font-size: 13px; line-height: 1.55;
+    box-shadow: inset 0 3px 0 0 rgba(255,255,255,0.35);
+  }
+  .swatch-note strong { display: block; font-family: var(--font-display); font-size: 14px; letter-spacing: 0.06em; margin-bottom: 6px; text-transform: uppercase; }
+
+  @media (max-width: 860px) {
+    .stage { grid-template-columns: 1fr; }
+  }
+  /* ==========================================================================
+     v2 SHARED CABINET CHROME — identical in every spec file so the bundle reads
+     as one machine. Radial oven-glow page, marquee headings, arcade toggle.
+     ========================================================================== */
+  body {
+    margin: 0;
+    padding: 28px clamp(16px, 4vw, 44px) 72px;
+    min-height: 100vh;
+    font-family: var(--font-en);
+    color: var(--md-on-surface);
+    background:
+      radial-gradient(ellipse 130% 95% at 50% -12%,
+        var(--bg-core) 0%, var(--bg-mid) 42%, var(--bg-edge) 100%),
+      var(--bg-edge);
+    background-attachment: fixed;
+  }
+  h1 {
+    font-family: var(--font-display);
+    font-weight: 900;
+    font-size: clamp(28px, 5vw, 50px);
+    line-height: 1.04;
+    letter-spacing: 0.045em;
+    text-transform: uppercase;
+    margin: 0 0 14px;
+    padding: 18px 22px;
+    color: var(--md-on-surface);
+    border: var(--border-fat) solid var(--md-outline);
+    border-radius: var(--shape-lg);
+    background:
+      linear-gradient(180deg, var(--md-surface-container-high) 0%, var(--md-surface-container-highest) 100%);
+    box-shadow: var(--press-4), inset 0 4px 0 0 var(--bevel-hi), inset 0 -4px 0 0 var(--bevel-lo);
+  }
+  h2 {
+    font-family: var(--font-display);
+    font-weight: 900;
+    font-size: 15px;
+    letter-spacing: 0.22em;
+    text-transform: uppercase;
+    color: var(--md-on-surface-variant);
+    margin: 40px 0 12px;
+    display: flex;
+    align-items: center;
+    gap: 12px;
+  }
+  h2::after {
+    content: "";
+    flex: 1;
+    height: 0;
+    border-top: var(--border-thick) solid var(--md-outline);
+    opacity: 0.55;
+  }
+  h3 {
+    font-family: var(--font-display);
+    font-size: 13px;
+    letter-spacing: 0.16em;
+    text-transform: uppercase;
+    color: var(--md-on-surface-variant);
+  }
+  p.lede, p.caption { color: var(--md-on-surface-variant); max-width: 74ch; line-height: 1.55; }
+  p.lede { font-size: 15px; }
+  button.scheme-toggle {
+    font-family: var(--font-display);
+    font-size: 13px;
+    letter-spacing: 0.14em;
+    text-transform: uppercase;
+    padding: 12px 26px;
+    min-height: 48px;
+    border-radius: var(--shape-full);
+    border: var(--border-chunky) solid var(--md-outline);
+    background: linear-gradient(180deg, var(--md-surface-container-low), var(--md-surface-container-highest));
+    color: var(--md-on-surface);
+    cursor: pointer;
+    margin: 18px 0 26px;
+    box-shadow: var(--press-2), inset 0 3px 0 0 var(--bevel-hi);
+    transition: transform 90ms ease, box-shadow 90ms ease;
+  }
+  button.scheme-toggle:active {
+    transform: translateY(5px);
+    box-shadow: none;
+  }
+  button.scheme-toggle:focus-visible { outline: 4px solid var(--spark-ring); outline-offset: 3px; }
+  @media (prefers-reduced-motion: reduce) {
+    button.scheme-toggle { transition: none; }
+    button.scheme-toggle:active { transform: none; box-shadow: inset 0 4px 0 0 var(--bevel-lo); }
+  }
+
+  /* --- reusable HUD idioms (see README "Game HUD idioms") --- */
+  .v2-marquee {
+    font-family: var(--font-display);
+    font-size: 12px;
+    letter-spacing: 0.24em;
+    text-transform: uppercase;
+    color: var(--md-on-surface-variant);
+  }
+  .v2-bezel {
+    border: var(--border-chunky) solid var(--md-outline);
+    border-radius: var(--shape-md);
+    background: var(--panel-inset);
+    box-shadow: inset 0 5px 0 0 var(--bevel-lo), inset 0 -3px 0 0 var(--bevel-hi);
+  }
+  .v2-counter {
+    font-family: var(--font-display);
+    font-weight: 900;
+    font-variant-numeric: tabular-nums;
+    letter-spacing: -0.01em;
+    line-height: 1;
+  }
+</style>
+</head>
+<body data-scheme="light">
+  <h1>Game layout · 遊戲版面</h1>
+  <p class="lede">
+    The single main game surface. Material Cookie Clicker's moment-to-moment loop — click the
+    cookie, buy a generator, buy an upgrade — happens on <strong>one screen with no navigation
+    between those three things</strong>. The cookie is the hero, the generator shop is docked to it
+    as a right rail, and upgrades are a compact ticket strip on the same surface. Buying never
+    takes the player away from the cookie, and the cookie is never hidden behind a tab.
+    <span style="font-family:var(--font-zh); display:block; margin-top:6px;">
+      遊戲主畫面只有一個：撳曲奇、買生產器、買升級全部喺同一版，唔使切換頁面。曲奇係主角，商店貼喺右邊，升級係下面一條票仔橫條。
+    </span>
+  </p>
+  <button class="scheme-toggle" onclick="document.body.dataset.scheme = document.body.dataset.scheme === 'dark' ? 'light' : 'dark'">
+    🌗 Toggle light / dark · 切換淺色／深色
+  </button>
+
+  <div class="swatch-note">
+    <strong>The rule · 規則</strong>
+    Shops, upgrades and the cookie are never on different pages. Tabs exist only for genuinely
+    secondary surfaces a player visits deliberately and briefly — statistics, prestige, the tools
+    tech tree, the achievements gallery. If a control participates in the core loop, it lives on
+    this surface. 商店同升級永遠唔會分開放喺唔同版面；只有統計、轉生、工具科技樹、成就呢啲次要畫面先用分頁。
+  </div>
+
+  <h2>Wide layout · 闊版面</h2>
+  <p class="caption">
+    Three regions on one surface: the pinned HUD readouts across the top, the hero column (cookie
+    plus the upgrade ticket strip directly beneath it, within thumb reach of the cookie), and the
+    shop rail docked to the right. The rail scrolls internally; the cookie never scrolls away.
+  </p>
+
+  <div class="cabinet">
+    <div class="hud">
+      <div class="readout"><span class="k">Cookies · 曲奇</span><span class="v">4.82Qa</span></div>
+      <div class="readout"><span class="k">Per second · 每秒</span><span class="v">18,420</span></div>
+      <div class="readout"><span class="k">Per click · 每擊</span><span class="v">312</span></div>
+    </div>
+
+    <div class="stage">
+      <div>
+        <div class="panel hero">
+          <span class="tag">Hero · 主角區</span>
+          <button class="cookie-btn" aria-label="Click the cookie · 撳曲奇">🍪</button>
+          <span class="hero-cps">18,420 / sec · 每秒 18,420</span>
+        </div>
+
+        <div class="panel" style="margin-top: 14px;">
+          <div class="panel-title">Upgrades · 升級</div>
+          <span class="tag">Same surface — never a page · 同一版，唔會另開頁</span>
+          <div class="upgrade-strip">
+            <button class="mini-ticket">
+              <span class="g">🥄</span>
+              <span class="n">Golden Whisk<br />金打蛋器</span>
+              <span class="c">🍪 5,000</span>
+            </button>
+            <button class="mini-ticket">
+              <span class="g">🧈</span>
+              <span class="n">Butter Blessing<br />牛油祝福</span>
+              <span class="c">🍪 42,000</span>
+            </button>
+            <button class="mini-ticket owned">
+              <span class="g">🔥</span>
+              <span class="n">Hot Oven<br />熱焗爐</span>
+              <span class="c">Owned · 已擁有</span>
+            </button>
+            <button class="mini-ticket">
+              <span class="g">🧂</span>
+              <span class="n">Sea Salt Finish<br />海鹽收尾</span>
+              <span class="c">🍪 310,000</span>
+            </button>
+          </div>
+        </div>
+      </div>
+
+      <div class="panel">
+        <div class="panel-title">Shop · 商店</div>
+        <span class="tag">Docked rail · 貼邊直欄</span>
+        <div class="shop-list">
+          <button class="shop-row">
+            <span class="ico">👵</span>
+            <span><span class="nm">Grandma</span><span class="sub">🍪 1,200 · +26/sec</span></span>
+            <span class="own">14</span>
+          </button>
+          <button class="shop-row">
+            <span class="ico">🏭</span>
+            <span><span class="nm">Factory</span><span class="sub">🍪 18,400 · +340/sec</span></span>
+            <span class="own">6</span>
+          </button>
+          <button class="shop-row">
+            <span class="ico">⛏️</span>
+            <span><span class="nm">Cookie Mine</span><span class="sub">🍪 226,000 · +2,900/sec</span></span>
+            <span class="own">2</span>
+          </button>
+          <button class="shop-row" disabled>
+            <span class="ico">🚀</span>
+            <span><span class="nm">Shipment</span><span class="sub">🍪 4.1M · locked · 未夠</span></span>
+            <span class="own">0</span>
+          </button>
+        </div>
+      </div>
+    </div>
+
+    <div class="secondary-tabs" role="group" aria-label="Secondary surfaces · 次要畫面">
+      <button>Stats · 統計</button>
+      <button>Achievements · 成就</button>
+      <button>Tools tree · 工具樹</button>
+      <button>Prestige · 轉生</button>
+      <button>Settings · 設定</button>
+    </div>
+  </div>
+
+  <h2>Narrow layout · 窄版面</h2>
+  <p class="caption">
+    Below roughly 860px the rail cannot sit beside the cookie, so it becomes a bottom-sheet drawer
+    on the <em>same</em> surface — not a separate screen. The HUD stays pinned at the top, the
+    cookie stays visible above the sheet, and the sheet is dragged or tapped down rather than
+    navigated away from. The upgrade strip stays a horizontally-scrolling strip; it is never moved
+    into the drawer, because upgrades and generators are two different decisions.
+  </p>
+
+  <div class="narrow-frame">
+    <div class="cabinet">
+      <div class="hud">
+        <div class="readout"><span class="k">Cookies · 曲奇</span><span class="v">4.82Qa</span></div>
+      </div>
+      <div class="narrow-body">
+        <div class="panel hero">
+          <button class="cookie-btn" aria-label="Click the cookie · 撳曲奇">🍪</button>
+          <span class="hero-cps">18,420 / sec</span>
+        </div>
+        <div class="panel" style="margin-top: 12px;">
+          <div class="panel-title">Upgrades</div>
+          <div class="upgrade-strip">
+            <button class="mini-ticket">
+              <span class="g">🥄</span>
+              <span class="n">Golden Whisk<br />金打蛋器</span>
+              <span class="c">🍪 5,000</span>
+            </button>
+            <button class="mini-ticket">
+              <span class="g">🧈</span>
+              <span class="n">Butter Blessing<br />牛油祝福</span>
+              <span class="c">🍪 42,000</span>
+            </button>
+          </div>
+        </div>
+
+        <div class="sheet" role="region" aria-label="Shop drawer · 商店抽屜">
+          <div class="handle" aria-hidden="true"></div>
+          <div class="panel-title">Shop · 商店 — same surface · 同一版</div>
+          <div class="shop-list">
+            <button class="shop-row">
+              <span class="ico">👵</span>
+              <span><span class="nm">Grandma</span><span class="sub">🍪 1,200 · +26/sec</span></span>
+              <span class="own">14</span>
+            </button>
+            <button class="shop-row">
+              <span class="ico">🏭</span>
+              <span><span class="nm">Factory</span><span class="sub">🍪 18,400 · +340/sec</span></span>
+              <span class="own">6</span>
+            </button>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <h2>Rules this layout encodes · 呢個版面定死嘅規矩</h2>
+  <ul style="max-width: 78ch; line-height: 1.65; font-size: 14px;">
+    <li><strong>No navigation inside the loop.</strong> Clicking, buying a generator and buying an
+      upgrade are reachable without a single route change. 核心循環唔准換頁。</li>
+    <li><strong>The cookie is never occluded by a purchase surface.</strong> The drawer covers at
+      most the lower portion of the narrow layout and the cookie stays visible and clickable above it.</li>
+    <li><strong>The HUD readouts are pinned</strong> and use the same recessed bezel as
+      <code>stat-tile.html</code>, so a number means the same thing everywhere.</li>
+    <li><strong>Tabs are for secondary surfaces only</strong> — statistics, achievements, the tools
+      tech tree, prestige, settings. Adding a core-loop control to a tab is a spec violation.</li>
+    <li><strong>Every control here is ≥44px</strong>, keyboard reachable in reading order, and
+      focus-ringed in the spark accent; the drawer is a region on the same document, not a modal,
+      so focus is never trapped.</li>
+    <li><strong>Reduced motion:</strong> the press-compression on the cookie, the tickets and the
+      shop rows becomes an instant inset state change rather than a transition, and the drawer
+      snaps between positions instead of sliding.</li>
+  </ul>
+</body>
+</html>

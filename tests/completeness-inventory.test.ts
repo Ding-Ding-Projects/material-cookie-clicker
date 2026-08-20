@@ -726,9 +726,9 @@ describe("hand-written per-surface completeness inventory", () => {
     );
   });
 
-  it("records the actual parity release-red verdict and proves the cross-check wrapper restores", () => {
-    expect(validateDesignParityStructure()).toEqual(["Design parity structure verdict is red: REFERENCE_HASH_STALE"]);
-    expect(validateDesignParityRelease()).toEqual(["Design parity release verdict is red: DIFF_REVIEW_DEFECT"]);
+  it("records the actual parity verdicts and proves the cross-check wrapper restores", () => {
+    expect(validateDesignParityStructure()).toEqual([]);
+    expect(validateDesignParityRelease()).toEqual(["Design parity release verdict is red: EVIDENCE_PENDING"]);
     const candidate = loadDesignParityInventory();
     const redFixture: DesignParityReleaseValidator = () => {
       throw new ParityGuardError("DIFF_REVIEW_DEFECT", "fixture-only visual difference");
@@ -748,8 +748,8 @@ describe("hand-written per-surface completeness inventory", () => {
   it("keeps honest structural rows green while completion mode reports exact open blockers", () => {
     expect(validate(inventory)).toEqual([]);
     const blockers = validateCompletion(inventory);
-    expect(blockers).toContain("Design parity structure verdict is red: REFERENCE_HASH_STALE");
-    expect(blockers).toContain("Design parity release verdict is red: DIFF_REVIEW_DEFECT");
+    expect(blockers).not.toContain("Design parity structure verdict is red: REFERENCE_HASH_STALE");
+    expect(blockers).toContain("Design parity release verdict is red: EVIDENCE_PENDING");
     expect(blockers).toContain("App.tsx still contains the obsolete unmounted MinigameEventsScreen adapter.");
     expect(blockers).toContain("Graphics progression receipt has no build-artifact hash binding.");
     expect(blockers).toEqual(expect.arrayContaining([
@@ -757,7 +757,7 @@ describe("hand-written per-surface completeness inventory", () => {
       expect.stringMatching(/^desktop-playable-minigames is not completion-ready:/),
       expect.stringMatching(/^site-graphics-progression is not completion-ready:/),
     ]));
-    expect(blockers).not.toContain("Graphics progression receipt is stale for the cited implementation paths.");
+    expect(blockers).toContain("Graphics progression receipt is stale for the cited implementation paths.");
   });
 
   if (process.env.COMPLETENESS_MODE === "completion") {

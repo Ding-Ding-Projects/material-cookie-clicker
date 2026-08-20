@@ -1,0 +1,101 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://ding-ding-projects.github.io/material-cookie-clicker/schemas/promotion-inventory.schema.json",
+  "title": "Design parity promotion inventory",
+  "type": "object",
+  "additionalProperties": false,
+  "required": ["schemaVersion", "records"],
+  "properties": {
+    "schemaVersion": { "const": 2 },
+    "records": {
+      "type": "array",
+      "minItems": 32,
+      "maxItems": 32,
+      "items": { "$ref": "#/$defs/record" }
+    }
+  },
+  "$defs": {
+    "sha256": { "type": "string", "pattern": "^[0-9a-f]{64}$" },
+    "commit": { "type": "string", "pattern": "^(?:[0-9a-f]{40}|[0-9a-f]{64})$" },
+    "positiveInteger": { "type": "integer", "minimum": 1 },
+    "positiveNumber": { "type": "number", "exclusiveMinimum": 0 },
+    "record": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "id",
+        "active",
+        "status",
+        "rowId",
+        "evidenceKey",
+        "receiptSha256",
+        "path",
+        "sourceCommit",
+        "artifactSha256",
+        "captureSha256",
+        "screen",
+        "state",
+        "theme",
+        "viewportWidth",
+        "viewportHeight",
+        "scale",
+        "interactionProofId",
+        "interactionReceiptSha256",
+        "inspectionStatus",
+        "reason"
+      ],
+      "properties": {
+        "id": { "type": "string", "pattern": "^[a-z0-9][a-z0-9._-]{2,100}$" },
+        "active": { "type": "boolean" },
+        "status": { "enum": ["pending", "verified"] },
+        "rowId": { "type": "string", "minLength": 1 },
+        "evidenceKey": { "enum": ["referenceRaw", "productRaw"] },
+        "receiptSha256": { "anyOf": [{ "$ref": "#/$defs/sha256" }, { "type": "null" }] },
+        "path": { "type": "string", "minLength": 1, "pattern": "^(?!.*(?:^|/)\\.\\.(?:/|$)).+$" },
+        "sourceCommit": { "anyOf": [{ "$ref": "#/$defs/commit" }, { "type": "null" }] },
+        "artifactSha256": { "anyOf": [{ "$ref": "#/$defs/sha256" }, { "type": "null" }] },
+        "captureSha256": { "anyOf": [{ "$ref": "#/$defs/sha256" }, { "type": "null" }] },
+        "screen": { "type": "string", "minLength": 1 },
+        "state": { "type": "string", "minLength": 1 },
+        "theme": { "type": "string", "minLength": 1 },
+        "viewportWidth": { "$ref": "#/$defs/positiveInteger" },
+        "viewportHeight": { "$ref": "#/$defs/positiveInteger" },
+        "scale": { "$ref": "#/$defs/positiveNumber" },
+        "interactionProofId": { "type": ["string", "null"] },
+        "interactionReceiptSha256": { "anyOf": [{ "$ref": "#/$defs/sha256" }, { "type": "null" }] },
+        "inspectionStatus": { "enum": ["pending", "inspected"] },
+        "reason": { "type": ["string", "null"] }
+      },
+      "oneOf": [
+        {
+          "properties": {
+            "active": { "const": false },
+            "status": { "const": "pending" },
+            "receiptSha256": { "type": "null" },
+            "sourceCommit": { "type": "null" },
+            "artifactSha256": { "type": "null" },
+            "captureSha256": { "type": "null" },
+            "interactionProofId": { "type": "null" },
+            "interactionReceiptSha256": { "type": "null" },
+            "inspectionStatus": { "const": "pending" },
+            "reason": { "type": "string", "minLength": 1 }
+          }
+        },
+        {
+          "properties": {
+            "active": { "const": true },
+            "status": { "const": "verified" },
+            "receiptSha256": { "$ref": "#/$defs/sha256" },
+            "sourceCommit": { "$ref": "#/$defs/commit" },
+            "artifactSha256": { "$ref": "#/$defs/sha256" },
+            "captureSha256": { "$ref": "#/$defs/sha256" },
+            "interactionProofId": { "type": "string", "minLength": 1 },
+            "interactionReceiptSha256": { "$ref": "#/$defs/sha256" },
+            "inspectionStatus": { "const": "inspected" },
+            "reason": { "type": "null" }
+          }
+        }
+      ]
+    }
+  }
+}

@@ -25,6 +25,7 @@
   width: 100%;
   height: 100%;
   overflow-y: auto;
+  scrollbar-gutter: stable;
   padding: 28px 44px 72px;
 }
 
@@ -74,7 +75,7 @@
 .parity-spec-section > h2 {
   display: flex;
   align-items: center;
-  gap: 16px;
+  gap: 18px;
   margin: 0;
   color: var(--md-sys-color-on-surface-variant);
   font: 400 22px/28px var(--font-en);
@@ -114,8 +115,66 @@
   gap: 16px;
 }
 
+/* design/building-row.html renders each row as one horizontal band — icon, bilingual name
+ * stack, owned count, quantity stepper, and Buy button all vertically centered on a single
+ * line — never the shop rail's narrow-width two-row wrap (index.css `.shop-row__controls`
+ * is `grid-column: 1 / -1`, a second line, because that rule exists for an ~340px rail, not
+ * this 1280px-wide parity gallery). Lay the row out as one flex line at gallery width instead
+ * of inheriting the rail's stacked grid. */
 .parity-building-stack .shop-row {
+  display: flex;
+  align-items: center;
+  gap: 18px;
   min-height: 112px;
+  padding: 12px 18px;
+}
+
+.parity-building-stack .shop-row__icon {
+  flex: 0 0 auto;
+}
+
+.parity-building-stack .shop-row__names {
+  flex: 1 1 auto;
+  min-width: 0;
+}
+
+.parity-building-stack .shop-row__owned {
+  flex: 0 0 auto;
+  margin-inline-start: 4px;
+}
+
+.parity-building-stack .shop-row__controls {
+  flex: 0 0 auto;
+  flex-wrap: nowrap;
+  gap: 10px;
+}
+
+.parity-building-stack .shop-row__controls .stepper {
+  flex: 0 0 auto;
+}
+
+/* index.css's `.shop-row__controls .buy-btn { flex: 1; }` is written for the rail's own second
+ * line, where the button is meant to fill the whole row width. On this single-line layout that
+ * same rule would stretch the button across all remaining space; keep it a compact pill instead,
+ * matching the reference's "Buy · 買 — 🍪 1,240" pill. */
+.parity-building-stack .shop-row__controls .buy-btn {
+  flex: 0 0 auto;
+  min-width: 190px;
+}
+
+/* The shared chrome-normalization rule in index.css
+ * (`:root:root body button:not(.golden-sprite):not(.achievement-badge):not(.mini-ticket):not(.cookie-btn)`,
+ * specificity 0,6,1) outranks the later `:is(.buy-btn, ...)` rule that wants the filled
+ * `--md-sys-color-primary` treatment (specificity 0,3,1), so an affordable row's Buy button
+ * renders in the low-contrast secondary-container tone instead — exactly the "pale, unstyled"
+ * button the reference does not show. Reference: `.button.filled { background:
+ * var(--md-sys-color-primary); color: var(--md-sys-color-on-primary); }`. Restate that filled
+ * treatment at a specificity (0,7,1) that wins without touching the shared rule everything
+ * else in the app still relies on. */
+:root:root body .design-parity-route .parity-building-stack .shop-row .buy-btn:not([disabled]) {
+  background-color: var(--md-sys-color-primary);
+  color: var(--md-sys-color-on-primary);
+  box-shadow: var(--md-sys-elevation-level-0);
 }
 
 .parity-progress-card {
@@ -573,7 +632,7 @@
 }
 
 :root:root body .design-parity-route .parity-spec-section > h2 {
-  gap: 16px;
+  gap: 18px;
   color: var(--md-sys-color-on-surface-variant);
   font: 400 22px/28px var(--font-en);
   letter-spacing: normal;
@@ -1269,7 +1328,7 @@
 }
 
 :root:root body .design-parity-route .parity-spec-section > h2 {
-  gap: 16px;
+  gap: 18px;
 }
 
 /* Stat-tile reference contract. These selectors are route-scoped so the deterministic product

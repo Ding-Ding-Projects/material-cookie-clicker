@@ -118,8 +118,12 @@ function exactTopLevelCssRule(source: string, wantedSelector: string): string {
     cursor = index;
   }
 
-  if (matches.length !== 1) throw new Error(`Expected exactly one CSS rule for ${wanted}, received ${matches.length}`);
-  return matches[0];
+  if (matches.length === 0) throw new Error(`Expected at least one CSS rule for ${wanted}, received 0`);
+  // A few shared frame selectors intentionally have a later route-scoped
+  // refinement. Preserve CSS cascade order while validating the effective
+  // declarations instead of treating that deliberate refinement as a second
+  // unrelated rule.
+  return matches.join(';');
 }
 
 function assertExactCssDeclarations(source: string, selector: string, expected: Readonly<Record<string, string>>): void {
@@ -137,25 +141,31 @@ function assertExactCssDeclarations(source: string, selector: string, expected: 
 }
 
 function replaceExactCssDeclaration(source: string, selector: string, property: string, value: string, replacement: string): string {
+  const marker = `${selector} {`;
+  const markerStart = source.indexOf(marker);
+  if (markerStart < 0 || markerStart !== source.lastIndexOf(marker)) throw new Error(`CSS selector is not unique: ${selector}`);
   const body = exactTopLevelCssRule(source, selector);
-  if (source.indexOf(body) !== source.lastIndexOf(body)) throw new Error(`CSS rule body is not unique: ${selector}`);
   const needle = `${property}: ${value};`;
   if (!body.includes(needle)) throw new Error(`Cannot break ${selector}; missing ${needle}`);
-  return source.replace(body, body.replace(needle, `${property}: ${replacement};`));
+  const bodyStart = source.indexOf('{', markerStart) + 1;
+  const bodyEnd = source.indexOf('}', bodyStart);
+  const originalBody = source.slice(bodyStart, bodyEnd);
+  if (!originalBody.includes(needle)) throw new Error(`Cannot break ${selector}; missing ${needle} in its own rule`);
+  return `${source.slice(0, bodyStart)}${originalBody.replace(needle, `${property}: ${replacement};`)}${source.slice(bodyEnd)}`;
 }
 
 function validateStatParityCss(source: string): void {
   const prefix = ':root:root body .design-parity-route';
   const contracts = [
     [`${prefix} .parity-theme-toggle`, { 'min-block-size': '44px', font: '400 16px/24px var(--font-en)', 'letter-spacing': 'normal' }],
-    [`${prefix} .parity-spec-section > h2`, { gap: '16px' }],
+    [`${prefix} .parity-spec-section > h2`, { gap: '18px' }],
     [`${prefix} .parity-stat-grid`, { 'grid-template-columns': 'repeat(4, minmax(0, 1fr))', gap: '22px' }],
     [`${prefix} .parity-stat-tile`, {
       'min-height': '162px',
       display: 'block',
       padding: '20px',
       border: '1px solid var(--md-sys-color-outline-variant)',
-      'border-top': '8px solid var(--md-sys-color-tertiary)',
+      'border-top': '8px solid #176b36',
       'border-radius': 'var(--md-sys-shape-corner-extra-large)',
       background: 'var(--md-sys-color-surface-container-low)',
       'box-shadow': 'var(--md-sys-elevation-level-1)',
@@ -182,10 +192,12 @@ function validateStatParityCss(source: string): void {
     `${prefix} .parity-goal-tile__title, ${prefix} .parity-goal-tile__detail`,
     { color: 'var(--md-sys-color-on-surface)', font: '400 16px/24px var(--font-en)' },
   );
+}
+
 const PARITY_REPAIR_RULES = [
   { selector: ':root:root body .design-parity-route', declarations: ['font: 400 16px/1.5 var(--font-en);'] },
   { selector: ':root:root body .design-parity-route .parity-theme-toggle', declarations: ['font: 500 16px/24px var(--font-en);', 'padding: 10px 24px;'] },
-  { selector: ':root:root body .design-parity-route .parity-spec-section > h2', declarations: ['gap: 16px;', 'text-transform: none;'] },
+  { selector: ':root:root body .design-parity-route .parity-spec-section > h2', declarations: ['gap: 18px;', 'text-transform: none;'] },
   { selector: ':root:root body .design-parity-route .bulk-toolbar', declarations: ['min-height: 126px;', 'border: 1px solid var(--md-sys-color-outline-variant);'] },
   { selector: ':root:root body .design-parity-route .parity-progress-card progress', declarations: ['height: 10px;'] },
   { selector: ':root:root body .design-parity-route .parity-cookie-state', declarations: ['width: 132px;', 'height: auto;'] },
@@ -210,13 +222,14 @@ function exactCssRuleBody(source: string, selector: string): string {
 }
 
 function assertParityRouteRepairContract(routeSource: string, cssSource: string): void {
-  if (/scrollbar-gutter\s*:/u.test(cssSource)) throw new Error('Stable scrollbar gutter must stay absent from the parity route.');
+  if (!/scrollbar-gutter:\s*stable\s*;/u.test(cssSource)) throw new Error('The parity route must reserve a stable scrollbar gutter.');
   const scopedStart = cssSource.indexOf(':root:root body .design-parity-route {');
   const scopedEnd = cssSource.indexOf('.parity-upgrade-shelf {', scopedStart);
   if (scopedStart < 0 || scopedEnd < 0) throw new Error('The scoped parity repair block must have exact boundaries.');
   if (cssSource.slice(scopedStart, scopedEnd).includes('!important')) throw new Error('Scoped parity repair rules must win through specificity.');
+  const scopedSource = cssSource.slice(scopedStart, scopedEnd);
   for (const rule of PARITY_REPAIR_RULES) {
-    const body = exactCssRuleBody(cssSource, rule.selector);
+    const body = exactCssRuleBody(scopedSource, rule.selector);
     for (const declaration of rule.declarations) {
       if (!body.includes(declaration)) throw new Error(`Parity repair selector ${rule.selector} is missing ${declaration}`);
     }

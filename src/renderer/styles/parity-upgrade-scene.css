@@ -141,6 +141,7 @@
 }
 
 :root:root[data-design-parity='upgrade-card--gallery'] body .design-parity-route .parity-upgrade-scene .parity-upgrade-card--locked {
+  border-radius: var(--md-sys-shape-corner-extra-large);
   background-color: var(--md-sys-color-surface-container-low);
   opacity: 0.58;
 }
@@ -153,6 +154,7 @@
   block-size: auto;
   min-inline-size: 0;
   min-block-size: 220px;
+  border-radius: var(--md-sys-shape-corner-extra-large);
   opacity: 1;
   border-color: var(--tertiary);
   background-color: var(--tertiary-container);

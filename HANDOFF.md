@@ -458,3 +458,80 @@ every newly mounted Application tools tab, build and inspect the unsigned instal
 candidate commit, and verify publication separately. Keep the local-model row partial until
 catalog, queue, chat, and allowlisted harness adapters are packaged and exercised. Do not convert a
 pending row to verified from source or test evidence alone.
+
+
+## Session update (2026-08-20) — graphic and site defect repairs, measured
+
+This session repaired a batch of rendering defects across the desktop app and the site, each
+verified by measuring the real built/rendered output over CDP (computed styles, bounding rects,
+pixel colors) rather than by reading source and assuming the fix landed. None of this is a release;
+it sits on top of the `43d2174` candidate at whatever commit this lane's changes are integrated to.
+
+**Desktop app, measured against the built renderer:**
+
+- **Memory Match rendered as one 16-card horizontal strip.** `.minigame-board--memory` still
+  carried a four-column grid declaration from an earlier layout rule while its DOM children are
+  rows, not a flat card grid. Fixed and re-measured: four rows now sit at y ≈ 900 / 956 / 1012 /
+  1068, and the board wraps/scrolls instead of overflowing.
+- **Flagged Minesweeper cells were transparent.** `--md-sys-color-tertiary-container` and its
+  `-on-` counterpart were referenced by the flag style but never declared anywhere in the token
+  set. Declared them; measured `rgb(248, 226, 135)` for the flagged cell against
+  `rgb(245, 223, 196)` for a hidden cell, so the two states are now visually distinct.
+- **Every minigame caption rendered at full body-text size.** `--md-sys-typescale-body-small-font`
+  was referenced but undeclared, so captions fell back to the body-size cascade. Declared it;
+  measured 12px on the caption text after the fix.
+- **Tool-card file inputs were transparent.** They read an undeclared `--surface-container-low`
+  token; declared it and the inputs now paint a real surface color instead of showing the page
+  background through them.
+- **The minigame hero band clipped its own hint line.** The band reserved 48px for two caption
+  lines plus padding/gaps, and the real content needed exactly 13px more — proved by temporarily
+  restoring the old (too-small) value on the live build and re-measuring the same clip, then
+  re-applying the fix and confirming the hint line is fully visible.
+- **`canonical-tools.css` was losing silently to `index.css`.** Six selectors in the tools
+  stylesheet were being overridden by equal-or-lower-specificity rules in `index.css` because
+  `main.tsx` imports `./App` (which pulls in `canonical-tools.css`) on line 3 and
+  `./styles/index.css` on line 4 — so `index.css` always lands later in the cascade and wins ties.
+  Put `canonical-tools.css` in its own cascade layer so those six selectors win on layer order
+  rather than depending on import sequence.
+
+**Site, verified against the rendered/served pages:**
+
+- The eight `--m3-*` color roles had a dark-mode value declared only under an explicit
+  `[data-theme="dark"]` selector, which sixteen of the site's seventeen pages never set — and the
+  one page that did set a theme attribute set it to the literal string `"system"`, which matches
+  neither the light default nor the explicit dark selector. Net effect: dark mode never actually
+  applied its own role values anywhere except by accident.
+- Fifteen of the site's pages had no Open Graph tags and no favicon at all.
+- Four data tables were cropped (overflow hidden) rather than made to scroll on a phone-width
+  viewport.
+- The regex builder popover painted underneath the modal dialogs that are the only way to open it,
+  making it inert whenever a modal was showing.
+
+None of the above were verified through the full aggregate suite in this pass — this lane touched
+only project-record files, not source or tests, so it re-states facts reported to it rather than
+re-running `npm run check` itself. See the per-file inventory note below.
+
+### Per-file test inventory (as reported to this lane, not re-verified here)
+
+This documentation lane did not execute the test suite. The counts above in "Current checks at the
+candidate" (1,124/1,124 across 59 app files / 998 tests, 37 local-model package tests, 89
+surface-kernel tests) remain the last aggregate figure this repository's records show at `43d2174`.
+Whether that count still holds after the current integration commits has
+not been independently re-run by this lane and should not be assumed current without a fresh
+`npm run check`.
+
+**Thirteen tests were already failing on `main` before this session started**, inherited from an
+earlier merge, and had gone unnoticed because no CI workflow in this repository runs tests (GitHub
+Actions is deliberately configured to run no tests and no lint, per this project's standing policy —
+release workflows build and publish only). Those thirteen failures are pre-existing and were not
+introduced by the graphic-defect repairs described above; whoever picks this up next should locate
+and name them explicitly with a fresh `npm run check` rather than assuming this note is stale.
+
+### Release is still blocked — do not claim otherwise
+
+The release remains blocked by the icon-fidelity assertion in `scripts/build-common.ps1`, tracked as
+GitHub issue #3. That assertion was diagnosed this session but was **deliberately not weakened** —
+per the hard rule that a guard nobody has watched fail proves nothing, and per the standing
+instruction to fix the real cause rather than loosen the check. Issue #3 remains open. No release has
+shipped in this session, and this session did not run the installer build, the installed-interaction
+matrix, or any capture/promotion workflow.

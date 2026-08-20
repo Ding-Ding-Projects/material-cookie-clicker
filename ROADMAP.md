@@ -102,6 +102,23 @@ The hand-written matrix is authoritative; the largest gaps are:
 5. Publish exactly one release for the final integrated commit, verify its assets and workflow
    timing, and leave the repository with only proven, merged work.
 
+## Session note (2026-08-20) — graphic and site defect repairs
+
+A follow-up lane repaired a batch of measured rendering defects on top of the `43d2174` candidate:
+the Memory Match board layout, undeclared Minesweeper flag-color and
+caption-typescale tokens, an undeclared tool-card surface token, a 13px hero-band clipping shortfall
+on the minigame hint line, and a cascade-layer ordering fix for six `canonical-tools.css` selectors
+that were silently losing to `index.css`. On the site: dark-mode `--m3-*` role values that never
+actually applied on sixteen of seventeen pages, missing Open Graph tags and favicons on fifteen
+pages, four tables that clipped instead of scrolling on phone widths, and a regex-builder popover
+that painted behind the modal dialogs used to open it.
+
+This is not a release and does not change the release-blocking state below. Thirteen tests were
+already failing on `main` before this session, inherited from an earlier merge and unseen because no
+CI workflow runs tests; they were not introduced by this pass and remain to be named and fixed. The
+release is still blocked by the icon-fidelity assertion in `scripts/build-common.ps1` (GitHub issue
+#3), which was diagnosed and deliberately left intact rather than weakened.
+
 ## Standing constraints
 
 - Nobody pays for the application: no purchase, licence, subscription, or paid feature tier.

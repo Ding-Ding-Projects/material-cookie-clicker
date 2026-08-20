@@ -81,7 +81,7 @@ function assertStandaloneNarratorReference(html: string, css: string): void {
   }
   requireSingle(html, 'class="narrator-toast-reference"', 'standalone narrator page class');
   requireSingle(html, 'class="gallery narrator-toast-gallery"', 'standalone narrator gallery class');
-  if ((html.match(/<aside\b[^>]*\brole="status"/g) ?? []).length !== 2) {
+  if ((html.match(/<aside\b[^>]*\srole="status"/g) ?? []).length !== 2) {
     throw new Error('Expected exactly two independently semantic status notices');
   }
   for (const label of ['Dismiss golden moment', 'Dismiss offline report']) {

@@ -49,7 +49,7 @@ const REQUIRED_IDS = [
   "site-command-palette", "site-notifications", "site-appearance", "site-logo", "site-tabs",
   "site-locks", "site-authenticator", "site-unlock-ladder", "site-support-tickets",
   "site-file-converter", "site-ollama", "site-history", "site-exports", "site-bulk",
-  "site-changelog", "site-status-hub", "site-link-preview", "site-installer-link",
+  "site-changelog", "site-status-hub", "site-link-preview", "site-installer-link", "site-house-ads",
   "site-playable-game-boundary",
 ] as const;
 

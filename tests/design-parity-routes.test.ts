@@ -8,6 +8,7 @@ import {
   assertDesignParityCoverage,
   DESIGN_PARITY_FIXTURES,
   DESIGN_PARITY_NETWORK_POLICY,
+  DESIGN_PARITY_PAGE_COPY,
   DESIGN_PARITY_ROW_IDS,
   DesignParityRoute,
   resolveDesignParityRequest,
@@ -27,6 +28,7 @@ describe('built-product design parity routes', () => {
     expect(inventoryIds).toHaveLength(16);
     expect(new Set(inventoryIds).size).toBe(16);
     expect([...DESIGN_PARITY_ROW_IDS].sort()).toEqual([...inventoryIds].sort());
+    expect(Object.keys(DESIGN_PARITY_PAGE_COPY).sort()).toEqual([...inventoryIds].sort());
     assertDesignParityCoverage(inventoryIds);
 
     for (const row of inventory.rows) {
@@ -39,6 +41,9 @@ describe('built-product design parity routes', () => {
       expect(markup).toContain(`data-design-parity-fixture="${row.deterministic.fixture}"`);
       expect(markup).toContain('data-motion="paused"');
       expect(markup).toContain('data-network="blocked"');
+      const renderedText = markup.replaceAll('&amp;', '&').replaceAll('&#x27;', "'");
+      expect(renderedText).toContain(DESIGN_PARITY_PAGE_COPY[request.rowId].title);
+      expect(renderedText).toContain(DESIGN_PARITY_PAGE_COPY[request.rowId].section);
     }
   });
 
@@ -53,6 +58,39 @@ describe('built-product design parity routes', () => {
     expect(() => assertDesignParityCoverage(missingOne)).toThrow(/coverage mismatch/i);
     expect(() => assertDesignParityCoverage([...missingOne, 'upgrade-card--gallery'])).not.toThrow();
     expect(() => assertDesignParityCoverage([...DESIGN_PARITY_ROW_IDS, DESIGN_PARITY_ROW_IDS[0]])).toThrow(/coverage mismatch/i);
+  });
+
+  it('locks the exact deterministic counts, labels, and mixed states that frame the references', () => {
+    const render = (rowId: string): string => {
+      const row = inventory.rows.find((candidate) => candidate.id === rowId);
+      if (!row) throw new Error(`Missing inventory row ${rowId}`);
+      const request = resolveDesignParityRequest(new URL(row.product.route).searchParams);
+      if (!request) throw new Error(`Missing request for ${rowId}`);
+      return renderToStaticMarkup(createElement(DesignParityRoute, { request })).replaceAll('&#x27;', "'");
+    };
+
+    expect(render('achievement-badge--gallery')).toContain('Hundred Bakeries · 百間麵包店');
+    expect(render('building-row--gallery')).toContain("Grandma's Bakery");
+    expect(render('building-row--gallery')).toContain('Buy · 買 — 🍪 1,240');
+    expect(render('bulk-toolbar--progress')).toContain('4 / 7 done · 完成 4 / 7');
+    expect(render('game-layout--main')).toContain('4.82 Qa');
+    expect(render('game-layout--main')).toContain('Achievements · 成就');
+    expect(render('narrator-toast--gallery')).toContain('+1,337 cookies; frenzy active for 60s');
+    expect(render('narrator-toast--gallery')).toContain('+2.4 M cookies over 6 h 12 m');
+    expect(render('prestige-gate--ready')).toContain('Emergency exit · 緊急離開');
+    expect(render('search-regex-builder--open')).toContain('bak(ery|eries)');
+    expect(render('search-regex-builder--open')).toContain('2 of 3 matches');
+    expect(render('settings-funny-sliders--default')).toContain('Current level: 2 of 5');
+    expect(render('settings-funny-sliders--default')).toContain('而家程度：4 / 5');
+    expect(render('stat-tile--gallery')).toContain('4.82 Qa');
+    expect(render('stat-tile--gallery')).toContain('18,420');
+    expect(render('tools-tree--mixed')).toContain('7<span class="tools-hud__counter-sep">/</span>17');
+    for (const state of ['undiscovered', 'locked', 'ready', 'unlocked']) {
+      expect(render('tool-card--gallery')).toContain(`tool-node ${state}`);
+    }
+    for (const label of ['Locked · 未解鎖 (12 / 50)', 'Buy · 買 — 🍪 5,000', 'Already owned · 已經買咗']) {
+      expect(render('upgrade-card--gallery')).toContain(label);
+    }
   });
 
   it('renders every route without network access or external assets', () => {

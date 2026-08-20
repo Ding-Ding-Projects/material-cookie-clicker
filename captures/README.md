@@ -24,9 +24,15 @@ pixels.
 ## Release capture inventory and isolated launcher
 
 `scripts/release-capture-inventory.json` is the hand-written release evidence
-list. It distinguishes existing current-build images from pending evidence;
-pending rows do not carry an image path and therefore cannot accidentally pass
-because an older, similarly named capture happens to exist.
+list. Its version-2 schema distinguishes promoted, pending, supporting and
+superseded evidence without treating those words as interchangeable. A pending
+row never carries a top-level promoted image path and therefore
+cannot accidentally pass because an older, similarly named capture happens to
+exist. A pending row may carry a `supportingEvidence` object when real inspected
+bytes and a partial receipt exist; that object must state its limits and must
+explicitly decline generic promotion compliance. An `existing` row is accepted
+only with a source commit, image and receipt hashes, dimensions, method and
+receipt path.
 
 `scripts/prepare-release-capture-plan.mjs` prepares a launch plan for the
 approved cheap Lowlevel named hidden-desktop route. It does not launch a window
@@ -41,10 +47,10 @@ use synchronous evaluations and explicit deadlines; they do not use the
 `scripts/validate-release-capture-evidence.mjs` validates the final evidence
 record against the inventory, exact source commit and method. A verified row
 must point to a real PNG and record the dynamically resolved window title and
-`Chrome_WidgetWin_1` class. A blocked row must name the exact blocker. This lane
-created the harness but deliberately did not launch any UI, so the following
-current release states remain **pending** rather than being inferred from older
-images:
+`Chrome_WidgetWin_1` class. A blocked row must name the exact blocker. No
+portable current-release evidence record satisfying that complete contract is
+checked in yet, so the following states remain **pending** rather than being
+inferred from older images:
 
 - the current minigame-events dashboard and each of its five playable boards;
 - the Lucky Chance drawer with a real token draw;
@@ -52,6 +58,15 @@ images:
 - the endless Home extension card;
 - the collapsed Diesel Depot persisted across a reload;
 - installed-executable launch and the unsigned update-ready banner.
+
+Three graphics-purchase states have real supporting frames and a shared partial
+receipt under `design/parity/evidence/graphics-progression/`: cookie-only, the
+first Colour plate becoming affordable at exactly 50 cookies, and that first
+purchase applied without revealing later chrome. They are registered in the
+release inventory as pending with `promotionCompliance: not-claimed`. The
+receipt does not contain the complete generic-promotion or exact release-tip
+contract, so these files are useful supporting evidence rather than promoted
+release evidence.
 
 The same inventory carries the pre-existing gaps already documented later in
 this file: remaining event-pool images, a milk-focused composition, late Home
@@ -62,14 +77,29 @@ rows look complete.
 
 ## `app/` — the built application
 
-### The current set
+### Graphics-purchase supporting frames
 
-Sixteen images, taken across three runs of one build in one sitting, and every
-one of them opened and looked at afterwards. This is the set the README table
-and the documentation site's capture matrix both point at. Everything below this
-section is older evidence from earlier lanes, kept for the record; where an old
-image and a new one show the same surface, the old one is no longer listed in
-either table and the new one is.
+These frames are stored with their partial receipt rather than duplicated into
+`captures/app/`. Their bytes, dimensions and hashes are checked by
+`tests/build-evidence.test.ts`; their incomplete promotion state stays visible.
+
+| File | What it shows |
+| --- | --- |
+| `design/parity/evidence/graphics-progression/before.png` | The usable plain cookie by itself. The title bar, counters, cabinet, console, discovery ticket and rails are absent. |
+| `design/parity/evidence/graphics-progression/affordable.png` | The same state once the balance reaches the exact 50-cookie price: one Colour plate appears beneath the cookie. |
+| `design/parity/evidence/graphics-progression/after.png` | The Colour rung has been purchased. The palette changes, while every later structural and illustrated layer remains absent. |
+
+Shared partial receipt: `design/parity/evidence/graphics-progression/receipt.json`,
+source commit `330352ce7513ba420752dd7243762f0dd75f9eaa`. These paths are not presented as
+generic-promotion or current-release completion.
+
+### The EvidenceRefresh historical set — 18 images
+
+Eighteen images, taken across three runs of one build in one sitting, and every
+one of them opened and looked at afterwards. README and the documentation site
+still embed selected members as clearly labelled historical evidence. They are
+not current-release inventory rows: later graphics-purchase, minigame,
+endless-progression and application-tools work landed after this set.
 
 **How they were taken.** From the built `dist/`, launched by the real `electron`
 binary onto an off-screen Windows desktop named `EvidenceRefresh`. Each run got
@@ -94,10 +124,10 @@ retaken after the panel settled.
 
 | File | What it shows |
 | --- | --- |
-| `plain-start.png` | A genuinely fresh profile: white page, system font, a 1px grey rule under the title bar, square corners, no shadows, no illustrated art — and in the middle of it a flat grey circle with the word `COOKIE` on it. The title bar's own controls are coin-slot plates (`10` to drag the window, `30` minimize, `45` maximize) and the close cross beside them is an ordinary button with no price. The only two console buttons are the free `Prices` catalogue and a `SETTINGS` plate at `25`. Nothing was seeded and nothing was pressed before the shutter. |
-| `plain-upgrading.png` | The same run with exactly two of the seven look rungs bought — `look.palette` (50) and `look.cabinet` (250). The warm palette and the wooden cabinet are back; everything above them is still visibly absent (system font rather than the display face, flat cream rather than the oven glow, a brown disc rather than the drawn cookie, a plain `▪` on the Shop Sign ticket). The counter reads 100 because 300 of the seeded 400 cookies were really spent. |
-| `game-progressed.png` | The full mid-game surface in the light theme: three HUD plates, the raid-supplies shelf, eight console buttons, the drawn hero cookie over its oven glow, the three-section upgrade shelf at `68 / 180`, the shop rail and the Diesel Depot status card, with the milk tide along the floor at `Wong Tai Sin Milk — 312% milk`. |
-| `game-dark.png` | The same surface, same save, same minute, in the dark "arcade night" theme. Note that the dark theme is the seventh rung of the look ladder: a save that has not bought it cannot reach this picture at all. |
+| `plain-start.png` | Superseded fresh-state baseline. It accurately shows the earlier plain profile, but the current opening now hides the pictured title bar, counters, console and surrounding panel until explicit graphics purchases reveal them. |
+| `plain-upgrading.png` | Historical two-rung state from the same older run: `look.palette` and `look.cabinet` bought, with later visual layers still absent. |
+| `game-progressed.png` | Historical full mid-game surface in the light theme: three HUD plates, raid supplies, console, hero cookie, upgrade shelf, shop rail and depot card. |
+| `game-dark.png` | Historical dark-theme pair for the same progressed save. It remains useful for that build, but is not a current-release receipt. |
 | `dialog-factory.png` | The Diesel Factory panel, **stalled** — the honest-halt behaviour photographed rather than asserted. The tanks are at 85 of 85 litres so refining reads `0 / 1.00 L/s` while its rating stays at 1.00, and the yard is at 170 of 170 barrels so intake has stopped too. The status line names both reasons. The shipping station below reports ready to ship 85 L, litres shipped 14 L, vouchers minted 139 and consumed by WinForge 76 — the last two counted from the ledger file rather than from the game. |
 | `dialog-home.png` | The Home panel with the Kitchen genuinely under construction: `Building the Kitchen`, 54%, 28s remaining, and the room's own card badged `BUILDING` with scaffolding across its floor plan. The blueprint (5,000) and the builders (10,000) were bought with real presses — that is the 15,000 the panel reports as spent — and the sixty seconds were served by the running application in real time. |
 | `dialog-achievements.png` | The Achievements panel at `78 / 201 unlocked`, with earned badges drawn in gold and unearned ones flat grey behind a `???`. |
@@ -112,6 +142,28 @@ retaken after the panel settled.
 | `golden-dial-stepped.png` | The same round with `prefers-reduced-motion` on. An inner ring of two dozen ticks appears — every position the needle may occupy — the instruction becomes `The needle steps one notch at a time`, and the briefed sweep goes from 1.8 to 2.9 seconds. Reduced motion changes the cadence, not the target: the band is the same 26%. |
 | `golden-dial-won.png` | Three hits in a row and the payout: a yellow pill at the top of the stage reading `Golden cookie redeemed: Windfall`. Another sprite has already spawned lower down, which is the fast developer schedule doing what it is for. |
 | `event-sugar-rush.png` | A **Sugar Rush** five seconds from the end of it: an amber event plate in the HUD with a sun glyph, a draining bar and a `5s` countdown, and a marquee card in the corner saying in plain words what it does — every click lands seven times as hard. Worth a second look for a layout reason as well: the event plate pushed the eight console buttons onto a row of their own, and in that wider HUD the raid-supplies shelf prints all three plates whole. |
+
+### Superseded design-iteration archive — 39 explicitly indexed files
+
+These files are retained because they are genuine photographs of intermediate
+built versions. They are not current-release evidence and are not silently
+substituted for a similarly named current state. The commit grouping makes the
+progression auditable without pretending that every frame still describes the
+current interface.
+
+| Source commit | Retained files | Historical purpose |
+| --- | --- | --- |
+| `9aacd07` | `shell-achievements.png`, `shell-generators.png`, `shell-integration-launch.png`, `shell-prestige.png`, `shell-statistics.png`, `shell-tools.png`, `shell-upgrades.png` | First complete shell and per-destination built captures. |
+| `9b4e2f3` | `redesign-achievements.png`, `redesign-cookie.png`, `redesign-generators.png`, `redesign-prestige.png`, `redesign-statistics.png`, `redesign-tools.png`, `redesign-upgrades.png` | Early arcade-layout redesign. |
+| `8a38ae9`, `3541e01`, `563a580` | `surface-achievements.png`, `surface-game.png`, `surface-game-dark.png`, `surface-prestige.png`, `surface-statistics.png`, `surface-tools.png` | One-surface game-loop iterations, including the first dark pair and compact Tools surface. |
+| `71f378f` | `overlay-achievements.png`, `overlay-game.png`, `overlay-prestige.png`, `overlay-statistics.png`, `overlay-tools.png` | Console-cluster and anchored-overlay iteration. |
+| `292c191` | `graphics-achievements.png`, `graphics-game.png` | Historical illustration evidence from before explicit graphics-purchase gating. |
+| `642b5dd` | `combined-game.png` | Combined overlay-and-graphics integration frame. |
+| `953d8dd` | `controls-game.png`, `controls-tools.png` | Cabinet-hardware control treatment. |
+| `0480efe` | `chrome-dialog-prestige.png`, `chrome-game.png` | Theme-aware chrome iteration. |
+| `6da0868`, `2e12cf2` | `delight-game.png`, `final-game.png` | Bilingual delight layer and the then-integrated game state. |
+| `d56c053` | `realism-cookie.png`, `realism-cookie-dark.png` | Hero-cookie realism pair. |
+| `856b8ad`, `daa2188` | `titlebar-dark.png`, `anim-diesel-2.png`, `anim-diesel-3.png` | Cabinet title-bar and later diesel animation phases. The complete diesel sequence is documented again in its feature section below. |
 
 ### The gap-closing set
 
@@ -924,6 +976,11 @@ genuinely remains.
 
 **Whole features with no photograph on this build**
 
+- **The Minigames surface and Lucky Chance drawer.** The dashboard, Klondike,
+  Memory Match, Cookie 2048, Minesweeper, Breakout and the drawer are implemented.
+  A later verification pass exercised the flow from the built artifact, but no
+  committed interaction receipt or current screenshot exists for any of these
+  seven states.
 - **Eighteen of the twenty-two pool events.** Sugar Rush, Cookie Eclipse, Clot
   and Market Day are photographed (the last two together, in the double-event
   frame). The rest are described on the site from their shipped definitions.
@@ -937,6 +994,10 @@ genuinely remains.
 
 **States of features that are photographed**
 
+- **Release-tip fresh, progressed-light and progressed-dark states.** Older
+  captures exist, and three partial-receipt frames show the current graphics
+  opening sequence, but none satisfies the complete release-tip evidence
+  contract yet.
 - The home past **three finished rooms**: the Bedroom, Workshop and Garden have
   never been reached, so the twenty- and thirty-minute builds and the fifteen
   dearest pieces of furniture are unit-tested and undrawn.
@@ -957,10 +1018,10 @@ genuinely remains.
   reduced-motion behaviour was always the exception — it is a domain mode rather
   than a CSS declaration, and it is in `golden-dial-stepped.png`.
 
-**Things that do not exist yet**
+**Implemented surfaces without a current photograph**
 
-- The command palette and the appearance editor. Both are named in the tools
-  tech tree as game content; neither is a built application surface.
+- The command palette and the appearance editor are implemented application
+  surfaces. Their installed interaction and current screenshots remain pending.
 
 **Method gaps**
 

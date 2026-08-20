@@ -1,11 +1,95 @@
 {
-  "schemaVersion": "material-cookie-clicker.release-captures.v1",
+  "schemaVersion": "material-cookie-clicker.release-captures.v2",
   "requiredMethod": "lowlevel-cheap-headless",
   "builtArtifact": "dist",
   "states": [
-    { "id": "fresh-start", "status": "existing", "image": "captures/app/plain-start.png", "surface": "Fresh installed launch", "proof": "Fresh profile and built renderer" },
-    { "id": "progressed-game", "status": "existing", "image": "captures/app/game-progressed.png", "surface": "Progressed main game", "proof": "Progressed save loaded by the built renderer" },
-    { "id": "dark-game", "status": "existing", "image": "captures/app/game-dark.png", "surface": "Dark theme", "proof": "Progressed built renderer in the dark theme" },
+    {
+      "id": "fresh-start",
+      "status": "pending",
+      "surface": "Fresh installed launch",
+      "proof": "Current cookie-only opening at the release tip; the prior image is retained only as superseded history.",
+      "supersededEvidence": {
+        "image": "captures/app/plain-start.png",
+        "sourceCommit": "4fa7d43e1459b15ab49aceaf48d0cd8db5937ea5",
+        "reason": "Predates the explicit graphics-purchase composition and still shows title-bar, HUD and console chrome."
+      }
+    },
+    {
+      "id": "progressed-game",
+      "status": "pending",
+      "surface": "Progressed main game",
+      "proof": "Current release-tip progressed surface; the prior image predates the minigame, endless-progression and application-tools integrations.",
+      "supersededEvidence": {
+        "image": "captures/app/game-progressed.png",
+        "sourceCommit": "4fa7d43e1459b15ab49aceaf48d0cd8db5937ea5",
+        "reason": "Useful historical UI evidence, but not a current-build release receipt."
+      }
+    },
+    {
+      "id": "dark-game",
+      "status": "pending",
+      "surface": "Dark theme",
+      "proof": "Current release-tip progressed surface in dark theme; the prior image predates the current integrated feature set.",
+      "supersededEvidence": {
+        "image": "captures/app/game-dark.png",
+        "sourceCommit": "4fa7d43e1459b15ab49aceaf48d0cd8db5937ea5",
+        "reason": "Useful historical UI evidence, but not a current-build release receipt."
+      }
+    },
+    {
+      "id": "graphics-cookie-only",
+      "status": "pending",
+      "surface": "Cookie-only graphics state",
+      "proof": "A supporting frame shows the exact visible state, but its partial receipt does not satisfy generic promotion or current-release completion.",
+      "supportingEvidence": {
+        "state": "before",
+        "image": "design/parity/evidence/graphics-progression/before.png",
+        "sourceCommit": "330352ce7513ba420752dd7243762f0dd75f9eaa",
+        "sha256": "55c751e8a3dc0b395ef0f768b5721b953d126174011fd457d2e9034924ab1a97",
+        "dimensions": { "width": 1440, "height": 900 },
+        "method": "cheap-lowlevel-headless",
+        "receipt": "design/parity/evidence/graphics-progression/receipt.json",
+        "receiptSha256": "b2b2ee904b8b4ce084d0c10c5af1f4abab6d454b4cecabf849bbd0ce16d83fca",
+        "promotionCompliance": "not-claimed",
+        "limitations": "Partial feature-state receipt only; no generic promotion receipt and no exact release-tip binding."
+      }
+    },
+    {
+      "id": "graphics-first-rung-affordable",
+      "status": "pending",
+      "surface": "First graphics purchase becomes affordable",
+      "proof": "A supporting frame shows the Colour plate at its exact price, but its partial receipt does not satisfy generic promotion or current-release completion.",
+      "supportingEvidence": {
+        "state": "affordable",
+        "image": "design/parity/evidence/graphics-progression/affordable.png",
+        "sourceCommit": "330352ce7513ba420752dd7243762f0dd75f9eaa",
+        "sha256": "8c3d2f50f62659db8e79b0376c7c1b7733a14e54002aaf28df8a84ea37a697b9",
+        "dimensions": { "width": 1440, "height": 900 },
+        "method": "cheap-lowlevel-headless",
+        "receipt": "design/parity/evidence/graphics-progression/receipt.json",
+        "receiptSha256": "b2b2ee904b8b4ce084d0c10c5af1f4abab6d454b4cecabf849bbd0ce16d83fca",
+        "promotionCompliance": "not-claimed",
+        "limitations": "Partial feature-state receipt only; no generic promotion receipt and no exact release-tip binding."
+      }
+    },
+    {
+      "id": "graphics-first-rung-purchased",
+      "status": "pending",
+      "surface": "First graphics purchase applied",
+      "proof": "A supporting frame shows the purchased palette without revealing later chrome, but its partial receipt does not satisfy generic promotion or current-release completion.",
+      "supportingEvidence": {
+        "state": "after",
+        "image": "design/parity/evidence/graphics-progression/after.png",
+        "sourceCommit": "330352ce7513ba420752dd7243762f0dd75f9eaa",
+        "sha256": "6555fac48bd8366a4e9549e6b86d217786f50817bb38cc8a3331a23454622891",
+        "dimensions": { "width": 1440, "height": 900 },
+        "method": "cheap-lowlevel-headless",
+        "receipt": "design/parity/evidence/graphics-progression/receipt.json",
+        "receiptSha256": "b2b2ee904b8b4ce084d0c10c5af1f4abab6d454b4cecabf849bbd0ce16d83fca",
+        "promotionCompliance": "not-claimed",
+        "limitations": "Partial feature-state receipt only; no generic promotion receipt and no exact release-tip binding."
+      }
+    },
     { "id": "minigame-events", "status": "pending", "surface": "Current minigame events dashboard", "proof": "Five current game cards, unlock threshold, schedule and lifecycle states" },
     { "id": "minigame-klondike", "status": "pending", "surface": "Playable Klondike", "proof": "Real dealt board and one legal move" },
     { "id": "minigame-memory", "status": "pending", "surface": "Playable Memory Match", "proof": "Real board and one revealed pair" },
@@ -25,8 +109,8 @@
     { "id": "prestige-keyed", "status": "pending", "surface": "Prestige super-confirmation", "proof": "One-key, sliding and completed states" },
     { "id": "factory-reduced-motion", "status": "pending", "surface": "Factory reduced motion", "proof": "Stopped pipe and derrick motion" },
     { "id": "raid-reduced-motion", "status": "pending", "surface": "Mouse Raid reduced motion", "proof": "Non-scurrying accessible raid state" },
-    { "id": "command-palette", "status": "pending", "surface": "Command palette", "proof": "Feature is not yet implemented; evidence cannot exist" },
-    { "id": "appearance-editor", "status": "pending", "surface": "Appearance editor", "proof": "Feature is not yet implemented; evidence cannot exist" },
+    { "id": "command-palette", "status": "pending", "surface": "Command palette", "proof": "Implemented surface; installed teleport interaction and current capture remain pending" },
+    { "id": "appearance-editor", "status": "pending", "surface": "Appearance editor", "proof": "Implemented surface; installed anchored-editor interaction and current capture remain pending" },
     { "id": "narrow-window", "status": "pending", "surface": "Genuinely narrow application window", "proof": "Real window resize, not only device emulation" }
   ]
 }

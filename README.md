@@ -98,8 +98,9 @@ an empty reward pool, the state is unchanged.
 <span lang="zh-HK">小遊戲事件喺累計焗製 100,000 個曲奇時永久解鎖；呢個數字係全程累計數，轉生後都唔會倒退。1,000,000 個累計焗製曲奇會永久解鎖 Mouse Raid。排程、棋盤、生命週期、金色代幣同幸運機會抽獎結果都會保存，離線期間唔會刷代幣。</span>
 
 The v0.2.55 release lane later ran the complete local check (`903/903` tests), built the unsigned
-installer, and exercised the minigame/endless surfaces from the built artifact. A current committed
-minigame capture is still missing, so the completeness inventory records that narrower evidence gap.
+installer, and exercised the minigame/endless surfaces from the built artifact. No current committed
+screenshot exists for the Minigames dashboard, any of its five playable boards, or the Lucky Chance
+drawer, so all seven visual states remain explicit evidence gaps.
 
 ## Integrated application tools candidate
 
@@ -190,14 +191,12 @@ site is published from `site/`.
 
 ## Captures
 
-Real screenshots of the built application, taken from `dist/` running maximised
-on an off-screen Windows desktop and photographed window by window via Win32
-PrintWindow, then opened and looked at afterwards. One of the sixteen starts from a
-genuinely empty profile, with nothing seeded and nothing pressed. The rest start from a save written into the running
-application's own storage to skip the grind, and everything bought on top of it —
-the seven look rungs, the Settings emblem, a Whack Pass, a storage rung, a house
-blueprint and its builders — was a real press on the real control. The home
-capture served its sixty seconds of construction on a real clock.
+The historical gallery below contains twenty-six real screenshots of built application versions,
+taken from `dist/` running maximised on an off-screen Windows desktop and photographed window by
+window via Win32 PrintWindow, then opened and looked at afterwards. The files remain useful evidence
+for the versions that produced them, but the release inventory no longer labels them as current-tip
+captures. The stricter graphics-purchase lane has three later supporting frames, documented below,
+while a fully promoted release-tip set remains pending.
 
 Three things were set that a player cannot reach, each named where it applies:
 `data-theme` on the running renderer's root element for the light and dark pair
@@ -223,9 +222,10 @@ later rooms of the house, so the twenty- and thirty-minute builds and the
 dearest furniture stay undrawn; a *missed* press on the Oven Dial, with its
 shake and its two-second penalty; the prestige gate once a key has been turned,
 which cannot be reached without actually spending a run; and the factory panel
-under reduced motion. Older photographs of several surfaces exist on disk and
-are described in `captures/README.md`; they are not listed below because they
-are pictures of builds that have since changed.
+under reduced motion. The current Minigames dashboard, its five playable boards,
+and the Lucky Chance drawer also have no committed screenshot yet. Older photographs
+of several surfaces exist on disk and are described in `captures/README.md`; they
+are retained as pictures of builds that have since changed.
 
 One thing the run found by looking rather than by testing, and it is a fault
 rather than a gap: when all eight console buttons sit on the HUD row, the
@@ -247,12 +247,23 @@ minigame has goes unreadable exactly while you are pointing at it. Both are
 named here and neither is fixed in this release.
 
 <details>
-<summary>The twenty-six captures of the current build</summary>
+<summary>Twenty-six retained application captures and three graphics-progression supporting frames</summary>
 
 > **Current evidence note:** `plain-start.png` is a superseded baseline. It accurately records the
 > previous fresh state, but the current opening now renders only the usable plain cookie until the
-> graphics ladder becomes affordable. A replacement built-artifact capture is pending after
-> integration; the progressed-surface captures remain current.
+> graphics ladder becomes affordable. Three later built-artifact frames now show the cookie-only,
+> first-rung-affordable and first-rung-purchased states. Their shared receipt is intentionally treated
+> as supporting evidence only: it does not satisfy the generic promotion contract or bind to the
+> current release tip. A fully promoted current-release capture remains pending, as do refreshed
+> progressed light and dark surfaces.
+
+| Graphics progression supporting state | Evidence |
+| --- | --- |
+| Cookie only, before the first graphics rung is affordable | ![A white application surface containing only the usable plain COOKIE disc; no title bar, counters, cabinet, console, discovery ticket, shop rail or other graphics are visible.](design/parity/evidence/graphics-progression/before.png) |
+| The first graphics rung appears at exactly 50 cookies | ![The same cookie-only surface with one Colour purchase plate directly beneath the cookie, priced at exactly 50 cookies.](design/parity/evidence/graphics-progression/affordable.png) |
+| The first rung has been purchased without revealing later chrome | ![The cookie-only surface after the Colour purchase: the background and cookie use the warm palette, while the title bar, counters, cabinet, console, discovery ticket and rails remain absent.](design/parity/evidence/graphics-progression/after.png) |
+
+Receipt: [`design/parity/evidence/graphics-progression/receipt.json`](design/parity/evidence/graphics-progression/receipt.json), source commit `330352ce7513ba420752dd7243762f0dd75f9eaa`. The receipt proves these exact bytes and states through the cheap headless route; it is not presented as generic promotion or current-release completion.
 
 | What it shows | Capture |
 | --- | --- |

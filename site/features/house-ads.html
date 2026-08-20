@@ -1,0 +1,85 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1" />
+<title>House ads — Material Cookie Clicker</title>
+<meta name="description" content="Non-blocking, dismissible cards that promote the project's own real features — no third party, no network, no payment." />
+<meta property="og:title" content="House ads — Material Cookie Clicker" />
+<meta property="og:description" content="Non-blocking, dismissible cards that promote the project's own real features — no third party, no network, no payment." />
+<meta property="og:url" content="https://ding-ding-projects.github.io/material-cookie-clicker/features/house-ads.html" />
+<meta property="og:type" content="article" />
+<meta property="og:site_name" content="Material Cookie Clicker" />
+<meta property="og:image" content="https://ding-ding-projects.github.io/material-cookie-clicker/social-preview.png" />
+<meta property="og:image:width" content="1280" />
+<meta property="og:image:height" content="640" />
+<meta property="og:image:alt" content="The Material Cookie Clicker logo: a warm cookie emblem beside the project name on a dark brown field." />
+<meta name="twitter:card" content="summary_large_image" />
+<meta name="theme-color" content="#7a4a1d" />
+<link rel="icon" href="../favicon.svg" type="image/svg+xml" />
+<link rel="stylesheet" href="../assets/site.css" />
+</head>
+<body>
+<a class="skip-link" href="#main">Skip to main content</a>
+<header class="site-head">
+  <div class="wrap">
+    <a class="brand" href="../index.html"><span aria-hidden="true">&#127850;</span> Material Cookie Clicker</a>
+    <nav class="site-nav" aria-label="Primary">
+      <ul>
+        <li><a href="../index.html">Home</a></li>
+        <li><a href="../features/index.html">Features</a></li>
+        <li><a href="../index.html#download">Download</a></li>
+      </ul>
+    </nav>
+  </div>
+</header>
+<main id="main" class="wrap">
+  <article>
+    <h1>House ads</h1>
+    <p class="lede">Non-blocking, dismissible cards that promote the project&rsquo;s own real features &mdash; no third party, no network, no payment.</p>
+    <div class="inset" style="margin-bottom:18px">
+      <span class="label">Current state</span>
+      <p style="margin:0"><span class="tag tag--complete">Implemented</span> the site renders one bundled house-ad card after first paint, persists dismissals locally, and exposes global, per-card, bulk, export, and reset controls in the Control Center. Built-site interaction and capture evidence remain open.</p>
+    </div>
+
+    <h2>Behavior</h2>
+    <p>A house ad is a small, dismissible card that promotes one feature the game already ships &mdash; the <a href="diesel-factory.html">diesel factory</a>, the <a href="tools-tech-tree.html">Tools tech tree</a>, the changelog viewer, or any other real, in-app surface. It names the feature, links to its destination or its feature article, and carries a close control. Dismissing a card keeps it hidden across reloads until house ads are reset in the Control Center. Nothing about a house ad blocks input, steals focus, or interrupts whatever the player is doing &mdash; it follows the same non-blocking notification rules as every other toast in the interface.</p>
+
+    <h2>Configuration</h2>
+    <p>There is no third party anywhere in this feature. Every card is authored content bundled inside the repository, pointing only at a real in-app destination or a real feature article &mdash; never an external advertiser, a tracking pixel, or a paid placement. The rotation is a fixed, bundled list; nothing is fetched at runtime to decide what to show. The Control Center provides a global on/off switch, per-card enable/disable controls, bulk actions, export, and reset. Cards follow the same language modes and per-language funny-level sliders as the rest of the interface: the promoted feature and its destination stay factual at every level, and only the surrounding voice changes.</p>
+
+    <h2>Failure modes</h2>
+    <p>An empty or malformed bundled card list simply shows no card; a missing promotion is not an error a player needs to see. A card whose destination has since been removed or renamed is a documentation defect to fix in the card list, not a runtime failure to paper over with a broken link.</p>
+
+    <h2>Security and privacy</h2>
+    <p>No network request of any kind: no ad network, no CDN, no analytics, no tracking, and no impression count sent anywhere. Nothing here costs the player money &mdash; a house ad promotes a feature already included in the same free, unsigned build, and it is never a purchase prompt. Dismissal state lives in local application storage only.</p>
+
+    <h2>Verification</h2>
+    <p><code>tests/site-house-ads.test.ts</code> checks the bundled catalogue, local-only behavior, linked targets, Material surface tokens, metadata, and documentation contract. <code>scripts/check-site.mjs</code> validates the complete static site. See the repository&rsquo;s per-surface completeness inventory for the remaining built-site interaction and capture evidence gap.</p>
+
+    <h2>Suggested articles</h2>
+    <ul>
+      <li>Notification centre (see the repository documentation index)</li>
+      <li><a href="tools-tech-tree.html">The Tools tech tree</a></li>
+      <li><a href="control-economy.html">The control economy</a></li>
+    </ul>
+
+    <nav class="related plate" aria-labelledby="related-heading">
+      <h2 id="related-heading">Related articles</h2>
+      <ul>
+        <li><a href="tools-tech-tree.html">The Tools tech tree</a></li>
+        <li><a href="control-economy.html">The control economy</a></li>
+        <li><a href="index.html">All features &amp; search</a></li>
+      </ul>
+    </nav>
+  </article>
+</main>
+<footer class="site-foot">
+  <div class="wrap">
+    <p>Material Cookie Clicker is free, unsigned by permanent policy, and nobody ever pays anything to use it. This site is fully self-contained: no CDN, no remote font, no remote image, no analytics, no network request of any kind. Every graphic is either drawn in CSS or a screenshot of the application stored in this repository.</p>
+    <p><a href="https://github.com/Ding-Ding-Projects/material-cookie-clicker">Source code on GitHub</a> &middot; <a href="../features/index.html">All feature articles</a></p>
+  </div>
+</footer>
+<script type="module" src="../assets/site-shell.js"></script>
+</body>
+</html>

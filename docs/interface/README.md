@@ -39,6 +39,7 @@ approved, promotion-compliant, or release-ready.
 - [Settings surface](settings-surface.md)
 - [Dialog emoji setting](dialog-emoji-setting.md)
 - [Destructive confirmation](destructive-confirmation.md)
+- [House ads](house-ads.md)
 
 Each article distinguishes present behavior from the complete contract. See the
 [per-surface inventory](../completeness.md) for implementation, persistence, tests, packaged proof,

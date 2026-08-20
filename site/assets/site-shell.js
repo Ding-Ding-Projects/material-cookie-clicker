@@ -1,3 +1,5 @@
+import { renderHouseAds } from './site-ads.js';
+
 const ROOT = location.pathname.includes('/features/') ? '../' : '';
 const STORAGE_KEY = 'mcc-site-shell-v1';
 const SETTINGS_KEY = 'mcc-site-settings-v1';
@@ -301,3 +303,13 @@ document.addEventListener('keydown', (event) => {
 
 for (const button of document.querySelectorAll('[data-regex-for]')) attachRegexBuilder(button);
 renderShell();
+
+// House ads are decoration on top of the real page, never part of first paint: mount after the
+// browser is idle (or on a short timeout where idle callbacks aren't available) and re-mount
+// whenever the shared settings — language, dismissal — change in another tab or the control
+// centre.
+const scheduleAdMount = window.requestIdleCallback || ((callback) => setTimeout(callback, 200));
+scheduleAdMount(() => renderHouseAds());
+addEventListener('storage', (event) => {
+  if (event.key === SETTINGS_KEY || event.key === 'mcc-site-ads-v1') renderHouseAds();
+});

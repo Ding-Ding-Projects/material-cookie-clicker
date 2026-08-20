@@ -391,6 +391,22 @@ function Export-ExecutableIconProof {
     [Parameter(Mandatory = $true)][string]$OutputRoot,
     [Parameter(Mandatory = $true)][string]$Label
   )
+  # GitHub issue 3 diagnostic note (scripts/diagnose-icon-fidelity.ps1 confirms this against the
+  # committed ICO): assets\material-cookie-clicker.ico stores its 256x256 directory entry as an
+  # uncompressed BMP/DIB (270,376 of the file's 285,478 bytes -- ~94.7% of the whole file), where
+  # Windows Vista and later expect PNG compression for icon directory entries >= 256px. All four
+  # entries (16/32/48/256) are otherwise real 32bpp entries with an alpha channel, so
+  # Icon::new($SourceIcon,16,16) below genuinely selects a real 16px resource rather than
+  # rescaling anything -- the parse itself is unaffected (verified: Icon constructor and
+  # Icon(file,16,16)/Icon(file,32,32) all parse this file without error). The mismatch this
+  # function throws on is believed to originate on the OTHER side of the comparison: the
+  # executable path below extracts a compiled Win32 HICON via PrivateExtractIcons and
+  # recomposites it through Icon.FromHandle(...).Clone().ToBitmap(), which can alter bytes for
+  # partially-transparent pixels during the HICON mask round-trip even when the source .ico bytes
+  # for that resource are untouched. That theory could not be confirmed empirically in this pass
+  # because no built Setup.exe/app executable exists locally to extract from; run
+  # scripts/diagnose-icon-fidelity.ps1 -Executable <path> against a real build to get a
+  # per-pixel, per-channel verdict before changing the assertion below.
   if (-not (Test-Path -LiteralPath $Executable -PathType Leaf)) { throw "Icon source executable does not exist: $Executable" }
   if (-not (Test-Path -LiteralPath $SourceIcon -PathType Leaf)) { throw "Committed icon source does not exist: $SourceIcon" }
   if ($Label -notmatch '^[a-z0-9-]+$') { throw 'Icon proof labels may contain only lowercase letters, digits, and hyphens.' }

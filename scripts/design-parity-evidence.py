@@ -307,17 +307,101 @@ def promotion_record(receipt: dict[str, Any], row: dict[str, Any], side: str, re
     }
 
 
+def build_diff_image(ref_image: "Image.Image", prod_image: "Image.Image") -> "Image.Image":
+    """Build a readable three-panel visual delta: reference / product / highlighted diff.
+
+    The highlighted panel shows the product desaturated to greyscale with any pixel
+    that differs from the reference tinted magenta, so a reader can see both *where*
+    the built product differs from the reference and roughly *what* the product looked
+    like there, without needing to flip between the two raw stills.
+    """
+    width, height = ref_image.size
+    diff = ImageChops.difference(ref_image, prod_image)
+    diff_l = diff.convert("L")
+    mask = diff_l.point(lambda p: 255 if p > 8 else 0)
+
+    grey_product = prod_image.convert("L").convert("RGB")
+    tint = Image.new("RGB", (width, height), (255, 0, 200))
+    highlighted = Image.composite(tint, grey_product, mask)
+
+    gutter = 8
+    label_h = 28
+    panel_w = width
+    canvas = Image.new("RGB", (panel_w * 3 + gutter * 2, height + label_h), "white")
+    draw = ImageDraw.Draw(canvas)
+    panels = [
+        (ref_image, "REFERENCE", 0),
+        (prod_image, "BUILT PRODUCT", panel_w + gutter),
+        (highlighted, "DIFF (magenta = changed)", (panel_w + gutter) * 2),
+    ]
+    for image, label, x_offset in panels:
+        canvas.paste(image, (x_offset, label_h))
+        draw.text((x_offset + 8, 6), label, fill="black")
+    return canvas
+
+
+def run_diff_images(repo: Path) -> None:
+    evidence_root = repo / "design" / "parity" / "evidence"
+    results: list[dict[str, Any]] = []
+    for entry in sorted(evidence_root.iterdir()):
+        if not entry.is_dir():
+            continue
+        row_id = entry.name
+        reference_path = entry / "reference.png"
+        product_path = entry / "product.png"
+        diff_path = entry / "diff.png"
+        if not reference_path.exists() or not product_path.exists():
+            results.append({"rowId": row_id, "status": "skipped", "reason": "missing reference.png or product.png"})
+            continue
+        try:
+            with Image.open(reference_path) as opened:
+                ref_image = opened.convert("RGB")
+            with Image.open(product_path) as opened:
+                prod_image = opened.convert("RGB")
+        except Exception as error:  # noqa: BLE001 - report and continue
+            results.append({"rowId": row_id, "status": "skipped", "reason": f"unreadable source image: {error}"})
+            continue
+        if ref_image.size != prod_image.size:
+            results.append({
+                "rowId": row_id,
+                "status": "skipped",
+                "reason": f"size mismatch reference={ref_image.size} product={prod_image.size}",
+            })
+            continue
+        canvas = build_diff_image(ref_image, prod_image)
+        atomic_png(diff_path, canvas)
+        signature = diff_path.read_bytes()[:8]
+        expected_signature = bytes([137, 80, 78, 71, 13, 10, 26, 10])
+        with Image.open(diff_path) as verify_opened:
+            verify_size = verify_opened.size
+        results.append({
+            "rowId": row_id,
+            "status": "generated",
+            "path": relative(repo, diff_path),
+            "bytes": diff_path.stat().st_size,
+            "dimensions": {"width": verify_size[0], "height": verify_size[1]},
+            "pngSignatureValid": signature == expected_signature,
+        })
+    print(json.dumps({"mode": "diff-images", "results": results}, indent=2))
+
+
 def parse_args() -> argparse.Namespace:
     parser = argparse.ArgumentParser(description="Promote fresh design-parity evidence from one finalized task-owned run.")
+    parser.add_argument("--mode", default="promote", choices=["promote", "diff-images"])
     parser.add_argument("--repo-root", required=True)
-    parser.add_argument("--run-root", required=True)
-    parser.add_argument("--ledger", required=True)
+    parser.add_argument("--run-root", required=False)
+    parser.add_argument("--ledger", required=False)
     parser.add_argument("--max-age-hours", default="168")
     return parser.parse_args()
 
 
 def main() -> None:
     args = parse_args()
+    if args.mode == "diff-images":
+        run_diff_images(Path(args.repo_root).resolve())
+        return
+    if not args.run_root or not args.ledger:
+        raise ValueError("--run-root and --ledger are required for --mode promote")
     repo = Path(args.repo_root).resolve()
     run = Path(args.run_root).resolve()
     ledger_path = require_under(run, Path(args.ledger), "run ledger")

@@ -70,6 +70,11 @@ try {
   if (/function Invoke-ProjectInstaller[\s\S]*?Select-Object -First 1/.test(common)) throw new Error('Invoke-ProjectInstaller still uses ambiguous first-match executable selection');
   if (!common.includes('CSC_IDENTITY_AUTO_DISCOVERY') || !common.includes('signerInvocationCount')) throw new Error('signer environment/process provenance is missing');
   const packageJson = JSON.parse(readFileSync(path.join(root, 'package.json'), 'utf8'));
+  if (packageJson.build.afterPack !== 'scripts/stamp-packaged-icon.cjs') throw new Error('packaged icon hook is not registered');
+  const iconHook = readFileSync(path.join(root, 'scripts', 'stamp-packaged-icon.cjs'), 'utf8');
+  for (const required of ["execFileSync(editor, [executable, '--set-icon', icon]", "windowsHide: true", "electron-winstaller', 'vendor', 'rcedit.exe"]) {
+    if (!iconHook.includes(required)) throw new Error(`packaged icon hook is missing exact boundary: ${required}`);
+  }
   for (const key of ['forceCodeSigning', 'signExecutable', 'signAndEditExecutable']) {
     if (packageJson.build.win[key] !== false) throw new Error(`${key} is not explicitly false`);
   }

@@ -549,3 +549,10 @@ scripts/test-packaging-process-exit.ps1` proves exit `0` succeeds, exit `7` fail
 and both outputs reach their logs. `node scripts/test-installer-contract.mjs` invokes that red/green
 probe as part of the installer contract. This repair does not resolve the separately recorded icon
 fidelity blocker, does not publish a release, and does not claim installed-runtime evidence.
+
+The same packaging pass proved why the icon Chut remained red: keeping
+`signAndEditExecutable=false` correctly disables the combined editor/signer stage, so the packaged
+executable retained Electron's default icon. The reviewed `afterPack` hook now performs only a fixed
+resource-editor `--set-icon` call with the committed ICO. Signing stays disabled, arguments are not
+renderer- or user-controlled, and the existing pixel comparison remains unchanged as the deciding
+verification.

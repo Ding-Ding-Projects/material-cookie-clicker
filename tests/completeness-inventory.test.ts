@@ -1,10 +1,21 @@
+import { createHash } from "node:crypto";
+import { spawnSync } from "node:child_process";
 import { existsSync, readFileSync, readdirSync, statSync } from "node:fs";
 import { dirname, resolve } from "node:path";
 import { fileURLToPath } from "node:url";
+import * as ts from "typescript";
 import { describe, expect, it } from "vitest";
+
+import { GAME_SURFACE_IDS } from "../src/renderer/game/console-panels.js";
+import {
+  ParityGuardError,
+  loadInventory as loadDesignParityInventory,
+  validateInventory as validateDesignParityInventory,
+} from "../design/_verify/design-parity-guard.mjs";
 
 const ROOT = resolve(dirname(fileURLToPath(import.meta.url)), "..");
 const INVENTORY = resolve(ROOT, "docs/completeness.md");
+const GRAPHICS_RECEIPT = resolve(ROOT, "design/parity/evidence/graphics-progression/receipt.json");
 
 const COLUMNS = [
   "Inventory ID",
@@ -22,18 +33,18 @@ const COLUMNS = [
 ] as const;
 
 const REQUIRED_IDS = [
-  "desktop-game-core", "desktop-generator-ladder", "desktop-endless-progression",
-  "desktop-golden-random-events", "desktop-minigame-events", "desktop-home", "desktop-diesel",
+  "desktop-game-core", "desktop-graphics-progression", "desktop-generator-ladder", "desktop-endless-progression",
+  "desktop-golden-random-events", "desktop-minigame-events", "desktop-playable-minigames", "desktop-home", "desktop-diesel",
   "desktop-achievements", "desktop-prestige", "desktop-settings", "desktop-language",
   "desktop-funny-levels", "desktop-emoji-dialog-toggle", "desktop-school-mode", "desktop-narrator",
   "desktop-scheduled-settings", "desktop-personal-vocabulary", "desktop-regex-builder",
-  "desktop-command-palette", "desktop-notifications", "desktop-appearance-editor",
+  "desktop-command-palette", "desktop-notifications", "desktop-design-reference-parity", "desktop-appearance-editor",
   "desktop-logo-customization", "desktop-tabs", "desktop-toy-locks", "desktop-authenticator",
   "desktop-unlock-ladder", "desktop-support-tickets", "desktop-file-converter", "desktop-ollama",
   "desktop-local-history", "desktop-exports", "desktop-bulk-actions", "desktop-changelog",
   "desktop-offline-docs", "desktop-external-editor", "desktop-status-hub",
   "desktop-destructive-confirmation", "desktop-auto-update", "desktop-download-dialogs",
-  "site-landing", "site-feature-articles", "site-language", "site-funny", "site-emoji",
+  "site-landing", "site-feature-articles", "site-graphics-progression", "site-language", "site-funny", "site-emoji",
   "site-school", "site-narrator", "site-scheduled", "site-personal-vocabulary", "site-regex",
   "site-command-palette", "site-notifications", "site-appearance", "site-logo", "site-tabs",
   "site-locks", "site-authenticator", "site-unlock-ladder", "site-support-tickets",
@@ -93,6 +104,8 @@ const FEATURE_ARTICLES = [
   "docs/data/exports-and-privacy.md",
   "docs/data/local-version-history.md",
   "docs/data/offline-and-no-network.md",
+  "docs/gameplay/graphics-progression.md",
+  "docs/gameplay/minigame-events.md",
   "docs/interface/destructive-confirmation.md",
   "docs/interface/dialog-emoji-setting.md",
   "docs/interface/material-design-appearance.md",
@@ -204,6 +217,370 @@ function validate(markdown: string, articleExists = existsSync): string[] {
   return errors;
 }
 
+type SourceReader = (relativePath: string) => string;
+
+const GRAPHICS_IMPLEMENTATION_PATHS = [
+  "src/renderer/App.tsx",
+  "src/renderer/screens/CookieHero.tsx",
+  "src/shared/game/control-unlocks.ts",
+  "src/shared/game/look-tiers.ts",
+  "src/renderer/styles/index.css",
+] as const;
+
+const MINIGAME_IMPLEMENTATION_PATHS = [
+  "src/renderer/App.tsx",
+  "src/renderer/screens/MinigamesScreen.tsx",
+  "src/renderer/game/console-panels.ts",
+  "src/shared/game/disclosure.ts",
+  "src/shared/game/minigames.ts",
+  "src/shared/game/reducer.ts",
+] as const;
+
+const DESIGN_PARITY_PATHS = [
+  "design/reference-app/index.html",
+  "design/reference-app/app.js",
+  "src/renderer/DesignParityRoute.tsx",
+  "design/parity/inventory.json",
+  "design/_verify/design-parity-guard.mjs",
+] as const;
+
+function sourceReader(relativePath: string): string {
+  return readFileSync(resolve(ROOT, relativePath), "utf8");
+}
+
+function hasExactPath(cell: string, path: string): boolean {
+  return cell.includes(`\`${path}\``);
+}
+
+function rowMap(markdown: string): Map<string, Row> {
+  return new Map(parseRows(markdown).rows.map((row) => [row["Inventory ID"], row]));
+}
+
+function validateMountedMinigames(
+  markdown: string,
+  readSource: SourceReader = sourceReader,
+  rejectObsoleteAdapter = false,
+): string[] {
+  const errors: string[] = [];
+  const rows = rowMap(markdown);
+  for (const id of ["desktop-minigame-events", "desktop-playable-minigames"]) {
+    const row = rows.get(id);
+    if (!row) continue;
+    for (const path of MINIGAME_IMPLEMENTATION_PATHS) {
+      if (!hasExactPath(row.Implementation, path)) errors.push(`${id} omits mounted minigame path: ${path}`);
+    }
+    if (row.Implementation.includes("MinigameEventsScreen.tsx")) {
+      errors.push(`${id} cites the unmounted MinigameEventsScreen adapter.`);
+    }
+  }
+
+  const app = readSource("src/renderer/App.tsx");
+  const appSource = ts.createSourceFile("App.tsx", app, ts.ScriptTarget.Latest, true, ts.ScriptKind.TSX);
+  let hasPlayableImport = false;
+  let hasPlayableMount = false;
+  let hasObsoleteImport = false;
+  let hasObsoleteAdapter = false;
+
+  for (const statement of appSource.statements) {
+    if (ts.isImportDeclaration(statement) && ts.isStringLiteral(statement.moduleSpecifier)) {
+      if (statement.moduleSpecifier.text === "./screens/MinigamesScreen") {
+        const bindings = statement.importClause?.namedBindings;
+        if (bindings && ts.isNamedImports(bindings)) {
+          hasPlayableImport = bindings.elements.some((element) =>
+            element.propertyName?.text === "MinigamesScreen" && element.name.text === "PlayableMinigamesScreen");
+        }
+      }
+      if (statement.moduleSpecifier.text === "./screens/MinigameEventsScreen") hasObsoleteImport = true;
+    }
+    if (ts.isFunctionDeclaration(statement) && statement.name?.text === "MinigamesScreen") hasObsoleteAdapter = true;
+    if (ts.isFunctionDeclaration(statement) && statement.name?.text === "GameShell" && statement.body) {
+      const visit = (node: ts.Node): void => {
+        if (
+          ts.isBinaryExpression(node)
+          && node.operatorToken.kind === ts.SyntaxKind.AmpersandAmpersandToken
+          && ts.isBinaryExpression(node.left)
+          && node.left.operatorToken.kind === ts.SyntaxKind.EqualsEqualsEqualsToken
+          && ts.isIdentifier(node.left.left)
+          && node.left.left.text === "openSurface"
+          && ts.isStringLiteral(node.left.right)
+          && node.left.right.text === "minigames"
+          && ts.isJsxSelfClosingElement(node.right)
+          && ts.isIdentifier(node.right.tagName)
+          && node.right.tagName.text === "PlayableMinigamesScreen"
+        ) {
+          hasPlayableMount = true;
+        }
+        ts.forEachChild(node, visit);
+      };
+      visit(statement.body);
+    }
+  }
+
+  if (!hasPlayableImport) {
+    errors.push("The playable minigame screen import is missing or renamed.");
+  }
+  if (!hasPlayableMount) {
+    errors.push("The registered minigames surface does not mount PlayableMinigamesScreen.");
+  }
+
+  if (!GAME_SURFACE_IDS.includes("minigames")) errors.push("GAME_SURFACE_IDS does not register minigames.");
+
+  const disclosure = readSource("src/shared/game/disclosure.ts");
+  const disclosureSource = ts.createSourceFile("disclosure.ts", disclosure, ts.ScriptTarget.Latest, true, ts.ScriptKind.TS);
+  let disclosureBindings = 0;
+  const visitDisclosure = (node: ts.Node): void => {
+    if (
+      ts.isPropertyAssignment(node)
+      && ((ts.isIdentifier(node.name) && node.name.text === "minigames") || (ts.isStringLiteral(node.name) && node.name.text === "minigames"))
+      && ts.isCallExpression(node.initializer)
+      && ts.isIdentifier(node.initializer.expression)
+      && node.initializer.expression.text === "areMinigameEventsUnlocked"
+      && node.initializer.arguments.length === 1
+      && ts.isIdentifier(node.initializer.arguments[0])
+      && node.initializer.arguments[0].text === "state"
+    ) {
+      disclosureBindings += 1;
+    }
+    ts.forEachChild(node, visitDisclosure);
+  };
+  visitDisclosure(disclosureSource);
+  if (disclosureBindings < 2) {
+    errors.push("Minigame disclosure does not bind both feature and console availability.");
+  }
+  if (rejectObsoleteAdapter && (hasObsoleteImport || hasObsoleteAdapter)) {
+    errors.push("App.tsx still contains the obsolete unmounted MinigameEventsScreen adapter.");
+  }
+  return errors;
+}
+
+type GraphicsReceipt = {
+  version?: number;
+  sourceCommit?: string;
+  route?: string;
+  launchPid?: number;
+  hwnd?: string;
+  cleanupCompleted?: boolean;
+  buildReceiptPath?: string;
+  buildReceiptSha256?: string;
+  captures?: Array<{ state?: string; path?: string; sha256?: string; width?: number; height?: number }>;
+};
+
+type GraphicsBuildReceipt = {
+  version?: number;
+  sourceCommit?: string;
+  artifactPath?: string;
+  artifactSha256?: string;
+  verifiedDimensions?: { width?: number; height?: number; scale?: number };
+};
+
+type GitEvidenceProbe = (sourceCommit: string, paths: readonly string[]) => { ancestor: boolean; changed: boolean; error?: string };
+
+function sha256(path: string): string {
+  return createHash("sha256").update(readFileSync(path)).digest("hex");
+}
+
+function defaultGitEvidenceProbe(sourceCommit: string, paths: readonly string[]): ReturnType<GitEvidenceProbe> {
+  const ancestor = spawnSync("git", ["merge-base", "--is-ancestor", sourceCommit, "HEAD"], { cwd: ROOT });
+  if (ancestor.status !== 0) {
+    return { ancestor: false, changed: true, error: ancestor.error?.message ?? ancestor.stderr?.toString().trim() };
+  }
+  const diff = spawnSync("git", ["diff", "--quiet", sourceCommit, "--", ...paths], { cwd: ROOT });
+  if (diff.status !== 0 && diff.status !== 1) {
+    return { ancestor: true, changed: true, error: diff.error?.message ?? diff.stderr?.toString().trim() };
+  }
+  return { ancestor: true, changed: diff.status === 1 };
+}
+
+function validateGraphicsRegistration(markdown: string): string[] {
+  const errors: string[] = [];
+  const row = rowMap(markdown).get("desktop-graphics-progression");
+  if (!row) return ["Missing required inventory row: desktop-graphics-progression"];
+  for (const path of GRAPHICS_IMPLEMENTATION_PATHS) {
+    if (!hasExactPath(row.Implementation, path)) errors.push(`desktop-graphics-progression omits implementation path: ${path}`);
+  }
+  const receiptPath = "design/parity/evidence/graphics-progression/receipt.json";
+  if (!hasExactPath(row["Built interaction"], receiptPath)) {
+    errors.push(`desktop-graphics-progression does not cite ${receiptPath}.`);
+  }
+  return errors;
+}
+
+function validateGraphicsEvidence(
+  markdown: string,
+  receipt: GraphicsReceipt = JSON.parse(readFileSync(GRAPHICS_RECEIPT, "utf8")) as GraphicsReceipt,
+  probe: GitEvidenceProbe = defaultGitEvidenceProbe,
+): string[] {
+  const errors = validateGraphicsRegistration(markdown);
+  const row = rowMap(markdown).get("desktop-graphics-progression");
+  if (!row) return errors;
+
+  if (
+    receipt.version !== 1
+    || receipt.route !== "cheap-lowlevel-headless"
+    || !Number.isInteger(receipt.launchPid)
+    || typeof receipt.hwnd !== "string"
+    || receipt.hwnd.trim() === ""
+    || receipt.cleanupCompleted !== true
+  ) {
+    errors.push("Graphics progression receipt identity, route, or cleanup state is invalid.");
+  }
+  if (typeof receipt.sourceCommit !== "string" || !/^[0-9a-f]{40}$/.test(receipt.sourceCommit)) {
+    errors.push("Graphics progression receipt source commit is missing or invalid.");
+    return errors;
+  }
+
+  const expectedCaptures = new Map([
+    ["before", "design/parity/evidence/graphics-progression/before.png"],
+    ["affordable", "design/parity/evidence/graphics-progression/affordable.png"],
+    ["after", "design/parity/evidence/graphics-progression/after.png"],
+  ]);
+  const captures = new Map((receipt.captures ?? []).map((capture) => [capture.state, capture]));
+  for (const [state, path] of expectedCaptures) {
+    const capture = captures.get(state);
+    if (!capture || capture.path !== path || capture.width !== 1440 || capture.height !== 900) {
+      errors.push(`Graphics progression receipt does not bind the exact ${state} capture.`);
+      continue;
+    }
+    if (!hasExactPath(row["Capture evidence"], path)) {
+      errors.push(`desktop-graphics-progression does not cite ${path}.`);
+    }
+    const absolute = resolve(ROOT, path);
+    if (!existsSync(absolute) || capture.sha256 !== sha256(absolute)) {
+      errors.push(`Graphics progression ${state} capture is absent or its hash is stale.`);
+    } else {
+      const bytes = readFileSync(absolute);
+      if (
+        bytes.length < 24
+        || bytes.subarray(0, 8).toString("hex") !== "89504e470d0a1a0a"
+        || bytes.readUInt32BE(16) !== 1440
+        || bytes.readUInt32BE(20) !== 900
+      ) {
+        errors.push(`Graphics progression ${state} capture is not a 1440x900 PNG.`);
+      }
+    }
+  }
+  if ((receipt.captures ?? []).length !== expectedCaptures.size || captures.size !== expectedCaptures.size) {
+    errors.push("Graphics progression receipt has an unexpected or duplicate capture set.");
+  }
+
+  const gitState = probe(receipt.sourceCommit, GRAPHICS_IMPLEMENTATION_PATHS);
+  if (!gitState.ancestor) errors.push("Graphics progression receipt source is not an ancestor of HEAD.");
+  if (gitState.error) errors.push(`Graphics progression receipt freshness could not be proven: ${gitState.error}`);
+  if (gitState.changed) errors.push("Graphics progression receipt is stale for the cited implementation paths.");
+  return errors;
+}
+
+function validateGraphicsCompletion(
+  markdown: string,
+  receipt: GraphicsReceipt = JSON.parse(readFileSync(GRAPHICS_RECEIPT, "utf8")) as GraphicsReceipt,
+): string[] {
+  const errors = validateGraphicsEvidence(markdown, receipt);
+  if (!receipt.buildReceiptPath || !receipt.buildReceiptSha256) {
+    errors.push("Graphics progression receipt has no build-artifact hash binding.");
+    return errors;
+  }
+
+  const buildPath = resolve(ROOT, receipt.buildReceiptPath);
+  if (buildPath !== ROOT && !buildPath.startsWith(`${ROOT}\\`) && !buildPath.startsWith(`${ROOT}/`)) {
+    errors.push("Graphics progression build-receipt path escapes the repository.");
+    return errors;
+  }
+  if (!existsSync(buildPath) || !statSync(buildPath).isFile() || sha256(buildPath) !== receipt.buildReceiptSha256) {
+    errors.push("Graphics progression build receipt is absent or its hash is stale.");
+    return errors;
+  }
+
+  let build: GraphicsBuildReceipt;
+  try {
+    build = JSON.parse(readFileSync(buildPath, "utf8")) as GraphicsBuildReceipt;
+  } catch {
+    errors.push("Graphics progression build receipt is not valid JSON.");
+    return errors;
+  }
+  if (
+    build.version !== 1
+    || build.sourceCommit !== receipt.sourceCommit
+    || typeof build.artifactPath !== "string"
+    || typeof build.artifactSha256 !== "string"
+    || !/^[0-9a-f]{64}$/.test(build.artifactSha256)
+    || build.verifiedDimensions?.width !== 1440
+    || build.verifiedDimensions?.height !== 900
+    || build.verifiedDimensions?.scale !== 1
+  ) {
+    errors.push("Graphics progression build receipt does not bind the capture source, artifact, and tuple.");
+    return errors;
+  }
+
+  const artifactPath = resolve(ROOT, build.artifactPath);
+  if (artifactPath !== ROOT && !artifactPath.startsWith(`${ROOT}\\`) && !artifactPath.startsWith(`${ROOT}/`)) {
+    errors.push("Graphics progression build artifact path escapes the repository.");
+  } else if (!existsSync(artifactPath) || !statSync(artifactPath).isFile() || sha256(artifactPath) !== build.artifactSha256) {
+    errors.push("Graphics progression build artifact is absent or its hash is stale.");
+  }
+  return errors;
+}
+
+type DesignParityReleaseValidator = (inventory: ReturnType<typeof loadDesignParityInventory>) => unknown;
+
+function validateDesignParityRegistration(markdown: string): string[] {
+  const row = rowMap(markdown).get("desktop-design-reference-parity");
+  if (!row) return ["Missing required inventory row: desktop-design-reference-parity"];
+  const errors: string[] = [];
+  for (const path of DESIGN_PARITY_PATHS) {
+    if (!hasExactPath(row.Implementation, path)) errors.push(`desktop-design-reference-parity omits implementation path: ${path}`);
+  }
+  return errors;
+}
+
+function validateDesignParityRelease(
+  inventory = loadDesignParityInventory(),
+  releaseValidator: DesignParityReleaseValidator = (candidate) => validateDesignParityInventory(candidate, { mode: "release" }),
+): string[] {
+  try {
+    releaseValidator(inventory);
+    return [];
+  } catch (error) {
+    if (error instanceof ParityGuardError) return [`Design parity release verdict is red: ${error.code}`];
+    throw error;
+  }
+}
+
+function validateDesignParityStructure(
+  inventory = loadDesignParityInventory(),
+  structureValidator: DesignParityReleaseValidator = (candidate) => validateDesignParityInventory(candidate, { mode: "structure" }),
+): string[] {
+  try {
+    structureValidator(inventory);
+    return [];
+  } catch (error) {
+    if (error instanceof ParityGuardError) return [`Design parity structure verdict is red: ${error.code}`];
+    throw error;
+  }
+}
+
+function validateCompletion(markdown: string): string[] {
+  const errors = [
+    ...validate(markdown),
+    ...validatePages(markdown),
+    ...validateMountedMinigames(markdown, sourceReader, true),
+    ...validateGraphicsCompletion(markdown),
+    ...validateDesignParityRegistration(markdown),
+    ...validateDesignParityStructure(),
+    ...validateDesignParityRelease(),
+  ];
+  for (const row of parseRows(markdown).rows) {
+    if (!/^Verified(?:\b|\s|—)/.test(row["Truthful state"])) {
+      errors.push(`${row["Inventory ID"]} is not completion-ready: ${row["Truthful state"]}`);
+    }
+  }
+  for (const row of parsePageRows(markdown)) {
+    if (!/^Verified(?:\b|\s|—)/.test(row["Page-specific evidence state"])) {
+      errors.push(`${row["Page ID"]} page evidence is not completion-ready.`);
+    }
+  }
+  return errors;
+}
+
 function parsePageRows(markdown: string): Record<(typeof PAGE_COLUMNS)[number], string>[] {
   const lines = markdown.replaceAll("\r\n", "\n").split("\n");
   const rows: Record<(typeof PAGE_COLUMNS)[number], string>[] = [];
@@ -300,7 +677,94 @@ describe("hand-written per-surface completeness inventory", () => {
   it("contains every exact row, evidence field, and article", () => {
     expect(validate(inventory)).toEqual([]);
     expect(validatePages(inventory)).toEqual([]);
+    expect(validateMountedMinigames(inventory)).toEqual([]);
+    expect(validateGraphicsRegistration(inventory)).toEqual([]);
+    expect(validateDesignParityRegistration(inventory)).toEqual([]);
   });
+
+  it("turns red for each newly inventoried capability row and green after restore", () => {
+    for (const id of [
+      "desktop-graphics-progression",
+      "desktop-playable-minigames",
+      "desktop-design-reference-parity",
+      "site-graphics-progression",
+    ]) {
+      const broken = inventory.replace(new RegExp(`^\\| ${id} \\|.*\\r?\\n`, "m"), "");
+      expect(broken, id).not.toBe(inventory);
+      expect(validate(broken), id).toContain(`Missing required inventory row: ${id}`);
+      expect(validate(inventory), `${id} restore`).toEqual([]);
+    }
+  });
+
+  it("turns red when the real minigame mount disappears and green after restore", () => {
+    const appPath = "src/renderer/App.tsx";
+    const source = sourceReader(appPath);
+    const broken = source.replace(
+      "{openSurface === 'minigames' && <PlayableMinigamesScreen />}",
+      "{openSurface === 'minigames' && null}",
+    );
+    expect(broken).not.toBe(source);
+    const brokenReader: SourceReader = (relativePath) => relativePath === appPath ? broken : sourceReader(relativePath);
+    expect(validateMountedMinigames(inventory, brokenReader)).toContain(
+      "The registered minigames surface does not mount PlayableMinigamesScreen.",
+    );
+    expect(validateMountedMinigames(inventory)).toEqual([]);
+  });
+
+  it("turns red for a stale graphics receipt and green for the restored receipt", () => {
+    const receipt = JSON.parse(readFileSync(GRAPHICS_RECEIPT, "utf8")) as GraphicsReceipt;
+    const stale = structuredClone(receipt);
+    stale.sourceCommit = "da632899b0ca6405a49a5c2367f4938a2a233759";
+    expect(validateGraphicsEvidence(inventory, stale)).toContain(
+      "Graphics progression receipt is stale for the cited implementation paths.",
+    );
+    expect(validateGraphicsEvidence(inventory, receipt)).toEqual([]);
+
+    const forgedBuildBinding = { ...receipt, buildReceiptPath: "package.json", buildReceiptSha256: "0".repeat(64) };
+    expect(validateGraphicsCompletion(inventory, forgedBuildBinding)).toContain(
+      "Graphics progression build receipt is absent or its hash is stale.",
+    );
+  });
+
+  it("records the actual parity release-red verdict and proves the cross-check wrapper restores", () => {
+    expect(validateDesignParityStructure()).toEqual(["Design parity structure verdict is red: REFERENCE_HASH_STALE"]);
+    expect(validateDesignParityRelease()).toEqual(["Design parity release verdict is red: DIFF_REVIEW_DEFECT"]);
+    const candidate = loadDesignParityInventory();
+    const redFixture: DesignParityReleaseValidator = () => {
+      throw new ParityGuardError("DIFF_REVIEW_DEFECT", "fixture-only visual difference");
+    };
+    const greenFixture: DesignParityReleaseValidator = () => ({ mode: "release" });
+    expect(validateDesignParityStructure(candidate, redFixture)).toEqual([
+      "Design parity structure verdict is red: DIFF_REVIEW_DEFECT",
+    ]);
+    expect(validateDesignParityStructure(candidate, greenFixture)).toEqual([]);
+    expect(validateDesignParityRelease(candidate, redFixture)).toEqual([
+      "Design parity release verdict is red: DIFF_REVIEW_DEFECT",
+    ]);
+    expect(validateDesignParityRelease(candidate, greenFixture)).toEqual([]);
+    expect(validateDesignParityRegistration(inventory)).toEqual([]);
+  });
+
+  it("keeps honest structural rows green while completion mode reports exact open blockers", () => {
+    expect(validate(inventory)).toEqual([]);
+    const blockers = validateCompletion(inventory);
+    expect(blockers).toContain("Design parity structure verdict is red: REFERENCE_HASH_STALE");
+    expect(blockers).toContain("Design parity release verdict is red: DIFF_REVIEW_DEFECT");
+    expect(blockers).toContain("App.tsx still contains the obsolete unmounted MinigameEventsScreen adapter.");
+    expect(blockers).toContain("Graphics progression receipt has no build-artifact hash binding.");
+    expect(blockers).toEqual(expect.arrayContaining([
+      expect.stringMatching(/^desktop-minigame-events is not completion-ready:/),
+      expect.stringMatching(/^desktop-playable-minigames is not completion-ready:/),
+      expect.stringMatching(/^site-graphics-progression is not completion-ready:/),
+    ]));
+    expect(blockers).not.toContain("Graphics progression receipt is stale for the cited implementation paths.");
+  });
+
+  if (process.env.COMPLETENESS_MODE === "completion") {
+    it("requires every completion boundary and cross-check to be green", () => {
+      expect(validateCompletion(inventory)).toEqual([]);
+    });
+  }
 
   it("turns red when a required row disappears", () => {
     const broken = inventory.replace(/^\| desktop-status-hub \|.*\r?\n/m, "");

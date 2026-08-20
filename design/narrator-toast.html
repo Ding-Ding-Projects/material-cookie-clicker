@@ -1,3 +1,39 @@
 <!-- @dsCard group="Feedback" -->
-<!doctype html><html lang="en-HK"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1"><title>Material Cookie Clicker · Milestone toast</title><link rel="stylesheet" href="./reference-app/material-reference.css"></head>
-<body data-scheme="light"><main class="spec-shell"><header class="spec-intro"><h1>Milestone toast · 里程碑提示</h1><p>The product-owned notification anatomy shows both an informational milestone and a persistent queued message without becoming a modal. · 產品自己嘅提示結構同時顯示一般里程碑同持續訊息，但唔會變成阻塞對話框。</p><button class="theme-toggle" onclick="document.body.dataset.scheme=document.body.dataset.scheme==='dark'?'light':'dark'">🌗 Toggle light / dark · 切換淺色 / 深色</button></header><section class="spec-section"><h2 class="section-title">Notification lifecycle variants · 提示生命週期版本</h2><div class="gallery" style="max-width:660px"><aside class="notice" role="status"><strong>Golden moment · 金曲奇時刻</strong><span>Golden cookie clicked! +1,337 cookies; frenzy active for 60s. · 撳中金曲奇！+1,337 塊曲奇；狂熱持續 60 秒。</span><button class="icon-button" aria-label="Dismiss golden moment">×</button></aside><aside class="notice queued" role="status"><strong>Offline report · 離線報告</strong><span>Welcome back — +2.4 M cookies over 6 h 12 m. · 歡迎返嚟——離線 6 小時 12 分鐘賺咗 2.4 M 塊曲奇。</span><button class="icon-button" aria-label="Dismiss offline report">×</button></aside></div></section></main></body></html>
+<!doctype html>
+<html lang="en-HK">
+  <head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width,initial-scale=1">
+    <title>Material Cookie Clicker · Milestone toast</title>
+    <link rel="stylesheet" href="./reference-app/material-reference.css">
+    <link rel="stylesheet" href="./reference-app/narrator-toast.css">
+  </head>
+  <body class="narrator-toast-reference" data-scheme="light">
+    <main class="spec-shell">
+      <header class="spec-intro">
+        <h1>Milestone toast · 里程碑提示</h1>
+        <p>The product-owned notification anatomy shows both an informational milestone and a persistent queued message without becoming a modal. · 產品自己嘅提示結構同時顯示一般里程碑同持續訊息，但唔會變成阻塞對話框。</p>
+        <button
+          type="button"
+          class="theme-toggle"
+          onclick="document.body.dataset.scheme=document.body.dataset.scheme==='dark'?'light':'dark'"
+        >🌗 Toggle light / dark · 切換淺色 / 深色</button>
+      </header>
+      <section class="spec-section">
+        <h2 class="section-title">Notification lifecycle variants · 提示生命週期版本</h2>
+        <div class="gallery narrator-toast-gallery">
+          <aside class="notice" role="status">
+            <strong>Golden moment · 金曲奇時刻</strong>
+            <span>Golden cookie clicked! +1,337 cookies; frenzy active for 60s. · 撳中金曲奇！+1,337 塊曲奇；狂熱持續 60 秒。</span>
+            <button type="button" class="icon-button" aria-label="Dismiss golden moment">×</button>
+          </aside>
+          <aside class="notice queued" role="status">
+            <strong>Offline report · 離線報告</strong>
+            <span>Welcome back — +2.4 M cookies over 6 h 12 m. · 歡迎返嚟——離線 6 小時 12 分鐘賺咗 2.4 M 塊曲奇。</span>
+            <button type="button" class="icon-button" aria-label="Dismiss offline report">×</button>
+          </aside>
+        </div>
+      </section>
+    </main>
+  </body>
+</html>

@@ -1,8 +1,9 @@
-import { useLayoutEffect, type ReactNode } from 'react';
+import { useLayoutEffect, useRef, useState, type ReactNode } from 'react';
 
 import { AchievementMedal, GeneratorIcon, HeroCookieArt, ToolIcon, ToolTierGem, UpgradeIcon } from './assets/icons.js';
 import { BulkToolbar } from './components/BulkToolbar.js';
 import { UpgradeParityScene } from './parity/UpgradeParityScene.js';
+import { DestructiveGate } from './components/DestructiveGate.js';
 import './styles/design-parity-route.css';
 
 export const DESIGN_PARITY_NETWORK_POLICY = 'blocked' as const;
@@ -292,33 +293,39 @@ function CookieGallery() {
 }
 
 function GameLayout() {
+  const [dialogOpen, setDialogOpen] = useState(true);
   return (
     <div className="parity-game-layout" aria-label="Main product game layout">
       <div className="hud"><div className="hud__readout"><span>Cookies · 曲奇</span><strong>4.82 Qa</strong></div><div className="hud__readout"><span>Per second · 每秒</span><strong>18,420</strong></div><div className="hud__readout"><span>Per click · 每撳</span><strong>312</strong></div></div>
-      <section className="panel parity-layout-cookie"><div className="cookie-target-wrap parity-layout-hero"><button type="button" className="cookie-btn cookie-btn--art cookie-btn--lift" aria-label="Bake cookie · 焗曲奇"><HeroCookieArt extraClass="cookie-btn__art" /></button><span>Click the cookie · 撳曲奇</span></div><nav className="parity-console" aria-label="Secondary product panels"><button type="button">Achievements · 成就</button><button type="button">Tools · 工具</button><button type="button">Statistics · 統計</button><button type="button">Prestige · 轉生</button></nav></section>
+      <section className="panel parity-layout-cookie"><div className="cookie-target-wrap parity-layout-hero"><button type="button" className="cookie-btn cookie-btn--art cookie-btn--lift" aria-label="Bake cookie · 焗曲奇"><HeroCookieArt extraClass="cookie-btn__art" /></button><span>Click the cookie · 撳曲奇</span></div><nav className="parity-console" aria-label="Secondary product panels"><button type="button" aria-pressed={dialogOpen} onClick={() => setDialogOpen(true)}>Achievements · 成就</button><button type="button">Tools · 工具</button><button type="button">Statistics · 統計</button><button type="button">Prestige · 轉生</button></nav></section>
       <section className="panel upgrade-shelf parity-layout-upgrades"><h2 className="panel__title">Upgrades <span className="panel__title-zh">升級</span></h2><UpgradeTickets compact /></section>
       <section className="panel shop-rail parity-layout-shop"><h2 className="panel__title">Buildings <span className="panel__title-zh">建築</span></h2>{['Grandma’s Bakery · 嫲嫲麵包店', 'Cookie Farm · 曲奇農場', 'Cookie Factory · 曲奇工廠', 'Cookie Rocket · 曲奇火箭'].map((name, index) => <div className="parity-game-shop-row" key={name}><span>{name}</span><strong>{[12, 8, 3, 0][index]}</strong><button type="button" disabled={index === 3}>Buy · 買</button></div>)}</section>
-      <aside className="anchored-panel parity-layout-dialog" aria-label="Achievements anchored panel"><h2>Achievements · 成就</h2><button type="button" aria-label="Close achievements">×</button><p>7 / 17 unlocked · 已解鎖 7 / 17</p></aside>
+      {dialogOpen ? <aside className="anchored-panel parity-layout-dialog" aria-label="Achievements anchored panel"><h2>Achievements · 成就</h2><button type="button" aria-label="Close achievements" onClick={() => setDialogOpen(false)}>×</button><p>7 / 17 unlocked · 已解鎖 7 / 17</p></aside> : null}
     </div>
   );
 }
 
 function NarratorToastGallery() {
+  const [goldenVisible, setGoldenVisible] = useState(true);
+  const [offlineVisible, setOfflineVisible] = useState(true);
   return (
     <GalleryFrame label="Narrator toast product gallery">
       <div className="parity-toast-stack">
-        <div className="canonical-notice" role="status"><strong>Golden moment · 金曲奇時刻</strong><span>Golden cookie clicked! +1,337 cookies; frenzy active for 60s. · 撳中金曲奇！+1,337 塊曲奇；狂熱持續 60 秒。</span><button type="button" aria-label="Dismiss golden moment">×</button></div>
-        <div className="canonical-notice parity-notice--queued" role="status"><strong>Offline report · 離線報告</strong><span>Welcome back — +2.4 M cookies over 6 h 12 m. · 歡迎返嚟——離線 6 小時 12 分鐘賺咗 2.4 M 塊曲奇。</span><button type="button" aria-label="Dismiss offline report">×</button></div>
+        {goldenVisible ? <aside className="canonical-notice" role="status"><strong>Golden moment · 金曲奇時刻</strong><span>Golden cookie clicked! +1,337 cookies; frenzy active for 60s. · 撳中金曲奇！+1,337 塊曲奇；狂熱持續 60 秒。</span><button type="button" aria-label="Dismiss golden moment" onClick={() => setGoldenVisible(false)}>×</button></aside> : null}
+        {offlineVisible ? <aside className="canonical-notice parity-notice--queued" role="status"><strong>Offline report · 離線報告</strong><span>Welcome back — +2.4 M cookies over 6 h 12 m. · 歡迎返嚟——離線 6 小時 12 分鐘賺咗 2.4 M 塊曲奇。</span><button type="button" aria-label="Dismiss offline report" onClick={() => setOfflineVisible(false)}>×</button></aside> : null}
       </div>
     </GalleryFrame>
   );
 }
 
 function PrestigeReady() {
+  const [gateOpen, setGateOpen] = useState(true);
+  const [completion, setCompletion] = useState<{ en: string; yue: string } | null>(null);
+  const projectionRef = useRef<HTMLElement | null>(null);
   return (
     <GalleryFrame label="Prestige ready product state">
-      <section className="projection-card"><h2>Ascension projection · 飛升預覽</h2><p>Prestiging now awards <strong>128 ascension points</strong>. · 而家轉生會攞到 <strong>128 粒飛升點</strong>。</p><p className="projection-card__detail">Each point permanently adds 1% total production. · 每粒永久加 1% 總產量。</p></section>
-      <div className="gate parity-gate"><h2>Confirm prestige · 確認轉生</h2><p><strong>This will reset · 呢個會清空</strong><br />Cookies, buildings, and ordinary upgrades. · 曲奇、建築同普通升級。</p><p><strong>This carries forward · 呢個會保留</strong><br />Permanent unlocks and +6 Golden Chips. · 永久解鎖同 +6 粒金籌碼。</p><div className="gate__keys"><label className="gate__key"><input type="checkbox" defaultChecked />Key 1 · 鎖匙一</label><label className="gate__key"><input type="checkbox" defaultChecked />Key 2 · 鎖匙二</label></div><label className="gate__slider-label" htmlFor="parity-prestige-slider">Slide fully to ascend · 拉到底轉生</label><input id="parity-prestige-slider" className="gate__slider" type="range" min="0" max="100" defaultValue="100" /><div className="parity-gate-actions"><button type="button" className="gate-trigger tone-prestige">Ascend now · 而家飛升</button><button type="button" className="gate__emergency">Emergency exit · 緊急離開</button></div></div>
+      <section ref={projectionRef} className="projection-card" tabIndex={-1}><h2>Ascension projection · 飛升預覽</h2><p>Prestiging now awards <strong>128 ascension points</strong>. · 而家轉生會攞到 <strong>128 粒飛升點</strong>。</p><p className="projection-card__detail">Each point permanently adds 1% total production. · 每粒永久加 1% 總產量。</p></section>
+      {gateOpen ? <DestructiveGate tone="prestige" title={{ en: 'Confirm prestige', yue: '確認轉生' }} impact={<><p><strong>This will reset · 呢個會清空</strong><br />Cookies, buildings, and ordinary upgrades. · 曲奇、建築同普通升級。</p><p><strong>This carries forward · 呢個會保留</strong><br />Permanent unlocks and +6 Golden Chips. · 永久解鎖同 +6 粒金籌碼。</p></>} key2Label={{ en: 'Confirm you read the impact', yue: '確認你睇過影響' }} completion={completion} onConfirm={() => setCompletion({ en: 'Prestige authorization complete.', yue: '轉生確認已完成。' })} onExit={() => setGateOpen(false)} returnFocusTo={projectionRef} /> : <button type="button" className="parity-gate-opener" onClick={() => { setCompletion(null); setGateOpen(true); }}>Open prestige confirmation · 開啟轉生確認</button>}
     </GalleryFrame>
   );
 }
@@ -334,13 +341,21 @@ function RegexBuilderOpen() {
 }
 
 function SettingsFunnySliders() {
+  const [languageMode, setLanguageMode] = useState<'en' | 'yue' | 'both'>('both');
+  const [funnyLevelEn, setFunnyLevelEn] = useState(2);
+  const [funnyLevelYue, setFunnyLevelYue] = useState(4);
   return (
     <GalleryFrame label="Funny level settings product state">
-      <section className="settings-block parity-language-block"><span className="settings-block__label">Language mode · 語言模式</span><div className="settings-modes" role="group" aria-label="Language mode"><button type="button" className="settings-modes__button" aria-pressed="false">English</button><button type="button" className="settings-modes__button" aria-pressed="false">粵語 Cantonese</button><button type="button" className="settings-modes__button" aria-pressed="true">Bilingual · 雙語</button></div><p className="settings-caption">Persists across restarts and applies to every product surface. · 重新開啟後仍會保留，亦套用到每個產品畫面。</p></section>
+      <section className="settings-block parity-language-block"><span className="settings-block__label">Language mode · 語言模式</span><div className="settings-modes" role="group" aria-label="Language mode"><button type="button" className="settings-modes__button" aria-pressed={languageMode === 'en'} onClick={() => setLanguageMode('en')}>English</button><button type="button" className="settings-modes__button" aria-pressed={languageMode === 'yue'} onClick={() => setLanguageMode('yue')}>粵語 Cantonese</button><button type="button" className="settings-modes__button" aria-pressed={languageMode === 'both'} onClick={() => setLanguageMode('both')}>Bilingual · 雙語</button></div><p className="settings-caption">Persists across restarts and applies to every product surface. · 重新開啟後仍會保留，亦套用到每個產品畫面。</p></section>
       <p className="settings-note settings-note--warning">These are two separate controls. Moving one never changes the other. · 呢兩條係獨立控制，郁一條唔會改另一條。</p>
-      <section className="settings-block"><span className="settings-block__label">Message voice · 訊息語氣</span><p className="settings-caption">Facts stay exact at every level; only the voice changes. · 每個程度嘅事實都一樣準確，淨係語氣會變。</p><div className="settings-sliders"><label className="settings-slider settings-slider--en"><span className="settings-slider__title">English funny level</span><span className="settings-slider__scale">1 = fully serious, 5 = maximum playfulness</span><input className="settings-slider__input" type="range" min="1" max="5" defaultValue="2" /><span className="settings-slider__value">Current level: 2 of 5</span></label><label className="settings-slider settings-slider--yue"><span className="settings-slider__title">廣東話搞笑程度</span><span className="settings-slider__scale">1 = 完全正經，5 = 最搞笑</span><input className="settings-slider__input" type="range" min="1" max="5" defaultValue="4" /><span className="settings-slider__value">而家程度：4 / 5</span></label></div></section>
+      <section className="settings-block"><span className="settings-block__label">Message voice · 訊息語氣</span><p className="settings-caption">Facts stay exact at every level; only the voice changes. · 每個程度嘅事實都一樣準確，淨係語氣會變。</p><div className="settings-sliders"><ParityFunnySlider language="en" level={funnyLevelEn} onChange={setFunnyLevelEn} /><ParityFunnySlider language="yue" level={funnyLevelYue} onChange={setFunnyLevelYue} /></div></section>
     </GalleryFrame>
   );
+}
+
+function ParityFunnySlider({ language, level, onChange }: { readonly language: 'en' | 'yue'; readonly level: number; readonly onChange: (level: number) => void }) {
+  const english = language === 'en';
+  return <label className={`settings-slider settings-slider--${language}`}><span className="settings-slider__title">{english ? 'English funny level' : '廣東話搞笑程度'}</span><span className="settings-slider__scale">{english ? '1 = fully serious, 5 = maximum playfulness' : '1 = 完全正經，5 = 最搞笑'}</span><input className="settings-slider__input" type="range" min="1" max="5" value={level} aria-label={english ? `English funny level, currently ${level} of 5` : `廣東話搞笑程度，而家 ${level} / 5`} onChange={(event) => onChange(Number(event.target.value))} /><span className="settings-slider__value">{english ? `Current level: ${level} of 5` : `而家程度：${level} / 5`}</span></label>;
 }
 
 function StatGallery() {
@@ -369,12 +384,27 @@ function StatGallery() {
   );
 }
 
-const COLOR_ROLES = [
-  ['Primary', '--md-sys-color-primary', '--md-sys-color-on-primary'], ['Primary container', '--md-sys-color-primary-container', '--md-sys-color-on-primary-container'], ['Secondary', '--md-sys-color-secondary', '--md-sys-color-on-secondary'], ['Tertiary', '--md-sys-color-tertiary', '--md-sys-color-on-tertiary'], ['Surface', '--md-sys-color-surface', '--md-sys-color-on-surface'], ['Surface high', '--md-sys-color-surface-container-high', '--md-sys-color-on-surface'], ['Error', '--md-sys-color-error', '--md-sys-color-on-error'], ['Outline', '--md-sys-color-outline', '--md-sys-color-surface'],
-] as const;
+interface ColorRoleFixture {
+  readonly name: string;
+  readonly token: string;
+  readonly background?: string;
+  readonly foreground: string;
+  readonly border?: string;
+}
+
+const COLOR_ROLES: readonly ColorRoleFixture[] = [
+  { name: 'Primary', token: '--md-sys-color-primary', background: '--md-sys-color-primary', foreground: '--md-sys-color-on-primary' },
+  { name: 'Primary container', token: '--md-sys-color-primary-container', background: '--md-sys-color-primary-container', foreground: '--md-sys-color-on-primary-container' },
+  { name: 'Secondary', token: '--md-sys-color-secondary', background: '--md-sys-color-secondary', foreground: '--md-sys-color-on-secondary' },
+  { name: 'Tertiary', token: '--md-sys-color-tertiary', background: '--md-sys-color-tertiary', foreground: '--md-sys-color-on-tertiary' },
+  { name: 'Surface', token: '--md-sys-color-surface', foreground: '--md-sys-color-on-surface' },
+  { name: 'Surface high', token: '--md-sys-color-surface-container-high', background: '--md-sys-color-surface-container-high', foreground: '--md-sys-color-on-surface' },
+  { name: 'Error', token: '--md-sys-color-error', background: '--md-sys-color-error', foreground: '--md-sys-color-on-error' },
+  { name: 'Outline', token: '--md-sys-color-outline', foreground: '--md-sys-color-on-surface', border: '--md-sys-color-outline' },
+];
 
 function ColorRoles() {
-  return <GalleryFrame label="Live product color roles"><div className="parity-token-grid">{COLOR_ROLES.map(([name, background, foreground]) => <div className="parity-color-role" key={name} style={{ background: `var(${background})`, color: `var(${foreground})` }}><strong>{name}</strong><code>{background}</code></div>)}</div></GalleryFrame>;
+  return <GalleryFrame label="Live product color roles"><div className="parity-token-grid">{COLOR_ROLES.map((role) => <div className="parity-color-role" key={role.name} style={{ ...(role.background ? { background: `var(${role.background})` } : {}), color: `var(${role.foreground})`, ...(role.border ? { borderColor: `var(${role.border})` } : {}) }}><strong>{role.name}</strong><code>{role.token}</code></div>)}</div></GalleryFrame>;
 }
 
 function ShapeElevationScale() {
@@ -433,7 +463,11 @@ const TREE_TIERS: Readonly<Record<1 | 2 | 3, readonly ToolFixture[]>> = {
 };
 
 function ToolsTree() {
-  return <GalleryFrame label="Mixed tool tree product state"><div className="tools-hud"><span className="tools-hud__counter"><span className="tools-hud__counter-value">7<span className="tools-hud__counter-sep">/</span>17</span><span className="tools-hud__counter-label">tools unlocked · 已解鎖工具</span></span><div className="tools-hud__track"><div className="tools-hud__fill" style={{ width: '41.18%' }} /></div><button type="button" className="tools-hud__toggle" aria-pressed="true">Tool progression · 工具進度</button></div><div className="search-field parity-tree-search"><span aria-hidden="true">🔍</span><input className="search-field__input" aria-label="Search tools" placeholder="Search tools… · 搜尋工具…" /><button type="button" className="builder-toggle" aria-label="Open regex builder">⚙</button></div><div className="parity-tools-tree">{([1, 2, 3] as const).map((tier) => <section className="tools-tier" data-tier={tier} key={tier}><h2 className="tools-tier__heading"><span className="tools-tier__gem"><ToolTierGem tier={tier} /></span>Tier {tier} · 第 {tier} 層</h2><ul className="parity-tree-cards">{TREE_TIERS[tier].map((tool) => <ToolFixtureCard tool={tool} key={`${tier}-${tool.id}`} />)}</ul></section>)}</div></GalleryFrame>;
+  const [query, setQuery] = useState('');
+  const [progressVisible, setProgressVisible] = useState(true);
+  const normalizedQuery = query.trim().toLocaleLowerCase('en-HK');
+  const matches = (tool: ToolFixture): boolean => !normalizedQuery || [tool.name, tool.yue, tool.state, tool.progress].some((value) => value.toLocaleLowerCase('en-HK').includes(normalizedQuery));
+  return <GalleryFrame label="Mixed tool tree product state"><div className="tools-hud"><span className="tools-hud__counter"><span className="tools-hud__counter-value">7<span className="tools-hud__counter-sep">/</span>17</span><span className="tools-hud__counter-label">tools unlocked · 已解鎖工具</span></span><div className="tools-hud__track" role="progressbar" aria-label="7 of 17 tools unlocked" aria-valuemin={0} aria-valuemax={17} aria-valuenow={7} hidden={!progressVisible}><div className="tools-hud__fill" style={{ width: '41.18%' }} /></div><button type="button" className="tools-hud__toggle" aria-pressed={progressVisible} onClick={() => setProgressVisible((visible) => !visible)}>Tool progression · 工具進度</button></div><div className="search-field parity-tree-search"><span aria-hidden="true">🔍</span><input className="search-field__input" aria-label="Search tools" placeholder="Search tools… · 搜尋工具…" value={query} onChange={(event) => setQuery(event.target.value)} /><button type="button" className="builder-toggle" aria-label="Open regex builder">⚙</button></div><div className="parity-tools-tree">{([1, 2, 3] as const).map((tier) => <section className="tools-tier" data-tier={tier} key={tier}><h2 className="tools-tier__heading"><span className="tools-tier__gem"><ToolTierGem tier={tier} /></span>Tier {tier} · 第 {tier} 層</h2><ul className="parity-tree-cards">{TREE_TIERS[tier].filter(matches).map((tool) => <ToolFixtureCard tool={tool} key={`${tier}-${tool.id}`} />)}</ul></section>)}</div></GalleryFrame>;
 }
 
 function UpgradeTickets({ compact = false }: { readonly compact?: boolean }) {

@@ -8,6 +8,16 @@ const stylesheet = readFileSync(stylesheetPath, 'utf8').replaceAll('\r\n', '\n')
 const inventoryPath = resolve(process.cwd(), 'design/parity/inventory.json');
 const inventory = JSON.parse(readFileSync(inventoryPath, 'utf8')) as {
   auditRecords: Record<string, { status: string; primitives: Record<string, { status: string }> }>;
+  rows: Array<{
+    id: string;
+    materialDesign3AuditId: string;
+    evidence: { diff: { path: string; status: string } };
+  }>;
+};
+
+type VisualDiff = {
+  metrics?: { changedPixels?: number };
+  review?: { verdict?: string; reason?: string };
 };
 
 const requiredTokens = [
@@ -109,13 +119,34 @@ function auditMaterialChrome(css: string): void {
 function auditLedger(records: typeof inventory.auditRecords): void {
   for (const auditId of requiredAuditIds) {
     const audit = records[auditId];
-    if (!audit || audit.status !== 'defect') {
-      throw new Error(`Material audit ${auditId} must stay pending until visual evidence lands`);
+    if (!audit) {
+      throw new Error(`Material audit ${auditId} is missing`);
     }
-    const defects = Object.entries(audit.primitives).filter(([, primitive]) => primitive.status !== 'conforming');
-    if (defects.length > 0) {
-      throw new Error(`Material audit ${auditId} has nonconforming primitives: ${defects.map(([name]) => name).join(', ')}`);
+    const expected = Object.values(audit.primitives).some((primitive) => primitive.status === 'defect')
+      ? 'defect'
+      : 'conforming';
+    if (audit.status !== expected) {
+      throw new Error(`Material audit ${auditId} summary ${audit.status} contradicts primitive status ${expected}`);
     }
+  }
+}
+
+function readVisualDiff(row: (typeof inventory.rows)[number]): VisualDiff {
+  return JSON.parse(readFileSync(resolve(process.cwd(), row.evidence.diff.path), 'utf8')) as VisualDiff;
+}
+
+function auditVisualReview(row: (typeof inventory.rows)[number], diff: VisualDiff): void {
+  if (row.evidence.diff.status !== 'verified') {
+    throw new Error(`Visual diff ${row.id} evidence must be verified`);
+  }
+  if ((diff.metrics?.changedPixels ?? 0) <= 0) {
+    throw new Error(`Visual diff ${row.id} must record its measured delta`);
+  }
+  if (diff.review?.verdict !== 'defect') {
+    throw new Error(`Visual diff ${row.id} must remain defect until its differences are approved`);
+  }
+  if (!diff.review.reason?.trim()) {
+    throw new Error(`Visual diff ${row.id} defect needs a reason`);
   }
 }
 
@@ -164,13 +195,26 @@ describe('Material Design 3 Expressive product chrome', () => {
     );
   });
 
-  it('keeps repaired primitives conforming while overall visual evidence stays pending', () => {
+  it('keeps every audit summary derived from its primitive statuses', () => {
     expect(() => auditLedger(inventory.auditRecords)).not.toThrow();
   });
 
-  it.each(requiredAuditIds)('turns red when audit %s regresses', (auditId) => {
+  it.each(requiredAuditIds)('turns red when audit %s summary contradicts its primitives', (auditId) => {
     const broken = structuredClone(inventory.auditRecords);
-    broken[auditId].status = 'conforming';
-    expect(() => auditLedger(broken)).toThrow(`Material audit ${auditId} must stay pending until visual evidence lands`);
+    broken[auditId].status = broken[auditId].status === 'conforming' ? 'defect' : 'conforming';
+    const expected = broken[auditId].status === 'conforming' ? 'defect' : 'conforming';
+    expect(() => auditLedger(broken)).toThrow(
+      `Material audit ${auditId} summary ${broken[auditId].status} contradicts primitive status ${expected}`,
+    );
+  });
+
+  it.each(inventory.rows)('keeps unapproved visual differences red for $id', (row) => {
+    const real = readVisualDiff(row);
+    const broken = structuredClone(real);
+    broken.review = { ...broken.review, verdict: 'conforming' };
+    expect(() => auditVisualReview(row, broken)).toThrow(
+      `Visual diff ${row.id} must remain defect until its differences are approved`,
+    );
+    expect(() => auditVisualReview(row, real)).not.toThrow();
   });
 });

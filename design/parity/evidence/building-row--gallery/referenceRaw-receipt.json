@@ -3,22 +3,22 @@
   "id": "building-row--gallery--reference",
   "route": "cheap-lowlevel-headless",
   "source": {
-    "startCommit": "7cf30ae5ab93349790c674647fe9fe3e64a01af7",
-    "endCommit": "7cf30ae5ab93349790c674647fe9fe3e64a01af7",
+    "startCommit": "6f878d9fc1dc6246a7a078ce33aa9b12531fe775",
+    "endCommit": "6f878d9fc1dc6246a7a078ce33aa9b12531fe775",
     "artifactPath": "dist/renderer/assets/index-BQyFOhDT.js",
     "artifactSha256": "4663d6eaeafea4f1291311a86691fffc4e24ced846e32bcbd4405b5dd8b79198",
     "buildReceiptPath": "design/parity/evidence/build-receipt.json",
-    "buildReceiptSha256": "858f0c822df7fddfd40542d6e4584a0045f01ce7fc94a5abfb13b6b7527e2b50",
-    "artifactBuiltAt": "2026-08-20T02:05:16.247Z"
+    "buildReceiptSha256": "f7ce8b13e1e8de02d0f9fa4db35846089a171b74a81ea13b46f1648e6a03b382",
+    "artifactBuiltAt": "2026-08-20T02:25:40.088Z"
   },
   "capture": {
-    "rawPath": "C:\\Users\\cntow\\AppData\\Local\\Temp\\mcc-parity-7cf30ae-20260819-2200\\output\\reference-rows-current\\building-row--gallery\\reference.png",
+    "rawPath": "C:\\Users\\cntow\\AppData\\Local\\Temp\\mcc-parity-6f878d9\\output\\reference-rows-current\\building-row--gallery\\reference.png",
     "promotedPath": "design/parity/evidence/building-row--gallery/reference.png",
-    "sha256": "c81631a08b7f9ee4a1a69eac385543593736a39ab3f720bad3fa8886f33b198d",
-    "rawSha256": "c81631a08b7f9ee4a1a69eac385543593736a39ab3f720bad3fa8886f33b198d",
+    "sha256": "a999edb6e0aa7a511d9857ffaf7c3eb6a443b4b250b72098a7b54f13c4d521de",
+    "rawSha256": "a999edb6e0aa7a511d9857ffaf7c3eb6a443b4b250b72098a7b54f13c4d521de",
     "mimeType": "image/png",
-    "startedAt": "2026-08-20T02:05:16.247Z",
-    "capturedAt": "2026-08-20T02:05:16.451Z",
+    "startedAt": "2026-08-20T02:25:40.088Z",
+    "capturedAt": "2026-08-20T02:25:40.274Z",
     "width": 1280,
     "height": 800
   },
@@ -59,8 +59,8 @@
     "reviewer": "automated parity capture review"
   },
   "runtime": {
-    "launchPid": 58468,
-    "hwnd": "7539508",
+    "launchPid": 40616,
+    "hwnd": "656522",
     "hwndResolvedLive": true,
     "consoleErrorCount": 0,
     "pageErrorCount": 0,

@@ -2,7 +2,7 @@
   "version": 1,
   "id": "achievement-badge--gallery",
   "route": "cheap-lowlevel-headless",
-  "sourceCommit": "7cf30ae5ab93349790c674647fe9fe3e64a01af7",
+  "sourceCommit": "6f878d9fc1dc6246a7a078ce33aa9b12531fe775",
   "reviewer": "automated parity capture review",
   "rawReceiptPaths": [
     "design/parity/evidence/achievement-badge--gallery/referenceRaw-receipt.json",

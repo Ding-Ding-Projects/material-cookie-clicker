@@ -19,7 +19,7 @@
     },
     "product": {
       "path": "design/parity/evidence/tokens-shape-elevation--scale/product.png",
-      "sha256": "7913afa1c8db6d84fc2cb4326eff7f84456993f48d0a8f3ba469c3da622661a7"
+      "sha256": "b1b17d73b52e561752346e284424a7c12b90c909c9f62d427c5327f003a4a871"
     }
   },
   "dimensions": {
@@ -27,10 +27,10 @@
     "height": 800
   },
   "metrics": {
-    "changedPixels": 732882,
+    "changedPixels": 668498,
     "totalPixels": 1024000,
-    "changedRatio": 0.715705078125,
-    "rgbRmse": 56.3274111576358
+    "changedRatio": 0.652830078125,
+    "rgbRmse": 55.78788359832454
   },
   "tool": {
     "name": "Pillow ImageChops.difference",

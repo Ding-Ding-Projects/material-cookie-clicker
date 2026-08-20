@@ -19,7 +19,7 @@
     },
     "product": {
       "path": "design/parity/evidence/upgrade-card--gallery/product.png",
-      "sha256": "d649a1896bbe235faf6d393a8f5f4dd85b99b1d87eb2933bd95f2e4df45d47dc"
+      "sha256": "dac84f26b26e6d8ee5baf4649a34f4f6aee2f8568e3a72a245722bc5aff90e49"
     }
   },
   "dimensions": {
@@ -27,10 +27,10 @@
     "height": 800
   },
   "metrics": {
-    "changedPixels": 697764,
+    "changedPixels": 719347,
     "totalPixels": 1024000,
-    "changedRatio": 0.68141015625,
-    "rgbRmse": 55.75903691412851
+    "changedRatio": 0.7024873046875,
+    "rgbRmse": 56.54528457800714
   },
   "tool": {
     "name": "Pillow ImageChops.difference",

@@ -7,7 +7,7 @@
       "rowId": "achievement-badge--gallery",
       "evidenceKey": "referenceRaw",
       "receiptPath": "design/parity/evidence/achievement-badge--gallery/referenceRaw-receipt.json",
-      "receiptSha256": "ce8e72929af08c5c5f6ceb0ac860f9c939a4a378998cfb5d7248b48564edb3e1"
+      "receiptSha256": "541fb7ad53ff979179a7152798413765191a512918038a4165186f9daa8b843d"
     },
     {
       "id": "achievement-badge--gallery--product",
@@ -15,7 +15,7 @@
       "rowId": "achievement-badge--gallery",
       "evidenceKey": "productRaw",
       "receiptPath": "design/parity/evidence/achievement-badge--gallery/productRaw-receipt.json",
-      "receiptSha256": "e3f6d2d577df83e1bbe7c4525ac5f53e1a4d3bb19efca4bd3caba541d0415d34"
+      "receiptSha256": "0da947548742b934c56e8e3eb8d76f129fc06e1d0ac7c24872795a23b48a0138"
     },
     {
       "id": "building-row--gallery--reference",
@@ -23,7 +23,7 @@
       "rowId": "building-row--gallery",
       "evidenceKey": "referenceRaw",
       "receiptPath": "design/parity/evidence/building-row--gallery/referenceRaw-receipt.json",
-      "receiptSha256": "c5a27d132f953ec1f457a21c369f45296dc67310016e6ba065cfdedfdca90c72"
+      "receiptSha256": "d0b4e8bc962920f39b44c3f0a033cd35801fb00b5e1689acec121349b4b44dc3"
     },
     {
       "id": "building-row--gallery--product",
@@ -31,7 +31,7 @@
       "rowId": "building-row--gallery",
       "evidenceKey": "productRaw",
       "receiptPath": "design/parity/evidence/building-row--gallery/productRaw-receipt.json",
-      "receiptSha256": "dc31b4d03bec8a9f68ebc72c5ff1cd1e5e8e192a9556517f2f8329846715bd0f"
+      "receiptSha256": "b65bb8fea4ea0273c3c40de1072d6ac33a49c3f003e234db145d0d9aa18b0916"
     },
     {
       "id": "bulk-toolbar--progress--reference",
@@ -39,7 +39,7 @@
       "rowId": "bulk-toolbar--progress",
       "evidenceKey": "referenceRaw",
       "receiptPath": "design/parity/evidence/bulk-toolbar--progress/referenceRaw-receipt.json",
-      "receiptSha256": "751394e9e282a57803e40ea55c63ebbe0f7cbf457228098d5a4bbf6105be6a22"
+      "receiptSha256": "ab963255bc6a4e83da5824a904ca66a7749fc4e3c98238ed7eabc38bba4162c6"
     },
     {
       "id": "bulk-toolbar--progress--product",
@@ -47,7 +47,7 @@
       "rowId": "bulk-toolbar--progress",
       "evidenceKey": "productRaw",
       "receiptPath": "design/parity/evidence/bulk-toolbar--progress/productRaw-receipt.json",
-      "receiptSha256": "7d8626a9a3f8e733c33e4ddf6d8998a0d1c437af4253f51f11d2f09c2628fe8c"
+      "receiptSha256": "8f26cc9160c984f510805b1e66d6aa0153229e0c175a6f893b1d64fd3437e679"
     },
     {
       "id": "cookie-surface--gallery--reference",
@@ -55,7 +55,7 @@
       "rowId": "cookie-surface--gallery",
       "evidenceKey": "referenceRaw",
       "receiptPath": "design/parity/evidence/cookie-surface--gallery/referenceRaw-receipt.json",
-      "receiptSha256": "fb39c83382effac7a64f0a98c391a7e83cb0d9e6d845f5bad3ab8ea114c28670"
+      "receiptSha256": "46e6bf9bfbdda4d59b44e9a9cfccbd05e67cee6a0b453161cd63b6cc32a2410b"
     },
     {
       "id": "cookie-surface--gallery--product",
@@ -63,7 +63,7 @@
       "rowId": "cookie-surface--gallery",
       "evidenceKey": "productRaw",
       "receiptPath": "design/parity/evidence/cookie-surface--gallery/productRaw-receipt.json",
-      "receiptSha256": "37937f4f39d8d09268c8e7131fe80f1413d0e8c58eae9037b18ac2697554f30e"
+      "receiptSha256": "c255e694581ed0787da42b1df5129580bad10ab38950dfb5f191b7f9c0206e3b"
     },
     {
       "id": "game-layout--main--reference",
@@ -71,7 +71,7 @@
       "rowId": "game-layout--main",
       "evidenceKey": "referenceRaw",
       "receiptPath": "design/parity/evidence/game-layout--main/referenceRaw-receipt.json",
-      "receiptSha256": "1de7f11eaa0bd7414c6dc87d58fda3be012e2790cf71092bf4e6551084a73eb6"
+      "receiptSha256": "4b93655935a926de88509ba91c8be3588309c92e22ed637eb839d741b1242920"
     },
     {
       "id": "game-layout--main--product",
@@ -79,7 +79,7 @@
       "rowId": "game-layout--main",
       "evidenceKey": "productRaw",
       "receiptPath": "design/parity/evidence/game-layout--main/productRaw-receipt.json",
-      "receiptSha256": "835a1023af8a4dcd83b0fea40c0eae96d48012de3e00d334f24015bc082097eb"
+      "receiptSha256": "b251a8bf37df8e1a3e13f5c8361060bfd8ae2dd055397dbef6b7630251923320"
     },
     {
       "id": "narrator-toast--gallery--reference",
@@ -87,7 +87,7 @@
       "rowId": "narrator-toast--gallery",
       "evidenceKey": "referenceRaw",
       "receiptPath": "design/parity/evidence/narrator-toast--gallery/referenceRaw-receipt.json",
-      "receiptSha256": "77e8e47d12dcc3cbd2f49ff6be1c6473edc850ae08ef3233e3b0b1a3af8b391b"
+      "receiptSha256": "e5638129aeb8f445112ff9a19967c595e561a77831e6ced2c05b7fa6b1e792ed"
     },
     {
       "id": "narrator-toast--gallery--product",
@@ -95,7 +95,7 @@
       "rowId": "narrator-toast--gallery",
       "evidenceKey": "productRaw",
       "receiptPath": "design/parity/evidence/narrator-toast--gallery/productRaw-receipt.json",
-      "receiptSha256": "980a45a7dd231e3da701f839b19594ceabad9064e76b3ae45a33dcb77f8208c1"
+      "receiptSha256": "73cfbc9cda9a48e3043cbcb7b7e067c6cced0109f35d014bffbd90aa32bdd39c"
     },
     {
       "id": "prestige-gate--ready--reference",
@@ -103,7 +103,7 @@
       "rowId": "prestige-gate--ready",
       "evidenceKey": "referenceRaw",
       "receiptPath": "design/parity/evidence/prestige-gate--ready/referenceRaw-receipt.json",
-      "receiptSha256": "a8eb2016291913b44b75ed18e1f8dae6fdc767f5b6da1eeb6a643e0e28ec7723"
+      "receiptSha256": "65dbde1eddf52497dec426aaf3ac4801078e3eb50c45afd43fda753a15d975d8"
     },
     {
       "id": "prestige-gate--ready--product",
@@ -111,7 +111,7 @@
       "rowId": "prestige-gate--ready",
       "evidenceKey": "productRaw",
       "receiptPath": "design/parity/evidence/prestige-gate--ready/productRaw-receipt.json",
-      "receiptSha256": "6537579c50b651568c29a2fb363fb4ab0ed7e90e7699d24e2f156ce6dcc3968c"
+      "receiptSha256": "bac78590139af90285a7d43c07e67864b04a1769cba25f8aae302d3d1c94c44e"
     },
     {
       "id": "search-regex-builder--open--reference",
@@ -119,7 +119,7 @@
       "rowId": "search-regex-builder--open",
       "evidenceKey": "referenceRaw",
       "receiptPath": "design/parity/evidence/search-regex-builder--open/referenceRaw-receipt.json",
-      "receiptSha256": "07f5cc2c176e849ef0992e4b1ae3658409d6debb0341851e289cf607d5666bc8"
+      "receiptSha256": "9e4564e4b1cea81f14f0430f19c4775e86ee7918a2b1b308a36c1f976b3b8e9d"
     },
     {
       "id": "search-regex-builder--open--product",
@@ -127,7 +127,7 @@
       "rowId": "search-regex-builder--open",
       "evidenceKey": "productRaw",
       "receiptPath": "design/parity/evidence/search-regex-builder--open/productRaw-receipt.json",
-      "receiptSha256": "2d0a553298dde9ec6aafaa58a78b936cbce35ffe5ea58f2b6cc58809afdf7a91"
+      "receiptSha256": "783fae2023ce0e89d2dce441fbe0741cd57f0272ad3c6b0d58fb94f570065b2e"
     },
     {
       "id": "settings-funny-sliders--default--reference",
@@ -135,7 +135,7 @@
       "rowId": "settings-funny-sliders--default",
       "evidenceKey": "referenceRaw",
       "receiptPath": "design/parity/evidence/settings-funny-sliders--default/referenceRaw-receipt.json",
-      "receiptSha256": "b2e81b9d68c9f3bad75a7d3b80b190a55b8f288919469c7b956fceb22d8891e1"
+      "receiptSha256": "b866c49d2b00b4160e5418403d3b14553196e135e7c73967e8c55107506fe2e5"
     },
     {
       "id": "settings-funny-sliders--default--product",
@@ -143,7 +143,7 @@
       "rowId": "settings-funny-sliders--default",
       "evidenceKey": "productRaw",
       "receiptPath": "design/parity/evidence/settings-funny-sliders--default/productRaw-receipt.json",
-      "receiptSha256": "8e9f515521b6b6b8f03a50f719b59e9fa0390603637bfef09cffa98b852a532c"
+      "receiptSha256": "2c722703bde383670770465847384863ec9d3c02fb84c0c70aeffe5ba530afb8"
     },
     {
       "id": "stat-tile--gallery--reference",
@@ -151,7 +151,7 @@
       "rowId": "stat-tile--gallery",
       "evidenceKey": "referenceRaw",
       "receiptPath": "design/parity/evidence/stat-tile--gallery/referenceRaw-receipt.json",
-      "receiptSha256": "b24ec52de52e5d15ba986bfeed2704c2bd4aaf4bf1352d16eb26ebae5ec777ea"
+      "receiptSha256": "7f4d68aaefcfee5bb2ef31153d269015309a8c34818fdcd98e8ef10f4237ff5b"
     },
     {
       "id": "stat-tile--gallery--product",
@@ -159,7 +159,7 @@
       "rowId": "stat-tile--gallery",
       "evidenceKey": "productRaw",
       "receiptPath": "design/parity/evidence/stat-tile--gallery/productRaw-receipt.json",
-      "receiptSha256": "697eb162b8585e9ac229a45d1e4e3e92a8159edadfe39d2f0bd842e26aff4bbe"
+      "receiptSha256": "6bc37f4cf72714dcb97b31c9572b5a0d557a2ef9842ba48c3bed9276a860cd4e"
     },
     {
       "id": "tokens-color--roles--reference",
@@ -167,7 +167,7 @@
       "rowId": "tokens-color--roles",
       "evidenceKey": "referenceRaw",
       "receiptPath": "design/parity/evidence/tokens-color--roles/referenceRaw-receipt.json",
-      "receiptSha256": "26e1a06ff1968b4d3fe27efb01e46d34edc8381731be3e5c94db7a167d335f5b"
+      "receiptSha256": "9d778f9569f3499f804669e7cd33db76e980f16674a9975d778085a5ec4aa49a"
     },
     {
       "id": "tokens-color--roles--product",
@@ -175,7 +175,7 @@
       "rowId": "tokens-color--roles",
       "evidenceKey": "productRaw",
       "receiptPath": "design/parity/evidence/tokens-color--roles/productRaw-receipt.json",
-      "receiptSha256": "2316755f6e328e26d6e66a11877401f50b4aaf36c6a245fd586027401a7cf7dc"
+      "receiptSha256": "5d05e94a64edc34d9cf95ed4c969b426c2b3aba1cf6f190d1691a17bca4a3353"
     },
     {
       "id": "tokens-shape-elevation--scale--reference",
@@ -183,7 +183,7 @@
       "rowId": "tokens-shape-elevation--scale",
       "evidenceKey": "referenceRaw",
       "receiptPath": "design/parity/evidence/tokens-shape-elevation--scale/referenceRaw-receipt.json",
-      "receiptSha256": "1514cad595672836c7e1bf8917285b145f4d49d825aa6986689f36e17ecd015a"
+      "receiptSha256": "6b94a4b622a998e883e333278d56df652ce7226a652dadc4975fbf1770540d52"
     },
     {
       "id": "tokens-shape-elevation--scale--product",
@@ -191,7 +191,7 @@
       "rowId": "tokens-shape-elevation--scale",
       "evidenceKey": "productRaw",
       "receiptPath": "design/parity/evidence/tokens-shape-elevation--scale/productRaw-receipt.json",
-      "receiptSha256": "caed39ffbaa746a75453ffceb1c557e64a48ab44ecc90f92a374f04e98513247"
+      "receiptSha256": "76e4f2e3574404f2736d13c0661f88537ce17cb21628abfa7a355cd3b1882829"
     },
     {
       "id": "tokens-type--scale--reference",
@@ -199,7 +199,7 @@
       "rowId": "tokens-type--scale",
       "evidenceKey": "referenceRaw",
       "receiptPath": "design/parity/evidence/tokens-type--scale/referenceRaw-receipt.json",
-      "receiptSha256": "fed58e915d2450dff5072f411922437e562aa60bb67bc13febd9d2b021f9bc02"
+      "receiptSha256": "5fbef29a9689a66cca3514cedc11f9b763975e350355ffb822229b0a430aa55c"
     },
     {
       "id": "tokens-type--scale--product",
@@ -207,7 +207,7 @@
       "rowId": "tokens-type--scale",
       "evidenceKey": "productRaw",
       "receiptPath": "design/parity/evidence/tokens-type--scale/productRaw-receipt.json",
-      "receiptSha256": "2c72b5fb1eb212f752b48927403cf490dd0380f4e1b20abbf668d48b1e01b443"
+      "receiptSha256": "95d9052cde43aa7bd49fb73c91cbb5a08cbf728210fdd2bf4a8d70e238e5ae55"
     },
     {
       "id": "tool-card--gallery--reference",
@@ -215,7 +215,7 @@
       "rowId": "tool-card--gallery",
       "evidenceKey": "referenceRaw",
       "receiptPath": "design/parity/evidence/tool-card--gallery/referenceRaw-receipt.json",
-      "receiptSha256": "f136c2541135d9f9d1a580c37cb0cd9b772cb44085ac784804d729843cf51e29"
+      "receiptSha256": "c5027e9a4ad2c1d81e2ac5f011114334990f4b97535f21f7a9934003a1be1410"
     },
     {
       "id": "tool-card--gallery--product",
@@ -223,7 +223,7 @@
       "rowId": "tool-card--gallery",
       "evidenceKey": "productRaw",
       "receiptPath": "design/parity/evidence/tool-card--gallery/productRaw-receipt.json",
-      "receiptSha256": "0491a9601469cf94f14c2a96e2c1039d33cfdfc0b2a1799e6a6defb205eec1f5"
+      "receiptSha256": "b259d82dac99e54a3cc2555017182ce237f2bcb7ce5731a1eb2d272744591c11"
     },
     {
       "id": "tools-tree--mixed--reference",
@@ -231,7 +231,7 @@
       "rowId": "tools-tree--mixed",
       "evidenceKey": "referenceRaw",
       "receiptPath": "design/parity/evidence/tools-tree--mixed/referenceRaw-receipt.json",
-      "receiptSha256": "0dcd12118a8d1cf863f2e4ccb1c769f2bae5928c84cce8295e894393aa55591e"
+      "receiptSha256": "237b9b0847af6b36f45172caf0cce5f02f90cfeed0f42c90f1183ee0b8522601"
     },
     {
       "id": "tools-tree--mixed--product",
@@ -239,7 +239,7 @@
       "rowId": "tools-tree--mixed",
       "evidenceKey": "productRaw",
       "receiptPath": "design/parity/evidence/tools-tree--mixed/productRaw-receipt.json",
-      "receiptSha256": "b02e4f55da0f6f5ffded72c9c54b029ffa2c1c6661f2912831d4a4e73094bd21"
+      "receiptSha256": "a9f88b3d1802ba92803381a480b9a59663ab761a38a0416728435ed9714d24dc"
     },
     {
       "id": "upgrade-card--gallery--reference",
@@ -247,7 +247,7 @@
       "rowId": "upgrade-card--gallery",
       "evidenceKey": "referenceRaw",
       "receiptPath": "design/parity/evidence/upgrade-card--gallery/referenceRaw-receipt.json",
-      "receiptSha256": "4bba9704afe69d2973d6410929e30e8d4e53802853ac8ab47cad5be211d25044"
+      "receiptSha256": "cdd6afb318c27124c036154265063e42aca0362209474caeeab311ba73ef5f87"
     },
     {
       "id": "upgrade-card--gallery--product",
@@ -255,7 +255,7 @@
       "rowId": "upgrade-card--gallery",
       "evidenceKey": "productRaw",
       "receiptPath": "design/parity/evidence/upgrade-card--gallery/productRaw-receipt.json",
-      "receiptSha256": "3f12f391bac8a3a2722f069683b9a1260180050f13a74f0a041c64424f1bf47b"
+      "receiptSha256": "add095b4b855b1ba6300b9eeb067a6891e17b7322f4b92061249edaae6950b82"
     }
   ]
 }

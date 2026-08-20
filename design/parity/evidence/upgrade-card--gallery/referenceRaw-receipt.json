@@ -3,22 +3,22 @@
   "id": "upgrade-card--gallery--reference",
   "route": "cheap-lowlevel-headless",
   "source": {
-    "startCommit": "330352ce7513ba420752dd7243762f0dd75f9eaa",
-    "endCommit": "330352ce7513ba420752dd7243762f0dd75f9eaa",
+    "startCommit": "25633dc1c4ff5d323dc4ad8b941fc3e142d74ed1",
+    "endCommit": "25633dc1c4ff5d323dc4ad8b941fc3e142d74ed1",
     "artifactPath": "dist/renderer/assets/index-BQyFOhDT.js",
     "artifactSha256": "4663d6eaeafea4f1291311a86691fffc4e24ced846e32bcbd4405b5dd8b79198",
     "buildReceiptPath": "design/parity/evidence/build-receipt.json",
-    "buildReceiptSha256": "34ff59d65a1ad149e636e8605f8d8c39364df8f0ddaecf4cc10fb72c566f9394",
-    "artifactBuiltAt": "2026-08-20T00:26:12.314Z"
+    "buildReceiptSha256": "e9c0194c8eb7d6db5d56e93097bd8845dea7db46d55208abcc65d4faa3e199e8",
+    "artifactBuiltAt": "2026-08-20T00:46:50.777Z"
   },
   "capture": {
-    "rawPath": "C:\\Users\\cntow\\AppData\\Local\\Temp\\mcc-parity-330352c-20260819-2025\\output\\reference-rows-current\\upgrade-card--gallery\\reference.png",
+    "rawPath": "C:\\Users\\cntow\\AppData\\Local\\Temp\\mcc-parity-25633dc-20260819-2045\\output\\reference-rows-current\\upgrade-card--gallery\\reference.png",
     "promotedPath": "design/parity/evidence/upgrade-card--gallery/reference.png",
     "sha256": "fdc7750b74790de25b90877a282cfadaf7aaa3d3a7ea956c4b72c10ca84c957a",
     "rawSha256": "fdc7750b74790de25b90877a282cfadaf7aaa3d3a7ea956c4b72c10ca84c957a",
     "mimeType": "image/png",
-    "startedAt": "2026-08-20T00:26:12.314Z",
-    "capturedAt": "2026-08-20T00:26:12.614Z",
+    "startedAt": "2026-08-20T00:46:50.777Z",
+    "capturedAt": "2026-08-20T00:46:51.006Z",
     "width": 1280,
     "height": 800
   },
@@ -59,8 +59,8 @@
     "reviewer": "automated parity capture review"
   },
   "runtime": {
-    "launchPid": 51504,
-    "hwnd": "15468902",
+    "launchPid": 48156,
+    "hwnd": "656114",
     "hwndResolvedLive": true,
     "consoleErrorCount": 0,
     "pageErrorCount": 0,

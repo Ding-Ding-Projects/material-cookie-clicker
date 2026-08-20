@@ -19,7 +19,7 @@
     },
     "product": {
       "path": "design/parity/evidence/game-layout--main/product.png",
-      "sha256": "d9010a5abfbbbbef41bd27408b38034d772e1e268903519e7d4cdd0e840ff639"
+      "sha256": "cf118eec553a6cc9e398e2e8717ce3da51b9ac19031ab9c7a1be4f62a3f8c744"
     }
   },
   "dimensions": {
@@ -27,10 +27,10 @@
     "height": 800
   },
   "metrics": {
-    "changedPixels": 919142,
+    "changedPixels": 726400,
     "totalPixels": 1024000,
-    "changedRatio": 0.897599609375,
-    "rgbRmse": 56.65605697533307
+    "changedRatio": 0.709375,
+    "rgbRmse": 52.55189712347254
   },
   "tool": {
     "name": "Pillow ImageChops.difference",

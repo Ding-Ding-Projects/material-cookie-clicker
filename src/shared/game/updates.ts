@@ -27,6 +27,8 @@
 
 /** The repository whose GitHub releases this application updates from. */
 export const UPDATE_REPOSITORY = "Ding-Ding-Projects/material-cookie-clicker";
+export const UPDATE_VERIFICATION_FLAG = "MATERIAL_COOKIE_CLICKER_VERIFY_UPDATE_FEED";
+export const UPDATE_VERIFICATION_URL = "MATERIAL_COOKIE_CLICKER_VERIFY_UPDATE_FEED_URL";
 
 /**
  * The Squirrel.Windows feed address: the directory holding `RELEASES`, the full `.nupkg` and
@@ -45,6 +47,25 @@ export function squirrelFeedUrl(repository: string = UPDATE_REPOSITORY): string 
     throw new Error(`Not an owner/name GitHub repository: ${repository}`);
   }
   return `https://github.com/${repository}/releases/latest/download/`;
+}
+
+/**
+ * Resolve the one verification-only updater seam. Production never reads an alternate feed:
+ * both an exact opt-in flag and a bounded credential-free HTTPS URL are required. The mutable
+ * public latest route is deliberately rejected because it cannot prove a deterministic pair.
+ */
+export function verificationSquirrelFeedUrl(enabled: string | undefined, candidate: string | undefined): string | null {
+  if (enabled !== "1") return null;
+  if (!candidate || candidate.length > 2048) throw new Error(`${UPDATE_VERIFICATION_URL} is required and must be at most 2048 characters.`);
+  let url: URL;
+  try { url = new URL(candidate); } catch { throw new Error(`${UPDATE_VERIFICATION_URL} must be a valid URL.`); }
+  if (url.protocol !== "https:" || url.username || url.password || url.search || url.hash || !url.pathname.endsWith("/")) {
+    throw new Error(`${UPDATE_VERIFICATION_URL} must be credential-free HTTPS without query or fragment data and end in a slash.`);
+  }
+  if (url.hostname === "github.com" && /\/releases\/latest\/download\/?$/i.test(url.pathname)) {
+    throw new Error(`${UPDATE_VERIFICATION_URL} cannot use the mutable public latest feed.`);
+  }
+  return url.href;
 }
 
 /**

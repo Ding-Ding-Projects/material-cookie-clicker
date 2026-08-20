@@ -8,6 +8,7 @@ import squirrelStartup from 'electron-squirrel-startup';
 
 import { DieselLedgerService } from './diesel-ledger-service.js';
 import { UpdateService } from './update-service.js';
+import { UPDATE_VERIFICATION_FLAG, UPDATE_VERIFICATION_URL, verificationSquirrelFeedUrl } from '../shared/game/updates.js';
 import {
   UPDATE_IPC_CHANNELS,
   DIESEL_IPC_CHANNELS,
@@ -536,7 +537,11 @@ void app.whenReady().then(() => {
   // (see src/shared/game/updates.ts for what Squirrel does and does not guarantee). The service
   // is started unconditionally: in a development checkout it works out that there is no updater
   // behind it, logs that, and publishes an `unsupported` status the notice never renders.
-  const updates = new UpdateService();
+  const verificationFeed = verificationSquirrelFeedUrl(
+    process.env[UPDATE_VERIFICATION_FLAG],
+    process.env[UPDATE_VERIFICATION_URL],
+  );
+  const updates = verificationFeed ? new UpdateService(verificationFeed) : new UpdateService();
   const pushStatus = () => {
     if (!mainWindow || mainWindow.isDestroyed()) return;
     mainWindow.webContents.send(UPDATE_IPC_CHANNELS.status, updates.current);

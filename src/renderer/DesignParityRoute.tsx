@@ -530,10 +530,14 @@ export function DesignParityRoute({ request }: { readonly request: ResolvedDesig
     const previous = new Map<string, string | null>();
     const attributes: Record<string, string> = {
       'data-theme': request.theme,
-      'data-look-colour': 'on',
-      'data-look-type': 'on',
-      'data-look-shape': 'on',
-      'data-look-elevation': 'on',
+      // These are the real rung attributes from look-tiers.ts. The four this used to write —
+      // data-look-colour/type/shape/elevation — match no rung and no stylesheet rule, so a
+      // save with palette, cabinet, marquee or glow at 'off' handed the parity route a
+      // partly-plain look while it claimed a full one.
+      'data-look-palette': 'on',
+      'data-look-cabinet': 'on',
+      'data-look-marquee': 'on',
+      'data-look-glow': 'on',
       'data-look-art': 'on',
       'data-look-motion': 'on',
       'data-look-dark': 'on',

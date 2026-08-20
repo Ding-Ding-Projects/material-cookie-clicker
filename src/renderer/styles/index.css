@@ -10900,12 +10900,22 @@ body[data-eclipse='on'] .cookie-hero::after {
  * Both measurements now come off the cookie's own size: the first row is the art's real height,
  * and the band is that plus the two lines the hero panel prints under it. The band therefore
  * still cannot change when a panel appears — the cookie size is viewport-derived and nothing else
- * feeds into it — but it is now guaranteed to be big enough for what it holds.
+ * feeds into it — and the reserve below now accounts for the panel's own padding and row gaps
+ * as well as the two lines, which the earlier hand-picked 48px did not.
  */
 .stage__hero-column {
   --hero-cookie-size: clamp(110px, 17vh, 190px);
   --hero-cookie-row: calc(var(--hero-cookie-size) * 1.2);
-  --hero-cookie-band: calc(var(--hero-cookie-row) + 48px);
+  /* The 48px this used to reserve was short, and the comment above claimed otherwise. The two
+     rows under the cookie are not the whole cost: .cookie-hero still carries padding 10px
+     top and bottom from its base rule, and two 6px row gaps. Written out rather than
+     re-guessed, so the next person can check the arithmetic against the type:
+       padding 10 + 10, gaps 6 + 6, .cookie-cps 13px/1.25 ≈ 17, .cookie-hero__hint 11px/1.25 ≈ 14.
+     That is 63px, and the hint line has room to wrap in bilingual mode, so the reserve is
+     expressed in ems of the lines it holds rather than as one more magic number. */
+  --hero-cookie-captions: calc(1.25 * 13px + 1.25 * 11px);
+  --hero-cookie-chrome: 32px; /* 10 + 10 padding, 6 + 6 row gaps */
+  --hero-cookie-band: calc(var(--hero-cookie-row) + var(--hero-cookie-captions) + var(--hero-cookie-chrome));
 }
 
 /* The two lines under the cookie sit ABOVE its glow. The glow is a decorative radial wash that
@@ -11779,6 +11789,8 @@ body[data-eclipse='on'] .cookie-hero::after {
   --md-sys-color-on-secondary-container: var(--on-secondary-container);
   --md-sys-color-tertiary: var(--tertiary);
   --md-sys-color-on-tertiary: var(--on-tertiary);
+  --md-sys-color-tertiary-container: var(--tertiary-container);
+  --md-sys-color-on-tertiary-container: var(--on-tertiary-container);
   --md-sys-color-error: var(--error);
   --md-sys-color-on-error: var(--on-error);
   --md-sys-color-error-container: var(--error-container);
@@ -11823,6 +11835,7 @@ body[data-eclipse='on'] .cookie-hero::after {
   --md-sys-typescale-title-medium-font: 500 1rem/1.5rem var(--font-en);
   --md-sys-typescale-body-large-font: 400 1rem/1.5rem var(--font-en);
   --md-sys-typescale-body-medium-font: 400 0.875rem/1.25rem var(--font-en);
+  --md-sys-typescale-body-small-font: 400 0.75rem/1rem var(--font-en);
   --md-sys-typescale-label-large-font: 500 0.875rem/1.25rem var(--font-en);
   --md-sys-typescale-label-medium-font: 500 0.75rem/1rem var(--font-en);
 }
@@ -13349,6 +13362,10 @@ body[data-eclipse='on'] .cookie-hero::after {
 
 .minigame-board--memory {
   display: grid;
+  /* The board's children are ROWS, not cards. The earlier four-column declaration far above
+     survives unless it is reset here, which laid all four rows out side by side as one strip.
+     The mines board resets the same way a few rules below. */
+  grid-template-columns: minmax(max-content, 1fr);
   gap: 8px;
 }
 
@@ -13361,6 +13378,7 @@ body[data-eclipse='on'] .cookie-hero::after {
 .minigame-board--memory-wrap {
   display: grid;
   gap: 10px;
+  overflow-x: auto;
 }
 
 .minigame-memory-card-wrap {

@@ -9,6 +9,7 @@ import {
   UPDATE_CHECK_INTERVAL_MS,
   UPDATE_FIRST_CHECK_DELAY_MS,
   UPDATE_REPOSITORY,
+  verificationSquirrelFeedUrl,
   type UpdateStatus,
 } from "../../src/shared/game/updates";
 import { UPDATE_IPC_CHANNELS } from "../../src/shared/game/ipc-contracts";
@@ -44,6 +45,27 @@ describe("squirrel feed url", () => {
 
   it("names the project repository", () => {
     expect(UPDATE_REPOSITORY).toBe("Ding-Ding-Projects/material-cookie-clicker");
+  });
+
+  it("keeps the deterministic feed override behind one explicit verification boundary", () => {
+    expect(verificationSquirrelFeedUrl(undefined, "https://updates.example.test/pair/")).toBeNull();
+    expect(verificationSquirrelFeedUrl("0", "https://updates.example.test/pair/")).toBeNull();
+    expect(verificationSquirrelFeedUrl("1", "https://updates.example.test/pair/")).toBe(
+      "https://updates.example.test/pair/",
+    );
+  });
+
+  it("refuses credentialed, unbounded, and mutable latest verification feeds", () => {
+    for (const bad of [
+      "http://updates.example.test/pair/",
+      "https://user:secret@updates.example.test/pair/",
+      "https://updates.example.test/pair/?candidate=1",
+      "https://updates.example.test/pair/#candidate",
+      "https://updates.example.test/pair",
+      "https://github.com/Ding-Ding-Projects/material-cookie-clicker/releases/latest/download/",
+    ]) {
+      expect(() => verificationSquirrelFeedUrl("1", bad)).toThrow();
+    }
   });
 });
 

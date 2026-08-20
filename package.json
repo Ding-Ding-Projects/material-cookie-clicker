@@ -21,8 +21,9 @@
     "build:main": "tsc -p tsconfig.main.json",
     "build:preload": "esbuild src/preload/index.ts --bundle --platform=node --format=cjs --external:electron --outfile=dist/preload/index.cjs",
     "precheck": "npm run build:surface-kernel",
-    "check": "tsc -p tsconfig.renderer.json --noEmit && tsc -p tsconfig.main.json --noEmit && vitest run tests && npm run typecheck --workspaces --if-present && npm run test --workspaces --if-present",
+    "check": "npm run test:installer-contract && tsc -p tsconfig.renderer.json --noEmit && tsc -p tsconfig.main.json --noEmit && vitest run tests && npm run typecheck --workspaces --if-present && npm run test --workspaces --if-present",
     "count:lines": "node scripts/count-lines.mjs",
+    "test:installer-contract": "node scripts/test-installer-contract.mjs",
     "dev": "npm run build && electron .",
     "start": "npm run build && electron .",
     "test": "vitest run tests",
@@ -75,12 +76,13 @@
         }
       ],
       "forceCodeSigning": false,
-      "signExecutable": false
+      "signExecutable": false,
+      "signAndEditExecutable": false
     },
     "squirrelWindows": {
       "name": "MaterialCookieClicker",
       "artifactName": "MaterialCookieClicker-Setup.${ext}",
-      "iconUrl": "https://raw.githubusercontent.com/Ding-Ding-Projects/material-cookie-clicker/a98e38c07423a7cfb4cb3190412884a404a7245e/assets/material-cookie-clicker.ico",
+      "iconUrl": "https://raw.githubusercontent.com/Ding-Ding-Projects/material-cookie-clicker/416d3805761d58a9b626f4d0207b004bef396731/assets/material-cookie-clicker.ico",
       "msi": false
     },
     "publish": {

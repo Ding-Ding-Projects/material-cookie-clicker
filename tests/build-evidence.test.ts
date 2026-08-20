@@ -47,6 +47,12 @@ describe('release build evidence', () => {
     );
     expect(packageJson.build.squirrelWindows.iconUrl).not.toContain('/main/');
     expect(packageJson.build.squirrelWindows.iconUrl).not.toContain('/latest/');
+    expect(packageJson.build.squirrelWindows.iconUrl).toContain('/416d3805761d58a9b626f4d0207b004bef396731/');
+    expect(packageJson.build.win).toMatchObject({
+      forceCodeSigning: false,
+      signExecutable: false,
+      signAndEditExecutable: false,
+    });
   });
 
   it('requires clean pinned source manifests and records delta/icon evidence', () => {
@@ -55,11 +61,18 @@ describe('release build evidence', () => {
     expect(common).toMatch(/^function Assert-SourceUnchanged \{/m);
     expect(common).toMatch(/^function Export-ExecutableIconProof \{/m);
     expect(common).toContain("schemaVersion = 'material-cookie-clicker.local-build.v2'");
-    expect(common).toContain("schemaVersion = 'material-cookie-clicker.local-installer.v2'");
+    expect(common).toContain("schemaVersion = 'material-cookie-clicker.local-installer.v3'");
     expect(common).toContain('sourceClean = $true');
     expect(common).toContain('sourcePinned = $true');
     expect(common).toContain('deltaAvailable = $deltaPackages.Count -gt 0');
     expect(common).not.toContain("schemaVersion = 'material-cookie-clicker.local-installer.v1'");
+    expect(common).toContain('Invoke-SquirrelPackagingWithAudit');
+    expect(common).toContain('CSC_IDENTITY_AUTO_DISCOVERY');
+    expect(common).toContain('signerInvocationCount');
+    expect(common).toContain("$expectedApplicationName = 'Material Cookie Clicker.exe'");
+    expect(common).not.toMatch(/function Invoke-ProjectInstaller[\s\S]*?Select-Object -First 1/);
+    expect(read('scripts/verify-squirrel-artifacts.ps1')).toContain('RELEASES contains a duplicate package row');
+    expect(read('scripts/validate-squirrel-runtime-receipt.mjs')).toContain('artifact receipt setup binding does not match');
     const downloader = read('scripts/download-dependencies.ps1').replaceAll('\r\n', '\n');
     expect(downloader).toMatch(/^function Write-DependencyEvidence \{/m);
     expect(downloader).toContain("node_modules\\.material-cookie-clicker-dependency-evidence.json");

@@ -59,8 +59,21 @@ jobs:
         id: version
         shell: pwsh
         run: |
-          $version = node scripts/prepare-release-version.mjs '${{ github.run_number }}' '${{ github.run_attempt }}'
+          # The script stages bumped metadata OUTSIDE the checkout by design and
+          # refuses --output-dir paths inside it, so the workflow is what copies the
+          # result in. Without --output-dir it exits 1 with
+          #   --output-dir is required; this command never rewrites tracked package metadata.
+          # which is what failed every release run until now. --print-only would silence
+          # that and be WRONG: windows-build downloads package.json and asserts its
+          # version equals the release version, so unbumped metadata fails there instead.
+          $stage = Join-Path $env:RUNNER_TEMP 'release-metadata'
+          if (Test-Path -LiteralPath $stage) { Remove-Item -LiteralPath $stage -Recurse -Force }
+          $version = node scripts/prepare-release-version.mjs '${{ github.run_number }}' '${{ github.run_attempt }}' --output-dir $stage
           if ($LASTEXITCODE -ne 0 -or -not $version) { throw 'Could not prepare a unique semantic package version.' }
+          Copy-Item -LiteralPath (Join-Path $stage 'package.json') -Destination 'package.json' -Force
+          Copy-Item -LiteralPath (Join-Path $stage 'package-lock.json') -Destination 'package-lock.json' -Force
+          $applied = (Get-Content -LiteralPath 'package.json' -Raw | ConvertFrom-Json).version
+          if ($applied -ne $version) { throw "Staged metadata did not apply: package.json reads $applied, expected $version." }
           $tag = "v$version"
           "version=$version" | Out-File -FilePath $env:GITHUB_OUTPUT -Encoding utf8 -Append
           "tag=$tag" | Out-File -FilePath $env:GITHUB_OUTPUT -Encoding utf8 -Append

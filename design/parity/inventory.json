@@ -358,7 +358,7 @@
       ],
       "reference": {
         "file": "achievement-badge.html",
-        "sha256": "797d9dc8d8da2b029087e0f0389fba530abed2474982d017468518eb3141448a",
+        "sha256": "3649e1c1a028534d5896743307f43d601c60f47c387566581aa097d04ef46981",
         "route": "/design/reference-app/index.html?row=achievement-badge--gallery&theme=light&width=1280&height=800&scale=1&state=gallery&locale=en-HK&capture=1"
       },
       "product": {
@@ -426,7 +426,7 @@
       ],
       "reference": {
         "file": "building-row.html",
-        "sha256": "05bf75d2302a7ec94a8bfb59d2a628ff9accdfec6fdac212f665d28b2bd53cca",
+        "sha256": "29ad0c27ecfdd8b854598d0a395fb86588c3d93f8e168b1dd82acf401dfe676d",
         "route": "/design/reference-app/index.html?row=building-row--gallery&theme=light&width=1280&height=800&scale=1&state=gallery&locale=en-HK&capture=1"
       },
       "product": {
@@ -494,7 +494,7 @@
       ],
       "reference": {
         "file": "bulk-toolbar.html",
-        "sha256": "4a03b0c14a933c030dc1da49afe614415af2106a274486d8055f68e3747a54bf",
+        "sha256": "5d06cab3eb82442dd1b1176bd879acc84dda4cae96e11283d4ef22fb94acbd3c",
         "route": "/design/reference-app/index.html?row=bulk-toolbar--progress&theme=light&width=1280&height=800&scale=1&state=progress&locale=en-HK&capture=1"
       },
       "product": {
@@ -567,7 +567,7 @@
       ],
       "reference": {
         "file": "cookie-surface.html",
-        "sha256": "a5e1b725129142cf2635f00409a0676048870a37307389c76d5225822abf06e3",
+        "sha256": "80a830bb7c11484d154b61c7ef13e4d185203ae6b1911bda403dc33c106b5d19",
         "route": "/design/reference-app/index.html?row=cookie-surface--gallery&theme=light&width=1280&height=800&scale=1&state=gallery&locale=en-HK&capture=1"
       },
       "product": {
@@ -634,7 +634,7 @@
       ],
       "reference": {
         "file": "game-layout.html",
-        "sha256": "c54c5efd76f4be8e63ef927613e394f3ef316025dbb2b95e82da0c1e7810dead",
+        "sha256": "d8461b56336fc35df70a24477a6d6edab9c57c0d5085665a2ed6b05fef4fabb7",
         "route": "/design/reference-app/index.html?row=game-layout--main&theme=light&width=1280&height=800&scale=1&state=main&locale=en-HK&capture=1"
       },
       "product": {
@@ -701,7 +701,7 @@
       ],
       "reference": {
         "file": "narrator-toast.html",
-        "sha256": "ede2035ce5776dc50558da7372780eca2c5d0cc2f9f2f6854a186296ac5f9bd2",
+        "sha256": "e7b65c2a6f6362f5de9ac27b87adb8a05b64e6dd26327446cd872c15a05f169d",
         "route": "/design/reference-app/index.html?row=narrator-toast--gallery&theme=light&width=1280&height=800&scale=1&state=gallery&locale=en-HK&capture=1"
       },
       "product": {
@@ -774,7 +774,7 @@
       ],
       "reference": {
         "file": "prestige-gate.html",
-        "sha256": "6accfc275dfe1b4ed51a0bc0715f43055593e0c1ff1379c0f2c4652a7c4fadbb",
+        "sha256": "4f5dcc06f504207f55d5c78b4b44cf8dfb8f249397d52e12af85ce44dd00ac3a",
         "route": "/design/reference-app/index.html?row=prestige-gate--ready&theme=light&width=1280&height=800&scale=1&state=ready&locale=en-HK&capture=1"
       },
       "product": {
@@ -841,7 +841,7 @@
       ],
       "reference": {
         "file": "search-regex-builder.html",
-        "sha256": "52a11cd27f95341cf4a7e2f60548df678e9787d669daa290bdf021378e495390",
+        "sha256": "42f0b4db4535b7b84b93b80b062662fd42dbeb5cc5954c34d6a93dbfdea975f7",
         "route": "/design/reference-app/index.html?row=search-regex-builder--open&theme=light&width=1280&height=800&scale=1&state=open&locale=en-HK&capture=1"
       },
       "product": {
@@ -910,7 +910,7 @@
       ],
       "reference": {
         "file": "settings-funny-sliders.html",
-        "sha256": "9c70f903bc9cc1cbc7d198142879f84df9198b777ad5107b57787bfc910fe943",
+        "sha256": "845c42bbb1b0ce9328ebf800e8054e2ccc44b6e4b3787840e3054d027247be65",
         "route": "/design/reference-app/index.html?row=settings-funny-sliders--default&theme=light&width=1280&height=800&scale=1&state=default&locale=en-HK&capture=1"
       },
       "product": {
@@ -978,7 +978,7 @@
       ],
       "reference": {
         "file": "stat-tile.html",
-        "sha256": "1b112c1dc161d7855da2bc2ca2f0dcd1ceedd3bef2423a52e5ce70e0557e125f",
+        "sha256": "8591e79d86dde16123be41986e8e76d17e4160680f95885524ce1359661110ed",
         "route": "/design/reference-app/index.html?row=stat-tile--gallery&theme=light&width=1280&height=800&scale=1&state=gallery&locale=en-HK&capture=1"
       },
       "product": {
@@ -1046,7 +1046,7 @@
       ],
       "reference": {
         "file": "tokens-color.html",
-        "sha256": "cf47b1db08c25597a18831cad712307b8a3ddbb02ac58af0fb240ff4b54a4349",
+        "sha256": "4b9386b1dfcb896d2dabdfa6213d1a4829bdf81ceb333b082ab6394180bfa08e",
         "route": "/design/reference-app/index.html?row=tokens-color--roles&theme=light&width=1280&height=800&scale=1&state=roles&locale=en-HK&capture=1"
       },
       "product": {
@@ -1115,7 +1115,7 @@
       ],
       "reference": {
         "file": "tokens-shape-elevation.html",
-        "sha256": "affc1a9229d67af83037a2beb006ed43545108f6cf94b9ba9355bdca10f1f1b5",
+        "sha256": "9d684a93e10b81c02fcf6f1ab6666ca29da2a223c17f746109eae6843459b652",
         "route": "/design/reference-app/index.html?row=tokens-shape-elevation--scale&theme=light&width=1280&height=800&scale=1&state=scale&locale=en-HK&capture=1"
       },
       "product": {
@@ -1183,7 +1183,7 @@
       ],
       "reference": {
         "file": "tokens-type.html",
-        "sha256": "a6e299e768361a755118ec9cd8a14ac77a9251734bba7cb94dd455f5cb403e35",
+        "sha256": "2cd6a10ee1b053ee4b733f78bcffcff9c13d37a2c1b36b7e833dd2b9d1d74639",
         "route": "/design/reference-app/index.html?row=tokens-type--scale&theme=light&width=1280&height=800&scale=1&state=scale&locale=en-HK&capture=1"
       },
       "product": {
@@ -1252,7 +1252,7 @@
       ],
       "reference": {
         "file": "tool-card.html",
-        "sha256": "5c17ccd0ddd396624442250daa1712d3334939b782601795a4c7ccefce2fb561",
+        "sha256": "7158eba026b8b0310cd3e36d6347ddac1f888894a01d28f2e355bb90bdcf2fd6",
         "route": "/design/reference-app/index.html?row=tool-card--gallery&theme=light&width=1280&height=800&scale=1&state=gallery&locale=en-HK&capture=1"
       },
       "product": {
@@ -1320,7 +1320,7 @@
       ],
       "reference": {
         "file": "tools-tree.html",
-        "sha256": "24694630b46f652e59ec0e0f1ea5b18b097e1daf7d270f653a79dce0c220dd6b",
+        "sha256": "96aed8f1fe50877395aa4a34a08fcd743564ec7bd56f0b13559dbe20a0fcba0b",
         "route": "/design/reference-app/index.html?row=tools-tree--mixed&theme=light&width=1280&height=800&scale=1&state=mixed&locale=en-HK&capture=1"
       },
       "product": {
@@ -1388,7 +1388,7 @@
       ],
       "reference": {
         "file": "upgrade-card.html",
-        "sha256": "576c8fe99724a9750e3250ea7b658fe41e43a98002dde406672aad16823893ac",
+        "sha256": "79a387ee56d2d47f1c4fb806481449fa5e8c02a00d453b06b4bf75b8f031b673",
         "route": "/design/reference-app/index.html?row=upgrade-card--gallery&theme=light&width=1280&height=800&scale=1&state=gallery&locale=en-HK&capture=1"
       },
       "product": {

@@ -1,4 +1,5 @@
-import { attachRegexBuilder } from './site-shell.js';
+import { attachRegexBuilder, onColourFor } from './site-shell.js';
+import { listAds, dismissAd, resetDismissedAds } from './site-ads.js';
 
 const SETTINGS_KEY = 'mcc-site-settings-v1';
 const RECORDS_KEY = 'mcc-site-records-v1';
@@ -10,6 +11,7 @@ const defaults = {
   narratorRate: 1, narratorPitch: 1, theme: 'system', density: 'comfortable', accent: '#7a4a1d',
   rainbow: false, rainbowSpeed: 3, fontFamily: 'Segoe UI', fontScale: 1, fontWeight: 400,
   logo: 'cookie', logoFit: 'contain', logoX: 50, logoY: 50, customLogo: '', vocabulary: null,
+  adsEnabled: true, adsDisabledIds: [],
   schedules: [], locks: [], tickets: [], totpEntries: [], notifications: [], history: [],
 };
 
@@ -60,10 +62,16 @@ function bind(id, key, event = 'change', transform = (value) => value) {
 }
 
 function applyAppearance() {
-  document.documentElement.dataset.theme = settings.theme;
+  // 'system' is not a value any stylesheet matches. Writing it verbatim left the control
+  // centre light on a dark machine at its own default, which is most first visits. Removing
+  // the attribute is what actually means 'follow the system' — the prefers-color-scheme block
+  // is written :not([data-theme="light"]) so it takes over exactly then.
+  if (settings.theme === 'system') delete document.documentElement.dataset.theme;
+  else document.documentElement.dataset.theme = settings.theme;
   document.documentElement.dataset.density = settings.density;
   document.documentElement.dataset.rainbow = String(settings.rainbow);
   document.documentElement.style.setProperty('--user-accent', settings.accent);
+  document.documentElement.style.setProperty('--m3-on-primary', onColourFor(settings.accent));
   document.documentElement.style.setProperty('--user-font', settings.fontFamily);
   document.documentElement.style.setProperty('--user-font-scale', settings.fontScale);
   document.documentElement.style.setProperty('--user-font-weight', settings.fontWeight);
@@ -181,13 +189,64 @@ function renderSchedules() {
   }
 }
 renderSchedules();
+
+document.getElementById('ads-enabled').checked = settings.adsEnabled;
+document.getElementById('ads-enabled').addEventListener('change', (event) => {
+  settings.adsEnabled = event.target.checked; saveSettings();
+  addHistory('settings changed', `House ads ${settings.adsEnabled ? 'enabled' : 'disabled'}`);
+  renderAds();
+});
+function adEnabled(id) { return !settings.adsDisabledIds.includes(id); }
+function renderAds() {
+  const input = document.getElementById('ads-search'); const list = document.getElementById('ads-list'); list.replaceChildren();
+  const ads = listAds().filter((ad) => matchesInput(input, `${ad.id} ${ad.en.eyebrow} ${ad.en.body} ${ad.en.cta} ${ad.yue.body}`));
+  for (const ad of ads) {
+    const li = document.createElement('li');
+    li.innerHTML = `<label><input type="checkbox" data-ad-checkbox="${ad.id}" /> <strong>${ad.icon} ${ad.id}</strong></label><span class="status-chip ${adEnabled(ad.id) ? 'status-chip--verified' : 'status-chip--waiting'}">${adEnabled(ad.id) ? 'Enabled' : 'Disabled'}</span><p>${ad.en.body}</p><button type="button" data-ad-toggle="${ad.id}">${adEnabled(ad.id) ? 'Disable' : 'Enable'}…</button>`;
+    li.querySelector('[data-ad-toggle]').addEventListener('click', () => {
+      settings.adsDisabledIds = adEnabled(ad.id) ? [...settings.adsDisabledIds, ad.id] : settings.adsDisabledIds.filter((id) => id !== ad.id);
+      saveSettings(); addHistory('settings changed', `House ad ${ad.id} ${adEnabled(ad.id) ? 'enabled' : 'disabled'}`); renderAds();
+    });
+    list.append(li);
+  }
+  if (!ads.length) list.innerHTML = '<li>No house ads match this search.</li>';
+}
+document.getElementById('ads-search').addEventListener('input', renderAds);
+function adCheckboxes() { return [...document.querySelectorAll('[data-ad-checkbox]')]; }
+function checkedAdIds() { return adCheckboxes().filter((box) => box.checked).map((box) => box.dataset.adCheckbox); }
+document.getElementById('ads-select-all').addEventListener('click', () => adCheckboxes().forEach((box) => box.checked = true));
+document.getElementById('ads-select-none').addEventListener('click', () => adCheckboxes().forEach((box) => box.checked = false));
+document.getElementById('ads-invert').addEventListener('click', () => adCheckboxes().forEach((box) => box.checked = !box.checked));
+document.getElementById('ads-bulk-enable').addEventListener('click', () => {
+  const ids = checkedAdIds(); if (!ids.length) return notify('Nothing selected', 'Select one or more house ads first.');
+  settings.adsDisabledIds = settings.adsDisabledIds.filter((id) => !ids.includes(id)); saveSettings();
+  addHistory('settings changed', `${ids.length} house ad(s) enabled in bulk`); renderAds();
+});
+document.getElementById('ads-bulk-disable').addEventListener('click', () => {
+  const ids = checkedAdIds(); if (!ids.length) return notify('Nothing selected', 'Select one or more house ads first.');
+  settings.adsDisabledIds = [...new Set([...settings.adsDisabledIds, ...ids])]; saveSettings();
+  addHistory('settings changed', `${ids.length} house ad(s) disabled in bulk`); renderAds();
+});
+document.getElementById('ads-bulk-dismiss').addEventListener('click', () => {
+  const ids = checkedAdIds(); if (!ids.length) return notify('Nothing selected', 'Select one or more house ads first.');
+  ids.forEach((id) => dismissAd(id)); addHistory('settings changed', `${ids.length} house ad(s) dismissed in bulk`); renderAds();
+  notify('House ads dismissed', `${ids.length} ad(s) dismissed across this browser; they stay dismissed until reset.`);
+});
+document.getElementById('export-ads').addEventListener('click', () => download('material-cookie-clicker-site-house-ads.json', 'application/json', JSON.stringify({ version: 1, adsEnabled: settings.adsEnabled, disabledIds: settings.adsDisabledIds }, null, 2)));
+document.getElementById('reset-ads').addEventListener('click', () => {
+  settings.adsEnabled = defaults.adsEnabled; settings.adsDisabledIds = [...defaults.adsDisabledIds]; saveSettings();
+  resetDismissedAds(); document.getElementById('ads-enabled').checked = settings.adsEnabled;
+  addHistory('restored', 'House ads restored to shipped defaults'); renderAds();
+});
+renderAds();
+
 function scheduleMatches(rule, now) {
   if (!rule.enabled || !rule.days.includes(now.getDay())) return false;
   const date = now.toISOString().slice(0, 10); if (rule.startDate && date < rule.startDate) return false; if (rule.endDate && date > rule.endDate) return false;
   const minutes = now.getHours() * 60 + now.getMinutes(); const [startH,startM] = rule.startTime.split(':').map(Number); const [endH,endM] = rule.endTime.split(':').map(Number);
   const start = startH * 60 + startM; const end = endH * 60 + endM; return start <= end ? minutes >= start && minutes < end : minutes >= start || minutes < end;
 }
-function applySchedules() { const matched = settings.schedules.filter((rule) => scheduleMatches(rule, new Date())); const active = matched.at(-1); if (active) { document.documentElement.dataset.theme = active.theme; document.documentElement.dataset.scheduled = active.id; } else delete document.documentElement.dataset.scheduled; }
+function applySchedules() { const matched = settings.schedules.filter((rule) => scheduleMatches(rule, new Date())); const active = matched.at(-1); if (active) { if (active.theme === 'system') delete document.documentElement.dataset.theme; else document.documentElement.dataset.theme = active.theme; document.documentElement.dataset.scheduled = active.id; } else delete document.documentElement.dataset.scheduled; }
 applySchedules(); setInterval(applySchedules, 60000);
 
 document.getElementById('accent-text').addEventListener('change', (event) => { if (/^#[0-9a-f]{6}$/i.test(event.target.value)) { settings.accent = event.target.value; saveSettings(); applyAppearance(); } else notify('Invalid colour', 'Use six hexadecimal digits after #.', 'error'); });

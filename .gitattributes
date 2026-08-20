@@ -1,0 +1,38 @@
+# Two hand-written hash manifests in this repository pin sha256 of files on disk:
+# design/parity/inventory.json (reference.sha256) and tests/design-system-ingestion.test.ts.
+# Without a normalization rule they cannot both pass on one machine — core.autocrlf gave the
+# working tree CRLF on Windows and LF on Linux, so one manifest matched and the other could not.
+# Every text file is stored and checked out LF so a pinned hash means one thing everywhere.
+* text=auto eol=lf
+
+*.html  text eol=lf
+*.css   text eol=lf
+*.js    text eol=lf
+*.mjs   text eol=lf
+*.cjs   text eol=lf
+*.json  text eol=lf
+*.md    text eol=lf
+*.ts    text eol=lf
+*.tsx   text eol=lf
+*.yml   text eol=lf
+*.yaml  text eol=lf
+*.py    text eol=lf
+*.svg   text eol=lf
+
+# Windows scripts must keep CRLF or the shells that run them misbehave.
+*.bat   text eol=crlf
+*.cmd   text eol=crlf
+*.ps1   text eol=crlf
+
+# Binary: never touched, never line-ending-converted.
+*.png   binary
+*.ico   binary
+*.webp  binary
+*.jpg   binary
+*.jpeg  binary
+*.gif   binary
+*.woff  binary
+*.woff2 binary
+*.ttf   binary
+*.zip   binary
+*.nupkg binary

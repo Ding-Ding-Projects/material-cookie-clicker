@@ -1,5 +1,49 @@
+import { renderHouseAds } from './site-ads.js';
+
 const ROOT = location.pathname.includes('/features/') ? '../' : '';
 const STORAGE_KEY = 'mcc-site-shell-v1';
+const SETTINGS_KEY = 'mcc-site-settings-v1';
+
+/* Appearance the visitor chose in the control centre has to reach the other sixteen pages, and
+   control-center.js is loaded by exactly one of them. Reading the same key here is what makes a
+   theme, accent or font choice mean anything outside the settings screen. Applied before the tab
+   strip is built so nothing paints in the wrong colours first. */
+/* Which label colour survives on a given accent: WCAG relative luminance, then the better of
+ * black and white. The picker accepts any six hex digits, so a hard-coded white label went
+ * white-on-white on a pale accent. Exported because control-center.js needs the same answer when
+ * the picker changes, and two copies of a contrast rule is two rules that will disagree. */
+export function onColourFor(hex) {
+  const m = /^#([0-9a-f]{6})$/i.exec(String(hex || ''));
+  if (!m) return '#ffffff';
+  const channel = (value) => { const c = value / 255; return c <= 0.03928 ? c / 12.92 : ((c + 0.055) / 1.055) ** 2.4; };
+  const [r, g, b] = [0, 2, 4].map((at) => parseInt(m[1].slice(at, at + 2), 16));
+  const luminance = 0.2126 * channel(r) + 0.7152 * channel(g) + 0.0722 * channel(b);
+  const onWhite = 1.05 / (luminance + 0.05);
+  const onBlack = (luminance + 0.05) / 0.05;
+  return onBlack >= onWhite ? '#000000' : '#ffffff';
+}
+
+function applyStoredAppearance() {
+  let saved;
+  try { saved = JSON.parse(localStorage.getItem(SETTINGS_KEY) || 'null'); } catch { saved = null; }
+  if (!saved || typeof saved !== 'object') return;
+  const root = document.documentElement;
+  // 'system' matches no stylesheet rule; the absence of the attribute is what follows the system.
+  if (saved.theme === 'dark' || saved.theme === 'light') root.dataset.theme = saved.theme;
+  else delete root.dataset.theme;
+  if (typeof saved.density === 'string') root.dataset.density = saved.density;
+  if (saved.rainbow === true || saved.rainbow === false) root.dataset.rainbow = String(saved.rainbow);
+  if (typeof saved.accent === 'string' && /^#[0-9a-f]{6}$/i.test(saved.accent)) {
+    root.style.setProperty('--user-accent', saved.accent);
+    root.style.setProperty('--m3-on-primary', onColourFor(saved.accent));
+  }
+  if (typeof saved.fontFamily === 'string' && saved.fontFamily) root.style.setProperty('--user-font', saved.fontFamily);
+  if (Number.isFinite(Number(saved.fontScale))) root.style.setProperty('--user-font-scale', String(Number(saved.fontScale)));
+  if (Number.isFinite(Number(saved.fontWeight))) root.style.setProperty('--user-font-weight', String(Number(saved.fontWeight)));
+}
+
+applyStoredAppearance();
+addEventListener('storage', (event) => { if (event.key === SETTINGS_KEY) applyStoredAppearance(); });
 
 const TABS = [
   { id: 'home', label: 'Home', href: `${ROOT}index.html`, group: 'Project' },
@@ -126,8 +170,14 @@ function openContextMenu(event, tab) {
     <button type="button" role="menuitem" data-action="dock">Dock tabs: ${state.dock}</button>
     <a role="menuitem" href="${ROOT}control-center.html#appearance">Edit tab appearance…</a>
   `;
-  menu.style.left = `${Math.min(event.clientX, innerWidth - 300)}px`;
-  menu.style.top = `${Math.min(event.clientY, innerHeight - 300)}px`;
+  // Clamped on one side only, this put the menu at a negative offset on any viewport under
+  // 300px — filter field and first item off the top-left corner, unreachable. The 300 was
+  // also a guess: the element is min(320px, 94vw) wide, so the real box is measured instead.
+  const box = menu.getBoundingClientRect();
+  const width = box.width || Math.min(320, innerWidth * 0.94);
+  const height = box.height || 300;
+  menu.style.left = `${Math.max(8, Math.min(event.clientX, innerWidth - width - 8))}px`;
+  menu.style.top = `${Math.max(8, Math.min(event.clientY, innerHeight - height - 8))}px`;
   document.body.append(menu);
   attachRegexBuilder(menu.querySelector('[data-regex-for]'));
   const filter = menu.querySelector('input');
@@ -173,7 +223,15 @@ export function attachRegexBuilder(button) {
       <p data-feedback role="status"></p>
       <button type="button" data-apply>Apply pattern</button>
     `;
-    document.body.append(panel);
+    // The builder used to be appended to <body> unconditionally. Both of its buttons live
+    // inside <dialog> elements opened with showModal(), and a modal dialog renders in the top
+    // layer and makes everything outside it inert — so the panel was painted behind the very
+    // dialog that opened it and could be neither seen nor clicked. At the 'Full window'
+    // palette size it was not even peeking out at the edges, so the button simply did nothing.
+    // Appending it to the owning dialog puts it in the same top-layer subtree.
+    const owner = button.closest('dialog') ?? document.body;
+    panel.dataset.inDialog = String(owner !== document.body);
+    owner.append(panel);
     const pattern = panel.querySelector('[data-pattern]');
     const feedback = panel.querySelector('[data-feedback]');
     const evaluate = () => {
@@ -245,3 +303,13 @@ document.addEventListener('keydown', (event) => {
 
 for (const button of document.querySelectorAll('[data-regex-for]')) attachRegexBuilder(button);
 renderShell();
+
+// House ads are decoration on top of the real page, never part of first paint: mount after the
+// browser is idle (or on a short timeout where idle callbacks aren't available) and re-mount
+// whenever the shared settings — language, dismissal — change in another tab or the control
+// centre.
+const scheduleAdMount = window.requestIdleCallback || ((callback) => setTimeout(callback, 200));
+scheduleAdMount(() => renderHouseAds());
+addEventListener('storage', (event) => {
+  if (event.key === SETTINGS_KEY || event.key === 'mcc-site-ads-v1') renderHouseAds();
+});

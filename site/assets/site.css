@@ -735,6 +735,29 @@ mark { background: var(--spark); color: #221B00; border-radius: 4px; padding: 0 
   --m3-on-primary-container: #ffdbc6;
 }
 
+/* The eight roles above had a dark value ONLY under an explicit [data-theme="dark"], and
+   data-theme was written by control-center.js alone — which sixteen of the seventeen pages
+   never load. So on a dark-OS machine the --md-* family went dark from its own
+   prefers-color-scheme block far above while the tab rail, boundary callout, toasts, palette
+   and context menu stayed cream: light islands stapled onto a dark page.
+
+   The guard is :not([data-theme="light"]) rather than a bare media query, so a visitor who has
+   explicitly chosen light still gets light on a dark machine. The explicit dark block below
+   keeps winning in the other direction. */
+@media (prefers-color-scheme: dark) {
+  :root:not([data-theme="light"]) {
+    color-scheme: dark;
+    --m3-surface: #18120f;
+    --m3-surface-container: #241b17;
+    --m3-surface-container-high: #302520;
+    --m3-on-surface: #f0dfd6;
+    --m3-on-surface-variant: #d7c2b8;
+    --m3-outline: #a08d83;
+    --m3-primary-container: #5d2f16;
+    --m3-on-primary-container: #ffdbc6;
+  }
+}
+
 :root[data-theme="light"] { color-scheme: light; }
 
 :root[data-density="compact"] .setting-card,
@@ -802,7 +825,10 @@ mark { background: var(--spark); color: #221B00; border-radius: 4px; padding: 0 
 :root[data-site-dock="bottom"] .site-tab-shell { bottom: 0; border-radius: 24px 24px 0 0; }
 :root[data-site-dock="left"] body { padding-left: 196px; }
 :root[data-site-dock="right"] body { padding-right: 196px; }
-:root[data-site-dock="top"] body { padding-top: 96px; }
+/* The strip is allowed max-height: 144px above, and with both groups expanded it reaches it —
+   96px reserved here let it cover the site header by up to 48px. The bottom dock already
+   reserves more than its own maximum; the top one now does too. */
+:root[data-site-dock="top"] body { padding-top: 168px; }
 :root[data-site-dock="bottom"] body { padding-bottom: 168px; }
 
 .site-tab-tools { display: flex; gap: 8px; }
@@ -914,7 +940,12 @@ input[type="button"], input[type="submit"] {
   border-radius: 24px;
   padding: 0 20px;
   background: var(--m3-primary);
-  color: white;
+  /* --m3-primary is --user-accent, written straight from the colour picker, which accepts any
+     six hex digits. A hard-coded white label went white-on-white the moment somebody chose a
+     pale accent. --m3-on-primary is computed from the chosen accent's luminance in
+     control-center.js and applied by site-shell.js on every page, with a white default so a
+     visitor who has never opened settings sees exactly what they saw before. */
+  color: var(--m3-on-primary, #ffffff);
   font: inherit;
   font-weight: 700;
   cursor: pointer;
@@ -962,6 +993,17 @@ button:focus-visible, a:focus-visible, input:focus-visible, select:focus-visible
 .site-context-menu [role="menuitem"] { display: flex; align-items: center; justify-content: space-between; text-align: left; }
 .site-context-menu a[role="menuitem"] { min-height: 48px; padding: 12px 16px; border-radius: 24px; text-decoration: none; }
 .site-regex-builder { position: fixed; inset: 8vh auto auto 50%; transform: translateX(-50%); width: min(620px, 94vw); display: grid; gap: 12px; }
+/* Inside a modal dialog the builder is already in the top layer, so it does not need to be
+   torn out of flow — and a fixed 8vh offset would sit it over the dialog's own controls.
+   It stays bounded and scrolls inside itself rather than running off the viewport. */
+.site-regex-builder[data-in-dialog="true"] {
+  position: static;
+  transform: none;
+  width: 100%;
+  max-height: min(52vh, 460px);
+  overflow: auto;
+  margin-block-start: 12px;
+}
 .site-overlay-heading { display: flex; align-items: center; justify-content: space-between; gap: 12px; }
 .site-overlay-heading button { min-width: 48px; padding: 0; }
 .site-token-row { display: flex; flex-wrap: wrap; gap: 6px; }
@@ -979,14 +1021,34 @@ button:focus-visible, a:focus-visible, input:focus-visible, select:focus-visible
 
 @media (max-width: 760px) {
   :root[data-site-dock="left"] body,
-  :root[data-site-dock="right"] body { padding-left: 0; padding-right: 0; padding-bottom: 116px; }
+  :root[data-site-dock="right"] body { padding-left: 0; padding-right: 0; padding-bottom: 96px; }
   :root[data-site-dock="left"] .site-tab-shell,
-  :root[data-site-dock="right"] .site-tab-shell { inset: auto 0 0; width: auto; max-height: 112px; flex-direction: row; border-radius: 24px 24px 0 0; }
-  .site-tab-group { min-width: max-content; }
-  .site-tab-group [role="tablist"] { flex-direction: row; }
+  :root[data-site-dock="right"] .site-tab-shell {
+    inset: auto 0 0;
+    width: auto;
+    max-height: 80px;
+    flex-direction: row;
+    border-radius: 24px 24px 0 0;
+    /* Whole labels are wider than one-letter stubs, so the strip must be allowed to run off the
+       side and be scrolled to. Letting it wrap instead produced a two-row bar that covered the
+       article and still cut the last tab in half — measured at 390px before this rule. */
+    flex-wrap: nowrap;
+    overflow-x: auto;
+    overflow-y: hidden;
+    scrollbar-width: thin;
+  }
+  /* The shell's direct child is .site-tab-groups, and it is the element that was stacking the
+     two groups — the shell being nowrap did nothing while its only child ran down the page. */
+  .site-tab-groups { display: flex; flex-direction: row; flex-wrap: nowrap; gap: 8px; min-width: max-content; }
+  .site-tab-group { min-width: max-content; flex: 0 0 auto; }
+  .site-tab-group [role="tablist"] { flex-direction: row; flex-wrap: nowrap; }
   .site-group-heading { display: none; }
-  .site-tab { min-width: 52px; justify-content: center; font-size: 0; }
-  .site-tab span:last-child::first-letter { font-size: 16px; }
+  /* font-size: 0 plus a ::first-letter restore collapsed every label to a single character —
+     and "Settings" and "Status" are both S, so two tabs were indistinguishable. The label is
+     kept whole and simply allowed to be narrow; it truncates with an ellipsis if it must, which
+     at least says there is more, and the full name stays in the accessible name either way. */
+  .site-tab { min-width: max-content; flex: 0 0 auto; justify-content: flex-start; gap: 6px; padding: 0 14px; }
+  .site-tab > span:last-child { white-space: nowrap; font-size: 13px; }
   .control-tabs { top: 0; }
   .site-search-combo { grid-template-columns: minmax(0, 1fr) 52px; }
   .settings-grid, .status-grid, .tab-search-grid { grid-template-columns: 1fr; }

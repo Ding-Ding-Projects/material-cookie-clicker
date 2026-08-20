@@ -928,6 +928,59 @@ the one the ledger file received). What they do NOT show is the easing, the
 settle, or that nothing exceeds three flashes a second — those are properties of
 the CSS and of the one-shot, non-repeating animations it declares.
 
+### Root-level orphan captures
+
+Two files at the top level of this directory — not under `app/` — that predate
+the reveal work described in the "Make the game surface something the player
+uncovers" commit (`8b3f78a`) and were never given their own table row anywhere
+in this file, README.md, `site/README.md`, or `docs/`:
+
+| File | What it shows | Why it is kept |
+| --- | --- | --- |
+| `captures/disclosure-start.png` | A fresh-profile opening from before the discovery-ticket reveal system existed. | Genuine build evidence from that commit; superseded by the current cookie-only opening but never indexed. |
+| `captures/disclosure-shop-revealed.png` | The same run after the shop rail was revealed, before the current three-ticket discovery sequence (Shop Sign, Upgrade Catalogue, Steady Hand). | Same as above. |
+
+They are not deleted, because deleting an unindexed file is exactly the silent
+loss this document exists to prevent. They are named here instead, so the gap
+is visible rather than merely present.
+
+## Retention policy
+
+This file's job is to make every retained image accountable, not to keep every
+image forever. As of this writing there are 119 PNG files under `captures/`
+(117 unique basenames — `plain-start.png` and `plain-upgrading.png` each exist
+in two places, at the top level and under `app/`, both genuinely referenced).
+Of those 117 unique names, 115 already have a table row somewhere in this file
+naming what they show, which commit or session produced them, and whether they
+are current or superseded; the two exceptions are the root-level orphans listed
+directly above, which now do too.
+
+**What is kept, and why.** Every superseded generation above — the
+`EvidenceRefresh` historical set, the superseded design-iteration archive, the
+gap-closing set, the wave-two events set, and each per-feature set further down
+— is retained because it is a real photograph of a real build at a real commit,
+grouped by the section headings above so a reader can tell which generation
+produced which file without re-deriving it. Nothing here is regenerated,
+touched up, or silently replaced by a same-named file from a later run.
+
+**What a future cleanup may safely consider removing**, and only in a dedicated
+commit separate from feature work, after re-checking that no `scripts/`,
+README.md, `site/`, or `docs/` reference has been added since:
+
+- The `Superseded design-iteration archive` (39 files, listed by commit above) —
+  every one of those surfaces has a current replacement already photographed in
+  the current sets.
+- `plain-start.png` — explicitly marked superseded in both this file and
+  README.md's evidence table, retained only pending a fresh cookie-only capture.
+
+**What must not be removed without first replacing its citation:** any file the
+release inventory (`scripts/release-capture-inventory.json`) points to from a
+`supersededEvidence.image` or `supportingEvidence.image` field — currently
+`captures/app/plain-start.png`, `captures/app/game-progressed.png`,
+`captures/app/game-dark.png`, and the three files under
+`design/parity/evidence/graphics-progression/` — since the inventory's own
+schema requires that path to resolve.
+
 ## `design/` — the design system
 
 Captured from the spec files in `design/`, rendered in a browser on the same

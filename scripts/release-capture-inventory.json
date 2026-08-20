@@ -2,6 +2,15 @@
   "schemaVersion": "material-cookie-clicker.release-captures.v2",
   "requiredMethod": "lowlevel-cheap-headless",
   "builtArtifact": "dist",
+  "summary": {
+    "note": "Computed directly from the states array below; update both together and re-verify by counting rather than editing this block by hand.",
+    "totalStates": 28,
+    "pendingStates": 28,
+    "statesWithNoImageField": 22,
+    "statesWithSupersededEvidenceOnly": 3,
+    "statesWithSupportingEvidenceOnly": 3,
+    "statesFullyPromoted": 0
+  },
   "states": [
     {
       "id": "fresh-start",

@@ -1238,7 +1238,7 @@
   align-content: start;
   gap: 16px;
   padding: 22px;
-  border: 1px solid var(--md-sys-color-tertiary);
+  border: 1px solid #176b36;
   border-radius: var(--md-sys-shape-corner-extra-large);
   background: var(--tertiary-container);
   color: var(--on-tertiary-container);
@@ -1284,7 +1284,7 @@
   display: block;
   padding: 20px;
   border: 1px solid var(--md-sys-color-outline-variant);
-  border-top: 8px solid var(--md-sys-color-tertiary);
+  border-top: 8px solid #176b36;
   border-radius: var(--md-sys-shape-corner-extra-large);
   background: var(--md-sys-color-surface-container-low);
   box-shadow: var(--md-sys-elevation-level-1);
@@ -1339,6 +1339,18 @@
 
 :root:root body .design-parity-route .parity-stat-tile .stat-tile__trend.down {
   color: #9d2828;
+}
+
+/* The two values above are the light-mode figures the checked-in reference specifies, so they
+   stay literal. They are unreadable on the dark surface, though — #176b36 and #9d2828 sit at
+   about 2.6:1 on --surface-low's #1a120b — so dark gets its own pair. Functional data colour,
+   kept as data; the glyph carries the direction either way. */
+:root[data-theme='dark']:root body .design-parity-route .parity-stat-tile .stat-tile__trend.up {
+  color: #7ddaa0;
+}
+
+:root[data-theme='dark']:root body .design-parity-route .parity-stat-tile .stat-tile__trend.down {
+  color: #ffb4ab;
 }
 
 :root:root body .design-parity-route .parity-goal-tile {

@@ -1,0 +1,132 @@
+/* House ads: small, dismissible, non-blocking cards promoting the project's own features.
+   No third party, no network, no payment — every property below reads from the same Material
+   tokens site.css already defines, so a theme/accent/density change updates these too. */
+
+.site-house-ads {
+  position: fixed;
+  z-index: 40;
+  left: 16px;
+  bottom: 16px;
+  width: min(360px, calc(100vw - 32px));
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+  pointer-events: none;
+}
+
+/* The tab shell docks to an edge and can occupy the left strip; keep the ad stack clear of it
+   on wide viewports docked left, matching how the toast region already avoids the shell. */
+:root[data-site-dock="left"] .site-house-ads { left: max(16px, var(--site-shell-inline-size, 0px)); }
+:root[data-site-dock="right"] .site-house-ads { left: 16px; right: auto; }
+
+.site-house-ad {
+  pointer-events: auto;
+  background: var(--m3-surface-container);
+  color: var(--m3-on-surface);
+  border: 1px solid var(--m3-outline);
+  border-radius: var(--m3-shape-md);
+  box-shadow: 0 4px 14px rgba(0, 0, 0, 0.18);
+  padding: 14px 14px 12px;
+  display: grid;
+  grid-template-columns: auto 1fr auto;
+  gap: 4px 10px;
+  align-items: start;
+  animation: site-ad-in 220ms ease-out;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .site-house-ad { animation: none; }
+}
+
+@keyframes site-ad-in {
+  from { opacity: 0; transform: translateY(8px); }
+  to { opacity: 1; transform: translateY(0); }
+}
+
+.site-house-ad .site-ad-icon {
+  grid-row: 1 / 3;
+  font-size: 22px;
+  line-height: 1;
+  padding-top: 2px;
+}
+
+.site-house-ad .site-ad-eyebrow {
+  grid-column: 2;
+  font-size: 11px;
+  font-weight: 700;
+  letter-spacing: 0.06em;
+  text-transform: uppercase;
+  color: var(--m3-on-surface-variant, var(--m3-on-surface));
+  margin: 0;
+}
+
+.site-house-ad .site-ad-body {
+  grid-column: 2;
+  font-size: 13.5px;
+  line-height: 1.4;
+  margin: 0;
+}
+
+.site-house-ad .site-ad-body + .site-ad-body {
+  margin-top: 4px;
+}
+
+.site-house-ad .site-ad-actions {
+  grid-column: 2;
+  display: flex;
+  gap: 8px;
+  margin-top: 8px;
+}
+
+.site-house-ad .site-ad-actions a {
+  font-size: 13px;
+  font-weight: 600;
+  color: var(--m3-primary);
+  text-decoration: none;
+  min-height: 44px;
+  display: inline-flex;
+  align-items: center;
+  padding: 0 6px;
+  border-radius: 8px;
+}
+
+.site-house-ad .site-ad-actions a:hover,
+.site-house-ad .site-ad-actions a:focus-visible {
+  text-decoration: underline;
+}
+
+.site-house-ad .site-ad-dismiss {
+  grid-column: 3;
+  grid-row: 1;
+  min-width: 44px;
+  min-height: 44px;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  background: transparent;
+  border: none;
+  border-radius: 999px;
+  color: var(--m3-on-surface-variant, var(--m3-on-surface));
+  font-size: 16px;
+  cursor: pointer;
+}
+
+.site-house-ad .site-ad-dismiss:hover {
+  background: rgba(0, 0, 0, 0.08);
+}
+
+:root[data-theme="dark"] .site-house-ad .site-ad-dismiss:hover,
+:root:not([data-theme="light"]) .site-house-ad .site-ad-dismiss:hover {
+  background: rgba(255, 255, 255, 0.12);
+}
+
+.site-house-ad .site-ad-dismiss:focus-visible,
+.site-house-ad .site-ad-actions a:focus-visible,
+.site-house-ad .site-ad-actions button:focus-visible {
+  outline: 2px solid var(--m3-primary);
+  outline-offset: 2px;
+}
+
+@media (max-width: 320px) {
+  .site-house-ads { left: 8px; right: 8px; width: auto; }
+}

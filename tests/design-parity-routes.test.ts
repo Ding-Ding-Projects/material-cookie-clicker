@@ -79,6 +79,63 @@ function validateDesignRouteTokenSet(source: string): void {
   }
 }
 
+const PARITY_REPAIR_RULES = [
+  { selector: ':root:root body .design-parity-route', declarations: ['font: 400 16px/1.5 var(--font-en);'] },
+  { selector: ':root:root body .design-parity-route .parity-theme-toggle', declarations: ['font: 500 16px/24px var(--font-en);', 'padding: 10px 24px;'] },
+  { selector: ':root:root body .design-parity-route .parity-spec-section > h2', declarations: ['gap: 16px;', 'text-transform: none;'] },
+  { selector: ':root:root body .design-parity-route .bulk-toolbar', declarations: ['min-height: 126px;', 'border: 1px solid var(--md-sys-color-outline-variant);'] },
+  { selector: ':root:root body .design-parity-route .parity-progress-card progress', declarations: ['height: 10px;'] },
+  { selector: ':root:root body .design-parity-route .parity-cookie-state', declarations: ['width: 132px;', 'height: auto;'] },
+  { selector: ':root:root body .design-parity-route .parity-game-layout > .hud', declarations: ['gap: 14px;'] },
+  { selector: ':root:root body .design-parity-route .parity-layout-cookie', declarations: ['grid-template-rows: 1fr 60px;', 'place-items: center;'] },
+  { selector: ':root:root body .design-parity-route .parity-layout-dialog', declarations: ['animation: none;', 'opacity: 1;', 'height: auto;'] },
+  { selector: ':root:root body .design-parity-route .parity-toast-stack .canonical-notice', declarations: ['grid-template-columns: 1fr 48px;', 'padding: 22px 24px;'] },
+  { selector: ':root:root body .design-parity-route .gate.tone-prestige', declarations: ['min-height: 520px;', 'width: min(480px, 100%);'] },
+  { selector: ':root:root body .design-parity-route .parity-regex-popover', declarations: ['position: static;', 'width: min(380px, 100%);'] },
+  { selector: ":root:root body .design-parity-route .parity-regex-popover .flag-row input[type='checkbox']", declarations: ['appearance: auto;', 'min-height: 0;'] },
+  { selector: ':root:root body .design-parity-route .settings-block', declarations: ['display: grid;', 'padding: 20px;'] },
+  { selector: ':root:root body .design-parity-route .tools-hud', declarations: ['grid-template-columns: auto minmax(180px, 1fr) auto;', 'min-height: 82px;'] },
+  { selector: ':root:root body .design-parity-route .parity-tools-tree .tools-tier__heading', declarations: ['font: 500 18px/24px var(--font-en);', 'border-bottom: 8px solid var(--md-sys-color-primary);'] },
+  { selector: ':root:root body .design-parity-route .parity-tools-tree .item-card.undiscovered', declarations: ['opacity: .58;'] },
+] as const;
+
+function exactCssRuleBody(source: string, selector: string): string {
+  const escaped = selector.replace(/[.*+?^${}()|[\]\\]/g, '\\$&');
+  const matches = [...source.matchAll(new RegExp(`(?:^|\\r?\\n)${escaped}\\s*\\{([^{}]*)\\}`, 'g'))];
+  if (matches.length !== 1) throw new Error(`Expected exactly one parity repair selector ${selector}, received ${matches.length}`);
+  return matches[0][1].replace(/\s+/g, ' ').trim();
+}
+
+function assertParityRouteRepairContract(routeSource: string, cssSource: string): void {
+  if (/scrollbar-gutter\s*:/u.test(cssSource)) throw new Error('Stable scrollbar gutter must stay absent from the parity route.');
+  const scopedStart = cssSource.indexOf(':root:root body .design-parity-route {');
+  const scopedEnd = cssSource.indexOf('.parity-upgrade-shelf {', scopedStart);
+  if (scopedStart < 0 || scopedEnd < 0) throw new Error('The scoped parity repair block must have exact boundaries.');
+  if (cssSource.slice(scopedStart, scopedEnd).includes('!important')) throw new Error('Scoped parity repair rules must win through specificity.');
+  for (const rule of PARITY_REPAIR_RULES) {
+    const body = exactCssRuleBody(cssSource, rule.selector);
+    for (const declaration of rule.declarations) {
+      if (!body.includes(declaration)) throw new Error(`Parity repair selector ${rule.selector} is missing ${declaration}`);
+    }
+  }
+
+  const exactSourceLines = [
+    "import { DestructiveGate } from './components/DestructiveGate.js';",
+    '<DestructiveGate tone="prestige"',
+    'onClick={() => setDialogOpen(false)}',
+    'onClick={() => setGoldenVisible(false)}',
+    'level={funnyLevelEn}',
+    'level={funnyLevelYue}',
+    'value={level}',
+    'TREE_TIERS[tier].filter(matches).map((tool)',
+    'onClick={() => setProgressVisible((visible) => !visible)}',
+  ];
+  for (const line of exactSourceLines) {
+    if (!routeSource.includes(line)) throw new Error(`Parity route repair source is missing exact boundary ${line}`);
+  }
+  if (routeSource.includes('className="gate parity-gate"')) throw new Error('The bespoke prestige gate must not return.');
+}
+
 describe('built-product design parity routes', () => {
   it('covers every hand-written inventory row exactly once with the exact product URL tuple', () => {
     const inventoryIds = inventory.rows.map((row) => row.id);
@@ -134,7 +191,7 @@ describe('built-product design parity routes', () => {
     expect(render('game-layout--main')).toContain('Achievements · 成就');
     expect(render('narrator-toast--gallery')).toContain('+1,337 cookies; frenzy active for 60s');
     expect(render('narrator-toast--gallery')).toContain('+2.4 M cookies over 6 h 12 m');
-    expect(render('prestige-gate--ready')).toContain('Emergency exit · 緊急離開');
+    expect(render('prestige-gate--ready')).toContain('Emergency exit · 緊急退出');
     expect(render('search-regex-builder--open')).toContain('bak(ery|eries)');
     expect(render('search-regex-builder--open')).toContain('2 of 3 matches');
     expect(render('settings-funny-sliders--default')).toContain('Current level: 2 of 5');
@@ -201,5 +258,19 @@ describe('built-product design parity routes', () => {
         expect(referenceTokens, `${token} must be defined by the modern reference`).toContain(`${token}:`);
       }
     }
+  });
+
+  it('locks the hand-written parity repair boundary and proves an exact removal turns red before restore', () => {
+    const routeSource = readFileSync(resolve('src/renderer/DesignParityRoute.tsx'), 'utf8');
+    const cssSource = readFileSync(resolve('src/renderer/styles/design-parity-route.css'), 'utf8');
+    const selector = ':root:root body .design-parity-route .parity-theme-toggle';
+    const brokenCss = cssSource.replace(`${selector} {`, `${selector}-REMOVED {`);
+    const brokenRoute = routeSource.replace("import { DestructiveGate } from './components/DestructiveGate.js';", '');
+
+    expect(() => assertParityRouteRepairContract(routeSource, cssSource)).not.toThrow();
+    expect(brokenCss).not.toBe(cssSource);
+    expect(brokenRoute).not.toBe(routeSource);
+    expect(() => assertParityRouteRepairContract(routeSource, brokenCss)).toThrow(/exactly one parity repair selector/i);
+    expect(() => assertParityRouteRepairContract(brokenRoute, cssSource)).toThrow(/DestructiveGate/);
   });
 });

@@ -1,7 +1,28 @@
 # Roadmap
 
-Status as of 2026-08-19. A feature is listed as verified, evidence-pending, partial, logic-only, or
-not implemented; planned work is never phrased as shipped.
+Status as of 2026-08-19 at integration candidate
+`43d2174bc2172d31e572d9668282764438e4d904`. A feature is listed as verified,
+evidence-pending, partial, logic-only, or not implemented; planned work is never phrased as
+shipped.
+
+## Current integration candidate
+
+- **Not a release.** `43d2174` is 61 commits ahead of the verified `v0.2.55` source and has not
+  been published. Release and installed-runtime evidence from `v0.2.55` does not automatically
+  prove the source changes that followed it.
+- **Current source/package checks.** `npm run check` completed at the pinned clean candidate with
+  both TypeScript checks and **1,124/1,124 tests**: 998 application tests across 59 files, 37
+  local-model package tests, and 89 surface-kernel tests. The eight focused completeness tests also
+  pass, as do 78/78 light/dark contrast pairs.
+- **Design parity remains red.** Structure covers 16/16 references and all 19 deliberate negative
+  cases turn red and restore green, but release mode fails because all 16 visual-diff reviews remain
+  `defect`.
+- **Promotion provenance is invalidated.** The 32 current promotion records omit 13 generic
+  contract fields; their capture/build/interaction/privacy records live inside the repository
+  rather than one task run root; no staged transaction or backups exist; and the generator
+  hard-codes source/process/window identifiers. The minigame-button capture source also had
+  uncommitted changes. A fresh clean-source, task-rooted promotion run is required after the visual
+  defects are repaired.
 
 ## Published and verified baseline
 
@@ -43,13 +64,18 @@ not implemented; planned work is never phrased as shipped.
 
 ## Integrated source candidate; runtime evidence pending
 
-The independent implementation lanes have converged in the current source candidate. Settings →
-Application tools mounts identity/appearance, categorized conversion with dedicated PDF controls,
-local-model recovery, and security/state tools. Main-process file grants, a persistent bounded
-conversion queue, operating-system-vault storage, and local Git history are wired through preload.
+The independent implementation lanes have converged at `43d2174`. Settings → Application tools
+mounts identity/logo/appearance, categorized conversion with dedicated PDF controls, local-model
+recovery, authenticator registration, local history, schedules, exports, changelog, offline docs,
+and security/state tools. Main-process file grants, a persistent bounded conversion queue,
+operating-system-vault storage, and local Git history are wired through preload.
+
 The full packaged local-model catalog/pull/chat/harness adapter remains explicitly unavailable.
-Installed interactions, captures, installer proof, and release proof are still pending, so the
-[per-surface inventory](docs/completeness.md) keeps the affected rows partial or evidence-pending.
+Persisted authenticator code-view hydration, authenticated history restore, complete export/editor
+handoff, populated offline docs/changelog data, per-element toy locks, the unlock ladder, external
+editor integration, and browser-extension download surfaces remain partial or absent. Installed
+interactions, captures, installer proof, and release proof are still pending, so the
+[per-surface inventory](docs/completeness.md) remains authoritative.
 
 ## Remaining canonical gaps after source integration
 
@@ -67,10 +93,13 @@ The hand-written matrix is authoritative; the largest gaps are:
 
 ## Completion order
 
-1. Pin the integrated source candidate and keep the per-surface matrix factual.
-2. Run the built-artifact interaction/capture matrix for every newly mounted tool tab.
-3. Package and verify the unsigned installer and its original product icon.
-4. Publish exactly one release for the final integrated commit, verify its assets and workflow
+1. Keep `43d2174` and the per-surface matrix factual while source lanes converge.
+2. Repair all 16 parity defects and replace the invalidated evidence with one clean, task-rooted,
+   transactional promotion run.
+3. Run the built-artifact interaction/capture matrix for every newly mounted tool tab, including
+   graphics fresh state, minigames/Lucky Chance, Office Building, and endless Home extensions.
+4. Package and verify the unsigned installer and its original product icon.
+5. Publish exactly one release for the final integrated commit, verify its assets and workflow
    timing, and leave the repository with only proven, merged work.
 
 ## Standing constraints
@@ -78,5 +107,7 @@ The hand-written matrix is authoritative; the largest gaps are:
 - Nobody pays for the application: no purchase, licence, subscription, or paid feature tier.
 - Code signing is permanently prohibited; releases are unsigned and say so.
 - In-game discovery may gate a gameplay bonus but never substitute for a usable application feature.
-- The bakery-arcade visual language is an explicit product decision; accessibility, contrast,
-  focus, target size, reduced motion, and clipping requirements still apply.
+- Gameplay artwork retains the bakery-arcade identity while application chrome and controls use
+  Material Design 3 roles and anatomy. The red 16-row parity state remains a release blocker;
+  accessibility, contrast, focus, target size, reduced motion, and clipping requirements still
+  apply.

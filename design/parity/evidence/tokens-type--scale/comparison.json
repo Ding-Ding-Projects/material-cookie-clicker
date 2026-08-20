@@ -1,0 +1,23 @@
+{
+  "schemaVersion": 1,
+  "rowId": "tokens-type--scale",
+  "tuple": {
+    "screen": "tokens-type",
+    "state": "scale",
+    "theme": "light",
+    "viewport": {
+      "width": 1280,
+      "height": 800
+    },
+    "scale": 1,
+    "locale": "en-HK"
+  },
+  "labels": [
+    "REFERENCE",
+    "BUILT PRODUCT"
+  ],
+  "inputs": {
+    "referenceSha256": "0f10f645927f9ba53ed0ee88b87f2c2a2ddc8acbada90c3022bbc1a0753bd15d",
+    "productSha256": "54882e386e530af1e26206051ef743bd744c2382de974d7ffca01fa92844e3ec"
+  }
+}

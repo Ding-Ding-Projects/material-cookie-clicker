@@ -1,0 +1,23 @@
+{
+  "schemaVersion": 1,
+  "rowId": "search-regex-builder--open",
+  "tuple": {
+    "screen": "search-regex-builder",
+    "state": "open",
+    "theme": "light",
+    "viewport": {
+      "width": 1280,
+      "height": 800
+    },
+    "scale": 1,
+    "locale": "en-HK"
+  },
+  "labels": [
+    "REFERENCE",
+    "BUILT PRODUCT"
+  ],
+  "inputs": {
+    "referenceSha256": "d8ed116b7ab1c45dd29bd604883e1dce9383b90f052211ada7a79d039309f35c",
+    "productSha256": "26f7e93506b4d82ba410da8d659e9e8ddd995c34e549b07e9f77f9cd9a75fffb"
+  }
+}

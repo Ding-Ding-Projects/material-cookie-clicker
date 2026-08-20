@@ -1,0 +1,22 @@
+{
+  "version": 1,
+  "rowId": "cookie-surface--gallery",
+  "side": "referenceRaw",
+  "route": "/design/reference-app/index.html?row=cookie-surface--gallery&theme=light&width=1280&height=800&scale=1&state=gallery&locale=en-HK&capture=1",
+  "state": {
+    "file": "cookie-surface.html",
+    "width": 1280,
+    "height": 800,
+    "scale": 1,
+    "lang": "en-HK",
+    "theme": "light",
+    "state": "gallery",
+    "rect": {
+      "x": 0,
+      "y": 0,
+      "width": 1280,
+      "height": 800
+    }
+  },
+  "cleanupCompleted": true
+}

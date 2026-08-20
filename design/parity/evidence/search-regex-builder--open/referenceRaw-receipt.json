@@ -1,0 +1,87 @@
+{
+  "version": 1,
+  "id": "search-regex-builder--open--reference",
+  "route": "cheap-lowlevel-headless",
+  "source": {
+    "startCommit": "330352ce7513ba420752dd7243762f0dd75f9eaa",
+    "endCommit": "330352ce7513ba420752dd7243762f0dd75f9eaa",
+    "artifactPath": "dist/renderer/assets/index-BQyFOhDT.js",
+    "artifactSha256": "4663d6eaeafea4f1291311a86691fffc4e24ced846e32bcbd4405b5dd8b79198",
+    "buildReceiptPath": "design/parity/evidence/build-receipt.json",
+    "buildReceiptSha256": "34ff59d65a1ad149e636e8605f8d8c39364df8f0ddaecf4cc10fb72c566f9394",
+    "artifactBuiltAt": "2026-08-20T00:26:09.979Z"
+  },
+  "capture": {
+    "rawPath": "C:\\Users\\cntow\\AppData\\Local\\Temp\\mcc-parity-330352c-20260819-2025\\output\\reference-rows-current\\search-regex-builder--open\\reference.png",
+    "promotedPath": "design/parity/evidence/search-regex-builder--open/reference.png",
+    "sha256": "d8ed116b7ab1c45dd29bd604883e1dce9383b90f052211ada7a79d039309f35c",
+    "rawSha256": "d8ed116b7ab1c45dd29bd604883e1dce9383b90f052211ada7a79d039309f35c",
+    "mimeType": "image/png",
+    "startedAt": "2026-08-20T00:26:09.979Z",
+    "capturedAt": "2026-08-20T00:26:10.269Z",
+    "width": 1280,
+    "height": 800
+  },
+  "state": {
+    "surface": "design-reference-app",
+    "screen": "search-regex-builder",
+    "state": "open",
+    "theme": "light",
+    "viewport": {
+      "width": 1280,
+      "height": 800
+    },
+    "scale": 1,
+    "locale": "en-HK",
+    "captureKind": "page",
+    "deterministic": {
+      "fixture": "regex-builder-open-v1",
+      "time": "2026-08-19T12:00:00Z",
+      "motion": "paused",
+      "randomSeed": 1908,
+      "fonts": "Segoe UI system stack",
+      "network": "blocked"
+    }
+  },
+  "privacy": {
+    "visibleDesktopUntouched": true,
+    "expectedSurfaceOnly": true,
+    "sensitiveDataReviewed": true,
+    "unrelatedTargetsObserved": false,
+    "mocked": false,
+    "handEdited": false
+  },
+  "inspection": {
+    "decoded": true,
+    "pixelsInspected": true,
+    "targetVisible": true,
+    "expectedStateVisible": true,
+    "reviewer": "automated parity capture review"
+  },
+  "runtime": {
+    "launchPid": 51504,
+    "hwnd": "15468902",
+    "hwndResolvedLive": true,
+    "consoleErrorCount": 0,
+    "pageErrorCount": 0,
+    "interactionProofId": "search-regex-builder--open-referenceRaw",
+    "interactionReceiptPath": "design/parity/evidence/search-regex-builder--open/referenceRaw-interaction.json",
+    "interactionReceiptSha256": "1aeb39afd4fdd03e26a074af5e103923bdb35b07f1495760de7f42baec7154ce",
+    "privacyScanPath": "design/parity/evidence/search-regex-builder--open/referenceRaw-privacy.json",
+    "privacyScanSha256": "ee01fec30d242657c3bb5c4a425aa47dd2e39724a3e47eeba106e061a9c28c84",
+    "cleanupCompleted": true,
+    "cleanupOwnedOnly": true
+  },
+  "inventory": {
+    "path": "design/parity/evidence/promotion-inventory.json",
+    "recordId": "search-regex-builder--open--reference",
+    "rowId": "search-regex-builder--open",
+    "evidenceKey": "referenceRaw"
+  },
+  "documentation": [
+    {
+      "path": "design/parity/inventory.json",
+      "alt": "search-regex-builder--open referenceRaw at 1280 by 800"
+    }
+  ]
+}

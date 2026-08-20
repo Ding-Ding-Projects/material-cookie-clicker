@@ -1,0 +1,87 @@
+{
+  "version": 1,
+  "id": "settings-funny-sliders--default--product",
+  "route": "cheap-lowlevel-headless",
+  "source": {
+    "startCommit": "330352ce7513ba420752dd7243762f0dd75f9eaa",
+    "endCommit": "330352ce7513ba420752dd7243762f0dd75f9eaa",
+    "artifactPath": "dist/renderer/assets/index-BQyFOhDT.js",
+    "artifactSha256": "4663d6eaeafea4f1291311a86691fffc4e24ced846e32bcbd4405b5dd8b79198",
+    "buildReceiptPath": "design/parity/evidence/build-receipt.json",
+    "buildReceiptSha256": "34ff59d65a1ad149e636e8605f8d8c39364df8f0ddaecf4cc10fb72c566f9394",
+    "artifactBuiltAt": "2026-08-20T00:25:11.530Z"
+  },
+  "capture": {
+    "rawPath": "C:\\Users\\cntow\\AppData\\Local\\Temp\\mcc-parity-330352c-20260819-2025\\output\\product-rows\\settings-funny-sliders--default\\product.png",
+    "promotedPath": "design/parity/evidence/settings-funny-sliders--default/product.png",
+    "sha256": "cebcb05ee983c4b1e8af73d5e5988363d99bbee4c8d185ecfd537de3d165ac52",
+    "rawSha256": "cebcb05ee983c4b1e8af73d5e5988363d99bbee4c8d185ecfd537de3d165ac52",
+    "mimeType": "image/png",
+    "startedAt": "2026-08-20T00:25:11.530Z",
+    "capturedAt": "2026-08-20T00:25:11.758Z",
+    "width": 1280,
+    "height": 800
+  },
+  "state": {
+    "surface": "desktop-app",
+    "screen": "settings-funny-sliders",
+    "state": "default",
+    "theme": "light",
+    "viewport": {
+      "width": 1280,
+      "height": 800
+    },
+    "scale": 1,
+    "locale": "en-HK",
+    "captureKind": "page",
+    "deterministic": {
+      "fixture": "settings-default-v1",
+      "time": "2026-08-19T12:00:00Z",
+      "motion": "paused",
+      "randomSeed": 1909,
+      "fonts": "Segoe UI system stack",
+      "network": "blocked"
+    }
+  },
+  "privacy": {
+    "visibleDesktopUntouched": true,
+    "expectedSurfaceOnly": true,
+    "sensitiveDataReviewed": true,
+    "unrelatedTargetsObserved": false,
+    "mocked": false,
+    "handEdited": false
+  },
+  "inspection": {
+    "decoded": true,
+    "pixelsInspected": true,
+    "targetVisible": true,
+    "expectedStateVisible": true,
+    "reviewer": "automated parity capture review"
+  },
+  "runtime": {
+    "launchPid": 44684,
+    "hwnd": "789628",
+    "hwndResolvedLive": true,
+    "consoleErrorCount": 0,
+    "pageErrorCount": 0,
+    "interactionProofId": "settings-funny-sliders--default-productRaw",
+    "interactionReceiptPath": "design/parity/evidence/settings-funny-sliders--default/productRaw-interaction.json",
+    "interactionReceiptSha256": "b60f612fc6f18d86b52cb41476caa4885c7f6372e4dc381723a05158522acbc9",
+    "privacyScanPath": "design/parity/evidence/settings-funny-sliders--default/productRaw-privacy.json",
+    "privacyScanSha256": "ee01fec30d242657c3bb5c4a425aa47dd2e39724a3e47eeba106e061a9c28c84",
+    "cleanupCompleted": true,
+    "cleanupOwnedOnly": true
+  },
+  "inventory": {
+    "path": "design/parity/evidence/promotion-inventory.json",
+    "recordId": "settings-funny-sliders--default--product",
+    "rowId": "settings-funny-sliders--default",
+    "evidenceKey": "productRaw"
+  },
+  "documentation": [
+    {
+      "path": "design/parity/inventory.json",
+      "alt": "settings-funny-sliders--default productRaw at 1280 by 800"
+    }
+  ]
+}

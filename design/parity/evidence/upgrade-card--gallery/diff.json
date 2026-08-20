@@ -1,0 +1,43 @@
+{
+  "schemaVersion": 1,
+  "rowId": "upgrade-card--gallery",
+  "tuple": {
+    "screen": "upgrade-card",
+    "state": "gallery",
+    "theme": "light",
+    "viewport": {
+      "width": 1280,
+      "height": 800
+    },
+    "scale": 1,
+    "locale": "en-HK"
+  },
+  "inputs": {
+    "reference": {
+      "path": "design/parity/evidence/upgrade-card--gallery/reference.png",
+      "sha256": "fdc7750b74790de25b90877a282cfadaf7aaa3d3a7ea956c4b72c10ca84c957a"
+    },
+    "product": {
+      "path": "design/parity/evidence/upgrade-card--gallery/product.png",
+      "sha256": "d649a1896bbe235faf6d393a8f5f4dd85b99b1d87eb2933bd95f2e4df45d47dc"
+    }
+  },
+  "dimensions": {
+    "width": 1280,
+    "height": 800
+  },
+  "metrics": {
+    "changedPixels": 697764,
+    "totalPixels": 1024000,
+    "changedRatio": 0.68141015625,
+    "rgbRmse": 55.75903691412851
+  },
+  "tool": {
+    "name": "Pillow ImageChops.difference",
+    "version": "12.3.0"
+  },
+  "review": {
+    "verdict": "defect",
+    "reason": "Visible deltas remain unapproved; metrics prioritize human review and do not waive differences."
+  }
+}

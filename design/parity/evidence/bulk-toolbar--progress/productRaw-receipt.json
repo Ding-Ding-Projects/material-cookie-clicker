@@ -1,0 +1,87 @@
+{
+  "version": 1,
+  "id": "bulk-toolbar--progress--product",
+  "route": "cheap-lowlevel-headless",
+  "source": {
+    "startCommit": "330352ce7513ba420752dd7243762f0dd75f9eaa",
+    "endCommit": "330352ce7513ba420752dd7243762f0dd75f9eaa",
+    "artifactPath": "dist/renderer/assets/index-BQyFOhDT.js",
+    "artifactSha256": "4663d6eaeafea4f1291311a86691fffc4e24ced846e32bcbd4405b5dd8b79198",
+    "buildReceiptPath": "design/parity/evidence/build-receipt.json",
+    "buildReceiptSha256": "34ff59d65a1ad149e636e8605f8d8c39364df8f0ddaecf4cc10fb72c566f9394",
+    "artifactBuiltAt": "2026-08-20T00:25:09.780Z"
+  },
+  "capture": {
+    "rawPath": "C:\\Users\\cntow\\AppData\\Local\\Temp\\mcc-parity-330352c-20260819-2025\\output\\product-rows\\bulk-toolbar--progress\\product.png",
+    "promotedPath": "design/parity/evidence/bulk-toolbar--progress/product.png",
+    "sha256": "49b1999e52853ec74f8b315e710677c4f96af1193a7cf3f965a2404ae59d2197",
+    "rawSha256": "49b1999e52853ec74f8b315e710677c4f96af1193a7cf3f965a2404ae59d2197",
+    "mimeType": "image/png",
+    "startedAt": "2026-08-20T00:25:09.780Z",
+    "capturedAt": "2026-08-20T00:25:09.998Z",
+    "width": 1280,
+    "height": 800
+  },
+  "state": {
+    "surface": "desktop-app",
+    "screen": "bulk-toolbar",
+    "state": "progress",
+    "theme": "light",
+    "viewport": {
+      "width": 1280,
+      "height": 800
+    },
+    "scale": 1,
+    "locale": "en-HK",
+    "captureKind": "page",
+    "deterministic": {
+      "fixture": "bulk-progress-v1",
+      "time": "2026-08-19T12:00:00Z",
+      "motion": "paused",
+      "randomSeed": 1903,
+      "fonts": "Segoe UI system stack",
+      "network": "blocked"
+    }
+  },
+  "privacy": {
+    "visibleDesktopUntouched": true,
+    "expectedSurfaceOnly": true,
+    "sensitiveDataReviewed": true,
+    "unrelatedTargetsObserved": false,
+    "mocked": false,
+    "handEdited": false
+  },
+  "inspection": {
+    "decoded": true,
+    "pixelsInspected": true,
+    "targetVisible": true,
+    "expectedStateVisible": true,
+    "reviewer": "automated parity capture review"
+  },
+  "runtime": {
+    "launchPid": 44684,
+    "hwnd": "789628",
+    "hwndResolvedLive": true,
+    "consoleErrorCount": 0,
+    "pageErrorCount": 0,
+    "interactionProofId": "bulk-toolbar--progress-productRaw",
+    "interactionReceiptPath": "design/parity/evidence/bulk-toolbar--progress/productRaw-interaction.json",
+    "interactionReceiptSha256": "38eeb8cbaa4300760f95433bc6dadfece848feb131f25e45164be900079d682d",
+    "privacyScanPath": "design/parity/evidence/bulk-toolbar--progress/productRaw-privacy.json",
+    "privacyScanSha256": "ee01fec30d242657c3bb5c4a425aa47dd2e39724a3e47eeba106e061a9c28c84",
+    "cleanupCompleted": true,
+    "cleanupOwnedOnly": true
+  },
+  "inventory": {
+    "path": "design/parity/evidence/promotion-inventory.json",
+    "recordId": "bulk-toolbar--progress--product",
+    "rowId": "bulk-toolbar--progress",
+    "evidenceKey": "productRaw"
+  },
+  "documentation": [
+    {
+      "path": "design/parity/inventory.json",
+      "alt": "bulk-toolbar--progress productRaw at 1280 by 800"
+    }
+  ]
+}

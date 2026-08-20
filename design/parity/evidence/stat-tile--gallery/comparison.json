@@ -1,0 +1,23 @@
+{
+  "schemaVersion": 1,
+  "rowId": "stat-tile--gallery",
+  "tuple": {
+    "screen": "stat-tile",
+    "state": "gallery",
+    "theme": "light",
+    "viewport": {
+      "width": 1280,
+      "height": 800
+    },
+    "scale": 1,
+    "locale": "en-HK"
+  },
+  "labels": [
+    "REFERENCE",
+    "BUILT PRODUCT"
+  ],
+  "inputs": {
+    "referenceSha256": "dd567d8ec81f0a053150939f304c78215b73e11100496b0e0d105fa66dca42ba",
+    "productSha256": "a73a2189e3e0fcce83de0a7ee914ecd4be9c5eca4f5bfac0217d408e23c7ab79"
+  }
+}

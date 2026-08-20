@@ -1,0 +1,87 @@
+{
+  "version": 1,
+  "id": "tokens-color--roles--reference",
+  "route": "cheap-lowlevel-headless",
+  "source": {
+    "startCommit": "330352ce7513ba420752dd7243762f0dd75f9eaa",
+    "endCommit": "330352ce7513ba420752dd7243762f0dd75f9eaa",
+    "artifactPath": "dist/renderer/assets/index-BQyFOhDT.js",
+    "artifactSha256": "4663d6eaeafea4f1291311a86691fffc4e24ced846e32bcbd4405b5dd8b79198",
+    "buildReceiptPath": "design/parity/evidence/build-receipt.json",
+    "buildReceiptSha256": "34ff59d65a1ad149e636e8605f8d8c39364df8f0ddaecf4cc10fb72c566f9394",
+    "artifactBuiltAt": "2026-08-20T00:26:10.835Z"
+  },
+  "capture": {
+    "rawPath": "C:\\Users\\cntow\\AppData\\Local\\Temp\\mcc-parity-330352c-20260819-2025\\output\\reference-rows-current\\tokens-color--roles\\reference.png",
+    "promotedPath": "design/parity/evidence/tokens-color--roles/reference.png",
+    "sha256": "a925627ee8224c94ffc267cf81b7be971925875a43df640e29a351abe0f4b1d5",
+    "rawSha256": "a925627ee8224c94ffc267cf81b7be971925875a43df640e29a351abe0f4b1d5",
+    "mimeType": "image/png",
+    "startedAt": "2026-08-20T00:26:10.835Z",
+    "capturedAt": "2026-08-20T00:26:11.138Z",
+    "width": 1280,
+    "height": 800
+  },
+  "state": {
+    "surface": "design-reference-app",
+    "screen": "tokens-color",
+    "state": "roles",
+    "theme": "light",
+    "viewport": {
+      "width": 1280,
+      "height": 800
+    },
+    "scale": 1,
+    "locale": "en-HK",
+    "captureKind": "page",
+    "deterministic": {
+      "fixture": "color-roles-v1",
+      "time": "2026-08-19T12:00:00Z",
+      "motion": "paused",
+      "randomSeed": 1911,
+      "fonts": "Segoe UI system stack",
+      "network": "blocked"
+    }
+  },
+  "privacy": {
+    "visibleDesktopUntouched": true,
+    "expectedSurfaceOnly": true,
+    "sensitiveDataReviewed": true,
+    "unrelatedTargetsObserved": false,
+    "mocked": false,
+    "handEdited": false
+  },
+  "inspection": {
+    "decoded": true,
+    "pixelsInspected": true,
+    "targetVisible": true,
+    "expectedStateVisible": true,
+    "reviewer": "automated parity capture review"
+  },
+  "runtime": {
+    "launchPid": 51504,
+    "hwnd": "15468902",
+    "hwndResolvedLive": true,
+    "consoleErrorCount": 0,
+    "pageErrorCount": 0,
+    "interactionProofId": "tokens-color--roles-referenceRaw",
+    "interactionReceiptPath": "design/parity/evidence/tokens-color--roles/referenceRaw-interaction.json",
+    "interactionReceiptSha256": "ec2e2678f70b750916082a67044677560840e8bab3645e06d020e84801c90510",
+    "privacyScanPath": "design/parity/evidence/tokens-color--roles/referenceRaw-privacy.json",
+    "privacyScanSha256": "ee01fec30d242657c3bb5c4a425aa47dd2e39724a3e47eeba106e061a9c28c84",
+    "cleanupCompleted": true,
+    "cleanupOwnedOnly": true
+  },
+  "inventory": {
+    "path": "design/parity/evidence/promotion-inventory.json",
+    "recordId": "tokens-color--roles--reference",
+    "rowId": "tokens-color--roles",
+    "evidenceKey": "referenceRaw"
+  },
+  "documentation": [
+    {
+      "path": "design/parity/inventory.json",
+      "alt": "tokens-color--roles referenceRaw at 1280 by 800"
+    }
+  ]
+}

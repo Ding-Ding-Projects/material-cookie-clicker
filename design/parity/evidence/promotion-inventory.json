@@ -1,0 +1,261 @@
+{
+  "schemaVersion": 1,
+  "records": [
+    {
+      "id": "achievement-badge--gallery--reference",
+      "active": true,
+      "rowId": "achievement-badge--gallery",
+      "evidenceKey": "referenceRaw",
+      "receiptPath": "design/parity/evidence/achievement-badge--gallery/referenceRaw-receipt.json",
+      "receiptSha256": "ce8e72929af08c5c5f6ceb0ac860f9c939a4a378998cfb5d7248b48564edb3e1"
+    },
+    {
+      "id": "achievement-badge--gallery--product",
+      "active": true,
+      "rowId": "achievement-badge--gallery",
+      "evidenceKey": "productRaw",
+      "receiptPath": "design/parity/evidence/achievement-badge--gallery/productRaw-receipt.json",
+      "receiptSha256": "e3f6d2d577df83e1bbe7c4525ac5f53e1a4d3bb19efca4bd3caba541d0415d34"
+    },
+    {
+      "id": "building-row--gallery--reference",
+      "active": true,
+      "rowId": "building-row--gallery",
+      "evidenceKey": "referenceRaw",
+      "receiptPath": "design/parity/evidence/building-row--gallery/referenceRaw-receipt.json",
+      "receiptSha256": "c5a27d132f953ec1f457a21c369f45296dc67310016e6ba065cfdedfdca90c72"
+    },
+    {
+      "id": "building-row--gallery--product",
+      "active": true,
+      "rowId": "building-row--gallery",
+      "evidenceKey": "productRaw",
+      "receiptPath": "design/parity/evidence/building-row--gallery/productRaw-receipt.json",
+      "receiptSha256": "dc31b4d03bec8a9f68ebc72c5ff1cd1e5e8e192a9556517f2f8329846715bd0f"
+    },
+    {
+      "id": "bulk-toolbar--progress--reference",
+      "active": true,
+      "rowId": "bulk-toolbar--progress",
+      "evidenceKey": "referenceRaw",
+      "receiptPath": "design/parity/evidence/bulk-toolbar--progress/referenceRaw-receipt.json",
+      "receiptSha256": "751394e9e282a57803e40ea55c63ebbe0f7cbf457228098d5a4bbf6105be6a22"
+    },
+    {
+      "id": "bulk-toolbar--progress--product",
+      "active": true,
+      "rowId": "bulk-toolbar--progress",
+      "evidenceKey": "productRaw",
+      "receiptPath": "design/parity/evidence/bulk-toolbar--progress/productRaw-receipt.json",
+      "receiptSha256": "7d8626a9a3f8e733c33e4ddf6d8998a0d1c437af4253f51f11d2f09c2628fe8c"
+    },
+    {
+      "id": "cookie-surface--gallery--reference",
+      "active": true,
+      "rowId": "cookie-surface--gallery",
+      "evidenceKey": "referenceRaw",
+      "receiptPath": "design/parity/evidence/cookie-surface--gallery/referenceRaw-receipt.json",
+      "receiptSha256": "fb39c83382effac7a64f0a98c391a7e83cb0d9e6d845f5bad3ab8ea114c28670"
+    },
+    {
+      "id": "cookie-surface--gallery--product",
+      "active": true,
+      "rowId": "cookie-surface--gallery",
+      "evidenceKey": "productRaw",
+      "receiptPath": "design/parity/evidence/cookie-surface--gallery/productRaw-receipt.json",
+      "receiptSha256": "37937f4f39d8d09268c8e7131fe80f1413d0e8c58eae9037b18ac2697554f30e"
+    },
+    {
+      "id": "game-layout--main--reference",
+      "active": true,
+      "rowId": "game-layout--main",
+      "evidenceKey": "referenceRaw",
+      "receiptPath": "design/parity/evidence/game-layout--main/referenceRaw-receipt.json",
+      "receiptSha256": "1de7f11eaa0bd7414c6dc87d58fda3be012e2790cf71092bf4e6551084a73eb6"
+    },
+    {
+      "id": "game-layout--main--product",
+      "active": true,
+      "rowId": "game-layout--main",
+      "evidenceKey": "productRaw",
+      "receiptPath": "design/parity/evidence/game-layout--main/productRaw-receipt.json",
+      "receiptSha256": "835a1023af8a4dcd83b0fea40c0eae96d48012de3e00d334f24015bc082097eb"
+    },
+    {
+      "id": "narrator-toast--gallery--reference",
+      "active": true,
+      "rowId": "narrator-toast--gallery",
+      "evidenceKey": "referenceRaw",
+      "receiptPath": "design/parity/evidence/narrator-toast--gallery/referenceRaw-receipt.json",
+      "receiptSha256": "77e8e47d12dcc3cbd2f49ff6be1c6473edc850ae08ef3233e3b0b1a3af8b391b"
+    },
+    {
+      "id": "narrator-toast--gallery--product",
+      "active": true,
+      "rowId": "narrator-toast--gallery",
+      "evidenceKey": "productRaw",
+      "receiptPath": "design/parity/evidence/narrator-toast--gallery/productRaw-receipt.json",
+      "receiptSha256": "980a45a7dd231e3da701f839b19594ceabad9064e76b3ae45a33dcb77f8208c1"
+    },
+    {
+      "id": "prestige-gate--ready--reference",
+      "active": true,
+      "rowId": "prestige-gate--ready",
+      "evidenceKey": "referenceRaw",
+      "receiptPath": "design/parity/evidence/prestige-gate--ready/referenceRaw-receipt.json",
+      "receiptSha256": "a8eb2016291913b44b75ed18e1f8dae6fdc767f5b6da1eeb6a643e0e28ec7723"
+    },
+    {
+      "id": "prestige-gate--ready--product",
+      "active": true,
+      "rowId": "prestige-gate--ready",
+      "evidenceKey": "productRaw",
+      "receiptPath": "design/parity/evidence/prestige-gate--ready/productRaw-receipt.json",
+      "receiptSha256": "6537579c50b651568c29a2fb363fb4ab0ed7e90e7699d24e2f156ce6dcc3968c"
+    },
+    {
+      "id": "search-regex-builder--open--reference",
+      "active": true,
+      "rowId": "search-regex-builder--open",
+      "evidenceKey": "referenceRaw",
+      "receiptPath": "design/parity/evidence/search-regex-builder--open/referenceRaw-receipt.json",
+      "receiptSha256": "07f5cc2c176e849ef0992e4b1ae3658409d6debb0341851e289cf607d5666bc8"
+    },
+    {
+      "id": "search-regex-builder--open--product",
+      "active": true,
+      "rowId": "search-regex-builder--open",
+      "evidenceKey": "productRaw",
+      "receiptPath": "design/parity/evidence/search-regex-builder--open/productRaw-receipt.json",
+      "receiptSha256": "2d0a553298dde9ec6aafaa58a78b936cbce35ffe5ea58f2b6cc58809afdf7a91"
+    },
+    {
+      "id": "settings-funny-sliders--default--reference",
+      "active": true,
+      "rowId": "settings-funny-sliders--default",
+      "evidenceKey": "referenceRaw",
+      "receiptPath": "design/parity/evidence/settings-funny-sliders--default/referenceRaw-receipt.json",
+      "receiptSha256": "b2e81b9d68c9f3bad75a7d3b80b190a55b8f288919469c7b956fceb22d8891e1"
+    },
+    {
+      "id": "settings-funny-sliders--default--product",
+      "active": true,
+      "rowId": "settings-funny-sliders--default",
+      "evidenceKey": "productRaw",
+      "receiptPath": "design/parity/evidence/settings-funny-sliders--default/productRaw-receipt.json",
+      "receiptSha256": "8e9f515521b6b6b8f03a50f719b59e9fa0390603637bfef09cffa98b852a532c"
+    },
+    {
+      "id": "stat-tile--gallery--reference",
+      "active": true,
+      "rowId": "stat-tile--gallery",
+      "evidenceKey": "referenceRaw",
+      "receiptPath": "design/parity/evidence/stat-tile--gallery/referenceRaw-receipt.json",
+      "receiptSha256": "b24ec52de52e5d15ba986bfeed2704c2bd4aaf4bf1352d16eb26ebae5ec777ea"
+    },
+    {
+      "id": "stat-tile--gallery--product",
+      "active": true,
+      "rowId": "stat-tile--gallery",
+      "evidenceKey": "productRaw",
+      "receiptPath": "design/parity/evidence/stat-tile--gallery/productRaw-receipt.json",
+      "receiptSha256": "697eb162b8585e9ac229a45d1e4e3e92a8159edadfe39d2f0bd842e26aff4bbe"
+    },
+    {
+      "id": "tokens-color--roles--reference",
+      "active": true,
+      "rowId": "tokens-color--roles",
+      "evidenceKey": "referenceRaw",
+      "receiptPath": "design/parity/evidence/tokens-color--roles/referenceRaw-receipt.json",
+      "receiptSha256": "26e1a06ff1968b4d3fe27efb01e46d34edc8381731be3e5c94db7a167d335f5b"
+    },
+    {
+      "id": "tokens-color--roles--product",
+      "active": true,
+      "rowId": "tokens-color--roles",
+      "evidenceKey": "productRaw",
+      "receiptPath": "design/parity/evidence/tokens-color--roles/productRaw-receipt.json",
+      "receiptSha256": "2316755f6e328e26d6e66a11877401f50b4aaf36c6a245fd586027401a7cf7dc"
+    },
+    {
+      "id": "tokens-shape-elevation--scale--reference",
+      "active": true,
+      "rowId": "tokens-shape-elevation--scale",
+      "evidenceKey": "referenceRaw",
+      "receiptPath": "design/parity/evidence/tokens-shape-elevation--scale/referenceRaw-receipt.json",
+      "receiptSha256": "1514cad595672836c7e1bf8917285b145f4d49d825aa6986689f36e17ecd015a"
+    },
+    {
+      "id": "tokens-shape-elevation--scale--product",
+      "active": true,
+      "rowId": "tokens-shape-elevation--scale",
+      "evidenceKey": "productRaw",
+      "receiptPath": "design/parity/evidence/tokens-shape-elevation--scale/productRaw-receipt.json",
+      "receiptSha256": "caed39ffbaa746a75453ffceb1c557e64a48ab44ecc90f92a374f04e98513247"
+    },
+    {
+      "id": "tokens-type--scale--reference",
+      "active": true,
+      "rowId": "tokens-type--scale",
+      "evidenceKey": "referenceRaw",
+      "receiptPath": "design/parity/evidence/tokens-type--scale/referenceRaw-receipt.json",
+      "receiptSha256": "fed58e915d2450dff5072f411922437e562aa60bb67bc13febd9d2b021f9bc02"
+    },
+    {
+      "id": "tokens-type--scale--product",
+      "active": true,
+      "rowId": "tokens-type--scale",
+      "evidenceKey": "productRaw",
+      "receiptPath": "design/parity/evidence/tokens-type--scale/productRaw-receipt.json",
+      "receiptSha256": "2c72b5fb1eb212f752b48927403cf490dd0380f4e1b20abbf668d48b1e01b443"
+    },
+    {
+      "id": "tool-card--gallery--reference",
+      "active": true,
+      "rowId": "tool-card--gallery",
+      "evidenceKey": "referenceRaw",
+      "receiptPath": "design/parity/evidence/tool-card--gallery/referenceRaw-receipt.json",
+      "receiptSha256": "f136c2541135d9f9d1a580c37cb0cd9b772cb44085ac784804d729843cf51e29"
+    },
+    {
+      "id": "tool-card--gallery--product",
+      "active": true,
+      "rowId": "tool-card--gallery",
+      "evidenceKey": "productRaw",
+      "receiptPath": "design/parity/evidence/tool-card--gallery/productRaw-receipt.json",
+      "receiptSha256": "0491a9601469cf94f14c2a96e2c1039d33cfdfc0b2a1799e6a6defb205eec1f5"
+    },
+    {
+      "id": "tools-tree--mixed--reference",
+      "active": true,
+      "rowId": "tools-tree--mixed",
+      "evidenceKey": "referenceRaw",
+      "receiptPath": "design/parity/evidence/tools-tree--mixed/referenceRaw-receipt.json",
+      "receiptSha256": "0dcd12118a8d1cf863f2e4ccb1c769f2bae5928c84cce8295e894393aa55591e"
+    },
+    {
+      "id": "tools-tree--mixed--product",
+      "active": true,
+      "rowId": "tools-tree--mixed",
+      "evidenceKey": "productRaw",
+      "receiptPath": "design/parity/evidence/tools-tree--mixed/productRaw-receipt.json",
+      "receiptSha256": "b02e4f55da0f6f5ffded72c9c54b029ffa2c1c6661f2912831d4a4e73094bd21"
+    },
+    {
+      "id": "upgrade-card--gallery--reference",
+      "active": true,
+      "rowId": "upgrade-card--gallery",
+      "evidenceKey": "referenceRaw",
+      "receiptPath": "design/parity/evidence/upgrade-card--gallery/referenceRaw-receipt.json",
+      "receiptSha256": "4bba9704afe69d2973d6410929e30e8d4e53802853ac8ab47cad5be211d25044"
+    },
+    {
+      "id": "upgrade-card--gallery--product",
+      "active": true,
+      "rowId": "upgrade-card--gallery",
+      "evidenceKey": "productRaw",
+      "receiptPath": "design/parity/evidence/upgrade-card--gallery/productRaw-receipt.json",
+      "receiptSha256": "3f12f391bac8a3a2722f069683b9a1260180050f13a74f0a041c64424f1bf47b"
+    }
+  ]
+}

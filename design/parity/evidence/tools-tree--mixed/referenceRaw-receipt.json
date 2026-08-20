@@ -1,0 +1,87 @@
+{
+  "version": 1,
+  "id": "tools-tree--mixed--reference",
+  "route": "cheap-lowlevel-headless",
+  "source": {
+    "startCommit": "330352ce7513ba420752dd7243762f0dd75f9eaa",
+    "endCommit": "330352ce7513ba420752dd7243762f0dd75f9eaa",
+    "artifactPath": "dist/renderer/assets/index-BQyFOhDT.js",
+    "artifactSha256": "4663d6eaeafea4f1291311a86691fffc4e24ced846e32bcbd4405b5dd8b79198",
+    "buildReceiptPath": "design/parity/evidence/build-receipt.json",
+    "buildReceiptSha256": "34ff59d65a1ad149e636e8605f8d8c39364df8f0ddaecf4cc10fb72c566f9394",
+    "artifactBuiltAt": "2026-08-20T00:26:11.981Z"
+  },
+  "capture": {
+    "rawPath": "C:\\Users\\cntow\\AppData\\Local\\Temp\\mcc-parity-330352c-20260819-2025\\output\\reference-rows-current\\tools-tree--mixed\\reference.png",
+    "promotedPath": "design/parity/evidence/tools-tree--mixed/reference.png",
+    "sha256": "613193d9ebf25e82d326f4f4397ad827580489c5de9a886f3f9c41e13b7d9f89",
+    "rawSha256": "613193d9ebf25e82d326f4f4397ad827580489c5de9a886f3f9c41e13b7d9f89",
+    "mimeType": "image/png",
+    "startedAt": "2026-08-20T00:26:11.981Z",
+    "capturedAt": "2026-08-20T00:26:12.314Z",
+    "width": 1280,
+    "height": 800
+  },
+  "state": {
+    "surface": "design-reference-app",
+    "screen": "tools-tree",
+    "state": "mixed",
+    "theme": "light",
+    "viewport": {
+      "width": 1280,
+      "height": 800
+    },
+    "scale": 1,
+    "locale": "en-HK",
+    "captureKind": "page",
+    "deterministic": {
+      "fixture": "tools-tree-mixed-v1",
+      "time": "2026-08-19T12:00:00Z",
+      "motion": "paused",
+      "randomSeed": 1915,
+      "fonts": "Segoe UI system stack",
+      "network": "blocked"
+    }
+  },
+  "privacy": {
+    "visibleDesktopUntouched": true,
+    "expectedSurfaceOnly": true,
+    "sensitiveDataReviewed": true,
+    "unrelatedTargetsObserved": false,
+    "mocked": false,
+    "handEdited": false
+  },
+  "inspection": {
+    "decoded": true,
+    "pixelsInspected": true,
+    "targetVisible": true,
+    "expectedStateVisible": true,
+    "reviewer": "automated parity capture review"
+  },
+  "runtime": {
+    "launchPid": 51504,
+    "hwnd": "15468902",
+    "hwndResolvedLive": true,
+    "consoleErrorCount": 0,
+    "pageErrorCount": 0,
+    "interactionProofId": "tools-tree--mixed-referenceRaw",
+    "interactionReceiptPath": "design/parity/evidence/tools-tree--mixed/referenceRaw-interaction.json",
+    "interactionReceiptSha256": "53d88352b5188e6c9f38792f51295c75972a7265bada2267ccbe5f13e10a60ba",
+    "privacyScanPath": "design/parity/evidence/tools-tree--mixed/referenceRaw-privacy.json",
+    "privacyScanSha256": "ee01fec30d242657c3bb5c4a425aa47dd2e39724a3e47eeba106e061a9c28c84",
+    "cleanupCompleted": true,
+    "cleanupOwnedOnly": true
+  },
+  "inventory": {
+    "path": "design/parity/evidence/promotion-inventory.json",
+    "recordId": "tools-tree--mixed--reference",
+    "rowId": "tools-tree--mixed",
+    "evidenceKey": "referenceRaw"
+  },
+  "documentation": [
+    {
+      "path": "design/parity/inventory.json",
+      "alt": "tools-tree--mixed referenceRaw at 1280 by 800"
+    }
+  ]
+}

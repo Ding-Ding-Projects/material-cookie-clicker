@@ -1,0 +1,23 @@
+{
+  "schemaVersion": 1,
+  "rowId": "tools-tree--mixed",
+  "tuple": {
+    "screen": "tools-tree",
+    "state": "mixed",
+    "theme": "light",
+    "viewport": {
+      "width": 1280,
+      "height": 800
+    },
+    "scale": 1,
+    "locale": "en-HK"
+  },
+  "labels": [
+    "REFERENCE",
+    "BUILT PRODUCT"
+  ],
+  "inputs": {
+    "referenceSha256": "613193d9ebf25e82d326f4f4397ad827580489c5de9a886f3f9c41e13b7d9f89",
+    "productSha256": "e24beb2fa79579c8da18827141d172c0977fe9f85aca1bb3cb8d3e55681c4ce3"
+  }
+}

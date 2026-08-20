@@ -1,0 +1,87 @@
+{
+  "version": 1,
+  "id": "search-regex-builder--open--product",
+  "route": "cheap-lowlevel-headless",
+  "source": {
+    "startCommit": "330352ce7513ba420752dd7243762f0dd75f9eaa",
+    "endCommit": "330352ce7513ba420752dd7243762f0dd75f9eaa",
+    "artifactPath": "dist/renderer/assets/index-BQyFOhDT.js",
+    "artifactSha256": "4663d6eaeafea4f1291311a86691fffc4e24ced846e32bcbd4405b5dd8b79198",
+    "buildReceiptPath": "design/parity/evidence/build-receipt.json",
+    "buildReceiptSha256": "34ff59d65a1ad149e636e8605f8d8c39364df8f0ddaecf4cc10fb72c566f9394",
+    "artifactBuiltAt": "2026-08-20T00:25:11.274Z"
+  },
+  "capture": {
+    "rawPath": "C:\\Users\\cntow\\AppData\\Local\\Temp\\mcc-parity-330352c-20260819-2025\\output\\product-rows\\search-regex-builder--open\\product.png",
+    "promotedPath": "design/parity/evidence/search-regex-builder--open/product.png",
+    "sha256": "26f7e93506b4d82ba410da8d659e9e8ddd995c34e549b07e9f77f9cd9a75fffb",
+    "rawSha256": "26f7e93506b4d82ba410da8d659e9e8ddd995c34e549b07e9f77f9cd9a75fffb",
+    "mimeType": "image/png",
+    "startedAt": "2026-08-20T00:25:11.274Z",
+    "capturedAt": "2026-08-20T00:25:11.530Z",
+    "width": 1280,
+    "height": 800
+  },
+  "state": {
+    "surface": "desktop-app",
+    "screen": "search-regex-builder",
+    "state": "open",
+    "theme": "light",
+    "viewport": {
+      "width": 1280,
+      "height": 800
+    },
+    "scale": 1,
+    "locale": "en-HK",
+    "captureKind": "page",
+    "deterministic": {
+      "fixture": "regex-builder-open-v1",
+      "time": "2026-08-19T12:00:00Z",
+      "motion": "paused",
+      "randomSeed": 1908,
+      "fonts": "Segoe UI system stack",
+      "network": "blocked"
+    }
+  },
+  "privacy": {
+    "visibleDesktopUntouched": true,
+    "expectedSurfaceOnly": true,
+    "sensitiveDataReviewed": true,
+    "unrelatedTargetsObserved": false,
+    "mocked": false,
+    "handEdited": false
+  },
+  "inspection": {
+    "decoded": true,
+    "pixelsInspected": true,
+    "targetVisible": true,
+    "expectedStateVisible": true,
+    "reviewer": "automated parity capture review"
+  },
+  "runtime": {
+    "launchPid": 44684,
+    "hwnd": "789628",
+    "hwndResolvedLive": true,
+    "consoleErrorCount": 0,
+    "pageErrorCount": 0,
+    "interactionProofId": "search-regex-builder--open-productRaw",
+    "interactionReceiptPath": "design/parity/evidence/search-regex-builder--open/productRaw-interaction.json",
+    "interactionReceiptSha256": "db51b2a1fc19460ea9f397631438c9f8aaad26e8b8a11c5b5344e9400de68125",
+    "privacyScanPath": "design/parity/evidence/search-regex-builder--open/productRaw-privacy.json",
+    "privacyScanSha256": "ee01fec30d242657c3bb5c4a425aa47dd2e39724a3e47eeba106e061a9c28c84",
+    "cleanupCompleted": true,
+    "cleanupOwnedOnly": true
+  },
+  "inventory": {
+    "path": "design/parity/evidence/promotion-inventory.json",
+    "recordId": "search-regex-builder--open--product",
+    "rowId": "search-regex-builder--open",
+    "evidenceKey": "productRaw"
+  },
+  "documentation": [
+    {
+      "path": "design/parity/inventory.json",
+      "alt": "search-regex-builder--open productRaw at 1280 by 800"
+    }
+  ]
+}

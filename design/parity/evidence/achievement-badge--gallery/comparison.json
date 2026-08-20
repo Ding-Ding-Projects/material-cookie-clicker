@@ -1,0 +1,23 @@
+{
+  "schemaVersion": 1,
+  "rowId": "achievement-badge--gallery",
+  "tuple": {
+    "screen": "achievement-badge",
+    "state": "gallery",
+    "theme": "light",
+    "viewport": {
+      "width": 1280,
+      "height": 800
+    },
+    "scale": 1,
+    "locale": "en-HK"
+  },
+  "labels": [
+    "REFERENCE",
+    "BUILT PRODUCT"
+  ],
+  "inputs": {
+    "referenceSha256": "78877661ea44de52dbda4c77400c307cb8b8b41fe43fc0ec0a5c7ec3caa791b1",
+    "productSha256": "5457f5f65e3281ac3568e854ded3f028fdafeb768a5bc889bbb35ea478a481d8"
+  }
+}

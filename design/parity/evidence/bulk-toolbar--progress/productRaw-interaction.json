@@ -1,0 +1,18 @@
+{
+  "version": 1,
+  "rowId": "bulk-toolbar--progress",
+  "side": "productRaw",
+  "route": "app://material-cookie-clicker/?designParity=bulk-toolbar--progress&panel=catalogue&theme=light&width=1280&height=800&scale=1&state=progress&locale=en-HK",
+  "state": {
+    "row": "bulk-toolbar--progress",
+    "fixture": "bulk-progress-v1",
+    "width": 1280,
+    "height": 800,
+    "scale": 1,
+    "lang": "en-HK",
+    "theme": "light",
+    "network": "blocked",
+    "motion": "paused"
+  },
+  "cleanupCompleted": true
+}

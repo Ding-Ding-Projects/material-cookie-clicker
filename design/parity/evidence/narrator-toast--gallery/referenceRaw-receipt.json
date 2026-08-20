@@ -1,0 +1,87 @@
+{
+  "version": 1,
+  "id": "narrator-toast--gallery--reference",
+  "route": "cheap-lowlevel-headless",
+  "source": {
+    "startCommit": "330352ce7513ba420752dd7243762f0dd75f9eaa",
+    "endCommit": "330352ce7513ba420752dd7243762f0dd75f9eaa",
+    "artifactPath": "dist/renderer/assets/index-BQyFOhDT.js",
+    "artifactSha256": "4663d6eaeafea4f1291311a86691fffc4e24ced846e32bcbd4405b5dd8b79198",
+    "buildReceiptPath": "design/parity/evidence/build-receipt.json",
+    "buildReceiptSha256": "34ff59d65a1ad149e636e8605f8d8c39364df8f0ddaecf4cc10fb72c566f9394",
+    "artifactBuiltAt": "2026-08-20T00:26:09.406Z"
+  },
+  "capture": {
+    "rawPath": "C:\\Users\\cntow\\AppData\\Local\\Temp\\mcc-parity-330352c-20260819-2025\\output\\reference-rows-current\\narrator-toast--gallery\\reference.png",
+    "promotedPath": "design/parity/evidence/narrator-toast--gallery/reference.png",
+    "sha256": "09d03d58ccfed1381b1ca16e128fbead71b30874cc40697d15d3faf412df0576",
+    "rawSha256": "09d03d58ccfed1381b1ca16e128fbead71b30874cc40697d15d3faf412df0576",
+    "mimeType": "image/png",
+    "startedAt": "2026-08-20T00:26:09.406Z",
+    "capturedAt": "2026-08-20T00:26:09.705Z",
+    "width": 1280,
+    "height": 800
+  },
+  "state": {
+    "surface": "design-reference-app",
+    "screen": "narrator-toast",
+    "state": "gallery",
+    "theme": "light",
+    "viewport": {
+      "width": 1280,
+      "height": 800
+    },
+    "scale": 1,
+    "locale": "en-HK",
+    "captureKind": "page",
+    "deterministic": {
+      "fixture": "narrator-toast-v1",
+      "time": "2026-08-19T12:00:00Z",
+      "motion": "paused",
+      "randomSeed": 1906,
+      "fonts": "Segoe UI system stack",
+      "network": "blocked"
+    }
+  },
+  "privacy": {
+    "visibleDesktopUntouched": true,
+    "expectedSurfaceOnly": true,
+    "sensitiveDataReviewed": true,
+    "unrelatedTargetsObserved": false,
+    "mocked": false,
+    "handEdited": false
+  },
+  "inspection": {
+    "decoded": true,
+    "pixelsInspected": true,
+    "targetVisible": true,
+    "expectedStateVisible": true,
+    "reviewer": "automated parity capture review"
+  },
+  "runtime": {
+    "launchPid": 51504,
+    "hwnd": "15468902",
+    "hwndResolvedLive": true,
+    "consoleErrorCount": 0,
+    "pageErrorCount": 0,
+    "interactionProofId": "narrator-toast--gallery-referenceRaw",
+    "interactionReceiptPath": "design/parity/evidence/narrator-toast--gallery/referenceRaw-interaction.json",
+    "interactionReceiptSha256": "be1f525a3bf9733799165bc4a666c4fe7c2500e0539dbc3a3fe5bc8f68cfa95d",
+    "privacyScanPath": "design/parity/evidence/narrator-toast--gallery/referenceRaw-privacy.json",
+    "privacyScanSha256": "ee01fec30d242657c3bb5c4a425aa47dd2e39724a3e47eeba106e061a9c28c84",
+    "cleanupCompleted": true,
+    "cleanupOwnedOnly": true
+  },
+  "inventory": {
+    "path": "design/parity/evidence/promotion-inventory.json",
+    "recordId": "narrator-toast--gallery--reference",
+    "rowId": "narrator-toast--gallery",
+    "evidenceKey": "referenceRaw"
+  },
+  "documentation": [
+    {
+      "path": "design/parity/inventory.json",
+      "alt": "narrator-toast--gallery referenceRaw at 1280 by 800"
+    }
+  ]
+}

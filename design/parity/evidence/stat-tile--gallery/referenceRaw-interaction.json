@@ -1,0 +1,22 @@
+{
+  "version": 1,
+  "rowId": "stat-tile--gallery",
+  "side": "referenceRaw",
+  "route": "/design/reference-app/index.html?row=stat-tile--gallery&theme=light&width=1280&height=800&scale=1&state=gallery&locale=en-HK&capture=1",
+  "state": {
+    "file": "stat-tile.html",
+    "width": 1280,
+    "height": 800,
+    "scale": 1,
+    "lang": "en-HK",
+    "theme": "light",
+    "state": "gallery",
+    "rect": {
+      "x": 0,
+      "y": 0,
+      "width": 1280,
+      "height": 800
+    }
+  },
+  "cleanupCompleted": true
+}

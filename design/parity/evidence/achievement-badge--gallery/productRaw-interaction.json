@@ -1,0 +1,18 @@
+{
+  "version": 1,
+  "rowId": "achievement-badge--gallery",
+  "side": "productRaw",
+  "route": "app://material-cookie-clicker/?designParity=achievement-badge--gallery&panel=achievements&theme=light&width=1280&height=800&scale=1&state=gallery&locale=en-HK",
+  "state": {
+    "row": "achievement-badge--gallery",
+    "fixture": "achievement-gallery-v1",
+    "width": 1280,
+    "height": 800,
+    "scale": 1,
+    "lang": "en-HK",
+    "theme": "light",
+    "network": "blocked",
+    "motion": "paused"
+  },
+  "cleanupCompleted": true
+}

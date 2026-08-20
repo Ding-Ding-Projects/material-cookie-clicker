@@ -15,11 +15,11 @@
   "inputs": {
     "reference": {
       "path": "design/parity/evidence/prestige-gate--ready/reference.png",
-      "sha256": "c76af92f980a1f6a2adbfb278c720e83d850339ab81b35472d2bbd1852516daa"
+      "sha256": "cbf906355a9ec4fd9528b36289f558abd9d9b7a2047c62959907f5768f91875d"
     },
     "product": {
       "path": "design/parity/evidence/prestige-gate--ready/product.png",
-      "sha256": "23d5f79ccad25355d6696293ea8072347836f443cda173c61af4b506953b28ed"
+      "sha256": "caca4fe8585680f768d6c576e7735178ac6278054005df8a8afba9c936c15be6"
     }
   },
   "dimensions": {
@@ -27,10 +27,10 @@
     "height": 800
   },
   "metrics": {
-    "changedPixels": 456649,
+    "changedPixels": 380314,
     "totalPixels": 1024000,
-    "changedRatio": 0.4459462890625,
-    "rgbRmse": 55.7271973113873
+    "changedRatio": 0.371400390625,
+    "rgbRmse": 40.34941307803854
   },
   "tool": {
     "name": "Pillow ImageChops.difference",

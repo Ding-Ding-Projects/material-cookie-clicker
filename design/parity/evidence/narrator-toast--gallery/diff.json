@@ -15,11 +15,11 @@
   "inputs": {
     "reference": {
       "path": "design/parity/evidence/narrator-toast--gallery/reference.png",
-      "sha256": "09d03d58ccfed1381b1ca16e128fbead71b30874cc40697d15d3faf412df0576"
+      "sha256": "72e0470a86dfa69261aaa555a2e05d846aeb910f7d100952bddbcebfd89a901e"
     },
     "product": {
       "path": "design/parity/evidence/narrator-toast--gallery/product.png",
-      "sha256": "e48267164ba53a3e353043fb1b130868f8a6647b716f5c1594398244c2b35a4c"
+      "sha256": "dbdd4c9be778075861a43840176d59fed26ee00bce4f31c1103c368587b8a1b2"
     }
   },
   "dimensions": {
@@ -27,10 +27,10 @@
     "height": 800
   },
   "metrics": {
-    "changedPixels": 488176,
+    "changedPixels": 153498,
     "totalPixels": 1024000,
-    "changedRatio": 0.476734375,
-    "rgbRmse": 49.23891236166672
+    "changedRatio": 0.149900390625,
+    "rgbRmse": 27.8469638296754
   },
   "tool": {
     "name": "Pillow ImageChops.difference",

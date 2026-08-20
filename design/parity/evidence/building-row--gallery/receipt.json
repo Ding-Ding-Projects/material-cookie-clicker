@@ -2,7 +2,7 @@
   "version": 1,
   "id": "building-row--gallery",
   "route": "cheap-lowlevel-headless",
-  "sourceCommit": "25633dc1c4ff5d323dc4ad8b941fc3e142d74ed1",
+  "sourceCommit": "13e09369a3b6f9336d4604f7b8eade652276a4e5",
   "reviewer": "automated parity capture review",
   "rawReceiptPaths": [
     "design/parity/evidence/building-row--gallery/referenceRaw-receipt.json",

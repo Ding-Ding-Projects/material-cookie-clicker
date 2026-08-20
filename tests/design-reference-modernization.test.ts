@@ -64,17 +64,17 @@ describe('modern Material design references', () => {
     expect(css).not.toMatch(/--press-|--drop-|cabinet-frame|bevel|marquee/i);
   });
 
-  it('keeps every prior visual-evidence item explicitly pending after source modernization', () => {
+  it('binds every recaptured evidence item to the modernized source', () => {
     const inventory = JSON.parse(readFileSync(resolve('design/parity/inventory.json'), 'utf8')) as {
       rows: Array<{ sourceCommit: string; evidence: Record<string, { status: string; reason?: string }> }>;
     };
     expect(inventory.rows).toHaveLength(16);
     for (const row of inventory.rows) {
-      expect(row.sourceCommit).toBe('pending-recapture-after-reference-modernization');
+      expect(row.sourceCommit).toBe('13e09369a3b6f9336d4604f7b8eade652276a4e5');
       expect(Object.keys(row.evidence).sort()).toEqual(['comparison', 'diff', 'productRaw', 'referenceRaw']);
       for (const evidence of Object.values(row.evidence)) {
-        expect(evidence.status).toBe('pending');
-        expect(evidence.reason?.trim().length).toBeGreaterThan(20);
+        expect(evidence.status).toBe('verified');
+        expect(evidence.reason).toBeUndefined();
       }
     }
   });

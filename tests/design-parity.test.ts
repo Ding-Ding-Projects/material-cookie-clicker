@@ -10,15 +10,7 @@ import {
 } from '../design/_verify/design-parity-guard.mjs';
 
 function historicalVerifiedEvidenceFixture(): ReturnType<typeof loadInventory> {
-  const inventory = structuredClone(loadInventory());
-  for (const row of inventory.rows) {
-    row.sourceCommit = '25633dc1c4ff5d323dc4ad8b941fc3e142d74ed1';
-    for (const evidence of Object.values(row.evidence) as Array<{ status: string; reason?: string }>) {
-      evidence.status = 'verified';
-      delete evidence.reason;
-    }
-  }
-  return inventory;
+  return structuredClone(loadInventory());
 }
 
 describe('design parity inventory', () => {
@@ -36,9 +28,9 @@ describe('design parity inventory', () => {
     expect(results.every((result) => result.red && result.restored === 'green')).toBe(true);
   });
 
-  it('does not let stale captures pass the release boundary after reference modernization', () => {
+  it('does not let unapproved recaptured differences pass the release boundary', () => {
     expect(() => validateInventory(loadInventory(), { mode: 'release' })).toThrowError(
-      expect.objectContaining<Partial<ParityGuardError>>({ code: 'EVIDENCE_PENDING' }),
+      expect.objectContaining<Partial<ParityGuardError>>({ code: 'DIFF_REVIEW_DEFECT' }),
     );
   });
 

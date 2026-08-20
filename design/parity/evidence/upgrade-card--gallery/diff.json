@@ -15,11 +15,11 @@
   "inputs": {
     "reference": {
       "path": "design/parity/evidence/upgrade-card--gallery/reference.png",
-      "sha256": "fdc7750b74790de25b90877a282cfadaf7aaa3d3a7ea956c4b72c10ca84c957a"
+      "sha256": "67b12d443703ccfeee50aa273e8a9e0372c2896724b639c8efa63266a6827081"
     },
     "product": {
       "path": "design/parity/evidence/upgrade-card--gallery/product.png",
-      "sha256": "dac84f26b26e6d8ee5baf4649a34f4f6aee2f8568e3a72a245722bc5aff90e49"
+      "sha256": "def6893b305b848c87a935fe53b01fd2426c1eb4455ea00a896779116edb1a1a"
     }
   },
   "dimensions": {
@@ -27,10 +27,10 @@
     "height": 800
   },
   "metrics": {
-    "changedPixels": 719347,
+    "changedPixels": 432930,
     "totalPixels": 1024000,
-    "changedRatio": 0.7024873046875,
-    "rgbRmse": 56.54528457800714
+    "changedRatio": 0.422783203125,
+    "rgbRmse": 31.965788994104695
   },
   "tool": {
     "name": "Pillow ImageChops.difference",

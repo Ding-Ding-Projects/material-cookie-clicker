@@ -1,4 +1,4 @@
-import { attachRegexBuilder } from './site-shell.js';
+import { attachRegexBuilder, onColourFor } from './site-shell.js';
 
 const SETTINGS_KEY = 'mcc-site-settings-v1';
 const RECORDS_KEY = 'mcc-site-records-v1';
@@ -69,6 +69,7 @@ function applyAppearance() {
   document.documentElement.dataset.density = settings.density;
   document.documentElement.dataset.rainbow = String(settings.rainbow);
   document.documentElement.style.setProperty('--user-accent', settings.accent);
+  document.documentElement.style.setProperty('--m3-on-primary', onColourFor(settings.accent));
   document.documentElement.style.setProperty('--user-font', settings.fontFamily);
   document.documentElement.style.setProperty('--user-font-scale', settings.fontScale);
   document.documentElement.style.setProperty('--user-font-weight', settings.fontWeight);

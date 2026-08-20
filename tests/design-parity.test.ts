@@ -9,6 +9,18 @@ import {
   validateInventory,
 } from '../design/_verify/design-parity-guard.mjs';
 
+function historicalVerifiedEvidenceFixture(): ReturnType<typeof loadInventory> {
+  const inventory = structuredClone(loadInventory());
+  for (const row of inventory.rows) {
+    row.sourceCommit = '25633dc1c4ff5d323dc4ad8b941fc3e142d74ed1';
+    for (const evidence of Object.values(row.evidence) as Array<{ status: string; reason?: string }>) {
+      evidence.status = 'verified';
+      delete evidence.reason;
+    }
+  }
+  return inventory;
+}
+
 describe('design parity inventory', () => {
   it('covers the exact hand-written checked-in reference set', () => {
     expect(validateInventory(loadInventory(), { mode: 'structure' })).toEqual({
@@ -24,14 +36,20 @@ describe('design parity inventory', () => {
     expect(results.every((result) => result.red && result.restored === 'green')).toBe(true);
   });
 
-  it('does not let unapproved visual differences pass the release boundary', () => {
+  it('does not let stale captures pass the release boundary after reference modernization', () => {
     expect(() => validateInventory(loadInventory(), { mode: 'release' })).toThrowError(
+      expect.objectContaining<Partial<ParityGuardError>>({ code: 'EVIDENCE_PENDING' }),
+    );
+  });
+
+  it('still rejects an unapproved historical visual difference when its evidence fixture is verified', () => {
+    expect(() => validateInventory(historicalVerifiedEvidenceFixture(), { mode: 'release' })).toThrowError(
       expect.objectContaining<Partial<ParityGuardError>>({ code: 'DIFF_REVIEW_DEFECT' }),
     );
   });
 
   it('checks raw receipt bindings before it reaches the visual review verdict', () => {
-    const inventory = structuredClone(loadInventory());
+    const inventory = historicalVerifiedEvidenceFixture();
     delete inventory.rows[0].evidence.referenceRaw.receiptPath;
     expect(() => validateInventory(inventory, { mode: 'release' })).toThrowError(
       expect.objectContaining<Partial<ParityGuardError>>({ code: 'EVIDENCE_RECEIPT_MISSING' }),
@@ -39,7 +57,7 @@ describe('design parity inventory', () => {
   });
 
   it('turns release-evidence boundaries red and restores the honest evidence contract green', () => {
-    const source = loadInventory();
+    const source = historicalVerifiedEvidenceFixture();
     expect(validateInventory(source, { mode: 'evidence' })).toEqual({ rowCount: 16, referenceCount: 16, mode: 'evidence' });
     const cases: Array<[string, (inventory: any) => void, string]> = [
       ['missing receipt', (inventory) => { delete inventory.rows[0].evidence.referenceRaw.receiptPath; }, 'EVIDENCE_RECEIPT_MISSING'],

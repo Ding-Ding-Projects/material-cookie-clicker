@@ -210,6 +210,11 @@ describe('Material Design 3 Expressive product chrome', () => {
 
   it.each(inventory.rows)('keeps unapproved visual differences red for $id', (row) => {
     const real = readVisualDiff(row);
+    if (row.evidence.diff.status === 'pending') {
+      expect(real.review?.verdict).toBe('defect');
+      expect(() => auditVisualReview(row, real)).toThrow(`Visual diff ${row.id} evidence must be verified`);
+      return;
+    }
     const broken = structuredClone(real);
     broken.review = { ...broken.review, verdict: 'conforming' };
     expect(() => auditVisualReview(row, broken)).toThrow(

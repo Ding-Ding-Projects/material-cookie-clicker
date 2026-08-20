@@ -3,22 +3,22 @@
   "id": "upgrade-card--gallery--product",
   "route": "cheap-lowlevel-headless",
   "source": {
-    "startCommit": "330352ce7513ba420752dd7243762f0dd75f9eaa",
-    "endCommit": "330352ce7513ba420752dd7243762f0dd75f9eaa",
+    "startCommit": "25633dc1c4ff5d323dc4ad8b941fc3e142d74ed1",
+    "endCommit": "25633dc1c4ff5d323dc4ad8b941fc3e142d74ed1",
     "artifactPath": "dist/renderer/assets/index-BQyFOhDT.js",
     "artifactSha256": "4663d6eaeafea4f1291311a86691fffc4e24ced846e32bcbd4405b5dd8b79198",
     "buildReceiptPath": "design/parity/evidence/build-receipt.json",
-    "buildReceiptSha256": "34ff59d65a1ad149e636e8605f8d8c39364df8f0ddaecf4cc10fb72c566f9394",
-    "artifactBuiltAt": "2026-08-20T00:25:13.112Z"
+    "buildReceiptSha256": "e9c0194c8eb7d6db5d56e93097bd8845dea7db46d55208abcc65d4faa3e199e8",
+    "artifactBuiltAt": "2026-08-20T00:45:37.818Z"
   },
   "capture": {
-    "rawPath": "C:\\Users\\cntow\\AppData\\Local\\Temp\\mcc-parity-330352c-20260819-2025\\output\\product-rows\\upgrade-card--gallery\\product.png",
+    "rawPath": "C:\\Users\\cntow\\AppData\\Local\\Temp\\mcc-parity-25633dc-20260819-2045\\output\\product-rows\\upgrade-card--gallery\\product.png",
     "promotedPath": "design/parity/evidence/upgrade-card--gallery/product.png",
-    "sha256": "d649a1896bbe235faf6d393a8f5f4dd85b99b1d87eb2933bd95f2e4df45d47dc",
-    "rawSha256": "d649a1896bbe235faf6d393a8f5f4dd85b99b1d87eb2933bd95f2e4df45d47dc",
+    "sha256": "dac84f26b26e6d8ee5baf4649a34f4f6aee2f8568e3a72a245722bc5aff90e49",
+    "rawSha256": "dac84f26b26e6d8ee5baf4649a34f4f6aee2f8568e3a72a245722bc5aff90e49",
     "mimeType": "image/png",
-    "startedAt": "2026-08-20T00:25:13.112Z",
-    "capturedAt": "2026-08-20T00:25:13.340Z",
+    "startedAt": "2026-08-20T00:45:37.818Z",
+    "capturedAt": "2026-08-20T00:45:38.009Z",
     "width": 1280,
     "height": 800
   },
@@ -59,8 +59,8 @@
     "reviewer": "automated parity capture review"
   },
   "runtime": {
-    "launchPid": 44684,
-    "hwnd": "789628",
+    "launchPid": 37684,
+    "hwnd": "17368082",
     "hwndResolvedLive": true,
     "consoleErrorCount": 0,
     "pageErrorCount": 0,

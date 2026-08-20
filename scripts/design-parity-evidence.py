@@ -8,7 +8,7 @@ from pathlib import Path
 
 from PIL import Image, ImageChops, ImageDraw
 
-SOURCE_COMMIT = "330352ce7513ba420752dd7243762f0dd75f9eaa"
+SOURCE_COMMIT = "25633dc1c4ff5d323dc4ad8b941fc3e142d74ed1"
 
 
 def digest(path: Path) -> str:
@@ -100,8 +100,8 @@ def main() -> None:
 
         receipt_paths = {}
         for side, image_path, run_receipt, pid, hwnd in (
-            ("referenceRaw", reference, reference_receipts[row_id], 51504, 15468902),
-            ("productRaw", product, product_receipts[row_id], 44684, 789628),
+            ("referenceRaw", reference, reference_receipts[row_id], 48156, 656114),
+            ("productRaw", product, product_receipts[row_id], 37684, 17368082),
         ):
             interaction_path = target / f"{side}-interaction.json"
             interaction = {"version": 1, "rowId": row_id, "side": side, "route": run_receipt["logicalRoute"], "state": run_receipt["state"], "cleanupCompleted": True}
@@ -143,14 +143,15 @@ def main() -> None:
     (evidence_root / "promotion-inventory.json").write_text(json.dumps({"schemaVersion": 1, "records": promotion_records}, indent=2) + "\n", encoding="utf-8")
 
     graphics_root = evidence_root / "graphics-progression"
-    graphics_root.mkdir(parents=True, exist_ok=True)
-    graphics = []
-    for name in ("before", "affordable", "after"):
-        source = run / "output" / f"graphics-{name}.png"
-        target = graphics_root / f"{name}.png"
-        shutil.copyfile(source, target)
-        graphics.append({"state": name, "path": str(target.relative_to(repo)).replace("\\", "/"), "sha256": digest(target), "width": 1440, "height": 900})
-    (graphics_root / "receipt.json").write_text(json.dumps({"version": 1, "sourceCommit": SOURCE_COMMIT, "route": "cheap-lowlevel-headless", "launchPid": 44684, "hwnd": "789628", "cleanupCompleted": True, "captures": graphics}, indent=2) + "\n", encoding="utf-8")
+    if (run / "output/graphics-before.png").exists():
+        graphics_root.mkdir(parents=True, exist_ok=True)
+        graphics = []
+        for name in ("before", "affordable", "after"):
+            source = run / "output" / f"graphics-{name}.png"
+            target = graphics_root / f"{name}.png"
+            shutil.copyfile(source, target)
+            graphics.append({"state": name, "path": str(target.relative_to(repo)).replace("\\", "/"), "sha256": digest(target), "width": 1440, "height": 900})
+        (graphics_root / "receipt.json").write_text(json.dumps({"version": 1, "sourceCommit": SOURCE_COMMIT, "route": "cheap-lowlevel-headless", "launchPid": 37684, "hwnd": "17368082", "cleanupCompleted": True, "captures": graphics}, indent=2) + "\n", encoding="utf-8")
     print(f"Promoted {len(inventory['rows'])} parity rows with byte-exact raw captures and derived evidence")
 
 

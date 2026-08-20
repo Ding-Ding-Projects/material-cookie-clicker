@@ -3,22 +3,22 @@
   "id": "prestige-gate--ready--product",
   "route": "cheap-lowlevel-headless",
   "source": {
-    "startCommit": "330352ce7513ba420752dd7243762f0dd75f9eaa",
-    "endCommit": "330352ce7513ba420752dd7243762f0dd75f9eaa",
+    "startCommit": "25633dc1c4ff5d323dc4ad8b941fc3e142d74ed1",
+    "endCommit": "25633dc1c4ff5d323dc4ad8b941fc3e142d74ed1",
     "artifactPath": "dist/renderer/assets/index-BQyFOhDT.js",
     "artifactSha256": "4663d6eaeafea4f1291311a86691fffc4e24ced846e32bcbd4405b5dd8b79198",
     "buildReceiptPath": "design/parity/evidence/build-receipt.json",
-    "buildReceiptSha256": "34ff59d65a1ad149e636e8605f8d8c39364df8f0ddaecf4cc10fb72c566f9394",
-    "artifactBuiltAt": "2026-08-20T00:25:11.037Z"
+    "buildReceiptSha256": "e9c0194c8eb7d6db5d56e93097bd8845dea7db46d55208abcc65d4faa3e199e8",
+    "artifactBuiltAt": "2026-08-20T00:45:36.081Z"
   },
   "capture": {
-    "rawPath": "C:\\Users\\cntow\\AppData\\Local\\Temp\\mcc-parity-330352c-20260819-2025\\output\\product-rows\\prestige-gate--ready\\product.png",
+    "rawPath": "C:\\Users\\cntow\\AppData\\Local\\Temp\\mcc-parity-25633dc-20260819-2045\\output\\product-rows\\prestige-gate--ready\\product.png",
     "promotedPath": "design/parity/evidence/prestige-gate--ready/product.png",
-    "sha256": "8215a7f4dfd0ea183a078da692827e305ec404a0be67dc8b52512b28328bdef7",
-    "rawSha256": "8215a7f4dfd0ea183a078da692827e305ec404a0be67dc8b52512b28328bdef7",
+    "sha256": "23d5f79ccad25355d6696293ea8072347836f443cda173c61af4b506953b28ed",
+    "rawSha256": "23d5f79ccad25355d6696293ea8072347836f443cda173c61af4b506953b28ed",
     "mimeType": "image/png",
-    "startedAt": "2026-08-20T00:25:11.037Z",
-    "capturedAt": "2026-08-20T00:25:11.274Z",
+    "startedAt": "2026-08-20T00:45:36.081Z",
+    "capturedAt": "2026-08-20T00:45:36.276Z",
     "width": 1280,
     "height": 800
   },
@@ -59,8 +59,8 @@
     "reviewer": "automated parity capture review"
   },
   "runtime": {
-    "launchPid": 44684,
-    "hwnd": "789628",
+    "launchPid": 37684,
+    "hwnd": "17368082",
     "hwndResolvedLive": true,
     "consoleErrorCount": 0,
     "pageErrorCount": 0,

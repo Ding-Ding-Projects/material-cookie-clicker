@@ -19,7 +19,7 @@
     },
     "product": {
       "path": "design/parity/evidence/prestige-gate--ready/product.png",
-      "sha256": "8215a7f4dfd0ea183a078da692827e305ec404a0be67dc8b52512b28328bdef7"
+      "sha256": "23d5f79ccad25355d6696293ea8072347836f443cda173c61af4b506953b28ed"
     }
   },
   "dimensions": {
@@ -27,10 +27,10 @@
     "height": 800
   },
   "metrics": {
-    "changedPixels": 467033,
+    "changedPixels": 456649,
     "totalPixels": 1024000,
-    "changedRatio": 0.4560869140625,
-    "rgbRmse": 58.960098254649445
+    "changedRatio": 0.4459462890625,
+    "rgbRmse": 55.7271973113873
   },
   "tool": {
     "name": "Pillow ImageChops.difference",

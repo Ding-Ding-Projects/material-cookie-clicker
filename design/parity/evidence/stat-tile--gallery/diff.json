@@ -19,7 +19,7 @@
     },
     "product": {
       "path": "design/parity/evidence/stat-tile--gallery/product.png",
-      "sha256": "a73a2189e3e0fcce83de0a7ee914ecd4be9c5eca4f5bfac0217d408e23c7ab79"
+      "sha256": "d15c741d92c3f7aa08514a4c67f3c5bca580a115ad8f932df19cfafe35dbebcd"
     }
   },
   "dimensions": {
@@ -27,10 +27,10 @@
     "height": 800
   },
   "metrics": {
-    "changedPixels": 561879,
+    "changedPixels": 608893,
     "totalPixels": 1024000,
-    "changedRatio": 0.5487099609375,
-    "rgbRmse": 53.94421193512871
+    "changedRatio": 0.5946220703125,
+    "rgbRmse": 54.956067331901956
   },
   "tool": {
     "name": "Pillow ImageChops.difference",

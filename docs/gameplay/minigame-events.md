@@ -2,7 +2,9 @@
 
 > **Status at integration base `43d2174`: mounted in the desktop application; focused documentation checks are in scope, while built interaction, screenshots, and a promotion receipt remain pending.**
 
-## Mounted surface and unlock
+## Behavior
+
+### Mounted surface and unlock
 
 The surface users actually receive is `src/renderer/screens/MinigamesScreen.tsx`. `src/renderer/App.tsx` imports that component as `PlayableMinigamesScreen` and mounts it inside the `minigames` anchored panel when `openSurface === "minigames"`. The separate `MinigameEventsScreen` adapter that also exists in `App.tsx` is not the component mounted by that route, so this article describes `PlayableMinigamesScreen`, not the dormant adapter.
 
@@ -10,7 +12,7 @@ The Minigames console button appears permanently at **100,000 lifetime baked coo
 
 The seeded scheduler chooses its next opportunity **6–12 minutes** ahead. Its **30-second clock is the incoming reveal window**: the notice becomes visible during the final 30 seconds before the scheduled start. It is not a 30-second round deadline, and a started board does not expire after 30 seconds. After the unlock, the empty panel also exposes a Start button for each of the five boards; only one board can be active or minimized at a time. The hero band above the board list previously clipped its own hint line by 13px (the band reserved height for two caption lines plus padding/gaps but the real caption content needed 13px more, confirmed by reverting the old value on the live build, seeing the clip reproduce, then re-applying the fix); captions across all five boards also rendered at full body-text size until an undeclared `--md-sys-typescale-body-small-font` token was added, measured at 12px after the fix.
 
-## Five boards in the mounted component
+### Five boards in the mounted component
 
 The mounted controls are narrower than the richer move helpers in `src/shared/game/minigames.ts`. `PlayableMinigamesScreen` writes validated whole-board updates with `minigameUpdate`, so the claims below stop at the controls that component actually exposes.
 
@@ -20,7 +22,7 @@ The mounted controls are narrower than the richer move helpers in `src/shared/ga
 - **Minesweeper** exposes an 8×8 board with ten persisted mines. A normal click reveals one cell and a context-menu action toggles a flag; a flagged cell is now visually distinct from a hidden one (previously transparent from two undeclared tokens, `--md-sys-color-tertiary-container` and its `-on-` counterpart, measured as `rgb(248, 226, 135)` flagged versus `rgb(245, 223, 196)` hidden after the fix). The mounted screen does not wire the shared reducer's first-click relocation, flood reveal, or chord actions, so this article does not claim those interactions.
 - **Breakout** is step-driven rather than a continuous animation. **Advance ball** applies one movement/bounce/brick/life step, and the left/right buttons move the paddle by a bounded increment. Bricks, score, lives, ball vector, and paddle position are persisted.
 
-## Lifecycle and persistence
+### Lifecycle and persistence
 
 The mounted panel dispatches the persisted lifecycle directly:
 
@@ -32,7 +34,7 @@ The mounted panel dispatches the persisted lifecycle directly:
 
 The same save JSON carries an optional `minigames` compatibility block containing the active board, schedule, Golden Token ledger, Lucky Chance state, and awarded reward ids. A missing or non-object block defaults each area to its empty state, preserving older saves without inventing minigame progress. This is an optional block in the same save, not a second save file.
 
-## Golden Token sources
+### Golden Token sources
 
 Every award is keyed by source and source id, so replaying the same source cannot mint the same award twice.
 
@@ -46,7 +48,7 @@ Every award is keyed by source and source id, so replaying the same source canno
 
 With five distinct board ids, the reachable first rare-chain award is the third distinct completed board. Offline progress does not dispatch any of these award actions.
 
-## Lucky Chance results
+### Lucky Chance results
 
 One draw costs one Golden Token. The draw uses a persisted draw count and a seeded five-slot pool:
 
@@ -60,7 +62,40 @@ One draw costs one Golden Token. The draw uses a persisted draw count and a seed
 
 Unclaimed rewards are selected before repeats. After every reward id has been claimed, the pool can return a duplicate result and still spends the token. When no Golden Token is available, the reducer returns the existing state without writing a result.
 
-## Local checks and evidence boundary
+## Configuration
+
+Thresholds and board rules live in `src/shared/game/minigames.ts`. The mounted React surface is
+`src/renderer/screens/MinigamesScreen.tsx`, and `src/renderer/App.tsx` opens it through the
+registered `minigames` console surface listed in `src/renderer/game/console-panels.ts`.
+
+Schedule, active-board, Golden Token and Lucky Chance data are serialized by
+`src/shared/game/save-codec.ts` as an optional block inside the ordinary save, not a second save
+file. The schedule and every board draw from the game's seeded random stream, so a given save
+replays the same sequence. No setting shortens the shipped 6-12 minute interval, and no setting
+creates offline token income.
+
+## Failure modes
+
+- A missing minigame block is read as an empty suite, so an older save stays usable.
+- An incomplete or corrupt block falls back to empty minigame state without discarding the
+  surrounding game save.
+- Scheduling is deferred while another minigame, random event or waiting golden cookie already owns
+  the opportunity slot; a scheduled opportunity never replaces an active board.
+- A repeated Golden Token source key awards nothing a second time.
+- A Lucky Chance action with no token writes no result and spends nothing.
+- Closing or minimizing the panel does not pause cookie production.
+
+## Security and privacy
+
+Every board, the schedule, the Golden Token ledger and the Lucky Chance pool are computed locally
+and stored only in the player's own save. The surface makes no network request, loads no remote
+asset and reports no telemetry, so nothing about how a player performs on a board leaves the
+machine. Board art is inline SVG drawn by the renderer rather than a fetched image.
+
+Because the block lives inside the ordinary save, exporting that save exports minigame progress
+with it; nothing else is written elsewhere on disk.
+
+## Verification
 
 The scoped checks for this documentation change are:
 
@@ -73,4 +108,9 @@ npx vitest run tests/completeness-inventory.test.ts tests/game/disclosure.test.t
 
 The release-capture inventory still marks `minigame-events`, `minigame-klondike`, `minigame-memory`, `minigame-2048`, `minigame-minesweeper`, and `minigame-breakout` as `pending`. No minigame record exists in `design/parity/evidence/promotion-inventory.json`, so there is no promoted reference/product receipt for this surface. Source mounting and passing local checks are not substitutes for built interaction, a real screenshot, or a promotion receipt.
 
-Suggested articles: [Golden Cookie Events](golden-cookie-events.md), [Achievements](achievements.md), and [Prestige](prestige.md).
+## Suggested articles
+
+- [Golden Cookie Events](golden-cookie-events.md) — the Oven Dial redemption that awards a token.
+- [Achievements](achievements.md) — each newly unlocked milestone awards one token.
+- [Prestige](prestige.md) — what the 100,000 lifetime unlock survives.
+- [Graphics progression](graphics-progression.md) — the look rungs the panel renders under.

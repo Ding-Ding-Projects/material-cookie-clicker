@@ -56,8 +56,24 @@ const COOKIE_HERO_SOURCE = readFileSync(
   "utf8",
 );
 
-/** The text of THE PLAIN LAYER — everything after its banner comment. */
-const PLAIN_LAYER = STYLESHEET.slice(STYLESHEET.indexOf("THE PLAIN LAYER"));
+/**
+ * The text of THE PLAIN LAYER.
+ *
+ * This used to be "everything after its banner comment", which was true only while the plain layer
+ * was the last thing in the stylesheet. It stopped being last: a MINIGAME EVENTS / LUCKY DRAWER
+ * section was appended after it, and that section legitimately carries its own
+ * `@media (prefers-reduced-motion: reduce)` rule for the board buttons. The slice swallowed it and
+ * the plain layer was reported as buying motion back from someone who had asked not to have it —
+ * a finding about a rule that is not in the plain layer at all.
+ *
+ * Bounded at the next top-level section banner, so the slice describes what it claims to.
+ */
+const SECTION_BANNER = new RegExp(String.raw`^/\* -{4,} [A-Z]`, "m");
+const PLAIN_LAYER_START = STYLESHEET.indexOf("THE PLAIN LAYER");
+const NEXT_SECTION = STYLESHEET.slice(PLAIN_LAYER_START).search(SECTION_BANNER);
+const PLAIN_LAYER = NEXT_SECTION < 0
+  ? STYLESHEET.slice(PLAIN_LAYER_START)
+  : STYLESHEET.slice(PLAIN_LAYER_START, PLAIN_LAYER_START + NEXT_SECTION);
 
 /** Everything BEFORE the plain layer: the v2 sheet, which this feature must not have rewritten. */
 const V2_LAYER = STYLESHEET.slice(0, STYLESHEET.indexOf("THE PLAIN LAYER"));

@@ -1,5 +1,9 @@
 import assert from 'node:assert/strict';
-import { test } from 'node:test';
+// Written against node:test, but this directory is run by vitest, which reported
+// "No test suite found in file" and ran ZERO of the sixteen checks below — the file
+// looked present while asserting nothing. vitest's `test` has the same
+// (name, fn) shape, so importing it here keeps every assertion exactly as written.
+import { test } from 'vitest';
 import { readFileSync } from 'node:fs';
 import { dirname, resolve } from 'node:path';
 import { fileURLToPath } from 'node:url';

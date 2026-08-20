@@ -715,7 +715,11 @@ export function validatePromotionReceipt(receipt, {
 export function assertNoHardcodedCaptureIdentity(source, { path = 'source' } = {}) {
   if (typeof source !== 'string') reject('SOURCE_SCAN_INVALID', `${path} must be text`);
   const forbidden = [
-    [/^\s*SOURCE_COMMIT\s*=\s*["'][0-9a-f]{40,64}["']/mu, 'hard-coded source commit'],
+    // Anchored at the start of the line, this matched a bare `SOURCE_COMMIT = "..."` and missed
+    // every declared form -- `const SOURCE_COMMIT`, `let`, `var`, `export const`, and the Python
+    // `SOURCE_COMMIT: str = "..."` -- which is how anyone would actually write it. A guard that
+    // catches only the spelling nobody uses is a guard that passes on everything.
+    [/^\s*(?:export\s+)?(?:const|let|var)?\s*SOURCE_COMMIT\s*(?::\s*\w+\s*)?=\s*["'][0-9a-f]{40,64}["']/mu, 'hard-coded source commit'],
     [/\b(?:launchPid|hwnd)\s*[":=]\s*["']?\d{2,}["']?/mu, 'hard-coded process/window identity'],
     [/\(\s*["'](?:referenceRaw|productRaw)["'][^\n]*,\s*\d+\s*,\s*\d+\s*\)/mu, 'hard-coded process/window tuple'],
     [/next\s*\([^\n]*glob\s*\(\s*["']\*\.js["']\s*\)/mu, 'arbitrary first-JavaScript artifact selection'],

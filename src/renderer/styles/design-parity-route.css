@@ -221,6 +221,19 @@
   height: 132px;
 }
 
+/* design/cookie-surface.html renders the illustrated cookie as domain data art sitting INSIDE
+ * a visibly round Material target — a small baked disc centred in the 132px primary-container
+ * circle, with the circle's own rim still showing all the way round. index.css's base
+ * `.cookie-btn--art .cookie-btn__art { inset: -10%; }` is tuned for the live game's single
+ * hero cookie, where the drawing is meant to overhang its pedestal by a fifth on every side;
+ * at this gallery's 132px size that overhang (~13px) is bigger than the state-4 focus ring's
+ * own outline-offset (4px), so the oversized art paints over the ring as well as crowding into
+ * the next cookie's gap. Shrink the art back inside the button so both the round Material
+ * target and the focus ring stay visible, matching the reference's proportions. */
+.parity-cookie-state .cookie-btn--art .cookie-btn__art {
+  inset: 21%;
+}
+
 .parity-cookie-state--1 .cookie-btn {
   transform: translateY(-4px);
   box-shadow: var(--md-sys-elevation-level-3);
@@ -711,6 +724,10 @@
 :root:root body .design-parity-route .parity-cookie-state .cookie-btn {
   width: 132px;
   height: 132px;
+}
+
+:root:root body .design-parity-route .parity-cookie-state .cookie-btn--art .cookie-btn__art {
+  inset: 21%;
 }
 
 :root:root body .design-parity-route .parity-cookie-state--0 .cookie-btn,

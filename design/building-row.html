@@ -1,4 +1,100 @@
 <!-- @dsCard group="Game Surfaces" -->
-<!doctype html><html lang="en-HK"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1"><title>Material Cookie Clicker · Building row</title><link rel="stylesheet" href="./reference-app/material-reference.css"></head>
-<body data-scheme="light"><main class="spec-shell"><header class="spec-intro"><h1>Building row · 建築物列 — generator list item</h1><p>The deterministic list shows an affordable row, an unaffordable row, and a locked row with the real bilingual anatomy, counts, rates, quantity controls, and price labels. · 固定清單用真正雙語結構顯示買得起、買唔起同未解鎖三種狀態。</p><button class="theme-toggle" onclick="document.body.dataset.scheme=document.body.dataset.scheme==='dark'?'light':'dark'">🌗 Toggle light / dark · 切換淺色 / 深色</button></header>
-<section class="spec-section"><h2 class="section-title">Affordable, unaffordable, locked · 買得起、買唔起、未解鎖</h2><div class="gallery"><article class="card row"><div class="art" aria-hidden="true">👵</div><div><h3>Grandma's Bakery</h3><p class="muted bilingual">嫲嫲嘅麵包店</p><p class="muted">+18.4 CPS each</p></div><strong class="number">12</strong><div class="actions"><div class="segmented" role="group" aria-label="Buy quantity for Grandma's Bakery"><button aria-pressed="false">×1</button><button aria-pressed="true">×10</button><button aria-pressed="false">×100</button><button aria-pressed="false">Max</button></div><button class="button filled">Buy · 買 — 🍪 1,240</button></div></article><article class="card row"><div class="art" aria-hidden="true">🏭</div><div><h3>Cookie Factory</h3><p class="muted bilingual">曲奇工廠</p><p class="muted">+210 CPS each</p></div><strong class="number">3</strong><div class="actions"><div class="segmented"><button aria-pressed="true">×1</button><button aria-pressed="false">×10</button><button aria-pressed="false">×100</button><button aria-pressed="false">Max</button></div><button class="button" disabled>Buy · 買 — 🍪 88,500</button></div></article><article class="card row disabled"><div class="art" aria-hidden="true">🚀</div><div><h3>Cookie Rocket</h3><p class="muted bilingual">曲奇火箭</p><p class="muted">Unlocks at 500 Cookie Factories owned · 擁有 500 間曲奇工廠先解鎖</p></div><strong class="number">0</strong><div class="actions"><div class="segmented"><button disabled>×1</button><button disabled>×10</button><button disabled>×100</button><button disabled>Max</button></div><button class="button" disabled>Locked · 未解鎖</button></div></article></div></section></main></body></html>
+<!doctype html>
+<html lang="en-HK">
+  <head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width,initial-scale=1">
+    <title>Material Cookie Clicker · Building row</title>
+    <link rel="stylesheet" href="./reference-app/material-reference.css">
+    <link rel="stylesheet" href="./reference-app/building-row.css">
+  </head>
+  <body data-scheme="light">
+    <main class="spec-shell">
+      <header class="spec-intro"><h1>Building row · 建築物列 — generator list item</h1>
+        <p>The deterministic list shows an affordable row, an unaffordable row, and a locked row with the real bilingual anatomy, counts, rates, quantity controls, and price labels. · 固定清單用真正雙語結構顯示買得起、買唔起同未解鎖三種狀態。</p>
+        <button class="theme-toggle" onclick="document.body.dataset.scheme=document.body.dataset.scheme==='dark'?'light':'dark'">🌗 Toggle light / dark · 切換淺色 / 深色</button>
+      </header>
+
+      <section class="spec-section">
+        <h2 class="section-title">Affordable, unaffordable, locked · 買得起、買唔起、未解鎖</h2>
+        <div class="gallery building-gallery">
+          <article class="card row">
+            <div class="art" aria-hidden="true">
+              <svg class="building-art" data-building-art="grandma" viewBox="0 0 34 34" focusable="false" aria-hidden="true">
+                <path class="art-fill" d="M5 27h24v3H5zM8 16h18v11H8zM11 12h12l3 4H8z"/>
+                <path class="art-cut" d="M12 20h10v7H12zM14 22h2v2h-2zm4 0h2v2h-2z"/>
+                <path class="art-line" d="M10 12c1-5 4-8 7-8s6 3 7 8M13 9h8"/>
+              </svg>
+            </div>
+            <div class="row-copy" data-state="affordable">
+              <h3>Grandma's Bakery</h3>
+              <p class="muted bilingual">嫲嫲嘅麵包店</p>
+              <p class="muted rate">+18.4 CPS each</p>
+            </div>
+            <strong class="number" aria-label="12 owned · 擁有 12">12</strong>
+            <div class="actions">
+              <div class="segmented" role="group" aria-label="Buy quantity for Grandma's Bakery · 嫲嫲嘅麵包店購買數量">
+                <button type="button" aria-pressed="false">×1</button>
+                <button type="button" aria-pressed="true">×10</button>
+                <button type="button" aria-pressed="false">×100</button>
+                <button type="button" class="max-option" aria-pressed="false"><span>Max</span><span class="max-zh">最多</span></button>
+              </div>
+              <button type="button" class="button filled">Buy · 買 — 🍪 1,240</button>
+            </div>
+          </article>
+
+          <article class="card row">
+            <div class="art" aria-hidden="true">
+              <svg class="building-art" data-building-art="factory" viewBox="0 0 34 34" focusable="false" aria-hidden="true">
+                <path class="art-fill" d="M4 27h26v3H4zM5 16l8 5v-5l8 5v-8h7v14H5zM22 4h4v9h-4z"/>
+                <path class="art-cut" d="M9 23h3v4H9zm6 0h3v4h-3zm7-5h3v3h-3zm0 5h3v4h-3z"/>
+                <path class="art-line" d="M24 4c-3-2-3-4 0-5 3 2 3 4 0 5z"/>
+              </svg>
+            </div>
+            <div class="row-copy" data-state="unaffordable">
+              <h3>Cookie Factory</h3>
+              <p class="muted bilingual">曲奇工廠</p>
+              <p class="muted rate">+210 CPS each</p>
+            </div>
+            <strong class="number" aria-label="3 owned · 擁有 3">3</strong>
+            <div class="actions">
+              <div class="segmented" role="group" aria-label="Buy quantity for Cookie Factory · 曲奇工廠購買數量">
+                <button type="button" aria-pressed="true">×1</button>
+                <button type="button" aria-pressed="false">×10</button>
+                <button type="button" aria-pressed="false">×100</button>
+                <button type="button" class="max-option" aria-pressed="false"><span>Max</span><span class="max-zh">最多</span></button>
+              </div>
+              <button type="button" class="button" disabled>Buy · 買 — 🍪 88,500</button>
+            </div>
+          </article>
+
+          <article class="card row disabled">
+            <div class="art" aria-hidden="true">
+              <svg class="building-art" data-building-art="rocket" viewBox="0 0 34 34" focusable="false" aria-hidden="true">
+                <path class="art-fill" d="M18 4c6 3 9 8 8 14l-7 7-10-10 7-10zM9 15l-5 3 5 3 3-3zm10 10l3 5 3-5-3-3z"/>
+                <circle class="art-cut" cx="19" cy="11" r="3"/>
+                <path class="art-accent" d="M8 23l3-3 3 3-6 7H4z"/>
+                <path class="art-line" d="M16 5l12-1-2 12"/>
+              </svg>
+            </div>
+            <div class="row-copy" data-state="locked">
+              <h3>Cookie Rocket</h3>
+              <p class="muted bilingual">曲奇火箭</p>
+              <p class="muted rate">Unlocks at 500 Cookie Factories owned · 擁有 500 間曲奇工廠先解鎖</p>
+            </div>
+            <strong class="number" aria-label="0 owned · 擁有 0">0</strong>
+            <div class="actions">
+              <div class="segmented" role="group" aria-label="Buy quantity for Cookie Rocket · 曲奇火箭購買數量">
+                <button type="button" disabled>×1</button>
+                <button type="button" disabled>×10</button>
+                <button type="button" disabled>×100</button>
+                <button type="button" class="max-option" disabled><span>Max</span><span class="max-zh">最多</span></button>
+              </div>
+              <button type="button" class="button" disabled>Locked · 未解鎖</button>
+            </div>
+          </article>
+        </div>
+      </section>
+    </main>
+  </body>
+</html>

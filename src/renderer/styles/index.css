@@ -13071,3 +13071,351 @@ body[data-eclipse='on'] .cookie-hero::after {
   .minigame-tableau { grid-template-columns: repeat(4, minmax(40px, 1fr)); }
   .minigame-board--mines { grid-template-columns: repeat(8, minmax(24px, 1fr)); }
 }
+
+/* Full Material action anatomy for minigames and Lucky Chance. This intentionally outranks the
+   generic button normalization above: that selector carries four :not() classes and otherwise
+   flattens every purpose-specific action back into the same 40px tonal pill. */
+.md3-action--filled {
+  --md3-action-container: var(--md-sys-color-primary);
+  --md3-action-ink: var(--md-sys-color-on-primary);
+  --md3-action-outline: transparent;
+}
+
+.md3-action--tonal {
+  --md3-action-container: var(--md-sys-color-secondary-container);
+  --md3-action-ink: var(--md-sys-color-on-secondary-container);
+  --md3-action-outline: transparent;
+}
+
+.md3-action--outlined {
+  --md3-action-container: transparent;
+  --md3-action-ink: var(--md-sys-color-primary);
+  --md3-action-outline: var(--md-sys-color-outline);
+}
+
+.md3-action--text {
+  --md3-action-container: transparent;
+  --md3-action-ink: var(--md-sys-color-primary);
+  --md3-action-outline: transparent;
+}
+
+.md3-action--danger-text {
+  --md3-action-container: transparent;
+  --md3-action-ink: var(--md-sys-color-error);
+  --md3-action-outline: transparent;
+}
+
+.md3-action--danger-outlined {
+  --md3-action-container: transparent;
+  --md3-action-ink: var(--md-sys-color-error);
+  --md3-action-outline: var(--md-sys-color-error);
+}
+
+:root:root body button.md3-action:not(.golden-sprite):not(.achievement-badge):not(.mini-ticket):not(.cookie-btn) {
+  appearance: none;
+  -webkit-appearance: none;
+  position: relative;
+  isolation: isolate;
+  display: inline-flex;
+  min-block-size: 48px;
+  min-inline-size: 48px;
+  max-inline-size: 100%;
+  align-items: center;
+  justify-content: center;
+  gap: 8px;
+  padding: 10px 20px;
+  overflow: hidden;
+  border: 1px solid var(--md3-action-outline, transparent);
+  border-radius: var(--md-sys-shape-corner-full);
+  background-color: var(--md3-action-container, var(--md-sys-color-secondary-container));
+  background-image: none;
+  color: var(--md3-action-ink, var(--md-sys-color-on-secondary-container));
+  box-shadow: var(--md-sys-elevation-level-0);
+  font: var(--md-sys-typescale-label-large-font);
+  line-height: 1.25;
+  letter-spacing: 0.1px;
+  text-align: center;
+  white-space: normal;
+  overflow-wrap: anywhere;
+  cursor: pointer;
+  transition:
+    box-shadow var(--md-sys-motion-duration-short4) var(--md-sys-motion-easing-standard),
+    color var(--md-sys-motion-duration-short4) var(--md-sys-motion-easing-standard),
+    border-color var(--md-sys-motion-duration-short4) var(--md-sys-motion-easing-standard);
+}
+
+:root:root body button.md3-action:not(.golden-sprite):not(.achievement-badge):not(.mini-ticket):not(.cookie-btn)::before {
+  content: '';
+  position: absolute;
+  inset: 0;
+  z-index: 0;
+  border-radius: inherit;
+  background: currentColor;
+  opacity: 0;
+  pointer-events: none;
+  transition: opacity var(--md-sys-motion-duration-short4) var(--md-sys-motion-easing-standard);
+}
+
+:root:root body button.md3-action:not(.golden-sprite):not(.achievement-badge):not(.mini-ticket):not(.cookie-btn) > * {
+  position: relative;
+  z-index: 1;
+}
+
+:root:root body button.md3-action:not(.golden-sprite):not(.achievement-badge):not(.mini-ticket):not(.cookie-btn):hover:not(:disabled):not([aria-disabled='true']) {
+  background-color: var(--md3-action-container, var(--md-sys-color-secondary-container));
+  color: var(--md3-action-ink, var(--md-sys-color-on-secondary-container));
+  box-shadow: var(--md-sys-elevation-level-1);
+}
+
+:root:root body button.md3-action:not(.golden-sprite):not(.achievement-badge):not(.mini-ticket):not(.cookie-btn):hover:not(:disabled):not([aria-disabled='true'])::before {
+  opacity: var(--md-sys-state-hover-opacity);
+}
+
+:root:root body button.md3-action:not(.golden-sprite):not(.achievement-badge):not(.mini-ticket):not(.cookie-btn):active:not(:disabled):not([aria-disabled='true']) {
+  background-color: var(--md3-action-container, var(--md-sys-color-secondary-container));
+  box-shadow: var(--md-sys-elevation-level-0);
+}
+
+:root:root body button.md3-action:not(.golden-sprite):not(.achievement-badge):not(.mini-ticket):not(.cookie-btn):active:not(:disabled):not([aria-disabled='true'])::before {
+  opacity: var(--md-sys-state-pressed-opacity);
+}
+
+:root:root body button.md3-action:not(.golden-sprite):not(.achievement-badge):not(.mini-ticket):not(.cookie-btn):focus-visible {
+  outline: 3px solid var(--md-sys-color-primary);
+  outline-offset: 2px;
+  box-shadow: var(--md-sys-elevation-level-0);
+}
+
+:root:root body button.md3-action:not(.golden-sprite):not(.achievement-badge):not(.mini-ticket):not(.cookie-btn):focus-visible::before {
+  opacity: var(--md-sys-state-focus-opacity);
+}
+
+:root:root body button.md3-action:not(.golden-sprite):not(.achievement-badge):not(.mini-ticket):not(.cookie-btn):disabled,
+:root:root body button.md3-action:not(.golden-sprite):not(.achievement-badge):not(.mini-ticket):not(.cookie-btn)[aria-disabled='true'] {
+  border-color: transparent;
+  background-color: color-mix(in srgb, var(--md-sys-color-on-surface) 12%, var(--md-sys-color-surface));
+  color: color-mix(in srgb, var(--md-sys-color-on-surface) 38%, var(--md-sys-color-surface));
+  box-shadow: var(--md-sys-elevation-level-0);
+  opacity: 1;
+  cursor: not-allowed;
+}
+
+:root:root body button.md3-action.md3-action--icon:not(.golden-sprite):not(.achievement-badge):not(.mini-ticket):not(.cookie-btn) {
+  inline-size: 48px;
+  block-size: 48px;
+  flex: 0 0 48px;
+  padding: 4px;
+  border: 0;
+  background-clip: content-box;
+  border-radius: var(--md-sys-shape-corner-full);
+}
+
+:root:root body button.md3-action.md3-action--icon:not(.golden-sprite):not(.achievement-badge):not(.mini-ticket):not(.cookie-btn)::before {
+  inset: 4px;
+}
+
+.md3-action--icon .md3-action__label {
+  position: absolute;
+  inline-size: 1px;
+  block-size: 1px;
+  overflow: hidden;
+  clip-path: inset(50%);
+  white-space: nowrap;
+}
+
+.minigame-a11y-label,
+.minigame-live-result {
+  position: absolute;
+  inline-size: 1px;
+  block-size: 1px;
+  overflow: hidden;
+  clip-path: inset(50%);
+  white-space: nowrap;
+}
+
+.md3-action__icon {
+  inline-size: 24px;
+  block-size: 24px;
+  flex: 0 0 24px;
+  fill: none;
+  stroke: currentColor;
+  stroke-width: 1.9;
+  stroke-linecap: round;
+  stroke-linejoin: round;
+}
+
+.md3-action__label,
+.md3-action__bilingual {
+  min-inline-size: 0;
+}
+
+.md3-action__bilingual {
+  display: inline-flex;
+  flex-wrap: wrap;
+  align-items: baseline;
+  justify-content: center;
+  gap: 2px 5px;
+}
+
+.minigame-action--start .md3-action__bilingual {
+  justify-content: flex-start;
+}
+
+.md3-action__icon[data-icon='play'] path,
+.md3-action__icon[data-icon='minimize'] path,
+.md3-action__icon[data-icon='spark'] path,
+.md3-action__icon[data-icon='advance'] path {
+  fill: currentColor;
+  stroke: none;
+}
+
+.minigame-picker {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(min(100%, 210px), 1fr));
+  align-items: stretch;
+}
+
+.minigame-picker .md3-action,
+.lucky-chance-card > .md3-action {
+  inline-size: 100%;
+}
+
+.minigame-action--start {
+  justify-content: flex-start;
+  text-align: start;
+}
+
+.minigame-action-reason {
+  margin: 0;
+  color: var(--md-sys-color-on-surface-variant);
+  font: var(--md-sys-typescale-body-small-font);
+}
+
+.minigame-board__wide-note {
+  grid-column: 1 / -1;
+}
+
+:root:root body button.minigame-memory-card:not(.golden-sprite):not(.achievement-badge):not(.mini-ticket):not(.cookie-btn),
+:root:root body button.minigame-mine-cell:not(.golden-sprite):not(.achievement-badge):not(.mini-ticket):not(.cookie-btn) {
+  appearance: none;
+  -webkit-appearance: none;
+  min-inline-size: 48px;
+  min-block-size: 48px;
+  inline-size: 48px;
+  block-size: 48px;
+  padding: 0;
+  border: 1px solid var(--md-sys-color-outline);
+  border-radius: var(--md-sys-shape-corner-medium);
+  background: var(--md-sys-color-surface-container-high);
+  color: var(--md-sys-color-on-surface);
+  box-shadow: var(--md-sys-elevation-level-0);
+  cursor: pointer;
+}
+
+:root:root body button.minigame-memory-card:not(.golden-sprite):not(.achievement-badge):not(.mini-ticket):not(.cookie-btn):hover:not(:disabled),
+:root:root body button.minigame-mine-cell:not(.golden-sprite):not(.achievement-badge):not(.mini-ticket):not(.cookie-btn):hover:not(:disabled) {
+  background: color-mix(in srgb, var(--md-sys-color-on-surface) var(--md-sys-state-hover-opacity), var(--md-sys-color-surface-container-high));
+  box-shadow: var(--md-sys-elevation-level-1);
+}
+
+:root:root body button.minigame-memory-card:not(.golden-sprite):not(.achievement-badge):not(.mini-ticket):not(.cookie-btn):focus-visible,
+:root:root body button.minigame-mine-cell:not(.golden-sprite):not(.achievement-badge):not(.mini-ticket):not(.cookie-btn):focus-visible {
+  position: relative;
+  z-index: 2;
+  outline: 3px solid var(--md-sys-color-primary);
+  outline-offset: 2px;
+  box-shadow: 0 0 0 2px color-mix(in srgb, var(--md-sys-color-primary) var(--md-sys-state-focus-opacity), transparent);
+}
+
+:root:root body button.minigame-memory-card:not(.golden-sprite):not(.achievement-badge):not(.mini-ticket):not(.cookie-btn):disabled,
+:root:root body button.minigame-mine-cell:not(.golden-sprite):not(.achievement-badge):not(.mini-ticket):not(.cookie-btn):disabled {
+  border-color: var(--md-sys-color-outline-variant);
+  background: var(--md-sys-color-surface-container-highest);
+  color: var(--md-sys-color-on-surface);
+  box-shadow: var(--md-sys-elevation-level-0);
+  opacity: 1;
+  cursor: default;
+}
+
+:root:root body button.minigame-memory-card[data-card-state='matched']:not(.golden-sprite):not(.achievement-badge):not(.mini-ticket):not(.cookie-btn) {
+  background: var(--md-sys-color-primary-container);
+  color: var(--md-sys-color-on-primary-container);
+}
+
+:root:root body button.minigame-mine-cell[data-cell-state='flagged']:not(.golden-sprite):not(.achievement-badge):not(.mini-ticket):not(.cookie-btn) {
+  background: var(--md-sys-color-tertiary-container);
+  color: var(--md-sys-color-on-tertiary-container);
+}
+
+.minigame-board--memory {
+  display: grid;
+  gap: 8px;
+}
+
+.minigame-grid-row--memory {
+  display: grid;
+  grid-template-columns: repeat(4, minmax(48px, 1fr));
+  gap: 8px;
+}
+
+.minigame-board--memory-wrap {
+  display: grid;
+  gap: 10px;
+}
+
+.minigame-memory-card-wrap {
+  display: grid;
+  min-inline-size: 48px;
+  min-block-size: 48px;
+}
+
+.minigame-board--mines-wrap {
+  display: grid;
+  gap: 10px;
+  overflow-x: auto;
+}
+
+.minigame-board--mines {
+  display: grid;
+  grid-template-columns: minmax(max-content, 1fr);
+  gap: 6px;
+  min-inline-size: max-content;
+  padding: 5px;
+}
+
+.minigame-grid-row--mines {
+  display: grid;
+  grid-template-columns: repeat(8, 48px);
+  gap: 6px;
+}
+
+.minigame-mine-cell-wrap {
+  display: grid;
+  inline-size: 48px;
+  block-size: 48px;
+}
+
+@media (max-width: 480px) {
+  .minigame-picker {
+    grid-template-columns: minmax(0, 1fr);
+  }
+
+  .minigame-actions:not(.minigame-actions--directions) > .md3-action:not(.md3-action--icon) {
+    flex: 1 1 100%;
+    min-inline-size: 0;
+  }
+
+  .minigame-picker .md3-action,
+  .lucky-chance-card > .md3-action {
+    min-inline-size: 0;
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  :root:root body button.md3-action:not(.golden-sprite):not(.achievement-badge):not(.mini-ticket):not(.cookie-btn),
+  :root:root body button.md3-action:not(.golden-sprite):not(.achievement-badge):not(.mini-ticket):not(.cookie-btn)::before,
+  :root:root body button.minigame-memory-card:not(.golden-sprite):not(.achievement-badge):not(.mini-ticket):not(.cookie-btn),
+  :root:root body button.minigame-mine-cell:not(.golden-sprite):not(.achievement-badge):not(.mini-ticket):not(.cookie-btn) {
+    transition: none;
+  }
+}

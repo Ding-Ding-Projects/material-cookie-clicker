@@ -1,4 +1,5 @@
 import { BilingualLines } from '../components/BilingualLines.js';
+import { MinigameAction, MinigameActionLabel } from '../components/MinigameAction.js';
 import { bilingualText, showsCantonese, showsEnglish, type Bilingual } from '../game/copy.js';
 import { MINIGAME_COPY, MINIGAME_IDS } from '../game/minigame-copy.js';
 import type { MinigameId } from '../../shared/game/minigames.js';
@@ -78,15 +79,16 @@ export function MinigameEventsScreen({
           <h2 className="settings-block__label" id="minigame-token-heading">
             {bilingualText(MINIGAME_COPY.goldenTokenHeading)}
           </h2>
-          <button
-            type="button"
-            className="buy-btn"
+          <MinigameAction
+            data-action="events-lucky-toggle"
+            variant="tonal"
+            icon={luckyChanceOpen ? 'abandon' : 'spark'}
             aria-expanded={luckyChanceOpen}
             aria-controls="minigame-lucky-chance-drawer"
             onClick={luckyChanceOpen ? onCloseLuckyChance : onOpenLuckyChance}
           >
-            {bilingualText(luckyChanceOpen ? MINIGAME_COPY.closeLuckyChance : MINIGAME_COPY.openLuckyChance)}
-          </button>
+            <MinigameActionLabel text={luckyChanceOpen ? MINIGAME_COPY.closeLuckyChance : MINIGAME_COPY.openLuckyChance} />
+          </MinigameAction>
         </div>
         <p className="settings-caption">{bilingualText(MINIGAME_COPY.goldenTokenSummary)}</p>
         <div className="stat-grid">
@@ -185,24 +187,24 @@ function renderEventActions(
 ) {
   if (!event || event.status === 'completed' || event.status === 'abandoned') {
     return (
-      <button type="button" className="settings-modes__button" onClick={() => handlers.onSchedule(handlers.gameId)}>
-        {bilingualText(MINIGAME_COPY.schedule)}
-      </button>
+      <MinigameAction data-action="event-schedule" variant="filled" icon="play" onClick={() => handlers.onSchedule(handlers.gameId)}>
+        <MinigameActionLabel text={MINIGAME_COPY.schedule} />
+      </MinigameAction>
     );
   }
 
   if (event.status === 'active') {
     return (
       <>
-        <button type="button" className="settings-modes__button" onClick={() => handlers.onMinimize(event.eventId)}>
-          {bilingualText(MINIGAME_COPY.minimize)}
-        </button>
-        <button type="button" className="settings-modes__button" onClick={() => handlers.onRestart(event.eventId)}>
-          {bilingualText(MINIGAME_COPY.restart)}
-        </button>
-        <button type="button" className="settings-modes__button" onClick={() => handlers.onAbandon(event.eventId)}>
-          {bilingualText(MINIGAME_COPY.abandon)}
-        </button>
+        <MinigameAction data-action="event-minimize" variant="text" icon="minimize" onClick={() => handlers.onMinimize(event.eventId)}>
+          <MinigameActionLabel text={MINIGAME_COPY.minimize} />
+        </MinigameAction>
+        <MinigameAction data-action="event-restart" variant="tonal" icon="restart" onClick={() => handlers.onRestart(event.eventId)}>
+          <MinigameActionLabel text={MINIGAME_COPY.restart} />
+        </MinigameAction>
+        <MinigameAction data-action="event-abandon" variant="danger-text" icon="abandon" onClick={() => handlers.onAbandon(event.eventId)}>
+          <MinigameActionLabel text={MINIGAME_COPY.abandon} />
+        </MinigameAction>
       </>
     );
   }
@@ -210,23 +212,23 @@ function renderEventActions(
   if (event.status === 'minimized') {
     return (
       <>
-        <button type="button" className="settings-modes__button" onClick={() => handlers.onResume(event.eventId)}>
-          {bilingualText(MINIGAME_COPY.resume)}
-        </button>
-        <button type="button" className="settings-modes__button" onClick={() => handlers.onRestart(event.eventId)}>
-          {bilingualText(MINIGAME_COPY.restart)}
-        </button>
-        <button type="button" className="settings-modes__button" onClick={() => handlers.onAbandon(event.eventId)}>
-          {bilingualText(MINIGAME_COPY.abandon)}
-        </button>
+        <MinigameAction data-action="event-resume" variant="filled" icon="play" onClick={() => handlers.onResume(event.eventId)}>
+          <MinigameActionLabel text={MINIGAME_COPY.resume} />
+        </MinigameAction>
+        <MinigameAction data-action="event-restart" variant="tonal" icon="restart" onClick={() => handlers.onRestart(event.eventId)}>
+          <MinigameActionLabel text={MINIGAME_COPY.restart} />
+        </MinigameAction>
+        <MinigameAction data-action="event-abandon" variant="danger-text" icon="abandon" onClick={() => handlers.onAbandon(event.eventId)}>
+          <MinigameActionLabel text={MINIGAME_COPY.abandon} />
+        </MinigameAction>
       </>
     );
   }
 
   return (
-    <button type="button" className="settings-modes__button" onClick={() => handlers.onAbandon(event.eventId)}>
-      {bilingualText(MINIGAME_COPY.abandon)}
-    </button>
+    <MinigameAction data-action="event-abandon" variant="danger-text" icon="abandon" onClick={() => handlers.onAbandon(event.eventId)}>
+      <MinigameActionLabel text={MINIGAME_COPY.abandon} />
+    </MinigameAction>
   );
 }
 
@@ -249,9 +251,9 @@ function LuckyChanceDrawer({
         <h2 className="settings-block__label" id="lucky-chance-drawer-heading">
           {bilingualText(MINIGAME_COPY.luckyChanceHeading)}
         </h2>
-        <button type="button" className="buy-btn" onClick={onClose}>
-          {bilingualText(MINIGAME_COPY.closeLuckyChance)}
-        </button>
+        <MinigameAction data-action="drawer-close" variant="outlined" icon="abandon" onClick={onClose}>
+          <MinigameActionLabel text={MINIGAME_COPY.closeLuckyChance} />
+        </MinigameAction>
       </div>
       <p className="settings-note settings-note--warning">
         <BilingualLines text={MINIGAME_COPY.luckyChanceSummary} />
@@ -268,10 +270,19 @@ function LuckyChanceDrawer({
         <div className="stat-tile">
           {showsEnglish() ? <span className="stat-tile__label-en">{MINIGAME_COPY.luckyChanceHeading.en}</span> : null}
           {showsCantonese() ? <span className="stat-tile__label-zh">{MINIGAME_COPY.luckyChanceHeading.yue}</span> : null}
-          <button type="button" className="buy-btn" disabled={!canDraw} onClick={onDraw}>
-            {bilingualText(MINIGAME_COPY.drawLuckyChance)}
-          </button>
-          {!canDraw ? <p className="settings-caption"><BilingualLines text={MINIGAME_COPY.insufficientTokens} /></p> : null}
+          <MinigameAction
+            data-action="drawer-draw"
+            variant="filled"
+            icon="spark"
+            aria-disabled={!canDraw}
+            aria-describedby={!canDraw ? 'lucky-chance-draw-unavailable' : undefined}
+            onClick={() => {
+              if (canDraw) onDraw();
+            }}
+          >
+            <MinigameActionLabel text={MINIGAME_COPY.drawLuckyChance} />
+          </MinigameAction>
+          {!canDraw ? <p className="settings-caption" id="lucky-chance-draw-unavailable"><BilingualLines text={MINIGAME_COPY.insufficientTokens} /></p> : null}
         </div>
       </div>
       {result ? (

@@ -5,6 +5,18 @@
 <meta name="viewport" content="width=device-width, initial-scale=1" />
 <title>Minigame events and Lucky Drawer — Material Cookie Clicker</title>
 <meta name="description" content="The mounted five-board Minigames panel, its 100,000-cookie unlock, Golden Tokens, Lucky Chance results, and current evidence boundary." />
+<meta property="og:title" content="Minigame events and Lucky Drawer — Material Cookie Clicker" />
+<meta property="og:description" content="The mounted five-board Minigames panel, its 100,000-cookie unlock, Golden Tokens, Lucky Chance results, and current evidence boundary." />
+<meta property="og:url" content="https://ding-ding-projects.github.io/material-cookie-clicker/features/minigame-events.html" />
+<meta property="og:type" content="article" />
+<meta property="og:site_name" content="Material Cookie Clicker" />
+<meta property="og:image" content="https://ding-ding-projects.github.io/material-cookie-clicker/social-preview.png" />
+<meta property="og:image:width" content="1280" />
+<meta property="og:image:height" content="640" />
+<meta property="og:image:alt" content="The Material Cookie Clicker logo: a warm cookie emblem beside the project name on a dark brown field." />
+<meta name="twitter:card" content="summary_large_image" />
+<meta name="theme-color" content="#7a4a1d" />
+<link rel="icon" href="../favicon.svg" type="image/svg+xml" />
 <link rel="stylesheet" href="../assets/site.css" />
 </head>
 <body>
@@ -34,6 +46,7 @@
     <p>The active board, schedule, Golden Token ledger, Lucky Chance state, and reward ids live in one optional compatibility block inside the ordinary save JSON. Older saves with no block load empty minigame state instead of invented progress.</p>
 
     <h2>Golden Token sources</h2>
+    <div class="scroller">
     <table>
       <thead><tr><th scope="col">Source</th><th scope="col">Amount</th><th scope="col">Duplicate protection</th></tr></thead>
       <tbody>
@@ -44,6 +57,7 @@
         <tr><td>Rare chain</td><td>2</td><td>Completed-board count at each multiple of three</td></tr>
       </tbody>
     </table>
+    </div>
     <p>With five board ids, the first reachable rare-chain award is the third distinct completed board. Offline time dispatches none of these source actions.</p>
 
     <h2>Lucky Chance results</h2>

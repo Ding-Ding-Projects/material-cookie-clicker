@@ -15,6 +15,9 @@ import { fileURLToPath } from 'node:url';
 const SITE = resolve(dirname(fileURLToPath(import.meta.url)), '..', 'site');
 
 /** The only external addresses this site is allowed to contain, as links only. */
+/** The site's own published origin. Absolute self-references are required by Open Graph. */
+const SITE_ORIGIN = 'https://ding-ding-projects.github.io/material-cookie-clicker/';
+
 const ALLOWED_EXTERNAL = [
   'https://github.com/Ding-Ding-Projects/material-cookie-clicker',
   'https://github.com/Ding-Ding-Projects/material-cookie-clicker/releases/latest',
@@ -82,8 +85,22 @@ for (const file of files.filter(isText)) {
   for (const match of text.matchAll(/https?:\/\/[^\s"'`<>)]+/g)) {
     const url = match[0].replace(/[.,]$/, '');
     externalCount += 1;
-    if (!ALLOWED_EXTERNAL.includes(url)) {
+    // The site's own published origin is not a third party. Open Graph needs an absolute
+    // https URL for og:url and og:image — a relative one is the commonest reason a pasted link
+    // shows no picture — so anything under SITE_ORIGIN is allowed and is checked below instead
+    // of being refused here. This is also why those two URLs used to be written with the colon
+    // HTML-entity-encoded: that hid them from this very scan, so nothing verified them at all.
+    const ownOrigin = url.startsWith(SITE_ORIGIN);
+    if (!ownOrigin && !ALLOWED_EXTERNAL.includes(url)) {
       problems.push(`${rel(file)}: unexpected external address ${url}`);
+      continue;
+    }
+    if (ownOrigin) {
+      // It must point at a file this repository actually publishes.
+      const target = url.slice(SITE_ORIGIN.length).split(/[?#]/)[0];
+      if (target && !existsSync(join(SITE, target))) {
+        problems.push(`${rel(file)}: ${url} names ${target || '(root)'}, which the site does not publish`);
+      }
       continue;
     }
     // An allowed address is still only allowed as a link a person clicks.
@@ -160,6 +177,22 @@ for (const page of pages) {
   // nest and a non-greedy match closes on the wrong tag.
   for (const offender of unmarkedHanText(html)) {
     problems.push(`${name}: Han text outside a lang="zh-HK" element: ${offender}`);
+  }
+
+  /* site.css gives every table `min-width: 480px` and gives `body` `overflow-x: hidden`, so a
+     table that is not inside a .scroller does not produce a scrollbar on a phone — its last
+     column is simply cropped away with nothing to say so. Four tables were shipping like that. */
+  for (const match of html.matchAll(/<table[\s>]/g)) {
+    const before = html.slice(Math.max(0, match.index - 400), match.index);
+    const opened = before.lastIndexOf('class="scroller"');
+    if (opened < 0 || opened < before.lastIndexOf('</div>')) {
+      problems.push(`${name}: a <table> is not wrapped in a .scroller, so it is cropped rather than scrolled at narrow widths`);
+    }
+  }
+  /* A page without a favicon link falls back to /favicon.ico at the SERVER root, which 404s
+     under a repository subpath — the tab icon disappears the moment a reader clicks in. */
+  if (!/<link rel="icon"/.test(html)) {
+    problems.push(`${name}: no <link rel="icon">, so the tab icon falls back to the server root and 404s`);
   }
 }
 

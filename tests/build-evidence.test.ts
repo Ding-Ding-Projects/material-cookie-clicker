@@ -1,6 +1,6 @@
 import { execFileSync } from 'node:child_process';
 import { createHash } from 'node:crypto';
-import { readFileSync } from 'node:fs';
+import { readFileSync, readdirSync } from 'node:fs';
 import { resolve } from 'node:path';
 import { describe, expect, it } from 'vitest';
 import { validateOnlyExpectedPageTarget } from '../scripts/cdp-isolated-session.mjs';
@@ -229,12 +229,29 @@ describe('release build evidence', () => {
     expect(servedSocial.equals(social)).toBe(true);
     expect(servedSocial.readUInt32BE(16)).toBe(social.readUInt32BE(16));
     expect(servedSocial.readUInt32BE(20)).toBe(social.readUInt32BE(20));
-    for (const page of ['site/index.html', 'site/control-center.html']) {
+    // This used to iterate a hard-coded two-page array, so fifteen feature pages carried no
+    // Open Graph tags, no favicon and no theme-color and nothing went red — the guard had never
+    // looked at them. Enumerating the directory means a new page cannot be added without them.
+    const sitePages = [
+      ...readdirSync(resolve(root, 'site')).filter((name) => name.endsWith('.html')).map((name) => `site/${name}`),
+      ...readdirSync(resolve(root, 'site/features')).filter((name) => name.endsWith('.html')).map((name) => `site/features/${name}`),
+    ].sort();
+    expect(sitePages.length).toBeGreaterThanOrEqual(17);
+    for (const page of sitePages) {
       const markup = read(page);
-      expect(markup).toContain('<meta property="og:image:width" content="1280" />');
-      expect(markup).toContain('<meta property="og:image:height" content="640" />');
-      expect(markup).toContain('<meta name="twitter:card" content="summary_large_image" />');
-      expect(markup).toContain('<meta name="theme-color" content="#7a4a1d" />');
+      const depth = page.startsWith('site/features/') ? '../' : '';
+      expect(markup, `${page} og:image:width`).toContain('<meta property="og:image:width" content="1280" />');
+      expect(markup, `${page} og:image:height`).toContain('<meta property="og:image:height" content="640" />');
+      expect(markup, `${page} twitter:card`).toContain('<meta name="twitter:card" content="summary_large_image" />');
+      expect(markup, `${page} theme-color`).toContain('<meta name="theme-color" content="#7a4a1d" />');
+      expect(markup, `${page} favicon`).toContain(`<link rel="icon" href="${depth}favicon.svg" type="image/svg+xml" />`);
+      // A relative og:image is the commonest reason a pasted link shows no picture at all.
+      const ogImage = /<meta property="og:image" content="([^"]+)" \/>/.exec(markup);
+      expect(ogImage, `${page} og:image`).not.toBeNull();
+      expect(ogImage![1], `${page} og:image must be absolute https`).toMatch(/^https:\/\//);
+      for (const required of ['og:title', 'og:description', 'og:url', 'og:type', 'og:site_name', 'og:image:alt']) {
+        expect(markup, `${page} ${required}`).toContain(`<meta property="${required}" content="`);
+      }
     }
   });
 

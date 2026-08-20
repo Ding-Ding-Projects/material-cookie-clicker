@@ -735,6 +735,29 @@ mark { background: var(--spark); color: #221B00; border-radius: 4px; padding: 0 
   --m3-on-primary-container: #ffdbc6;
 }
 
+/* The eight roles above had a dark value ONLY under an explicit [data-theme="dark"], and
+   data-theme was written by control-center.js alone — which sixteen of the seventeen pages
+   never load. So on a dark-OS machine the --md-* family went dark from its own
+   prefers-color-scheme block far above while the tab rail, boundary callout, toasts, palette
+   and context menu stayed cream: light islands stapled onto a dark page.
+
+   The guard is :not([data-theme="light"]) rather than a bare media query, so a visitor who has
+   explicitly chosen light still gets light on a dark machine. The explicit dark block below
+   keeps winning in the other direction. */
+@media (prefers-color-scheme: dark) {
+  :root:not([data-theme="light"]) {
+    color-scheme: dark;
+    --m3-surface: #18120f;
+    --m3-surface-container: #241b17;
+    --m3-surface-container-high: #302520;
+    --m3-on-surface: #f0dfd6;
+    --m3-on-surface-variant: #d7c2b8;
+    --m3-outline: #a08d83;
+    --m3-primary-container: #5d2f16;
+    --m3-on-primary-container: #ffdbc6;
+  }
+}
+
 :root[data-theme="light"] { color-scheme: light; }
 
 :root[data-density="compact"] .setting-card,

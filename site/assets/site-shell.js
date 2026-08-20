@@ -1,5 +1,29 @@
 const ROOT = location.pathname.includes('/features/') ? '../' : '';
 const STORAGE_KEY = 'mcc-site-shell-v1';
+const SETTINGS_KEY = 'mcc-site-settings-v1';
+
+/* Appearance the visitor chose in the control centre has to reach the other sixteen pages, and
+   control-center.js is loaded by exactly one of them. Reading the same key here is what makes a
+   theme, accent or font choice mean anything outside the settings screen. Applied before the tab
+   strip is built so nothing paints in the wrong colours first. */
+function applyStoredAppearance() {
+  let saved;
+  try { saved = JSON.parse(localStorage.getItem(SETTINGS_KEY) || 'null'); } catch { saved = null; }
+  if (!saved || typeof saved !== 'object') return;
+  const root = document.documentElement;
+  // 'system' matches no stylesheet rule; the absence of the attribute is what follows the system.
+  if (saved.theme === 'dark' || saved.theme === 'light') root.dataset.theme = saved.theme;
+  else delete root.dataset.theme;
+  if (typeof saved.density === 'string') root.dataset.density = saved.density;
+  if (saved.rainbow === true || saved.rainbow === false) root.dataset.rainbow = String(saved.rainbow);
+  if (typeof saved.accent === 'string' && /^#[0-9a-f]{6}$/i.test(saved.accent)) root.style.setProperty('--user-accent', saved.accent);
+  if (typeof saved.fontFamily === 'string' && saved.fontFamily) root.style.setProperty('--user-font', saved.fontFamily);
+  if (Number.isFinite(Number(saved.fontScale))) root.style.setProperty('--user-font-scale', String(Number(saved.fontScale)));
+  if (Number.isFinite(Number(saved.fontWeight))) root.style.setProperty('--user-font-weight', String(Number(saved.fontWeight)));
+}
+
+applyStoredAppearance();
+addEventListener('storage', (event) => { if (event.key === SETTINGS_KEY) applyStoredAppearance(); });
 
 const TABS = [
   { id: 'home', label: 'Home', href: `${ROOT}index.html`, group: 'Project' },

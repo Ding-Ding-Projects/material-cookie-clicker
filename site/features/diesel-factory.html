@@ -5,6 +5,18 @@
 <meta name="viewport" content="width=device-width, initial-scale=1" />
 <title>The diesel factory — Material Cookie Clicker</title>
 <meta name="description" content="Cookies buy the plant; the plant makes the diesel. A four-stage production line — wells, refining, tanks, depot — that stalls honestly and ships real litres to WinForge." />
+<meta property="og:title" content="The diesel factory — Material Cookie Clicker" />
+<meta property="og:description" content="Cookies buy the plant; the plant makes the diesel. A four-stage production line — wells, refining, tanks, depot — that stalls honestly and ships real litres to WinForge." />
+<meta property="og:url" content="https://ding-ding-projects.github.io/material-cookie-clicker/features/diesel-factory.html" />
+<meta property="og:type" content="article" />
+<meta property="og:site_name" content="Material Cookie Clicker" />
+<meta property="og:image" content="https://ding-ding-projects.github.io/material-cookie-clicker/social-preview.png" />
+<meta property="og:image:width" content="1280" />
+<meta property="og:image:height" content="640" />
+<meta property="og:image:alt" content="The Material Cookie Clicker logo: a warm cookie emblem beside the project name on a dark brown field." />
+<meta name="twitter:card" content="summary_large_image" />
+<meta name="theme-color" content="#7a4a1d" />
+<link rel="icon" href="../favicon.svg" type="image/svg+xml" />
 <link rel="stylesheet" href="../assets/site.css" />
 </head>
 <body>
@@ -52,6 +64,7 @@
     <p>The panel shows which stage stopped by dimming it and naming the reason, and it separates the rate the plant is <em>rated</em> for from the rate it is <em>currently achieving</em> &mdash; two readouts, never one.</p>
 
     <h2>The rate curve</h2>
+    <div class="scroller">
     <table>
       <thead><tr><th>Equipment</th><th>First unit</th><th>Growth</th><th>What one unit does</th></tr></thead>
       <tbody>
@@ -63,6 +76,7 @@
         <tr><td>Transfer Pump</td><td>40,000</td><td>&times;1.15</td><td>+8% throughput on every refining unit</td></tr>
       </tbody>
     </table>
+    </div>
     <p>Every line grows <strong>1.15 a unit</strong> &mdash; the same house ratio the generator ladder uses, so the factory shop reads without being taught anything new. Conversion starts at <strong>2.5 barrels per litre</strong>; storage starts at a 10-litre drum and a 20-barrel hardstanding.</p>
     <p>Those numbers teach the mechanic by themselves. <strong>One well feeds exactly one still</strong> &mdash; 0.05 barrels a second produced against 0.02 &times; 2.5 = 0.05 demanded &mdash; and one importer feeds exactly one cracker. Buy wells alone and the yard backs up; buy stills alone and they idle. A fresh floor also runs out of <em>yard</em> before it runs out of <em>drum</em>: twenty barrels is eight litres and the drum holds ten, which is why the first Storage Tank raises both numbers at once.</p>
 

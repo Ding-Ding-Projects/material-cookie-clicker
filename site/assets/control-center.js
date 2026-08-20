@@ -60,7 +60,12 @@ function bind(id, key, event = 'change', transform = (value) => value) {
 }
 
 function applyAppearance() {
-  document.documentElement.dataset.theme = settings.theme;
+  // 'system' is not a value any stylesheet matches. Writing it verbatim left the control
+  // centre light on a dark machine at its own default, which is most first visits. Removing
+  // the attribute is what actually means 'follow the system' — the prefers-color-scheme block
+  // is written :not([data-theme="light"]) so it takes over exactly then.
+  if (settings.theme === 'system') delete document.documentElement.dataset.theme;
+  else document.documentElement.dataset.theme = settings.theme;
   document.documentElement.dataset.density = settings.density;
   document.documentElement.dataset.rainbow = String(settings.rainbow);
   document.documentElement.style.setProperty('--user-accent', settings.accent);
@@ -187,7 +192,7 @@ function scheduleMatches(rule, now) {
   const minutes = now.getHours() * 60 + now.getMinutes(); const [startH,startM] = rule.startTime.split(':').map(Number); const [endH,endM] = rule.endTime.split(':').map(Number);
   const start = startH * 60 + startM; const end = endH * 60 + endM; return start <= end ? minutes >= start && minutes < end : minutes >= start || minutes < end;
 }
-function applySchedules() { const matched = settings.schedules.filter((rule) => scheduleMatches(rule, new Date())); const active = matched.at(-1); if (active) { document.documentElement.dataset.theme = active.theme; document.documentElement.dataset.scheduled = active.id; } else delete document.documentElement.dataset.scheduled; }
+function applySchedules() { const matched = settings.schedules.filter((rule) => scheduleMatches(rule, new Date())); const active = matched.at(-1); if (active) { if (active.theme === 'system') delete document.documentElement.dataset.theme; else document.documentElement.dataset.theme = active.theme; document.documentElement.dataset.scheduled = active.id; } else delete document.documentElement.dataset.scheduled; }
 applySchedules(); setInterval(applySchedules, 60000);
 
 document.getElementById('accent-text').addEventListener('change', (event) => { if (/^#[0-9a-f]{6}$/i.test(event.target.value)) { settings.accent = event.target.value; saveSettings(); applyAppearance(); } else notify('Invalid colour', 'Use six hexadecimal digits after #.', 'error'); });

@@ -757,7 +757,11 @@ describe("hand-written per-surface completeness inventory", () => {
       expect.stringMatching(/^desktop-playable-minigames is not completion-ready:/),
       expect.stringMatching(/^site-graphics-progression is not completion-ready:/),
     ]));
-    expect(blockers).toContain("Graphics progression receipt is stale for the cited implementation paths.");
+    // Closed: the three graphics captures were re-taken at the current commit, so the receipt no
+    // longer trails the implementation paths it cites. Asserted as absent for the same reason the
+    // REFERENCE_HASH_STALE line above is — a blocker that has been fixed must not be able to come
+    // back unnoticed.
+    expect(blockers).not.toContain("Graphics progression receipt is stale for the cited implementation paths.");
   });
 
   if (process.env.COMPLETENESS_MODE === "completion") {

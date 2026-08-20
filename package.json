@@ -80,7 +80,7 @@
     "squirrelWindows": {
       "name": "MaterialCookieClicker",
       "artifactName": "MaterialCookieClicker-Setup.${ext}",
-      "iconUrl": "https://raw.githubusercontent.com/Ding-Ding-Projects/material-cookie-clicker/a98e38c07423a7cfb4cb3190412884a404a7245e/assets/material-cookie-clicker.ico",
+      "iconUrl": "https://raw.githubusercontent.com/Ding-Ding-Projects/material-cookie-clicker/43d2174bc2172d31e572d9668282764438e4d904/assets/material-cookie-clicker.ico",
       "msi": false
     },
     "publish": {

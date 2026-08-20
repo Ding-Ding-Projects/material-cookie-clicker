@@ -3,7 +3,7 @@ name: Release
 on:
   push:
     branches:
-      - main
+      - '**'
   workflow_dispatch: {}
 
 permissions:
@@ -22,19 +22,18 @@ jobs:
       version: ${{ steps.version.outputs.version }}
       tag: ${{ steps.version.outputs.tag }}
     steps:
-      - name: Record first-job start time
-        id: timing
-        shell: pwsh
-        run: '"started_at=$((Get-Date).ToUniversalTime().ToString("yyyy-MM-ddTHH:mm:ssZ"))" | Out-File -FilePath $env:GITHUB_OUTPUT -Encoding utf8 -Append'
       - uses: actions/checkout@v4
         with:
           fetch-depth: 0
-      - name: Assert release source is the fresh origin/main tip
+      - name: Assert release source is the fresh remote branch tip
         shell: pwsh
         run: |
-          git fetch --no-tags origin main
-          $mainTip = git rev-parse origin/main
-          if ($LASTEXITCODE -ne 0 -or $mainTip -ne $env:GITHUB_SHA) { throw "Release source $env:GITHUB_SHA is not the fresh origin/main tip $mainTip." }
+          if ($env:GITHUB_REF_TYPE -ne 'branch' -or -not $env:GITHUB_REF_NAME) { throw 'Release runs require an exact branch ref.' }
+          $trackingRef = "refs/remotes/origin/$env:GITHUB_REF_NAME"
+          git fetch --no-tags origin "refs/heads/$($env:GITHUB_REF_NAME):$trackingRef"
+          if ($LASTEXITCODE -ne 0) { throw "Could not fetch the release source branch $env:GITHUB_REF_NAME." }
+          $huiTip = git rev-parse $trackingRef
+          if ($LASTEXITCODE -ne 0 -or $huiTip -ne $env:GITHUB_SHA) { throw "Release source $env:GITHUB_SHA is not the fresh origin/$env:GITHUB_REF_NAME tip $huiTip." }
       - uses: actions/setup-node@v4
         with:
           node-version: 22
@@ -48,6 +47,12 @@ jobs:
           node --version
           npm --version
           if ($env:RUNNER_OS -ne 'Windows' -or $env:RUNNER_ARCH -ne 'X64') { throw 'The GitHub-hosted runner does not match the required Windows X64 environment.' }
+      - name: Produce exact committed line-count evidence
+        shell: pwsh
+        run: |
+          New-Item -ItemType Directory -Path release-stage -Force | Out-Null
+          node scripts/count-lines.mjs --require-committed | Out-File -FilePath release-stage/line-count.md -Encoding utf8
+          if ($LASTEXITCODE -ne 0) { throw 'The committed release line counter failed.' }
       - name: Install locked dependencies from a cache-miss-safe state
         run: npm ci
       - name: Compute unique release tag
@@ -62,6 +67,19 @@ jobs:
       - name: Bootstrap pinned GitHub CLI in the job-local tool cache
         shell: pwsh
         run: ./scripts/bootstrap-gh-cli.ps1 -ToolsRoot (Join-Path $env:RUNNER_TEMP 'material-cookie-clicker-tools')
+      - name: Read the first job start from GitHub Actions evidence
+        id: timing
+        shell: pwsh
+        env:
+          GH_TOKEN: ${{ secrets.RELEASE_TOKEN || secrets.ORG_TOKEN || secrets.GITHUB_TOKEN }}
+        run: |
+          $jobResponse = gh api "repos/$env:GITHUB_REPOSITORY/actions/runs/$env:GITHUB_RUN_ID/attempts/$env:GITHUB_RUN_ATTEMPT/jobs?per_page=100"
+          if ($LASTEXITCODE -ne 0) { throw 'Could not read the current workflow job timing evidence.' }
+          $jobs = ($jobResponse -join "`n") | ConvertFrom-Json
+          $firstJobs = @($jobs.jobs | Where-Object { $_.name -eq 'prepare' -and $_.started_at })
+          if ($firstJobs.Count -ne 1) { throw "Expected one running prepare job with started_at, received $($firstJobs.Count)." }
+          $started = [DateTimeOffset]::Parse([string]$firstJobs[0].started_at).ToUniversalTime().ToString('yyyy-MM-ddTHH:mm:ssZ')
+          "started_at=$started" | Out-File -FilePath $env:GITHUB_OUTPUT -Encoding utf8 -Append
       - name: Generate bounded in-app release manifest
         shell: pwsh
         env:
@@ -69,7 +87,9 @@ jobs:
           RELEASE_TAG: ${{ steps.version.outputs.tag }}
           WORKFLOW_STARTED: ${{ steps.timing.outputs.started_at }}
         run: |
-          gh api --paginate --slurp "repos/$env:GITHUB_REPOSITORY/releases?per_page=100" | Out-File -FilePath release-inventory.raw.json -Encoding utf8
+          $releaseInventory = gh api --paginate --slurp "repos/$env:GITHUB_REPOSITORY/releases?per_page=100"
+          if ($LASTEXITCODE -ne 0) { throw 'Could not read the existing GitHub release inventory.' }
+          $releaseInventory | Out-File -FilePath release-inventory.raw.json -Encoding utf8
           node scripts/compact-release-inventory.mjs --input release-inventory.raw.json --output release-inventory.json
           node scripts/select-dim-sum-release.mjs --repository $env:GITHUB_REPOSITORY | Out-File -FilePath release-dish.json -Encoding utf8
           node scripts/generate-release-changelog.mjs `
@@ -95,6 +115,7 @@ jobs:
             site/assets/generated-changelog.mjs
             release-changelog.pending.json
             release-dish.json
+            release-stage/line-count.md
           if-no-files-found: warn
           retention-days: 7
 
@@ -184,9 +205,6 @@ jobs:
             iconProof = $iconProof
           }
           $evidence | ConvertTo-Json -Depth 8 | Set-Content -LiteralPath 'release-stage/installer-evidence.json' -Encoding utf8
-      - name: Produce reproducible line-count table
-        shell: pwsh
-        run: npm run count:lines | Out-File -FilePath release-stage/line-count.md -Encoding utf8
       - uses: actions/upload-artifact@v4
         if: always()
         continue-on-error: true
@@ -202,12 +220,17 @@ jobs:
     timeout-minutes: 30
     steps:
       - uses: actions/checkout@v4
-      - name: Assert release source is the fresh origin/main tip
+        with:
+          fetch-depth: 0
+      - name: Assert release source is the fresh remote branch tip
         shell: pwsh
         run: |
-          git fetch --no-tags origin main
-          $mainTip = git rev-parse origin/main
-          if ($LASTEXITCODE -ne 0 -or $mainTip -ne $env:GITHUB_SHA) { throw "Release source $env:GITHUB_SHA is not the fresh origin/main tip $mainTip." }
+          if ($env:GITHUB_REF_TYPE -ne 'branch' -or -not $env:GITHUB_REF_NAME) { throw 'Release runs require an exact branch ref.' }
+          $trackingRef = "refs/remotes/origin/$env:GITHUB_REF_NAME"
+          git fetch --no-tags origin "refs/heads/$($env:GITHUB_REF_NAME):$trackingRef"
+          if ($LASTEXITCODE -ne 0) { throw "Could not fetch the release source branch $env:GITHUB_REF_NAME." }
+          $huiTip = git rev-parse $trackingRef
+          if ($LASTEXITCODE -ne 0 -or $huiTip -ne $env:GITHUB_SHA) { throw "Release source $env:GITHUB_SHA is not the fresh origin/$env:GITHUB_REF_NAME tip $huiTip." }
       - uses: actions/download-artifact@v4
         with:
           name: windows-release-${{ github.run_id }}-${{ github.run_attempt }}
@@ -223,48 +246,134 @@ jobs:
           RELEASE_VERSION: ${{ needs.windows-build.outputs.version }}
           WORKFLOW_STARTED: ${{ needs.prepare.outputs.started_at }}
         run: |
-          $setup = Resolve-Path 'release-stage/MaterialCookieClicker-Setup.exe'
-          $releases = Resolve-Path 'release-stage/RELEASES'
-          $nupkg = Resolve-Path "release-stage/MaterialCookieClicker-$env:RELEASE_VERSION-full.nupkg"
+          $ErrorActionPreference = 'Stop'
+
+          function Invoke-CheckedGh {
+            param(
+              [Parameter(Mandatory = $true)][string[]]$Arguments,
+              [Parameter(Mandatory = $true)][string]$Operation
+            )
+            $output = @(& gh @Arguments 2>&1)
+            $exitCode = $LASTEXITCODE
+            if ($exitCode -ne 0) {
+              $detail = ($output | Select-Object -Last 5 | ForEach-Object { [string]$_ }) -join ' | '
+              throw "$Operation failed with gh exit code $exitCode. $detail"
+            }
+            return $output
+          }
+
+          function Read-ReleaseById {
+            param([Parameter(Mandatory = $true)][long]$ReleaseId)
+            $raw = Invoke-CheckedGh -Operation "Read release $ReleaseId" -Arguments @(
+              'api', "repos/$env:GITHUB_REPOSITORY/releases/$ReleaseId"
+            )
+            return (($raw -join "`n") | ConvertFrom-Json)
+          }
+
+          function Assert-ReleaseAssetSet {
+            param(
+              [Parameter(Mandatory = $true)]$Release,
+              [Parameter(Mandatory = $true)][string[]]$ExpectedNames
+            )
+            $actualNames = @($Release.assets | ForEach-Object { [string]$_.name })
+            if ((@($actualNames | Sort-Object -Unique)).Count -ne $actualNames.Count) { throw 'The release contains duplicate asset names.' }
+            $difference = @(Compare-Object -ReferenceObject @($ExpectedNames | Sort-Object) -DifferenceObject @($actualNames | Sort-Object))
+            if ($difference.Count -ne 0) {
+              $rendered = ($difference | ForEach-Object { "$($_.SideIndicator) $($_.InputObject)" }) -join ', '
+              throw "The release asset set is not exact: $rendered"
+            }
+            foreach ($asset in @($Release.assets)) {
+              if ($asset.state -ne 'uploaded' -or [long]$asset.size -lt 1 -or [string]$asset.digest -notmatch '^sha256:[0-9a-f]{64}$') {
+                throw "Release asset $($asset.name) lacks uploaded state, nonzero size, or SHA-256 evidence."
+              }
+            }
+          }
+
+          function Upload-DraftAsset {
+            param(
+              [Parameter(Mandatory = $true)][long]$ReleaseId,
+              [Parameter(Mandatory = $true)][string]$Path
+            )
+            $file = Get-Item -LiteralPath $Path
+            $encodedName = [Uri]::EscapeDataString($file.Name)
+            $raw = Invoke-CheckedGh -Operation "Upload draft asset $($file.Name)" -Arguments @(
+              'api', "https://uploads.github.com/repos/$env:GITHUB_REPOSITORY/releases/$ReleaseId/assets?name=$encodedName",
+              '--method', 'POST',
+              '--header', 'Content-Type: application/octet-stream', '--input', $file.FullName
+            )
+            $asset = ($raw -join "`n") | ConvertFrom-Json
+            if ($asset.name -ne $file.Name -or $asset.state -ne 'uploaded' -or [long]$asset.size -ne $file.Length -or [string]$asset.digest -notmatch '^sha256:[0-9a-f]{64}$') {
+              throw "Uploaded asset evidence did not match $($file.Name)."
+            }
+          }
+
+          $setup = (Resolve-Path 'release-stage/MaterialCookieClicker-Setup.exe').Path
+          $releases = (Resolve-Path 'release-stage/RELEASES').Path
+          $nupkg = (Resolve-Path "release-stage/MaterialCookieClicker-$env:RELEASE_VERSION-full.nupkg").Path
           $deltas = @(Get-ChildItem -LiteralPath release-stage -Filter '*-delta.nupkg')
           $iconProofAssets = @(Get-ChildItem -LiteralPath 'release-stage/icon-proof' -Filter '*.png')
-          $installerEvidence = Resolve-Path 'release-stage/installer-evidence.json'
+          $installerEvidence = (Resolve-Path 'release-stage/installer-evidence.json').Path
           $installerEvidenceData = Get-Content -LiteralPath $installerEvidence -Raw | ConvertFrom-Json
-          $lineCount = Resolve-Path 'release-stage/line-count.md'
+          $lineCount = (Resolve-Path 'release-stage/line-count.md').Path
           $dish = Get-Content -LiteralPath 'release-stage/release-dish.json' -Raw | ConvertFrom-Json
           $title = "Material Cookie Clicker $env:RELEASE_TAG"
-          $initialNotes = @(
-            'Publication timing is being finalized.'
-            ''
-            "- Source commit: ``$env:GITHUB_SHA``"
-            '- Packaged changelog state: pending publication at the verified workflow start.'
-          )
           if ($dish.available) {
             $title = "$title — $($dish.codeName)"
-            $initialNotes += @(
-              "- Dim sum code name: $($dish.codeName)"
-              "- Public dish photo: [$($dish.assetName)]($($dish.photoUrl))"
-            )
           }
           if ($iconProofAssets.Count -ne 4) { throw "Expected four extracted icon proof images, received $($iconProofAssets.Count)." }
-          $initialAssets = @($setup, $releases, $nupkg, $installerEvidence) + $deltas + $iconProofAssets
-          gh release create $env:RELEASE_TAG @initialAssets --repo $env:GITHUB_REPOSITORY --target $env:GITHUB_SHA --title $title --notes ($initialNotes -join "`n") --draft
-          gh release edit $env:RELEASE_TAG --repo $env:GITHUB_REPOSITORY --draft=false
-          $publishedRef = gh api "repos/$env:GITHUB_REPOSITORY/git/ref/tags/$env:RELEASE_TAG" | ConvertFrom-Json
-          $publishedSha = if ($publishedRef.object.type -eq 'tag') { gh api "repos/$env:GITHUB_REPOSITORY/git/tags/$($publishedRef.object.sha)" --jq .object.sha } else { $publishedRef.object.sha }
-          if ($publishedSha -ne $env:GITHUB_SHA) { throw "Published release tag $env:RELEASE_TAG resolves to $publishedSha, expected workflow SHA $env:GITHUB_SHA." }
-          $publishedAt = gh api "repos/$env:GITHUB_REPOSITORY/releases/tags/$env:RELEASE_TAG" --jq .published_at
-          if (-not $publishedAt) { throw 'The published release did not report published_at.' }
+
+          $existingRaw = Invoke-CheckedGh -Operation 'Check the release tag inventory' -Arguments @(
+            'api', "repos/$env:GITHUB_REPOSITORY/releases?per_page=100"
+          )
+          $existing = @((($existingRaw -join "`n") | ConvertFrom-Json) | Where-Object { $_.tag_name -eq $env:RELEASE_TAG })
+          if ($existing.Count -ne 0) { throw "Release tag $env:RELEASE_TAG already exists as a published or draft release." }
+
+          @(
+            'Draft release: assets and final timing are still being assembled.'
+            ''
+            "- Source branch: ``$env:GITHUB_REF_NAME``"
+            "- Source commit: ``$env:GITHUB_SHA``"
+          ) | Out-File -FilePath release-notes.draft.md -Encoding utf8
+
+          Invoke-CheckedGh -Operation "Create draft release $env:RELEASE_TAG" -Arguments @(
+            'release', 'create', $env:RELEASE_TAG,
+            '--repo', $env:GITHUB_REPOSITORY, '--target', $env:GITHUB_SHA,
+            '--title', $title, '--notes-file', 'release-notes.draft.md', '--draft'
+          ) | Out-Null
+
+          $draftInventoryRaw = Invoke-CheckedGh -Operation 'Locate the new draft by numeric release ID' -Arguments @(
+            'api', "repos/$env:GITHUB_REPOSITORY/releases?per_page=100"
+          )
+          $draftMatches = @((($draftInventoryRaw -join "`n") | ConvertFrom-Json) | Where-Object {
+            $_.tag_name -eq $env:RELEASE_TAG -and $_.draft -eq $true -and $_.target_commitish -eq $env:GITHUB_SHA
+          })
+          if ($draftMatches.Count -ne 1) { throw "Expected exactly one matching draft, received $($draftMatches.Count)." }
+          $releaseId = [long]$draftMatches[0].id
+
+          $baseAssets = @($setup, $releases, $nupkg, $installerEvidence) + @($deltas | ForEach-Object { $_.FullName }) + @($iconProofAssets | ForEach-Object { $_.FullName })
+          foreach ($assetPath in $baseAssets) { Upload-DraftAsset -ReleaseId $releaseId -Path $assetPath }
+
+          $started = [DateTimeOffset]::Parse($env:WORKFLOW_STARTED).ToUniversalTime()
+          $releaseTimestamp = [DateTimeOffset]::UtcNow
+          $releaseTimestampText = $releaseTimestamp.ToString('yyyy-MM-ddTHH:mm:ssZ')
           node scripts/generate-release-changelog.mjs `
             --reconcile release-stage/release-changelog.pending.json `
-            --published-at $publishedAt `
+            --published-at $releaseTimestampText `
             --output-json release-stage/release-changelog.json
+          if ($LASTEXITCODE -ne 0) { throw 'Could not reconcile the release manifest before publication.' }
           $manifestHash = (Get-FileHash -LiteralPath 'release-stage/release-changelog.json' -Algorithm SHA256).Hash.ToLowerInvariant()
-          gh release upload $env:RELEASE_TAG 'release-stage/release-changelog.json' --repo $env:GITHUB_REPOSITORY
-          $started = [DateTimeOffset]::Parse($env:WORKFLOW_STARTED)
-          $completed = [DateTimeOffset]::Parse($publishedAt)
+          Upload-DraftAsset -ReleaseId $releaseId -Path 'release-stage/release-changelog.json'
+
+          $expectedAssetNames = @($baseAssets | ForEach-Object { [IO.Path]::GetFileName($_) }) + @('release-changelog.json')
+          $draft = Read-ReleaseById -ReleaseId $releaseId
+          if ($draft.draft -ne $true -or $draft.prerelease -ne $false) { throw 'The staged release stopped being an ordinary draft before final verification.' }
+          Assert-ReleaseAssetSet -Release $draft -ExpectedNames $expectedAssetNames
+
+          $completed = [DateTimeOffset]::UtcNow
           $elapsed = $completed - $started
+          if ($elapsed.TotalSeconds -lt 0) { throw 'Workflow completion preceded the first job start.' }
           $duration = '{0:00}:{1:00}:{2:00}' -f [Math]::Floor($elapsed.TotalHours), $elapsed.Minutes, $elapsed.Seconds
+          $completedText = $completed.ToString('yyyy-MM-ddTHH:mm:ssZ')
           $notes = @(
             'Unsigned Squirrel.Windows release. Code signing is permanently prohibited; Setup.exe was verified as NotSigned before publication.'
             ''
@@ -273,19 +382,64 @@ jobs:
             "- Packaged icon proof: Setup.exe and the application executable were extracted and validated at 16px and 32px; machine-readable evidence is attached as [installer-evidence.json]($env:GITHUB_SERVER_URL/$env:GITHUB_REPOSITORY/releases/download/$env:RELEASE_TAG/installer-evidence.json)."
             $(if ($dish.available) { "- Dim sum code name: $($dish.codeName)" } else { '- Dim sum code name: unavailable; the release was not blocked.' })
             $(if ($dish.available) { "- Public dish photo: [$($dish.assetName)]($($dish.photoUrl))" } else { "- Public dish photo: unavailable ($($dish.reason))" })
+            "- Source branch: ``$env:GITHUB_REF_NAME``"
             "- Source commit: ``$env:GITHUB_SHA``"
-            "- Packaged changelog state: pending publication at the verified workflow start; version, source commit, and release URL are final."
+            '- Packaged changelog state: reconciled and attached while the release was still a draft.'
             "- Reconciled release manifest: [release-changelog.json]($env:GITHUB_SERVER_URL/$env:GITHUB_REPOSITORY/releases/download/$env:RELEASE_TAG/release-changelog.json) (SHA-256 ``$manifestHash``)"
             "- Workflow run: $env:GITHUB_SERVER_URL/$env:GITHUB_REPOSITORY/actions/runs/$env:GITHUB_RUN_ID"
-            "- Workflow started: $($started.ToUniversalTime().ToString('yyyy-MM-ddTHH:mm:ssZ'))"
-            "- Workflow completed: $($completed.ToUniversalTime().ToString('yyyy-MM-ddTHH:mm:ssZ'))"
+            "- Workflow started: $($started.ToString('yyyy-MM-ddTHH:mm:ssZ'))"
+            "- Workflow completed: $completedText"
             "- Workflow duration: $duration"
             ''
             (Get-Content -LiteralPath $lineCount -Raw)
           ) -join "`n"
           $notes | Out-File -FilePath release-notes.md -Encoding utf8
-          gh release edit $env:RELEASE_TAG --repo $env:GITHUB_REPOSITORY --notes-file release-notes.md
-          $publishedRef = gh api "repos/$env:GITHUB_REPOSITORY/git/ref/tags/$env:RELEASE_TAG" | ConvertFrom-Json
-          $publishedSha = if ($publishedRef.object.type -eq 'tag') { gh api "repos/$env:GITHUB_REPOSITORY/git/tags/$($publishedRef.object.sha)" --jq .object.sha } else { $publishedRef.object.sha }
+
+          $makeLatest = if ($env:GITHUB_REF_NAME -eq 'main') { 'true' } else { 'false' }
+          $publishedRaw = Invoke-CheckedGh -Operation "Atomically publish release $env:RELEASE_TAG" -Arguments @(
+            'api', '--method', 'PATCH', "repos/$env:GITHUB_REPOSITORY/releases/$releaseId",
+            '-f', "name=$title", '-F', 'body=@release-notes.md',
+            '-F', 'draft=false', '-F', 'prerelease=false', '-f', "make_latest=$makeLatest"
+          )
+          $published = ($publishedRaw -join "`n") | ConvertFrom-Json
+          if ($published.draft -ne $false -or $published.prerelease -ne $false -or -not $published.published_at) {
+            throw 'The final publication response was not one non-draft, non-prerelease release.'
+          }
+          if ($published.tag_name -ne $env:RELEASE_TAG -or $published.target_commitish -ne $env:GITHUB_SHA) {
+            throw 'The final publication response did not preserve the exact tag and source commit.'
+          }
+          $publishedAtText = [DateTimeOffset]::Parse([string]$published.published_at).ToUniversalTime().ToString('yyyy-MM-ddTHH:mm:ssZ')
+          if ($publishedAtText -ne $completedText) {
+            throw "The atomic publication completed at $publishedAtText, but the prepared release notes record $completedText."
+          }
+          Assert-ReleaseAssetSet -Release $published -ExpectedNames $expectedAssetNames
+          if ([string]$published.body -notmatch [regex]::Escape("Workflow completed: $completedText") -or
+              [string]$published.body -notmatch [regex]::Escape("Workflow duration: $duration")) {
+            throw 'The published release body did not preserve exact start-to-publication timing evidence.'
+          }
+
+          $publishedRefRaw = Invoke-CheckedGh -Operation 'Read the published release tag ref' -Arguments @(
+            'api', "repos/$env:GITHUB_REPOSITORY/git/ref/tags/$env:RELEASE_TAG"
+          )
+          $publishedRef = ($publishedRefRaw -join "`n") | ConvertFrom-Json
+          if ($publishedRef.object.type -eq 'tag') {
+            $tagObject = Invoke-CheckedGh -Operation 'Resolve the annotated release tag' -Arguments @(
+              'api', "repos/$env:GITHUB_REPOSITORY/git/tags/$($publishedRef.object.sha)", '--jq', '.object.sha'
+            )
+            $publishedSha = ($tagObject -join "`n").Trim()
+          } else {
+            $publishedSha = [string]$publishedRef.object.sha
+          }
           if ($publishedSha -ne $env:GITHUB_SHA) { throw "Published release tag $env:RELEASE_TAG resolves to $publishedSha, expected workflow SHA $env:GITHUB_SHA." }
-          gh release view $env:RELEASE_TAG --repo $env:GITHUB_REPOSITORY --json isDraft,tagName,targetCommitish,assets --jq '{isDraft,tagName,targetCommitish,assets:[.assets[].name]}'
+
+          [ordered]@{
+            releaseId = $releaseId
+            tag = $published.tag_name
+            target = $published.target_commitish
+            draft = $published.draft
+            prerelease = $published.prerelease
+            assets = @($published.assets | ForEach-Object { $_.name })
+            workflowStarted = $started.ToString('yyyy-MM-ddTHH:mm:ssZ')
+            workflowCompleted = $completedText
+            workflowDuration = $duration
+          } | ConvertTo-Json -Depth 4

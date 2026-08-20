@@ -8,7 +8,7 @@ from pathlib import Path
 
 from PIL import Image, ImageChops, ImageDraw
 
-SOURCE_COMMIT = "25633dc1c4ff5d323dc4ad8b941fc3e142d74ed1"
+SOURCE_COMMIT = "13e09369a3b6f9336d4604f7b8eade652276a4e5"
 
 
 def digest(path: Path) -> str:
@@ -44,6 +44,7 @@ def main() -> None:
 
     for row in inventory["rows"]:
         row_id = row["id"]
+        row["reference"]["sha256"] = digest(repo / "design" / row["reference"]["file"])
         target = evidence_root / row_id
         target.mkdir(parents=True, exist_ok=True)
         reference_source = run / "output/reference-rows-current" / row_id / "reference.png"
@@ -100,8 +101,8 @@ def main() -> None:
 
         receipt_paths = {}
         for side, image_path, run_receipt, pid, hwnd in (
-            ("referenceRaw", reference, reference_receipts[row_id], 48156, 656114),
-            ("productRaw", product, product_receipts[row_id], 37684, 17368082),
+            ("referenceRaw", reference, reference_receipts[row_id], 67144, 11930650),
+            ("productRaw", product, product_receipts[row_id], 17204, 855042),
         ):
             interaction_path = target / f"{side}-interaction.json"
             interaction = {"version": 1, "rowId": row_id, "side": side, "route": run_receipt["logicalRoute"], "state": run_receipt["state"], "cleanupCompleted": True}

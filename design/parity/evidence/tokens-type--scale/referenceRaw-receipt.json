@@ -3,22 +3,22 @@
   "id": "tokens-type--scale--reference",
   "route": "cheap-lowlevel-headless",
   "source": {
-    "startCommit": "25633dc1c4ff5d323dc4ad8b941fc3e142d74ed1",
-    "endCommit": "25633dc1c4ff5d323dc4ad8b941fc3e142d74ed1",
+    "startCommit": "13e09369a3b6f9336d4604f7b8eade652276a4e5",
+    "endCommit": "13e09369a3b6f9336d4604f7b8eade652276a4e5",
     "artifactPath": "dist/renderer/assets/index-BQyFOhDT.js",
     "artifactSha256": "4663d6eaeafea4f1291311a86691fffc4e24ced846e32bcbd4405b5dd8b79198",
     "buildReceiptPath": "design/parity/evidence/build-receipt.json",
-    "buildReceiptSha256": "e9c0194c8eb7d6db5d56e93097bd8845dea7db46d55208abcc65d4faa3e199e8",
-    "artifactBuiltAt": "2026-08-20T00:46:50.071Z"
+    "buildReceiptSha256": "e78ea118e5a71516fdd91ef11f1f3426316e41b31d99d295b954211b84ef4d79",
+    "artifactBuiltAt": "2026-08-20T01:37:01.226Z"
   },
   "capture": {
-    "rawPath": "C:\\Users\\cntow\\AppData\\Local\\Temp\\mcc-parity-25633dc-20260819-2045\\output\\reference-rows-current\\tokens-type--scale\\reference.png",
+    "rawPath": "C:\\Users\\cntow\\AppData\\Local\\Temp\\mcc-parity-13e0936-20260819-2135\\output\\reference-rows-current\\tokens-type--scale\\reference.png",
     "promotedPath": "design/parity/evidence/tokens-type--scale/reference.png",
-    "sha256": "0f10f645927f9ba53ed0ee88b87f2c2a2ddc8acbada90c3022bbc1a0753bd15d",
-    "rawSha256": "0f10f645927f9ba53ed0ee88b87f2c2a2ddc8acbada90c3022bbc1a0753bd15d",
+    "sha256": "44f26606c36812dde732dc1295aeaafac0c2c425f58572b8c834f373523cbbd5",
+    "rawSha256": "44f26606c36812dde732dc1295aeaafac0c2c425f58572b8c834f373523cbbd5",
     "mimeType": "image/png",
-    "startedAt": "2026-08-20T00:46:50.071Z",
-    "capturedAt": "2026-08-20T00:46:50.307Z",
+    "startedAt": "2026-08-20T01:37:01.226Z",
+    "capturedAt": "2026-08-20T01:37:01.422Z",
     "width": 1280,
     "height": 800
   },
@@ -59,8 +59,8 @@
     "reviewer": "automated parity capture review"
   },
   "runtime": {
-    "launchPid": 48156,
-    "hwnd": "656114",
+    "launchPid": 67144,
+    "hwnd": "11930650",
     "hwndResolvedLive": true,
     "consoleErrorCount": 0,
     "pageErrorCount": 0,

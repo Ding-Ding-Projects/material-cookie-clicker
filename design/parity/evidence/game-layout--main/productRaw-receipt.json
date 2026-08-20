@@ -3,22 +3,22 @@
   "id": "game-layout--main--product",
   "route": "cheap-lowlevel-headless",
   "source": {
-    "startCommit": "25633dc1c4ff5d323dc4ad8b941fc3e142d74ed1",
-    "endCommit": "25633dc1c4ff5d323dc4ad8b941fc3e142d74ed1",
+    "startCommit": "13e09369a3b6f9336d4604f7b8eade652276a4e5",
+    "endCommit": "13e09369a3b6f9336d4604f7b8eade652276a4e5",
     "artifactPath": "dist/renderer/assets/index-BQyFOhDT.js",
     "artifactSha256": "4663d6eaeafea4f1291311a86691fffc4e24ced846e32bcbd4405b5dd8b79198",
     "buildReceiptPath": "design/parity/evidence/build-receipt.json",
-    "buildReceiptSha256": "e9c0194c8eb7d6db5d56e93097bd8845dea7db46d55208abcc65d4faa3e199e8",
-    "artifactBuiltAt": "2026-08-20T00:45:35.658Z"
+    "buildReceiptSha256": "e78ea118e5a71516fdd91ef11f1f3426316e41b31d99d295b954211b84ef4d79",
+    "artifactBuiltAt": "2026-08-20T01:35:49.132Z"
   },
   "capture": {
-    "rawPath": "C:\\Users\\cntow\\AppData\\Local\\Temp\\mcc-parity-25633dc-20260819-2045\\output\\product-rows\\game-layout--main\\product.png",
+    "rawPath": "C:\\Users\\cntow\\AppData\\Local\\Temp\\mcc-parity-13e0936-20260819-2135\\output\\product-rows\\game-layout--main\\product.png",
     "promotedPath": "design/parity/evidence/game-layout--main/product.png",
-    "sha256": "cf118eec553a6cc9e398e2e8717ce3da51b9ac19031ab9c7a1be4f62a3f8c744",
-    "rawSha256": "cf118eec553a6cc9e398e2e8717ce3da51b9ac19031ab9c7a1be4f62a3f8c744",
+    "sha256": "3fc63fa36fb2a5de6fdcd3fc9a412a7b2f7384e973ead5779e957358a888b04d",
+    "rawSha256": "3fc63fa36fb2a5de6fdcd3fc9a412a7b2f7384e973ead5779e957358a888b04d",
     "mimeType": "image/png",
-    "startedAt": "2026-08-20T00:45:35.658Z",
-    "capturedAt": "2026-08-20T00:45:35.874Z",
+    "startedAt": "2026-08-20T01:35:49.132Z",
+    "capturedAt": "2026-08-20T01:35:49.313Z",
     "width": 1280,
     "height": 800
   },
@@ -59,8 +59,8 @@
     "reviewer": "automated parity capture review"
   },
   "runtime": {
-    "launchPid": 37684,
-    "hwnd": "17368082",
+    "launchPid": 17204,
+    "hwnd": "855042",
     "hwndResolvedLive": true,
     "consoleErrorCount": 0,
     "pageErrorCount": 0,

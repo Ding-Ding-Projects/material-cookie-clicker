@@ -17,7 +17,7 @@
     "BUILT PRODUCT"
   ],
   "inputs": {
-    "referenceSha256": "f32ac9af1b8ff0a18f55c5848f294acc30fbb0b1dca7c08ed5bc12701c48180d",
-    "productSha256": "32477a043548093e1baf75a49cf2944a244161b624a685d9f45ac938935f22a9"
+    "referenceSha256": "d26ddcac4140ca929102df3f8e83160404f673098a535045da0cb2101554f9cc",
+    "productSha256": "09cb4e617dcb6748d6886ab49713e0f15e947974a47b21a0bde10ce6129b1ed3"
   }
 }

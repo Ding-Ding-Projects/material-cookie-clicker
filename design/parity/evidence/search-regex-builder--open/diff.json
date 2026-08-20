@@ -15,11 +15,11 @@
   "inputs": {
     "reference": {
       "path": "design/parity/evidence/search-regex-builder--open/reference.png",
-      "sha256": "d8ed116b7ab1c45dd29bd604883e1dce9383b90f052211ada7a79d039309f35c"
+      "sha256": "4ceddf85b02fb98f16afd18df79afa40635de9d7fb1a85e262e59bca7279ae4e"
     },
     "product": {
       "path": "design/parity/evidence/search-regex-builder--open/product.png",
-      "sha256": "82772f4d3bf245ea117a631e1bbfb6c461422d5c33bd917cdb53f5214d13e9b2"
+      "sha256": "ab6d03ee4e934202be986314fe8c18b18c63652c77a564a3d2a95d4e07fb4013"
     }
   },
   "dimensions": {
@@ -27,10 +27,10 @@
     "height": 800
   },
   "metrics": {
-    "changedPixels": 463675,
+    "changedPixels": 345037,
     "totalPixels": 1024000,
-    "changedRatio": 0.4528076171875,
-    "rgbRmse": 52.88111923441461
+    "changedRatio": 0.3369501953125,
+    "rgbRmse": 32.85215053229171
   },
   "tool": {
     "name": "Pillow ImageChops.difference",

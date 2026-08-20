@@ -58,17 +58,23 @@ try {
   if (!mutableRefused) throw new Error('verification plan accepted the mutable public latest feed');
 
   const powershell = `${process.env.SystemRoot}\\System32\\WindowsPowerShell\\v1.0\\powershell.exe`;
-  for (const relative of ['scripts/build-common.ps1', 'scripts/build-installer.ps1', 'scripts/verify-squirrel-artifacts.ps1', 'scripts/verify-installed-release-evidence.ps1', 'scripts/test-verify-squirrel-artifacts.ps1']) {
+  for (const relative of ['scripts/build-common.ps1', 'scripts/build-installer.ps1', 'scripts/verify-squirrel-artifacts.ps1', 'scripts/verify-installed-release-evidence.ps1', 'scripts/test-verify-squirrel-artifacts.ps1', 'scripts/test-packaging-process-exit.ps1']) {
     const command = `$errors=$null;[System.Management.Automation.Language.Parser]::ParseFile('${path.join(root, relative).replaceAll("'", "''")}',[ref]$null,[ref]$errors)|Out-Null;if($errors.Count){$errors|ForEach-Object{Write-Error $_};exit 1}`;
     run(powershell, ['-NoProfile', '-ExecutionPolicy', 'Bypass', '-Command', command], `PowerShell syntax ${relative}`);
   }
   run(powershell, ['-NoProfile', '-ExecutionPolicy', 'Bypass', '-File', path.join(root, 'scripts', 'test-verify-squirrel-artifacts.ps1')], 'Squirrel artifact red-green test');
+  run(powershell, ['-NoProfile', '-ExecutionPolicy', 'Bypass', '-File', path.join(root, 'scripts', 'test-packaging-process-exit.ps1')], 'packaging process exit red-green test');
   run(process.execPath, [path.join(root, 'scripts', 'test-validate-squirrel-runtime-receipt.mjs')], 'runtime receipt red-green test');
 
   const common = readFileSync(path.join(root, 'scripts', 'build-common.ps1'), 'utf8');
   if (/function Invoke-ProjectInstaller[\s\S]*?Select-Object -First 1/.test(common)) throw new Error('Invoke-ProjectInstaller still uses ambiguous first-match executable selection');
   if (!common.includes('CSC_IDENTITY_AUTO_DISCOVERY') || !common.includes('signerInvocationCount')) throw new Error('signer environment/process provenance is missing');
   const packageJson = JSON.parse(readFileSync(path.join(root, 'package.json'), 'utf8'));
+  if (packageJson.build.afterPack !== 'scripts/stamp-packaged-icon.cjs') throw new Error('packaged icon hook is not registered');
+  const iconHook = readFileSync(path.join(root, 'scripts', 'stamp-packaged-icon.cjs'), 'utf8');
+  for (const required of ["execFileSync(editor, [executable, '--set-icon', icon]", "windowsHide: true", "electron-winstaller', 'vendor', 'rcedit.exe"]) {
+    if (!iconHook.includes(required)) throw new Error(`packaged icon hook is missing exact boundary: ${required}`);
+  }
   for (const key of ['forceCodeSigning', 'signExecutable', 'signAndEditExecutable']) {
     if (packageJson.build.win[key] !== false) throw new Error(`${key} is not explicitly false`);
   }

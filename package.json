@@ -58,6 +58,7 @@
     "appId": "org.dingdingprojects.materialcookieclicker",
     "productName": "Material Cookie Clicker",
     "asar": true,
+    "afterPack": "scripts/stamp-packaged-icon.cjs",
     "directories": {
       "output": "release"
     },

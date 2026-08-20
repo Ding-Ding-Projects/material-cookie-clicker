@@ -409,6 +409,7 @@ describe("look tiers: the floors, which are not for sale at any tier", () => {
       ".toast-stack",
       ".offline-banner",
       ".shell-status",
+      ".canonical-palette-launch",
       ".click-popup",
       ".cookie-cps",
       ".cookie-hero__hint",

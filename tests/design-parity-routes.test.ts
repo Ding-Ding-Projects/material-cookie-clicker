@@ -24,6 +24,7 @@ const inventory = JSON.parse(readFileSync(resolve('design/parity/inventory.json'
 
 const ALLOWED_DESIGN_ROUTE_TOKENS = [
   '--font-en',
+  '--font-zh',
   '--md-sys-color-error',
   '--md-sys-color-on-error',
   '--md-sys-color-on-primary',
@@ -77,6 +78,110 @@ function validateDesignRouteTokenSet(source: string): void {
   for (const forbidden of FORBIDDEN_DESIGN_ROUTE_TOKENS) {
     if (source.includes(`var(${forbidden})`)) throw new Error(`Forbidden design route token: ${forbidden}`);
   }
+}
+
+function normalizeCssSelector(selector: string): string {
+  return selector.replace(/\s+/g, ' ').trim();
+}
+
+function exactTopLevelCssRule(source: string, wantedSelector: string): string {
+  const css = source.replace(/\/\*[\s\S]*?\*\//g, '');
+  const wanted = normalizeCssSelector(wantedSelector);
+  const matches: string[] = [];
+  let cursor = 0;
+
+  while (cursor < css.length) {
+    while (/\s/.test(css[cursor] ?? '')) cursor += 1;
+    const open = css.indexOf('{', cursor);
+    if (open < 0) break;
+    const prelude = css.slice(cursor, open).trim();
+    let depth = 1;
+    let quote = '';
+    let index = open + 1;
+    for (; index < css.length && depth > 0; index += 1) {
+      const character = css[index];
+      if (quote) {
+        if (character === '\\') index += 1;
+        else if (character === quote) quote = '';
+      } else if (character === '"' || character === "'") {
+        quote = character;
+      } else if (character === '{') {
+        depth += 1;
+      } else if (character === '}') {
+        depth -= 1;
+      }
+    }
+    if (depth !== 0) throw new Error(`Unclosed CSS rule: ${prelude}`);
+    if (!prelude.startsWith('@') && normalizeCssSelector(prelude) === wanted) {
+      matches.push(css.slice(open + 1, index - 1));
+    }
+    cursor = index;
+  }
+
+  if (matches.length !== 1) throw new Error(`Expected exactly one CSS rule for ${wanted}, received ${matches.length}`);
+  return matches[0];
+}
+
+function assertExactCssDeclarations(source: string, selector: string, expected: Readonly<Record<string, string>>): void {
+  const declarations = new Map<string, string>();
+  for (const candidate of exactTopLevelCssRule(source, selector).split(';')) {
+    const colon = candidate.indexOf(':');
+    if (colon < 0) continue;
+    declarations.set(candidate.slice(0, colon).trim(), candidate.slice(colon + 1).trim());
+  }
+  for (const [property, value] of Object.entries(expected)) {
+    if (declarations.get(property) !== value) {
+      throw new Error(`${selector} must declare ${property}: ${value}; received ${declarations.get(property) ?? '(missing)'}`);
+    }
+  }
+}
+
+function replaceExactCssDeclaration(source: string, selector: string, property: string, value: string, replacement: string): string {
+  const body = exactTopLevelCssRule(source, selector);
+  if (source.indexOf(body) !== source.lastIndexOf(body)) throw new Error(`CSS rule body is not unique: ${selector}`);
+  const needle = `${property}: ${value};`;
+  if (!body.includes(needle)) throw new Error(`Cannot break ${selector}; missing ${needle}`);
+  return source.replace(body, body.replace(needle, `${property}: ${replacement};`));
+}
+
+function validateStatParityCss(source: string): void {
+  const prefix = ':root:root body .design-parity-route';
+  const contracts = [
+    [`${prefix} .parity-theme-toggle`, { 'min-block-size': '44px', font: '400 16px/24px var(--font-en)', 'letter-spacing': 'normal' }],
+    [`${prefix} .parity-spec-section > h2`, { gap: '16px' }],
+    [`${prefix} .parity-stat-grid`, { 'grid-template-columns': 'repeat(4, minmax(0, 1fr))', gap: '22px' }],
+    [`${prefix} .parity-stat-tile`, {
+      'min-height': '162px',
+      display: 'block',
+      padding: '20px',
+      border: '1px solid var(--md-sys-color-outline-variant)',
+      'border-top': '8px solid var(--md-sys-color-tertiary)',
+      'border-radius': 'var(--md-sys-shape-corner-extra-large)',
+      background: 'var(--md-sys-color-surface-container-low)',
+      'box-shadow': 'var(--md-sys-elevation-level-1)',
+    }],
+    [`${prefix} .parity-stat-tile::before`, { content: 'none', display: 'none' }],
+    [`${prefix} .parity-stat-tile .stat-tile__label-en`, { color: 'var(--md-sys-color-on-surface)', 'font-family': 'var(--font-en)' }],
+    [`${prefix} .parity-stat-tile .stat-tile__label-zh`, { color: 'var(--md-sys-color-on-surface-variant)', 'font-family': 'var(--font-zh)' }],
+    [`${prefix} .parity-stat-tile .stat-tile__value`, { margin: '0', color: 'var(--md-sys-color-on-surface)', font: '700 28px/36px var(--font-en)', 'font-variant-numeric': 'tabular-nums' }],
+    [`${prefix} .parity-stat-tile .stat-tile__trend`, { display: 'inline', margin: '0', font: '400 16px/24px var(--font-en)' }],
+    [`${prefix} .parity-stat-tile .stat-tile__trend.up`, { color: '#176b36' }],
+    [`${prefix} .parity-stat-tile .stat-tile__trend.down`, { color: '#9d2828' }],
+    [`${prefix} .parity-goal-tile`, { width: 'min(310px, 100%)', 'min-height': '218px', display: 'grid', 'align-content': 'start', gap: '28px' }],
+    [`${prefix} .parity-goal-tile__progress`, { width: '100%', height: '10px', 'accent-color': 'var(--md-sys-color-primary)' }],
+  ] as const;
+
+  for (const [selector, declarations] of contracts) assertExactCssDeclarations(source, selector, declarations);
+  assertExactCssDeclarations(
+    source,
+    `${prefix} .parity-stat-tile .stat-tile__label-en, ${prefix} .parity-stat-tile .stat-tile__label-zh`,
+    { display: 'block', 'font-size': '16px', 'line-height': '24px', 'font-weight': '400', 'letter-spacing': 'normal', 'text-transform': 'none' },
+  );
+  assertExactCssDeclarations(
+    source,
+    `${prefix} .parity-goal-tile__title, ${prefix} .parity-goal-tile__detail`,
+    { color: 'var(--md-sys-color-on-surface)', font: '400 16px/24px var(--font-en)' },
+  );
 }
 
 describe('built-product design parity routes', () => {
@@ -147,6 +252,34 @@ describe('built-product design parity routes', () => {
     }
     for (const label of ['Locked · 未解鎖 (12 / 50)', 'Buy · 買 — 🍪 5,000', 'Already owned · 已經買咗']) {
       expect(render('upgrade-card--gallery')).toContain(label);
+    }
+  });
+
+  it('pins the exact stat-tile route anatomy and proves geometry drift turns the guard red', () => {
+    const css = readFileSync(resolve('src/renderer/styles/design-parity-route.css'), 'utf8');
+    const row = inventory.rows.find((candidate) => candidate.id === 'stat-tile--gallery');
+    if (!row) throw new Error('Missing stat-tile--gallery inventory row');
+    const request = resolveDesignParityRequest(new URL(row.product.route).searchParams);
+    if (!request) throw new Error('Missing stat-tile--gallery request');
+    const markup = renderToStaticMarkup(createElement(DesignParityRoute, { request }));
+
+    expect(markup).toContain('class="stat-grid parity-stat-grid"');
+    expect(markup.match(/class="stat-tile parity-stat-tile(?:\s|\")/g)).toHaveLength(5);
+    expect(markup.match(/class="parity-stat-reading"/g)).toHaveLength(4);
+    expect(markup).toContain('class="parity-goal-tile__title">Next prestige level · 下一個轉生等級</span>');
+    expect(markup).not.toContain('stat-tile__label-en">Next prestige level');
+    expect(markup).toContain('class="parity-goal-tile__progress"');
+    expect(markup).toContain('aria-label="Next prestige level progress: 68%"');
+
+    const prefix = ':root:root body .design-parity-route';
+    expect(() => validateStatParityCss(css)).not.toThrow();
+    for (const broken of [
+      replaceExactCssDeclaration(css, `${prefix} .parity-stat-grid`, 'grid-template-columns', 'repeat(4, minmax(0, 1fr))', 'repeat(5, minmax(0, 1fr))'),
+      replaceExactCssDeclaration(css, `${prefix} .parity-stat-tile .stat-tile__value`, 'font', '700 28px/36px var(--font-en)', '900 32px/normal var(--font-en)'),
+      replaceExactCssDeclaration(css, `${prefix} .parity-goal-tile__progress`, 'height', '10px', '16px'),
+    ]) {
+      expect(broken).not.toBe(css);
+      expect(() => validateStatParityCss(broken)).toThrow(/must declare/i);
     }
   });
 

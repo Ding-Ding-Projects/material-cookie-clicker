@@ -283,7 +283,19 @@ function Invoke-SquirrelPackagingWithAudit {
     $nodeArguments = @($npxCli) + $BuilderArguments
     if (@($nodeArguments | Where-Object { $_ -match '"' }).Count -gt 0) { throw 'Packaging arguments may not contain quotation marks.' }
     $argumentLine = (($nodeArguments | ForEach-Object { '"' + $_ + '"' }) -join ' ')
-    $process = Start-Process -FilePath $Tools.Node -ArgumentList $argumentLine -WorkingDirectory $Root -RedirectStandardOutput $stdoutPath -RedirectStandardError $stderrPath -WindowStyle Hidden -PassThru
+    $startInfo = [Diagnostics.ProcessStartInfo]::new()
+    $startInfo.FileName = $Tools.Node
+    $startInfo.Arguments = $argumentLine
+    $startInfo.WorkingDirectory = $Root
+    $startInfo.UseShellExecute = $false
+    $startInfo.CreateNoWindow = $true
+    $startInfo.RedirectStandardOutput = $true
+    $startInfo.RedirectStandardError = $true
+    $process = [Diagnostics.Process]::new()
+    $process.StartInfo = $startInfo
+    if (-not $process.Start()) { throw 'electron-builder packaging process did not start.' }
+    $stdoutTask = $process.StandardOutput.ReadToEndAsync()
+    $stderrTask = $process.StandardError.ReadToEndAsync()
     do {
       $process.Refresh()
       $snapshot = @(Get-CimInstance Win32_Process -ErrorAction Stop)
@@ -300,7 +312,9 @@ function Invoke-SquirrelPackagingWithAudit {
       if (-not $process.HasExited) { Start-Sleep -Milliseconds 50 }
     } while (-not $process.HasExited)
     $process.WaitForExit()
-    $exitCode = $process.ExitCode
+    $stdoutTask.GetAwaiter().GetResult() | Set-Content -LiteralPath $stdoutPath -Encoding UTF8
+    $stderrTask.GetAwaiter().GetResult() | Set-Content -LiteralPath $stderrPath -Encoding UTF8
+    $exitCode = [int]$process.ExitCode
     $processAuditComplete = $true
   } finally {
     $logParent = Split-Path -Parent $LogPath

@@ -238,7 +238,7 @@ describe('release build evidence', () => {
     }
   });
 
-  it('pins Squirrel branding to an immutable full commit URL', () => {
+  it('pins Squirrel branding to an immutable full commit URL with current-byte parity', () => {
     const packageJson = JSON.parse(read('package.json'));
     expect(packageJson.build.squirrelWindows.iconUrl).toMatch(
       /^https:\/\/raw\.githubusercontent\.com\/Ding-Ding-Projects\/material-cookie-clicker\/[0-9a-f]{40}\/assets\/material-cookie-clicker\.ico$/,
@@ -251,6 +251,10 @@ describe('release build evidence', () => {
       signExecutable: false,
       signAndEditExecutable: false,
     });
+    expect(packageJson.build.squirrelWindows.iconUrl).not.toContain('a98e38c07423a7cfb4cb3190412884a404a7245e');
+    expect(packageJson.scripts['brand:check']).toContain('verify-brand-release-integrity.mjs');
+    expect(packageJson.scripts['brand:proof']).toContain('verify-brand-release-integrity.mjs --json');
+    expect(() => execFileSync(process.execPath, ['scripts/verify-brand-release-integrity.mjs', '--network', 'local'], { cwd: root, stdio: 'pipe' })).not.toThrow();
   });
 
   it('requires clean pinned source manifests and records delta/icon evidence', () => {

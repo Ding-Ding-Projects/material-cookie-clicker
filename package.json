@@ -13,7 +13,9 @@
   ],
   "scripts": {
     "brand:generate": "node scripts/generate-app-icon.mjs --write",
-    "brand:check": "node scripts/generate-app-icon.mjs --check",
+    "brand:check": "node scripts/generate-app-icon.mjs --check && node scripts/verify-brand-release-integrity.mjs",
+    "brand:proof": "node scripts/verify-brand-release-integrity.mjs --json",
+    "brand:proof:packaged": "node scripts/verify-packaged-icon-proof.mjs",
     "build:surface-kernel": "npm run build --workspace @material-cookie-clicker/surface-kernel && node scripts/assert-surface-kernel-ready.mjs",
     "prebuild": "npm run brand:check && npm run build:surface-kernel",
     "build": "npm run build:renderer && npm run build:main && npm run build:preload",

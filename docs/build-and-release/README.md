@@ -5,6 +5,7 @@
 - [Dependency bootstrap](dependency-bootstrap.md)
 - [CI and release workflow](ci-and-release-workflow.md)
 - [Automatic updates](automatic-updates.md)
+- [Release icon integrity](release-icon-integrity.md)
 
 The verified baseline is `v0.2.55` at commit
 `a98e38c07423a7cfb4cb3190412884a404a7245e`. It is a non-draft release with an unsigned

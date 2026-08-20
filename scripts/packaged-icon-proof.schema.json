@@ -1,0 +1,105 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://ding-ding-projects.github.io/material-cookie-clicker/schemas/packaged-icon-proof.v1.json",
+  "title": "Material Cookie Clicker packaged icon proof",
+  "type": "object",
+  "additionalProperties": false,
+  "required": ["schemaVersion", "sourceCommit", "sourceIcon", "artifacts", "verifiedAt"],
+  "properties": {
+    "schemaVersion": { "const": "material-cookie-clicker.packaged-icon-proof.v1" },
+    "sourceCommit": { "type": "string", "pattern": "^[0-9a-f]{40}$" },
+    "sourceIcon": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["path", "bytes", "sha256", "frames"],
+      "properties": {
+        "path": { "const": "assets/material-cookie-clicker.ico" },
+        "bytes": { "type": "integer", "minimum": 1 },
+        "sha256": { "$ref": "#/$defs/sha256" },
+        "frames": {
+          "type": "array",
+          "minItems": 4,
+          "maxItems": 4,
+          "prefixItems": [
+            { "$ref": "#/$defs/sourceFrame16" },
+            { "$ref": "#/$defs/sourceFrame32" },
+            { "$ref": "#/$defs/sourceFrame48" },
+            { "$ref": "#/$defs/sourceFrame256" }
+          ],
+          "items": false
+        }
+      }
+    },
+    "artifacts": {
+      "type": "array",
+      "minItems": 2,
+      "maxItems": 2,
+      "prefixItems": [
+        { "$ref": "#/$defs/setupArtifact" },
+        { "$ref": "#/$defs/applicationArtifact" }
+      ],
+      "items": false
+    },
+    "verifiedAt": { "type": "string", "pattern": "^\\d{4}-\\d{2}-\\d{2}T\\d{2}:\\d{2}:\\d{2}(?:\\.\\d{3})?Z$" }
+  },
+  "$defs": {
+    "sha256": { "type": "string", "pattern": "^[0-9a-f]{64}$" },
+    "sourceFrame": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["size", "pixelSha256"],
+      "properties": {
+        "size": { "type": "integer" },
+        "pixelSha256": { "$ref": "#/$defs/sha256" }
+      }
+    },
+    "sourceFrame16": { "allOf": [{ "$ref": "#/$defs/sourceFrame" }, { "properties": { "size": { "const": 16 } } }] },
+    "sourceFrame32": { "allOf": [{ "$ref": "#/$defs/sourceFrame" }, { "properties": { "size": { "const": 32 } } }] },
+    "sourceFrame48": { "allOf": [{ "$ref": "#/$defs/sourceFrame" }, { "properties": { "size": { "const": 48 } } }] },
+    "sourceFrame256": { "allOf": [{ "$ref": "#/$defs/sourceFrame" }, { "properties": { "size": { "const": 256 } } }] },
+    "executable": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["name", "bytes", "sha256"],
+      "properties": {
+        "name": { "type": "string", "minLength": 1 },
+        "bytes": { "type": "integer", "minimum": 1 },
+        "sha256": { "$ref": "#/$defs/sha256" }
+      }
+    },
+    "extractedIcon": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["size", "path", "bytes", "sha256", "pixelSha256", "sourcePixelSha256", "matchesSource"],
+      "properties": {
+        "size": { "type": "integer" },
+        "path": { "type": "string", "pattern": "^[^/\\\\]+\\.png$" },
+        "bytes": { "type": "integer", "minimum": 1 },
+        "sha256": { "$ref": "#/$defs/sha256" },
+        "pixelSha256": { "$ref": "#/$defs/sha256" },
+        "sourcePixelSha256": { "$ref": "#/$defs/sha256" },
+        "matchesSource": { "const": true }
+      }
+    },
+    "extracted16": { "allOf": [{ "$ref": "#/$defs/extractedIcon" }, { "properties": { "size": { "const": 16 } } }] },
+    "extracted32": { "allOf": [{ "$ref": "#/$defs/extractedIcon" }, { "properties": { "size": { "const": 32 } } }] },
+    "artifact": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["kind", "executable", "extractedIcons"],
+      "properties": {
+        "kind": { "type": "string" },
+        "executable": { "$ref": "#/$defs/executable" },
+        "extractedIcons": {
+          "type": "array",
+          "minItems": 2,
+          "maxItems": 2,
+          "prefixItems": [{ "$ref": "#/$defs/extracted16" }, { "$ref": "#/$defs/extracted32" }],
+          "items": false
+        }
+      }
+    },
+    "setupArtifact": { "allOf": [{ "$ref": "#/$defs/artifact" }, { "properties": { "kind": { "const": "setup" } } }] },
+    "applicationArtifact": { "allOf": [{ "$ref": "#/$defs/artifact" }, { "properties": { "kind": { "const": "application" } } }] }
+  }
+}

@@ -1,68 +1,70 @@
 # Handoff
 
-## Current integration handoff (2026-08-19)
+## Current integration handoff (2026-08-20)
 
-The active integration candidate is
-`43d2174bc2172d31e572d9668282764438e4d904`. It is **61 commits ahead of** the verified
-published baseline `v0.2.55` (`a98e38c07423a7cfb4cb3190412884a404a7245e`) and has not been
-published. Do not describe the candidate as a release, and do not transfer the release's installed
-interaction evidence to source changes that landed afterward.
+The active integration candidate is `e2171d1a06ed81a8ab6576d9c4fb13b9ee9c9a0e` on `main`. It is
+**120 commits ahead of** the verified published baseline `v0.2.55`
+(`a98e38c07423a7cfb4cb3190412884a404a7245e`) and has **not** been published. Do not describe the
+candidate as a release, and do not transfer the release's installed interaction evidence to source
+changes that landed afterward.
 
 ### Current checks at the candidate
 
-| Check | Exact result at `43d2174` |
+| Check | Exact result at `e2171d1` |
 | --- | --- |
-| `npm run check` | Renderer and main TypeScript checks passed; **59 application test files / 998 tests**, **37 local-model package tests**, and **89 surface-kernel tests** passed — **1,124/1,124 tests** in aggregate. The checkout stayed clean and at the same commit for the full run. |
-| Completeness inventory | **8/8** focused tests passed, including deliberate missing-row, blank-evidence, missing-article/page/section, and broken-anchor cases. |
-| Contrast | **78/78** light/dark role pairs passed at pinned `43d2174`. |
-| Design-parity structure | **16/16** hand-written rows cover the **16/16** checked-in references. |
-| Design-parity negative proof | **19/19** exact deliberate breaks turned red and restored green. |
-| Design-parity release check | **RED.** All **16/16** visual-diff reviews remain `defect`; the first reported failure is `DIFF_REVIEW_DEFECT` for `achievement-badge--gallery`. Changed-pixel ratios range from 0.10 to 0.57. |
+| `npx vitest run tests` | **71 files, 1074 tests, all passing** |
+| `npm run build` | exit 0 |
+| `node scripts/check-site.mjs` | All checks passed — 18 pages, 76 files, 353 internal links |
+| `npx electron-builder --win squirrel --publish never` | produced `release/squirrel-windows/MaterialCookieClicker-Setup.exe` and `RELEASES` |
+| Packaged executable icon fidelity | **PASS** at 16px and 32px against the committed `.ico` |
+| Signature, app and setup executables | `NotSigned` — the permanent no-signing policy holds |
 
-The aggregate check above is source and package evidence, not installed-runtime or capture evidence.
-The current candidate's smoke test, installer, installed interaction matrix, capture matrix, remote
-workflows, and release have **not** been run by this documentation lane.
+Thirteen tests were failing when this session began, inherited from an earlier merge and unseen
+because no workflow runs tests. All thirteen are closed by their real causes; none was closed by
+loosening an assertion. Two of the thirteen were whole files that did not execute at all — one had
+a parse error and one used the wrong test runner — so they had been asserting nothing while
+appearing present.
 
-### Evidence-promotion blocker
+### What is genuinely still open
 
-The design-parity files currently committed under `design/parity/evidence/` are not eligible for
-release promotion under the generic evidence-promotion contract. They are being invalidated until
-a fresh compliant run exists:
+- **The candidate is unpublished.** 120 commits sit between it and `v0.2.55`. Nothing here has been
+  verified through an installed build except the icon fidelity check above.
+- **Design-parity evidence is provenance-incomplete, on purpose.** Every row in
+  `design/parity/inventory.json` reads `sourceCommit: "pending-fresh-provenance-run"`. Evidence
+  enters the inventory only through a full promotion run — build receipt, run ledger and a promotion
+  record per artifact — and `tests/design-parity.test.ts` asserts that pending state deliberately,
+  proving the verified path against a fixture instead. The captured PNGs predate the parity repairs
+  that have since landed, so the ratios in `design/parity/DRIFT-ANALYSIS.md` overstate the current
+  gap; that document's status section says so.
+- **The release capture inventory is 28 states, all pending**, 25 with no image at all. The gap is
+  now stated in exact counts at the top of `scripts/release-capture-inventory.json` rather than
+  left for a reader to tally.
+- **`site-house-ads` has no built-site interaction proof.** The surface is implemented in source
+  with focused tests; `docs/completeness.md` records it as such rather than as verified.
+- **`assets/material-cookie-clicker.ico` stores its 256x256 entry as an uncompressed BMP**, 270,376
+  of the file's 285,478 bytes, where Windows Vista and later expect PNG compression. It decodes
+  correctly and blocks nothing; left alone rather than regenerated as a drive-by change.
 
-- capture, build, interaction, and privacy records were written inside the repository rather than
-  retained under one task run root;
-- the 32-row promotion inventory omits 13 fields required by the generic promotion record;
-- no staged promotion transaction or pre-promotion backups exist; and
-- `scripts/design-parity-evidence.py` hard-codes the source commit, process identifiers, and window
-  handles instead of deriving them from the inspected run.
+### What changed in this session, and how it was verified
 
-The receipts name capture source `6f878d9fc1dc6246a7a078ce33aa9b12531fe775`; the current integration
-tip is `43d2174`. The minigame-button source worktree also contained uncommitted changes at the
-capture source, so those pixels cannot be promoted as evidence for the committed candidate. A
-fresh, clean, task-rooted capture and promotion run is required even after the 16 visual defects are
-resolved. The structural and negative checks remain useful, but they do not make the release check
-green and do not repair the promotion provenance.
+Every rendering fix below was measured against the real built application over the Chrome DevTools
+Protocol, or against an isolated headless browser for the site — not argued from the stylesheet.
 
-### Implemented scope, without evidence inflation
+| Defect | Evidence |
+| --- | --- |
+| Memory Match rendered as one 16-card strip | Four row children were landing in four columns; now measured at y 900/956/1012/1068 |
+| Flagged Minesweeper cells were transparent | `--md-sys-color-tertiary-container` was undeclared; measured `rgb(248,226,135)` after |
+| Every minigame caption rendered at body size | `--md-sys-typescale-body-small-font` was undeclared; measured 12px after |
+| Tool-card file inputs were transparent | Read an undeclared `--surface-container-low` |
+| Hero hint line was clipped away entirely | Short by exactly 13px; proved by restoring the old value live and re-measuring |
+| Site went half-dark on a dark-OS machine | Eight `--m3-*` roles had no `prefers-color-scheme` fallback; proved by neutralising the new block live and watching the rail go cream |
+| 15 of 17 pages had no link preview or favicon | The guard iterated a hard-coded two-page array; it now enumerates the directory |
+| Four tables cropped rather than scrolled on a phone | Now measured `bodyOverflowX: 0` at 390px with the table scrolling inside its own container |
+| The regex builder was unreachable | It was appended to `<body>` while its buttons live inside `showModal()` dialogs, so it painted behind them |
+| The packaged executable carried no icon | `signAndEditExecutable: false` disables rcedit, which is what embeds the icon; see GitHub issue 3 |
 
-- **Graphics progression:** source and focused tests implement a cookie-only fresh state and seven
-  ordered, explicit visual purchases. Production alone does not grant a look rung. No current
-  promotion-compliant fresh-state capture exists.
-- **Minigames and Lucky Chance:** the five persisted boards, schedule, Golden Tokens, and atomic
-  drawer reducer are implemented and included in the passing aggregate suite. The inventory still
-  has no dedicated installed UI interaction test or current promotable capture for this surface.
-- **Office and endless play:** the generator ladder has twenty-one tiers, with Office Building at
-  tier nine and a permanent reveal at 500,000,000 lifetime baked cookies. Generator ownership and
-  prestige remain uncapped; Home continues through persisted extension floors after six authored
-  rooms. The Office row and endless-floor state still lack current committed interaction/capture
-  evidence.
-- **Canonical application tools:** the candidate mounts identity/logo/appearance, converter/PDF,
-  local-model recovery, authenticator registration, local history, schedules, exports, changelog,
-  offline-docs, notifications, tabs, command palette, School mode, vocabulary, narrator, and local
-  status surfaces. The per-surface inventory remains authoritative: several are partial,
-  English-first, missing packaged adapters or data, or missing installed interaction and capture
-  proof. The complete local-model catalog/pull/chat/harness runtime, per-element toy locks, unlock
-  ladder, external-editor handoff, and browser-extension download flow are not complete.
+`.gitattributes` now normalises line endings to LF. Two hand-written hash manifests in this
+repository previously disagreed about line endings and could not both pass on one machine.
 
 ## Graphics-purchase follow-up (2026-08-19)
 

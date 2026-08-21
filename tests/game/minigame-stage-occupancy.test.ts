@@ -1,6 +1,9 @@
 import { describe, expect, it } from 'vitest';
 
-import { EMPTY_MINIGAME_STATE, minigameOccupiesStage } from '../../src/shared/game/minigames.js';
+import { EMPTY_MINIGAME_STATE, createSeededRng, minigameOccupiesStage } from '../../src/shared/game/minigames.js';
+import { bnFromNumber } from '../../src/shared/game/big-number.js';
+import { createInitialGameState } from '../../src/shared/game/reducer.js';
+import { tickRandomEvents } from '../../src/shared/game/random-events.js';
 
 /**
  * `EMPTY_MINIGAME_STATE` has no `active` key at all, so on a fresh save `state.minigames.active` is
@@ -53,5 +56,40 @@ describe('minigame stage occupancy', () => {
     expect(calls.length).toBeGreaterThanOrEqual(3);
     // The comparison that caused this must not come back in any form.
     expect(source).not.toMatch(/^\s*.*minigames\.active !== null/m);
+  });
+
+  /**
+   * The end-to-end assertion, and the one that would actually have caught this.
+   *
+   * Testing the helper proves the helper. It does not prove the scheduler is reachable, and the
+   * defect lived in the CALLER: a save whose `minigames.active` is `undefined` had `blocked`
+   * computed as `true`, so no random event could spawn from it, ever. This drives the real
+   * `tickRandomEvents` from exactly that state and requires something to actually appear.
+   */
+  it('lets a random event spawn from a save that has never played a minigame', () => {
+    const base = createInitialGameState(new Date(0).toISOString());
+    const state = {
+      ...base,
+      cookies: bnFromNumber(5_000_000),
+      lifetimeCookies: bnFromNumber(5_000_000),
+      stats: { ...base.stats, totalCookiesBaked: bnFromNumber(5_000_000) },
+    };
+    // The precondition the whole defect turned on.
+    expect(state.minigames.active).toBeUndefined();
+
+    const rng = createSeededRng(20260821, 0);
+    let events = state.randomEvents;
+    let spawned = false;
+    for (let second = 1; second <= 20_000 && !spawned; second += 1) {
+      const result = tickRandomEvents(events, { ...state, randomEvents: events }, second * 1_000, rng, {
+        // Exactly what handleTick passes for this state now. Before the fix it passed `true` here,
+        // on this state, on every tick.
+        blocked: minigameOccupiesStage(state.minigames.active),
+        hidden: false,
+      } as never);
+      events = result.randomEvents;
+      spawned = events.actives.length > 0;
+    }
+    expect(spawned, 'a random event must be able to spawn from an untouched save').toBe(true);
   });
 });

@@ -27,7 +27,7 @@ import {
   GOLDEN_SPAWN_BOUNDS,
 } from "../../src/shared/game/golden-cookie";
 import { applyGameAction, type ReducerCtx } from "../../src/shared/game/reducer";
-import type { GameState, GoldenCookieState } from "../../src/shared/game/types";
+import type { GameState, GoldenCookieState, RngPort } from "../../src/shared/game/types";
 import { freshState } from "./test-helpers";
 
 /**
@@ -48,6 +48,21 @@ function ctx(epochMs: number, seed = 7): ReducerCtx {
 function spawned(nowMs = 0, seed = 7): GoldenCookieState {
   const idle: GoldenCookieState = { isSpawned: false, rngStreamIndex: 0, nextEligibleAtEpochMs: 0 };
   return maybeSpawnGoldenCookie(idle, nowMs, createSplitMix32Rng(seed));
+}
+
+/**
+ * Catch a cookie and PIN it to the Oven Dial.
+ *
+ * A catch now rolls one of the fifty challenges (golden-challenges.ts), so a suite about dial
+ * geometry that simply caught a cookie would sometimes be handed a Mouse Stampede and fail for a
+ * reason that has nothing to do with what it is testing. Pinning keeps every assertion below about
+ * the dial itself; that the roll is genuinely random and reaches all fifty is asserted separately
+ * in tests/game/golden-challenges.test.ts, which is where that belongs.
+ */
+function caughtDial(state: GoldenCookieState, rng: RngPort, nowMs = 0, stepped = false): GoldenCookieState {
+  const caught = catchGoldenCookie(state, rng, nowMs, stepped);
+  if (!caught.dial) return caught;
+  return { ...caught, dial: { ...caught.dial, challengeId: "dial.oven", progress: 0, target: [] } };
 }
 
 /** The exact elapsed time at which the needle sits on `target`, on the outward half of a sweep. */
@@ -182,7 +197,7 @@ describe("oven dial: stepped mode lands on notches and nowhere else", () => {
 describe("oven dial: catching the cookie opens it", () => {
   it("opens round one with a band that sits wholly on the track", () => {
     for (let seed = 0; seed < 100; seed += 1) {
-      const caught = catchGoldenCookie(spawned(), createSplitMix32Rng(seed), 5000);
+      const caught = caughtDial(spawned(), createSplitMix32Rng(seed), 5000);
       const { zoneHalfWidth } = goldenDialRound(0);
       expect(caught.dial?.roundsWon).toBe(0);
       expect(caught.dial?.misses).toBe(0);
@@ -193,21 +208,21 @@ describe("oven dial: catching the cookie opens it", () => {
   });
 
   it("freezes the reduced-motion choice onto the state at the catch", () => {
-    expect(catchGoldenCookie(spawned(), createSplitMix32Rng(1), 0, true).dial?.stepped).toBe(true);
-    expect(catchGoldenCookie(spawned(), createSplitMix32Rng(1), 0, false).dial?.stepped).toBe(false);
+    expect(caughtDial(spawned(), createSplitMix32Rng(1), 0, true).dial?.stepped).toBe(true);
+    expect(caughtDial(spawned(), createSplitMix32Rng(1), 0, false).dial?.stepped).toBe(false);
   });
 
   it("refuses to catch nothing, and refuses to re-open a dial already open", () => {
     const idle: GoldenCookieState = { isSpawned: false, rngStreamIndex: 0, nextEligibleAtEpochMs: 0 };
     expect(catchGoldenCookie(idle, createSplitMix32Rng(1), 0)).toBe(idle);
-    const caught = catchGoldenCookie(spawned(), createSplitMix32Rng(11), 0);
+    const caught = caughtDial(spawned(), createSplitMix32Rng(11), 0);
     expect(catchGoldenCookie(caught, createSplitMix32Rng(99), 500)).toBe(caught);
   });
 });
 
 describe("oven dial: pressing it is skill and only skill", () => {
   it("counts a press with the needle in the band as a hit, at the exact moment it is in the band", () => {
-    const caught = catchGoldenCookie(spawned(0), createSplitMix32Rng(11), 0);
+    const caught = caughtDial(spawned(0), createSplitMix32Rng(11), 0);
     const at = elapsedForPosition(caught.dial!.zoneCentre, 0);
     const result = pressGoldenDial(caught, at, createSplitMix32Rng(3));
     expect(result.hit).toBe(true);
@@ -216,7 +231,7 @@ describe("oven dial: pressing it is skill and only skill", () => {
   });
 
   it("counts a press just outside the band as a miss, and just inside as a hit", () => {
-    const caught = catchGoldenCookie(spawned(0), createSplitMix32Rng(11), 0);
+    const caught = caughtDial(spawned(0), createSplitMix32Rng(11), 0);
     const { zoneCentre } = caught.dial!;
     const { zoneHalfWidth } = goldenDialRound(0);
     const justInside = elapsedForPosition(zoneCentre + zoneHalfWidth * 0.95, 0);
@@ -226,7 +241,7 @@ describe("oven dial: pressing it is skill and only skill", () => {
   });
 
   it("gives the same verdict for the same press however many times it is replayed, on any seed", () => {
-    const caught = catchGoldenCookie(spawned(0), createSplitMix32Rng(11), 0);
+    const caught = caughtDial(spawned(0), createSplitMix32Rng(11), 0);
     const at = elapsedForPosition(caught.dial!.zoneCentre, 0);
     const verdicts = new Set(
       Array.from({ length: 50 }, (_, seed) => pressGoldenDial(caught, at, createSplitMix32Rng(seed)).hit),
@@ -237,7 +252,7 @@ describe("oven dial: pressing it is skill and only skill", () => {
   });
 
   it("takes three hits to redeem, and reports won only on the third", () => {
-    let state = catchGoldenCookie(spawned(0), createSplitMix32Rng(11), 0);
+    let state = caughtDial(spawned(0), createSplitMix32Rng(11), 0);
     let now = 0;
     for (let round = 1; round <= GOLDEN_DIAL_ROUNDS; round += 1) {
       const dial = state.dial!;
@@ -251,7 +266,7 @@ describe("oven dial: pressing it is skill and only skill", () => {
   });
 
   it("restarts the sweep and moves the band on a won round, so round two is a new problem", () => {
-    const caught = catchGoldenCookie(spawned(0), createSplitMix32Rng(11), 0);
+    const caught = caughtDial(spawned(0), createSplitMix32Rng(11), 0);
     const at = elapsedForPosition(caught.dial!.zoneCentre, 0);
     const next = pressGoldenDial(caught, at, createSplitMix32Rng(23)).goldenCookie;
     expect(next.dial?.roundStartedAtEpochMs).toBe(at);
@@ -261,7 +276,7 @@ describe("oven dial: pressing it is skill and only skill", () => {
   });
 
   it("burns two seconds on a miss, keeps the round, and does NOT move the band or restart the sweep", () => {
-    const caught = catchGoldenCookie(spawned(0), createSplitMix32Rng(11), 0);
+    const caught = caughtDial(spawned(0), createSplitMix32Rng(11), 0);
     const { zoneCentre } = caught.dial!;
     const missAt = elapsedForPosition(Math.max(0, zoneCentre - goldenDialRound(0).zoneHalfWidth * 3), 0);
     const before = goldenWindowRemainingMs(caught, 0);
@@ -285,7 +300,7 @@ describe("oven dial: pressing it is skill and only skill", () => {
   });
 
   it("judges a stepped dial on the notch the needle is actually sitting on", () => {
-    const caught = catchGoldenCookie(spawned(0), createSplitMix32Rng(11), 0, true);
+    const caught = caughtDial(spawned(0), createSplitMix32Rng(11), 0, true);
     const at = 700;
     const shown = goldenDialNeedlePosition(at, 0, true);
     const result = pressGoldenDial(caught, at, createSplitMix32Rng(3));
@@ -297,7 +312,7 @@ describe("oven dial: pressing it is skill and only skill", () => {
 
 describe("golden cookie: the ways it gets away", () => {
   it("flees on demand: despawned, no effect won, ordinary cooldown scheduled", () => {
-    const caught = catchGoldenCookie(spawned(0), createSplitMix32Rng(11), 0);
+    const caught = caughtDial(spawned(0), createSplitMix32Rng(11), 0);
     const fled = fleeGoldenCookie(caught, 60_000, createSplitMix32Rng(5));
     expect(fled.isSpawned).toBe(false);
     expect(fled.dial).toBeUndefined();
@@ -308,7 +323,7 @@ describe("golden cookie: the ways it gets away", () => {
   });
 
   it("flees on a timeout too, mid-dial, through the ordinary expiry path", () => {
-    const caught = catchGoldenCookie(spawned(0), createSplitMix32Rng(11), 0);
+    const caught = caughtDial(spawned(0), createSplitMix32Rng(11), 0);
     const stillThere = despawnIfExpired(caught, DEFAULT_GOLDEN_COOKIE_CONFIG.windowMs - 1, createSplitMix32Rng(5));
     expect(stillThere.isSpawned).toBe(true);
     const gone = despawnIfExpired(caught, DEFAULT_GOLDEN_COOKIE_CONFIG.windowMs, createSplitMix32Rng(5));
@@ -317,7 +332,7 @@ describe("golden cookie: the ways it gets away", () => {
   });
 
   it("times out sooner after misses, because the misses burned real seconds", () => {
-    const caught = catchGoldenCookie(spawned(0), createSplitMix32Rng(11), 0);
+    const caught = caughtDial(spawned(0), createSplitMix32Rng(11), 0);
     const missAt = elapsedForPosition(
       Math.max(0, caught.dial!.zoneCentre - goldenDialRound(0).zoneHalfWidth * 3),
       0,
@@ -347,6 +362,17 @@ describe("golden cookie: redemption parity with the old collect", () => {
 
     let state: GameState = { ...base, goldenCookie: golden };
     state = applyGameAction(state, { type: "goldenCatch" }, ctx(1000, 4));
+    // Pin the rolled challenge to the Oven Dial, for the same reason caughtDial above does: this
+    // test is about redemption parity across three DIAL rounds, and a catch now rolls one of
+    // fifty. Without this it occasionally opens a two-round pick and the parity it asserts is not
+    // the parity it means.
+    state = {
+      ...state,
+      goldenCookie: {
+        ...state.goldenCookie,
+        dial: { ...state.goldenCookie.dial!, challengeId: "dial.oven", progress: 0, target: [] },
+      },
+    };
     for (let round = 0; round < GOLDEN_DIAL_ROUNDS; round += 1) {
       // Every press is made at the moment the needle is dead centre of the band, and the clock is
       // held at 1000 so the last press — the one that redeems — reaches the same collect the
@@ -437,7 +463,7 @@ describe("golden cookie: the developer-only fast schedule", () => {
 
 describe("golden cookie: the save", () => {
   it("round-trips a caught cookie's position and open dial unchanged", () => {
-    const caught = catchGoldenCookie(spawned(5000, 3), createSplitMix32Rng(11), 5000, true);
+    const caught = caughtDial(spawned(5000, 3), createSplitMix32Rng(11), 5000, true);
     const state: GameState = freshState({ goldenCookie: caught });
     const decoded = decodeSave(JSON.parse(JSON.stringify(encodeSave(state))));
     expect(decoded.ok).toBe(true);

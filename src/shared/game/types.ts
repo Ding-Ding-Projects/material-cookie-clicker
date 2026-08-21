@@ -74,6 +74,25 @@ export interface GoldenDialState {
    * same zone and the same three rounds, played to a rhythm instead of to a glide.
    */
   readonly stepped: boolean;
+  /**
+   * WHICH of the fifty challenges this cookie opened (see golden-challenges.ts).
+   *
+   * Rolled from the seeded stream at the catch and persisted, exactly as `zoneCentre` is, so the
+   * challenge survives a save, a reload and a re-render rather than changing under the player
+   * mid-attempt. Optional because a save written before the registry existed has none; such a save
+   * plays the Oven Dial, which is what it was already playing.
+   */
+  readonly challengeId?: string;
+  /**
+   * Progress inside the CURRENT round: symbols entered of a sequence, or presses counted of a
+   * mash. Zero for the families whose round is decided by one press.
+   */
+  readonly progress?: number;
+  /**
+   * The rolled answer, as small integers: the order a sequence must be repeated in, or the single
+   * index of the golden option in a pick. Empty for families that hide nothing.
+   */
+  readonly target?: readonly number[];
 }
 
 export interface GoldenCookieState {

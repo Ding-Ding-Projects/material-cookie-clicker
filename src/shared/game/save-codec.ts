@@ -114,7 +114,18 @@ export function encodeSave(state: GameState): SaveDataOnDisk {
       permanentUnlockIds: [...state.prestige.permanentUnlockIds],
       rebornNodeIds: [...(state.prestige.rebornNodeIds ?? [])],
     },
-    goldenCookie: { ...state.goldenCookie },
+    goldenCookie: {
+      ...state.goldenCookie,
+      // The dial's rolled `target` is readonly in the domain and mutable on the wire, so it is
+      // copied rather than shared. Spreading the dial alone would keep the same array instance and
+      // hand a caller a live reference into game state.
+      dial: state.goldenCookie.dial
+        ? {
+            ...state.goldenCookie.dial,
+            target: state.goldenCookie.dial.target ? [...state.goldenCookie.dial.target] : undefined,
+          }
+        : undefined,
+    },
     stats: { ...state.stats },
     dieselDepot: { ...state.dieselDepot },
     dieselFactory: {

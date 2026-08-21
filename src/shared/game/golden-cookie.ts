@@ -2,6 +2,13 @@ import { bnFromNumber, bnMulScalar, type BigNum } from "./big-number.js";
 import { totalCps } from "./cps.js";
 import { goldenCookieBonuses } from "./upgrades.js";
 import type { GameState, GoldenCookieEffectState, GoldenCookieState, GoldenDialState, RngPort } from "./types.js";
+import {
+  evaluateGoldenChallengePress,
+  type GoldenChallengeInput,
+  getGoldenChallenge,
+  rollGoldenChallenge,
+  rollGoldenChallengeTarget,
+} from "./golden-challenges.js";
 
 /**
  * splitmix32 — a small, fast, deterministic PRNG. Chosen (over `Math.random()`) because the
@@ -231,6 +238,11 @@ export function catchGoldenCookie(
   stepped = false,
 ): GoldenCookieState {
   if (!state.isSpawned || state.dial) return state;
+  // WHICH of the fifty challenges this cookie opens is rolled here, once, and then persisted --
+  // the same treatment `zoneCentre` has always had, and for the same reason: a challenge that
+  // changed under the player on a re-render or a reload would not be a skill challenge at all.
+  const challenge = rollGoldenChallenge(rng);
+  const target = rollGoldenChallengeTarget(challenge, rng);
   return {
     ...state,
     dial: {
@@ -239,6 +251,9 @@ export function catchGoldenCookie(
       roundStartedAtEpochMs: nowEpochMs,
       misses: 0,
       stepped,
+      challengeId: challenge.id,
+      progress: 0,
+      target,
     },
     rngStreamIndex: rng.getStreamIndex(),
   };
@@ -277,6 +292,12 @@ export function pressGoldenDial(
   state: GoldenCookieState,
   nowEpochMs: number,
   rng: RngPort,
+  /**
+   * What the player did, for the families that need to know: how long a hold was held, or which
+   * symbol or option was chosen. Optional, because the dial and the mash are answered entirely by
+   * the clock and a press — which is also why every existing caller keeps working unchanged.
+   */
+  input?: GoldenChallengeInput,
 ): GoldenDialPressResult {
   const dial = state.dial;
   if (!state.isSpawned || !dial) {
@@ -286,13 +307,46 @@ export function pressGoldenDial(
   const roundIndex = dial.roundsWon;
   const elapsedMs = nowEpochMs - dial.roundStartedAtEpochMs;
   const needlePosition = goldenDialNeedlePosition(elapsedMs, roundIndex, dial.stepped);
-  const hit = isInsideGoldenDialZone(needlePosition, dial.zoneCentre, roundIndex);
+
+  /**
+   * Which of the fifty challenges is open decides what a press means. The dial keeps its exact
+   * previous behaviour -- same needle, same zone, same geometry -- because its evaluator is handed
+   * the position this function already computed rather than working one out of its own.
+   */
+  const challenge = getGoldenChallenge(dial.challengeId);
+  const outcome = evaluateGoldenChallengePress(challenge, {
+    elapsedMs,
+    progress: dial.progress ?? 0,
+    target: dial.target ?? [],
+    input,
+    needlePosition,
+    zoneCentre: dial.zoneCentre,
+  });
+  const hit = outcome.hit;
+  const totalRounds = challenge.rounds;
+
+  // A hit that does not finish the round -- another symbol of a sequence, another press of a mash
+  // -- banks progress and asks for more. It is neither a win nor a miss, so it costs nothing.
+  if (hit && !outcome.roundComplete) {
+    return {
+      goldenCookie: { ...state, dial: { ...dial, progress: outcome.progress } },
+      needlePosition,
+      hit: true,
+      won: false,
+    };
+  }
 
   if (!hit) {
     const spawnedAtEpochMs =
       state.spawnedAtEpochMs === undefined ? undefined : state.spawnedAtEpochMs - GOLDEN_DIAL_MISS_PENALTY_MS;
     return {
-      goldenCookie: { ...state, spawnedAtEpochMs, dial: { ...dial, misses: dial.misses + 1 } },
+      goldenCookie: {
+        ...state,
+        spawnedAtEpochMs,
+        // A miss also drops whatever the round had banked, which is what makes a sequence a memory
+        // test rather than a typing exercise.
+        dial: { ...dial, misses: dial.misses + 1, progress: outcome.progress },
+      },
       needlePosition,
       hit: false,
       won: false,
@@ -300,7 +354,7 @@ export function pressGoldenDial(
   }
 
   const roundsWon = roundIndex + 1;
-  if (roundsWon >= GOLDEN_DIAL_ROUNDS) {
+  if (roundsWon >= totalRounds) {
     return {
       goldenCookie: { ...state, dial: { ...dial, roundsWon } },
       needlePosition,
@@ -317,6 +371,10 @@ export function pressGoldenDial(
         roundsWon,
         zoneCentre: rollZoneCentre(rng, roundsWon),
         roundStartedAtEpochMs: nowEpochMs,
+        // Every round rolls its own answer, so a five-round pick is five real decisions rather
+        // than one decision repeated.
+        progress: 0,
+        target: rollGoldenChallengeTarget(challenge, rng),
       },
       rngStreamIndex: rng.getStreamIndex(),
     },

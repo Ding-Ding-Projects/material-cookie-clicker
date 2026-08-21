@@ -50,12 +50,23 @@ const GoldenCookieEffectSchema = z.object({
  * it is still a real position on the track — and the window it belongs to will have expired
  * anyway, which despawns the cookie on the first tick.
  */
+/**
+ * `challengeId`, `progress` and `target` are OPTIONAL fields rather than a new schema version, for
+ * exactly the reason the `rebornNodeIds` note below gives: a save written before the fifty golden
+ * challenges existed simply has none, and the absence already says the right thing -- it was
+ * playing the Oven Dial, and it still will. There is nothing a migration step could add here that
+ * the fallback in golden-challenges.ts#getGoldenChallenge does not already say correctly.
+ */
 const GoldenDialSchema = z.object({
   roundsWon: z.number().int().nonnegative(),
   zoneCentre: z.number(),
   roundStartedAtEpochMs: z.number(),
   misses: z.number().int().nonnegative(),
   stepped: z.boolean(),
+  challengeId: z.string().max(64).optional(),
+  progress: z.number().int().nonnegative().optional(),
+  // Bounded: a crafted save must not be able to hand the evaluator an enormous list.
+  target: z.array(z.number().int().nonnegative().max(64)).max(32).optional(),
 });
 
 const GoldenCookieStateSchema = z.object({

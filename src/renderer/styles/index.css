@@ -6593,6 +6593,13 @@ ul.card-grid {
 .event-indicator__body {
   display: flex;
   align-items: center;
+  gap: 8px;
+  /* A flex item's default min-width is auto, so a nowrap label refuses to shrink and shoves the
+     fixed 84px bar and the countdown past the indicator's own edge instead. Measured on a live
+     Mouse Raid: content 22px wider than the box, with overflow visible, so it spilled rather than
+     being cut — the label read "Mouse ▓▓▓51s· 5 of 5 mice le" with the bar sitting on top of it.
+     min-width: 0 lets the label give way; the head keeps its constant height either way. */
+  min-width: 0;
 }
 
 /* ==========================================================================================
@@ -6810,6 +6817,18 @@ ul.card-grid {
   font-weight: 900;
   letter-spacing: 0.05em;
   white-space: nowrap;
+  /* Bilingual event names are the long ones, and this column is the only part of the row that can
+     give. It truncates with an ellipsis rather than pushing the countdown off the panel: a clock
+     you cannot see is worse than a name you can only half read, and the full name is still in the
+     accessible name. */
+  min-width: 0;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+.event-indicator__name > * {
+  overflow: hidden;
+  text-overflow: ellipsis;
 }
 
 .event-indicator__bar {
@@ -8128,6 +8147,13 @@ ul.card-grid {
   align-items: baseline;
   column-gap: 4px;
   white-space: nowrap;
+  /* Measured on a live Mouse Raid: this element was given 47px and wanted 89px, and with the
+     indicator's overflow visible the remaining 42px of "5 of 5 mice left" simply painted over the
+     panel edge rather than being cut or scrolled. min-width: auto was refusing to let it shrink
+     honestly. It now truncates with an ellipsis; the count stays in the accessible name. */
+  min-width: 0;
+  overflow: hidden;
+  text-overflow: ellipsis;
   font-size: 11px;
   font-weight: 800;
   color: var(--on-error-container, #3b0a02);

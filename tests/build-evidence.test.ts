@@ -332,8 +332,18 @@ describe('isolated capture evidence', () => {
     missingMinigame.states = missingMinigame.states.filter((state: CaptureState) => state.id !== 'minigame-memory');
     expect(() => validateCaptureInventory(missingMinigame)).toThrow(/hand-written completeness list/);
 
+    // This flipped states[0] to 'existing' and relied on it being fresh-start AND still pending.
+    // Both are accidents of the file: reorder the inventory, or capture that state, and the fixture
+    // silently stops testing anything — the first because it would flip some other row, the second
+    // because flipping an already-existing row is a no-op that throws nothing. Build the fixture
+    // instead of borrowing one, so it asserts the same rule whatever the real inventory has done.
     const incompleteExisting = structuredClone(inventory);
-    incompleteExisting.states[0].status = 'existing';
+    const victim = incompleteExisting.states.find((state: CaptureState) => state.id === 'fresh-start');
+    expect(victim, 'fresh-start must remain in the hand-written state list').toBeDefined();
+    victim.status = 'existing';
+    delete victim.image;
+    delete victim.sha256;
+    delete victim.dimensions;
     expect(() => validateCaptureInventory(incompleteExisting)).toThrow(/fresh-start image is required/);
 
     const weakSupporting = structuredClone(inventory);

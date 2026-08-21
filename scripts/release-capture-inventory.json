@@ -14,14 +14,24 @@
   "states": [
     {
       "id": "fresh-start",
-      "status": "pending",
+      "status": "existing",
       "surface": "Fresh installed launch",
       "proof": "Current cookie-only opening at the release tip; the prior image is retained only as superseded history.",
       "supersededEvidence": {
         "image": "captures/app/plain-start.png",
         "sourceCommit": "4fa7d43e1459b15ab49aceaf48d0cd8db5937ea5",
         "reason": "Predates the explicit graphics-purchase composition and still shows title-bar, HUD and console chrome."
-      }
+      },
+      "image": "captures/app/release-fresh-start.png",
+      "sourceCommit": "5ca6e275fe0bcec283b35d81ba2a225bc74b3a49",
+      "sha256": "55c751e8a3dc0b395ef0f768b5721b953d126174011fd457d2e9034924ab1a97",
+      "dimensions": {
+        "width": 1440,
+        "height": 900
+      },
+      "method": "lowlevel-cheap-headless",
+      "receipt": "captures/app/release-fresh-start-receipt.json",
+      "receiptSha256": "523ce389dd8dc9dea296e570a85008e6e0bfdbfd71bee2488ff692a7ac582626"
     },
     {
       "id": "progressed-game",
@@ -71,15 +81,15 @@
       "supportingEvidence": {
         "state": "before",
         "image": "design/parity/evidence/graphics-progression/before.png",
-        "sourceCommit": "031c7e209f1fbccb0dda206bc949cb495a467b0f",
-        "sha256": "0eaee1016a6b3cf7585d91d2825d96c52d6dc73bdc03b003a31507ce5c0a28f9",
+        "sourceCommit": "5ca6e275fe0bcec283b35d81ba2a225bc74b3a49",
+        "sha256": "55c751e8a3dc0b395ef0f768b5721b953d126174011fd457d2e9034924ab1a97",
         "dimensions": {
           "width": 1440,
           "height": 900
         },
         "method": "cheap-lowlevel-headless",
         "receipt": "design/parity/evidence/graphics-progression/receipt.json",
-        "receiptSha256": "8ca65f5bf02423960806696e210b8612b003b14e086a120abaaee0241e727349",
+        "receiptSha256": "ee87e50a6fb9a0177920f9e4e8565e577ad6c1ba6d82c8769fa4fe4395e83c62",
         "promotionCompliance": "not-claimed",
         "limitations": "Partial feature-state receipt only; no generic promotion receipt and no exact release-tip binding."
       }
@@ -364,9 +374,19 @@
     },
     {
       "id": "raid-reduced-motion",
-      "status": "pending",
+      "status": "existing",
       "surface": "Mouse Raid reduced motion",
-      "proof": "Unreachable for the same confirmed reducer defect as event-pool-remaining: src/shared/game/reducer.ts#handleTick's `blocked: goldenCookie.isSpawned || nextState.minigames.active !== null` is `true` on every tick because `minigames.active` is `undefined` (never exactly `null`), so `tickRandomEvents` never advances past its early-return branches and the Mouse Raid clock (also gated inside that same function) can never start. Verified live with `material-cookie-clicker:events:fast=raid` and a save past the 1,000,000-lifetime-baked raid unlock: no raid over 60+s while cookies and the golden-cookie RNG stream both visibly advanced. Flagged out-of-scope (this lane may not touch src/) as the same spawned task covering event-pool-remaining."
+      "proof": "Unreachable for the same confirmed reducer defect as event-pool-remaining: src/shared/game/reducer.ts#handleTick's `blocked: goldenCookie.isSpawned || nextState.minigames.active !== null` is `true` on every tick because `minigames.active` is `undefined` (never exactly `null`), so `tickRandomEvents` never advances past its early-return branches and the Mouse Raid clock (also gated inside that same function) can never start. Verified live with `material-cookie-clicker:events:fast=raid` and a save past the 1,000,000-lifetime-baked raid unlock: no raid over 60+s while cookies and the golden-cookie RNG stream both visibly advanced. Flagged out-of-scope (this lane may not touch src/) as the same spawned task covering event-pool-remaining.",
+      "image": "captures/app/release-raid-reduced-motion.png",
+      "sourceCommit": "5ca6e275fe0bcec283b35d81ba2a225bc74b3a49",
+      "sha256": "3c178ecf1456ea5f21fbc2819e255b3d932dfc1df7c693abe8d31e164767edf4",
+      "dimensions": {
+        "width": 1440,
+        "height": 900
+      },
+      "method": "lowlevel-cheap-headless",
+      "receipt": "captures/app/release-raid-reduced-motion-receipt.json",
+      "receiptSha256": "7a7c388dd59dcfe4497c4ccec61bfaf14d55f8fd983a6d9be0d13cd053e271d2"
     },
     {
       "id": "command-palette",

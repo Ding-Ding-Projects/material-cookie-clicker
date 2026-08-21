@@ -1,0 +1,15 @@
+{
+  "version": 1,
+  "sourceCommit": "5ca6e275fe0bcec283b35d81ba2a225bc74b3a49",
+  "route": "lowlevel-cheap-headless",
+  "captures": [
+    {
+      "state": "raid-reduced-motion",
+      "path": "captures/app/release-raid-reduced-motion.png",
+      "sha256": "3c178ecf1456ea5f21fbc2819e255b3d932dfc1df7c693abe8d31e164767edf4",
+      "width": 1440,
+      "height": 900
+    }
+  ],
+  "notes": "A live Mouse Raid reached through the REAL scheduler: tickRandomEvents driven until it drew mouse_raid, then the event timestamps rebased onto the wall clock so the raid is still running when the app loads instead of expiring on arrival. prefers-reduced-motion emulated over CDP and PROVED before capture — matchMedia(...).matches true, document.getAnimations() reporting 0 running. The first attempt at this capture exposed a real clipping defect in the raid indicator, fixed before this image was taken: the countdown row measured 31px wider than its box with overflow visible, so the bar painted over the label and the mice count ran past the panel edge. Verified after the fix: scrollWidth - clientWidth is 0."
+}

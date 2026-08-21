@@ -1,0 +1,15 @@
+{
+  "version": 1,
+  "sourceCommit": "5ca6e275fe0bcec283b35d81ba2a225bc74b3a49",
+  "route": "lowlevel-cheap-headless",
+  "captures": [
+    {
+      "state": "fresh-start",
+      "path": "captures/app/release-fresh-start.png",
+      "sha256": "55c751e8a3dc0b395ef0f768b5721b953d126174011fd457d2e9034924ab1a97",
+      "width": 1440,
+      "height": 900
+    }
+  ],
+  "notes": "Genuinely fresh save seeded into localStorage over CDP, then reloaded. Nothing purchased, so the window shows the cookie-only opening composition a first-run player meets. Captured client-area only, matching the 1440x900 of every other row."
+}

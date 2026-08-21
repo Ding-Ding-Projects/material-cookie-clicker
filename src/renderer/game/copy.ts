@@ -412,6 +412,53 @@ export const COOKIE_SCREEN_COPY = {
  * what happens if the cookie gets away — because a player who reads only one of them should never
  * be the one who has to guess at the rules.
  */
+/**
+ * Copy for the four non-dial golden challenge families (golden-challenges.ts).
+ *
+ * Every string states a FACT the player needs to act on -- how many presses are left, how long the
+ * hold should be, how many symbols to repeat. The funny-level sliders style the wording around
+ * those numbers; the numbers themselves never move, because a challenge whose brief is unclear is
+ * not a skill challenge, it is a guess.
+ */
+export const GOLDEN_CHALLENGE_COPY = {
+  mashPress: { en: "Press!", yue: "撳！" },
+  mashProgress: (done: number, target: number, secondsLeft: string): Bilingual => ({
+    en: `${done} of ${target} presses — ${secondsLeft}s left`,
+    yue: `${done}／${target} 下 —— 仲有 ${secondsLeft} 秒`,
+  }),
+  holdPress: { en: "Hold, then let go", yue: "撳住，然後放手" },
+  holdTarget: (targetSeconds: string, toleranceSeconds: string, heldSeconds: string): Bilingual => ({
+    en: `Hold for ${targetSeconds}s, give or take ${toleranceSeconds}s — holding ${heldSeconds}s`,
+    yue: `撳住 ${targetSeconds} 秒，前後差 ${toleranceSeconds} 秒都得 —— 而家 ${heldSeconds} 秒`,
+  }),
+  sequenceWatch: (length: number): Bilingual => ({
+    en: `Watch the order — ${length} to remember`,
+    yue: `睇實個次序 —— 要記 ${length} 個`,
+  }),
+  sequenceRepeat: (done: number, length: number): Bilingual => ({
+    en: `Repeat the order — ${done} of ${length} in`,
+    yue: `照個次序撳返 —— 入咗 ${done}／${length}`,
+  }),
+  pickPrompt: (options: number): Bilingual => ({
+    en: `One of these ${options} is the golden one. Pick it.`,
+    yue: `呢 ${options} 個入面有一個係金嘅。揀佢。`,
+  }),
+  pickOption: (position: number): Bilingual => ({
+    en: `Option ${position}`,
+    yue: `第 ${position} 個`,
+  }),
+  /** Named rather than only drawn, so a sequence is never a colour-or-glyph-only round. */
+  symbolNames: [
+    { en: "Cookie", yue: "曲奇" },
+    { en: "Fortune cookie", yue: "簽語餅" },
+    { en: "Cupcake", yue: "杯子蛋糕" },
+    { en: "Fish cake", yue: "魚餅" },
+    { en: "Mooncake", yue: "月餅" },
+    { en: "Dango", yue: "糰子" },
+  ] as readonly Bilingual[],
+  symbolUnknown: { en: "Symbol", yue: "圖案" },
+} as const;
+
 export const GOLDEN_DIAL_COPY = {
   /** The accessible name of the spawned sprite on the stage. */
   spriteLabel: { en: "Catch the golden cookie", yue: "捉住金曲奇" },

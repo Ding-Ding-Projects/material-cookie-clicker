@@ -11,6 +11,7 @@ import {
   type GoldenCookieConfig,
   DEFAULT_GOLDEN_COOKIE_CONFIG,
 } from "./golden-cookie.js";
+import type { GoldenChallengeInput } from "./golden-challenges.js";
 import {
   buyRaidConsumable as buyRaidConsumablePure,
   buyWhackStorage as buyWhackStoragePure,
@@ -202,7 +203,15 @@ export type GameAction =
    * recomputes where the needle was from the round's start time and the clock, so a hand-built
    * dispatch cannot claim a hit it did not earn. Three hits in a row redeem the cookie.
    */
-  | { readonly type: "goldenDialPress" }
+  | {
+      readonly type: "goldenDialPress";
+      /**
+       * What the player did, for the challenge families that need to know: how long a hold
+       * was held, or which symbol or option was chosen. Omitted by the dial and the mash,
+       * which are answered by the clock and a press alone.
+       */
+      readonly input?: GoldenChallengeInput;
+    }
   /** Escape from the dial card, or a deliberate walk-away: the cookie flees, normal cooldown. */
   | { readonly type: "goldenFlee" }
   /**
@@ -1021,9 +1030,9 @@ function handleGoldenCatch(state: GameState, ctx: ReducerCtx, stepped: boolean):
   return { ...state, goldenCookie };
 }
 
-function handleGoldenDialPress(state: GameState, ctx: ReducerCtx): GameState {
+function handleGoldenDialPress(state: GameState, ctx: ReducerCtx, input?: GoldenChallengeInput): GameState {
   const nowMs = ctx.now();
-  const result = pressGoldenDial(state.goldenCookie, nowMs, ctx.rng);
+  const result = pressGoldenDial(state.goldenCookie, nowMs, ctx.rng, input);
   if (!result.won) {
     if (result.goldenCookie === state.goldenCookie) return state;
     return { ...state, goldenCookie: result.goldenCookie };
@@ -1341,7 +1350,7 @@ export function applyGameAction(state: GameState, action: GameAction, ctx: Reduc
     case "goldenCatch":
       return handleGoldenCatch(state, ctx, action.stepped ?? false);
     case "goldenDialPress":
-      return handleGoldenDialPress(state, ctx);
+      return handleGoldenDialPress(state, ctx, action.input);
     case "goldenFlee":
       return handleGoldenFlee(state, ctx);
     case "randomEventClick":

@@ -13194,3 +13194,124 @@ body[data-eclipse='on'] .cookie-hero::after {
   margin: 8px 0 0;
   color: var(--on-surface-variant);
 }
+
+/* ============================================================================================
+ * GOLDEN CHALLENGE CONTROLS
+ *
+ * The four non-dial families (golden-challenges.ts). The dial keeps its own art; these are the
+ * mash button, the hold button, the sequence symbols and the pick tray.
+ * ========================================================================================== */
+
+.golden-challenge {
+  display: grid;
+  gap: 12px;
+  justify-items: center;
+  inline-size: 100%;
+}
+
+.golden-challenge__mash-button,
+.golden-challenge__hold-button {
+  min-block-size: 64px;
+  min-inline-size: 180px;
+  padding: 0 28px;
+  border: 1px solid var(--outline-variant);
+  border-radius: var(--shape-full);
+  background: var(--primary);
+  color: var(--on-primary);
+  box-shadow: 0 4px 0 0 var(--primary-shadow);
+  font-family: var(--font-display);
+  font-size: 18px;
+  font-weight: 900;
+  cursor: pointer;
+  /* The hold must not select text or fire a context menu on a long press, or the gesture the
+     challenge is built on becomes a selection instead. */
+  user-select: none;
+  touch-action: manipulation;
+}
+
+.golden-challenge__mash-button:active,
+.golden-challenge__hold-button:active {
+  transform: translateY(3px);
+  box-shadow: 0 1px 0 0 var(--primary-shadow);
+}
+
+.golden-challenge__progress {
+  margin: 0;
+  text-align: center;
+  font-variant-numeric: tabular-nums;
+  color: var(--on-surface);
+}
+
+.golden-challenge__bar {
+  inline-size: min(100%, 320px);
+  block-size: 10px;
+  border-radius: var(--shape-full);
+  background: var(--surface-lowest);
+  border: 1px solid var(--outline-variant);
+  overflow: hidden;
+}
+
+.golden-challenge__bar > span {
+  display: block;
+  block-size: 100%;
+  background: var(--primary);
+}
+
+.golden-challenge__shown,
+.golden-challenge__symbols,
+.golden-challenge__options {
+  display: flex;
+  flex-wrap: wrap;
+  justify-content: center;
+  gap: 10px;
+  margin: 0;
+  padding: 0;
+  list-style: none;
+}
+
+.golden-challenge__shown > li {
+  display: grid;
+  justify-items: center;
+  gap: 2px;
+  font-size: 30px;
+}
+
+.golden-challenge__symbol-name {
+  font-size: 11px;
+  color: var(--on-surface-variant);
+}
+
+.golden-challenge__symbol,
+.golden-challenge__option {
+  min-inline-size: 56px;
+  min-block-size: 56px;
+  font-size: 26px;
+  border: 1px solid var(--outline-variant);
+  border-radius: var(--md-sys-shape-corner-medium);
+  background: var(--surface-lowest);
+  box-shadow: 0 3px 0 0 var(--cabinet-frame-dark);
+  cursor: pointer;
+}
+
+.golden-challenge__symbol:active,
+.golden-challenge__option:active {
+  transform: translateY(2px);
+  box-shadow: 0 1px 0 0 var(--cabinet-frame-dark);
+}
+
+.golden-challenge__symbol:focus-visible,
+.golden-challenge__option:focus-visible,
+.golden-challenge__mash-button:focus-visible,
+.golden-challenge__hold-button:focus-visible {
+  outline: 3px solid var(--primary);
+  outline-offset: 2px;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .golden-challenge__mash-button:active,
+  .golden-challenge__hold-button:active,
+  .golden-challenge__symbol:active,
+  .golden-challenge__option:active {
+    transform: none;
+  }
+}

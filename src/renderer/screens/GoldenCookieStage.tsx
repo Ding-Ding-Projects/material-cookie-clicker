@@ -7,6 +7,8 @@ import {
   goldenDialRound,
   goldenDialSweepMs,
 } from '../../shared/game/golden-cookie.js';
+import { GoldenChallengeControl } from '../components/GoldenChallengeControl.js';
+import { getGoldenChallenge, type GoldenChallengeInput } from '../../shared/game/golden-challenges.js';
 import { HeroCookieArt, OvenDialArt } from '../assets/icons.js';
 import { bilingualText, showsCantonese, showsEnglish, GOLDEN_DIAL_COPY } from '../game/copy.js';
 import { useGameDispatch, useStructureSnapshot } from '../game/GameProvider.js';
@@ -172,6 +174,11 @@ export function GoldenCookieStage() {
 
   if (!positioned && !outcome) return null;
 
+  // Which of the fifty challenges is open decides what this card renders. A save that predates
+  // the registry has no id and falls back to the Oven Dial, which is what it was already playing.
+  const challenge = getGoldenChallenge(dial?.challengeId);
+  const family = challenge.family;
+  const totalRounds = challenge.rounds;
   const roundIndex = dial ? Math.min(dial.roundsWon, GOLDEN_DIAL_ROUNDS - 1) : 0;
   const curve = goldenDialRound(roundIndex);
   const insideBand = dial ? Math.abs(needle - dial.zoneCentre) <= curve.zoneHalfWidth : false;
@@ -246,23 +253,33 @@ export function GoldenCookieStage() {
             }}
           >
             <h2 className="golden-dial-card__title" id="golden-dial-title">
-              {showsEnglish() ? <span>{GOLDEN_DIAL_COPY.title.en}</span> : null}
+              {/* The challenge NAMES itself, because one of fifty is open and a player who cannot
+                  tell which is being asked of them cannot play it. */}
+              {showsEnglish() ? <span>{challenge.nameEn}</span> : null}
               {showsCantonese() ? (
-                <span className="golden-dial-card__title-zh">{GOLDEN_DIAL_COPY.title.yue}</span>
+                <span className="golden-dial-card__title-zh">{challenge.nameYue}</span>
               ) : null}
             </h2>
             <p className="golden-dial-card__round">
-              {bilingualText(GOLDEN_DIAL_COPY.round(dial.roundsWon + 1, GOLDEN_DIAL_ROUNDS))}
+              {bilingualText(GOLDEN_DIAL_COPY.round(dial.roundsWon + 1, totalRounds))}
             </p>
-            <p className="golden-dial-card__instruction">
-              {bilingualText(dial.stepped ? GOLDEN_DIAL_COPY.steppedInstruction : GOLDEN_DIAL_COPY.instruction)}
-            </p>
+            {/* The dial's instruction is about a needle and a band, so it belongs only to the dial.
+                The other four families brief themselves inside their own control, where the numbers
+                that matter to them live. Showing this line on a sequence told the player to stop a
+                needle that was not on screen. */}
+            {family === 'dial' ? (
+              <p className="golden-dial-card__instruction">
+                {bilingualText(dial.stepped ? GOLDEN_DIAL_COPY.steppedInstruction : GOLDEN_DIAL_COPY.instruction)}
+              </p>
+            ) : null}
 
             {/* The dial as a real slider: a value with a range and, crucially, a valuetext that
                 says in words both where the needle is and whether it is in the band. This is the
                 non-visual channel for a position that is otherwise only drawn. It is read-only —
                 arrow keys do not move the needle, because the needle is the clock's, not the
                 player's; the ONE thing the player does is stop it. */}
+            {family === 'dial' ? (
+            <>
             <div
               className="golden-dial"
               role="slider"
@@ -286,6 +303,19 @@ export function GoldenCookieStage() {
             <button type="button" className="golden-dial-card__stop" onClick={press}>
               {bilingualText(GOLDEN_DIAL_COPY.stopLabel)}
             </button>
+            </>
+            ) : (
+              /* The other four families own their own controls, and each one dispatches the same
+                 press the dial does. The domain decides every outcome; these only report what the
+                 player actually did. */
+              <GoldenChallengeControl
+                dial={dial}
+                onPress={(input: GoldenChallengeInput | undefined) => {
+                  setFeedback(null);
+                  dispatch({ type: 'goldenDialPress', input });
+                }}
+              />
+            )}
 
             {/* One status region carrying the round briefing and the verdict on the last press.
                 The briefing states the difficulty in numbers, so the curve is something a player
@@ -293,9 +323,13 @@ export function GoldenCookieStage() {
             <p className="golden-dial-card__status" role="status" aria-live="polite">
               {feedback
                 ? bilingualText(feedback.kind === 'hit' ? GOLDEN_DIAL_COPY.hit : GOLDEN_DIAL_COPY.miss)
-                : bilingualText(
-                    GOLDEN_DIAL_COPY.roundBriefing(dial.roundsWon + 1, bandWidthPct, sweepSeconds),
-                  )}
+                : // Same reason as the instruction above: a band width and a sweep time describe
+                  // the dial and nothing else, so the other families leave this to their control.
+                  family === 'dial'
+                  ? bilingualText(
+                      GOLDEN_DIAL_COPY.roundBriefing(dial.roundsWon + 1, bandWidthPct, sweepSeconds),
+                    )
+                  : ''}
             </p>
 
             <button type="button" className="golden-dial-card__close" onClick={() => dispatch({ type: 'goldenFlee' })}>

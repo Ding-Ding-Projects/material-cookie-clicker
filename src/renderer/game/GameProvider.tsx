@@ -8,7 +8,10 @@ import {
   type ReactNode,
 } from 'react';
 
-import { bnSub, bnToNumber } from '../../shared/game/big-number.js';
+import { bnSub, bnToNumber, type BigNum } from '../../shared/game/big-number.js';
+import { decodeSave, encodeSave } from '../../shared/game/save-codec.js';
+import { applyRestoreCost, saveRestoreCost } from '../../shared/game/save-history-cost.js';
+import type { SaveHistoryRecord } from '../../shared/game/ipc-contracts.js';
 import { cookiesSpentString, summarizeLedger, type LedgerSummary } from '../../shared/game/diesel-exchange.js';
 import { formatBigNum } from '../../shared/game/format-number.js';
 import { createInitialGameState, type GameAction, type ReducerCtx } from '../../shared/game/reducer.js';
@@ -74,7 +77,17 @@ interface GameContextValue {
    * backend, and a wipe that cleared memory but left the save file on disk would resurrect
    * itself on the next launch.
    */
-  readonly wipeAllSaveData: () => Promise<void>;
+  /**
+   * Deletes the save from the live game and returns the archive id it was kept under, or null
+   * when it could not be archived. Deleting never destroys: see src/main/save-history.ts.
+   */
+  readonly wipeAllSaveData: () => Promise<string | null>;
+  /** Every archived save, newest first. Empty when history is unavailable. */
+  readonly listArchivedSaves: () => Promise<readonly SaveHistoryRecord[]>;
+  /** Restores an archived save minus half of its own per-second production. */
+  readonly restoreArchivedSave: (
+    id: string,
+  ) => Promise<{ readonly ok: true; readonly cost: BigNum } | { readonly ok: false; readonly reason: string }>;
   readonly diesel: DieselExchangeStatus;
 }
 
@@ -361,10 +374,60 @@ export function GameProvider({ children }: { children: ReactNode }) {
     dismissOfflineNotice: () => setOfflineNotice(null),
     milestoneMessage,
     wipeAllSaveData: async () => {
-      // Order matters: clear the backend FIRST, so that if the fresh state's autosave races
-      // in behind us it writes over an already-empty slot rather than us deleting it.
+      /**
+       * ARCHIVE BEFORE CLEARING. The owner's rule: deleting save progress never deletes anything.
+       *
+       * The save is committed to a local Git repository owned by the main process, so it can
+       * always be restored. That has to happen BEFORE the clear -- once localStorage is gone the
+       * bytes are unrecoverable, and an archive attempted afterwards would have nothing to keep.
+       *
+       * A failed archive does not block the deletion the player asked for; it is reported instead,
+       * because silently refusing to delete is its own defect. `archived` is what the caller uses
+       * to say honestly whether the save can be brought back.
+       */
+      let archived: string | null = null;
+      const bridge = window.materialCookieClicker?.saveHistory;
+      if (bridge) {
+        try {
+          const response = await bridge.archive(encodeSave(store.getState()), 'Save deleted by the player');
+          archived = response.ok ? response.id : null;
+          if (!response.ok) console.warn('Save history archive refused:', response.reason);
+        } catch (error) {
+          console.warn('Save history archive failed:', error);
+        }
+      }
+      // Then the original order: clear the backend FIRST, so that if the fresh state's autosave
+      // races in behind us it writes over an already-empty slot rather than us deleting it.
       await persistenceRef.current.wipe();
       store.replaceState(createInitialGameState(new Date().toISOString()));
+      return archived;
+    },
+
+    /**
+     * Bring back an archived save, minus its own restore cost.
+     *
+     * The cost is half of what THAT save produced per second, charged against the save being
+     * restored rather than the current balance -- see save-history-cost.ts for why that is the
+     * only reading that always works.
+     */
+    restoreArchivedSave: async (id: string) => {
+      const bridge = window.materialCookieClicker?.saveHistory;
+      if (!bridge) return { ok: false as const, reason: 'Save history is unavailable in this build.' };
+      const response = await bridge.read(id);
+      if (!response.ok) return { ok: false as const, reason: response.reason };
+      const decoded = decodeSave(response.save);
+      if (!decoded.ok) return { ok: false as const, reason: 'The archived save could no longer be decoded.' };
+      const restored = applyRestoreCost(decoded.state);
+      store.replaceState(restored);
+      await persistenceRef.current.save(restored);
+      return { ok: true as const, cost: saveRestoreCost(decoded.state) };
+    },
+
+    listArchivedSaves: async () => {
+      const bridge = window.materialCookieClicker?.saveHistory;
+      if (!bridge) return [];
+      const response = await bridge.list();
+      return response.ok ? response.entries : [];
     },
     diesel: {
       bridgeAvailable: Boolean(dieselBridge),
@@ -398,8 +461,18 @@ export function useOfflineNotice(): { notice: Bilingual | null; dismiss: () => v
   return { notice: offlineNotice, dismiss: dismissOfflineNotice };
 }
 
-export function useWipeAllSaveData(): () => Promise<void> {
+export function useWipeAllSaveData(): () => Promise<string | null> {
   return useGameContext().wipeAllSaveData;
+}
+
+/** Every archived save, newest first. Deleting progress never destroys it. */
+export function useArchivedSaves(): () => Promise<readonly SaveHistoryRecord[]> {
+  return useGameContext().listArchivedSaves;
+}
+
+/** Restores an archived save minus half of its own per-second production. */
+export function useRestoreArchivedSave(): GameContextValue['restoreArchivedSave'] {
+  return useGameContext().restoreArchivedSave;
 }
 
 /** The Diesel Depot card's view of the exchange. */

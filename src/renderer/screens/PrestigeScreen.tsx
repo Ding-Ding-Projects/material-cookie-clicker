@@ -4,6 +4,7 @@ import { formatBigNum } from '../../shared/game/format-number.js';
 import { ascensionValue, canPrestige, prestigeMultiplierFor } from '../../shared/game/prestige.js';
 import { getUpgradeDefinition } from '../../shared/game/upgrades.js';
 import { BilingualLines } from '../components/BilingualLines.js';
+import { DeletedSaves } from '../components/DeletedSaves.js';
 import { DestructiveGate } from '../components/DestructiveGate.js';
 import { RebornTree } from './RebornTree.js';
 import { showsEnglish, showsCantonese, bilingualText, PRESTIGE_SCREEN_COPY, STATS_SCREEN_COPY, TAB_COPY, type Bilingual } from '../game/copy.js';
@@ -157,6 +158,10 @@ export function PrestigeScreen() {
         </button>
       </div>
 
+      {/* Deleting never destroys, so the archive it writes needs somewhere to be seen and used.
+          Without this the feature would be written on every deletion and read by nothing. */}
+      <DeletedSaves />
+
       {openGate === 'prestige' ? (
         <DestructiveGate
           tone="prestige"
@@ -197,7 +202,16 @@ export function PrestigeScreen() {
           }
           completion={completion}
           onConfirm={() => {
-            void wipeAllSaveData().then(() => setCompletion(PRESTIGE_SCREEN_COPY.wipeCompleted));
+            // Report which of the two things actually happened. wipeAllSaveData returns the
+            // archive id, or null when the save could not be kept -- claiming it is restorable
+            // when it is not would be the worst possible thing to be wrong about here.
+            void wipeAllSaveData().then((archivedId) =>
+              setCompletion(
+                archivedId === null
+                  ? PRESTIGE_SCREEN_COPY.wipeNotArchived
+                  : PRESTIGE_SCREEN_COPY.wipeArchived,
+              ),
+            );
           }}
           onExit={closeGate}
           returnFocusTo={wipeTriggerRef}

@@ -14,10 +14,18 @@ import { UPDATE_VERIFICATION_FLAG, UPDATE_VERIFICATION_URL, verificationSquirrel
 import {
   UPDATE_IPC_CHANNELS,
   DIESEL_IPC_CHANNELS,
+  SAVE_HISTORY_IPC_CHANNELS,
   type DieselMintRequest,
   type DieselMintResponse,
   type DieselReadResponse,
+  type SaveHistoryArchiveResponse,
+  type SaveHistoryListResponse,
+  type SaveHistoryReadResponse,
 } from '../shared/game/ipc-contracts.js';
+import { SaveHistoryStore } from './save-history.js';
+import { saveRestoreCost } from '../shared/game/save-history-cost.js';
+import { decodeSave } from '../shared/game/save-codec.js';
+import type { SaveDataLatest } from '../shared/game/save-schema.js';
 import {
   CANONICAL_IPC_CHANNELS,
   normalizeCanonicalSharedSettings,
@@ -536,6 +544,78 @@ void app.whenReady().then(() => {
     const result = await dieselLedger.read();
     if (!result.ok) return result;
     return { ok: true, ledger: result.ledger, filePath: dieselLedger.filePath };
+  });
+
+  /**
+   * Save history. Deleting progress never deletes anything: the save is committed to a local Git
+   * repository beside the application's own data and can always be read back.
+   *
+   * It is a BARE repository under userData, so it is never inside a folder the player owns, is
+   * never dewed anywhere, and is removed by the same "delete the application data folder" reset
+   * every other local store here answers to.
+   *
+   * The renderer hands over an already-encoded save and gets records back; it never touches the
+   * file system itself. Every handler answers with an explicit ok/reason rather than throwing
+   * across the bridge, so a failure to archive can be reported instead of vanishing.
+   */
+  const saveHistory = new SaveHistoryStore(path.join(app.getPath('userData'), 'save-history'));
+
+  ipcMain.handle(
+    SAVE_HISTORY_IPC_CHANNELS.archive,
+    async (_event, save: unknown, summary: unknown): Promise<SaveHistoryArchiveResponse> => {
+      // Validate before writing: an unreadable archive is worse than a refused one, because the
+      // player is told their save was kept.
+      const decoded = decodeSave(save as SaveDataLatest);
+      if (!decoded.ok) return { ok: false, reason: 'The save failed validation and was not archived.' };
+      try {
+        const id = saveHistory.archive(
+          JSON.stringify(save),
+          typeof summary === 'string' && summary.trim().length > 0 ? summary.trim() : 'Save deleted',
+          Date.now(),
+        );
+        return { ok: true, id };
+      } catch (error) {
+        return { ok: false, reason: error instanceof Error ? error.message : 'Unknown error while archiving.' };
+      }
+    },
+  );
+
+  ipcMain.handle(SAVE_HISTORY_IPC_CHANNELS.list, async (): Promise<SaveHistoryListResponse> => {
+    try {
+      // The restore price is computed HERE, once, from the same function the restore itself uses,
+      // so the number the button advertises and the number actually charged cannot drift apart.
+      // An entry that no longer decodes is still listed with a null cost rather than hidden:
+      // silently dropping it would misrepresent what the history actually holds.
+      const entries = saveHistory.list().map((entry) => {
+        let restoreCost = null as ReturnType<typeof saveRestoreCost> | null;
+        try {
+          const decoded = decodeSave(JSON.parse(saveHistory.read(entry.id)) as SaveDataLatest);
+          if (decoded.ok) restoreCost = saveRestoreCost(decoded.state);
+        } catch {
+          restoreCost = null;
+        }
+        return { ...entry, restoreCost };
+      });
+      return { ok: true, entries };
+    } catch (error) {
+      return { ok: false, reason: error instanceof Error ? error.message : 'Unknown error while reading history.' };
+    }
+  });
+
+  ipcMain.handle(SAVE_HISTORY_IPC_CHANNELS.read, async (_event, id: unknown): Promise<SaveHistoryReadResponse> => {
+    // A commit id is 40 hex characters and nothing else. Checking it here keeps a crafted value
+    // from being joined into a path at all, rather than relying on the store to be careful.
+    if (typeof id !== 'string' || !/^[0-9a-f]{40}$/.test(id)) {
+      return { ok: false, reason: 'That is not an archived save id.' };
+    }
+    try {
+      const parsed: unknown = JSON.parse(saveHistory.read(id));
+      const decoded = decodeSave(parsed as SaveDataLatest);
+      if (!decoded.ok) return { ok: false, reason: 'The archived save could no longer be decoded.' };
+      return { ok: true, save: parsed as SaveDataLatest };
+    } catch (error) {
+      return { ok: false, reason: error instanceof Error ? error.message : 'Unknown error while reading the save.' };
+    }
   });
 
   // Automatic updates against the unsigned Squirrel.Windows feed the release pipeline publishes

@@ -1,5 +1,6 @@
 # Data, history, and portability
 
+- [Deleted save history](deleted-save-history.md)
 - [Local version history](local-version-history.md)
 - [Exports and privacy](exports-and-privacy.md)
 - [Offline and no-network operation](offline-and-no-network.md)

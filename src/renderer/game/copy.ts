@@ -687,13 +687,17 @@ export const PRESTIGE_SCREEN_COPY = {
     yue: `呢個會保留：${points} 粒飛升點（永久產量加成）、轉生樹入面買咗嘅所有節點、全部已解鎖成就同佢哋倒出嚟嘅奶、所有釘咗做永久嘅升級，同埋轉生樹「記憶」枝幫你帶得走嗰部分。`,
   }),
   gateWipeTitle: { en: "Delete all save data?", yue: "刪除全部存檔？" },
+  // This said the deletion was permanent with "no undo and no recovery route". That stopped being
+  // true when deleting started archiving the save to a local Git repository first, and a warning
+  // that overstates what happens is as dishonest as one that understates it. It still says plainly
+  // that the run ends and everything leaves the live game, because that part is real.
   gateWipeBody: {
-    en: "This will permanently delete every building, upgrade, achievement, ascension point, and prestige run. There is no undo and no recovery route once this completes.",
-    yue: "呢個會永久刪除每一個建築物、升級、成就、飛升點同轉生紀錄。完成之後無得反悔，無得復原。",
+    en: "Every building, upgrade, achievement, ascension point, and prestige run leaves the live game. The save itself is not destroyed: it is committed to a local history on this computer first, and can be restored later for half of what it produced per second. Nothing is uploaded anywhere.",
+    yue: "每一個建築物、升級、成就、飛升點同轉生紀錄都會離開遊戲。但個存檔唔會消失：佢會先 commit 入呢部電腦嘅本機歷史，之後可以用佢每秒產量嘅一半贖返嚟。冇任何嘢會上傳。",
   },
   key1Label: { en: "Confirm intent", yue: "確認意向" },
   key2PrestigeLabel: { en: "Confirm you read the impact", yue: "確認睇咗影響" },
-  key2WipeLabel: { en: "Confirm you understand this is permanent", yue: "確認明白呢個係永久性" },
+  key2WipeLabel: { en: "Confirm you understand this ends the run", yue: "確認明白呢局會就此結束" },
   sliderHintDisabled: { en: "Both keys required before this slider unlocks", yue: "要開晒兩條鎖匙先可以郁滑桿" },
   sliderHintEnabled: { en: "Drag fully right to confirm", yue: "拉到盡右邊確認" },
   emergencyExit: { en: "Emergency exit", yue: "緊急退出" },
@@ -702,6 +706,31 @@ export const PRESTIGE_SCREEN_COPY = {
     yue: `轉生完成！獲得飛升點 +${points}`,
   }),
   wipeCompleted: { en: "All save data deleted.", yue: "全部存檔已刪除。" },
+  // Says which of the two things actually happened, rather than promising a restore that is not
+  // there. An archive that failed is reported as a failure; it never reads as a quiet success.
+  wipeArchived: { en: "Save deleted, and kept in local history. It can be restored below.", yue: "存檔已刪除，並且留咗喺本機歷史度，可以喺下面贖返。" },
+  wipeNotArchived: { en: "Save deleted. It could NOT be written to local history, so it cannot be restored.", yue: "存檔已刪除。但寫唔入本機歷史，所以贖唔返。" },
+  historyTitle: { en: "Deleted saves", yue: "已刪除嘅存檔" },
+  historyEmpty: { en: "No save has been deleted on this computer yet.", yue: "呢部電腦仲未刪過任何存檔。" },
+  historyUnavailable: { en: "Local save history is unavailable in this build.", yue: "呢個版本冇本機存檔歷史。" },
+  historyExplain: {
+    en: "Deleting a save never destroys it. Each one is committed to a local Git repository beside this application's own data, on this computer only. Restoring costs half of what that save produced per second, charged against the save itself.",
+    yue: "刪存檔唔會真係毀咗佢。每一個都會 commit 入本應用程式自己資料旁邊嘅本機 Git repo，淨係喺呢部電腦。贖返要俾嗰個存檔每秒產量嘅一半，喺個存檔度扣。",
+  },
+  // A disabled control must say exactly which condition is unmet, never just sit there greyed out.
+  historyUndecodable: { en: "Cannot be read back", yue: "讀唔返" },
+  historyRestore: (cost: string): Bilingual => ({
+    en: `Restore for ${cost} cookies`,
+    yue: `用 ${cost} 粒曲奇贖返`,
+  }),
+  historyRestored: (cost: string): Bilingual => ({
+    en: `Save restored. It cost ${cost} cookies, charged against the restored save.`,
+    yue: `存檔已贖返。收咗 ${cost} 粒曲奇，喺贖返嗰個存檔度扣。`,
+  }),
+  historyRestoreFailed: (reason: string): Bilingual => ({
+    en: `The save could not be restored: ${reason}`,
+    yue: `贖唔返呢個存檔：${reason}`,
+  }),
   prestigeButton: { en: "Prestige…", yue: "轉生…" },
   wipeButton: { en: "Delete all save data…", yue: "刪除全部存檔…" },
 } as const satisfies Record<string, Bilingual | ((...args: any[]) => Bilingual)>;

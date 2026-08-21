@@ -41,7 +41,7 @@ const REQUIRED_IDS = [
   "desktop-command-palette", "desktop-notifications", "desktop-design-reference-parity", "desktop-appearance-editor",
   "desktop-logo-customization", "desktop-tabs", "desktop-toy-locks", "desktop-authenticator",
   "desktop-unlock-ladder", "desktop-support-tickets", "desktop-file-converter", "desktop-ollama",
-  "desktop-local-history", "desktop-exports", "desktop-bulk-actions", "desktop-changelog",
+  "desktop-local-history", "desktop-deleted-save-history", "desktop-exports", "desktop-bulk-actions", "desktop-changelog",
   "desktop-offline-docs", "desktop-external-editor", "desktop-status-hub",
   "desktop-destructive-confirmation", "desktop-auto-update", "desktop-download-dialogs",
   "site-landing", "site-feature-articles", "site-graphics-progression", "site-language", "site-funny", "site-emoji",

@@ -13147,3 +13147,50 @@ body[data-eclipse='on'] .cookie-hero::after {
     animation: none;
   }
 }
+
+/* ============================================================================================
+ * DELETED SAVES
+ *
+ * Deleting save progress commits the save to a local Git repository rather than destroying it, so
+ * this is the list that shows the archive and the control that buys one back. Restoring costs half
+ * of what that save produced per second.
+ * ========================================================================================== */
+
+.deleted-saves__list {
+  display: grid;
+  gap: 8px;
+  margin: 8px 0 0;
+  padding: 0;
+  list-style: none;
+}
+
+.deleted-saves__item {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 10px;
+  min-block-size: 44px;
+  padding: 8px 12px;
+  border: 1px solid var(--outline-variant);
+  border-radius: var(--md-sys-shape-corner-medium);
+  background: var(--surface-lowest);
+}
+
+.deleted-saves__when {
+  font-variant-numeric: tabular-nums;
+  color: var(--on-surface-variant);
+}
+
+/* Takes the slack so the button stays put as summaries vary in length, and wraps rather than
+   pushing the button off the row at a narrow width. */
+.deleted-saves__summary {
+  flex: 1 1 12ch;
+  min-inline-size: 0;
+  overflow-wrap: anywhere;
+}
+
+.deleted-saves__empty,
+.deleted-saves__status {
+  margin: 8px 0 0;
+  color: var(--on-surface-variant);
+}

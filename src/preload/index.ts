@@ -2,13 +2,19 @@ import { contextBridge, ipcRenderer } from 'electron';
 
 import {
   DIESEL_IPC_CHANNELS,
+  SAVE_HISTORY_IPC_CHANNELS,
   UPDATE_IPC_CHANNELS,
   type UpdateIpcApi,
   type DieselIpcApi,
   type DieselMintRequest,
   type DieselMintResponse,
   type DieselReadResponse,
+  type SaveHistoryArchiveResponse,
+  type SaveHistoryIpcApi,
+  type SaveHistoryListResponse,
+  type SaveHistoryReadResponse,
 } from '../shared/game/ipc-contracts.js';
+import type { SaveDataLatest } from '../shared/game/save-schema.js';
 import type { UpdateStatus } from '../shared/game/updates.js';
 import {
   CANONICAL_IPC_CHANNELS,
@@ -63,6 +69,12 @@ export interface MaterialCookieClickerWindowApi {
 export interface MaterialCookieClickerApi {
   window: MaterialCookieClickerWindowApi;
   /**
+   * Save history. Deleting progress never deletes anything -- the save is committed to a local Git
+   * repository owned by the main process and can always be read back. The renderer asks; it holds
+   * no file-system access of its own.
+   */
+  saveHistory: SaveHistoryIpcApi;
+  /**
    * The diesel voucher exchange with WinForge (see src/shared/game/diesel-exchange.ts). Two
    * calls, both of which end in the main process: mint a voucher, or read the ledger back. The
    * renderer gets no path, no handle and no `fs` — only these two questions.
@@ -91,6 +103,14 @@ const api: MaterialCookieClickerApi = {
       ipcRenderer.on('window:close-refused', handler);
       return () => ipcRenderer.removeListener('window:close-refused', handler);
     },
+  },
+  saveHistory: {
+    archive: (save: SaveDataLatest, summary: string): Promise<SaveHistoryArchiveResponse> =>
+      ipcRenderer.invoke(SAVE_HISTORY_IPC_CHANNELS.archive, save, summary) as Promise<SaveHistoryArchiveResponse>,
+    list: (): Promise<SaveHistoryListResponse> =>
+      ipcRenderer.invoke(SAVE_HISTORY_IPC_CHANNELS.list) as Promise<SaveHistoryListResponse>,
+    read: (id: string): Promise<SaveHistoryReadResponse> =>
+      ipcRenderer.invoke(SAVE_HISTORY_IPC_CHANNELS.read, id) as Promise<SaveHistoryReadResponse>,
   },
   diesel: {
     mint: (request: DieselMintRequest): Promise<DieselMintResponse> =>

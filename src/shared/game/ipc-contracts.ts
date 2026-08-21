@@ -1,3 +1,4 @@
+import type { BigNum } from "./big-number.js";
 import type { UpdateStatus } from "./updates.js";
 import type { DieselVoucher, DieselVoucherLedger } from "./diesel-exchange.js";
 import type { SaveDataLatest } from "./save-schema.js";
@@ -43,6 +44,61 @@ export interface GameIpcApi {
   load(): Promise<GameLoadResponse>;
   save(save: SaveDataLatest): Promise<GameSaveResponse>;
   wipe(): Promise<GameWipeResponse>;
+}
+
+/**
+ * THE SAVE HISTORY CHANNELS.
+ *
+ * Deleting save progress never deletes anything. The renderer hands the encoded save across, the
+ * main process commits it to a local Git repository beside the application's own data (see
+ * `src/main/save-history.ts`), and it can always be read back. Restoring costs half of what that
+ * save produced per second, which `src/shared/game/save-history-cost.ts` decides.
+ *
+ * The renderer owns no file system, so it asks rather than writes -- the same division the diesel
+ * channels below already use. These ARE wired end to end: main registers them, the preload exposes
+ * them, and `GameProvider` archives through them before it clears anything.
+ */
+export const SAVE_HISTORY_IPC_CHANNELS = {
+  archive: "saveHistory:archive",
+  list: "saveHistory:list",
+  read: "saveHistory:read",
+} as const;
+
+/** One archived save, newest first in a listing. */
+export interface SaveHistoryRecord {
+  readonly id: string;
+  readonly archivedAtEpochMs: number;
+  readonly summary: string;
+  /**
+   * What restoring this one costs: half of what THAT save produced per second.
+   *
+   * Carried on the record rather than computed in the renderer so the number on the button and the
+   * number actually charged come from one call to one function. Two independent calculations of a
+   * price is how a button comes to advertise something the transaction does not honour.
+   *
+   * `null` when the archived save can no longer be decoded -- the entry is still listed, because
+   * hiding it would misrepresent what the history holds.
+   */
+  readonly restoreCost: BigNum | null;
+}
+
+export type SaveHistoryArchiveResponse =
+  | { readonly ok: true; readonly id: string }
+  | { readonly ok: false; readonly reason: string };
+
+export type SaveHistoryListResponse =
+  | { readonly ok: true; readonly entries: readonly SaveHistoryRecord[] }
+  | { readonly ok: false; readonly reason: string };
+
+export type SaveHistoryReadResponse =
+  | { readonly ok: true; readonly save: SaveDataLatest }
+  | { readonly ok: false; readonly reason: string };
+
+/** The shape the preload bridge exposes to the renderer. */
+export interface SaveHistoryIpcApi {
+  archive(save: SaveDataLatest, summary: string): Promise<SaveHistoryArchiveResponse>;
+  list(): Promise<SaveHistoryListResponse>;
+  read(id: string): Promise<SaveHistoryReadResponse>;
 }
 
 /**

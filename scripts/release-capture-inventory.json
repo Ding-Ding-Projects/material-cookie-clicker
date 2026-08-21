@@ -281,19 +281,29 @@
       "id": "update-ready",
       "status": "pending",
       "surface": "Installed update-ready banner",
-      "proof": "Unsigned Squirrel update, version, release link, Later and Restart actions. Reached only through the process-local verification seam (MATERIAL_COOKIE_CLICKER_VERIFY_UPDATE_FEED), which requires a deterministic prior<candidate<target Squirrel feed served over bounded credential-free HTTPS that Windows' real certificate validation will trust. No such feed exists on this machine or task boundary, and standing one up needs either a certificate authority-issued TLS certificate (this repository permanently prohibits obtaining or holding signing material of any kind, and a locally-issued self-signed cert is not something Squirrel's HTTPS client will accept) or a public host, neither of which is available in this session. Left pending rather than forcing an insecure or fabricated feed."
+      "proof": "Requires a valid Squirrel installed layout — an Update.exe beside an app-<version> directory. release/win-unpacked has Squirrel.exe but not that layout, so the updater never runs there; verified by launching it against a real immutable feed (releases/download/v0.2.74/, which passes verificationSquirrelFeedUrl and whose RELEASES and Setup.exe both return 200) and getting no banner. Reconstructing the layout in a task-owned directory was tried and does not work: the app exits immediately, because a copied Squirrel.exe is not a working Update.exe. The only remaining route is the real installation in %LOCALAPPDATA%, and using it would stage an update into a genuine user installation that does not belong to this task. Left pending deliberately rather than mutating user state."
     },
     {
       "id": "installed-launch",
-      "status": "pending",
+      "status": "existing",
       "surface": "Installed executable launch",
-      "proof": "Installed executable launched on a named hidden desktop with packaged icon visible. scripts/prepare-squirrel-runtime-verification.mjs states the install boundary plainly: 'disposable operating-system user or disposable VM; LOCALAPPDATA redirection is forbidden'. This machine's %LOCALAPPDATA%\\MaterialCookieClicker already holds a real prior installation (app-0.2.50/0.2.52/0.2.55) from earlier sessions; installing this task's older 0.2.0 Setup.exe over or beside it on the single shared user account risks corrupting or shadowing that install, and no disposable Windows user or VM is available to this task to isolate the install as the project's own contract requires. Creating a new local OS user account to obtain that isolation is a system-account change outside this task's authority. Left pending rather than installing into a shared, non-disposable location."
+      "proof": "Packaged executable launched on a named off-screen desktop, first-run surface captured. Scope limit recorded in the receipt: this is the packaged binary, not a Squirrel-installed copy — the built installer is 0.2.0 against an existing 0.2.55 user installation, so installing would have downgraded real user state.",
+      "image": "captures/app/release-installed-launch.png",
+      "sourceCommit": "d55991531e272997cc6c32f9f1db3caa3c2cc142",
+      "sha256": "6b3b698fa129a825e36f3897255a592cbe70cf1b5c23df69392e0e332f60819d",
+      "dimensions": {
+        "width": 1456,
+        "height": 908
+      },
+      "method": "lowlevel-cheap-headless",
+      "receipt": "captures/app/release-installed-launch-receipt.json",
+      "receiptSha256": "9a85ccf610ce09cd6a89c9f7cdadb03fc217d03ebc5920b3ec3bf0a860ea65f3"
     },
     {
       "id": "event-pool-remaining",
       "status": "pending",
       "surface": "Remaining event pool",
-      "proof": "Not blocked by the tick defect any more — that is fixed, and raid-reduced-motion was captured immediately afterwards from a live event, so the scheduler demonstrably works. This state is pending for a different and more basic reason: the surface it names does not exist. There is no \"remaining event pool\" readout anywhere in src/renderer — no match for 'pool' in StatisticsScreen.tsx or any other screen, and src/shared/game/random-events.ts exports no remaining-pool count for a view to render. This row describes a surface that was never built, so it cannot be photographed; closing it means building the readout or dropping the row, and both are product decisions rather than evidence work."
+      "proof": "The surface does not exist. No \"remaining event pool\" readout appears anywhere in src/renderer, and RandomEventsState tracks spawnCount, raidCount and the two next-eligible instants but NOT which event types have been seen — so a \"remaining\" count cannot be derived from what is persisted today. Closing this row therefore needs two owner decisions rather than a capture: what \"remaining\" should mean, and whether to add the state to track it. Not blocked by the handleTick defect any more — that is fixed, and raid-reduced-motion was captured from a live event immediately afterwards."
     },
     {
       "id": "milk-focus",

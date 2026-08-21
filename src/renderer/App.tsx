@@ -997,8 +997,17 @@ function GameShell() {
         settingsSlotRef.current?.focus();
         return;
       }
-      setSettingsEntry({ row: outcome.row, nameEn: def.nameEn, nameYue: def.nameYue });
-      setPaletteTarget(APPLICATION_TOOL_TARGETS[toolId] ?? 'canonical-navigation');
+      // Open the FEATURE, not the settings screen that happens to house it. Every application
+      // tool has its own canonical target, and SettingsScreen switches to the Application tools
+      // tab and focuses that element when it is given one — so the target is what makes this an
+      // "open the thing" press rather than a "here is settings, go and find it" one.
+      //
+      // settingsEntry is what draws the "opened from the tech tree, here is the closest row"
+      // framing around the general settings view. With a real target to land on that framing is
+      // wrong, so it is only set when there is no target to open.
+      const target = APPLICATION_TOOL_TARGETS[toolId] ?? null;
+      setSettingsEntry(target ? null : { row: outcome.row, nameEn: def.nameEn, nameYue: def.nameYue });
+      setPaletteTarget(target ?? 'canonical-navigation');
       const button = buttonRefs.current[outcome.panel];
       if (button) {
         const rect = button.getBoundingClientRect();

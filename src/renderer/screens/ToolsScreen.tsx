@@ -109,12 +109,10 @@ function OpenItNowCallout({ def, onOpen }: { def: ToolDefinition; onOpen: OpenAp
   const buttonBought = useControlRung('tools.openItNow');
   return (
     <div className="open-real-feature">
-      <span className="open-real-feature__badge">
-        🔓 {bilingualText(TOOLS_SCREEN_COPY.alwaysAvailable)}
-      </span>
-      <span className="open-real-feature__note">
-        {bilingualText(TOOLS_SCREEN_COPY.openItNowNote)}
-      </span>
+      {/* The "always available" badge and its explanatory note are gone by owner request. They
+          described the button rather than being one, and a card that spends three lines telling
+          you a button exists is worse than the button on its own. What remains is the coin slot
+          while it is unbought and the button once it is. */}
       {settingsBought ? null : (
         <span className="open-real-feature__note open-real-feature__note--priced">
           {bilingualText(TOOLS_SCREEN_COPY.openItNowPriced(formatExactDigits(controlRungPrice(SETTINGS_OPEN_RUNG_ID))))}

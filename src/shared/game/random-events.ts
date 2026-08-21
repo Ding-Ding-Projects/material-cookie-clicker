@@ -1275,6 +1275,17 @@ export interface RandomEventConfig {
    */
   readonly raidFreshGraceMs: number;
   /**
+   * The pool's own fresh-save grace, the counterpart to `raidFreshGraceMs`.
+   *
+   * `nextEligibleAtEpochMs` starts at zero, which every other clock in this file reads as "never
+   * scheduled". The pool had no seeding step for it, so the first tick of a brand-new save was
+   * already past due and an event landed within seconds of the first click — measured at 2
+   * seconds over a simulated hour. Nobody had seen it because the scheduler was unreachable
+   * until the handleTick blocked-flag defect was fixed; the cadence after that first one was
+   * correct all along, at seven events an hour spaced six to fourteen minutes apart.
+   */
+  readonly poolFreshGraceMs: number;
+  /**
    * Below this balance a raid does not fire at all. Eighty per cent of four hundred cookies is
    * not a robbery, it is noise — and it is noise aimed at exactly the player least able to read
    * a new mechanic. The raid waits (it does not re-roll) until the counter is worth raiding.
@@ -1324,6 +1335,7 @@ export const DEFAULT_RANDOM_EVENT_CONFIG: RandomEventConfig = {
   raidMaxDelayMs: 60 * 60 * 1000,
   raidJitterMs: 90 * 1000,
   raidFreshGraceMs: 10 * 60 * 1000,
+  poolFreshGraceMs: 3 * 60 * 1000,
   raidMinCookies: 1_000,
   raidStealCeiling: 0.8,
   payouts: DEFAULT_RANDOM_EVENT_PAYOUTS,
@@ -1349,6 +1361,9 @@ export const FAST_RANDOM_EVENT_CONFIG: RandomEventConfig = {
   raidMaxDelayMs: DEFAULT_RANDOM_EVENT_CONFIG.raidMaxDelayMs,
   raidJitterMs: DEFAULT_RANDOM_EVENT_CONFIG.raidJitterMs,
   raidFreshGraceMs: DEFAULT_RANDOM_EVENT_CONFIG.raidFreshGraceMs,
+  // The fast schedule exists so a test or a capture can see an event promptly; inheriting the
+  // real fresh-save grace would defeat exactly that.
+  poolFreshGraceMs: 0,
   raidMinCookies: DEFAULT_RANDOM_EVENT_CONFIG.raidMinCookies,
   raidStealCeiling: DEFAULT_RANDOM_EVENT_CONFIG.raidStealCeiling,
   payouts: DEFAULT_RANDOM_EVENT_PAYOUTS,
@@ -1380,6 +1395,7 @@ export const RAID_CAPTURE_EVENT_CONFIG: RandomEventConfig = {
   raidMaxDelayMs: 6_000,
   raidJitterMs: 500,
   raidFreshGraceMs: 0,
+  poolFreshGraceMs: 0,
   raidMinCookies: DEFAULT_RANDOM_EVENT_CONFIG.raidMinCookies,
   raidStealCeiling: DEFAULT_RANDOM_EVENT_CONFIG.raidStealCeiling,
   payouts: DEFAULT_RANDOM_EVENT_PAYOUTS,
@@ -2594,6 +2610,24 @@ export function tickRandomEvents(
   }
 
   // 5 — the pool's window.
+  if (state.nextEligibleAtEpochMs === 0) {
+    // First sight of this save: seed the pool clock, exactly as the raid does a few branches
+    // above. Without this a zero read as "already due" and a brand-new game was interrupted
+    // within seconds of the first click — measured at 2 seconds over a simulated hour.
+    const seeded = nowEpochMs + config.poolFreshGraceMs + rollDelayMs(rng, config);
+    if (seeded > nowEpochMs) {
+      return {
+        randomEvents: { ...state, nextEligibleAtEpochMs: seeded, rngStreamIndex: rng.getStreamIndex() },
+        instantBonus: zero,
+        raidTheft: null,
+      };
+    }
+    // A configuration with no grace and no delay — the fast schedule the tests drive — is asking
+    // for a spawn on this very tick, so seeding must not eat it. Fall through to the due check
+    // rather than returning quiet, which would make the first tick of such a run do nothing.
+    state = { ...state, nextEligibleAtEpochMs: seeded, rngStreamIndex: rng.getStreamIndex() };
+  }
+
   if (nowEpochMs < state.nextEligibleAtEpochMs) return quiet;
 
   // ONE SPAWN, one to three events. The stack size and every member come off the injected port,

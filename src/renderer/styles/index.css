@@ -13463,3 +13463,88 @@ body[data-eclipse='on'] .cookie-hero::after {
     transition: none;
   }
 }
+
+
+/* ==========================================================================================
+ * SETTINGS FORM CONTROLS.
+ *
+ * These were bare `<input type="checkbox">` and unclassed `<input>` elements inside plain
+ * `<label>`s, so they rendered as raw operating-system widgets: a native tick box shoved
+ * flush against its own text with no gap, and a 1990s sunken text field. Reported as the
+ * surface looking "generic", which is exactly right — nothing here was Material at all while
+ * everything around it was.
+ *
+ * Scoped to .settings-block so it dresses the settings surface without reaching any other
+ * screen's controls.
+ * ======================================================================================== */
+
+:root:root body .settings-block label {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  min-block-size: 44px;
+  flex-wrap: wrap;
+}
+
+/* A label whose control is a text field reads as a stacked field-with-caption rather than a row. */
+:root:root body .settings-block label:has(> input:not([type='checkbox']):not([type='radio'])) {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr);
+  align-items: start;
+  gap: 6px;
+  font: var(--md-sys-typescale-body-medium-font);
+  color: var(--on-surface-variant);
+}
+
+:root:root body .settings-block input[type='checkbox'] {
+  /* accent-color is the honest way to theme a real checkbox: it keeps the platform control,
+     its semantics and its focus behaviour, and only repaints it. Rebuilding one out of a div
+     is how a tick box stops being announced as a tick box. */
+  accent-color: var(--primary);
+  inline-size: 20px;
+  block-size: 20px;
+  margin: 0;
+  flex: 0 0 auto;
+  cursor: pointer;
+}
+
+:root:root body .settings-block input:not([type='checkbox']):not([type='radio']):not([type='range']):not([type='file']) {
+  inline-size: 100%;
+  max-inline-size: 420px;
+  min-block-size: 44px;
+  padding: 10px 14px;
+  border: 1px solid var(--outline);
+  border-radius: var(--md-sys-shape-corner-extra-small);
+  background: var(--surface-lowest);
+  color: var(--on-surface);
+  font: var(--md-sys-typescale-body-large-font);
+}
+
+:root:root body .settings-block input:not([type='checkbox']):not([type='radio']):focus-visible,
+:root:root body .settings-block input[type='checkbox']:focus-visible {
+  outline: 3px solid var(--primary);
+  outline-offset: 2px;
+}
+
+:root:root body .settings-block > button {
+  min-block-size: 44px;
+  padding: 0 24px;
+  border: 0;
+  border-radius: var(--md-sys-shape-corner-large);
+  background: var(--primary-container);
+  color: var(--on-primary-container);
+  font: var(--md-sys-typescale-label-large-font);
+  cursor: pointer;
+}
+
+:root:root body .settings-block > button:focus-visible {
+  outline: 3px solid var(--primary);
+  outline-offset: 2px;
+}
+
+/* The paragraphs between controls were running straight into them. */
+:root:root body .settings-block > p {
+  margin-block: 4px 12px;
+  color: var(--on-surface-variant);
+  font: var(--md-sys-typescale-body-medium-font);
+}

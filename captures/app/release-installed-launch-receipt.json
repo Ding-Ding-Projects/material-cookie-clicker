@@ -1,0 +1,17 @@
+{
+  "version": 1,
+  "sourceCommit": "d55991531e272997cc6c32f9f1db3caa3c2cc142",
+  "route": "lowlevel-cheap-headless",
+  "captures": [
+    {
+      "state": "installed-launch",
+      "path": "captures/app/release-installed-launch.png",
+      "sha256": "6b3b698fa129a825e36f3897255a592cbe70cf1b5c23df69392e0e332f60819d",
+      "width": 1456,
+      "height": 908
+    }
+  ],
+  "scope": "The PACKAGED executable from release/win-unpacked, launched on a named off-screen desktop and photographed on first run. It is the artifact electron-builder produced and the same binary the icon-fidelity check passes against at 16px and 32px.",
+  "limitation": "NOT a Squirrel-installed copy. The built installer is version 0.2.0 while this machine already carries a real user installation at 0.2.55, so running Setup.exe would have downgraded and damaged an existing installation that does not belong to this task. Installing into an isolated location is not available either: prepare-squirrel-runtime-verification.mjs requires a disposable operating-system user or VM and forbids LOCALAPPDATA redirection. What this image proves is that the packaged binary launches and renders its first-run surface; it does not prove the Squirrel install flow, shortcuts, or uninstall.",
+  "notes": "The golden-cookie toast visible bottom-right is a random event firing in the real packaged build — independent confirmation that the handleTick blocked-flag fix works outside the test suite, since before it no random event could spawn at all."
+}

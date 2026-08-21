@@ -1,6 +1,6 @@
 {
   "version": 1,
-  "sourceCommit": "7498e267469ddda61f60dafedad4d03a2bf6f043",
+  "sourceCommit": "b131294f10520a789c7e4b9ab6005effb43fee6b",
   "route": "cheap-lowlevel-headless",
   "launchPid": 33156,
   "hwnd": "7932446",
@@ -23,7 +23,7 @@
     {
       "state": "after",
       "path": "design/parity/evidence/graphics-progression/after.png",
-      "sha256": "34864f7022d005ecff6a0c4dcedd5b72287a35f0aa79f0a51f8ad23a785fb88e",
+      "sha256": "2132af282840c66ec1c35be65916d7828061ca854c7c5efc89d07711799da3d0",
       "width": 1440,
       "height": 900
     }

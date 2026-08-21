@@ -361,13 +361,29 @@ jobs:
             '--title', $title, '--notes-file', 'release-notes.draft.md', '--draft'
           ) | Out-Null
 
-          $draftInventoryRaw = Invoke-CheckedGh -Operation 'Locate the new draft by numeric release ID' -Arguments @(
-            'api', "repos/$env:GITHUB_REPOSITORY/releases?per_page=100"
-          )
-          $draftMatches = @((($draftInventoryRaw -join "`n") | ConvertFrom-Json) | Where-Object {
-            $_.tag_name -eq $env:RELEASE_TAG -and $_.draft -eq $true -and $_.target_commitish -eq $env:GITHUB_SHA
-          })
-          if ($draftMatches.Count -ne 1) { throw "Expected exactly one matching draft, received $($draftMatches.Count)." }
+          # The release LIST endpoint is eventually consistent: a draft created a moment earlier is
+          # not always in it yet. Read once and this throws "received 0" on a draft that plainly
+          # exists -- observed on run 32431485087, where the draft was created at 00:14:26 and the
+          # lookup failed at 00:14:28, and the same query matched perfectly when repeated later.
+          # Retried with a bounded backoff. The requirement is unchanged: still EXACTLY one match on
+          # tag, draft state and target commit. More than one is still an immediate failure, because
+          # that means something other than this run created a release for this tag.
+          $draftMatches = @()
+          foreach ($attempt in 1..6) {
+            $draftInventoryRaw = Invoke-CheckedGh -Operation 'Locate the new draft by numeric release ID' -Arguments @(
+              'api', "repos/$env:GITHUB_REPOSITORY/releases?per_page=100"
+            )
+            $draftMatches = @((($draftInventoryRaw -join "`n") | ConvertFrom-Json) | Where-Object {
+              $_.tag_name -eq $env:RELEASE_TAG -and $_.draft -eq $true -and $_.target_commitish -eq $env:GITHUB_SHA
+            })
+            if ($draftMatches.Count -gt 1) { throw "Expected exactly one matching draft, received $($draftMatches.Count)." }
+            if ($draftMatches.Count -eq 1) { break }
+            if ($attempt -lt 6) {
+              Write-Host "Draft $env:RELEASE_TAG not visible yet (attempt $attempt of 6); retrying."
+              Start-Sleep -Seconds ($attempt * 5)
+            }
+          }
+          if ($draftMatches.Count -ne 1) { throw "Expected exactly one matching draft, received $($draftMatches.Count) after 6 attempts." }
           $releaseId = [long]$draftMatches[0].id
 
           $baseAssets = @($setup, $releases, $nupkg, $installerEvidence) + @($deltas | ForEach-Object { $_.FullName }) + @($iconProofAssets | ForEach-Object { $_.FullName })

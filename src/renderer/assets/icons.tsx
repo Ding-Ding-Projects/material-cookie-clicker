@@ -1859,3 +1859,221 @@ export function ParcelArt({ extraClass }: { extraClass?: string } = {}) {
     </Art>
   );
 }
+
+/* ------------------------------------------------------------------------------------------
+ * Minigame board art.
+ *
+ * The five minigame boards used to render as literal text glyphs (card codes like "H7", a
+ * bare flag/star/square trio for Minesweeper, raw numbers for 2048). This section draws real
+ * pictures for them instead, in the same warm-bakery language as the rest of the illustrated
+ * set above: a chunky ink outline, flat theme-token fills, a bevel highlight. Every drawing
+ * here is always shown -- these are gameplay pieces, not shelf entities behind the `look.art`
+ * purchase, so there is no PlainGlyph fallback to wire up.
+ *
+ * Every one of these is `aria-hidden` at its call site; the existing text label (a sibling
+ * span, or the parent's aria-label/aria-labelledby) stays the accessible name. Nothing here
+ * changes what a screen reader announces.
+ * ---------------------------------------------------------------------------------------- */
+
+const BOARD_RED = 'var(--error, #a33019)';
+
+function BoardArt({ children, extraClass }: { children: ReactNode; extraClass?: string }) {
+  return (
+    <svg
+      className={extraClass ? `minigame-art ${extraClass}` : 'minigame-art'}
+      viewBox="0 0 32 32"
+      aria-hidden="true"
+      focusable="false"
+      stroke={INK}
+      strokeWidth={1.4}
+      strokeLinejoin="round"
+      strokeLinecap="round"
+      fill="none"
+    >
+      {children}
+    </svg>
+  );
+}
+
+/** One pip of a suit, drawn small so it can be placed at a corner or centred large. */
+function SuitPip({ suitId, x, y, scale, color }: { suitId: string; x: number; y: number; scale: number; color: string }) {
+  const transform = `translate(${x} ${y}) scale(${scale})`;
+  if (suitId === 'H') {
+    return <path transform={transform} d="M0 2.6C0 0.6 1.6 -1 3.4 -1c1.1 0 2 0.5 2.6 1.4C6.6 -0.5 7.5 -1 8.6 -1 10.4 -1 12 0.6 12 2.6c0 3-4.2 5.8-6 6.9-1.8-1.1-6-3.9-6-6.9Z" fill={color} stroke="none" />;
+  }
+  if (suitId === 'D') {
+    return <path transform={transform} d="M6 -1.2 11 4l-5 5.2L1 4Z" fill={color} stroke="none" />;
+  }
+  if (suitId === 'C') {
+    return (
+      <g transform={transform} fill={color} stroke="none">
+        <circle cx="6" cy="1.6" r="2.6" />
+        <circle cx="3.2" cy="5" r="2.6" />
+        <circle cx="8.8" cy="5" r="2.6" />
+        <path d="M5.1 6.4h1.8l0.7 3.6H4.4Z" />
+      </g>
+    );
+  }
+  return (
+    <g transform={transform} fill={color} stroke="none">
+      <path d="M6 -1c2.6 2.6 6 5 6 7.6a3 3 0 0 1-5.5 1.7C6.3 9.6 6 10.6 6.9 12H5.1c0.9-1.4 0.6-2.4 0.4-3.7A3 3 0 0 1 0 6.6C0 4 3.4 1.6 6 -1Z" />
+    </g>
+  );
+}
+
+/** The cookie-and-crumb pattern shared by every card back: a Klondike hider and a Memory back. */
+function CardBackPattern() {
+  return (
+    <>
+      <rect x="2.5" y="1.5" width="27" height="29" rx="3.5" fill={CRUST} stroke={CRUST_DARK} strokeWidth="1.6" />
+      <rect x="5" y="4" width="22" height="24" rx="2.2" fill="none" stroke={GOLD} strokeWidth="1.3" opacity="0.85" />
+      <circle cx="11" cy="10.5" r="2.1" fill={GOLD} stroke="none" opacity="0.9" />
+      <circle cx="21" cy="14" r="1.7" fill={CHIP} stroke="none" opacity="0.8" />
+      <circle cx="14.5" cy="19" r="1.9" fill={CHIP} stroke="none" opacity="0.8" />
+      <circle cx="22" cy="22.5" r="2.2" fill={GOLD} stroke="none" opacity="0.9" />
+      <circle cx="9.5" cy="23.5" r="1.5" fill={GOLD} stroke="none" opacity="0.75" />
+      <circle cx="16" cy="9" r="1.4" fill={CHIP} stroke="none" opacity="0.7" />
+    </>
+  );
+}
+
+/** A face-down Klondike / Memory card: the shared cookie back pattern. */
+export function PlayingCardBackArt({ extraClass }: { extraClass?: string } = {}) {
+  return <BoardArt extraClass={extraClass}><CardBackPattern /></BoardArt>;
+}
+
+/** A face-up Klondike card: white stock, a corner rank, and one big centred suit pip. */
+export function PlayingCardFaceArt({ suitId, rank, extraClass }: { suitId: string; rank: number; extraClass?: string }) {
+  const color = suitId === 'H' || suitId === 'D' ? BOARD_RED : INK;
+  const label = rank === 1 ? 'A' : rank === 11 ? 'J' : rank === 12 ? 'Q' : rank === 13 ? 'K' : String(rank);
+  return (
+    <BoardArt extraClass={extraClass}>
+      <rect x="2.5" y="1.5" width="27" height="29" rx="3.5" fill={PLATE} stroke={CRUST} strokeWidth="1.4" />
+      <text x="4.6" y="9" fontSize="6" fontWeight="700" fill={color} stroke="none" fontFamily="inherit">{label}</text>
+      <SuitPip suitId={suitId} x={4.4} y={10.4} scale={0.55} color={color} />
+      <g transform="rotate(180 16 16)">
+        <text x="4.6" y="9" fontSize="6" fontWeight="700" fill={color} stroke="none" fontFamily="inherit">{label}</text>
+        <SuitPip suitId={suitId} x={4.4} y={10.4} scale={0.55} color={color} />
+      </g>
+      <SuitPip suitId={suitId} x={16} y={14} scale={1.3} color={color} />
+    </BoardArt>
+  );
+}
+
+/** One of the eight Memory Match cookie faces, distinguished by chip pattern and glaze ring. */
+export function MemoryCookieArt({ variant, extraClass }: { variant: number; extraClass?: string }) {
+  const index = ((variant % 8) + 8) % 8;
+  const glaze = [GOLD, EMERALD, AMETHYST, BRONZE, GOLD_DEEP, EMERALD_LIGHT, AMETHYST_LIGHT, BRONZE_LIGHT][index];
+  const chipCount = 3 + (index % 4);
+  const chips = Array.from({ length: chipCount }, (_, chipIndex) => {
+    const angle = (chipIndex / chipCount) * Math.PI * 2 + index;
+    return [16 + Math.cos(angle) * 6.5, 16 + Math.sin(angle) * 6.5] as const;
+  });
+  return (
+    <BoardArt extraClass={extraClass}>
+      <circle cx="16" cy="16" r="12.5" fill={DOUGH} stroke={CRUST} strokeWidth="1.6" />
+      <circle cx="16" cy="16" r="12.5" fill="none" stroke={glaze} strokeWidth="2" opacity="0.55" />
+      {chips.map(([x, y], chipIndex) => <circle key={chipIndex} cx={x} cy={y} r="1.7" fill={CHIP} stroke="none" />)}
+      <circle cx="16" cy="16" r="2.1" fill={glaze} stroke={CRUST} strokeWidth="0.8" />
+    </BoardArt>
+  );
+}
+
+/** The 2048 board's number tile: fill and ink contrast scale with the value so every step reads. */
+export function Cookie2048TileArt({ value, extraClass }: { value: number; extraClass?: string }) {
+  if (!value) {
+    return (
+      <BoardArt extraClass={extraClass}>
+        <rect x="3" y="3" width="26" height="26" rx="4" fill={PLATE_DIM} stroke={CRUST} strokeWidth="1" opacity="0.5" />
+      </BoardArt>
+    );
+  }
+  const step = Math.max(0, Math.min(10, Math.log2(value)));
+  const palette = [DOUGH, GOLD, GOLD_DEEP, BRONZE, BRONZE_LIGHT, EMERALD, EMERALD_LIGHT, AMETHYST, AMETHYST_LIGHT, CRUST_DARK, INK];
+  const fill = palette[Math.round(step)] ?? CRUST_DARK;
+  const dark = step >= 6.5;
+  const ink = dark ? PLATE : CHIP;
+  const fontSize = value >= 1000 ? 7.4 : value >= 100 ? 8.6 : 10.5;
+  return (
+    <BoardArt extraClass={extraClass}>
+      <rect x="3" y="3" width="26" height="26" rx="5" fill={fill} stroke={CRUST_DARK} strokeWidth="1.4" />
+      <path d="M5.5 6.5h21" stroke={HIGHLIGHT} strokeWidth="1.6" opacity="0.5" strokeLinecap="round" />
+      <text x="16" y="19.5" fontSize={fontSize} fontWeight="700" fill={ink} stroke="none" textAnchor="middle" fontFamily="inherit">{value}</text>
+    </BoardArt>
+  );
+}
+
+/** A hidden Minesweeper cell: a raised bevelled square, the same "unrevealed" reading everywhere. */
+export function MinesweeperHiddenArt({ extraClass }: { extraClass?: string } = {}) {
+  return (
+    <BoardArt extraClass={extraClass}>
+      <rect x="3" y="3" width="26" height="26" rx="3" fill={PLATE_DIM} stroke={CRUST} strokeWidth="1.5" />
+      <path d="M5 5h22M5 5v22" stroke={HIGHLIGHT} strokeWidth="1.8" opacity="0.6" strokeLinecap="round" />
+      <path d="M27 5v22M5 27h22" stroke={CRUST_DARK} strokeWidth="1.6" opacity="0.5" strokeLinecap="round" />
+    </BoardArt>
+  );
+}
+
+/** A revealed, mine-free Minesweeper cell: a flat sunken square. */
+export function MinesweeperClearArt({ extraClass }: { extraClass?: string } = {}) {
+  return (
+    <BoardArt extraClass={extraClass}>
+      <rect x="3" y="3" width="26" height="26" rx="2" fill={PLATE} stroke={CRUST} strokeWidth="1" opacity="0.6" />
+    </BoardArt>
+  );
+}
+
+/** A revealed mine: a spiked ball with a bevel highlight, on the same sunken cell as a clear one. */
+export function MinesweeperMineArt({ extraClass }: { extraClass?: string } = {}) {
+  return (
+    <BoardArt extraClass={extraClass}>
+      <rect x="3" y="3" width="26" height="26" rx="2" fill={ALARM_LIGHT} stroke={CRUST} strokeWidth="1" opacity="0.9" />
+      <g stroke={INK} strokeWidth="1.6" strokeLinecap="round">
+        <path d="M16 7v18M7 16h18M9.8 9.8l12.4 12.4M22.2 9.8L9.8 22.2" />
+      </g>
+      <circle cx="16" cy="16" r="6" fill={ALARM} stroke={INK} strokeWidth="1.6" />
+      <circle cx="13.6" cy="13.6" r="1.6" fill={METAL_HI} stroke="none" />
+    </BoardArt>
+  );
+}
+
+/** A planted flag, for a Minesweeper cell the player has marked. */
+export function MinesweeperFlagArt({ extraClass }: { extraClass?: string } = {}) {
+  return (
+    <BoardArt extraClass={extraClass}>
+      <rect x="3" y="3" width="26" height="26" rx="3" fill={PLATE_DIM} stroke={CRUST} strokeWidth="1.5" />
+      <path d="M13 8v18" stroke={INK} strokeWidth="1.8" strokeLinecap="round" />
+      <path d="M13 8.5 24 12l-11 4Z" fill={BOARD_RED} stroke={CRUST_DARK} strokeWidth="1.3" />
+      <path d="M10.5 26.5h6" stroke={INK} strokeWidth="1.8" strokeLinecap="round" />
+    </BoardArt>
+  );
+}
+
+/** The Breakout paddle, ball, and one brick -- a small kit for the live playfield. */
+export function BreakoutPaddleArt({ extraClass }: { extraClass?: string } = {}) {
+  return (
+    <BoardArt extraClass={extraClass}>
+      <rect x="1.5" y="10" width="29" height="12" rx="6" fill={EMERALD} stroke={CRUST_DARK} strokeWidth="1.5" />
+      <path d="M4 13.5h24" stroke={HIGHLIGHT} strokeWidth="1.8" opacity="0.5" strokeLinecap="round" />
+    </BoardArt>
+  );
+}
+
+export function BreakoutBallArt({ extraClass }: { extraClass?: string } = {}) {
+  return (
+    <BoardArt extraClass={extraClass}>
+      <circle cx="16" cy="16" r="12.5" fill={GOLD} stroke={GOLD_RING} strokeWidth="1.8" />
+      <circle cx="12.3" cy="12.3" r="3.2" fill={METAL_HI} stroke="none" opacity="0.85" />
+    </BoardArt>
+  );
+}
+
+export function BreakoutBrickArt({ variant, extraClass }: { variant: number; extraClass?: string }) {
+  const fill = [BRONZE, EMERALD, AMETHYST, GOLD_DEEP][((variant % 4) + 4) % 4];
+  return (
+    <BoardArt extraClass={extraClass}>
+      <rect x="1.5" y="7" width="29" height="18" rx="3" fill={fill} stroke={CRUST_DARK} strokeWidth="1.6" />
+      <path d="M4 10.5h24" stroke={HIGHLIGHT} strokeWidth="1.8" opacity="0.45" strokeLinecap="round" />
+    </BoardArt>
+  );
+}

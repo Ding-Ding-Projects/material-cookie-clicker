@@ -106,8 +106,50 @@ Thirteen tests were failing in this repository for an extended period because no
 tests and nobody ran them locally. Two of those were whole files that executed nothing at all. The
 absence of a red signal is not a green one.
 
+## This game is exempt from Material Design 3
+
+Do not migrate this app to Material Design 3. The owner has said so directly, and this exemption
+overrides the standing global instruction that every user-facing app must conform to it.
+
+It has already happened once. On 2026-08-19, commit `f3a477a "Migrate application chrome to
+Material Design 3"` added 665 lines to `src/renderer/styles/index.css`, following that global
+instruction in good faith. Its central rule was:
+
+    :root:root body button:not(.golden-sprite):not(.achievement-badge):not(.mini-ticket):not(.cookie-btn) {
+      border: 0;
+      border-radius: var(--md-sys-shape-corner-full);
+      background-image: none;
+      box-shadow: var(--md-sys-elevation-level-0);
+      filter: none;
+    }
+
+At roughly (0,6,2) specificity that reaches every button in the application except four classes
+exempted by name. The four properties it resets — border, background-image, box-shadow, filter —
+are exactly the four the arcade look is built from, so the shop, the cabinet chrome, the HUD, the
+tools tree and the big cookie all flattened into identical tonal pills. The owner reported the
+interface as looking "generic", then said plainly: "i never said to migrate to material design 3",
+and "i want it to have the cookie clicker feel". It was reverted on 2026-08-20.
+
+Two things worth carrying forward from it:
+
+**The four-class exemption list was the tell.** A rule that has to name `golden-sprite`,
+`achievement-badge`, `mini-ticket` and `cookie-btn` to avoid wrecking them is a rule that already
+knows it is reaching too far, and is patching the symptom one class at a time. When a selector needs
+a growing list of things it must not touch, the selector is wrong, not the list.
+
+**A blanket rule reaching the game surface is the shape to refuse**, whatever the design system.
+Chrome may be normalised; the game's own visual language may not. That is the dividing line here.
+
+The token ALIASES stayed and are fine. `--md-sys-color-primary: var(--primary)` is a name mapped
+onto a game token and repaints nothing, and roughly 70 later declarations plus three sibling
+stylesheets read `var(--md-sys-*)`. Deleting the names to make the revert look complete would
+resolve those to `unset` and blank out real surfaces — a worse regression than the one being undone.
+Aliasing is fine; repainting is not.
+
+`tests/no-m3-remigration.test.ts` fails if the blanket rule returns.
+
 ---
 
 粵語摘要：呢份嘢記低嘅唔係「應該點做」，係呢個 repo 真係出過事嘅地方——共用 checkout 累到人哋
-啲改動冇咗、改測試去夾 code、寫咗啲永遠唔會紅嘅守衛、仲有個 icon 一直入唔到個 exe 度。每一條
-後面都有件真事。
+啲改動冇咗、改測試去夾 code、寫咗啲永遠唔會紅嘅守衛、個 icon 一直入唔到個 exe 度，仲有次幫佢
+轉晒 Material Design 3，搞到成個遊戲啲掣變晒一樣嘅藥丸樣。每一條後面都有件真事。

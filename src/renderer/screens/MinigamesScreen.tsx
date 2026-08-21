@@ -13,6 +13,19 @@ import {
   type MinigameId,
 } from '../../shared/game/minigames.js';
 import { areMinigameEventsUnlocked } from '../../shared/game/control-unlocks.js';
+import {
+  BreakoutBallArt,
+  BreakoutBrickArt,
+  BreakoutPaddleArt,
+  Cookie2048TileArt,
+  MemoryCookieArt,
+  MinesweeperClearArt,
+  MinesweeperFlagArt,
+  MinesweeperHiddenArt,
+  MinesweeperMineArt,
+  PlayingCardBackArt,
+  PlayingCardFaceArt,
+} from '../assets/icons.js';
 import { MinigameAction, MinigameActionLabel, type MinigameActionIcon } from '../components/MinigameAction.js';
 import { bilingualText, MINIGAME_COPY, type Bilingual } from '../game/copy.js';
 import { useGameDispatch, useStructureSnapshot } from '../game/GameProvider.js';
@@ -44,6 +57,17 @@ function rank(card: string): number {
 
 function suit(card: string): string {
   return card.slice(0, 1);
+}
+
+function rankName(value: number): string {
+  return value === 1 ? 'Ace' : value === 11 ? 'Jack' : value === 12 ? 'Queen' : value === 13 ? 'King' : String(value);
+}
+
+function suitName(id: string): Bilingual {
+  return id === 'H' ? { en: 'Hearts', yue: '紅心' }
+    : id === 'D' ? { en: 'Diamonds', yue: '方塊' }
+      : id === 'C' ? { en: 'Clubs', yue: '梅花' }
+        : { en: 'Spades', yue: '黑桃' };
 }
 
 function moveWaste(game: KlondikeState): KlondikeState {
@@ -181,11 +205,18 @@ function ActiveGame({ data, dispatch }: { data: MinigameData; dispatch: ReturnTy
         <div className="minigame-tableau">
           {data.tableau.map((column, index) => (
             <div key={index} className="minigame-column" aria-label={bilingualText({ en: `Column ${index + 1}`, yue: `第 ${index + 1} 欄` })}>
-              {column.map((card, cardIndex) => (
-                <span key={`${card}-${cardIndex}`} className="minigame-card">
-                  {data.faceUp[index]?.[cardIndex] ? card : '🂠'}
-                </span>
-              ))}
+              {column.map((card, cardIndex) => {
+                const faceUp = data.faceUp[index]?.[cardIndex];
+                const cardLabel = faceUp
+                  ? { en: `${rankName(rank(card))} of ${suitName(suit(card)).en}`, yue: `${suitName(suit(card)).yue}${rankName(rank(card))}` }
+                  : { en: 'Face-down card', yue: '背向牌' };
+                return (
+                  <span key={`${card}-${cardIndex}`} className="minigame-card">
+                    <span className="minigame-a11y-label"><MinigameActionLabel text={cardLabel} /></span>
+                    {faceUp ? <PlayingCardFaceArt suitId={suit(card)} rank={rank(card)} extraClass="minigame-card-art" /> : <PlayingCardBackArt extraClass="minigame-card-art" />}
+                  </span>
+                );
+              })}
             </div>
           ))}
         </div>
@@ -205,7 +236,12 @@ function ActiveGame({ data, dispatch }: { data: MinigameData; dispatch: ReturnTy
         <p>{bilingualText({ en: `Score ${data.score} · Best tile ${data.bestTile}`, yue: `分數 ${data.score} · 最高方塊 ${data.bestTile}` })}</p>
         <div className="minigame-2048-grid">
           {data.board.flatMap((row, rowIndex) => row.map((value, column) => (
-            <span key={`${rowIndex}-${column}`} className="minigame-2048-cell">{value || '·'}</span>
+            <span key={`${rowIndex}-${column}`} className="minigame-2048-cell">
+              <Cookie2048TileArt value={value} extraClass="minigame-2048-art" />
+              <span className="minigame-a11y-label">
+                <MinigameActionLabel text={value ? { en: `Tile ${value}`, yue: `方塊 ${value}` } : { en: 'Empty cell', yue: '空格' }} />
+              </span>
+            </span>
           )))}
         </div>
         <div className="minigame-actions minigame-actions--directions" role="group" aria-label={bilingualText({ en: '2048 directions', yue: '2048 方向' })}>
@@ -240,11 +276,19 @@ function ActiveGame({ data, dispatch }: { data: MinigameData; dispatch: ReturnTy
   return (
     <section className="minigame-board minigame-board--breakout" aria-label={labelFor('breakout')}>
       <div className="breakout-field">
-        <div className="breakout-bricks">
-          {data.bricks.map((brick, index) => <span key={index} className={brick ? 'is-live' : 'is-cleared'} />)}
+        <div className="breakout-bricks" aria-hidden="true">
+          {data.bricks.map((brick, index) => (
+            <span key={index} className={brick ? 'is-live' : 'is-cleared'}>
+              {brick ? <BreakoutBrickArt variant={index} extraClass="minigame-breakout-brick-art" /> : null}
+            </span>
+          ))}
         </div>
-        <span className="breakout-ball" style={{ left: `${data.ball.x * 100}%`, top: `${data.ball.y * 100}%` }} />
-        <span className="breakout-paddle" style={{ left: `${data.paddleX * 100}%` }} />
+        <span className="breakout-ball" aria-hidden="true" style={{ left: `${data.ball.x * 100}%`, top: `${data.ball.y * 100}%` }}>
+          <BreakoutBallArt extraClass="minigame-breakout-art" />
+        </span>
+        <span className="breakout-paddle" aria-hidden="true" style={{ left: `${data.paddleX * 100}%` }}>
+          <BreakoutPaddleArt extraClass="minigame-breakout-art" />
+        </span>
       </div>
       <p>{bilingualText({ en: `Score ${data.score} · Lives ${data.lives}`, yue: `分數 ${data.score} · 生命 ${data.lives}` })}</p>
       <div className="minigame-actions" role="group" aria-label={bilingualText({ en: 'Breakout actions', yue: '打磚塊操作' })}>
@@ -399,7 +443,7 @@ function MemoryBoard({ game, dispatch }: { game: MemoryMatchState; dispatch: Ret
                       update(dispatch, memoryPick(game, index));
                     }}
                   >
-                    <span aria-hidden="true">{revealed ? card : '？'}</span>
+                    {revealed ? <MemoryCookieArt variant={Number(card.slice(-1))} extraClass="minigame-memory-art" /> : <PlayingCardBackArt extraClass="minigame-memory-art" />}
                     <span className="minigame-a11y-label" id={`memory-card-${index}-label`}>
                       <MinigameActionLabel text={state} />
                     </span>
@@ -548,7 +592,9 @@ function MinesweeperBoard({ game, dispatch }: { game: MinesweeperState; dispatch
                   update(dispatch, flagMine(game, index));
                 }}
               >
-                <span aria-hidden="true">{flagged ? '⚑' : revealed ? (game.mines.includes(index) ? '✹' : '·') : '◼'}</span>
+                {flagged ? <MinesweeperFlagArt extraClass="minigame-mine-art" />
+                  : revealed ? (game.mines.includes(index) ? <MinesweeperMineArt extraClass="minigame-mine-art" /> : <MinesweeperClearArt extraClass="minigame-mine-art" />)
+                    : <MinesweeperHiddenArt extraClass="minigame-mine-art" />}
                 <span className="minigame-a11y-label" id={`mine-cell-${index}-label`}>
                   <MinigameActionLabel text={state} />
                 </span>

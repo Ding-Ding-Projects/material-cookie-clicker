@@ -37,8 +37,6 @@ const descriptionSelector =
   ":root:root[data-design-parity='upgrade-card--gallery'] body .design-parity-route .parity-upgrade-scene .parity-upgrade-card__description";
 const stateSelector =
   ":root:root[data-design-parity='upgrade-card--gallery'] body .design-parity-route .parity-upgrade-scene .parity-upgrade-card__state";
-const genericButtonSelector =
-  ':root:root body button:not(.golden-sprite):not(.achievement-badge):not(.mini-ticket):not(.cookie-btn)';
 
 type Specificity = readonly [ids: number, classes: number, types: number];
 
@@ -130,13 +128,9 @@ function assertUpgradeParityCss(candidate: string): void {
     candidate,
     'button.parity-upgrade-card',
   );
-  if (compareSpecificity(specificity(actualBuyableSelector), specificity(genericButtonSelector)) <= 0) {
-    throw new Error('The route buyable-card selector must outrank the generic button selector');
-  }
   if (actualBuyableSelector !== buyableSelector) {
     throw new Error(`Unexpected buyable-card selector: ${actualBuyableSelector}`);
   }
-  balancedBlock(globalCss, genericButtonSelector);
 
   for (const selector of [cardSelector, actualBuyableSelector]) {
     requireDeclaration(candidate, selector, 'display', 'grid');
@@ -211,12 +205,20 @@ describe('upgrade parity route', () => {
     expect(() => assertUpgradeParityCss(sceneCss)).not.toThrow();
   });
 
-  it('turns red when the buyable selector loses cascade strength and green after restore', () => {
+  /**
+   * This used to assert the buyable selector outranked the Material Design 3 blanket button rule.
+   * That rule was removed on 2026-08-20 when the owner reverted the M3 migration, so there is no
+   * longer a generic selector to outrank and the specificity requirement went with it.
+   *
+   * The breakage is still worth catching, so the test keeps its shape and now asserts through the
+   * surviving exact-selector check. Deleting it outright would have quietly dropped the coverage.
+   */
+  it('turns red when the buyable selector is weakened and green after restore', () => {
     const weakened = '.parity-upgrade-scene button.parity-upgrade-card--buyable';
     expect(occurrenceCount(sceneCss, buyableSelector)).toBe(4);
     const broken = sceneCss.replace(buyableSelector, weakened);
     expect(broken).not.toBe(sceneCss);
-    expect(() => assertUpgradeParityCss(broken)).toThrow(/must outrank the generic button selector/);
+    expect(() => assertUpgradeParityCss(broken)).toThrow(/Unexpected buyable-card selector/);
     expect(() => assertUpgradeParityCss(sceneCss)).not.toThrow();
   });
 });

@@ -43,7 +43,7 @@ window resolution, and owned cleanup.
 
 `design/_verify/design-parity-guard.mjs` validates the exact reference set and runs the negative
 proof. `tests/design-parity.test.ts`, `tests/design-reference-modernization.test.ts`, and
-`tests/m3-chrome.test.ts` cover the inventory, evidence bindings, and Material audit summaries.
+`tests/no-m3-remigration.test.ts` cover the inventory, evidence bindings, and Material audit summaries.
 
 At the current integration baseline, all 16 rows have verified reference/product captures,
 labelled comparisons, and machine-readable diffs bound to source commit `6f878d9`. All five audit

@@ -1,6 +1,6 @@
 import { describe, expect, it } from 'vitest';
 
-import { designParitySearchFromArgv } from '../src/main/design-parity-launch.js';
+import { designParitySearchFromArgv, mayNavigateTo } from '../src/main/design-parity-launch.js';
 
 /**
  * The main process turns one launch argument into the query string the renderer parses, so a
@@ -69,5 +69,52 @@ describe('design-parity launch query', () => {
     const withMark = designParitySearchFromArgv(['electron.exe', '.', `--design-parity-query=?${full}`]);
     const without = designParitySearchFromArgv(['electron.exe', '.', `--design-parity-query=${full}`]);
     expect(withMark).toBe(without);
+  });
+});
+
+/**
+ * The navigation guard exists to stop the renderer navigating anywhere at all. The parity capture
+ * harness drives sixteen rows through one session, so a narrow exception was cut for moving between
+ * fixtures of the SAME document. This is the security-sensitive half of that helper, so what it
+ * REFUSES matters far more than what it allows.
+ */
+describe('design-parity navigation guard', () => {
+  const base = 'file:///C:/app/dist/renderer/index.html';
+  const query = '?designParity=stat-tile--gallery&theme=light&width=1280&height=800&scale=1&state=gallery&locale=en-HK';
+  const loaded = `${base}?designParity=cookie-surface--gallery&theme=light&width=1280&height=800&scale=1&state=gallery&locale=en-HK`;
+
+  it('allows staying exactly where it is', () => {
+    expect(mayNavigateTo(loaded, loaded)).toBe(true);
+  });
+
+  it('allows moving to another parity fixture of the same document', () => {
+    expect(mayNavigateTo(loaded, base + query)).toBe(true);
+  });
+
+  it('refuses anything that is not the same document', () => {
+    const refused: Readonly<Record<string, string>> = {
+      'a different path': `file:///C:/app/dist/renderer/other.html${query}`,
+      'a parent directory': `file:///C:/app/dist/other.html${query}`,
+      'a path prefix trick': `file:///C:/app/dist/renderer/index.html.evil${query}`,
+      'a different protocol': `https://example.com/dist/renderer/index.html${query}`,
+      'a remote host': `file://evil.example.com/C:/app/dist/renderer/index.html${query}`,
+      'embedded credentials': `https://user:pass@example.com/dist/renderer/index.html${query}`,
+      'a fragment': `${base}${query}#somewhere`,
+      'a data URL': 'data:text/html,<h1>hi</h1>',
+      'a javascript URL': 'javascript:alert(1)',
+      'about:blank': 'about:blank',
+      'no query at all': base,
+      'an unrelated query': `${base}?next=https://example.com`,
+      'a valid query plus an unknown key': `${base}${query}&evil=1`,
+      'an off-contract theme': `${base}?designParity=stat-tile--gallery&theme=neon`,
+      'not a URL': 'not a url at all',
+    };
+    for (const [why, next] of Object.entries(refused)) {
+      expect(mayNavigateTo(loaded, next), why).toBe(false);
+    }
+  });
+
+  it('refuses navigation away even when the CURRENT url carries a fragment', () => {
+    expect(mayNavigateTo(`${loaded}#here`, base + query)).toBe(false);
   });
 });

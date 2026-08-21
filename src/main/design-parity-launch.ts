@@ -23,11 +23,12 @@
  * The navigation guard is untouched. This decides the URL the window is loaded WITH; it does not
  * let the window navigate anywhere afterwards.
  */
-export function designParitySearchFromArgv(argv: readonly string[]): string | undefined {
-  const flag = '--design-parity-query=';
-  const supplied = argv.find((entry) => entry.startsWith(flag));
-  if (supplied === undefined) return undefined;
-  const raw = supplied.slice(flag.length);
+/**
+ * The single validator both the launch path and the navigation guard use. One rule, one place: a
+ * second copy would be free to drift, and the drifting copy would be the one deciding what the
+ * window is allowed to load.
+ */
+export function validDesignParitySearch(raw: string): string | undefined {
   if (raw.length === 0 || raw.length > 256) return undefined;
 
   const allowed: Readonly<Record<string, RegExp>> = {
@@ -61,4 +62,48 @@ export function designParitySearchFromArgv(argv: readonly string[]): string | un
   if (!seen.has('designParity')) return undefined;
 
   return `?${params.toString()}`;
+}
+
+/** Reads the one launch flag and validates whatever it carries. */
+export function designParitySearchFromArgv(argv: readonly string[]): string | undefined {
+  const flag = '--design-parity-query=';
+  const supplied = argv.find((entry) => entry.startsWith(flag));
+  if (supplied === undefined) return undefined;
+  return validDesignParitySearch(supplied.slice(flag.length));
+}
+
+/**
+ * Whether the window may navigate from `currentUrl` to `nextUrl`.
+ *
+ * The guard this backs exists to stop the renderer navigating ANYWHERE — that is a real boundary
+ * and it stays. But the parity capture harness drives all sixteen rows through one session, moving
+ * between fixtures of the SAME loaded document, and refusing that made the harness able to reach
+ * exactly one row: it could be launched with a query, and then never move.
+ *
+ * So the exception is drawn as narrowly as it can be and still be useful:
+ *
+ *   • Same origin, same pathname. Not "same site", not a prefix — byte-equal path.
+ *   • Only the query may differ, and it must pass the same validator the launch flag uses, so a
+ *     navigation cannot ask for anything a launch could not have asked for.
+ *   • No hash, no credentials, no port change — anything else about the URL differing is refused.
+ *
+ * A renderer that somehow issued one of these could change which parity fixture is displayed and
+ * nothing else. Everything that made the original guard worth having is intact.
+ */
+export function mayNavigateTo(currentUrl: string, nextUrl: string): boolean {
+  if (nextUrl === currentUrl) return true;
+  let current: URL;
+  let next: URL;
+  try {
+    current = new URL(currentUrl);
+    next = new URL(nextUrl);
+  } catch {
+    return false;
+  }
+  if (next.protocol !== current.protocol) return false;
+  if (next.host !== current.host) return false;
+  if (next.pathname !== current.pathname) return false;
+  if (next.hash !== '' || current.hash !== '') return false;
+  if (next.username !== '' || next.password !== '') return false;
+  return validDesignParitySearch(next.search) !== undefined;
 }

@@ -6,7 +6,7 @@ import { randomUUID } from 'node:crypto';
 import { app, BrowserWindow, dialog, ipcMain, safeStorage, shell, type OpenDialogOptions } from 'electron';
 import squirrelStartup from 'electron-squirrel-startup';
 
-import { designParitySearchFromArgv } from './design-parity-launch.js';
+import { designParitySearchFromArgv, mayNavigateTo } from './design-parity-launch.js';
 
 import { DieselLedgerService } from './diesel-ledger-service.js';
 import { UpdateService } from './update-service.js';
@@ -104,7 +104,7 @@ function createWindow(): BrowserWindow {
   window.removeMenu();
   window.webContents.setWindowOpenHandler(() => ({ action: 'deny' }));
   window.webContents.on('will-navigate', (event, url) => {
-    if (url !== window.webContents.getURL()) event.preventDefault();
+    if (!mayNavigateTo(window.webContents.getURL(), url)) event.preventDefault();
   });
   window.webContents.on('page-title-updated', (event) => {
     event.preventDefault();

@@ -10,6 +10,7 @@ import {
   controlRungLevel,
   controlRungPrice,
   getControlUnlock,
+  hasControlRung,
   V9_GRANDFATHERED_RUNG_IDS,
 } from "../../src/shared/game/control-unlocks";
 import {
@@ -238,7 +239,31 @@ describe("look tiers: gating", () => {
     const cabinet = buy(palette, "look.cabinet");
     expect(cabinet.cookies).toEqual(bnFromNumber(0));
     expect(nextLookPurchase(cabinet)).toMatchObject({ rungId: "look.marquee", affordable: false });
-    expect(lookStage(cabinet)).toBe("cabinet");
+    // Spending the LAST cookie on the cabinet collapses straight back to the bare cookie, because
+    // the zero rule outranks the ladder. The rung is still owned — one click restores the cabinet.
+    expect(lookStage(cabinet)).toBe("cookie-only");
+    expect(lookStage({ ...cabinet, cookies: bnFromNumber(1) })).toBe("cabinet");
+  });
+
+  /**
+   * The owner's rule, 2026-08-20: "Nothing other than a cookie should show on zero."
+   *
+   * A fresh save was already cookie-only, so this is specifically about a PROGRESSED save whose
+   * balance has been spent down to nothing: the furniture exists to hold cookies, so with none to
+   * hold there is nothing to furnish. Nothing is refunded or unbought — the stage is derived from
+   * the live balance, so the next click brings every owned rung straight back.
+   */
+  it("collapses to a bare cookie whenever the balance is zero, whatever is owned", () => {
+    const owned = buy(buy(withCookies(300), "look.palette"), "look.cabinet");
+    // The precondition: every graphics rung this ladder can reach at this point is owned.
+    expect(hasControlRung(owned, "look.palette")).toBe(true);
+    expect(hasControlRung(owned, "look.cabinet")).toBe(true);
+
+    expect(lookStage({ ...owned, cookies: bnFromNumber(0) })).toBe("cookie-only");
+    // One cookie is enough to bring it all back, and the ladder decides again from there.
+    expect(lookStage({ ...owned, cookies: bnFromNumber(1) })).toBe("cabinet");
+    // And an unprogressed save is unchanged by this rule: it was already cookie-only.
+    expect(lookStage(withCookies(0))).toBe("cookie-only");
   });
 
   it("puts the dark theme above the palette, which is what keeps the plain state coherent", () => {

@@ -900,8 +900,15 @@ function GameApp() {
  */
 function LookTierGate({ children }: { children: ReactNode }) {
   const structure = useStructureSnapshot();
-  const attributes = lookTierAttributes(structure);
-  const stage = lookStage(structure);
+  // The LIVE balance, from the fast slice, because the stage now collapses to a bare cookie at
+  // zero and the structure snapshot does not carry a per-tick cookie count. Same pattern the coin
+  // slots already use for affordability. It does not make this re-run every tick: the signature
+  // below is a joined string of the attribute VALUES plus the stage, and both change only when
+  // the balance actually crosses zero.
+  const fast = useFastSnapshot();
+  const live = { ...structure, cookies: fast.cookies };
+  const attributes = lookTierAttributes(live);
+  const stage = lookStage(live);
   // The dependency is the VALUES, joined, rather than the object: `lookTierAttributes` builds a
   // fresh object every render, so an identity dependency would re-run on every tick of the game
   // loop for a set of attributes that changes about seven times in a playthrough.

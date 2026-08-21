@@ -4,6 +4,7 @@ import {
   getControlUnlock,
   hasControlRung,
 } from "./control-unlocks.js";
+import { bnIsZero } from "./big-number.js";
 import type { GameState } from "./types.js";
 
 /**
@@ -90,6 +91,17 @@ export interface NextLookPurchase {
 }
 
 export function lookStage(state: GameState): LookStage {
+  /**
+   * A zero balance collapses the whole app back to a bare cookie, whatever has been bought.
+   *
+   * The owner's rule, given 2026-08-20: "Nothing other than a cookie should show on zero." It is
+   * the decree above taken literally and applied to the balance rather than only to a fresh save
+   * — the furniture is there to hold cookies, so with none to hold there is nothing to furnish.
+   * Click once and every bought rung comes straight back; nothing is refunded, unbought, or lost.
+   *
+   * This is checked FIRST, before the rungs, because it outranks them by design.
+   */
+  if (bnIsZero(state.cookies)) return "cookie-only";
   if (!hasControlRung(state, "look.palette")) return "cookie-only";
   if (!hasControlRung(state, "look.cabinet")) return "palette-only";
   return "cabinet";

@@ -405,12 +405,33 @@ jobs:
           if ($draft.draft -ne $true -or $draft.prerelease -ne $false) { throw 'The staged release stopped being an ordinary draft before final verification.' }
           Assert-ReleaseAssetSet -Release $draft -ExpectedNames $expectedAssetNames
 
+          # The completion stamp is a PREDICTION until GitHub answers. It used to be computed here,
+          # written into the notes, and then asserted equal to the publication time to the second --
+          # which only passes when the publish round-trip happens to land inside the same wall-clock
+          # second. It lost that coin flip on three consecutive runs (v0.2.82, v0.2.83, v0.2.84),
+          # failing the workflow AFTER the release had already published successfully.
+          #
+          # The notes are now rendered from whatever timestamp they are given, so the same block can
+          # be re-rendered with GitHub's real published_at once it is known. The evidence becomes
+          # exactly true instead of approximately right, and nothing depends on a race.
+          function Get-TimingText([DateTimeOffset]$completedAt) {
+            $span = $completedAt - $started
+            if ($span.TotalSeconds -lt 0) { throw 'Workflow completion preceded the first job start.' }
+            return @{
+              completedText = $completedAt.ToString('yyyy-MM-ddTHH:mm:ssZ')
+              duration = '{0:00}:{1:00}:{2:00}' -f [Math]::Floor($span.TotalHours), $span.Minutes, $span.Seconds
+            }
+          }
+          # The measured completion boundary stays exactly where it was: after every draft asset is
+          # uploaded and before the one atomic publication. That is the property the release
+          # contract cares about, and it is unchanged. What changed is only what happens when the
+          # server's own published_at turns out to be a second later.
           $completed = [DateTimeOffset]::UtcNow
-          $elapsed = $completed - $started
-          if ($elapsed.TotalSeconds -lt 0) { throw 'Workflow completion preceded the first job start.' }
-          $duration = '{0:00}:{1:00}:{2:00}' -f [Math]::Floor($elapsed.TotalHours), $elapsed.Minutes, $elapsed.Seconds
-          $completedText = $completed.ToString('yyyy-MM-ddTHH:mm:ssZ')
-          $notes = @(
+          $timing = Get-TimingText $completed
+          $completedText = $timing.completedText
+          $duration = $timing.duration
+          function New-ReleaseNotes([string]$completedText, [string]$duration) {
+            return @(
             'Unsigned Squirrel.Windows release. Code signing is permanently prohibited; Setup.exe was verified as NotSigned before publication.'
             ''
             "- Squirrel full package: $($installerEvidenceData.fullPackage)"
@@ -428,7 +449,9 @@ jobs:
             "- Workflow duration: $duration"
             ''
             (Get-Content -LiteralPath $lineCount -Raw)
-          ) -join "`n"
+            ) -join "`n"
+          }
+          $notes = New-ReleaseNotes -completedText $completedText -duration $duration
           $notes | Out-File -FilePath release-notes.md -Encoding utf8
 
           $makeLatest = if ($env:GITHUB_REF_NAME -eq 'main') { 'true' } else { 'false' }
@@ -444,9 +467,27 @@ jobs:
           if ($published.tag_name -ne $env:RELEASE_TAG -or $published.target_commitish -ne $env:GITHUB_SHA) {
             throw 'The final publication response did not preserve the exact tag and source commit.'
           }
-          $publishedAtText = [DateTimeOffset]::Parse([string]$published.published_at).ToUniversalTime().ToString('yyyy-MM-ddTHH:mm:ssZ')
+          # GitHub's published_at is the authoritative completion moment, so it wins over the
+          # prediction above. When they differ -- which is most of the time, by a second -- re-render
+          # the notes with the real value and patch the body once more, rather than failing a release
+          # that already published correctly.
+          $publishedAt = [DateTimeOffset]::Parse([string]$published.published_at).ToUniversalTime()
+          $publishedAtText = $publishedAt.ToString('yyyy-MM-ddTHH:mm:ssZ')
           if ($publishedAtText -ne $completedText) {
-            throw "The atomic publication completed at $publishedAtText, but the prepared release notes record $completedText."
+            $timing = Get-TimingText $publishedAt
+            $completedText = $timing.completedText
+            $duration = $timing.duration
+            $notes = New-ReleaseNotes -completedText $completedText -duration $duration
+            $notes | Out-File -FilePath release-notes.md -Encoding utf8
+            $publishedRaw = Invoke-CheckedGh -Operation "Record the exact publication time in $env:RELEASE_TAG" -Arguments @(
+              'api', '--method', 'PATCH', "repos/$env:GITHUB_REPOSITORY/releases/$releaseId",
+              '-F', 'body=@release-notes.md'
+            )
+            $published = ($publishedRaw -join "`n") | ConvertFrom-Json
+            $recheckedAt = [DateTimeOffset]::Parse([string]$published.published_at).ToUniversalTime().ToString('yyyy-MM-ddTHH:mm:ssZ')
+            if ($recheckedAt -ne $publishedAtText) {
+              throw "published_at moved from $publishedAtText to $recheckedAt while recording the timing evidence."
+            }
           }
           Assert-ReleaseAssetSet -Release $published -ExpectedNames $expectedAssetNames
           if ([string]$published.body -notmatch [regex]::Escape("Workflow completed: $completedText") -or

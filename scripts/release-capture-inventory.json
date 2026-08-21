@@ -81,7 +81,7 @@
       "supportingEvidence": {
         "state": "before",
         "image": "design/parity/evidence/graphics-progression/before.png",
-        "sourceCommit": "3e5895c879b954413763855206ef506dc7677d65",
+        "sourceCommit": "1d4d6674ce0c85357b20a072c4e30d58eac61243",
         "sha256": "1db0512c993f2060a7eb78a35c0aca08ba6be26c43820f37aaafc056ce16172e",
         "dimensions": {
           "width": 1440,
@@ -89,7 +89,7 @@
         },
         "method": "cheap-lowlevel-headless",
         "receipt": "design/parity/evidence/graphics-progression/receipt.json",
-        "receiptSha256": "ffe9643197c76d51704756972b5c2438f9176bc6c1cf9772fd7269be48854646",
+        "receiptSha256": "bc7b92e1ea3ff49bdc77a7f340273f72e3608c639245425d971baad8db6ac972",
         "promotionCompliance": "not-claimed",
         "limitations": "Partial feature-state receipt only; no generic promotion receipt and no exact release-tip binding."
       }

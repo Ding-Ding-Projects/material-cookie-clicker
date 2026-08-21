@@ -1,15 +1,27 @@
 # Roadmap
 
-Status as of 2026-08-19 at integration candidate
-`43d2174bc2172d31e572d9668282764438e4d904`. A feature is listed as verified,
+Status as of 2026-08-20 at integration candidate
+`e2171d1a06ed81a8ab6576d9c4fb13b9ee9c9a0e`. A feature is listed as verified,
 evidence-pending, partial, logic-only, or not implemented; planned work is never phrased as
 shipped.
 
 ## Current integration candidate
 
-- **Not a release.** `43d2174` is 61 commits ahead of the verified `v0.2.55` source and has not
+- **Not a release.** `e2171d1` is 120 commits ahead of the verified `v0.2.55` source and has not
   been published. Release and installed-runtime evidence from `v0.2.55` does not automatically
   prove the source changes that followed it.
+- **The suite is green at the candidate**: 71 files, 1074 tests. Thirteen tests were failing before
+  this pass, inherited from a merge and unseen because no workflow runs tests; all thirteen are
+  closed by their real causes. Two of them were whole files that executed nothing at all.
+- **The packaged executable now carries the committed icon.** `signAndEditExecutable: false`
+  disables rcedit, which is also what embeds the icon, so every packaged build had been shipping the
+  framework default. An `afterPack` hook runs rcedit with `--set-icon` only; both the app and the
+  setup executable remain `NotSigned`. GitHub issue 3 is closed with the measured evidence.
+- **Design-parity evidence stays provenance-incomplete deliberately.** Promotion requires a build
+  receipt, a run ledger and a per-artifact promotion record; `tests/design-parity.test.ts` asserts
+  the pending state on purpose and proves the verified path against a fixture. The captured PNGs
+  predate the parity repairs that have since landed, so the ratios in
+  `design/parity/DRIFT-ANALYSIS.md` overstate the current gap — its status section says so.
 - **Current source/package checks.** `npm run check` completed at the pinned clean candidate with
   both TypeScript checks and **1,124/1,124 tests**: 998 application tests across 59 files, 37
   local-model package tests, and 89 surface-kernel tests. The eight focused completeness tests also
@@ -64,7 +76,7 @@ shipped.
 
 ## Integrated source candidate; runtime evidence pending
 
-The independent implementation lanes have converged at `43d2174`. Settings → Application tools
+The independent implementation lanes have converged at `e2171d1`. Settings → Application tools
 mounts identity/logo/appearance, categorized conversion with dedicated PDF controls, local-model
 recovery, authenticator registration, local history, schedules, exports, changelog, offline docs,
 and security/state tools. Main-process file grants, a persistent bounded conversion queue,
@@ -93,7 +105,7 @@ The hand-written matrix is authoritative; the largest gaps are:
 
 ## Completion order
 
-1. Keep `43d2174` and the per-surface matrix factual while source lanes converge.
+1. Keep `e2171d1` and the per-surface matrix factual while source lanes converge.
 2. Repair all 16 parity defects and replace the invalidated evidence with one clean, task-rooted,
    transactional promotion run.
 3. Run the built-artifact interaction/capture matrix for every newly mounted tool tab, including
@@ -104,7 +116,7 @@ The hand-written matrix is authoritative; the largest gaps are:
 
 ## Session note (2026-08-20) — graphic and site defect repairs
 
-A follow-up lane repaired a batch of measured rendering defects on top of the `43d2174` candidate:
+A follow-up lane repaired a batch of measured rendering defects on top of the `e2171d1` candidate:
 the Memory Match board layout, undeclared Minesweeper flag-color and
 caption-typescale tokens, an undeclared tool-card surface token, a 13px hero-band clipping shortfall
 on the minigame hint line, and a cascade-layer ordering fix for six `canonical-tools.css` selectors

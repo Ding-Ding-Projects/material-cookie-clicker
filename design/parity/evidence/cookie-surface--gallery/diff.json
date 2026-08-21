@@ -19,7 +19,7 @@
     },
     "product": {
       "path": "design/parity/evidence/cookie-surface--gallery/product.png",
-      "sha256": "b72875e3f865a5b7fee39211f4011c278f45006fc28917df00d3f415e15689ae"
+      "sha256": "025b2a8b5525328f24714b80ed4dc659421d8bb0c2a9dd97f983393a22fa27fb"
     }
   },
   "dimensions": {
@@ -27,10 +27,10 @@
     "height": 800
   },
   "metrics": {
-    "changedPixels": 442913,
+    "changedPixels": 118487,
     "totalPixels": 1024000,
-    "changedRatio": 0.4325322265625,
-    "rgbRmse": 40.750223039075195
+    "changedRatio": 0.1157099609375,
+    "rgbRmse": 21.006978030563143
   },
   "tool": {
     "name": "Pillow ImageChops.difference",

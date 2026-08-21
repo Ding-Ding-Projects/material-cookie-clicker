@@ -81,14 +81,18 @@ function verifiedEvidenceFixture(): {
 }
 
 describe('design parity inventory', () => {
-  it('covers the exact hand-written checked-in reference set while promotion remains pending', () => {
+  it('covers the exact hand-written checked-in reference set with every record promoted', () => {
     expect(validateInventory(loadInventory(), { mode: 'structure' })).toEqual({
       rowCount: 16,
       referenceCount: 16,
       mode: 'structure',
     });
     expect(loadPromotionInventory().records).toHaveLength(32);
-    expect(loadPromotionInventory().records.every((record: any) => record.active === false && record.status === 'pending')).toBe(true);
+    // These thirty-two records were pending for as long as the product side of the capture pipeline
+    // was unreachable: the main process loaded the renderer with no query and refused to navigate,
+    // so nothing could ever ask for a parity fixture. With that closed at both layers, a real
+    // promotion run captured both sides of all sixteen rows and every receipt verified.
+    expect(loadPromotionInventory().records.every((record: any) => record.active === true && record.status === 'verified')).toBe(true);
   });
 
   it('turns red for every exact negative fixture and green after restore', () => {
@@ -97,10 +101,19 @@ describe('design parity inventory', () => {
     expect(results.every((result) => result.red && result.restored === 'green')).toBe(true);
   });
 
-  it('rejects the current provenance-incomplete evidence before visual review', () => {
+  it('accepts the promoted evidence and now rejects release for the visual difference itself', () => {
+    // This used to expect EVIDENCE_PENDING, which said the evidence had never been captured
+    // properly. It has been now, so release is refused one stage later and for the honest reason:
+    // the captures are trustworthy AND the product still does not match its reference. Verified
+    // evidence means the photograph is real, never that the thing photographed is correct.
     expect(() => validateInventory(loadInventory(), { mode: 'release' })).toThrowError(
-      expect.objectContaining<Partial<ParityGuardError>>({ code: 'EVIDENCE_PENDING' }),
+      expect.objectContaining<Partial<ParityGuardError>>({ code: 'DIFF_REVIEW_DEFECT' }),
     );
+    expect(validateInventory(loadInventory(), { mode: 'evidence', promotionInventory: loadPromotionInventory() })).toEqual({
+      rowCount: 16,
+      referenceCount: 16,
+      mode: 'evidence',
+    });
   });
 
   it('accepts a fully bound evidence fixture but still rejects its unapproved visual difference for release', () => {

@@ -19,7 +19,7 @@
     },
     "product": {
       "path": "design/parity/evidence/bulk-toolbar--progress/product.png",
-      "sha256": "872b047f218afe3eab5b7be02c59c00f2698f0f0af9513ae98160b397368c5f0"
+      "sha256": "92e963d7fa89abfa8e499f6206fac1c2dbe48038f203758fc1a91e10f5bdb1c7"
     }
   },
   "dimensions": {
@@ -27,10 +27,10 @@
     "height": 800
   },
   "metrics": {
-    "changedPixels": 302916,
+    "changedPixels": 130866,
     "totalPixels": 1024000,
-    "changedRatio": 0.29581640625,
-    "rgbRmse": 27.229402778082402
+    "changedRatio": 0.127798828125,
+    "rgbRmse": 21.029743468515314
   },
   "tool": {
     "name": "Pillow ImageChops.difference",

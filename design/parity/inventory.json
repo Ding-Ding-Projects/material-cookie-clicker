@@ -388,31 +388,40 @@
       "evidence": {
         "referenceRaw": {
           "path": "design/parity/evidence/achievement-badge--gallery/reference.png",
-          "status": "pending",
-          "reason": "Fresh reference PNG and complete task-owned promotion receipt are required."
+          "status": "verified",
+          "sha256": "3e9b4c11c1177bdc33e9aeb36f9014136e8aebf5c0b1051fad0ac5122d080562",
+          "promotionRecordId": "achievement-badge--gallery--reference",
+          "receiptSha256": "7823eddda282f2be1029abba0c60fe4a4915d599ac77bb3efc6ae01fa2d6e84f"
         },
         "productRaw": {
           "path": "design/parity/evidence/achievement-badge--gallery/product.png",
-          "status": "pending",
-          "reason": "Fresh built-product PNG and complete task-owned promotion receipt are required."
+          "status": "verified",
+          "sha256": "670a04daca04b0152ac4e41555e238809eafa005bba271eb4c12f084095ab7ca",
+          "promotionRecordId": "achievement-badge--gallery--product",
+          "receiptSha256": "9643574fd43c6ec421db281f929efaea2ad1177ce116e1ce4206e75c995af8a2"
         },
         "comparison": {
           "path": "design/parity/evidence/achievement-badge--gallery/comparison.png",
-          "status": "pending",
-          "reason": "Fresh accepted raw pairs are required before regenerating the labelled comparison."
+          "status": "verified",
+          "sha256": "8be1f628536e3d23b08fd9674b51f77c8c2265c07f248bd5ebfa2a54f0cabd60",
+          "manifestPath": "design/parity/evidence/achievement-badge--gallery/comparison.json",
+          "manifestSha256": "33c46839f138009922d928e2e4c615a27b42f365d0b096c3be63e1968cbf504f"
         },
         "diff": {
           "path": "design/parity/evidence/achievement-badge--gallery/diff.json",
-          "status": "pending",
-          "reason": "Fresh accepted raw pairs are required before regenerating the visual diff."
+          "status": "verified",
+          "sha256": "f47a08edfcbc8f5c418deab0a4e8d13dbb14fead0f23bfb7a5985dcda5377a27"
         }
       },
       "intentionalDeviations": [],
-      "sourceCommit": "pending-fresh-provenance-run",
+      "sourceCommit": "76f439476c3f2888a5d9993760cbf14da589370e",
       "captureProvenance": {
-        "status": "pending",
+        "status": "verified",
         "route": "cheap-lowlevel-headless",
-        "reason": "The previous receipts do not carry a complete task-owned run ledger, whole-build asset binding, live runtime proof, reviewed privacy proof, owned cleanup proof, or transactional stage record."
+        "sourceCommit": "76f439476c3f2888a5d9993760cbf14da589370e",
+        "runLedgerSha256": "5baac7f57661916f9113145d140bbe8e5ec43a7a571045a8b26a43f6b5865381",
+        "productArtifactSha256": "395eaf1b82d859f3e11ec1206fc6428fafd33492d757812d5d5315e8a12b3c52",
+        "referenceArtifactSha256": "d0897d6d5ca1210f3d84abc4b3e2aef02985fde8e6afaf9222112c4c1c5879ba"
       }
     },
     {
@@ -456,31 +465,40 @@
       "evidence": {
         "referenceRaw": {
           "path": "design/parity/evidence/building-row--gallery/reference.png",
-          "status": "pending",
-          "reason": "Fresh reference PNG and complete task-owned promotion receipt are required."
+          "status": "verified",
+          "sha256": "f4fcb7f36811f0a045bea86dc9ac96c4850e408d19345bf2c987b37f80260e04",
+          "promotionRecordId": "building-row--gallery--reference",
+          "receiptSha256": "9680dccc965b2b5038e52c00bcf872752721f35ebdc453cd2131b84609fb60f4"
         },
         "productRaw": {
           "path": "design/parity/evidence/building-row--gallery/product.png",
-          "status": "pending",
-          "reason": "Fresh built-product PNG and complete task-owned promotion receipt are required."
+          "status": "verified",
+          "sha256": "45f287ba2bc4321f184349d707a953d2945f1bed355383e85659948693a963ea",
+          "promotionRecordId": "building-row--gallery--product",
+          "receiptSha256": "1c371de3dcf184cf175f0fb1fcd0786452d9c175fc2cfc7d0b4049c225d410a3"
         },
         "comparison": {
           "path": "design/parity/evidence/building-row--gallery/comparison.png",
-          "status": "pending",
-          "reason": "Fresh accepted raw pairs are required before regenerating the labelled comparison."
+          "status": "verified",
+          "sha256": "fd68f4bb4c9422b8ee51f99bd1747ad0ed6299da0541aee4194579ab560c3a57",
+          "manifestPath": "design/parity/evidence/building-row--gallery/comparison.json",
+          "manifestSha256": "bee79909bff27e10d8beca5518f6dbcf25d18fc6af948cff5d7f4084944697e5"
         },
         "diff": {
           "path": "design/parity/evidence/building-row--gallery/diff.json",
-          "status": "pending",
-          "reason": "Fresh accepted raw pairs are required before regenerating the visual diff."
+          "status": "verified",
+          "sha256": "cd87fc0ec362de107fcd9cf27c13046f347bcb52b31784a5ff1a4d124777011b"
         }
       },
       "intentionalDeviations": [],
-      "sourceCommit": "pending-fresh-provenance-run",
+      "sourceCommit": "76f439476c3f2888a5d9993760cbf14da589370e",
       "captureProvenance": {
-        "status": "pending",
+        "status": "verified",
         "route": "cheap-lowlevel-headless",
-        "reason": "The previous receipts do not carry a complete task-owned run ledger, whole-build asset binding, live runtime proof, reviewed privacy proof, owned cleanup proof, or transactional stage record."
+        "sourceCommit": "76f439476c3f2888a5d9993760cbf14da589370e",
+        "runLedgerSha256": "5baac7f57661916f9113145d140bbe8e5ec43a7a571045a8b26a43f6b5865381",
+        "productArtifactSha256": "395eaf1b82d859f3e11ec1206fc6428fafd33492d757812d5d5315e8a12b3c52",
+        "referenceArtifactSha256": "d0897d6d5ca1210f3d84abc4b3e2aef02985fde8e6afaf9222112c4c1c5879ba"
       }
     },
     {
@@ -524,31 +542,40 @@
       "evidence": {
         "referenceRaw": {
           "path": "design/parity/evidence/bulk-toolbar--progress/reference.png",
-          "status": "pending",
-          "reason": "Fresh reference PNG and complete task-owned promotion receipt are required."
+          "status": "verified",
+          "sha256": "9665c8e221a0d2150fd3c90fe4951266623921dc08d7424af74da6a7314f9288",
+          "promotionRecordId": "bulk-toolbar--progress--reference",
+          "receiptSha256": "0c3a7a876370779d3e751ef01959ee79103b464bf4668099ed076016104d5b9c"
         },
         "productRaw": {
           "path": "design/parity/evidence/bulk-toolbar--progress/product.png",
-          "status": "pending",
-          "reason": "Fresh built-product PNG and complete task-owned promotion receipt are required."
+          "status": "verified",
+          "sha256": "92e963d7fa89abfa8e499f6206fac1c2dbe48038f203758fc1a91e10f5bdb1c7",
+          "promotionRecordId": "bulk-toolbar--progress--product",
+          "receiptSha256": "cdf295cdf93a286b49278395406886ab1d9ee4068420cf59dbcadc07b9d9ccb2"
         },
         "comparison": {
           "path": "design/parity/evidence/bulk-toolbar--progress/comparison.png",
-          "status": "pending",
-          "reason": "Fresh accepted raw pairs are required before regenerating the labelled comparison."
+          "status": "verified",
+          "sha256": "19d446b4b21e306061590c4f8efdeb8f92078a4fb61d575b63653f269b1fda27",
+          "manifestPath": "design/parity/evidence/bulk-toolbar--progress/comparison.json",
+          "manifestSha256": "689d9bd8cdad54986b154078b4c46f1ec1c451bbefeb78c05642e2dccdffbe1e"
         },
         "diff": {
           "path": "design/parity/evidence/bulk-toolbar--progress/diff.json",
-          "status": "pending",
-          "reason": "Fresh accepted raw pairs are required before regenerating the visual diff."
+          "status": "verified",
+          "sha256": "f83424fb4af6653c9a44e3e9fcbfee64c2d14831aedf55103b6975d99ef40a07"
         }
       },
       "intentionalDeviations": [],
-      "sourceCommit": "pending-fresh-provenance-run",
+      "sourceCommit": "76f439476c3f2888a5d9993760cbf14da589370e",
       "captureProvenance": {
-        "status": "pending",
+        "status": "verified",
         "route": "cheap-lowlevel-headless",
-        "reason": "The previous receipts do not carry a complete task-owned run ledger, whole-build asset binding, live runtime proof, reviewed privacy proof, owned cleanup proof, or transactional stage record."
+        "sourceCommit": "76f439476c3f2888a5d9993760cbf14da589370e",
+        "runLedgerSha256": "5baac7f57661916f9113145d140bbe8e5ec43a7a571045a8b26a43f6b5865381",
+        "productArtifactSha256": "395eaf1b82d859f3e11ec1206fc6428fafd33492d757812d5d5315e8a12b3c52",
+        "referenceArtifactSha256": "d0897d6d5ca1210f3d84abc4b3e2aef02985fde8e6afaf9222112c4c1c5879ba"
       }
     },
     {
@@ -597,31 +624,40 @@
       "evidence": {
         "referenceRaw": {
           "path": "design/parity/evidence/cookie-surface--gallery/reference.png",
-          "status": "pending",
-          "reason": "Fresh reference PNG and complete task-owned promotion receipt are required."
+          "status": "verified",
+          "sha256": "d7ab305b1255b04b8e9b40240d9f0be2f1290caa9ba7dd4c8e744c835eef5dbb",
+          "promotionRecordId": "cookie-surface--gallery--reference",
+          "receiptSha256": "80b4b8cdaf860737a0ae30cf1e27eb8c1bb687f0b82b305146c528a65a2e88ef"
         },
         "productRaw": {
           "path": "design/parity/evidence/cookie-surface--gallery/product.png",
-          "status": "pending",
-          "reason": "Fresh built-product PNG and complete task-owned promotion receipt are required."
+          "status": "verified",
+          "sha256": "025b2a8b5525328f24714b80ed4dc659421d8bb0c2a9dd97f983393a22fa27fb",
+          "promotionRecordId": "cookie-surface--gallery--product",
+          "receiptSha256": "92bf9bfb7e7dc97130459860964681621700a46e7d147597fc03d4e619dfa2a6"
         },
         "comparison": {
           "path": "design/parity/evidence/cookie-surface--gallery/comparison.png",
-          "status": "pending",
-          "reason": "Fresh accepted raw pairs are required before regenerating the labelled comparison."
+          "status": "verified",
+          "sha256": "2fa4bc87003bec833955ee46b3f5cc670cdd049e0b89a504211e705b9bb6bec1",
+          "manifestPath": "design/parity/evidence/cookie-surface--gallery/comparison.json",
+          "manifestSha256": "4db1f1307055446addf5f3f36f25f3a7ff0e6bb4d216d88f64f4a4597973b19d"
         },
         "diff": {
           "path": "design/parity/evidence/cookie-surface--gallery/diff.json",
-          "status": "pending",
-          "reason": "Fresh accepted raw pairs are required before regenerating the visual diff."
+          "status": "verified",
+          "sha256": "dd23b70164fd5cb511e875fc0907e6c476fba7abeaeb456d8e0520c9a9aa9185"
         }
       },
       "intentionalDeviations": [],
-      "sourceCommit": "pending-fresh-provenance-run",
+      "sourceCommit": "76f439476c3f2888a5d9993760cbf14da589370e",
       "captureProvenance": {
-        "status": "pending",
+        "status": "verified",
         "route": "cheap-lowlevel-headless",
-        "reason": "The previous receipts do not carry a complete task-owned run ledger, whole-build asset binding, live runtime proof, reviewed privacy proof, owned cleanup proof, or transactional stage record."
+        "sourceCommit": "76f439476c3f2888a5d9993760cbf14da589370e",
+        "runLedgerSha256": "5baac7f57661916f9113145d140bbe8e5ec43a7a571045a8b26a43f6b5865381",
+        "productArtifactSha256": "395eaf1b82d859f3e11ec1206fc6428fafd33492d757812d5d5315e8a12b3c52",
+        "referenceArtifactSha256": "d0897d6d5ca1210f3d84abc4b3e2aef02985fde8e6afaf9222112c4c1c5879ba"
       }
     },
     {
@@ -664,31 +700,40 @@
       "evidence": {
         "referenceRaw": {
           "path": "design/parity/evidence/game-layout--main/reference.png",
-          "status": "pending",
-          "reason": "Fresh reference PNG and complete task-owned promotion receipt are required."
+          "status": "verified",
+          "sha256": "984ff6c8dfa921f5e8071df06a6a4ddefcdf9a1c8cd1d4469db23a90d72fd21b",
+          "promotionRecordId": "game-layout--main--reference",
+          "receiptSha256": "cb6b22abdb84845746cbc0c19b3f043454aa7e999573b43fa583103524df6289"
         },
         "productRaw": {
           "path": "design/parity/evidence/game-layout--main/product.png",
-          "status": "pending",
-          "reason": "Fresh built-product PNG and complete task-owned promotion receipt are required."
+          "status": "verified",
+          "sha256": "fe7a0d4769843cf19c89f636bbab9c0cb2e4731bfaa5337eca545bc3eb7a3ee0",
+          "promotionRecordId": "game-layout--main--product",
+          "receiptSha256": "e94d2db72ed8387454559099aae855cfb8f1530fbd76dd4512836a1f5e688848"
         },
         "comparison": {
           "path": "design/parity/evidence/game-layout--main/comparison.png",
-          "status": "pending",
-          "reason": "Fresh accepted raw pairs are required before regenerating the labelled comparison."
+          "status": "verified",
+          "sha256": "61a6f56c1f11cd65d80761a774e8688a72a6d7dfdf1e8587b008fb9a953a2d16",
+          "manifestPath": "design/parity/evidence/game-layout--main/comparison.json",
+          "manifestSha256": "2315a5e54a40218ad15b5bdee5a062283e9eb439b2a1c00bd9ce5586abe3c1df"
         },
         "diff": {
           "path": "design/parity/evidence/game-layout--main/diff.json",
-          "status": "pending",
-          "reason": "Fresh accepted raw pairs are required before regenerating the visual diff."
+          "status": "verified",
+          "sha256": "75024ab7d3cb1c0cdba601c5b32e213a7adf2cf8bea74bc741bfa98d819c8f2f"
         }
       },
       "intentionalDeviations": [],
-      "sourceCommit": "pending-fresh-provenance-run",
+      "sourceCommit": "76f439476c3f2888a5d9993760cbf14da589370e",
       "captureProvenance": {
-        "status": "pending",
+        "status": "verified",
         "route": "cheap-lowlevel-headless",
-        "reason": "The previous receipts do not carry a complete task-owned run ledger, whole-build asset binding, live runtime proof, reviewed privacy proof, owned cleanup proof, or transactional stage record."
+        "sourceCommit": "76f439476c3f2888a5d9993760cbf14da589370e",
+        "runLedgerSha256": "5baac7f57661916f9113145d140bbe8e5ec43a7a571045a8b26a43f6b5865381",
+        "productArtifactSha256": "395eaf1b82d859f3e11ec1206fc6428fafd33492d757812d5d5315e8a12b3c52",
+        "referenceArtifactSha256": "d0897d6d5ca1210f3d84abc4b3e2aef02985fde8e6afaf9222112c4c1c5879ba"
       }
     },
     {
@@ -731,31 +776,40 @@
       "evidence": {
         "referenceRaw": {
           "path": "design/parity/evidence/narrator-toast--gallery/reference.png",
-          "status": "pending",
-          "reason": "Fresh reference PNG and complete task-owned promotion receipt are required."
+          "status": "verified",
+          "sha256": "9cdc7e750ace8af0366b1a238e80ec29521cf9431e35436dc0103eedf7878611",
+          "promotionRecordId": "narrator-toast--gallery--reference",
+          "receiptSha256": "de627f2c3842acb1350735fd68f4c09e765c44e0ed1eddc7abef4b03f47503d7"
         },
         "productRaw": {
           "path": "design/parity/evidence/narrator-toast--gallery/product.png",
-          "status": "pending",
-          "reason": "Fresh built-product PNG and complete task-owned promotion receipt are required."
+          "status": "verified",
+          "sha256": "c47f3372d3e1f6b5f46ff744d6fdf8d19ac223d39d0807fd8044e40611d34942",
+          "promotionRecordId": "narrator-toast--gallery--product",
+          "receiptSha256": "b6bff9d2f94f020565016385245d86ffcf0e70b036819eaa60cba547cd6ff773"
         },
         "comparison": {
           "path": "design/parity/evidence/narrator-toast--gallery/comparison.png",
-          "status": "pending",
-          "reason": "Fresh accepted raw pairs are required before regenerating the labelled comparison."
+          "status": "verified",
+          "sha256": "b7937af8cbd37418757c56d25abc139c474f3b82bf84bed9d5ca67616b709380",
+          "manifestPath": "design/parity/evidence/narrator-toast--gallery/comparison.json",
+          "manifestSha256": "09bafbd02f7fb11c3ddf623446b5f698454b835f15d00736a5dd1d72fd0b2aef"
         },
         "diff": {
           "path": "design/parity/evidence/narrator-toast--gallery/diff.json",
-          "status": "pending",
-          "reason": "Fresh accepted raw pairs are required before regenerating the visual diff."
+          "status": "verified",
+          "sha256": "b2a18e2e89eb766a8114b606a29d7b89820ef4bdc2e021d290ab612a0fcd51d7"
         }
       },
       "intentionalDeviations": [],
-      "sourceCommit": "pending-fresh-provenance-run",
+      "sourceCommit": "76f439476c3f2888a5d9993760cbf14da589370e",
       "captureProvenance": {
-        "status": "pending",
+        "status": "verified",
         "route": "cheap-lowlevel-headless",
-        "reason": "The previous receipts do not carry a complete task-owned run ledger, whole-build asset binding, live runtime proof, reviewed privacy proof, owned cleanup proof, or transactional stage record."
+        "sourceCommit": "76f439476c3f2888a5d9993760cbf14da589370e",
+        "runLedgerSha256": "5baac7f57661916f9113145d140bbe8e5ec43a7a571045a8b26a43f6b5865381",
+        "productArtifactSha256": "395eaf1b82d859f3e11ec1206fc6428fafd33492d757812d5d5315e8a12b3c52",
+        "referenceArtifactSha256": "d0897d6d5ca1210f3d84abc4b3e2aef02985fde8e6afaf9222112c4c1c5879ba"
       }
     },
     {
@@ -804,31 +858,40 @@
       "evidence": {
         "referenceRaw": {
           "path": "design/parity/evidence/prestige-gate--ready/reference.png",
-          "status": "pending",
-          "reason": "Fresh reference PNG and complete task-owned promotion receipt are required."
+          "status": "verified",
+          "sha256": "9d85716fcec5d8cebf6b75fc2682e4b75dd45e691a15e6e1a4ebf09c0d28a51b",
+          "promotionRecordId": "prestige-gate--ready--reference",
+          "receiptSha256": "575357c835956fa30f34153169a704754ec5af5d0035f0a293b0716a18f939db"
         },
         "productRaw": {
           "path": "design/parity/evidence/prestige-gate--ready/product.png",
-          "status": "pending",
-          "reason": "Fresh built-product PNG and complete task-owned promotion receipt are required."
+          "status": "verified",
+          "sha256": "bb5a645b2892a5ec1ab284f85f1ba46881bda2a7b0d1c04382f7a81ad6b2f76a",
+          "promotionRecordId": "prestige-gate--ready--product",
+          "receiptSha256": "b2e2d47d79bc578ff7d79bca23a66adbe65b28b9a7abed8e158406289c7755e5"
         },
         "comparison": {
           "path": "design/parity/evidence/prestige-gate--ready/comparison.png",
-          "status": "pending",
-          "reason": "Fresh accepted raw pairs are required before regenerating the labelled comparison."
+          "status": "verified",
+          "sha256": "2c07f9929d8c8b615eaa9a26602a9a5d18eec12624cf4c4883a95efc95742f2f",
+          "manifestPath": "design/parity/evidence/prestige-gate--ready/comparison.json",
+          "manifestSha256": "e066d4ae9a8f5114e4a91be341db779b25029a9ce4bdd7464020ce7a69f9bdb6"
         },
         "diff": {
           "path": "design/parity/evidence/prestige-gate--ready/diff.json",
-          "status": "pending",
-          "reason": "Fresh accepted raw pairs are required before regenerating the visual diff."
+          "status": "verified",
+          "sha256": "7b3e505a21989f22995afbb79ffd4ca1e86d3dcae7b24e7e7bf8a8717910cec2"
         }
       },
       "intentionalDeviations": [],
-      "sourceCommit": "pending-fresh-provenance-run",
+      "sourceCommit": "76f439476c3f2888a5d9993760cbf14da589370e",
       "captureProvenance": {
-        "status": "pending",
+        "status": "verified",
         "route": "cheap-lowlevel-headless",
-        "reason": "The previous receipts do not carry a complete task-owned run ledger, whole-build asset binding, live runtime proof, reviewed privacy proof, owned cleanup proof, or transactional stage record."
+        "sourceCommit": "76f439476c3f2888a5d9993760cbf14da589370e",
+        "runLedgerSha256": "5baac7f57661916f9113145d140bbe8e5ec43a7a571045a8b26a43f6b5865381",
+        "productArtifactSha256": "395eaf1b82d859f3e11ec1206fc6428fafd33492d757812d5d5315e8a12b3c52",
+        "referenceArtifactSha256": "d0897d6d5ca1210f3d84abc4b3e2aef02985fde8e6afaf9222112c4c1c5879ba"
       }
     },
     {
@@ -871,31 +934,40 @@
       "evidence": {
         "referenceRaw": {
           "path": "design/parity/evidence/search-regex-builder--open/reference.png",
-          "status": "pending",
-          "reason": "Fresh reference PNG and complete task-owned promotion receipt are required."
+          "status": "verified",
+          "sha256": "a703356a0dced52ea2eac51aac76d7ca45edb6afdfe67570d327caa3f8021384",
+          "promotionRecordId": "search-regex-builder--open--reference",
+          "receiptSha256": "7225e3f094e0ab3747622b0f9278faa9ced2097ebcce749023e15d0635609c60"
         },
         "productRaw": {
           "path": "design/parity/evidence/search-regex-builder--open/product.png",
-          "status": "pending",
-          "reason": "Fresh built-product PNG and complete task-owned promotion receipt are required."
+          "status": "verified",
+          "sha256": "c4d82cf9764a7eafbb71f17e9878aae05cab22875cc7ecc78d51e5d90f1f5ce6",
+          "promotionRecordId": "search-regex-builder--open--product",
+          "receiptSha256": "287247f5c427956ab9f9fb17b4794ca695473d0b9f48bf070a00440f7e3b3a96"
         },
         "comparison": {
           "path": "design/parity/evidence/search-regex-builder--open/comparison.png",
-          "status": "pending",
-          "reason": "Fresh accepted raw pairs are required before regenerating the labelled comparison."
+          "status": "verified",
+          "sha256": "5ce860054242a8e2d58c0ee8cd7852cb9a17266c961f36e744be8fe0228130f6",
+          "manifestPath": "design/parity/evidence/search-regex-builder--open/comparison.json",
+          "manifestSha256": "3b83a822d3feec277de1e76f62b868c79a3d3aad77f8629a03b84abd1589ea35"
         },
         "diff": {
           "path": "design/parity/evidence/search-regex-builder--open/diff.json",
-          "status": "pending",
-          "reason": "Fresh accepted raw pairs are required before regenerating the visual diff."
+          "status": "verified",
+          "sha256": "ec8aac36d55cfae9ae96611121f193b9f2aea818c47ba7c0d48b3fd781a83634"
         }
       },
       "intentionalDeviations": [],
-      "sourceCommit": "pending-fresh-provenance-run",
+      "sourceCommit": "76f439476c3f2888a5d9993760cbf14da589370e",
       "captureProvenance": {
-        "status": "pending",
+        "status": "verified",
         "route": "cheap-lowlevel-headless",
-        "reason": "The previous receipts do not carry a complete task-owned run ledger, whole-build asset binding, live runtime proof, reviewed privacy proof, owned cleanup proof, or transactional stage record."
+        "sourceCommit": "76f439476c3f2888a5d9993760cbf14da589370e",
+        "runLedgerSha256": "5baac7f57661916f9113145d140bbe8e5ec43a7a571045a8b26a43f6b5865381",
+        "productArtifactSha256": "395eaf1b82d859f3e11ec1206fc6428fafd33492d757812d5d5315e8a12b3c52",
+        "referenceArtifactSha256": "d0897d6d5ca1210f3d84abc4b3e2aef02985fde8e6afaf9222112c4c1c5879ba"
       }
     },
     {
@@ -940,31 +1012,40 @@
       "evidence": {
         "referenceRaw": {
           "path": "design/parity/evidence/settings-funny-sliders--default/reference.png",
-          "status": "pending",
-          "reason": "Fresh reference PNG and complete task-owned promotion receipt are required."
+          "status": "verified",
+          "sha256": "53fb93362d8615915122e13dca518dad8de275a358cfb5fecfe6e460c9458326",
+          "promotionRecordId": "settings-funny-sliders--default--reference",
+          "receiptSha256": "cbe1299d566c34249da162ba5de3ec849425b0189cb5179346e0f64cc0154172"
         },
         "productRaw": {
           "path": "design/parity/evidence/settings-funny-sliders--default/product.png",
-          "status": "pending",
-          "reason": "Fresh built-product PNG and complete task-owned promotion receipt are required."
+          "status": "verified",
+          "sha256": "e301877f90ca0a2853eb90470f906c61fd6a61f855682b3dc1ec2f0167466100",
+          "promotionRecordId": "settings-funny-sliders--default--product",
+          "receiptSha256": "2454a2001cb855d5ba12fa34e02adefd877c26e3c150a5c02b3542a4e7145c13"
         },
         "comparison": {
           "path": "design/parity/evidence/settings-funny-sliders--default/comparison.png",
-          "status": "pending",
-          "reason": "Fresh accepted raw pairs are required before regenerating the labelled comparison."
+          "status": "verified",
+          "sha256": "9dbe61aaafb55b84287de1d9829810c19b04ca2a78f195278031aa73326fd99d",
+          "manifestPath": "design/parity/evidence/settings-funny-sliders--default/comparison.json",
+          "manifestSha256": "485bb9decee3300b52616053daae96f1df05382ed034e5aaaab2c86841269be9"
         },
         "diff": {
           "path": "design/parity/evidence/settings-funny-sliders--default/diff.json",
-          "status": "pending",
-          "reason": "Fresh accepted raw pairs are required before regenerating the visual diff."
+          "status": "verified",
+          "sha256": "843321c05aa459d25b5b3200e25026b699fc0637a079371dbeef1a97ef4f49c9"
         }
       },
       "intentionalDeviations": [],
-      "sourceCommit": "pending-fresh-provenance-run",
+      "sourceCommit": "76f439476c3f2888a5d9993760cbf14da589370e",
       "captureProvenance": {
-        "status": "pending",
+        "status": "verified",
         "route": "cheap-lowlevel-headless",
-        "reason": "The previous receipts do not carry a complete task-owned run ledger, whole-build asset binding, live runtime proof, reviewed privacy proof, owned cleanup proof, or transactional stage record."
+        "sourceCommit": "76f439476c3f2888a5d9993760cbf14da589370e",
+        "runLedgerSha256": "5baac7f57661916f9113145d140bbe8e5ec43a7a571045a8b26a43f6b5865381",
+        "productArtifactSha256": "395eaf1b82d859f3e11ec1206fc6428fafd33492d757812d5d5315e8a12b3c52",
+        "referenceArtifactSha256": "d0897d6d5ca1210f3d84abc4b3e2aef02985fde8e6afaf9222112c4c1c5879ba"
       }
     },
     {
@@ -1008,31 +1089,40 @@
       "evidence": {
         "referenceRaw": {
           "path": "design/parity/evidence/stat-tile--gallery/reference.png",
-          "status": "pending",
-          "reason": "Fresh reference PNG and complete task-owned promotion receipt are required."
+          "status": "verified",
+          "sha256": "e4c71d77d683f7ae79d500db793752bb76320e8ff2bf8673cbd3f0d0b52b04a0",
+          "promotionRecordId": "stat-tile--gallery--reference",
+          "receiptSha256": "b460984eea86689ca8270276f0713d8e960bfc96bc505ead3d78fd7d1fdcd94f"
         },
         "productRaw": {
           "path": "design/parity/evidence/stat-tile--gallery/product.png",
-          "status": "pending",
-          "reason": "Fresh built-product PNG and complete task-owned promotion receipt are required."
+          "status": "verified",
+          "sha256": "0c829fe076d567c67f91064440587b5af711b019bb6da32ca7e0544a1a2e4311",
+          "promotionRecordId": "stat-tile--gallery--product",
+          "receiptSha256": "d6d0780205d7a050eda9fd4fb39531208ef242c4e09518a57c407ce96f436d0e"
         },
         "comparison": {
           "path": "design/parity/evidence/stat-tile--gallery/comparison.png",
-          "status": "pending",
-          "reason": "Fresh accepted raw pairs are required before regenerating the labelled comparison."
+          "status": "verified",
+          "sha256": "311e15a7586e008e3beccbfac729efbb7f6c3f728715b4475c8170438d7343f3",
+          "manifestPath": "design/parity/evidence/stat-tile--gallery/comparison.json",
+          "manifestSha256": "df46a60bc6ae0476f938baf7e14e59356af376b07408251be598579aa9b45fe0"
         },
         "diff": {
           "path": "design/parity/evidence/stat-tile--gallery/diff.json",
-          "status": "pending",
-          "reason": "Fresh accepted raw pairs are required before regenerating the visual diff."
+          "status": "verified",
+          "sha256": "cbb9d02af5a0eb760aadd7dcf23d03d38b4a39835bc47c34edd71736aeb635b8"
         }
       },
       "intentionalDeviations": [],
-      "sourceCommit": "pending-fresh-provenance-run",
+      "sourceCommit": "76f439476c3f2888a5d9993760cbf14da589370e",
       "captureProvenance": {
-        "status": "pending",
+        "status": "verified",
         "route": "cheap-lowlevel-headless",
-        "reason": "The previous receipts do not carry a complete task-owned run ledger, whole-build asset binding, live runtime proof, reviewed privacy proof, owned cleanup proof, or transactional stage record."
+        "sourceCommit": "76f439476c3f2888a5d9993760cbf14da589370e",
+        "runLedgerSha256": "5baac7f57661916f9113145d140bbe8e5ec43a7a571045a8b26a43f6b5865381",
+        "productArtifactSha256": "395eaf1b82d859f3e11ec1206fc6428fafd33492d757812d5d5315e8a12b3c52",
+        "referenceArtifactSha256": "d0897d6d5ca1210f3d84abc4b3e2aef02985fde8e6afaf9222112c4c1c5879ba"
       }
     },
     {
@@ -1076,31 +1166,40 @@
       "evidence": {
         "referenceRaw": {
           "path": "design/parity/evidence/tokens-color--roles/reference.png",
-          "status": "pending",
-          "reason": "Fresh reference PNG and complete task-owned promotion receipt are required."
+          "status": "verified",
+          "sha256": "4fb91a3c7f4454a17fb4d01da1d78188e281f4e2fcd5468b68d174643d0a767a",
+          "promotionRecordId": "tokens-color--roles--reference",
+          "receiptSha256": "f87a65e800b908a91bfcf748098f66043406bb01f02b4f92e8a69ebefdaee09a"
         },
         "productRaw": {
           "path": "design/parity/evidence/tokens-color--roles/product.png",
-          "status": "pending",
-          "reason": "Fresh built-product PNG and complete task-owned promotion receipt are required."
+          "status": "verified",
+          "sha256": "e8d271e29236451deb875af5706772cb72e72526c410242d6a2f421c252bfcfc",
+          "promotionRecordId": "tokens-color--roles--product",
+          "receiptSha256": "7f8fb1e8f427744558da79fe118446cd142e8950ecf0e443020567981e715e88"
         },
         "comparison": {
           "path": "design/parity/evidence/tokens-color--roles/comparison.png",
-          "status": "pending",
-          "reason": "Fresh accepted raw pairs are required before regenerating the labelled comparison."
+          "status": "verified",
+          "sha256": "18656a74f619ee1b07d5502eea38e8ce2f48c3c4fa3ae3544b3c4d7fd3f3f0a8",
+          "manifestPath": "design/parity/evidence/tokens-color--roles/comparison.json",
+          "manifestSha256": "62bd26c44fa9893d47b1209be98837a57b7f6068e2bf53d5ffd641e4ffac5c1c"
         },
         "diff": {
           "path": "design/parity/evidence/tokens-color--roles/diff.json",
-          "status": "pending",
-          "reason": "Fresh accepted raw pairs are required before regenerating the visual diff."
+          "status": "verified",
+          "sha256": "625039c73d7890e8da963ac1daff04d94b88f0b6969bcbb7bdd44e4aa6f1ee3d"
         }
       },
       "intentionalDeviations": [],
-      "sourceCommit": "pending-fresh-provenance-run",
+      "sourceCommit": "76f439476c3f2888a5d9993760cbf14da589370e",
       "captureProvenance": {
-        "status": "pending",
+        "status": "verified",
         "route": "cheap-lowlevel-headless",
-        "reason": "The previous receipts do not carry a complete task-owned run ledger, whole-build asset binding, live runtime proof, reviewed privacy proof, owned cleanup proof, or transactional stage record."
+        "sourceCommit": "76f439476c3f2888a5d9993760cbf14da589370e",
+        "runLedgerSha256": "5baac7f57661916f9113145d140bbe8e5ec43a7a571045a8b26a43f6b5865381",
+        "productArtifactSha256": "395eaf1b82d859f3e11ec1206fc6428fafd33492d757812d5d5315e8a12b3c52",
+        "referenceArtifactSha256": "d0897d6d5ca1210f3d84abc4b3e2aef02985fde8e6afaf9222112c4c1c5879ba"
       }
     },
     {
@@ -1145,31 +1244,40 @@
       "evidence": {
         "referenceRaw": {
           "path": "design/parity/evidence/tokens-shape-elevation--scale/reference.png",
-          "status": "pending",
-          "reason": "Fresh reference PNG and complete task-owned promotion receipt are required."
+          "status": "verified",
+          "sha256": "b8218116d45dcb29e042a905ccb2d53788170b88d47591a0f3e5953d631e1692",
+          "promotionRecordId": "tokens-shape-elevation--scale--reference",
+          "receiptSha256": "afba53339de59c5f2bbc2f846ab3b8a528fbfc1811713c447b97f4cc5f7aa5be"
         },
         "productRaw": {
           "path": "design/parity/evidence/tokens-shape-elevation--scale/product.png",
-          "status": "pending",
-          "reason": "Fresh built-product PNG and complete task-owned promotion receipt are required."
+          "status": "verified",
+          "sha256": "08537866aada8d1d3363843558ee2467af5509491e8eb0c3f411f6d72d7f54a5",
+          "promotionRecordId": "tokens-shape-elevation--scale--product",
+          "receiptSha256": "3d926ed677ee97e0ecb5805283aaf4bb25a7f82e4c3ca31d9316b7b2089fd10e"
         },
         "comparison": {
           "path": "design/parity/evidence/tokens-shape-elevation--scale/comparison.png",
-          "status": "pending",
-          "reason": "Fresh accepted raw pairs are required before regenerating the labelled comparison."
+          "status": "verified",
+          "sha256": "1db68ed698764b1770ba6b6e29c5c745e037cae0e630fdf01fc89af5b7a79ee9",
+          "manifestPath": "design/parity/evidence/tokens-shape-elevation--scale/comparison.json",
+          "manifestSha256": "34341c614c86f45472e9d5164adac446ee36a4b58d692aacbac7e86b10d68285"
         },
         "diff": {
           "path": "design/parity/evidence/tokens-shape-elevation--scale/diff.json",
-          "status": "pending",
-          "reason": "Fresh accepted raw pairs are required before regenerating the visual diff."
+          "status": "verified",
+          "sha256": "7f05d9f35c80a23b43c81d871878cf8a5f169773fdd0f24bad305c703ed07b24"
         }
       },
       "intentionalDeviations": [],
-      "sourceCommit": "pending-fresh-provenance-run",
+      "sourceCommit": "76f439476c3f2888a5d9993760cbf14da589370e",
       "captureProvenance": {
-        "status": "pending",
+        "status": "verified",
         "route": "cheap-lowlevel-headless",
-        "reason": "The previous receipts do not carry a complete task-owned run ledger, whole-build asset binding, live runtime proof, reviewed privacy proof, owned cleanup proof, or transactional stage record."
+        "sourceCommit": "76f439476c3f2888a5d9993760cbf14da589370e",
+        "runLedgerSha256": "5baac7f57661916f9113145d140bbe8e5ec43a7a571045a8b26a43f6b5865381",
+        "productArtifactSha256": "395eaf1b82d859f3e11ec1206fc6428fafd33492d757812d5d5315e8a12b3c52",
+        "referenceArtifactSha256": "d0897d6d5ca1210f3d84abc4b3e2aef02985fde8e6afaf9222112c4c1c5879ba"
       }
     },
     {
@@ -1213,31 +1321,40 @@
       "evidence": {
         "referenceRaw": {
           "path": "design/parity/evidence/tokens-type--scale/reference.png",
-          "status": "pending",
-          "reason": "Fresh reference PNG and complete task-owned promotion receipt are required."
+          "status": "verified",
+          "sha256": "c19ba2c7c0849e6535237230916400ae9847bca1de6c0b0273f42dc0256077b0",
+          "promotionRecordId": "tokens-type--scale--reference",
+          "receiptSha256": "4c2fea8a4df4c0a00dfaaf674cb5d9d6ab944c32e817a15ca620b6e61b316a08"
         },
         "productRaw": {
           "path": "design/parity/evidence/tokens-type--scale/product.png",
-          "status": "pending",
-          "reason": "Fresh built-product PNG and complete task-owned promotion receipt are required."
+          "status": "verified",
+          "sha256": "00845b5f0a64fb99e2921352084d71efab1f7d30f51b5b638f6578f3fe9c5e45",
+          "promotionRecordId": "tokens-type--scale--product",
+          "receiptSha256": "a6dd590fc28b249ea21a84ef33057be6f77e807158c2e837cdc6e28491312c20"
         },
         "comparison": {
           "path": "design/parity/evidence/tokens-type--scale/comparison.png",
-          "status": "pending",
-          "reason": "Fresh accepted raw pairs are required before regenerating the labelled comparison."
+          "status": "verified",
+          "sha256": "e137485e7ec7b3caab745d8a2eedd2274ccd7b7e38de731ae8f48f644deb2d9e",
+          "manifestPath": "design/parity/evidence/tokens-type--scale/comparison.json",
+          "manifestSha256": "f58da36d4ff148148da275792ce9f930af68ce649f189f0d7750e405010d8173"
         },
         "diff": {
           "path": "design/parity/evidence/tokens-type--scale/diff.json",
-          "status": "pending",
-          "reason": "Fresh accepted raw pairs are required before regenerating the visual diff."
+          "status": "verified",
+          "sha256": "793693d0e5ce24d4f1b62d2c9ff42635e9ff3a23a9a3f54b1d6eb628ff6c70a0"
         }
       },
       "intentionalDeviations": [],
-      "sourceCommit": "pending-fresh-provenance-run",
+      "sourceCommit": "76f439476c3f2888a5d9993760cbf14da589370e",
       "captureProvenance": {
-        "status": "pending",
+        "status": "verified",
         "route": "cheap-lowlevel-headless",
-        "reason": "The previous receipts do not carry a complete task-owned run ledger, whole-build asset binding, live runtime proof, reviewed privacy proof, owned cleanup proof, or transactional stage record."
+        "sourceCommit": "76f439476c3f2888a5d9993760cbf14da589370e",
+        "runLedgerSha256": "5baac7f57661916f9113145d140bbe8e5ec43a7a571045a8b26a43f6b5865381",
+        "productArtifactSha256": "395eaf1b82d859f3e11ec1206fc6428fafd33492d757812d5d5315e8a12b3c52",
+        "referenceArtifactSha256": "d0897d6d5ca1210f3d84abc4b3e2aef02985fde8e6afaf9222112c4c1c5879ba"
       }
     },
     {
@@ -1282,31 +1399,40 @@
       "evidence": {
         "referenceRaw": {
           "path": "design/parity/evidence/tool-card--gallery/reference.png",
-          "status": "pending",
-          "reason": "Fresh reference PNG and complete task-owned promotion receipt are required."
+          "status": "verified",
+          "sha256": "9b8baa794c970e8be6a435d323ad7f44711338e3cd3fe32e7ffe03f3f6f38737",
+          "promotionRecordId": "tool-card--gallery--reference",
+          "receiptSha256": "fe3ea0dea5f6b38a9d8d72ddc35de4ac7693af70b606b2d02c8e7ba63cb0c02e"
         },
         "productRaw": {
           "path": "design/parity/evidence/tool-card--gallery/product.png",
-          "status": "pending",
-          "reason": "Fresh built-product PNG and complete task-owned promotion receipt are required."
+          "status": "verified",
+          "sha256": "c3bb98a5d08c9afcf0b25b937f7536a0df9818366f01de1c77d7911a3fe2f302",
+          "promotionRecordId": "tool-card--gallery--product",
+          "receiptSha256": "ca431f8d07d5a3a17cd2ac23720e110963814e27879fe8e57f59f68a91ff99ac"
         },
         "comparison": {
           "path": "design/parity/evidence/tool-card--gallery/comparison.png",
-          "status": "pending",
-          "reason": "Fresh accepted raw pairs are required before regenerating the labelled comparison."
+          "status": "verified",
+          "sha256": "ea0f3ae3dff8aeb198ce390e92009c3f12c866246d0d9e35edf16fef42ea48a9",
+          "manifestPath": "design/parity/evidence/tool-card--gallery/comparison.json",
+          "manifestSha256": "7de6ed207f850fe824bfcfcfcb3672ab2426586267a1bb9842691a6004f6682d"
         },
         "diff": {
           "path": "design/parity/evidence/tool-card--gallery/diff.json",
-          "status": "pending",
-          "reason": "Fresh accepted raw pairs are required before regenerating the visual diff."
+          "status": "verified",
+          "sha256": "1277873a5689836cae99152238229d447d98bd1f23b3f5ebdc48cf553ba9e8b9"
         }
       },
       "intentionalDeviations": [],
-      "sourceCommit": "pending-fresh-provenance-run",
+      "sourceCommit": "76f439476c3f2888a5d9993760cbf14da589370e",
       "captureProvenance": {
-        "status": "pending",
+        "status": "verified",
         "route": "cheap-lowlevel-headless",
-        "reason": "The previous receipts do not carry a complete task-owned run ledger, whole-build asset binding, live runtime proof, reviewed privacy proof, owned cleanup proof, or transactional stage record."
+        "sourceCommit": "76f439476c3f2888a5d9993760cbf14da589370e",
+        "runLedgerSha256": "5baac7f57661916f9113145d140bbe8e5ec43a7a571045a8b26a43f6b5865381",
+        "productArtifactSha256": "395eaf1b82d859f3e11ec1206fc6428fafd33492d757812d5d5315e8a12b3c52",
+        "referenceArtifactSha256": "d0897d6d5ca1210f3d84abc4b3e2aef02985fde8e6afaf9222112c4c1c5879ba"
       }
     },
     {
@@ -1350,31 +1476,40 @@
       "evidence": {
         "referenceRaw": {
           "path": "design/parity/evidence/tools-tree--mixed/reference.png",
-          "status": "pending",
-          "reason": "Fresh reference PNG and complete task-owned promotion receipt are required."
+          "status": "verified",
+          "sha256": "daacca0f513fe9fe78ed1f04d75b87f597dfc32c6584d10c567fbde0bec59ad7",
+          "promotionRecordId": "tools-tree--mixed--reference",
+          "receiptSha256": "d61fd2e898e19ce5193ae5e77ccf87235200e1ed89d44e86b6aa9268f830486b"
         },
         "productRaw": {
           "path": "design/parity/evidence/tools-tree--mixed/product.png",
-          "status": "pending",
-          "reason": "Fresh built-product PNG and complete task-owned promotion receipt are required."
+          "status": "verified",
+          "sha256": "63dfcc60b81bd65f1407ff5176ca3dd8baf1fe295f9daf70a7fcdfd49b7c34de",
+          "promotionRecordId": "tools-tree--mixed--product",
+          "receiptSha256": "e114226e0771abcf53212fa4d505eb8b3175cf939272df694d8aaf546ec6d514"
         },
         "comparison": {
           "path": "design/parity/evidence/tools-tree--mixed/comparison.png",
-          "status": "pending",
-          "reason": "Fresh accepted raw pairs are required before regenerating the labelled comparison."
+          "status": "verified",
+          "sha256": "fc8c0847f881f2a8f1f588090d2a64c2a229071dfa689af12fa9a92e805e2750",
+          "manifestPath": "design/parity/evidence/tools-tree--mixed/comparison.json",
+          "manifestSha256": "12e58fc32a2266276c4f47a8228402d68d42310082a8a3858f003af9ab3d2751"
         },
         "diff": {
           "path": "design/parity/evidence/tools-tree--mixed/diff.json",
-          "status": "pending",
-          "reason": "Fresh accepted raw pairs are required before regenerating the visual diff."
+          "status": "verified",
+          "sha256": "3448936aa54a5cc3e25f3b3eabafc9a80002a62bf8276acfc49081aac983fd2b"
         }
       },
       "intentionalDeviations": [],
-      "sourceCommit": "pending-fresh-provenance-run",
+      "sourceCommit": "76f439476c3f2888a5d9993760cbf14da589370e",
       "captureProvenance": {
-        "status": "pending",
+        "status": "verified",
         "route": "cheap-lowlevel-headless",
-        "reason": "The previous receipts do not carry a complete task-owned run ledger, whole-build asset binding, live runtime proof, reviewed privacy proof, owned cleanup proof, or transactional stage record."
+        "sourceCommit": "76f439476c3f2888a5d9993760cbf14da589370e",
+        "runLedgerSha256": "5baac7f57661916f9113145d140bbe8e5ec43a7a571045a8b26a43f6b5865381",
+        "productArtifactSha256": "395eaf1b82d859f3e11ec1206fc6428fafd33492d757812d5d5315e8a12b3c52",
+        "referenceArtifactSha256": "d0897d6d5ca1210f3d84abc4b3e2aef02985fde8e6afaf9222112c4c1c5879ba"
       }
     },
     {
@@ -1418,31 +1553,40 @@
       "evidence": {
         "referenceRaw": {
           "path": "design/parity/evidence/upgrade-card--gallery/reference.png",
-          "status": "pending",
-          "reason": "Fresh reference PNG and complete task-owned promotion receipt are required."
+          "status": "verified",
+          "sha256": "4ddcff21b3f85edfa60f60684b28762a2fea32a53bbe04825230a201953aac10",
+          "promotionRecordId": "upgrade-card--gallery--reference",
+          "receiptSha256": "fc423fdc502a7c870163f2fc674e4363ce90dc9afbf399da5ec6010a74814c37"
         },
         "productRaw": {
           "path": "design/parity/evidence/upgrade-card--gallery/product.png",
-          "status": "pending",
-          "reason": "Fresh built-product PNG and complete task-owned promotion receipt are required."
+          "status": "verified",
+          "sha256": "757bd18b01c38bcb375237020f9c262e22f2c7f19264d730651997446f16471c",
+          "promotionRecordId": "upgrade-card--gallery--product",
+          "receiptSha256": "dd856f2e9687df3e618d1651d1f5e599b2786f7e77494f46420b51e222e2552f"
         },
         "comparison": {
           "path": "design/parity/evidence/upgrade-card--gallery/comparison.png",
-          "status": "pending",
-          "reason": "Fresh accepted raw pairs are required before regenerating the labelled comparison."
+          "status": "verified",
+          "sha256": "55c938ae59f65bd45a336c974662c7982a2d88a01c3f3f11c79ab1aaef46f377",
+          "manifestPath": "design/parity/evidence/upgrade-card--gallery/comparison.json",
+          "manifestSha256": "dfdffb72005ab92f83b2c0230e22f8cd390a587c2a1b2a6415aca6b4cd67f065"
         },
         "diff": {
           "path": "design/parity/evidence/upgrade-card--gallery/diff.json",
-          "status": "pending",
-          "reason": "Fresh accepted raw pairs are required before regenerating the visual diff."
+          "status": "verified",
+          "sha256": "fd0e8c1e8980a74c153ac37380896efac99fae5c318ba1b158398c31357ae1e2"
         }
       },
       "intentionalDeviations": [],
-      "sourceCommit": "pending-fresh-provenance-run",
+      "sourceCommit": "76f439476c3f2888a5d9993760cbf14da589370e",
       "captureProvenance": {
-        "status": "pending",
+        "status": "verified",
         "route": "cheap-lowlevel-headless",
-        "reason": "The previous receipts do not carry a complete task-owned run ledger, whole-build asset binding, live runtime proof, reviewed privacy proof, owned cleanup proof, or transactional stage record."
+        "sourceCommit": "76f439476c3f2888a5d9993760cbf14da589370e",
+        "runLedgerSha256": "5baac7f57661916f9113145d140bbe8e5ec43a7a571045a8b26a43f6b5865381",
+        "productArtifactSha256": "395eaf1b82d859f3e11ec1206fc6428fafd33492d757812d5d5315e8a12b3c52",
+        "referenceArtifactSha256": "d0897d6d5ca1210f3d84abc4b3e2aef02985fde8e6afaf9222112c4c1c5879ba"
       }
     }
   ]

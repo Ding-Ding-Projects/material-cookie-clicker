@@ -728,7 +728,11 @@ describe("hand-written per-surface completeness inventory", () => {
 
   it("records the actual parity verdicts and proves the cross-check wrapper restores", () => {
     expect(validateDesignParityStructure()).toEqual([]);
-    expect(validateDesignParityRelease()).toEqual(["Design parity release verdict is red: EVIDENCE_PENDING"]);
+    // Was EVIDENCE_PENDING while the parity captures had never been taken properly. A real
+    // promotion run has since captured both sides of all sixteen rows and verified every
+    // receipt, so release is refused one stage later and for the honest reason: the evidence is
+    // trustworthy AND the product still differs from its reference.
+    expect(validateDesignParityRelease()).toEqual(["Design parity release verdict is red: DIFF_REVIEW_DEFECT"]);
     const candidate = loadDesignParityInventory();
     const redFixture: DesignParityReleaseValidator = () => {
       throw new ParityGuardError("DIFF_REVIEW_DEFECT", "fixture-only visual difference");
@@ -749,7 +753,10 @@ describe("hand-written per-surface completeness inventory", () => {
     expect(validate(inventory)).toEqual([]);
     const blockers = validateCompletion(inventory);
     expect(blockers).not.toContain("Design parity structure verdict is red: REFERENCE_HASH_STALE");
-    expect(blockers).toContain("Design parity release verdict is red: EVIDENCE_PENDING");
+    // Same change as the verdict assertion above: the evidence is captured and verified now, so
+    // the release blocker is the visual difference rather than the missing provenance. It is
+    // still a blocker, and still correctly one.
+    expect(blockers).toContain("Design parity release verdict is red: DIFF_REVIEW_DEFECT");
     expect(blockers).toContain("App.tsx still contains the obsolete unmounted MinigameEventsScreen adapter.");
     expect(blockers).toContain("Graphics progression receipt has no build-artifact hash binding.");
     expect(blockers).toEqual(expect.arrayContaining([

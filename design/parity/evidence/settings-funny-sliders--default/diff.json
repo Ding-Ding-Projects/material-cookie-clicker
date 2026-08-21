@@ -19,7 +19,7 @@
     },
     "product": {
       "path": "design/parity/evidence/settings-funny-sliders--default/product.png",
-      "sha256": "09cb4e617dcb6748d6886ab49713e0f15e947974a47b21a0bde10ce6129b1ed3"
+      "sha256": "e301877f90ca0a2853eb90470f906c61fd6a61f855682b3dc1ec2f0167466100"
     }
   },
   "dimensions": {
@@ -27,10 +27,10 @@
     "height": 800
   },
   "metrics": {
-    "changedPixels": 396902,
+    "changedPixels": 226340,
     "totalPixels": 1024000,
-    "changedRatio": 0.387599609375,
-    "rgbRmse": 39.28734165756484
+    "changedRatio": 0.22103515625,
+    "rgbRmse": 33.40907959348557
   },
   "tool": {
     "name": "Pillow ImageChops.difference",

@@ -1,0 +1,104 @@
+{
+  "version": 1,
+  "sourceCommit": "75fcf9c7539ca76b7315f9f0214626bfa1e4d2fd",
+  "route": "cheap-lowlevel-headless",
+  "note": "Binds the graphics-progression captures to the exact built artifact that produced them. Without this the receipt named a commit but nothing about the bytes actually running, so a capture taken from a stale dist would still have looked bound.",
+  "artifactCount": 19,
+  "artifacts": [
+    {
+      "path": "dist/renderer/index.html",
+      "sha256": "27696e292e1bcca1128c24d60847555145ad9801e5d585c47a5a9bd73de18bef",
+      "bytes": 660
+    },
+    {
+      "path": "dist/renderer/assets/index-Bgz4Edfp.js",
+      "sha256": "6516622f1a0add76346785903cb8b11b1b5ed47e9b304fa5dfbbfc7262530949",
+      "bytes": 919987
+    },
+    {
+      "path": "dist/renderer/assets/index-D_HR0dEH.css",
+      "sha256": "e90aae5ab1deca630457b99b1270b39e51c085566df6b45309b27ce38db5c788",
+      "bytes": 259843
+    },
+    {
+      "path": "dist/main/converter-file-service.js",
+      "sha256": "3016e2044132dcc40198b54a558c71110abe7753b2792d492b9cf95290379fc2",
+      "bytes": 8818
+    },
+    {
+      "path": "dist/main/converter-pdf-service.js",
+      "sha256": "17162db9a57bfdaa2c96ab7b912ee3cff02bb42526bd29db9402cb6b3bc0b834",
+      "bytes": 7559
+    },
+    {
+      "path": "dist/main/converter-queue-store.js",
+      "sha256": "e842a51205e92677bfff8ec6bc88b9585222b725d485df7b980d62d3160c4fb4",
+      "bytes": 7860
+    },
+    {
+      "path": "dist/main/design-parity-launch.js",
+      "sha256": "94bf465d6fd17e3e193107f363b66749cfb994e8f6faa1a238746328f746efa7",
+      "bytes": 5278
+    },
+    {
+      "path": "dist/main/diesel-ledger-service.js",
+      "sha256": "647404e27cdc1ce0238c1839124adc2e80fb2e8f67520dc7bcaa25ed0a9969c8",
+      "bytes": 4891
+    },
+    {
+      "path": "dist/main/game-ipc.js",
+      "sha256": "868ed604271466a006252ca9422ff9f85268c8065c12134612d883ee2c76e324",
+      "bytes": 1667
+    },
+    {
+      "path": "dist/main/game-save-service.js",
+      "sha256": "313ee16c8acd16302e19d7610e99c266ba1ab86bdc643a083fa825e16b356f72",
+      "bytes": 3667
+    },
+    {
+      "path": "dist/main/identity-image-service.js",
+      "sha256": "3ba9a2844f417c6b78243469c7557c44392ef41439052b12b769e234276775d1",
+      "bytes": 254
+    },
+    {
+      "path": "dist/main/main.js",
+      "sha256": "b964de1f1b7003bb07263c205d244cdf6cac91a36b8c39f72895561d23306b57",
+      "bytes": 41536
+    },
+    {
+      "path": "dist/main/ollama-suite-service.js",
+      "sha256": "c03c55a6cf033f7e249bb0ac390c0f3f753bbdb807f5544218d89bd6071689ea",
+      "bytes": 3352
+    },
+    {
+      "path": "dist/main/save-history.js",
+      "sha256": "6b77b48917c899af9708355028300ec46b353bd1b918abb8dd4750fd1839df19",
+      "bytes": 7753
+    },
+    {
+      "path": "dist/main/security-local-history.js",
+      "sha256": "2ed22c2a92452d82d214106e1360b8659e80bf74c4284983921a84bac26ba1a7",
+      "bytes": 2756
+    },
+    {
+      "path": "dist/main/security-vault-service.js",
+      "sha256": "5f0192e709eb3e4de8ba9666788d15b004f075cb4b9fca973ff5c8e1c6df6434",
+      "bytes": 1460
+    },
+    {
+      "path": "dist/main/update-service.js",
+      "sha256": "3441eb045a90b1177ecdaece1e5241eb48b42e0ef8d2842a644142b0b72abcb4",
+      "bytes": 5718
+    },
+    {
+      "path": "dist/preload/index.cjs",
+      "sha256": "9bdf48fd81706056ebd5c95458b8398272456a351d4a6e04a803442d2607de4a",
+      "bytes": 7772
+    },
+    {
+      "path": "dist/preload/index.js",
+      "sha256": "5824a3ea8d910e2e4e575c4628fde9d8fd649204455c24bfe14fa0716481e03d",
+      "bytes": 5286
+    }
+  ]
+}

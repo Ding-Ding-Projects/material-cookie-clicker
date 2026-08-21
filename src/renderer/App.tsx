@@ -76,7 +76,6 @@ import { GoldenCookieStage } from './screens/GoldenCookieStage';
 import { StatisticsScreen } from './screens/StatisticsScreen';
 import { ToolsScreen, type OpenApplicationFeature } from './screens/ToolsScreen';
 import { UpgradeStrip } from './screens/UpgradeStrip';
-import { MinigameEventsScreen, type MinigameEventView } from './screens/MinigameEventsScreen';
 import { MinigamesScreen as PlayableMinigamesScreen } from './screens/MinigamesScreen';
 import { getMinigameVisibility, MINIGAME_IDS, type MinigameId } from '../shared/game/minigames.js';
 import { CANONICAL_COMMANDS, CanonicalCommandPalette } from './components/CanonicalCommandPalette.js';
@@ -287,60 +286,6 @@ function GameSurface({ onOpenFactory }: { onOpenFactory: (button: HTMLButtonElem
           the cookie and the shelf rather than pushing either of them anywhere. */}
       <MilkTide />
     </div>
-  );
-}
-
-/** The live adapter for the minigame-events panel. The child owns presentation; this seam owns
- * the real persisted schedule, active board lifecycle, token balance and atomic draw action. */
-function MinigamesScreen() {
-  const structure = useStructureSnapshot();
-  const dispatch = useGameDispatch();
-  const [luckyChanceOpen, setLuckyChanceOpen] = useState(false);
-  const active = structure.minigames.active;
-  const now = Date.now();
-  const visibility = getMinigameVisibility(structure.minigameSchedule, now);
-  const scheduledEvent: MinigameEventView | undefined = visibility === 'incoming'
-    ? {
-        eventId: `scheduled:${structure.minigameSchedule?.next.startsAtEpochMs ?? now}`,
-        gameId: MINIGAME_IDS[(structure.minigameSchedule?.occurrence ?? 0) % MINIGAME_IDS.length] ?? 'klondike',
-        status: 'scheduled',
-        scheduledFor: new Date(structure.minigameSchedule?.next.startsAtEpochMs ?? now).toLocaleTimeString(),
-      }
-    : undefined;
-  const activeEvent: MinigameEventView | undefined = active
-    ? {
-        eventId: `active:${active.startedAtEpochMs}`,
-        gameId: active.id,
-        status: active.status,
-        detail: active.status === 'active'
-          ? { en: 'The board is live and its exact state is saved.', yue: '個棋盤而家開緊，完整狀態已經儲低。' }
-          : { en: 'The board is minimized; resume it without losing the position.', yue: '個棋盤縮咗；繼續就唔會失去而家位置。' },
-      }
-    : undefined;
-  const events = activeEvent ? [activeEvent] : scheduledEvent ? [scheduledEvent] : [];
-  const luckyResult = structure.luckyChance.lastResult
-    ? ({
-        en: `Reward: ${structure.luckyChance.lastResult.rewardId}`,
-        yue: `獎勵：${structure.luckyChance.lastResult.rewardId}`,
-      } satisfies Bilingual)
-    : null;
-  const schedule = (gameId: MinigameId) => dispatch({ type: 'minigameStart', id: gameId });
-  return (
-    <MinigameEventsScreen
-      events={events}
-      goldenTokenBalance={structure.goldenTokens.balance}
-      luckyChanceOpen={luckyChanceOpen}
-      luckyChanceCanDraw={structure.goldenTokens.balance > 0}
-      luckyChanceResult={luckyResult}
-      onSchedule={schedule}
-      onAbandon={() => dispatch({ type: 'minigameAbandon' })}
-      onMinimize={() => dispatch({ type: 'minigameMinimize' })}
-      onResume={() => dispatch({ type: 'minigameResume' })}
-      onRestart={() => dispatch({ type: 'minigameRestart' })}
-      onOpenLuckyChance={() => setLuckyChanceOpen(true)}
-      onCloseLuckyChance={() => setLuckyChanceOpen(false)}
-      onDrawLuckyChance={() => dispatch({ type: 'luckyChanceDraw' })}
-    />
   );
 }
 

@@ -757,8 +757,13 @@ describe("hand-written per-surface completeness inventory", () => {
     // the release blocker is the visual difference rather than the missing provenance. It is
     // still a blocker, and still correctly one.
     expect(blockers).toContain("Design parity release verdict is red: DIFF_REVIEW_DEFECT");
-    expect(blockers).toContain("App.tsx still contains the obsolete unmounted MinigameEventsScreen adapter.");
-    expect(blockers).toContain("Graphics progression receipt has no build-artifact hash binding.");
+    // Both of these were open blockers and are now closed, so they are asserted ABSENT for the same
+    // reason REFERENCE_HASH_STALE above is: a blocker that has been fixed must not be able to come
+    // back unnoticed. The dead MinigameEventsScreen adapter was deleted from App.tsx (the mounted
+    // screen was always the imported PlayableMinigamesScreen), and the graphics receipt now names a
+    // build receipt that hashes all 19 dist files that produced the captures.
+    expect(blockers).not.toContain("App.tsx still contains the obsolete unmounted MinigameEventsScreen adapter.");
+    expect(blockers).not.toContain("Graphics progression receipt has no build-artifact hash binding.");
     expect(blockers).toEqual(expect.arrayContaining([
       expect.stringMatching(/^desktop-minigame-events is not completion-ready:/),
       expect.stringMatching(/^desktop-playable-minigames is not completion-ready:/),

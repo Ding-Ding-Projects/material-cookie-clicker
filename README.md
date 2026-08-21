@@ -263,7 +263,7 @@ named here and neither is fixed in this release.
 | The first graphics rung appears at exactly 50 cookies | ![The same cookie-only surface with one Colour purchase plate directly beneath the cookie, priced at exactly 50 cookies.](design/parity/evidence/graphics-progression/affordable.png) |
 | The first rung has been purchased without revealing later chrome | ![The cookie-only surface after the Colour purchase: the background and cookie use the warm palette, while the title bar, counters, cabinet, console, discovery ticket and rails remain absent.](design/parity/evidence/graphics-progression/after.png) |
 
-Receipt: [`design/parity/evidence/graphics-progression/receipt.json`](design/parity/evidence/graphics-progression/receipt.json), source commit `330352ce7513ba420752dd7243762f0dd75f9eaa`. The receipt proves these exact bytes and states through the cheap headless route; it is not presented as generic promotion or current-release completion.
+Receipt: [`design/parity/evidence/graphics-progression/receipt.json`](design/parity/evidence/graphics-progression/receipt.json), source commit `031c7e209f1fbccb0dda206bc949cb495a467b0f`. The receipt proves these exact bytes and states through the cheap headless route; it is not presented as generic promotion or current-release completion.
 
 | What it shows | Capture |
 | --- | --- |

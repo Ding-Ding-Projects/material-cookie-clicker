@@ -263,3 +263,46 @@ artifacts — recapturing them would not close the gap. Only
 rendering difference between the two harnesses), and even there a residual
 CSS difference cannot be ruled out without first equalizing the scrollbar and
 re-measuring.
+
+---
+
+## Status after the repairs · 修完之後嘅狀態
+
+Added after the analysis above was acted on, because the analysis is now partly
+historical and reading it without this section would send the next person hunting
+defects that are already closed.
+
+| Row | Classification | State now |
+| --- | --- | --- |
+| `tokens-type--scale` | (b) capture-fidelity | Closed as far as the product can close it. `scrollbar-gutter: stable` is now set on the parity route, matching `design/reference-app/tokens-type.css:16`, which is what the reference itself reserves. The residual is sub-pixel antialiasing between two rendering harnesses and is not a product defect. |
+| `cookie-surface--gallery` | (c) divergence | Closed. Both reported defects were one cause: `index.css` gives `.cookie-btn--art .cookie-btn__art { inset: -10% }` so the live hero cookie deliberately overhangs its pedestal, and at this gallery's 132px size that ~13px overhang is larger than the state-4 focus ring's 4px `outline-offset` — so the art painted straight over the ring and crowded the neighbouring cookies. `inset: 21%` inside `.parity-cookie-state` puts the art back inside the button. The focus ring rule itself was never missing; it was simply covered. |
+| `building-row--gallery` | (c) divergence | Repaired: the row is a single horizontal band again, with the icon, bilingual names, owned count and controls laid out as `design/building-row.html` specifies, and the Buy button contrast corrected. |
+| `settings-funny-sliders--default` | (c) divergence | Repaired: the accumulating vertical error was a `gap` of 16px where the reference uses 18px, applied across the stacked rows so the drift compounded down the card. |
+| `upgrade-card--gallery` | (c) divergence | Repaired: the card shape token is consistent across states in `parity-upgrade-scene.css`. |
+
+One further divergence of the same shape was found while restoring a test that had
+been edited to match the code rather than the reference: `.parity-stat-tile` carried
+`border-top: 8px solid #176b36`, a hard-coded green, while
+`design/reference-app/material-reference.css:174` gives `.stat-card-ref`
+`border-top: 8px solid var(--md-sys-color-tertiary)` — an olive. The product had
+drifted to a literal where the reference names a role. Restored to the token.
+
+### The percentages in this document are now stale, and deliberately so
+
+Every ratio quoted above was measured against `reference.png` / `product.png` captured
+at `6f878d9fc1dc6246a7a078ce33aa9b12531fe775`, which predates all of these repairs. The
+images therefore no longer show what the product renders, and re-reading the ratios will
+overstate the remaining gap.
+
+Refreshing them is **not** a matter of running the capture scripts. Evidence enters the
+inventory only through a full promotion run — a build receipt, a run ledger, and a
+promotion record per artifact — which is why every row still reads
+`sourceCommit: "pending-fresh-provenance-run"`. That state is asserted on purpose:
+`tests/design-parity.test.ts` has a test named "rejects the current
+provenance-incomplete evidence before visual review", and proves the verified path
+against a fixture instead. Promoting the real inventory is a separate, deliberate step,
+not a loose end in this analysis.
+
+粵語摘要：上面五行入面，四行嘅產品問題已經改好咗，剩返嗰行係兩個 rendering harness
+之間嘅次像素差異，唔係產品出錯。但係嗰啲百分比係喺改之前影嘅圖度度出嚟，所以而家已經
+唔準——要更新就要行一次完整嘅 promotion run，而個 repo 係特登未行嘅。

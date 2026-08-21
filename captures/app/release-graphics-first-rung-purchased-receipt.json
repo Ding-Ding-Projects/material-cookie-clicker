@@ -1,0 +1,15 @@
+{
+  "version": 1,
+  "state": "graphics-first-rung-purchased",
+  "sourceCommit": "c941bd821ec38c340831c5d23423874a89ac8ee9",
+  "route": "lowlevel-cheap-headless",
+  "launchPid": 21684,
+  "debugPort": 9333,
+  "seed": "graphics-after",
+  "image": "captures/app/release-graphics-first-rung-purchased.png",
+  "sha256": "07a1c5ca88c2aa1fec8f408517308c2e8f290511dc94d66d646c281cb441509f",
+  "width": 1440,
+  "height": 900,
+  "method": "cheap Lowlevel headless desktop (ReleaseCaptureDesktop) launching the built dist/main+dist/renderer Electron app with --remote-debugging-port, isolated single-target CDP session verified via scripts/cdp-isolated-session.mjs, Page.captureScreenshot",
+  "cleanupCompleted": true
+}

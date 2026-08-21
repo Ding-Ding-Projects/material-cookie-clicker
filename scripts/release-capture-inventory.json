@@ -5,11 +5,11 @@
   "summary": {
     "note": "Computed directly from the states array below; update both together and re-verify by counting rather than editing this block by hand.",
     "totalStates": 28,
-    "pendingStates": 28,
+    "pendingStates": 22,
     "statesWithNoImageField": 22,
-    "statesWithSupersededEvidenceOnly": 3,
-    "statesWithSupportingEvidenceOnly": 3,
-    "statesFullyPromoted": 0
+    "statesWithSupersededEvidenceOnly": 1,
+    "statesWithSupportingEvidenceOnly": 1,
+    "statesFullyPromoted": 6
   },
   "states": [
     {
@@ -25,25 +25,33 @@
     },
     {
       "id": "progressed-game",
-      "status": "pending",
+      "status": "existing",
       "surface": "Progressed main game",
-      "proof": "Current release-tip progressed surface; the prior image predates the minigame, endless-progression and application-tools integrations.",
-      "supersededEvidence": {
-        "image": "captures/app/game-progressed.png",
-        "sourceCommit": "4fa7d43e1459b15ab49aceaf48d0cd8db5937ea5",
-        "reason": "Useful historical UI evidence, but not a current-build release receipt."
-      }
+      "image": "captures/app/release-progressed-game.png",
+      "sourceCommit": "c941bd821ec38c340831c5d23423874a89ac8ee9",
+      "sha256": "c47cb0ecd4b3403b0d7c48c5d055a2185574c014bfcfb02058d37b56c69f8ec7",
+      "dimensions": {
+        "width": 1440,
+        "height": 900
+      },
+      "method": "lowlevel-cheap-headless",
+      "receipt": "captures/app/release-progressed-game-receipt.json",
+      "receiptSha256": "677f08e93bb8ae033c71e75c53aa33111ee7c30583c191e28a74191efca37e87"
     },
     {
       "id": "dark-game",
-      "status": "pending",
+      "status": "existing",
       "surface": "Dark theme",
-      "proof": "Current release-tip progressed surface in dark theme; the prior image predates the current integrated feature set.",
-      "supersededEvidence": {
-        "image": "captures/app/game-dark.png",
-        "sourceCommit": "4fa7d43e1459b15ab49aceaf48d0cd8db5937ea5",
-        "reason": "Useful historical UI evidence, but not a current-build release receipt."
-      }
+      "image": "captures/app/release-dark-game.png",
+      "sourceCommit": "c941bd821ec38c340831c5d23423874a89ac8ee9",
+      "sha256": "a0c580a74c54f3b35680c527b7eb5b97f33770f1335b3844c9ba15138dd2b202",
+      "dimensions": {
+        "width": 1440,
+        "height": 900
+      },
+      "method": "lowlevel-cheap-headless",
+      "receipt": "captures/app/release-dark-game-receipt.json",
+      "receiptSha256": "83fb7ee76eb489f7d0fc3beb9d6b791a39d34092a73f6fecab8b53f59940d666"
     },
     {
       "id": "graphics-cookie-only",
@@ -68,45 +76,33 @@
     },
     {
       "id": "graphics-first-rung-affordable",
-      "status": "pending",
+      "status": "existing",
       "surface": "First graphics purchase becomes affordable",
-      "proof": "A supporting frame shows the Colour plate at its exact price, but its partial receipt does not satisfy generic promotion or current-release completion.",
-      "supportingEvidence": {
-        "state": "affordable",
-        "image": "design/parity/evidence/graphics-progression/affordable.png",
-        "sourceCommit": "031c7e209f1fbccb0dda206bc949cb495a467b0f",
-        "sha256": "179fa0017c70d43914b8598c3df30f6eecac7965774355131ace19ff3d8235ac",
-        "dimensions": {
-          "width": 1440,
-          "height": 900
-        },
-        "method": "cheap-lowlevel-headless",
-        "receipt": "design/parity/evidence/graphics-progression/receipt.json",
-        "receiptSha256": "8ca65f5bf02423960806696e210b8612b003b14e086a120abaaee0241e727349",
-        "promotionCompliance": "not-claimed",
-        "limitations": "Partial feature-state receipt only; no generic promotion receipt and no exact release-tip binding."
-      }
+      "image": "captures/app/release-graphics-first-rung-affordable.png",
+      "sourceCommit": "c941bd821ec38c340831c5d23423874a89ac8ee9",
+      "sha256": "179fa0017c70d43914b8598c3df30f6eecac7965774355131ace19ff3d8235ac",
+      "dimensions": {
+        "width": 1440,
+        "height": 900
+      },
+      "method": "lowlevel-cheap-headless",
+      "receipt": "captures/app/release-graphics-first-rung-affordable-receipt.json",
+      "receiptSha256": "07702f691eadf19e9d6a9b89a0628fbc7e4afd9085f6768c5e4e5f08d106f934"
     },
     {
       "id": "graphics-first-rung-purchased",
-      "status": "pending",
+      "status": "existing",
       "surface": "First graphics purchase applied",
-      "proof": "A supporting frame shows the purchased palette without revealing later chrome, but its partial receipt does not satisfy generic promotion or current-release completion.",
-      "supportingEvidence": {
-        "state": "after",
-        "image": "design/parity/evidence/graphics-progression/after.png",
-        "sourceCommit": "031c7e209f1fbccb0dda206bc949cb495a467b0f",
-        "sha256": "bfd929da9a0dff8a69a79bc86fe23f99e9270947aa6ae1c89e7d5a2afc8158c1",
-        "dimensions": {
-          "width": 1440,
-          "height": 900
-        },
-        "method": "cheap-lowlevel-headless",
-        "receipt": "design/parity/evidence/graphics-progression/receipt.json",
-        "receiptSha256": "8ca65f5bf02423960806696e210b8612b003b14e086a120abaaee0241e727349",
-        "promotionCompliance": "not-claimed",
-        "limitations": "Partial feature-state receipt only; no generic promotion receipt and no exact release-tip binding."
-      }
+      "image": "captures/app/release-graphics-first-rung-purchased.png",
+      "sourceCommit": "c941bd821ec38c340831c5d23423874a89ac8ee9",
+      "sha256": "07a1c5ca88c2aa1fec8f408517308c2e8f290511dc94d66d646c281cb441509f",
+      "dimensions": {
+        "width": 1440,
+        "height": 900
+      },
+      "method": "lowlevel-cheap-headless",
+      "receipt": "captures/app/release-graphics-first-rung-purchased-receipt.json",
+      "receiptSha256": "2b375e69ccdd4c958025be2a7c9fd6eb420875c8f79b7560487116d1db542edf"
     },
     {
       "id": "minigame-events",
@@ -224,9 +220,18 @@
     },
     {
       "id": "command-palette",
-      "status": "pending",
+      "status": "existing",
       "surface": "Command palette",
-      "proof": "Implemented surface; installed teleport interaction and current capture remain pending"
+      "image": "captures/app/release-command-palette.png",
+      "sourceCommit": "c941bd821ec38c340831c5d23423874a89ac8ee9",
+      "sha256": "cdf6c48c9fcc8afa2aa99f4075f0ff09a9b8c68c3473da1915e4cefe93cca5e7",
+      "dimensions": {
+        "width": 1440,
+        "height": 900
+      },
+      "method": "lowlevel-cheap-headless",
+      "receipt": "captures/app/release-command-palette-receipt.json",
+      "receiptSha256": "44467f15b7c8aa6a3082e475b3af083307902f487800d2cc92ba7647cfc2c8f5"
     },
     {
       "id": "appearance-editor",
@@ -236,9 +241,18 @@
     },
     {
       "id": "narrow-window",
-      "status": "pending",
+      "status": "existing",
       "surface": "Genuinely narrow application window",
-      "proof": "Real window resize, not only device emulation"
+      "image": "captures/app/release-narrow-window.png",
+      "sourceCommit": "c941bd821ec38c340831c5d23423874a89ac8ee9",
+      "sha256": "b81ea018bc4a28ff0d1e155dd0ad79ef908750fce6271150d54f80e57b86a7ad",
+      "dimensions": {
+        "width": 480,
+        "height": 900
+      },
+      "method": "lowlevel-cheap-headless",
+      "receipt": "captures/app/release-narrow-window-receipt.json",
+      "receiptSha256": "521ca62a30cc0b2e9244237240c6a4914887edc7d3e4630c27d9bba06c9935c0"
     }
   ]
 }

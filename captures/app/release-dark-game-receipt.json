@@ -1,0 +1,15 @@
+{
+  "version": 1,
+  "state": "dark-game",
+  "sourceCommit": "c941bd821ec38c340831c5d23423874a89ac8ee9",
+  "route": "lowlevel-cheap-headless",
+  "launchPid": 21684,
+  "debugPort": 9333,
+  "seed": "progressed (prefers-color-scheme: dark emulated)",
+  "image": "captures/app/release-dark-game.png",
+  "sha256": "a0c580a74c54f3b35680c527b7eb5b97f33770f1335b3844c9ba15138dd2b202",
+  "width": 1440,
+  "height": 900,
+  "method": "cheap Lowlevel headless desktop (ReleaseCaptureDesktop) launching the built dist/main+dist/renderer Electron app with --remote-debugging-port, isolated single-target CDP session verified via scripts/cdp-isolated-session.mjs, Page.captureScreenshot",
+  "cleanupCompleted": true
+}

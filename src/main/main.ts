@@ -6,6 +6,8 @@ import { randomUUID } from 'node:crypto';
 import { app, BrowserWindow, dialog, ipcMain, safeStorage, shell, type OpenDialogOptions } from 'electron';
 import squirrelStartup from 'electron-squirrel-startup';
 
+import { designParitySearchFromArgv } from './design-parity-launch.js';
+
 import { DieselLedgerService } from './diesel-ledger-service.js';
 import { UpdateService } from './update-service.js';
 import { UPDATE_VERIFICATION_FLAG, UPDATE_VERIFICATION_URL, verificationSquirrelFeedUrl } from '../shared/game/updates.js';
@@ -42,6 +44,8 @@ import { LocalGitHistoryService } from './security-local-history.js';
 import { SafeStorageCredentialVault, type EncryptedCredentialStore } from './security-vault-service.js';
 
 const PRODUCT_NAME = 'Material Cookie Clicker';
+
+
 const PRODUCT_APP_ID = 'org.dingdingprojects.materialcookieclicker';
 
 const dirname = path.dirname(fileURLToPath(import.meta.url));
@@ -112,7 +116,8 @@ function createWindow(): BrowserWindow {
     console.error(`Material Cookie Clicker renderer failed to load (${errorCode}): ${errorDescription} — ${validatedURL}`);
     window.setTitle(PRODUCT_NAME);
   });
-  void window.loadFile(path.join(dirname, '..', 'renderer', 'index.html')).catch((error: unknown) => {
+  const paritySearch = designParitySearchFromArgv(process.argv);
+  void window.loadFile(path.join(dirname, '..', 'renderer', 'index.html'), paritySearch ? { search: paritySearch } : undefined).catch((error: unknown) => {
     console.error(`Material Cookie Clicker renderer load failed: ${(error as Error).message}`);
     window.setTitle(PRODUCT_NAME);
   });

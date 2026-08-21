@@ -1,0 +1,15 @@
+{
+  "version": 1,
+  "state": "command-palette",
+  "sourceCommit": "c941bd821ec38c340831c5d23423874a89ac8ee9",
+  "route": "lowlevel-cheap-headless",
+  "launchPid": 21684,
+  "debugPort": 9333,
+  "seed": "progressed (Ctrl+Shift+F dispatched)",
+  "image": "captures/app/release-command-palette.png",
+  "sha256": "cdf6c48c9fcc8afa2aa99f4075f0ff09a9b8c68c3473da1915e4cefe93cca5e7",
+  "width": 1440,
+  "height": 900,
+  "method": "cheap Lowlevel headless desktop (ReleaseCaptureDesktop) launching the built dist/main+dist/renderer Electron app with --remote-debugging-port, isolated single-target CDP session verified via scripts/cdp-isolated-session.mjs, Page.captureScreenshot",
+  "cleanupCompleted": true
+}

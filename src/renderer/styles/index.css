@@ -13102,3 +13102,48 @@ body[data-eclipse='on'] .cookie-hero::after {
   gap: 8px;
   min-block-size: 44px;
 }
+
+/* ============================================================================================
+ * REFUSED CLOSE
+ *
+ * The main process refuses a close until the one-cookie exit is bought, and always sent
+ * `window:close-refused` so the renderer could "flash the price plate" — but nothing listened,
+ * so the taskbar's Close window and Alt+F4 did nothing at all and said nothing about why. The
+ * refusal is deliberate and the price stays one cookie; this is only the part that tells the
+ * player, which had never been built.
+ *
+ * Verified on a fresh save with nothing bought: taskbar minimize works, taskbar close is refused.
+ * ========================================================================================== */
+
+/* The shared visually-hidden idiom. scripts/clipping-audit.mjs recognises this shape structurally
+   rather than by class name, so it is correctly read as intentional and not as clipping. */
+.visually-hidden {
+  position: absolute;
+  width: 1px;
+  height: 1px;
+  overflow: hidden;
+  clip-path: inset(50%);
+  white-space: nowrap;
+}
+
+@keyframes coin-slot-refused-flash {
+  0%, 100% { transform: none; }
+  20% { transform: translateX(-3px); }
+  40% { transform: translateX(3px); }
+  60% { transform: translateX(-2px); }
+  80% { transform: translateX(2px); }
+}
+
+.coin-slot--refused {
+  animation: coin-slot-refused-flash 420ms ease both;
+  outline: 2px solid var(--primary);
+  outline-offset: 2px;
+}
+
+/* Reduced motion keeps the outline, which carries the whole message, and drops the shake.
+   The live region says it in words regardless, so nothing here is the only signal. */
+@media (prefers-reduced-motion: reduce) {
+  .coin-slot--refused {
+    animation: none;
+  }
+}

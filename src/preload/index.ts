@@ -47,6 +47,17 @@ export interface MaterialCookieClickerWindowApi {
    */
   setResizable: (resizable: boolean) => void;
   setCloseAllowed: (allowed: boolean) => void;
+  /**
+   * Fires when the main process refused a close because the one-cookie exit is not bought yet.
+   *
+   * The main process has always sent `window:close-refused` "so the renderer can flash the price
+   * plate" — but nothing ever listened, so pressing the taskbar's Close window, or Alt+F4, before
+   * buying did absolutely nothing and gave no reason. The refusal is deliberate and the exit still
+   * costs exactly one cookie; what was missing was any way for the player to find that out.
+   *
+   * Returns its own unsubscribe, like `updates.onStatus`.
+   */
+  onCloseRefused: (listener: () => void) => () => void;
 }
 
 export interface MaterialCookieClickerApi {
@@ -73,6 +84,13 @@ const api: MaterialCookieClickerApi = {
     close: () => ipcRenderer.send('window:close'),
     setResizable: (resizable: boolean) => ipcRenderer.send('window:set-resizable', resizable === true),
     setCloseAllowed: (allowed: boolean) => ipcRenderer.send('window:set-close-allowed', allowed === true),
+    onCloseRefused: (listener: () => void): (() => void) => {
+      // The IpcRendererEvent is deliberately not passed through, matching updates.onStatus: the
+      // renderer gets the fact that a close was refused and nothing else from the main process.
+      const handler = (): void => listener();
+      ipcRenderer.on('window:close-refused', handler);
+      return () => ipcRenderer.removeListener('window:close-refused', handler);
+    },
   },
   diesel: {
     mint: (request: DieselMintRequest): Promise<DieselMintResponse> =>

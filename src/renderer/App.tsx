@@ -629,6 +629,34 @@ function TitleBar() {
   useEffect(() => {
     window.materialCookieClicker?.window.setCloseAllowed?.(closeBought);
   }, [closeBought]);
+
+  /**
+   * Answer a refused close, instead of doing nothing at all.
+   *
+   * The main process has always sent `window:close-refused` and its comment says the renderer is
+   * told "so it can flash the price plate" — but no listener existed anywhere, so pressing the
+   * taskbar's Close window or Alt+F4 before buying the one-cookie exit produced silence. The
+   * window simply did not close and nothing said why, which reads as a frozen app rather than as
+   * a joke. Verified on a fresh save: taskbar minimize works, taskbar close is refused.
+   *
+   * The refusal itself is unchanged and the exit still costs exactly one cookie. This only makes
+   * the reason visible: focus moves to the price plate and the live region says what it costs.
+   */
+  const closeSlotRef = useRef<HTMLButtonElement | null>(null);
+  const [closeRefused, setCloseRefused] = useState(false);
+  useEffect(() => {
+    const off = window.materialCookieClicker?.window.onCloseRefused?.(() => {
+      setCloseRefused(true);
+      closeSlotRef.current?.focus();
+    });
+    return off;
+  }, []);
+  useEffect(() => {
+    if (!closeRefused) return undefined;
+    // Long enough to read, short enough not to linger over the next thing the player does.
+    const timer = window.setTimeout(() => setCloseRefused(false), 2600);
+    return () => window.clearTimeout(timer);
+  }, [closeRefused]);
   const maximizeBought = useControlRung('chrome.maximize');
   const maximizeDoubleClick = useControlRung('chrome.maximize.doubleClick');
   const resizeBought = useControlRung('chrome.resize');
@@ -713,8 +741,26 @@ function TitleBar() {
             <span className="title-bar__glyph" aria-hidden="true">&#x2715;</span>
           </button>
         ) : (
-          <CoinSlot rungId="chrome.close" variant="chrome" glyph="&#x2715;" labelEn="Close" labelYue="閂窗" />
+          <CoinSlot
+            rungId="chrome.close"
+            variant="chrome"
+            glyph="&#x2715;"
+            labelEn="Close"
+            labelYue="閂窗"
+            focusRef={closeSlotRef}
+            className={closeRefused ? 'coin-slot--refused' : undefined}
+          />
         )}
+        {/* Says why the window did not close. Assertive, because the player has just pressed a
+            control that did nothing and is owed an immediate reason rather than a queued one. */}
+        <span className="visually-hidden" role="alert" aria-live="assertive">
+          {closeRefused
+            ? bilingualText({
+                en: 'The window did not close. The exit costs one cookie and has not been bought yet.',
+                yue: '個窗冇閂到。出口收一粒曲奇，仲未買。',
+              })
+            : ''}
+        </span>
       </div>
     </header>
   );

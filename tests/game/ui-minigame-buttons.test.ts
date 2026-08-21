@@ -9,6 +9,7 @@ const playable = read('src/renderer/screens/MinigamesScreen.tsx');
 const events = read('src/renderer/screens/MinigameEventsScreen.tsx');
 const action = read('src/renderer/components/MinigameAction.tsx');
 const css = read('src/renderer/styles/index.css');
+const REDUCED_MOTION_AT = '@media (prefers-reduced-motion: reduce)';
 const ACTION_BASE_SELECTOR = ":root:root body button.md3-action:not(.golden-sprite):not(.achievement-badge):not(.mini-ticket):not(.cookie-btn)";
 
 function balancedBlock(source: string, header: string): string {
@@ -173,10 +174,17 @@ describe('responsive, reduced-motion, and accessibility contracts', () => {
     expect(balancedBlock(narrow, '.minigame-picker')).toMatch(/^\s*grid-template-columns:\s*minmax\(0, 1fr\)\s*;/m);
     expect(narrow).toContain('flex: 1 1 100%');
 
-    const reducedAt = css.lastIndexOf('@media (prefers-reduced-motion: reduce)');
-    expect(reducedAt).toBeGreaterThanOrEqual(0);
-    const reduced = balancedBlock(css.slice(reducedAt), '@media (prefers-reduced-motion: reduce)');
-    expect(reduced).toContain(ACTION_BASE_SELECTOR);
+    // Find the reduced-motion block that actually covers this component, rather than assuming it
+    // is the LAST one in the file. It was written with lastIndexOf, which quietly made "md3-action's
+    // block must be last in index.css" into a requirement nobody intended — the next component to
+    // add its own reduced-motion block broke this test without changing anything it tests.
+    const reducedBlocks: string[] = [];
+    for (let at = css.indexOf(REDUCED_MOTION_AT); at !== -1; at = css.indexOf(REDUCED_MOTION_AT, at + 1)) {
+      reducedBlocks.push(balancedBlock(css.slice(at), REDUCED_MOTION_AT));
+    }
+    expect(reducedBlocks.length).toBeGreaterThan(0);
+    const reduced = reducedBlocks.find((block) => block.includes(ACTION_BASE_SELECTOR));
+    expect(reduced, 'no prefers-reduced-motion block covers the minigame action button').toBeDefined();
     expect(reduced).toMatch(/^\s*transition:\s*none\s*;/m);
   });
 

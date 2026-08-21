@@ -1,0 +1,13 @@
+{
+  "version": 1,
+  "state": "home-endless",
+  "sourceCommit": "c15307bbc2d0dba5430f8fed99b0cb11fca78f3c",
+  "route": "lowlevel-cheap-headless",
+  "seed": "home-endless.json — all six rooms built, extensionLevel 7, cookies 50,000,000,000",
+  "image": "captures/app/release-home-endless.png",
+  "sha256": "95e91bae3a71a25cda1d7f875ab81a08199f69a0fc4cea8dbafa34ea367794d1",
+  "width": 1456,
+  "height": 908,
+  "method": "cheap Lowlevel headless desktop (MCCProgression) launching the built dist/main+dist/renderer Electron app with --remote-debugging-port, isolated single-target CDP session verified via scripts/cdp-isolated-session.mjs (window.localStorage seeded with the encoded save, location.reload(), document.readyState polled to complete), background window resolved by title+class (Chrome_WidgetWin_1) via list_headless_windows, screenshot(hwnd=...) via the cheap Lowlevel MCP",
+  "cleanupCompleted": true
+}

@@ -1,0 +1,13 @@
+{
+  "version": 1,
+  "state": "golden-dial-miss",
+  "sourceCommit": "c15307bbc2d0dba5430f8fed99b0cb11fca78f3c",
+  "route": "lowlevel-cheap-headless",
+  "seed": "chrome-and-motion-states shared save (scripts/capture-seed-chrome-states.test.ts)",
+  "image": "captures/app/release-golden-dial-miss.png",
+  "sha256": "077d6fc6546c2f9d8ed7ff60a3cc1deec238901f0f46138d0ff1fbf37488c897",
+  "width": 1440,
+  "height": 900,
+  "method": "cheap Lowlevel headless desktop (ChromeStatesDesktop) launching the built dist/main+dist/renderer Electron app with --remote-debugging-port, isolated single-target CDP session verified via scripts/cdp-isolated-session.mjs; seeds the same chrome save with material-cookie-clicker:golden:fast=1 (2-6s spawn window); clicks the spawned golden-cookie sprite to catch it, then presses Stop the needle immediately (elapsed since catch near zero, needle at position 0, outside every rolled zone) and captures the resulting data-feedback=miss dial state; Page.captureScreenshot",
+  "cleanupCompleted": true
+}

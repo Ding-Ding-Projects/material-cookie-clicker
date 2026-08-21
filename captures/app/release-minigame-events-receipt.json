@@ -1,0 +1,15 @@
+{
+  "version": 1,
+  "state": "minigame-events",
+  "sourceCommit": "c15307bbc2d0dba5430f8fed99b0cb11fca78f3c",
+  "route": "lowlevel-cheap-headless",
+  "launchPid": 33888,
+  "debugPort": 9337,
+  "seed": "minigames",
+  "image": "captures/app/release-minigame-events.png",
+  "sha256": "147c11ce991dcf85f282b270bae2fa98f410cc48fa697b114a224055b58e6114",
+  "width": 1440,
+  "height": 900,
+  "method": "cheap Lowlevel headless desktop (MinigameCapture) launching the built dist/main+dist/renderer Electron app with --remote-debugging-port, isolated single-target CDP session verified via scripts/cdp-isolated-session.mjs, real DOM clicks on the built controls, Page.captureScreenshot",
+  "cleanupCompleted": true
+}

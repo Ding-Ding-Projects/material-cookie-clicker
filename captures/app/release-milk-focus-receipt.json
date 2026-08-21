@@ -1,0 +1,13 @@
+{
+  "version": 1,
+  "state": "milk-focus",
+  "sourceCommit": "c15307bbc2d0dba5430f8fed99b0cb11fca78f3c",
+  "route": "lowlevel-cheap-headless",
+  "seed": "milk-focus.json — 80 unlocked achievements, 408% milk (Milk That Should Not Exist band)",
+  "image": "captures/app/release-milk-focus.png",
+  "sha256": "b1f1d1c9d1f87b479f596fa16948dacb050c1c6c51b82ffaf2fec14a7dae6084",
+  "width": 700,
+  "height": 608,
+  "method": "cheap Lowlevel headless desktop (MCCProgression) launching the built dist/main+dist/renderer Electron app with --remote-debugging-port, isolated single-target CDP session verified via scripts/cdp-isolated-session.mjs (window.localStorage seeded with the encoded save, location.reload(), document.readyState polled to complete), background window resolved by title+class (Chrome_WidgetWin_1) via list_headless_windows, screenshot(hwnd=...) via the cheap Lowlevel MCP",
+  "cleanupCompleted": true
+}

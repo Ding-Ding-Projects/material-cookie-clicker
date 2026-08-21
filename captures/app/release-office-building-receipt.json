@@ -1,0 +1,13 @@
+{
+  "version": 1,
+  "state": "office-building",
+  "sourceCommit": "c15307bbc2d0dba5430f8fed99b0cb11fca78f3c",
+  "route": "lowlevel-cheap-headless",
+  "seed": "office-building.json — officeBuilding count 5, lifetimeCookies 2,500,000,000",
+  "image": "captures/app/release-office-building.png",
+  "sha256": "5138849d6e958ebb63f4f4d609ed8705316b19e99024637f92f4a45b551636d0",
+  "width": 1456,
+  "height": 908,
+  "method": "cheap Lowlevel headless desktop (MCCProgression) launching the built dist/main+dist/renderer Electron app with --remote-debugging-port, isolated single-target CDP session verified via scripts/cdp-isolated-session.mjs (window.localStorage seeded with the encoded save, location.reload(), document.readyState polled to complete), background window resolved by title+class (Chrome_WidgetWin_1) via list_headless_windows, screenshot(hwnd=...) via the cheap Lowlevel MCP",
+  "cleanupCompleted": true
+}

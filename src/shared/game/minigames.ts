@@ -38,6 +38,23 @@ export const EMPTY_LUCKY_CHANCE_STATE: LuckyChanceState = { tokens: 0, claimedRe
 export const EMPTY_MINIGAME_STATE: MinigameState = { completed: [], abandoned: [] };
 export const MINIGAME_IDS: readonly MinigameId[] = ["klondike", "memory_match", "cookie_2048", "minesweeper", "breakout"];
 
+/**
+ * Whether a minigame is currently holding the stage — the single question three callers were each
+ * answering slightly differently, and one of them got it wrong for the whole life of the feature.
+ *
+ * EMPTY_MINIGAME_STATE has no `active` key at all, so on a fresh save `state.minigames.active` is
+ * `undefined`, not `null`. Two guards asked `state.minigames.active && ...`, which is correct for
+ * both. The third asked `active !== null`, which is `true` for `undefined` — so it reported the
+ * stage as permanently occupied and every random event was blocked on every tick, from the first
+ * one, forever.
+ *
+ * One function now answers it, and it answers what the callers actually mean: a board that is
+ * being played or is minimised occupies the stage. A completed or abandoned board does not.
+ */
+export function minigameOccupiesStage(active: MinigameState["active"]): boolean {
+  return active?.status === "active" || active?.status === "minimized";
+}
+
 export function createSeededRng(seed: number, streamIndex = 0): RngPort {
   let state = (seed >>> 0) + (streamIndex >>> 0);
   return { next: () => { state = (state + 0x9e3779b9) >>> 0; let value = state; value = Math.imul(value ^ (value >>> 16), 0x21f0a2ad); value = Math.imul(value ^ (value >>> 15), 0x735a2d97); return ((value ^ (value >>> 15)) >>> 0) / 0x1_0000_0000; }, getStreamIndex: () => state >>> 0 };

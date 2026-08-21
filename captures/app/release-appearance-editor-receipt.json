@@ -1,0 +1,13 @@
+{
+  "version": 1,
+  "state": "appearance-editor",
+  "sourceCommit": "c15307bbc2d0dba5430f8fed99b0cb11fca78f3c",
+  "route": "lowlevel-cheap-headless",
+  "seed": "chrome-and-motion-states shared save (scripts/capture-seed-chrome-states.test.ts)",
+  "image": "captures/app/release-appearance-editor.png",
+  "sha256": "89fd1a9e4e377ce8b2a7427a2c793380a17ac7db129c061dd2e07c81899f85dc",
+  "width": 1440,
+  "height": 900,
+  "method": "cheap Lowlevel headless desktop (ChromeStatesDesktop) launching the built dist/main+dist/renderer Electron app with --remote-debugging-port, isolated single-target CDP session verified via scripts/cdp-isolated-session.mjs; seeds captures/tmp/chrome-states/chrome.json (ALL_CONTROL_RUNG_IDS bought, lifetime cookies past every unlock threshold, reveal upgrades owned); navigates Tools console -> appearanceEditor tool card 'Open it now' -> Settings/Application tools/Identity teleport -> clicks 'Edit application-tools appearance...' -> captures the open per-element AppearanceEditor dialog; Page.captureScreenshot",
+  "cleanupCompleted": true
+}

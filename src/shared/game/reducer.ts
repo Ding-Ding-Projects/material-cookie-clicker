@@ -102,6 +102,7 @@ import {
   type MinigameId,
   type MinigameMove,
   type MinigameScheduleState,
+  minigameOccupiesStage,
 } from "./minigames.js";
 
 export interface ReducerCtx {
@@ -755,7 +756,7 @@ function scheduleForNextMinigame(state: GameState, nowMs: number, rng: RngPort):
 function startScheduledMinigame(state: GameState, ctx: ReducerCtx, nowMs: number): GameState {
   if (!minigameUnlocked(state)) return state;
   if (state.goldenCookie.isSpawned || state.randomEvents.actives.length > 0) return state;
-  if (state.minigames.active && (state.minigames.active.status === "active" || state.minigames.active.status === "minimized")) return state;
+  if (minigameOccupiesStage(state.minigames.active)) return state;
   const schedule = state.minigameSchedule;
   if (!schedule || nowMs < schedule.next.startsAtEpochMs) return state;
   const rng = createSeededRng(schedule.rngSeed, schedule.occurrence);
@@ -774,7 +775,7 @@ function startScheduledMinigame(state: GameState, ctx: ReducerCtx, nowMs: number
 }
 
 function handleMinigameStart(state: GameState, ctx: ReducerCtx, id: MinigameId): GameState {
-  if (!minigameUnlocked(state) || (state.minigames.active && ["active", "minimized"].includes(state.minigames.active.status))) return state;
+  if (!minigameUnlocked(state) || minigameOccupiesStage(state.minigames.active)) return state;
   const nowMs = ctx.now();
   const rng = createSeededRng(Math.floor(ctx.rng.next() * 0x1_0000_0000) >>> 0);
   return {
@@ -931,7 +932,7 @@ function handleTick(state: GameState, ctx: ReducerCtx, elapsedMs: number): GameS
   // The random-event scheduler advances on the SAME tick, off the same clock and the same
   // RngPort, and is told whether a golden cookie is currently holding the stage.
   const eventResult = tickRandomEvents(nextState.randomEvents, nextState, nowMs, ctx.rng, {
-    blocked: goldenCookie.isSpawned || nextState.minigames.active !== null,
+    blocked: goldenCookie.isSpawned || minigameOccupiesStage(nextState.minigames.active),
     hidden: ctx.windowHidden ?? false,
     config: ctx.randomEventConfig ?? DEFAULT_RANDOM_EVENT_CONFIG,
   });

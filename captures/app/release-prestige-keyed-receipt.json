@@ -1,0 +1,13 @@
+{
+  "version": 1,
+  "state": "prestige-keyed",
+  "sourceCommit": "c15307bbc2d0dba5430f8fed99b0cb11fca78f3c",
+  "route": "lowlevel-cheap-headless",
+  "seed": "chrome-and-motion-states shared save (scripts/capture-seed-chrome-states.test.ts)",
+  "image": "captures/app/release-prestige-keyed.png",
+  "sha256": "4310f2ac5d24fa20404e15f7e954698faf04c4e78ba1ab093c5c304ed73c171f",
+  "width": 1440,
+  "height": 900,
+  "method": "cheap Lowlevel headless desktop (ChromeStatesDesktop) launching the built dist/main+dist/renderer Electron app with --remote-debugging-port, isolated single-target CDP session verified via scripts/cdp-isolated-session.mjs; seeds the chrome save (lifetimeCookies 5e12, past the 1e12 canPrestige floor, and the lifetime_1000000000 achievement unlocked so the Prestige console emblem is on screen); opens the Prestige panel, opens the prestige DestructiveGate, presses both real key toggles (aria-pressed=true on both), moves the slider to 55 via a native-setter input event, and captures the keyed-but-not-completed gate; Page.captureScreenshot",
+  "cleanupCompleted": true
+}

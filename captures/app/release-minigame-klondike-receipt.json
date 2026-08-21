@@ -1,0 +1,15 @@
+{
+  "version": 1,
+  "state": "minigame-klondike",
+  "sourceCommit": "c15307bbc2d0dba5430f8fed99b0cb11fca78f3c",
+  "route": "lowlevel-cheap-headless",
+  "launchPid": 33888,
+  "debugPort": 9337,
+  "seed": "minigames",
+  "image": "captures/app/release-minigame-klondike.png",
+  "sha256": "89190589ad2c2b3f600c20feff9571fd9819273d96434745eeb3f638dc382cfe",
+  "width": 1440,
+  "height": 900,
+  "method": "cheap Lowlevel headless desktop (MinigameCapture) launching the built dist/main+dist/renderer Electron app with --remote-debugging-port, isolated single-target CDP session verified via scripts/cdp-isolated-session.mjs, real DOM clicks on the built controls, Page.captureScreenshot",
+  "cleanupCompleted": true
+}

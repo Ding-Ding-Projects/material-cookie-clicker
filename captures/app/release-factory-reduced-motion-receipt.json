@@ -1,0 +1,13 @@
+{
+  "version": 1,
+  "state": "factory-reduced-motion",
+  "sourceCommit": "c15307bbc2d0dba5430f8fed99b0cb11fca78f3c",
+  "route": "lowlevel-cheap-headless",
+  "seed": "chrome-and-motion-states shared save (scripts/capture-seed-chrome-states.test.ts)",
+  "image": "captures/app/release-factory-reduced-motion.png",
+  "sha256": "4ebc1227ce6893ca7ad78331badae1298eaa28fcb3cef3fc40222a457e5198e9",
+  "width": 1440,
+  "height": 900,
+  "method": "cheap Lowlevel headless desktop (ChromeStatesDesktop) launching the built dist/main+dist/renderer Electron app with --remote-debugging-port, isolated single-target CDP session verified via scripts/cdp-isolated-session.mjs; seeds the chrome save with real Diesel Factory equipment (4 crude_well, 4 refinery_still, 3 storage_tank, crude and litres already in the line) so the pipe/derrick chrome is actively RUNNING rather than idle; sets Emulation.setEmulatedMedia to prefers-reduced-motion:reduce, reloads, verifies window.matchMedia('(prefers-reduced-motion: reduce)').matches is true, opens the Diesel Factory panel, and captures the running line under the reduced-motion media query; Page.captureScreenshot",
+  "cleanupCompleted": true
+}

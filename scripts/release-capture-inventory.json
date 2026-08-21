@@ -5,11 +5,11 @@
   "summary": {
     "note": "Computed directly from the states array below; update both together and re-verify by counting rather than editing this block by hand.",
     "totalStates": 28,
-    "pendingStates": 22,
-    "statesWithNoImageField": 22,
+    "pendingStates": 11,
+    "statesWithNoImageField": 11,
     "statesWithSupersededEvidenceOnly": 1,
     "statesWithSupportingEvidenceOnly": 1,
-    "statesFullyPromoted": 6
+    "statesFullyPromoted": 17
   },
   "states": [
     {
@@ -55,9 +55,19 @@
     },
     {
       "id": "graphics-cookie-only",
-      "status": "pending",
+      "status": "existing",
       "surface": "Cookie-only graphics state",
       "proof": "A supporting frame shows the exact visible state, but its partial receipt does not satisfy generic promotion or current-release completion.",
+      "image": "captures/app/release-graphics-cookie-only.png",
+      "sourceCommit": "c15307bbc2d0dba5430f8fed99b0cb11fca78f3c",
+      "sha256": "5e8cf85df89348e91574e97c42d35199c9a80c7caa50b5e631e8d2c6bbeb9b8d",
+      "dimensions": {
+        "width": 1456,
+        "height": 908
+      },
+      "method": "lowlevel-cheap-headless",
+      "receipt": "captures/app/release-graphics-cookie-only-receipt.json",
+      "receiptSha256": "63bdac0287fe7ec9e80def3cc1e45ab089424b7e4f29132ed5470f9976f0ba31",
       "supportingEvidence": {
         "state": "before",
         "image": "design/parity/evidence/graphics-progression/before.png",
@@ -106,117 +116,257 @@
     },
     {
       "id": "minigame-events",
-      "status": "pending",
+      "status": "existing",
       "surface": "Current minigame events dashboard",
-      "proof": "Five current game cards, unlock threshold, schedule and lifecycle states"
+      "image": "captures/app/release-minigame-events.png",
+      "sourceCommit": "c15307bbc2d0dba5430f8fed99b0cb11fca78f3c",
+      "sha256": "147c11ce991dcf85f282b270bae2fa98f410cc48fa697b114a224055b58e6114",
+      "dimensions": {
+        "width": 1440,
+        "height": 900
+      },
+      "method": "lowlevel-cheap-headless",
+      "receipt": "captures/app/release-minigame-events-receipt.json",
+      "receiptSha256": "dbc51aef27ebcf11bb194c6cb1b8eb0faf863220bca0c37e4390e4a302ef50ee"
     },
     {
       "id": "minigame-klondike",
-      "status": "pending",
+      "status": "existing",
       "surface": "Playable Klondike",
-      "proof": "Real dealt board and one legal move"
+      "image": "captures/app/release-minigame-klondike.png",
+      "sourceCommit": "c15307bbc2d0dba5430f8fed99b0cb11fca78f3c",
+      "sha256": "89190589ad2c2b3f600c20feff9571fd9819273d96434745eeb3f638dc382cfe",
+      "dimensions": {
+        "width": 1440,
+        "height": 900
+      },
+      "method": "lowlevel-cheap-headless",
+      "receipt": "captures/app/release-minigame-klondike-receipt.json",
+      "receiptSha256": "00f7da710cce500128fef7e5bca17e1c6af2f78a4fdefc43473f780f64994b98"
     },
     {
       "id": "minigame-memory",
-      "status": "pending",
+      "status": "existing",
       "surface": "Playable Memory Match",
-      "proof": "Real board and one revealed pair"
+      "image": "captures/app/release-minigame-memory.png",
+      "sourceCommit": "c15307bbc2d0dba5430f8fed99b0cb11fca78f3c",
+      "sha256": "c21ea6f7a9a26c3e9f80ff1207951f7c281349b521a35139f7ab5cbd3d7f4dd0",
+      "dimensions": {
+        "width": 1440,
+        "height": 900
+      },
+      "method": "lowlevel-cheap-headless",
+      "receipt": "captures/app/release-minigame-memory-receipt.json",
+      "receiptSha256": "ae428c31aa8411e2bc729d3a35b47c4d54397054a356f567a68e53d9940ad14d"
     },
     {
       "id": "minigame-2048",
-      "status": "pending",
+      "status": "existing",
       "surface": "Playable Cookie 2048",
-      "proof": "Real board after one move"
+      "image": "captures/app/release-minigame-2048.png",
+      "sourceCommit": "c15307bbc2d0dba5430f8fed99b0cb11fca78f3c",
+      "sha256": "6b0e465f6f4311ae09cd80789b3a8d863210136e30acc07256eaf84717c3092f",
+      "dimensions": {
+        "width": 1440,
+        "height": 900
+      },
+      "method": "lowlevel-cheap-headless",
+      "receipt": "captures/app/release-minigame-2048-receipt.json",
+      "receiptSha256": "9725186fb685a9f4b1cb9f40d20602ffb4cd31eb06a719384bc5b28926fb2cc2"
     },
     {
       "id": "minigame-minesweeper",
-      "status": "pending",
+      "status": "existing",
       "surface": "Playable Minesweeper",
-      "proof": "Real board after one reveal"
+      "image": "captures/app/release-minigame-minesweeper.png",
+      "sourceCommit": "c15307bbc2d0dba5430f8fed99b0cb11fca78f3c",
+      "sha256": "80779fdd3d5dd5c60b00f2faae6c4f70d94ce2fa33186321f04959817550a028",
+      "dimensions": {
+        "width": 1440,
+        "height": 900
+      },
+      "method": "lowlevel-cheap-headless",
+      "receipt": "captures/app/release-minigame-minesweeper-receipt.json",
+      "receiptSha256": "a816c0e4c32b3da3ab83e0bed2af951bab2d2f7c42cb814e62952e966cbdc790"
     },
     {
       "id": "minigame-breakout",
-      "status": "pending",
+      "status": "existing",
       "surface": "Playable Breakout",
-      "proof": "Real active board"
+      "image": "captures/app/release-minigame-breakout.png",
+      "sourceCommit": "c15307bbc2d0dba5430f8fed99b0cb11fca78f3c",
+      "sha256": "faf64e74b21747457ef2793ca0a2eca94a0a4dcbcae7b89b5abdca30d23c486f",
+      "dimensions": {
+        "width": 1440,
+        "height": 900
+      },
+      "method": "lowlevel-cheap-headless",
+      "receipt": "captures/app/release-minigame-breakout-receipt.json",
+      "receiptSha256": "61c589dd9fdefdc1cd4d82f978d9539f2d50806cbc961a4c22d06cd14a61a903"
     },
     {
       "id": "lucky-chance-drawer",
-      "status": "pending",
+      "status": "existing",
       "surface": "Lucky Chance drawer",
-      "proof": "Drawer open with token cost and one recorded result"
+      "image": "captures/app/release-lucky-chance-drawer.png",
+      "sourceCommit": "c15307bbc2d0dba5430f8fed99b0cb11fca78f3c",
+      "sha256": "5a15d4a8270407bf2b9b74f937ee7281d88aee284710ecbe41c5d22752b00fb4",
+      "dimensions": {
+        "width": 1440,
+        "height": 900
+      },
+      "method": "lowlevel-cheap-headless",
+      "receipt": "captures/app/release-lucky-chance-drawer-receipt.json",
+      "receiptSha256": "a385e36edf9f3226f6addf72252d5f80039e5a959195ae5e3fdc6d58cb4754cf"
     },
     {
       "id": "office-building",
-      "status": "pending",
+      "status": "existing",
       "surface": "Office Building generator",
-      "proof": "Generator row at and beyond the 500 million cookie threshold"
+      "proof": "Generator row at and beyond the 500 million cookie threshold",
+      "image": "captures/app/release-office-building.png",
+      "sourceCommit": "c15307bbc2d0dba5430f8fed99b0cb11fca78f3c",
+      "sha256": "5138849d6e958ebb63f4f4d609ed8705316b19e99024637f92f4a45b551636d0",
+      "dimensions": {
+        "width": 1456,
+        "height": 908
+      },
+      "method": "lowlevel-cheap-headless",
+      "receipt": "captures/app/release-office-building-receipt.json",
+      "receiptSha256": "16aad88bf62bc41da8bec03c4137d489233d90bac79518d1064ac7fcca36e45f"
     },
     {
       "id": "home-endless",
-      "status": "pending",
+      "status": "existing",
       "surface": "Endless Home extension",
-      "proof": "Seven finished extension floors with the next floor available"
+      "proof": "Seven finished extension floors with the next floor available",
+      "image": "captures/app/release-home-endless.png",
+      "sourceCommit": "c15307bbc2d0dba5430f8fed99b0cb11fca78f3c",
+      "sha256": "95e91bae3a71a25cda1d7f875ab81a08199f69a0fc4cea8dbafa34ea367794d1",
+      "dimensions": {
+        "width": 1456,
+        "height": 908
+      },
+      "method": "lowlevel-cheap-headless",
+      "receipt": "captures/app/release-home-endless-receipt.json",
+      "receiptSha256": "437303ad63d98188b5a94d17f1c677b71d69e3e7d37bdfd5ec72d278d82cbdbd"
     },
     {
       "id": "diesel-depot-collapsed",
-      "status": "pending",
+      "status": "existing",
       "surface": "Collapsed Diesel Depot",
-      "proof": "Collapsed summary and persisted state after reload"
+      "proof": "Collapsed summary and persisted state after reload",
+      "image": "captures/app/release-diesel-depot-collapsed.png",
+      "sourceCommit": "c15307bbc2d0dba5430f8fed99b0cb11fca78f3c",
+      "sha256": "d34e5cd47d401280fe173965beb574be6565b403265b47e1def1f9278525ff98",
+      "dimensions": {
+        "width": 1456,
+        "height": 908
+      },
+      "method": "lowlevel-cheap-headless",
+      "receipt": "captures/app/release-diesel-depot-collapsed-receipt.json",
+      "receiptSha256": "29de72e1fed27bec005f012456110439dc18b7f9af026f8b9fded4e9358a7677"
     },
     {
       "id": "update-ready",
       "status": "pending",
       "surface": "Installed update-ready banner",
-      "proof": "Unsigned Squirrel update, version, release link, Later and Restart actions"
+      "proof": "Unsigned Squirrel update, version, release link, Later and Restart actions. Reached only through the process-local verification seam (MATERIAL_COOKIE_CLICKER_VERIFY_UPDATE_FEED), which requires a deterministic prior<candidate<target Squirrel feed served over bounded credential-free HTTPS that Windows' real certificate validation will trust. No such feed exists on this machine or task boundary, and standing one up needs either a certificate authority-issued TLS certificate (this repository permanently prohibits obtaining or holding signing material of any kind, and a locally-issued self-signed cert is not something Squirrel's HTTPS client will accept) or a public host, neither of which is available in this session. Left pending rather than forcing an insecure or fabricated feed."
     },
     {
       "id": "installed-launch",
       "status": "pending",
       "surface": "Installed executable launch",
-      "proof": "Installed executable launched on a named hidden desktop with packaged icon visible"
+      "proof": "Installed executable launched on a named hidden desktop with packaged icon visible. scripts/prepare-squirrel-runtime-verification.mjs states the install boundary plainly: 'disposable operating-system user or disposable VM; LOCALAPPDATA redirection is forbidden'. This machine's %LOCALAPPDATA%\\MaterialCookieClicker already holds a real prior installation (app-0.2.50/0.2.52/0.2.55) from earlier sessions; installing this task's older 0.2.0 Setup.exe over or beside it on the single shared user account risks corrupting or shadowing that install, and no disposable Windows user or VM is available to this task to isolate the install as the project's own contract requires. Creating a new local OS user account to obtain that isolation is a system-account change outside this task's authority. Left pending rather than installing into a shared, non-disposable location."
     },
     {
       "id": "event-pool-remaining",
       "status": "pending",
       "surface": "Remaining event pool",
-      "proof": "Eighteen events that lack current-build photographs"
+      "proof": "Confirmed unreachable in the current build, not merely unphotographed: src/shared/game/reducer.ts#handleTick computes `blocked: goldenCookie.isSpawned || nextState.minigames.active !== null`, but `minigames.active` is `undefined` on a fresh save (and never becomes exactly `null` afterward), and `undefined !== null` is `true` in JavaScript. tickRandomEvents is therefore called with blocked:true on every tick, forever, so the pool can never spawn a single event. Verified live: a save satisfying every unlock threshold, with the developer flag `material-cookie-clicker:events:fast=event:sprinkle_storm` set, never spawned over 60+s of real ticking while the persisted save's randomEvents.rngStreamIndex and nextEligibleAtEpochMs stayed frozen at 0 and the cookie balance and goldenCookie.rngStreamIndex both visibly advanced in the same window. Flagged out-of-scope (this lane may not touch src/) as a spawned task suggesting the one-line fix (`!== undefined`)."
     },
     {
       "id": "milk-focus",
-      "status": "pending",
+      "status": "existing",
       "surface": "High milk level",
-      "proof": "Composition focused on the milk tide rather than incidental background evidence"
+      "proof": "Composition focused on the milk tide rather than incidental background evidence",
+      "image": "captures/app/release-milk-focus.png",
+      "sourceCommit": "c15307bbc2d0dba5430f8fed99b0cb11fca78f3c",
+      "sha256": "b1f1d1c9d1f87b479f596fa16948dacb050c1c6c51b82ffaf2fec14a7dae6084",
+      "dimensions": {
+        "width": 700,
+        "height": 608
+      },
+      "method": "lowlevel-cheap-headless",
+      "receipt": "captures/app/release-milk-focus-receipt.json",
+      "receiptSha256": "31dcbb514441673f24b5a2ab19c633572c6501054757b9a746f4306ab845821a"
     },
     {
       "id": "home-late-rooms",
-      "status": "pending",
+      "status": "existing",
       "surface": "Late authored Home rooms",
-      "proof": "Bedroom, Workshop and Garden build/furnishing states"
+      "proof": "Bedroom, Workshop and Garden build/furnishing states",
+      "image": "captures/app/release-home-late-rooms.png",
+      "sourceCommit": "c15307bbc2d0dba5430f8fed99b0cb11fca78f3c",
+      "sha256": "1ee4a714c879d56cddc4fce8b2409df68ea7d37c9d3b0445bd3afec41c24a289",
+      "dimensions": {
+        "width": 1456,
+        "height": 908
+      },
+      "method": "lowlevel-cheap-headless",
+      "receipt": "captures/app/release-home-late-rooms-receipt.json",
+      "receiptSha256": "ef4bb98c7aca80819f0a8725824e957cefb3865c3b0fcf83a9130ed9e96f7559"
     },
     {
       "id": "golden-dial-miss",
-      "status": "pending",
+      "status": "existing",
       "surface": "Missed Oven Dial press",
-      "proof": "Miss copy and shake state"
+      "image": "captures/app/release-golden-dial-miss.png",
+      "sourceCommit": "c15307bbc2d0dba5430f8fed99b0cb11fca78f3c",
+      "sha256": "077d6fc6546c2f9d8ed7ff60a3cc1deec238901f0f46138d0ff1fbf37488c897",
+      "dimensions": {
+        "width": 1440,
+        "height": 900
+      },
+      "method": "lowlevel-cheap-headless",
+      "receipt": "captures/app/release-golden-dial-miss-receipt.json",
+      "receiptSha256": "94f0ded468f987a54ca2f38b97baa85568a2c9c910f7f5751fec07238b3ac496"
     },
     {
       "id": "prestige-keyed",
-      "status": "pending",
+      "status": "existing",
       "surface": "Prestige super-confirmation",
-      "proof": "One-key, sliding and completed states"
+      "image": "captures/app/release-prestige-keyed.png",
+      "sourceCommit": "c15307bbc2d0dba5430f8fed99b0cb11fca78f3c",
+      "sha256": "4310f2ac5d24fa20404e15f7e954698faf04c4e78ba1ab093c5c304ed73c171f",
+      "dimensions": {
+        "width": 1440,
+        "height": 900
+      },
+      "method": "lowlevel-cheap-headless",
+      "receipt": "captures/app/release-prestige-keyed-receipt.json",
+      "receiptSha256": "05041ac6668676bc1e9538b70ac315d0ebc51401f7a07cf920c2fc239db90b87"
     },
     {
       "id": "factory-reduced-motion",
-      "status": "pending",
+      "status": "existing",
       "surface": "Factory reduced motion",
-      "proof": "Stopped pipe and derrick motion"
+      "image": "captures/app/release-factory-reduced-motion.png",
+      "sourceCommit": "c15307bbc2d0dba5430f8fed99b0cb11fca78f3c",
+      "sha256": "4ebc1227ce6893ca7ad78331badae1298eaa28fcb3cef3fc40222a457e5198e9",
+      "dimensions": {
+        "width": 1440,
+        "height": 900
+      },
+      "method": "lowlevel-cheap-headless",
+      "receipt": "captures/app/release-factory-reduced-motion-receipt.json",
+      "receiptSha256": "f270951aee6d10e679ac112a0f8e8af11fac1141f9b435057af8f6d6e5976629"
     },
     {
       "id": "raid-reduced-motion",
       "status": "pending",
       "surface": "Mouse Raid reduced motion",
-      "proof": "Non-scurrying accessible raid state"
+      "proof": "Unreachable for the same confirmed reducer defect as event-pool-remaining: src/shared/game/reducer.ts#handleTick's `blocked: goldenCookie.isSpawned || nextState.minigames.active !== null` is `true` on every tick because `minigames.active` is `undefined` (never exactly `null`), so `tickRandomEvents` never advances past its early-return branches and the Mouse Raid clock (also gated inside that same function) can never start. Verified live with `material-cookie-clicker:events:fast=raid` and a save past the 1,000,000-lifetime-baked raid unlock: no raid over 60+s while cookies and the golden-cookie RNG stream both visibly advanced. Flagged out-of-scope (this lane may not touch src/) as the same spawned task covering event-pool-remaining."
     },
     {
       "id": "command-palette",
@@ -235,9 +385,18 @@
     },
     {
       "id": "appearance-editor",
-      "status": "pending",
+      "status": "existing",
       "surface": "Appearance editor",
-      "proof": "Implemented surface; installed anchored-editor interaction and current capture remain pending"
+      "image": "captures/app/release-appearance-editor.png",
+      "sourceCommit": "c15307bbc2d0dba5430f8fed99b0cb11fca78f3c",
+      "sha256": "89fd1a9e4e377ce8b2a7427a2c793380a17ac7db129c061dd2e07c81899f85dc",
+      "dimensions": {
+        "width": 1440,
+        "height": 900
+      },
+      "method": "lowlevel-cheap-headless",
+      "receipt": "captures/app/release-appearance-editor-receipt.json",
+      "receiptSha256": "99cfa9c124baed8e47e063e3d7bb2d4ad1f18e4b90d67e0ad0677ebe36a06584"
     },
     {
       "id": "narrow-window",

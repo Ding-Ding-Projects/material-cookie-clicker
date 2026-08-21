@@ -34,7 +34,7 @@ const COLUMNS = [
 
 const REQUIRED_IDS = [
   "desktop-game-core", "desktop-graphics-progression", "desktop-generator-ladder", "desktop-endless-progression",
-  "desktop-golden-random-events", "desktop-minigame-events", "desktop-playable-minigames", "desktop-home", "desktop-diesel",
+  "desktop-golden-random-events", "desktop-golden-challenges", "desktop-minigame-events", "desktop-playable-minigames", "desktop-home", "desktop-diesel",
   "desktop-achievements", "desktop-prestige", "desktop-settings", "desktop-language",
   "desktop-funny-levels", "desktop-emoji-dialog-toggle", "desktop-school-mode", "desktop-narrator",
   "desktop-scheduled-settings", "desktop-personal-vocabulary", "desktop-regex-builder",

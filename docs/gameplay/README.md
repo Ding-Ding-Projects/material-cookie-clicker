@@ -39,6 +39,7 @@ must not be read as approved release evidence.
 - [Endless Home construction](home-construction.md) — six authored rooms followed by repeatable,
   persisted extension floors with no final level.
 - [Golden-cookie events](golden-cookie-events.md) — the random bonus overlay.
+- [Golden cookie challenges](golden-cookie-challenges.md) — the fifty challenges a caught cookie can open.
 - [Minigame events and Lucky Chance](minigame-events.md) — the five persisted minigames, Golden
   Tokens, and the seeded reward drawer.
 - [Achievements](achievements.md) — unlock conditions and the locked/unlocked badge states.

@@ -1,6 +1,6 @@
 {
   "version": 1,
-  "sourceCommit": "e28072cd0961d4350320587bb77a1bca212a28b5",
+  "sourceCommit": "3e5895c879b954413763855206ef506dc7677d65",
   "route": "cheap-lowlevel-headless",
   "launchPid": 33156,
   "hwnd": "7932446",
@@ -9,21 +9,21 @@
     {
       "state": "before",
       "path": "design/parity/evidence/graphics-progression/before.png",
-      "sha256": "55c751e8a3dc0b395ef0f768b5721b953d126174011fd457d2e9034924ab1a97",
+      "sha256": "1db0512c993f2060a7eb78a35c0aca08ba6be26c43820f37aaafc056ce16172e",
       "width": 1440,
       "height": 900
     },
     {
       "state": "affordable",
       "path": "design/parity/evidence/graphics-progression/affordable.png",
-      "sha256": "8c3d2f50f62659db8e79b0376c7c1b7733a14e54002aaf28df8a84ea37a697b9",
+      "sha256": "7ff180b8efb7b62c421fd3d0cb3a0a5b853033667451f555ec4719a443a0cc0f",
       "width": 1440,
       "height": 900
     },
     {
       "state": "after",
       "path": "design/parity/evidence/graphics-progression/after.png",
-      "sha256": "cb1555f20e96b190f6fb6998f5eea0667a69c502f0d29eaa2b1fcccddb437f01",
+      "sha256": "34864f7022d005ecff6a0c4dcedd5b72287a35f0aa79f0a51f8ad23a785fb88e",
       "width": 1440,
       "height": 900
     }

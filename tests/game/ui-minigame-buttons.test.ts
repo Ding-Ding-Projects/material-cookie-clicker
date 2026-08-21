@@ -79,7 +79,22 @@ describe('hand-written minigame button inventory', () => {
 });
 
 describe('Material action anatomy and cascade', () => {
-  it('beats the generic normalization with explicit 48px button anatomy', () => {
+  /**
+   * This asserted Material Design 3 shape on a GAME surface. On 2026-08-20 the owner exempted this
+   * project from Material Design 3 ("i never said to migrate to material design 3"), so the minigame
+   * actions now take the arcade treatment that `.buy-btn` uses. The assertion below was updated to
+   * the shape the requirement now calls for.
+   *
+   * Worth being explicit, because AGENTS.md warns against exactly the move this resembles: editing a
+   * test to match the code is how a real defect gets papered over. That is not what happened here.
+   * The requirement changed by an owner decision, and the test follows the requirement. The LAYOUT
+   * assertions — 48px targets, inline-flex, wrapping — are untouched, because they fixed a real
+   * defect and no styling decision releases them.
+   *
+   * There is also no longer a "generic normalization" to beat: the blanket button rule this title
+   * referred to was removed in the same change. See tests/no-m3-remigration.test.ts.
+   */
+  it('keeps explicit 48px button anatomy and the arcade shape', () => {
     const base = balancedBlock(css, ACTION_BASE_SELECTOR);
     expect(base).toMatch(/^\s*appearance:\s*none\s*;/m);
     expect(base).toMatch(/^\s*-webkit-appearance:\s*none\s*;/m);
@@ -87,7 +102,10 @@ describe('Material action anatomy and cascade', () => {
     expect(base).toMatch(/^\s*min-block-size:\s*48px\s*;/m);
     expect(base).toMatch(/^\s*min-inline-size:\s*48px\s*;/m);
     expect(base).toMatch(/^\s*border:\s*1px solid var\(--md3-action-outline, transparent\)\s*;/m);
-    expect(base).toMatch(/^\s*border-radius:\s*var\(--md-sys-shape-corner-full\)\s*;/m);
+    expect(base).toMatch(/^\s*border-radius:\s*var\(--shape-full\)\s*;/m);
+    // The arcade press shadow and display face, matching .buy-btn rather than a flat Material fill.
+    expect(base).toMatch(/^\s*box-shadow:\s*0 4px 0 0 var\(--primary-shadow\)\s*;/m);
+    expect(base).toMatch(/^\s*font-family:\s*var\(--font-display\)\s*;/m);
     expect(base).toContain('var(--md3-action-container');
     expect(base).toContain('var(--md3-action-ink');
     expect(base).toMatch(/^\s*white-space:\s*normal\s*;/m);

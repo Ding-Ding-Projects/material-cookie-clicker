@@ -1,0 +1,207 @@
+/**
+ * Bilingual chrome copy for the game screens.
+ *
+ * Item names (generators, upgrades, achievements, tools) already carry their own bilingual
+ * `nameEn`/`nameYue` fields on their domain definitions — see generators.ts, upgrades.ts,
+ * achievements.ts and tools.ts — and are read directly from there rather than duplicated here.
+ * This module only covers the surrounding UI chrome: tab labels, button labels, empty states,
+ * and the fixed contract copy (destructive gates, the tools feature-gate notes).
+ *
+ * Every string is an `{ en, yue }` pair. Numbers/costs/rates are interpolated as plain values
+ * and never themselves translated or altered — only the surrounding prose differs by language.
+ * A funny-level slider / language-mode toggle would normally select which of these renders
+ * (see the shared instructions' language-mode contract); no such settings surface exists yet in
+ * this lane's scope, so every screen renders both languages together (bilingual-by-default),
+ * matching the design mockups' own "English · 中文" presentation.
+ */
+export interface Bilingual {
+  readonly en: string;
+  readonly yue: string;
+}
+
+export function bilingualText({ en, yue }: Bilingual): string {
+  return `${en} · ${yue}`;
+}
+
+export const TAB_COPY = {
+  cookie: { en: "Cookie", yue: "曲奇" },
+  generators: { en: "Generators", yue: "生產建築" },
+  upgrades: { en: "Upgrades", yue: "升級" },
+  achievements: { en: "Achievements", yue: "成就" },
+  tools: { en: "Tools", yue: "工具" },
+  statistics: { en: "Statistics", yue: "統計" },
+  prestige: { en: "Prestige", yue: "轉生" },
+} as const satisfies Record<string, Bilingual>;
+
+export const COOKIE_SCREEN_COPY = {
+  clickTarget: { en: "Click the cookie", yue: "撳曲奇" },
+  cookiesLabel: { en: "Cookies", yue: "曲奇" },
+  cpsLabel: { en: "Cookies per second", yue: "每秒曲奇產量" },
+  goldenAvailable: { en: "Golden cookie available", yue: "金曲奇出現" },
+  holdHint: { en: "Hold to click repeatedly", yue: "撳住可以連續撳擊" },
+} as const satisfies Record<string, Bilingual>;
+
+export const LIST_COPY = {
+  searchPlaceholderGenerators: { en: "Search generators…", yue: "搜尋生產建築…" },
+  searchPlaceholderUpgrades: { en: "Search upgrades…", yue: "搜尋升級…" },
+  searchPlaceholderAchievements: { en: "Search achievements…", yue: "搜尋成就…" },
+  searchPlaceholderTools: { en: "Search tools…", yue: "搜尋工具…" },
+  regexBuilderOpen: { en: "Open regex builder", yue: "開啟規則運算式產生器" },
+  owned: { en: "Owned", yue: "擁有" },
+  locked: { en: "Locked", yue: "未解鎖" },
+  buy: { en: "Buy", yue: "買" },
+  buyMax: { en: "Max", yue: "全部" },
+  alreadyOwned: { en: "Already owned", yue: "已經擁有" },
+  noResults: { en: "Nothing matches this search.", yue: "搵唔到符合嘅結果。" },
+  reviewPreview: { en: "Review before buying", yue: "購買前先review下" },
+} as const satisfies Record<string, Bilingual>;
+
+export const BULK_COPY = {
+  selectedCount: (count: number): Bilingual => ({
+    en: `${count} selected`,
+    yue: `已選 ${count} 項`,
+  }),
+  buySelected: (count: number): Bilingual => ({ en: `Buy ${count} selected`, yue: `買落${count} 項已選` }),
+  exportSelected: (count: number): Bilingual => ({ en: `Export ${count} selected`, yue: `匯出 ${count} 項已選` }),
+  clearSelection: { en: "Clear selection", yue: "清除選擇" },
+  selectAllMatching: { en: "Select all matching", yue: "選取全部符合項" },
+  inFlight: { en: "Working…", yue: "處理緊…" },
+} as const satisfies Record<string, Bilingual | ((...args: any[]) => Bilingual)>;
+
+export const TOOLS_SCREEN_COPY = {
+  principle: {
+    en: "Every app feature here is part of the game: buy or unlock its tool to switch the real feature on. Until then it stays off.",
+    yue: "呢度每個應用程式功能都係遊戲一部分：買咗或者解鎖返隻工具，真正嘅功能先會著。未解鎖之前係熄咗嘅。",
+  },
+  openFeature: { en: "Open feature", yue: "開啟功能" },
+  featureLocked: { en: "Locked", yue: "未解鎖" },
+  featureGateNote: {
+    en: "This feature is switched off until you buy or unlock this tool.",
+    yue: "買咗或者解鎖咗呢隻工具之前，呢個功能係熄咗嘅。",
+  },
+  undiscoveredName: { en: "??? Tool", yue: "未發現嘅工具" },
+  undiscoveredBody: {
+    en: "Not discovered yet — keep playing and its name will reveal itself.",
+    yue: "仲未被發現，繼續玩落去就會顯示出嚟。",
+  },
+  progressionToggleOn: { en: "Tool progression: on", yue: "工具進度：開" },
+  progressionToggleOff: {
+    en: "Tool progression: off (previewing every tool as unlocked)",
+    yue: "工具進度：熄咗（預覽晒全部工具當已解鎖）",
+  },
+  shopPriceLabel: { en: "Price", yue: "價錢" },
+  buyEarly: { en: "Buy early", yue: "提前解鎖" },
+  openedRegexBuilder: {
+    en: "Opened — this screen's own search field already has the real regex builder, right above.",
+    yue: "已開啟——呢個畫面自己嘅搜尋欄上面就係真正嘅正則表達式產生器。",
+  },
+  openedGeneric: {
+    en: "Feature switched on — you own this tool. This build of Material Cookie Clicker has not wired it into a screen of its own yet.",
+    yue: "功能已經著咗——呢隻工具你已經有。不過呢個版本嘅曲奇餅乾點擊器仲未將佢接返自己嘅畫面。",
+  },
+} as const satisfies Record<string, Bilingual>;
+
+export const ACHIEVEMENTS_SCREEN_COPY = {
+  unlockedSummary: (unlocked: number, total: number): Bilingual => ({
+    en: `${unlocked} of ${total} achievements unlocked`,
+    yue: `已解鎖 ${unlocked} / ${total} 個成就`,
+  }),
+  unlockedAt: (dateText: string): Bilingual => ({
+    en: `Unlocked ${dateText}`,
+    yue: `${dateText} 解鎖`,
+  }),
+  requireLifetimeCookies: (target: string): Bilingual => ({
+    en: `Reach ${target} lifetime cookies`,
+    yue: `一生累積曲奇達到 ${target}`,
+  }),
+  requireClicks: (target: string): Bilingual => ({
+    en: `Click ${target} times`,
+    yue: `撳 ${target} 下`,
+  }),
+  requireGeneratorOwned: (count: number, nameEn: string, nameYue: string): Bilingual => ({
+    en: `Own ${count} × ${nameEn}`,
+    yue: `擁有 ${count} 個${nameYue}`,
+  }),
+  requirePrestige: (target: number): Bilingual => ({
+    en: `Prestige ${target} time${target === 1 ? "" : "s"}`,
+    yue: `轉生 ${target} 次`,
+  }),
+} as const satisfies Record<string, Bilingual | ((...args: any[]) => Bilingual)>;
+
+export const STATS_SCREEN_COPY = {
+  totalCookiesBaked: { en: "Total Cookies Baked", yue: "總共烤咗嘅曲奇" },
+  cookiesPerSecond: { en: "Cookies Per Second", yue: "每秒曲奇產量" },
+  clickPower: { en: "Click Power", yue: "每擊力量" },
+  prestigeRuns: { en: "Prestige Runs", yue: "轉生次數" },
+  totalClicks: { en: "Total Clicks", yue: "總撳擊次數" },
+  ascensionPoints: { en: "Ascension Points", yue: "飛升點" },
+  achievementsUnlocked: { en: "Achievements Unlocked", yue: "已解鎖成就" },
+  toolsUnlocked: { en: "Tools Unlocked", yue: "已解鎖工具" },
+  clockAnomalies: { en: "Clock Anomalies Caught", yue: "捕捉到嘅時鐘異常" },
+  lifetimeCookies: { en: "Lifetime Cookies", yue: "一生累積曲奇" },
+} as const satisfies Record<string, Bilingual>;
+
+export const PRESTIGE_SCREEN_COPY = {
+  projectionTitle: { en: "Ascension projection", yue: "飛升預測" },
+  projectionBody: (points: number): Bilingual => ({
+    en: `Prestiging right now would earn ${points} ascension point${points === 1 ? "" : "s"}.`,
+    yue: `而家轉生可以攞到 ${points} 粒飛升點。`,
+  }),
+  notYetEligible: {
+    en: "Not eligible yet — reach 1 trillion lifetime cookies to unlock prestige.",
+    yue: "仲未夠資格——一生累積曲奇要到達 1 兆先可以轉生。",
+  },
+  permanentShopTitle: { en: "Permanent upgrades", yue: "永久升級" },
+  permanentShopEmpty: {
+    en: "No upgrades are marked permanent yet, so a prestige currently resets every upgrade. Permanent unlocks survive prestige once earned.",
+    yue: "而家未有升級被標記做永久，所以轉生會重設晒所有升級。永久解鎖之後就唔會被轉生洗走。",
+  },
+  gatePrestigeTitle: { en: "Prestige now?", yue: "而家轉生？" },
+  gatePrestigeResets: {
+    en: "This will reset: all buildings, upgrades, and your current cookie count back to zero.",
+    yue: "呢個會清空：所有建築物、升級同埋而家嘅曲奇數量會歸零。",
+  },
+  gatePrestigeKeeps: (points: number): Bilingual => ({
+    en: `This carries forward: ${points} ascension point${points === 1 ? "" : "s"} (a permanent production bonus), all unlocked achievements, and every permanent upgrade.`,
+    yue: `呢個會保留：${points} 粒飛升點（永久產量加成）、全部已解鎖成就，同埋所有永久升級。`,
+  }),
+  gateWipeTitle: { en: "Delete all save data?", yue: "刪除全部存檔？" },
+  gateWipeBody: {
+    en: "This will permanently delete every building, upgrade, achievement, ascension point, and prestige run. There is no undo and no recovery route once this completes.",
+    yue: "呢個會永久刪除每一個建築物、升級、成就、飛升點同轉生紀錄。完成之後無得反悔，無得復原。",
+  },
+  key1Label: { en: "Confirm intent", yue: "確認意向" },
+  key2PrestigeLabel: { en: "Confirm you read the impact", yue: "確認睇咗影響" },
+  key2WipeLabel: { en: "Confirm you understand this is permanent", yue: "確認明白呢個係永久性" },
+  sliderHintDisabled: { en: "Both keys required before this slider unlocks", yue: "要開晒兩條鎖匙先可以郁滑桿" },
+  sliderHintEnabled: { en: "Drag fully right to confirm", yue: "拉到盡右邊確認" },
+  sliderAriaPrestige: { en: "Slide fully right to prestige", yue: "拉到盡右邊確認轉生" },
+  sliderAriaWipe: { en: "Slide fully right to delete everything", yue: "拉到盡右邊確認刪除全部" },
+  emergencyExit: { en: "Emergency exit", yue: "緊急退出" },
+  prestigeCompleted: (points: number): Bilingual => ({
+    en: `Prestiged! Ascension points awarded: +${points}`,
+    yue: `轉生完成！獲得飛升點 +${points}`,
+  }),
+  wipeCompleted: { en: "All save data deleted.", yue: "全部存檔已刪除。" },
+  prestigeButton: { en: "Prestige…", yue: "轉生…" },
+  wipeButton: { en: "Delete all save data…", yue: "刪除全部存檔…" },
+} as const satisfies Record<string, Bilingual | ((...args: any[]) => Bilingual)>;
+
+export const NARRATOR_COPY = {
+  regionLabel: { en: "Game milestones", yue: "遊戲重要進度" },
+} as const satisfies Record<string, Bilingual>;
+
+export const OFFLINE_COPY = {
+  welcomeBack: (cookies: string, hours: string): Bilingual => ({
+    en: `Welcome back — you earned ${cookies} cookies while away (${hours}).`,
+    yue: `歡迎返嚟——你唔喺度嘅時候賺咗 ${cookies} 舊曲奇（${hours}）。`,
+  }),
+  clockAnomaly: {
+    en: "Your device clock moved backwards, so no offline cookies were awarded this time.",
+    yue: "你部機嘅時鐘郁咗去返轉頭，所以今次冇離線曲奇獎勵。",
+  },
+  saveCorrupt: (detail: string): Bilingual => ({
+    en: `Your previous save could not be read (${detail}). It was kept, unread, next to a fresh save so nothing is lost.`,
+    yue: `舊存檔讀唔到（${detail}）。原檔保留咗喺新存檔隔籬，冇整走過任何嘢。`,
+  }),
+} as const satisfies Record<string, Bilingual | ((...args: any[]) => Bilingual)>;

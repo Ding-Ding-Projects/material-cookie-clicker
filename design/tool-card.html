@@ -19,7 +19,7 @@
     --font-zh: "Segoe UI", "Microsoft JhengHei", var(--font-en);
     --font-display: "Segoe UI Black", "Arial Black", "Segoe UI", var(--font-en);
     --shape-full: 999px; --shape-md: 18px; --shape-sm: 12px;
-    --border-thick: 3px; --border-chunky: 4px;
+    --border-thin: 2px; --border-thick: 3px; --border-chunky: 4px;
   }
   [data-scheme="dark"] {
     --md-primary: #FFB876; --md-on-primary: #4A2800; --md-primary-shadow: #A66A2E; --md-primary-container: #693C00; --md-on-primary-container: #FFDCB8;
@@ -89,34 +89,43 @@
     padding: 8px 12px; font-size: 13px; font-weight: 800;
   }
 
-  /* The persistent, always-present "the real feature is not locked" affordance.
-     Present in every single state, including undiscovered, and never greyed out.
-     Given its own contrasting, clearly-bordered callout box on purpose: a heavier lock
-     treatment above (dashed grey border, bigger padlock glyph) makes THIS block easy to read
-     as "part of the lock" if it isn't visually set apart, so it gets a distinct fill, a solid
-     (non-dashed) border, and its own small "always open" badge rather than blending into the
-     card chrome around it. */
-  .open-real-feature {
+  /* The feature gate: the block that states, on every card, whether the REAL application
+     feature behind this tool is switched on or off right now.
+
+     It keeps its own clearly bordered callout box for the same reason it always had one — a
+     heavier lock treatment above (dashed grey border, bigger padlock glyph) makes this block
+     easy to misread as "part of the lock" if it isn't visually set apart — but it now carries
+     the opposite message. Locked cards show a "locked until owned" badge and a DISABLED
+     action; only an owned tool shows the enabled "Open feature" action.
+
+     The two variants are deliberately different in border colour, badge glyph, badge wording
+     and button state, so the gate never depends on colour alone to tell the two apart. */
+  .feature-gate {
     display: flex; flex-direction: column; gap: 8px;
-    border: var(--border-thick) solid var(--spark-ring);
+    border: var(--border-thick) solid var(--md-outline);
     border-radius: var(--shape-sm);
     background: var(--md-surface);
     padding: 10px 12px;
     margin-top: auto;
   }
-  .open-real-feature .badge-row { display: flex; align-items: center; gap: 6px; font-size: 11px; font-weight: 800; color: var(--spark-ring); text-transform: uppercase; letter-spacing: 0.3px; }
-  .open-real-feature .note { font-size: 11.5px; color: var(--md-on-surface-variant); line-height: 1.45; }
-  .open-real-feature button {
+  .feature-gate.owned { border-color: var(--spark-ring); }
+  .feature-gate .badge-row { display: flex; align-items: center; gap: 6px; font-size: 11px; font-weight: 800; color: var(--md-on-surface-variant); text-transform: uppercase; letter-spacing: 0.3px; }
+  .feature-gate.owned .badge-row { color: var(--spark-ring); }
+  .feature-gate .note { font-size: 11.5px; color: var(--md-on-surface-variant); line-height: 1.45; }
+  .feature-gate button {
     font: inherit; font-weight: 800; font-size: 12.5px; min-height: 40px; padding: 0 14px;
     border-radius: var(--shape-full); border: var(--border-thick) solid var(--md-primary); background: var(--md-surface); color: var(--md-primary);
     cursor: pointer; white-space: nowrap; align-self: flex-start;
   }
-  [data-scheme="dark"] .open-real-feature button { color: var(--md-primary); border-color: var(--md-primary); }
-  .open-real-feature button:focus-visible { outline: 3px solid var(--md-primary); outline-offset: 2px; }
-  .tool-card.undiscovered .open-real-feature,
-  .tool-card.undiscovered .open-real-feature button,
-  .tool-card.undiscovered .open-real-feature .note,
-  .tool-card.undiscovered .open-real-feature .badge-row { filter: none; opacity: 1; }
+  [data-scheme="dark"] .feature-gate button { color: var(--md-primary); border-color: var(--md-primary); }
+  .feature-gate button:focus-visible { outline: 3px solid var(--md-primary); outline-offset: 2px; }
+  /* A disabled gate action stays readable rather than fading away: a player must be able to
+     read what is locked and why, not just notice that something is greyed. Both schemes clear
+     AA against their own fill. */
+  .feature-gate button[disabled] {
+    background: var(--md-surface-variant); color: var(--md-on-surface-variant);
+    border-color: var(--md-outline); cursor: not-allowed;
+  }
 </style>
 </head>
 <body data-scheme="light">

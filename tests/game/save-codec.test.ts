@@ -57,6 +57,21 @@ describe("decodeSave", () => {
     }
   });
 
+  it("migrates a genuine version-1 save (no purchasedToolIds on disk) into a valid version-2 state", () => {
+    const state = freshState({});
+    const v1Payload = { ...encodeSave(state), schemaVersion: 1 as const };
+    // A real v1 payload never had this field; drop it to prove the migration supplies it.
+    const { purchasedToolIds: _dropped, ...v1WithoutPurchasedTools } = v1Payload as typeof v1Payload & {
+      purchasedToolIds: readonly string[];
+    };
+    const result = decodeSave(v1WithoutPurchasedTools);
+    expect(result.ok).toBe(true);
+    if (result.ok) {
+      expect(result.state.schemaVersion).toBe(SAVE_SCHEMA_VERSION);
+      expect(result.state.purchasedToolIds).toEqual([]);
+    }
+  });
+
   it("reports 'future-version' (never guessing a downgrade) for a save from a newer app build", () => {
     const state = freshState({});
     const encoded = { ...encodeSave(state), schemaVersion: SAVE_SCHEMA_VERSION + 1 };

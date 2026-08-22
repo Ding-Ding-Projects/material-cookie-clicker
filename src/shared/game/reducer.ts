@@ -1,4 +1,5 @@
 import { bnAdd, bnClampNonNegative, bnCompare, bnFromNumber, bnMulScalar, bnSub, type BigNum } from "./big-number.js";
+import { totalCps } from "./cps.js";
 import { evaluateAchievements } from "./achievements.js";
 import {
   catchGoldenCookie,
@@ -86,6 +87,8 @@ import { canPrestige, performPrestige } from "./prestige.js";
 import { canBuyRebornNode, getRebornNodeDefinition, rebornPermanentSlots } from "./reborn.js";
 import { toolPrice } from "./tool-shop.js";
 import { isToolBonusActive, isToolDiscovered, totalBuyMaxDiscount } from "./tools.js";
+import { toolPrice } from "./tool-shop.js";
+import { isToolBonusActive, totalBuyMaxDiscount } from "./tools.js";
 import { computeMultipliers, getUpgradeDefinition, isUpgradeUnlocked } from "./upgrades.js";
 import type { GameState, RngPort } from "./types.js";
 import {
@@ -187,6 +190,7 @@ export type GameAction =
    * plate with the price on it.
    */
   | { readonly type: "buyControlUnlock"; readonly rungId: string }
+  | { readonly type: "setToolProgression"; readonly enabled: boolean }
   | { readonly type: "tick"; readonly elapsedMs: number }
   /**
    * CATCHING the golden-cookie sprite where it spawned on the stage. Opens the Oven Dial; it
@@ -603,6 +607,19 @@ function handleStartHomeConstruction(state: GameState, ctx: ReducerCtx, roomId: 
       build: { roomId, elapsedMs: 0, requiredMs },
       cookiesInvested: bnAdd(state.homeConstruction.cookiesInvested, cost),
     },
+ * Buys a tool's bonus early with cookies, skipping its unlock condition (tool-shop.ts). A
+ * no-op when the bonus is already active (purchased or naturally unlocked) or unaffordable —
+ * mirrors handleBuyUpgrade's refuse-silently shape rather than throwing.
+ */
+function handleBuyTool(state: GameState, ctx: ReducerCtx, toolId: string): GameState {
+  if (isToolBonusActive(state, toolId)) return state;
+  const price = toolPrice(toolId);
+  if (bnCompare(state.cookies, price) < 0) return state;
+
+  const nextState: GameState = {
+    ...state,
+    cookies: bnClampNonNegative(bnSub(state.cookies, price)),
+    purchasedToolIds: [...state.purchasedToolIds, toolId],
   };
 
   return withAchievements(nextState, nowIso(ctx));
@@ -678,6 +695,9 @@ function shuffle<T>(items: readonly T[], rng: RngPort): T[] {
     [next[index], next[swap]] = [next[swap], next[index]];
   }
   return next;
+function handleSetToolProgression(state: GameState, enabled: boolean): GameState {
+  if (state.toolProgressionEnabled === enabled) return state;
+  return { ...state, toolProgressionEnabled: enabled };
 }
 
 function initialMinigameData(id: MinigameId, rng: RngPort): MinigameData {
@@ -932,6 +952,14 @@ function handleTick(state: GameState, ctx: ReducerCtx, elapsedMs: number): GameS
   // SECOND plate prints the same call: the readout and the accrual are the same arithmetic, not
   // two copies of it that drift.
   const gained = bnMulScalar(effectiveCps(state, nowMs), elapsedMs / 1000);
+  const cps = totalCps(state);
+  const effect = state.goldenCookie.activeEffect;
+  const cpsWithEffect =
+    effect?.kind === "frenzy" && effect.multiplier !== undefined && isEffectActive(effect, nowMs)
+      ? bnMulScalar(cps, effect.multiplier)
+      : cps;
+
+  const gained = bnMulScalar(cpsWithEffect, elapsedMs / 1000);
   let nextState = addCookies(state, gained);
 
   let goldenCookie = despawnIfExpired(nextState.goldenCookie, nowMs, ctx.rng, config);
@@ -1345,6 +1373,13 @@ export function applyGameAction(state: GameState, action: GameAction, ctx: Reduc
     // actually produced, so a refused purchase is refunded nothing.
     case "buyControlUnlock":
       return withMarketDayRebate(state, handleBuyControlUnlock(state, ctx, action.rungId), ctx);
+      return handleBuyGeneratorBulk(state, ctx, action.generatorId, action.quantity);
+    case "buyUpgrade":
+      return handleBuyUpgrade(state, ctx, action.upgradeId);
+    case "buyTool":
+      return handleBuyTool(state, ctx, action.toolId);
+    case "setToolProgression":
+      return handleSetToolProgression(state, action.enabled);
     case "tick":
       return handleTick(state, ctx, action.elapsedMs);
     case "goldenCatch":
@@ -1399,6 +1434,7 @@ export function createInitialGameState(nowIsoString: string): GameState {
   const zero = bnFromNumber(0);
   return {
     schemaVersion: 9,
+    schemaVersion: 2,
     cookies: zero,
     lifetimeCookies: zero,
     baseClickValue: bnFromNumber(1),
@@ -1406,6 +1442,7 @@ export function createInitialGameState(nowIsoString: string): GameState {
     upgrades: [],
     achievements: [],
     prestige: { ascensionPoints: 0, totalPrestigeCount: 0, permanentUnlockIds: [], rebornNodeIds: [] },
+    prestige: { ascensionPoints: 0, totalPrestigeCount: 0, permanentUnlockIds: [] },
     goldenCookie: { isSpawned: false, rngStreamIndex: 0, nextEligibleAtEpochMs: 0 },
     randomEvents: createInitialRandomEventsState(),
     stats: { totalClicks: 0, totalCookiesBaked: zero, clockAnomalyCount: 0 },
